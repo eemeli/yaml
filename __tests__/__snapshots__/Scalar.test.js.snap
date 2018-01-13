@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parse "quoted" at end 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 7,
+    "start": 0,
+  },
+  "src": "\\"value\\"",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 7,
+    "start": 0,
+  },
+}
+`;
