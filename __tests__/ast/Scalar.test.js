@@ -17,7 +17,7 @@ describe('internals', () => {
   })
 })
 
-const testScalarParse = ({ pre, post, str, comment, expected }) => {
+const testScalarParse = ({ pre, post, str, comment, expected, inFlow }) => {
   let body = str
   if (comment) {
     const lines = body.split('\n')
@@ -26,7 +26,7 @@ const testScalarParse = ({ pre, post, str, comment, expected }) => {
   }
   const scalar = new Scalar(pre + body + post)
   const indent = scalar.endIndent(0)
-  const end = scalar.parse(pre.length, indent, false)
+  const end = scalar.parse(pre.length, indent, inFlow || false)
   const expectedEnd = scalar.endWhiteSpace(pre.length + body.length)
   expect(scalar.rawValue).toBe(expected || str)
   expect(end).toBe(expectedEnd)
@@ -40,7 +40,7 @@ const commonTests = {
   'complex mapping key': { pre: '? ', post: ' : ' },
   'seq value': { pre: '- ', post: '\n- ' },
   'indented block': { pre: '    - ', post: '\n  x' },
-  'flow seq value': { pre: '[ ', post: ' ]' },
+  'flow seq value': { pre: '[ ', post: ' ]', inFlow: true },
   'with comment': { pre: '\n  ', comment: 'comment # here!', post: '\n' }
 }
 
@@ -82,4 +82,13 @@ describe("parse >block", () => {
     test(name, () => testScalarParse(props))
   }
   test('literal with header', () => testScalarParse({ pre: '\n- ', str: `|+2\n${block}`, expected: block, post: '\n' }))
+})
+
+describe("parse single-line plain", () => {
+  for (const name in commonTests) {
+    const props = Object.assign({ str: 'plain value' }, commonTests[name])
+    test(name, () => testScalarParse(props))
+  }
+  test('escaped', () => testScalarParse({ pre: '', str: '-#:] ,', post: ': ' }))
+  test('escaped in flow', () => testScalarParse({ pre: '', str: '-#:', post: '] ,: ', inFlow: true }))
 })

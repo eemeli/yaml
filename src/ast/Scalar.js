@@ -43,20 +43,29 @@ export default class Scalar extends Node {
     return offset + 1
   }
 
-  endPlainLine (offset, first, inFlow) {
-    let ch = this.src[offset]
+  endPlainLine (start, first, inFlow) {
+    let ch = this.src[start]
     if (first) {
-      if (ch === '#' || ch === '\n') return offset
+      if (ch === '#' || ch === '\n') return start
       if (ch === ':' || ch === '?' || ch === '-') {
-        const next = this.src[offset + 1]
-        if (next === '\n' || next === '\t' || next === ' ') return offset
+        const next = this.src[start + 1]
+        if (next === '\n' || next === '\t' || next === ' ') return start
       }
     }
+    let offset = start
     while (ch && ch !== '\n') {
       if (inFlow && (ch === '[' || ch === ']' || ch === '{' || ch === '}' || ch === ',')) break
       const next = this.src[offset + 1]
       if (ch === ':' && (next === ' ' || next === '\t')) break
       if ((ch === ' ' || ch === '\t') && next === '#') break
+      offset += 1
+      ch = next
+    }
+    // last char can't be whitespace
+    ch = this.src[offset - 1]
+    while (offset > start && (ch === ' ' || ch === '\t')) {
+      offset -= 1
+      ch = this.src[offset - 1]
     }
     return offset
   }
@@ -128,7 +137,11 @@ export default class Scalar extends Node {
         if (end === null) break
         offset = endLine(end)
       }
-      this.valueRange = new Range(start, offset)
+      if (this.type === Scalar.Type.PLAIN && !this.valueRange.isEmpty) {
+        if (offset > start) this.valueRange.end = offset
+      } else {
+        this.valueRange = new Range(start, offset)
+      }
       LOG && console.log('block', { type: this.type, style: this.blockStyle, range: this.valueRange, value: this.rawValue })
     }
     return offset

@@ -742,3 +742,183 @@ Scalar {
   },
 }
 `;
+
+exports[`parse single-line plain bare 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 11,
+    "start": 0,
+  },
+  "src": "plain value",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 11,
+    "start": 0,
+  },
+}
+`;
+
+exports[`parse single-line plain complex mapping key 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 14,
+    "start": 2,
+  },
+  "src": "? plain value : ",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 13,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse single-line plain escaped 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 6,
+    "start": 0,
+  },
+  "src": "-#:] ,: ",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 6,
+    "start": 0,
+  },
+}
+`;
+
+exports[`parse single-line plain escaped in flow 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 3,
+    "start": 0,
+  },
+  "src": "-#:] ,: ",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 3,
+    "start": 0,
+  },
+}
+`;
+
+exports[`parse single-line plain flow seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 14,
+    "start": 2,
+  },
+  "src": "[ plain value ]",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 13,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse single-line plain indented block 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 17,
+    "start": 6,
+  },
+  "src": "    - plain value
+  x",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 17,
+    "start": 6,
+  },
+}
+`;
+
+exports[`parse single-line plain newline before & after 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 12,
+    "start": 1,
+  },
+  "src": "
+plain value
+",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 12,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse single-line plain seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 13,
+    "start": 2,
+  },
+  "src": "- plain value
+- ",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 13,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse single-line plain with comment 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 31,
+    "start": 16,
+  },
+  "nodeRange": Range {
+    "end": 31,
+    "start": 3,
+  },
+  "src": "
+  plain value #comment # here!
+",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 14,
+    "start": 3,
+  },
+}
+`;
