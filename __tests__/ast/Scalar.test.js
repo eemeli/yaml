@@ -21,8 +21,8 @@ const testScalarParse = (pre, str, post) => {
   const scalar = new Scalar(pre + str + post)
   const indent = scalar.endIndent(0).length
   const end = scalar.parse(pre.length, indent, false)
-  expect(end).toBe(pre.length + str.length)
   expect(scalar.rawValue).toBe(str)
+  expect(end).toBe(pre.length + str.length)
   expect(scalar).toMatchSnapshot()
 }
 
@@ -50,4 +50,5 @@ describe("parse 'quoted'", () => {
     test(name, () => testScalarParse(pre, "'value'", post))
   }
   test('multi-line', () => testScalarParse('\n', "'value\nwith\nmore lines'", '\n'))
+  test('escaped', () => testScalarParse('\n', "'value\nwith ''more'' lines'''", '\n'))
 })

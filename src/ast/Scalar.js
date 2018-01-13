@@ -32,7 +32,7 @@ export default class Scalar extends Node {
 
   endSingleQuote (offset) {
     let ch = this.src[offset]
-    while (ch && ch !== "'") {
+    while (ch) {
       if (ch === "'") {
         if (this.src[offset + 1] !== "'") break
         ch = this.src[offset += 2]

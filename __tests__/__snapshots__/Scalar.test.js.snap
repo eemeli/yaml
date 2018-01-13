@@ -201,6 +201,28 @@ Scalar {
 }
 `;
 
+exports[`parse 'quoted' escaped 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 30,
+    "start": 1,
+  },
+  "src": "
+'value
+with ''more'' lines'''
+",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 30,
+    "start": 1,
+  },
+}
+`;
+
 exports[`parse 'quoted' flow seq value 1`] = `
 Scalar {
   "anchor": null,
