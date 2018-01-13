@@ -20,6 +20,12 @@ export default class Node {
     this.tag = null
   }
 
+  get comment () {
+    if (!this.src || !this.commentRange) return null
+    const { start, end } = this.commentRange
+    return this.src.slice(start, end)
+  }
+
   get rawValue () {
     if (!this.src || !this.valueRange) return null
     const { start, end } = this.valueRange
@@ -34,7 +40,7 @@ export default class Node {
 
   endLine (offset) {
     let ch = this.src[offset]
-    while (ch && ch === '\n') ch = this.src[offset += 1]
+    while (ch && ch !== '\n') ch = this.src[offset += 1]
     return offset
   }
 
@@ -46,8 +52,10 @@ export default class Node {
 
   parseComment (offset) {
     if (this.src[offset] === '#') {
-      this.commentRange = new Range(offset + 1, this.endLine(offset))
-      return this.commentRange.end
+      const start = offset + 1
+      const end = this.endLine(start)
+      this.commentRange = new Range(start, end)
+      return end
     }
     return offset
   }

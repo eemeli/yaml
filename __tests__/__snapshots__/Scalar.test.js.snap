@@ -163,6 +163,30 @@ Scalar {
 }
 `;
 
+exports[`parse "quoted" with comment 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 27,
+    "start": 12,
+  },
+  "nodeRange": Range {
+    "end": 27,
+    "start": 3,
+  },
+  "src": "
+  \\"value\\" #comment # here!
+",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 10,
+    "start": 3,
+  },
+}
+`;
+
 exports[`parse "quoted" without spaces 1`] = `
 Scalar {
   "anchor": null,
@@ -345,6 +369,30 @@ Scalar {
 }
 `;
 
+exports[`parse 'quoted' with comment 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 27,
+    "start": 12,
+  },
+  "nodeRange": Range {
+    "end": 27,
+    "start": 3,
+  },
+  "src": "
+  'value' #comment # here!
+",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 10,
+    "start": 3,
+  },
+}
+`;
+
 exports[`parse 'quoted' without spaces 1`] = `
 Scalar {
   "anchor": null,
@@ -478,6 +526,30 @@ Scalar {
   "valueRange": Range {
     "end": 8,
     "start": 3,
+  },
+}
+`;
+
+exports[`parse *alias with comment 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 26,
+    "start": 11,
+  },
+  "nodeRange": Range {
+    "end": 26,
+    "start": 3,
+  },
+  "src": "
+  *alias #comment # here!
+",
+  "tag": null,
+  "type": "ALIAS",
+  "valueRange": Range {
+    "end": 9,
+    "start": 4,
   },
 }
 `;

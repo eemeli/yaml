@@ -17,13 +17,15 @@ describe('internals', () => {
   })
 })
 
-const testScalarParse = (pre, str, post, expected) => {
-  const scalar = new Scalar(pre + str + post)
+const testScalarParse = ({ pre, post, str, comment, expected }) => {
+  const scalar = new Scalar(pre + str + (comment ? ` #${comment}` : '') + post)
   const indent = scalar.endIndent(0).length
   const end = scalar.parse(pre.length, indent, false)
-  const expectedEnd = scalar.endWhiteSpace(pre.length + str.length)
+  let expectedEnd = pre.length + str.length
+  expectedEnd = comment ? scalar.endLine(expectedEnd) : scalar.endWhiteSpace(expectedEnd)
   expect(scalar.rawValue).toBe(expected || str)
   expect(end).toBe(expectedEnd)
+  if (comment) expect(scalar.comment).toBe(comment)
   expect(scalar).toMatchSnapshot()
 }
 
@@ -33,32 +35,33 @@ const commonTests = {
   'complex mapping key': { pre: '? ', post: ' : ' },
   'seq value': { pre: '- ', post: '\n- ' },
   'indented block': { pre: '    - ', post: '\n  x' },
-  'flow seq value': { pre: '[ ', post: ' ]' }
+  'flow seq value': { pre: '[ ', post: ' ]' },
+  'with comment': { pre: '\n  ', comment: 'comment # here!', post: '\n' }
 }
 
 describe('parse "quoted"', () => {
   for (const name in commonTests) {
-    const { pre, post } = commonTests[name]
-    test(name, () => testScalarParse(pre, '"value"', post))
+    const props = Object.assign({ str: '"value"' }, commonTests[name])
+    test(name, () => testScalarParse(props))
   }
-  test('without spaces', () => testScalarParse('{', '"value"', ','))
-  test('multi-line', () => testScalarParse('\n', '"value\nwith\nmore lines"', '\n'))
-  test('escaped', () => testScalarParse('\n', '"value\\\\\nwith \\"more\\" lines\\""', '\n'))
+  test('without spaces', () => testScalarParse({ pre: '{', str: '"value"', post: ',' }))
+  test('multi-line', () => testScalarParse({ pre: '\n', str: '"value\nwith\nmore lines"', post: '\n' }))
+  test('escaped', () => testScalarParse({ pre: '\n', str: '"value\\\\\nwith \\"more\\" lines\\""', post: '\n' }))
 })
 
 describe("parse 'quoted'", () => {
   for (const name in commonTests) {
-    const { pre, post } = commonTests[name]
-    test(name, () => testScalarParse(pre, "'value'", post))
+    const props = Object.assign({ str: "'value'" }, commonTests[name])
+    test(name, () => testScalarParse(props))
   }
-  test('without spaces', () => testScalarParse('{', "'value'", ','))
-  test('multi-line', () => testScalarParse('\n', "'value\nwith\nmore lines'", '\n'))
-  test('escaped', () => testScalarParse('\n', "'value\nwith ''more'' lines'''", '\n'))
+  test('without spaces', () => testScalarParse({ pre: '{', str: "'value'", post: ',' }))
+  test('multi-line', () => testScalarParse({ pre: '\n', str: "'value\nwith\nmore lines'", post: '\n' }))
+  test('escaped', () => testScalarParse({ pre: '\n', str: "'value\nwith ''more'' lines'''", post: '\n' }))
 })
 
 describe("parse *alias", () => {
   for (const name in commonTests) {
-    const { pre, post } = commonTests[name]
-    test(name, () => testScalarParse(pre, '*alias', post, 'alias'))
+    const props = Object.assign({ str: '*alias', expected: 'alias' }, commonTests[name])
+    test(name, () => testScalarParse(props))
   }
 })
