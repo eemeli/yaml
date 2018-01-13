@@ -98,3 +98,19 @@ describe("parse single-line plain", () => {
   test('escaped in flow', () => testScalarParse({ pre: '', str: '-#:', post: '] ,: ', inFlow: true }))
   test('empty', () => testScalarParse({ pre: '- ', str: '', post: ' : ' }))
 })
+
+describe("parse multi-line plain", () => {
+  const str = ':first#\n      ? :multi line\n  \n      \tplain value'
+  for (const name in commonTests) {
+    const props = Object.assign({ str }, commonTests[name])
+    if (props.comment) {
+      props.str = props.str.replace(/^.*/, '')
+      props.expected = props.str.replace(/^\n/, '')
+    }
+    if (props.post && props.post[0] !== '\n') {
+      props.pre = `  ${props.pre}`
+      props.post = props.post.replace(/^\s?/, '\n')
+    }
+    test(name, () => testScalarParse(props))
+  }
+})

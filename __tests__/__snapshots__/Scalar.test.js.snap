@@ -826,6 +826,194 @@ Scalar {
 }
 `;
 
+exports[`parse multi-line plain bare 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 49,
+    "start": 0,
+  },
+  "src": ":first#
+      ? :multi line
+  
+      	plain value",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 49,
+    "start": 0,
+  },
+}
+`;
+
+exports[`parse multi-line plain complex mapping key 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 53,
+    "start": 4,
+  },
+  "src": "  ? :first#
+      ? :multi line
+  
+      	plain value
+: ",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 53,
+    "start": 4,
+  },
+}
+`;
+
+exports[`parse multi-line plain flow seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 53,
+    "start": 4,
+  },
+  "src": "  [ :first#
+      ? :multi line
+  
+      	plain value
+]",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 53,
+    "start": 4,
+  },
+}
+`;
+
+exports[`parse multi-line plain indented block 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 55,
+    "start": 6,
+  },
+  "src": "    - :first#
+      ? :multi line
+  
+      	plain value
+  x",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 55,
+    "start": 6,
+  },
+}
+`;
+
+exports[`parse multi-line plain newline before & after 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 50,
+    "start": 1,
+  },
+  "src": "
+:first#
+      ? :multi line
+  
+      	plain value
+",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 50,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse multi-line plain seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 51,
+    "start": 2,
+  },
+  "src": "- :first#
+      ? :multi line
+  
+      	plain value
+- ",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 51,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse multi-line plain with comment 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 20,
+    "start": 5,
+  },
+  "nodeRange": Range {
+    "end": 62,
+    "start": 3,
+  },
+  "src": "
+   #comment # here!
+      ? :multi line
+  
+      	plain value
+",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 62,
+    "start": 21,
+  },
+}
+`;
+
+exports[`parse multi-line plain with props 1`] = `
+Scalar {
+  "anchor": "anchor",
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 65,
+    "start": 2,
+  },
+  "src": "- !tag! &anchor :first#
+      ? :multi line
+  
+      	plain value
+- ",
+  "tag": "tag!",
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 65,
+    "start": 16,
+  },
+}
+`;
+
 exports[`parse single-line plain bare 1`] = `
 Scalar {
   "anchor": null,
