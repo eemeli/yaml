@@ -42,9 +42,15 @@ export default class Node {
     return this.src.slice(start, end)
   }
 
+  endIdentifier (offset) {
+    let ch = this.src[offset]
+    while (ch && ch !== '\n' && ch !== '\t' && ch !== ' ') ch = this.src[offset += 1]
+    return offset
+  }
+
   endIndent (offset) {
     let ch = this.src[offset]
-    while (ch && ch === ' ') ch = this.src[offset += 1]
+    while (ch === ' ') ch = this.src[offset += 1]
     return offset
   }
 
@@ -56,7 +62,7 @@ export default class Node {
 
   endWhiteSpace (offset) {
     let ch = this.src[offset]
-    while (ch && (ch === '\t' || ch === ' ')) ch = this.src[offset += 1]
+    while (ch === '\t' || ch === ' ') ch = this.src[offset += 1]
     return offset
   }
 

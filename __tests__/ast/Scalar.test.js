@@ -1,22 +1,5 @@
 import Scalar from '../../src/ast/Scalar'
 
-describe('internals', () => {
-  test('constructor', () => {
-    const src = 'src'
-    const s = new Scalar(src)
-    expect(s.src).toBe(src)
-  })
-  test('endIndent', () => {
-    const src = '  - value\n- other\n'
-    const s = new Scalar(src)
-    const in1 = s.endIndent(0)
-    expect(in1).toBe(2)
-    const offset = src.indexOf('\n') + 1
-    const in2 = s.endIndent(offset)
-    expect(in2).toBe(offset)
-  })
-})
-
 const testScalarParse = ({ pre, post, str, comment, expected, inFlow, startIdx, test: customTest }) => {
   let body = str
   if (comment) {

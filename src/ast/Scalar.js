@@ -15,12 +15,6 @@ export default class Scalar extends Node {
     this.blockStyle = null
   }
 
-  endIdentifier (offset) {
-    let ch = this.src[offset]
-    while (ch && ch !== '\n' && ch !== '\t' && ch !== ' ') ch = this.src[offset += 1]
-    return offset
-  }
-
   endDoubleQuote (offset) {
     let ch = this.src[offset]
     while (ch && ch !== '"') {
