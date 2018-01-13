@@ -44,17 +44,17 @@ Scalar {
   "blockStyle": null,
   "commentRange": null,
   "nodeRange": Range {
-    "end": 32,
+    "end": 34,
     "start": 1,
   },
   "src": "
-\\"value\\\\\\\\
+\\" #value\\\\\\\\
 with \\\\\\"more\\\\\\" lines\\\\\\"\\"
 ",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
-    "end": 32,
+    "end": 34,
     "start": 1,
   },
 }
@@ -250,17 +250,17 @@ Scalar {
   "blockStyle": null,
   "commentRange": null,
   "nodeRange": Range {
-    "end": 30,
+    "end": 32,
     "start": 1,
   },
   "src": "
-'value
+' #value
 with ''more'' lines'''
 ",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
-    "end": 30,
+    "end": 32,
     "start": 1,
   },
 }
@@ -550,6 +550,195 @@ Scalar {
   "valueRange": Range {
     "end": 9,
     "start": 4,
+  },
+}
+`;
+
+exports[`parse >block bare 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": ">",
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 34,
+    "start": 0,
+  },
+  "src": ">
+      #multiline
+  
+      	block",
+  "tag": null,
+  "type": "BLOCK",
+  "valueRange": Range {
+    "end": 34,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse >block complex mapping key 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": ">",
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 38,
+    "start": 4,
+  },
+  "src": "  ? >
+      #multiline
+  
+      	block
+: ",
+  "tag": null,
+  "type": "BLOCK",
+  "valueRange": Range {
+    "end": 38,
+    "start": 6,
+  },
+}
+`;
+
+exports[`parse >block flow seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": ">",
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 38,
+    "start": 4,
+  },
+  "src": "  [ >
+      #multiline
+  
+      	block
+]",
+  "tag": null,
+  "type": "BLOCK",
+  "valueRange": Range {
+    "end": 38,
+    "start": 6,
+  },
+}
+`;
+
+exports[`parse >block indented block 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": ">",
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 40,
+    "start": 6,
+  },
+  "src": "    - >
+      #multiline
+  
+      	block
+  x",
+  "tag": null,
+  "type": "BLOCK",
+  "valueRange": Range {
+    "end": 40,
+    "start": 8,
+  },
+}
+`;
+
+exports[`parse >block literal with header 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": "|+2",
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 39,
+    "start": 3,
+  },
+  "src": "
+- |+2
+      #multiline
+  
+      	block
+",
+  "tag": null,
+  "type": "BLOCK",
+  "valueRange": Range {
+    "end": 39,
+    "start": 7,
+  },
+}
+`;
+
+exports[`parse >block newline before & after 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": ">",
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 35,
+    "start": 1,
+  },
+  "src": "
+>
+      #multiline
+  
+      	block
+",
+  "tag": null,
+  "type": "BLOCK",
+  "valueRange": Range {
+    "end": 35,
+    "start": 3,
+  },
+}
+`;
+
+exports[`parse >block seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": ">",
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 36,
+    "start": 2,
+  },
+  "src": "- >
+      #multiline
+  
+      	block
+- ",
+  "tag": null,
+  "type": "BLOCK",
+  "valueRange": Range {
+    "end": 36,
+    "start": 4,
+  },
+}
+`;
+
+exports[`parse >block with comment 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": ">",
+  "commentRange": Range {
+    "end": 21,
+    "start": 6,
+  },
+  "nodeRange": Range {
+    "end": 54,
+    "start": 3,
+  },
+  "src": "
+  > #comment # here!
+      #multiline
+  
+      	block
+",
+  "tag": null,
+  "type": "BLOCK",
+  "valueRange": Range {
+    "end": 54,
+    "start": 22,
   },
 }
 `;

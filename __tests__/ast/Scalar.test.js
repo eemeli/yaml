@@ -18,11 +18,16 @@ describe('internals', () => {
 })
 
 const testScalarParse = ({ pre, post, str, comment, expected }) => {
-  const scalar = new Scalar(pre + str + (comment ? ` #${comment}` : '') + post)
-  const indent = scalar.endIndent(0).length
+  let body = str
+  if (comment) {
+    const lines = body.split('\n')
+    lines[0] += ` #${comment}`
+    body = lines.join('\n')
+  }
+  const scalar = new Scalar(pre + body + post)
+  const indent = scalar.endIndent(0)
   const end = scalar.parse(pre.length, indent, false)
-  let expectedEnd = pre.length + str.length
-  expectedEnd = comment ? scalar.endLine(expectedEnd) : scalar.endWhiteSpace(expectedEnd)
+  const expectedEnd = scalar.endWhiteSpace(pre.length + body.length)
   expect(scalar.rawValue).toBe(expected || str)
   expect(end).toBe(expectedEnd)
   if (comment) expect(scalar.comment).toBe(comment)
@@ -46,7 +51,7 @@ describe('parse "quoted"', () => {
   }
   test('without spaces', () => testScalarParse({ pre: '{', str: '"value"', post: ',' }))
   test('multi-line', () => testScalarParse({ pre: '\n', str: '"value\nwith\nmore lines"', post: '\n' }))
-  test('escaped', () => testScalarParse({ pre: '\n', str: '"value\\\\\nwith \\"more\\" lines\\""', post: '\n' }))
+  test('escaped', () => testScalarParse({ pre: '\n', str: '" #value\\\\\nwith \\"more\\" lines\\""', post: '\n' }))
 })
 
 describe("parse 'quoted'", () => {
@@ -56,7 +61,7 @@ describe("parse 'quoted'", () => {
   }
   test('without spaces', () => testScalarParse({ pre: '{', str: "'value'", post: ',' }))
   test('multi-line', () => testScalarParse({ pre: '\n', str: "'value\nwith\nmore lines'", post: '\n' }))
-  test('escaped', () => testScalarParse({ pre: '\n', str: "'value\nwith ''more'' lines'''", post: '\n' }))
+  test('escaped', () => testScalarParse({ pre: '\n', str: "' #value\nwith ''more'' lines'''", post: '\n' }))
 })
 
 describe("parse *alias", () => {
@@ -64,4 +69,17 @@ describe("parse *alias", () => {
     const props = Object.assign({ str: '*alias', expected: 'alias' }, commonTests[name])
     test(name, () => testScalarParse(props))
   }
+})
+
+describe("parse >block", () => {
+  const block = '      #multiline\n  \n      \tblock'
+  for (const name in commonTests) {
+    const props = Object.assign({ str: `>\n${block}`, expected: block }, commonTests[name])
+    if (props.post && props.post[0] !== '\n') {
+      props.pre = `  ${props.pre}`
+      props.post = props.post.replace(/^\s?/, '\n')
+    }
+    test(name, () => testScalarParse(props))
+  }
+  test('literal with header', () => testScalarParse({ pre: '\n- ', str: `|+2\n${block}`, expected: block, post: '\n' }))
 })

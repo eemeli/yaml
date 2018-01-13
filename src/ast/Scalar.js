@@ -61,12 +61,19 @@ export default class Scalar extends Node {
     return offset
   }
 
+  endBlockStyle (offset) {
+    const valid = ['-', '+', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    let ch = this.src[offset]
+    while (valid.indexOf(ch) !== -1) ch = this.src[offset += 1]
+    return offset
+  }
+
   endBlockIndent (indent, offset) {
     const inEnd = this.endIndent(offset)
     if (inEnd > offset + indent) {
       return inEnd
     } else {
-      const wsEnd = this.endWhiteSpace(indentEnd)
+      const wsEnd = this.endWhiteSpace(inEnd)
       if (this.src[wsEnd] === '\n') {
         return wsEnd
       }
@@ -94,7 +101,7 @@ export default class Scalar extends Node {
       case '|':
       case '>':
         this.type = Scalar.Type.BLOCK
-        end = this.endIdentifier(offset)
+        end = this.endBlockStyle(offset + 1)
         this.blockStyle = this.src.slice(offset, end)
         break
       default:
@@ -115,7 +122,7 @@ export default class Scalar extends Node {
       null
     )
     if (endLine) {
-      const start = offset
+      const start = offset + 1
       while (this.src[offset] === '\n') {
         const end = this.endBlockIndent(indent, offset + 1)
         if (end === null) break
