@@ -96,4 +96,5 @@ describe("parse single-line plain", () => {
   }
   test('escaped', () => testScalarParse({ pre: '', str: '-#:] ,', post: ': ' }))
   test('escaped in flow', () => testScalarParse({ pre: '', str: '-#:', post: '] ,: ', inFlow: true }))
+  test('empty', () => testScalarParse({ pre: '- ', str: '', post: ' : ' }))
 })

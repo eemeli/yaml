@@ -130,12 +130,14 @@ export default class Scalar extends Node {
     ) : (
       null
     )
-    if (endLine) {
+    let ch = this.src[offset]
+    if (endLine && ch === '\n') {
       const start = offset + 1
-      while (this.src[offset] === '\n') {
+      while (ch === '\n') {
         const end = this.endBlockIndent(indent, offset + 1)
         if (end === null) break
         offset = endLine(end)
+        ch = this.src[offset]
       }
       if (this.type === Scalar.Type.PLAIN && !this.valueRange.isEmpty) {
         if (offset > start) this.valueRange.end = offset

@@ -864,6 +864,25 @@ Scalar {
 }
 `;
 
+exports[`parse single-line plain empty 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 3,
+    "start": 2,
+  },
+  "src": "-  : ",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 2,
+    "start": 2,
+  },
+}
+`;
+
 exports[`parse single-line plain escaped 1`] = `
 Scalar {
   "anchor": null,
