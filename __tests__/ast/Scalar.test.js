@@ -17,7 +17,7 @@ describe('internals', () => {
   })
 })
 
-const testScalarParse = ({ pre, post, str, comment, expected, inFlow }) => {
+const testScalarParse = ({ pre, post, str, comment, expected, inFlow, startIdx, test: customTest }) => {
   let body = str
   if (comment) {
     const lines = body.split('\n')
@@ -26,11 +26,12 @@ const testScalarParse = ({ pre, post, str, comment, expected, inFlow }) => {
   }
   const scalar = new Scalar(pre + body + post)
   const indent = scalar.endIndent(0)
-  const end = scalar.parse(pre.length, indent, inFlow || false)
+  const end = scalar.parse(startIdx || pre.length, indent, inFlow || false)
   const expectedEnd = scalar.endWhiteSpace(pre.length + body.length)
   expect(scalar.rawValue).toBe(expected || str)
   expect(end).toBe(expectedEnd)
   if (comment) expect(scalar.comment).toBe(comment)
+  if (customTest) customTest(scalar)
   expect(scalar).toMatchSnapshot()
 }
 
@@ -41,7 +42,11 @@ const commonTests = {
   'seq value': { pre: '- ', post: '\n- ' },
   'indented block': { pre: '    - ', post: '\n  x' },
   'flow seq value': { pre: '[ ', post: ' ]', inFlow: true },
-  'with comment': { pre: '\n  ', comment: 'comment # here!', post: '\n' }
+  'with comment': { pre: '\n  ', comment: 'comment # here!', post: '\n' },
+  'with props': { pre: '- !tag! &anchor ', post: '\n- ', startIdx: 2, test: (scalar) => {
+    expect(scalar.anchor).toBe('anchor')
+    expect(scalar.tag).toBe('tag!')
+  } }
 }
 
 describe('parse "quoted"', () => {

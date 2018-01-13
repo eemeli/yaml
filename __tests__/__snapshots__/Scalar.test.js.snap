@@ -187,6 +187,26 @@ Scalar {
 }
 `;
 
+exports[`parse "quoted" with props 1`] = `
+Scalar {
+  "anchor": "anchor",
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 23,
+    "start": 2,
+  },
+  "src": "- !tag! &anchor \\"value\\"
+- ",
+  "tag": "tag!",
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 23,
+    "start": 16,
+  },
+}
+`;
+
 exports[`parse "quoted" without spaces 1`] = `
 Scalar {
   "anchor": null,
@@ -393,6 +413,26 @@ Scalar {
 }
 `;
 
+exports[`parse 'quoted' with props 1`] = `
+Scalar {
+  "anchor": "anchor",
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 23,
+    "start": 2,
+  },
+  "src": "- !tag! &anchor 'value'
+- ",
+  "tag": "tag!",
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 23,
+    "start": 16,
+  },
+}
+`;
+
 exports[`parse 'quoted' without spaces 1`] = `
 Scalar {
   "anchor": null,
@@ -550,6 +590,26 @@ Scalar {
   "valueRange": Range {
     "end": 9,
     "start": 4,
+  },
+}
+`;
+
+exports[`parse *alias with props 1`] = `
+Scalar {
+  "anchor": "anchor",
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 22,
+    "start": 2,
+  },
+  "src": "- !tag! &anchor *alias
+- ",
+  "tag": "tag!",
+  "type": "ALIAS",
+  "valueRange": Range {
+    "end": 22,
+    "start": 17,
   },
 }
 `;
@@ -743,6 +803,29 @@ Scalar {
 }
 `;
 
+exports[`parse >block with props 1`] = `
+Scalar {
+  "anchor": "anchor",
+  "blockStyle": ">",
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 50,
+    "start": 2,
+  },
+  "src": "- !tag! &anchor >
+      #multiline
+  
+      	block
+- ",
+  "tag": "tag!",
+  "type": "BLOCK",
+  "valueRange": Range {
+    "end": 50,
+    "start": 18,
+  },
+}
+`;
+
 exports[`parse single-line plain bare 1`] = `
 Scalar {
   "anchor": null,
@@ -919,6 +1002,26 @@ Scalar {
   "valueRange": Range {
     "end": 14,
     "start": 3,
+  },
+}
+`;
+
+exports[`parse single-line plain with props 1`] = `
+Scalar {
+  "anchor": "anchor",
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 27,
+    "start": 2,
+  },
+  "src": "- !tag! &anchor plain value
+- ",
+  "tag": "tag!",
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 27,
+    "start": 16,
   },
 }
 `;
