@@ -1,3 +1,5 @@
+export const LOG = false
+
 export class Range {
   constructor (start, end) {
     this.start = start
@@ -55,8 +57,10 @@ export default class Node {
       const start = offset + 1
       const end = this.endLine(start)
       this.commentRange = new Range(start, end)
+      LOG && console.log('comment', this.commentRange)
       return end
     }
+    LOG && console.log('comment skip')
     return offset
   }
 
@@ -68,6 +72,7 @@ export default class Node {
       this[prop] = this.src.slice(offset + 1, end)
       offset = this.endWhiteSpace(end)
       ch = this.src[offset]
+      LOG && console.log('props', { prop, value: this[prop], offset, ch })
     }
     return offset
   }

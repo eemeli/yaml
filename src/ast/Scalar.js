@@ -1,4 +1,4 @@
-import Node, { Range } from './Node'
+import Node, { LOG, Range } from './Node'
 
 export default class Scalar extends Node {
   static Type = {
@@ -102,6 +102,7 @@ export default class Scalar extends Node {
         end = this.endPlainLine(offset, true, inFlow)
     }
     this.valueRange = new Range(start, end)
+    LOG && console.log('value', { type: this.type, range: this.valueRange, value: this.rawValue })
     return this.endWhiteSpace(end)
   }
 
@@ -121,6 +122,7 @@ export default class Scalar extends Node {
         offset = endLine(end)
       }
       this.valueRange = new Range(start, offset)
+      LOG && console.log('block', { type: this.type, style: this.blockStyle, range: this.valueRange, value: this.rawValue })
     }
     return offset
   }
@@ -134,12 +136,14 @@ export default class Scalar extends Node {
    */
   parse (offset, indent, inFlow) {
     // offset = this.endWhiteSpace(offset)
+    LOG && console.log('parse start', JSON.stringify(this.src))
     const start = offset
     offset = this.parseProps(offset)
     offset = this.parseInlineValue(offset, inFlow)
     offset = this.parseComment(offset)
     offset = this.parseBlockValue(offset, indent, inFlow)
     this.nodeRange = new Range(start, offset)
+    LOG && console.log('parse end', this.nodeRange)
     return offset
   }
 }
