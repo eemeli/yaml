@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`parse "quoted" at end 1`] = `
+exports[`parse "quoted" bare 1`] = `
 Scalar {
   "anchor": null,
   "blockStyle": null,
@@ -15,6 +15,291 @@ Scalar {
   "valueRange": Range {
     "end": 7,
     "start": 0,
+  },
+}
+`;
+
+exports[`parse "quoted" complex mapping key 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 9,
+    "start": 2,
+  },
+  "src": "? \\"value\\": ",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 9,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse "quoted" escaped 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 32,
+    "start": 1,
+  },
+  "src": "
+\\"value\\\\\\\\
+with \\\\\\"more\\\\\\" lines\\\\\\"\\"
+",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 32,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse "quoted" flow seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+  "src": "[\\"value\\"]",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse "quoted" indented block 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 13,
+    "start": 6,
+  },
+  "src": "    - \\"value\\"
+  x",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 13,
+    "start": 6,
+  },
+}
+`;
+
+exports[`parse "quoted" multi-line 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 24,
+    "start": 1,
+  },
+  "src": "
+\\"value
+with
+more lines\\"
+",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 24,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse "quoted" newline before & after 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+  "src": "
+\\"value\\"
+",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse "quoted" seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 9,
+    "start": 2,
+  },
+  "src": "- \\"value\\"
+- ",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 9,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse 'quoted' bare 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 7,
+    "start": 0,
+  },
+  "src": "'value'",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 7,
+    "start": 0,
+  },
+}
+`;
+
+exports[`parse 'quoted' complex mapping key 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 9,
+    "start": 2,
+  },
+  "src": "? 'value': ",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 9,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse 'quoted' flow seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+  "src": "['value']",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse 'quoted' indented block 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 13,
+    "start": 6,
+  },
+  "src": "    - 'value'
+  x",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 13,
+    "start": 6,
+  },
+}
+`;
+
+exports[`parse 'quoted' multi-line 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 24,
+    "start": 1,
+  },
+  "src": "
+'value
+with
+more lines'
+",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 24,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse 'quoted' newline before & after 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+  "src": "
+'value'
+",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse 'quoted' seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 9,
+    "start": 2,
+  },
+  "src": "- 'value'
+- ",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 9,
+    "start": 2,
   },
 }
 `;
