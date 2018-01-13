@@ -25,10 +25,10 @@ Scalar {
   "blockStyle": null,
   "commentRange": null,
   "nodeRange": Range {
-    "end": 9,
+    "end": 10,
     "start": 2,
   },
-  "src": "? \\"value\\": ",
+  "src": "? \\"value\\" : ",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -66,15 +66,15 @@ Scalar {
   "blockStyle": null,
   "commentRange": null,
   "nodeRange": Range {
-    "end": 8,
-    "start": 1,
+    "end": 10,
+    "start": 2,
   },
-  "src": "[\\"value\\"]",
+  "src": "[ \\"value\\" ]",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
-    "end": 8,
-    "start": 1,
+    "end": 9,
+    "start": 2,
   },
 }
 `;
@@ -163,6 +163,25 @@ Scalar {
 }
 `;
 
+exports[`parse "quoted" without spaces 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+  "src": "{\\"value\\",",
+  "tag": null,
+  "type": "DOUBLE",
+  "valueRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+}
+`;
+
 exports[`parse 'quoted' bare 1`] = `
 Scalar {
   "anchor": null,
@@ -188,10 +207,10 @@ Scalar {
   "blockStyle": null,
   "commentRange": null,
   "nodeRange": Range {
-    "end": 9,
+    "end": 10,
     "start": 2,
   },
-  "src": "? 'value': ",
+  "src": "? 'value' : ",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -229,15 +248,15 @@ Scalar {
   "blockStyle": null,
   "commentRange": null,
   "nodeRange": Range {
-    "end": 8,
-    "start": 1,
+    "end": 10,
+    "start": 2,
   },
-  "src": "['value']",
+  "src": "[ 'value' ]",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
-    "end": 8,
-    "start": 1,
+    "end": 9,
+    "start": 2,
   },
 }
 `;
@@ -322,6 +341,143 @@ Scalar {
   "valueRange": Range {
     "end": 9,
     "start": 2,
+  },
+}
+`;
+
+exports[`parse 'quoted' without spaces 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+  "src": "{'value',",
+  "tag": null,
+  "type": "SINGLE",
+  "valueRange": Range {
+    "end": 8,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse *alias bare 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 6,
+    "start": 0,
+  },
+  "src": "*alias",
+  "tag": null,
+  "type": "ALIAS",
+  "valueRange": Range {
+    "end": 6,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse *alias complex mapping key 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 9,
+    "start": 2,
+  },
+  "src": "? *alias : ",
+  "tag": null,
+  "type": "ALIAS",
+  "valueRange": Range {
+    "end": 8,
+    "start": 3,
+  },
+}
+`;
+
+exports[`parse *alias flow seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 9,
+    "start": 2,
+  },
+  "src": "[ *alias ]",
+  "tag": null,
+  "type": "ALIAS",
+  "valueRange": Range {
+    "end": 8,
+    "start": 3,
+  },
+}
+`;
+
+exports[`parse *alias indented block 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 12,
+    "start": 6,
+  },
+  "src": "    - *alias
+  x",
+  "tag": null,
+  "type": "ALIAS",
+  "valueRange": Range {
+    "end": 12,
+    "start": 7,
+  },
+}
+`;
+
+exports[`parse *alias newline before & after 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 7,
+    "start": 1,
+  },
+  "src": "
+*alias
+",
+  "tag": null,
+  "type": "ALIAS",
+  "valueRange": Range {
+    "end": 7,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse *alias seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "nodeRange": Range {
+    "end": 8,
+    "start": 2,
+  },
+  "src": "- *alias
+- ",
+  "tag": null,
+  "type": "ALIAS",
+  "valueRange": Range {
+    "end": 8,
+    "start": 3,
   },
 }
 `;

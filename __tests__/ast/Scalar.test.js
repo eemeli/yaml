@@ -17,22 +17,23 @@ describe('internals', () => {
   })
 })
 
-const testScalarParse = (pre, str, post) => {
+const testScalarParse = (pre, str, post, expected) => {
   const scalar = new Scalar(pre + str + post)
   const indent = scalar.endIndent(0).length
   const end = scalar.parse(pre.length, indent, false)
-  expect(scalar.rawValue).toBe(str)
-  expect(end).toBe(pre.length + str.length)
+  const expectedEnd = scalar.endWhiteSpace(pre.length + str.length)
+  expect(scalar.rawValue).toBe(expected || str)
+  expect(end).toBe(expectedEnd)
   expect(scalar).toMatchSnapshot()
 }
 
 const commonTests = {
   'bare': { pre: '', post: '' },
   'newline before & after': { pre: '\n', post: '\n' },
-  'complex mapping key': { pre: '? ', post: ': ' },
+  'complex mapping key': { pre: '? ', post: ' : ' },
   'seq value': { pre: '- ', post: '\n- ' },
   'indented block': { pre: '    - ', post: '\n  x' },
-  'flow seq value': { pre: '[', post: ']' }
+  'flow seq value': { pre: '[ ', post: ' ]' }
 }
 
 describe('parse "quoted"', () => {
@@ -40,6 +41,7 @@ describe('parse "quoted"', () => {
     const { pre, post } = commonTests[name]
     test(name, () => testScalarParse(pre, '"value"', post))
   }
+  test('without spaces', () => testScalarParse('{', '"value"', ','))
   test('multi-line', () => testScalarParse('\n', '"value\nwith\nmore lines"', '\n'))
   test('escaped', () => testScalarParse('\n', '"value\\\\\nwith \\"more\\" lines\\""', '\n'))
 })
@@ -49,6 +51,14 @@ describe("parse 'quoted'", () => {
     const { pre, post } = commonTests[name]
     test(name, () => testScalarParse(pre, "'value'", post))
   }
+  test('without spaces', () => testScalarParse('{', "'value'", ','))
   test('multi-line', () => testScalarParse('\n', "'value\nwith\nmore lines'", '\n'))
   test('escaped', () => testScalarParse('\n', "'value\nwith ''more'' lines'''", '\n'))
+})
+
+describe("parse *alias", () => {
+  for (const name in commonTests) {
+    const { pre, post } = commonTests[name]
+    test(name, () => testScalarParse(pre, '*alias', post, 'alias'))
+  }
 })
