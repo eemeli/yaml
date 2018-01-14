@@ -226,6 +226,121 @@ Scalar {
 }
 `;
 
+exports[`parse #comments bare 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 17,
+    "start": 2,
+  },
+  "nodeRange": Range {
+    "end": 17,
+    "start": 0,
+  },
+  "src": " #comment # here!",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 1,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse #comments complex mapping key 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 19,
+    "start": 4,
+  },
+  "nodeRange": Range {
+    "end": 19,
+    "start": 2,
+  },
+  "src": "?  #comment # here!
+: ",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 3,
+    "start": 3,
+  },
+}
+`;
+
+exports[`parse #comments indented block 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 23,
+    "start": 8,
+  },
+  "nodeRange": Range {
+    "end": 23,
+    "start": 6,
+  },
+  "src": "    -  #comment # here!
+  x",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 7,
+    "start": 7,
+  },
+}
+`;
+
+exports[`parse #comments newline before & after 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 18,
+    "start": 3,
+  },
+  "nodeRange": Range {
+    "end": 18,
+    "start": 1,
+  },
+  "src": "
+ #comment # here!
+",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 2,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse #comments seq value 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": Range {
+    "end": 19,
+    "start": 4,
+  },
+  "nodeRange": Range {
+    "end": 19,
+    "start": 2,
+  },
+  "src": "-  #comment # here!
+- ",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 3,
+    "start": 3,
+  },
+}
+`;
+
 exports[`parse %directives TAG 1`] = `
 Scalar {
   "anchor": null,
@@ -1106,10 +1221,10 @@ Scalar {
   },
   "src": "-  : ",
   "tag": null,
-  "type": "PLAIN",
+  "type": "MAP",
   "valueRange": Range {
-    "end": 2,
-    "start": 2,
+    "end": 3,
+    "start": 3,
   },
 }
 `;

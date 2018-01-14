@@ -3,11 +3,6 @@ import Range from './Range'
 export const LOG = false
 
 export default class Node {
-  static Prop = {
-    ANCHOR: 'ANCHOR',
-    TAG: 'TAG'
-  }
-
   static Type = {
     ALIAS: 'ALIAS',
     BLOCK: 'BLOCK',
@@ -58,8 +53,6 @@ export default class Node {
       case '|':
       case '>':
         return Node.Type.BLOCK
-      case '#':
-        return Node.Type.COMMENT
       case '%': {
         const prev = src[offset - 1]
         return !prev || prev === '\n' ? Node.Type.DIRECTIVE : Node.Type.PLAIN
@@ -86,6 +79,7 @@ export default class Node {
   // class; hence this intermediate object.
   static parseProps (src, offset) {
     const props = { anchor: null, tag: null, type: null, valueStart: null }
+    offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
     while (ch === '&' || ch === '!') {
       const end = Node.endOfIdentifier(src, offset)

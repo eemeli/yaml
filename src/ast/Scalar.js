@@ -134,8 +134,11 @@ export default class Scalar extends Node {
         offset = endOfLine(end)
         ch = this.src[offset]
       }
-      if (this.type === Node.Type.PLAIN && !this.valueRange.isEmpty) {
-        if (offset > start) this.valueRange.end = offset
+      if (this.type === Node.Type.PLAIN) {
+        if (offset > start) {
+          if (this.valueRange.isEmpty) this.valueRange.start = start
+          this.valueRange.end = offset
+        }
       } else {
         this.valueRange = new Range(start, offset)
       }

@@ -104,3 +104,12 @@ describe('parse %directives', () => {
   test('TAG', () => testScalarParse({ pre: '', post: '\n', str: `%${tag}`, expected: tag }))
   test('YAML with comment', () => testScalarParse({ pre: '', post: '\n', str: '%YAML 1.2', expected: 'YAML 1.2', comment: 'comment' }))
 })
+
+describe('parse #comments', () => {
+  const comment = 'comment # here!'
+  test('bare', () => testScalarParse({ pre: '', str: '', comment, post: '' }))
+  test('newline before & after', () => testScalarParse({ pre: '\n', str: '', comment, post: '\n' }))
+  test('complex mapping key', () => testScalarParse({ pre: '? ', str: '', comment, post: '\n: ' }))
+  test('seq value', () => testScalarParse({ pre: '- ', str: '', comment, post: '\n- ' }))
+  test('indented block', () => testScalarParse({ pre: '    - ', str: '', comment, post: '\n  x' }))
+})
