@@ -1150,15 +1150,34 @@ Scalar {
   "blockStyle": null,
   "commentRange": null,
   "range": Range {
-    "end": 3,
+    "end": 2,
     "start": 2,
   },
   "raw": "",
   "tag": null,
-  "type": "MAP",
+  "type": "PLAIN",
   "valueRange": Range {
-    "end": 3,
-    "start": 3,
+    "end": 2,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse single-line plain empty in flow 1`] = `
+Scalar {
+  "anchor": null,
+  "blockStyle": null,
+  "commentRange": null,
+  "range": Range {
+    "end": 6,
+    "start": 5,
+  },
+  "raw": "",
+  "tag": null,
+  "type": "PLAIN",
+  "valueRange": Range {
+    "end": 6,
+    "start": 6,
   },
 }
 `;

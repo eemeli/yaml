@@ -9,7 +9,8 @@ export default class Node {
     DOUBLE: 'DOUBLE',
     FLOW_MAP: 'FLOW_MAP',
     FLOW_SEQ: 'FLOW_SEQ',
-    MAP: 'MAP',
+    MAP_KEY: 'MAP_KEY',
+    MAP_VALUE: 'MAP_VALUE',
     PLAIN: 'PLAIN',
     SEQ_ITEM: 'SEQ_ITEM',
     SINGLE: 'SINGLE'
@@ -62,8 +63,9 @@ export default class Node {
       case '[':
         return Node.Type.FLOW_SEQ
       case '?':
+        return Node.isBlank(src, offset + 1) ? Node.Type.MAP_KEY : Node.Type.PLAIN
       case ':':
-        return Node.isBlank(src, offset + 1) ? Node.Type.MAP : Node.Type.PLAIN
+        return Node.isBlank(src, offset + 1) ? Node.Type.MAP_VALUE : Node.Type.PLAIN
       case '-':
         return Node.isBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
       case "'":
@@ -106,14 +108,6 @@ export default class Node {
     if (!this.commentRange) return null
     const { start, end } = this.commentRange
     return this.doc.src.slice(start, end)
-  }
-
-  get isSeqItem () {
-    return this.type === Node.Type.SEQ_ITEM
-  }
-
-  get isScalar () {
-    return !this.items && !this.isSeqItem
   }
 
   get jsonLike () {

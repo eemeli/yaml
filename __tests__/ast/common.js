@@ -1,9 +1,12 @@
+import CollectionItem from '../../src/ast/CollectionItem'
 import Document from '../../src/ast/Document'
 import Node from '../../src/ast/Node'
+import Scalar from '../../src/ast/Scalar'
 
 export const cleanForSnapshot = (node) => {
   if (node instanceof Node) {
     if (node.items) node.items.forEach(cleanForSnapshot)
+    else if (node.item) cleanForSnapshot(node.item)
     else node.raw = node.rawValue
     delete node.doc
   }
@@ -27,8 +30,11 @@ export const testParse = ({ pre, post, str, comment, expected, inFlow, startIdx,
   const expectedEnd = Node.endOfWhiteSpace(doc.src, pre.length + body.length)
   expect(node.range.end).toBe(expectedEnd)
   if (comment) {
-    if (node.isScalar) expect(node.comment).toBe(comment)
-    else if (node.isSeqItem) expect(node.comment || node.item.comment).toBe(comment)
+    if (node instanceof Scalar) {
+      expect(node.comment).toBe(comment)
+    } else if (node instanceof CollectionItem) {
+      expect(node.comment || node.item.comment).toBe(comment)
+    }
   }
   if (customTest) customTest(node)
   expect(cleanForSnapshot(node)).toMatchSnapshot()

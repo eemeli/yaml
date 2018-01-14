@@ -12,7 +12,7 @@ export default class CollectionItem extends Node {
   parse (start, indent, inFlow) {
     trace: ({ start, indent })
     const { src } = this.doc
-    this.indicator = src[start] // -
+    this.indicator = src[start] // ? or : or -
     let offset = Node.endOfWhiteSpace(src, start + 1)
     let lineStart = start - indent
     let itemIndent = offset - lineStart
@@ -28,7 +28,7 @@ export default class CollectionItem extends Node {
         }
       } else {
         lineStart = offset
-        offset = Node.endOfWhiteSpace(src, next) // against spec, to match \t allowed after -
+        offset = Node.endOfWhiteSpace(src, next) // against spec, to match \t allowed after indicator
         itemIndent = offset - lineStart
       }
       ch = src[offset]

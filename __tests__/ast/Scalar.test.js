@@ -47,7 +47,8 @@ describe("parse single-line plain", () => {
   }
   test('escaped', () => testParse({ pre: '', str: '-#:] ,', post: ': ' }))
   test('escaped in flow', () => testParse({ pre: '', str: '-#:', post: '] ,: ', inFlow: true }))
-  test('empty', () => testParse({ pre: '- ', str: '', post: ' : ' }))
+  test('empty', () => testParse({ pre: '- ', str: '', post: '\n- ' }))
+  test('empty in flow', () => testParse({ pre: '{ x: ', str: '', post: ' , ', inFlow: true }))
 })
 
 describe("parse multi-line plain", () => {

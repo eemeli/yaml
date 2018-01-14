@@ -29,6 +29,8 @@ export default class Document {
       case Node.Type.FLOW_SEQ:
         node = new FlowContainer(this, props)
         break
+      case Node.Type.MAP_KEY:
+      case Node.Type.MAP_VALUE:
       case Node.Type.SEQ_ITEM:
         node = new CollectionItem(this, props)
         break
