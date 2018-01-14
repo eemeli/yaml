@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`custom seq items seq in seq in seq 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
-  "item": SeqItem {
+  "item": CollectionItem {
     "anchor": null,
     "commentRange": null,
     "doc": Document {
@@ -15,7 +15,7 @@ SeqItem {
 ",
     },
     "indicator": "-",
-    "item": SeqItem {
+    "item": CollectionItem {
       "anchor": null,
       "commentRange": null,
       "doc": Document {
@@ -84,7 +84,7 @@ SeqItem {
 `;
 
 exports[`parse simple seq items bare 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -121,7 +121,7 @@ SeqItem {
 `;
 
 exports[`parse simple seq items complex mapping key 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -158,7 +158,7 @@ SeqItem {
 `;
 
 exports[`parse simple seq items flow seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -195,7 +195,7 @@ SeqItem {
 `;
 
 exports[`parse simple seq items indented block 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -233,7 +233,7 @@ SeqItem {
 `;
 
 exports[`parse simple seq items newline before & after 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -272,7 +272,7 @@ SeqItem {
 `;
 
 exports[`parse simple seq items seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -310,7 +310,7 @@ SeqItem {
 `;
 
 exports[`parse simple seq items with comment 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -352,7 +352,7 @@ SeqItem {
 `;
 
 exports[`parse simple seq items with props 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": "anchor",
   "commentRange": null,
   "indicator": "-",
@@ -390,7 +390,7 @@ SeqItem {
 `;
 
 exports[`seq items "- *alias" bare 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -427,7 +427,7 @@ SeqItem {
 `;
 
 exports[`seq items "- *alias" complex mapping key 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -465,7 +465,7 @@ SeqItem {
 `;
 
 exports[`seq items "- *alias" flow seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -503,7 +503,7 @@ SeqItem {
 `;
 
 exports[`seq items "- *alias" indented block 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -541,7 +541,7 @@ SeqItem {
 `;
 
 exports[`seq items "- *alias" newline before & after 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -580,7 +580,7 @@ SeqItem {
 `;
 
 exports[`seq items "- *alias" seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -618,7 +618,7 @@ SeqItem {
 `;
 
 exports[`seq items "- *alias" with comment 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -660,7 +660,7 @@ SeqItem {
 `;
 
 exports[`seq items "- *alias" with props 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": "anchor",
   "commentRange": null,
   "indicator": "-",
@@ -698,7 +698,7 @@ SeqItem {
 `;
 
 exports[`seq items "- >+2\\n       multiple\\n       lines" bare 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -739,7 +739,7 @@ SeqItem {
 `;
 
 exports[`seq items "- >+2\\n       multiple\\n       lines" complex mapping key 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -781,7 +781,7 @@ SeqItem {
 `;
 
 exports[`seq items "- >+2\\n       multiple\\n       lines" flow seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -823,7 +823,7 @@ SeqItem {
 `;
 
 exports[`seq items "- >+2\\n       multiple\\n       lines" indented block 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -865,7 +865,7 @@ SeqItem {
 `;
 
 exports[`seq items "- >+2\\n       multiple\\n       lines" newline before & after 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -908,7 +908,7 @@ SeqItem {
 `;
 
 exports[`seq items "- >+2\\n       multiple\\n       lines" seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -950,7 +950,7 @@ SeqItem {
 `;
 
 exports[`seq items "- >+2\\n       multiple\\n       lines" with comment 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -996,7 +996,7 @@ SeqItem {
 `;
 
 exports[`seq items "- >+2\\n       multiple\\n       lines" with props 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": "anchor",
   "commentRange": null,
   "indicator": "-",
@@ -1038,7 +1038,7 @@ SeqItem {
 `;
 
 exports[`seq items "- \\"multiline\\nquote\\"" bare 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1077,7 +1077,7 @@ quote\\"",
 `;
 
 exports[`seq items "- \\"multiline\\nquote\\"" complex mapping key 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1117,7 +1117,7 @@ quote\\"",
 `;
 
 exports[`seq items "- \\"multiline\\nquote\\"" flow seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1157,7 +1157,7 @@ quote\\"",
 `;
 
 exports[`seq items "- \\"multiline\\nquote\\"" indented block 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1197,7 +1197,7 @@ quote\\"",
 `;
 
 exports[`seq items "- \\"multiline\\nquote\\"" newline before & after 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1238,7 +1238,7 @@ quote\\"",
 `;
 
 exports[`seq items "- \\"multiline\\nquote\\"" seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1278,7 +1278,7 @@ quote\\"",
 `;
 
 exports[`seq items "- \\"multiline\\nquote\\"" with props 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": "anchor",
   "commentRange": null,
   "indicator": "-",
@@ -1318,7 +1318,7 @@ quote\\"",
 `;
 
 exports[`seq items "- -plain value" bare 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1355,7 +1355,7 @@ SeqItem {
 `;
 
 exports[`seq items "- -plain value" complex mapping key 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1393,7 +1393,7 @@ SeqItem {
 `;
 
 exports[`seq items "- -plain value" flow seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1431,7 +1431,7 @@ SeqItem {
 `;
 
 exports[`seq items "- -plain value" indented block 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1469,7 +1469,7 @@ SeqItem {
 `;
 
 exports[`seq items "- -plain value" newline before & after 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1508,7 +1508,7 @@ SeqItem {
 `;
 
 exports[`seq items "- -plain value" seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1546,7 +1546,7 @@ SeqItem {
 `;
 
 exports[`seq items "- -plain value" with comment 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1588,7 +1588,7 @@ SeqItem {
 `;
 
 exports[`seq items "- -plain value" with props 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": "anchor",
   "commentRange": null,
   "indicator": "-",
@@ -1626,7 +1626,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\n  \\n\\n    multiline plain" bare 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1669,7 +1669,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\n  \\n\\n    multiline plain" complex mapping key 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1713,7 +1713,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\n  \\n\\n    multiline plain" flow seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1757,7 +1757,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\n  \\n\\n    multiline plain" indented block 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1801,7 +1801,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\n  \\n\\n    multiline plain" newline before & after 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1846,7 +1846,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\n  \\n\\n    multiline plain" seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -1890,7 +1890,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\n  \\n\\n    multiline plain" with comment 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": Range {
     "end": 21,
@@ -1938,7 +1938,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\n  \\n\\n    multiline plain" with props 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": "anchor",
   "commentRange": null,
   "indicator": "-",
@@ -1982,7 +1982,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\t[ 1, 2 ]" bare 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -2059,7 +2059,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\t[ 1, 2 ]" complex mapping key 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -2139,7 +2139,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\t[ 1, 2 ]" flow seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -2219,7 +2219,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\t[ 1, 2 ]" indented block 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -2299,7 +2299,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\t[ 1, 2 ]" newline before & after 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -2382,7 +2382,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\t[ 1, 2 ]" seq value 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -2462,7 +2462,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\t[ 1, 2 ]" with comment 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": null,
   "commentRange": null,
   "indicator": "-",
@@ -2548,7 +2548,7 @@ SeqItem {
 `;
 
 exports[`seq items "-\\t[ 1, 2 ]" with props 1`] = `
-SeqItem {
+CollectionItem {
   "anchor": "anchor",
   "commentRange": null,
   "indicator": "-",

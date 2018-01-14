@@ -2,7 +2,7 @@ import FlowContainer from './FlowContainer'
 import Node from './Node'
 import Range from './Range'
 import Scalar from './Scalar'
-import SeqItem from './SeqItem'
+import CollectionItem from './CollectionItem'
 
 export default class Document {
   /**
@@ -30,7 +30,7 @@ export default class Document {
         node = new FlowContainer(this, props)
         break
       case Node.Type.SEQ_ITEM:
-        node = new SeqItem(this, props)
+        node = new CollectionItem(this, props)
         break
       default:
         node = new Scalar(this, props)

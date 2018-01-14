@@ -2,7 +2,7 @@ import Node from './Node'
 import Range from './Range'
 import Scalar from './Scalar'
 
-export default class SeqItem extends Node {
+export default class CollectionItem extends Node {
   constructor (doc, props) {
     super(doc, props)
     this.indicator = null
