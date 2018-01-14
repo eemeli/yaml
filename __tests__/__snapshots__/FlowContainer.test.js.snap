@@ -14,6 +14,7 @@ FlowContainer {
         "end": 7,
         "start": 2,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -30,6 +31,7 @@ FlowContainer {
         "end": 10,
         "start": 9,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -46,6 +48,7 @@ FlowContainer {
         "end": 26,
         "start": 16,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -67,6 +70,7 @@ FlowContainer {
             "end": 33,
             "start": 29,
           },
+          "raw": "five",
           "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
@@ -83,6 +87,7 @@ FlowContainer {
             "end": 40,
             "start": 36,
           },
+          "raw": "\\"6,\\"",
           "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
@@ -132,6 +137,7 @@ FlowContainer {
         "end": 9,
         "start": 4,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -148,6 +154,7 @@ FlowContainer {
         "end": 12,
         "start": 11,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -164,6 +171,7 @@ FlowContainer {
         "end": 28,
         "start": 18,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -185,6 +193,7 @@ FlowContainer {
             "end": 35,
             "start": 31,
           },
+          "raw": "five",
           "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
@@ -201,6 +210,7 @@ FlowContainer {
             "end": 42,
             "start": 38,
           },
+          "raw": "\\"6,\\"",
           "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
@@ -250,6 +260,7 @@ FlowContainer {
         "end": 9,
         "start": 4,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -266,6 +277,7 @@ FlowContainer {
         "end": 12,
         "start": 11,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -282,6 +294,7 @@ FlowContainer {
         "end": 28,
         "start": 18,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -303,6 +316,7 @@ FlowContainer {
             "end": 35,
             "start": 31,
           },
+          "raw": "five",
           "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
@@ -319,6 +333,7 @@ FlowContainer {
             "end": 42,
             "start": 38,
           },
+          "raw": "\\"6,\\"",
           "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
@@ -368,6 +383,7 @@ FlowContainer {
         "end": 13,
         "start": 8,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -384,6 +400,7 @@ FlowContainer {
         "end": 16,
         "start": 15,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -400,6 +417,7 @@ FlowContainer {
         "end": 32,
         "start": 22,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -421,6 +439,7 @@ FlowContainer {
             "end": 39,
             "start": 35,
           },
+          "raw": "five",
           "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
@@ -437,6 +456,7 @@ FlowContainer {
             "end": 46,
             "start": 42,
           },
+          "raw": "\\"6,\\"",
           "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
@@ -486,6 +506,7 @@ FlowContainer {
         "end": 8,
         "start": 3,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -502,6 +523,7 @@ FlowContainer {
         "end": 11,
         "start": 10,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -518,6 +540,7 @@ FlowContainer {
         "end": 27,
         "start": 17,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -539,6 +562,7 @@ FlowContainer {
             "end": 34,
             "start": 30,
           },
+          "raw": "five",
           "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
@@ -555,6 +579,7 @@ FlowContainer {
             "end": 41,
             "start": 37,
           },
+          "raw": "\\"6,\\"",
           "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
@@ -604,6 +629,7 @@ FlowContainer {
         "end": 9,
         "start": 4,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -620,6 +646,7 @@ FlowContainer {
         "end": 12,
         "start": 11,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -636,6 +663,7 @@ FlowContainer {
         "end": 28,
         "start": 18,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -657,6 +685,7 @@ FlowContainer {
             "end": 35,
             "start": 31,
           },
+          "raw": "five",
           "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
@@ -673,6 +702,7 @@ FlowContainer {
             "end": 42,
             "start": 38,
           },
+          "raw": "\\"6,\\"",
           "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
@@ -722,6 +752,7 @@ FlowContainer {
         "end": 10,
         "start": 5,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -738,6 +769,7 @@ FlowContainer {
         "end": 13,
         "start": 12,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -754,6 +786,7 @@ FlowContainer {
         "start": 16,
       },
       "range": null,
+      "raw": "",
       "tag": null,
       "type": "COMMENT",
       "valueRange": Range {
@@ -769,6 +802,7 @@ FlowContainer {
         "end": 46,
         "start": 36,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -790,6 +824,7 @@ FlowContainer {
             "end": 53,
             "start": 49,
           },
+          "raw": "five",
           "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
@@ -806,6 +841,7 @@ FlowContainer {
             "end": 60,
             "start": 56,
           },
+          "raw": "\\"6,\\"",
           "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
@@ -855,6 +891,7 @@ FlowContainer {
         "end": 23,
         "start": 18,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -871,6 +908,7 @@ FlowContainer {
         "end": 26,
         "start": 25,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -887,6 +925,7 @@ FlowContainer {
         "end": 42,
         "start": 32,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -908,6 +947,7 @@ FlowContainer {
             "end": 49,
             "start": 45,
           },
+          "raw": "five",
           "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
@@ -924,6 +964,7 @@ FlowContainer {
             "end": 56,
             "start": 52,
           },
+          "raw": "\\"6,\\"",
           "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
@@ -973,6 +1014,7 @@ FlowContainer {
         "end": 7,
         "start": 2,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -989,6 +1031,7 @@ FlowContainer {
         "end": 10,
         "start": 9,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1005,6 +1048,7 @@ FlowContainer {
         "end": 23,
         "start": 12,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1041,6 +1085,7 @@ FlowContainer {
         "end": 9,
         "start": 4,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -1057,6 +1102,7 @@ FlowContainer {
         "end": 12,
         "start": 11,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1073,6 +1119,7 @@ FlowContainer {
         "end": 25,
         "start": 14,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1109,6 +1156,7 @@ FlowContainer {
         "end": 9,
         "start": 4,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -1125,6 +1173,7 @@ FlowContainer {
         "end": 12,
         "start": 11,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1141,6 +1190,7 @@ FlowContainer {
         "end": 25,
         "start": 14,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1177,6 +1227,7 @@ FlowContainer {
         "end": 13,
         "start": 8,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -1193,6 +1244,7 @@ FlowContainer {
         "end": 16,
         "start": 15,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1209,6 +1261,7 @@ FlowContainer {
         "end": 29,
         "start": 18,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1245,6 +1298,7 @@ FlowContainer {
         "end": 8,
         "start": 3,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -1261,6 +1315,7 @@ FlowContainer {
         "end": 11,
         "start": 10,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1277,6 +1332,7 @@ FlowContainer {
         "end": 24,
         "start": 13,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1313,6 +1369,7 @@ FlowContainer {
         "end": 9,
         "start": 4,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -1329,6 +1386,7 @@ FlowContainer {
         "end": 12,
         "start": 11,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1345,6 +1403,7 @@ FlowContainer {
         "end": 25,
         "start": 14,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1384,6 +1443,7 @@ FlowContainer {
         "end": 10,
         "start": 5,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -1400,6 +1460,7 @@ FlowContainer {
         "end": 13,
         "start": 12,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1416,6 +1477,7 @@ FlowContainer {
         "end": 26,
         "start": 15,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1452,6 +1514,7 @@ FlowContainer {
         "end": 23,
         "start": 18,
       },
+      "raw": "\\"one\\"",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -1468,6 +1531,7 @@ FlowContainer {
         "end": 26,
         "start": 25,
       },
+      "raw": "2",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -1484,6 +1548,7 @@ FlowContainer {
         "end": 39,
         "start": 28,
       },
+      "raw": "three four",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {

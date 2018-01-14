@@ -1,9 +1,12 @@
 import Document from '../../src/ast/Document'
 import Node from '../../src/ast/Node'
 
-export const trimForSnapshot = (node) => {
-  delete node.doc
-  if (node.items) node.items.forEach(trimForSnapshot)
+export const cleanForSnapshot = (node) => {
+  if (node instanceof Node) {
+    if (node.items) node.items.forEach(cleanForSnapshot)
+    else node.raw = node.rawValue
+    delete node.doc
+  }
   return node
 }
 
@@ -25,7 +28,7 @@ export const testParse = ({ pre, post, str, comment, expected, inFlow, startIdx,
   expect(node.range.end).toBe(expectedEnd)
   if (comment && node.isScalar) expect(node.comment).toBe(comment)
   if (customTest) customTest(node)
-  expect(trimForSnapshot(node)).toMatchSnapshot()
+  expect(cleanForSnapshot(node)).toMatchSnapshot()
 }
 
 export const commonTests = {
