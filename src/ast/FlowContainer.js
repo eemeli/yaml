@@ -1,4 +1,4 @@
-import Node, { LOG } from './Node'
+import Node from './Node'
 import Range from './Range'
 import Scalar from './Scalar'
 
@@ -18,14 +18,14 @@ export default class FlowContainer extends Node {
   }
 
   parse (start, indent) {
-    LOG && console.log('flow-container parse start', { start, indent })
+    trace: ({ start, indent })
     const { src } = this.doc
     let ch = src[start] // { or [
     this.items = [ch]
     let offset = Node.endOfWhiteSpace(src, start + 1)
     ch = src[offset]
     while (ch && ch !== ']' && ch !== '}') {
-      LOG && console.log('item-start', this.items.length, ch)
+      trace: 'item-start', this.items.length, ch
       switch (ch) {
         case '\n': {
           const lineStart = offset + 1
@@ -71,7 +71,7 @@ export default class FlowContainer extends Node {
       offset = Node.endOfWhiteSpace(src, offset + 1)
       offset = this.parseComment(offset)
     }
-    LOG && console.log('flow-container items', this.items)
+    trace: 'items', this.items
     return offset
   }
 }

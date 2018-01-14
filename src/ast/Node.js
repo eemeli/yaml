@@ -1,7 +1,5 @@
 import Range from './Range'
 
-export const LOG = false
-
 export default class Node {
   static Type = {
     ALIAS: 'ALIAS',
@@ -90,7 +88,7 @@ export default class Node {
     }
     props.valueStart = offset
     props.type = Node.parseType(src, offset)
-    LOG && console.log('props', props)
+    trace: props
     return props
   }
 
@@ -135,10 +133,9 @@ export default class Node {
       const start = offset + 1
       const end = Node.endOfLine(this.doc.src, start)
       this.commentRange = new Range(start, end)
-      LOG && console.log('comment', this.commentRange)
+      trace: this.commentRange, this.doc.src.slice(this.commentRange.start, this.commentRange.end)
       return end
     }
-    LOG && console.log('comment skip')
     return offset
   }
 

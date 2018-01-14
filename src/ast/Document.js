@@ -1,5 +1,5 @@
 import FlowContainer from './FlowContainer'
-import Node, { LOG } from './Node'
+import Node from './Node'
 import Range from './Range'
 import Scalar from './Scalar'
 
@@ -20,7 +20,7 @@ export default class Document {
    * @returns {!number} - Index of the character after this node; may be `\n`
    */
   parseNode (start, indent, inFlow) {
-    LOG && console.log('start', { indent, inFlow }, this.src.slice(start))
+    trace: 'start', { indent, inFlow }, this.src.slice(start)
     const props = Node.parseProps(this.src, start)
     let node
     switch (props.type) {
@@ -33,7 +33,7 @@ export default class Document {
     }
     const end = node.parse(props.valueStart, indent, inFlow)
     node.range = new Range(start, end)
-    LOG && console.log('node', node.type, node.range)
+    trace: 'node', { type: node.type, range: node.range }
     return node
   }
 }
