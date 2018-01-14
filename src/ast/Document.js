@@ -20,6 +20,7 @@ export default class Document {
    * @returns {!number} - Index of the character after this node; may be `\n`
    */
   parseNode (start, indent, inFlow) {
+    LOG && console.log('start', { indent, inFlow }, this.src.slice(start))
     const props = Node.parseProps(this.src, start)
     let node
     switch (props.type) {

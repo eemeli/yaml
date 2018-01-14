@@ -23,7 +23,9 @@ export default class FlowContainer extends Node {
     let ch = src[start] // { or [
     this.items = [ch]
     let offset = Node.endOfWhiteSpace(src, start + 1)
+    ch = src[offset]
     while (ch && ch !== ']' && ch !== '}') {
+      LOG && console.log('item-start', this.items.length, ch)
       switch (ch) {
         case '\n': {
           const lineStart = offset + 1
@@ -56,7 +58,7 @@ export default class FlowContainer extends Node {
           const node = this.doc.parseNode(offset, indent, true)
           this.items.push(node)
           // FIXME: prevents infinite loop
-          if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${node.range}`)
+          if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
           offset = node.range.end
         }
       }
