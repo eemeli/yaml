@@ -1,17 +1,9 @@
-import Node, { LOG, Range } from './Node'
+import Node, { LOG } from './Node'
+import Range from './Range'
 
 export default class Scalar extends Node {
-  static Type = {
-    ALIAS: 'ALIAS',
-    DOUBLE: 'DOUBLE',
-    SINGLE: 'SINGLE',
-    PLAIN: 'PLAIN',
-    BLOCK: 'BLOCK'
-  }
-
-  constructor (src) {
-    super(src)
-    this.type = null
+  constructor (src, props) {
+    super(src, props)
     this.blockStyle = null
   }
 
@@ -72,11 +64,11 @@ export default class Scalar extends Node {
   }
 
   endBlockIndent (indent, offset) {
-    const inEnd = this.endIndent(offset)
+    const inEnd = Node.endOfIndent(this.src, offset)
     if (inEnd > offset + indent) {
       return inEnd
     } else {
-      const wsEnd = this.endWhiteSpace(inEnd)
+      const wsEnd = Node.endOfWhiteSpace(this.src, inEnd)
       if (this.src[wsEnd] === '\n') {
         return wsEnd
       }
@@ -84,42 +76,35 @@ export default class Scalar extends Node {
     return null
   }
 
-  parseInlineValue (offset, inFlow) {
-    let start = offset
+  parseInlineValue (start, inFlow) {
     let end
-    switch (this.src[offset]) {
-      case '*':
-        this.type = Scalar.Type.ALIAS
+    switch (this.type) {
+      case Node.Type.ALIAS:
         start += 1
-        end = this.endIdentifier(offset)
+        end = Node.endOfIdentifier(this.src, start)
         break
-      case '"':
-        this.type = Scalar.Type.DOUBLE
-        end = this.endDoubleQuote(offset + 1)
+      case Node.Type.DOUBLE:
+        end = this.endDoubleQuote(start + 1)
         break
-      case "'":
-        this.type = Scalar.Type.SINGLE
-        end = this.endSingleQuote(offset + 1)
+      case Node.Type.SINGLE:
+        end = this.endSingleQuote(start + 1)
         break
-      case '|':
-      case '>':
-        this.type = Scalar.Type.BLOCK
-        end = this.endBlockStyle(offset + 1)
-        this.blockStyle = this.src.slice(offset, end)
+      case Node.Type.BLOCK:
+        end = this.endBlockStyle(start + 1)
+        this.blockStyle = this.src.slice(start, end)
         break
-      default:
-        this.type = Scalar.Type.PLAIN
-        end = this.endPlainLine(offset, true, inFlow)
+      default: // Node.Type.PLAIN
+        end = this.endPlainLine(start, true, inFlow)
     }
     this.valueRange = new Range(start, end)
     LOG && console.log('value', { type: this.type, range: this.valueRange, value: this.rawValue })
-    return this.endWhiteSpace(end)
+    return Node.endOfWhiteSpace(this.src, end)
   }
 
   parseBlockValue (offset, indent, inFlow) {
-    const endLine = (this.type === Scalar.Type.BLOCK) ? (
+    const endLine = (this.type === Node.Type.BLOCK) ? (
       (offset) => this.endLine(offset)
-    ) : (this.type === Scalar.Type.PLAIN) ? (
+    ) : (this.type === Node.Type.PLAIN) ? (
       (offset) => this.endPlainLine(offset, false, inFlow)
     ) : (
       null
@@ -133,7 +118,7 @@ export default class Scalar extends Node {
         offset = endLine(end)
         ch = this.src[offset]
       }
-      if (this.type === Scalar.Type.PLAIN && !this.valueRange.isEmpty) {
+      if (this.type === Node.Type.PLAIN && !this.valueRange.isEmpty) {
         if (offset > start) this.valueRange.end = offset
       } else {
         this.valueRange = new Range(start, offset)
@@ -151,15 +136,10 @@ export default class Scalar extends Node {
    * @returns {!number} - Index of the character after this scalar, may be `\n`
    */
   parse (offset, indent, inFlow) {
-    // offset = this.endWhiteSpace(offset)
-    LOG && console.log('parse start', JSON.stringify(this.src))
-    const start = offset
-    offset = this.parseProps(offset)
+    LOG && console.log('scalar parse start', { offset, indent, inFlow })
     offset = this.parseInlineValue(offset, inFlow)
     offset = this.parseComment(offset)
     offset = this.parseBlockValue(offset, indent, inFlow)
-    this.nodeRange = new Range(start, offset)
-    LOG && console.log('parse end', this.nodeRange)
     return offset
   }
 }

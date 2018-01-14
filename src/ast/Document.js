@@ -1,0 +1,26 @@
+import Node, { LOG } from './Node'
+import Range from './Range'
+import Scalar from './Scalar'
+
+export default class Document {
+  /**
+   * Parses the node's type and value from the source
+   * @param {!string} src - Source of the YAML document
+   * @param {!number} start - Index of first non-whitespace character for the node
+   * @param {!number} indent - Current level of indentation
+   * @param {boolean} inFlow - true if currently in a flow-in context
+   * @returns {!number} - Index of the character after this node; may be `\n`
+   */
+  static parseNode (src, start, indent, inFlow) {
+    const props = Node.parseProps(src, start)
+    let node
+    switch (props.type) {
+      default:
+        node = new Scalar(src, props)
+    }
+    const end = node.parse(props.valueStart, indent, inFlow)
+    node.nodeRange = new Range(start, end)
+    LOG && console.log('node', node.type, node.nodeRange)
+    return node
+  }
+}

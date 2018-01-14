@@ -1,4 +1,5 @@
-import Scalar from '../../src/ast/Scalar'
+import Document from '../../src/ast/Document'
+import Node from '../../src/ast/Node'
 
 const testScalarParse = ({ pre, post, str, comment, expected, inFlow, startIdx, test: customTest }) => {
   let body = str
@@ -7,12 +8,12 @@ const testScalarParse = ({ pre, post, str, comment, expected, inFlow, startIdx, 
     lines[0] += ` #${comment}`
     body = lines.join('\n')
   }
-  const scalar = new Scalar(pre + body + post)
-  const indent = scalar.endIndent(0)
-  const end = scalar.parse(startIdx || pre.length, indent, inFlow || false)
-  const expectedEnd = scalar.endWhiteSpace(pre.length + body.length)
+  const src = pre + body + post
+  const indent = Node.endOfIndent(src, 0)
+  const scalar = Document.parseNode(src, startIdx || pre.length, indent, inFlow || false)
   expect(scalar.rawValue).toBe(expected || str)
-  expect(end).toBe(expectedEnd)
+  const expectedEnd = Node.endOfWhiteSpace(src, pre.length + body.length)
+  expect(scalar.nodeRange.end).toBe(expectedEnd)
   if (comment) expect(scalar.comment).toBe(comment)
   if (customTest) customTest(scalar)
   expect(scalar).toMatchSnapshot()

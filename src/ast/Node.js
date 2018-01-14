@@ -1,19 +1,6 @@
+import Range from './Range'
+
 export const LOG = false
-
-export class Range {
-  constructor (start, end) {
-    this.start = start
-    this.end = end || start
-  }
-
-  get isEmpty () {
-    return typeof this.start !== 'number' || !this.end || this.end <= this.start
-  }
-
-  get length () {
-    return this.isEmpty ? 0 : this.end - this.start
-  }
-}
 
 export default class Node {
   static Prop = {
@@ -21,13 +8,72 @@ export default class Node {
     TAG: 'TAG'
   }
 
-  constructor (src) {
+  static Type = {
+    ALIAS: 'ALIAS',
+    DOUBLE: 'DOUBLE',
+    SINGLE: 'SINGLE',
+    PLAIN: 'PLAIN',
+    BLOCK: 'BLOCK'
+  }
+
+  static endOfIdentifier (src, offset) {
+    let ch = src[offset]
+    while (ch && ch !== '\n' && ch !== '\t' && ch !== ' ') ch = src[offset += 1]
+    return offset
+  }
+
+  static endOfIndent (src, offset) {
+    let ch = src[offset]
+    while (ch === ' ') ch = src[offset += 1]
+    return offset
+  }
+
+  static endOfWhiteSpace (src, offset) {
+    let ch = src[offset]
+    while (ch === '\t' || ch === ' ') ch = src[offset += 1]
+    return offset
+  }
+
+  static parseType (src, offset) {
+    switch (src[offset]) {
+      case '*':
+        return Node.Type.ALIAS
+      case '"':
+        return Node.Type.DOUBLE
+      case "'":
+        return Node.Type.SINGLE
+      case '|':
+      case '>':
+        return Node.Type.BLOCK
+      default:
+        return Node.Type.PLAIN
+    }
+  }
+
+  static parseProps (src, offset) {
+    const props = { anchor: null, tag: null, type: null, valueStart: null }
+    let ch = src[offset]
+    while (ch === '&' || ch === '!') {
+      const end = Node.endOfIdentifier(src, offset)
+      const prop = ch === '&' ? 'anchor' : 'tag'
+      props[prop] = src.slice(offset + 1, end)
+      offset = Node.endOfWhiteSpace(src, end)
+      ch = src[offset]
+    }
+    props.valueStart = offset
+    props.type = Node.parseType(src, offset)
+    LOG && console.log('props', props)
+    return props
+  }
+
+  constructor (src, { anchor, tag, type }) {
     this.src = src
     this.nodeRange = null
     this.valueRange = null
     this.commentRange = null
-    this.anchor = null
-    this.tag = null
+    this.anchor = anchor
+    this.tag = tag
+    this.type = type
   }
 
   get comment () {
@@ -42,27 +88,9 @@ export default class Node {
     return this.src.slice(start, end)
   }
 
-  endIdentifier (offset) {
-    let ch = this.src[offset]
-    while (ch && ch !== '\n' && ch !== '\t' && ch !== ' ') ch = this.src[offset += 1]
-    return offset
-  }
-
-  endIndent (offset) {
-    let ch = this.src[offset]
-    while (ch === ' ') ch = this.src[offset += 1]
-    return offset
-  }
-
   endLine (offset) {
     let ch = this.src[offset]
     while (ch && ch !== '\n') ch = this.src[offset += 1]
-    return offset
-  }
-
-  endWhiteSpace (offset) {
-    let ch = this.src[offset]
-    while (ch === '\t' || ch === ' ') ch = this.src[offset += 1]
     return offset
   }
 
@@ -75,19 +103,6 @@ export default class Node {
       return end
     }
     LOG && console.log('comment skip')
-    return offset
-  }
-
-  parseProps (offset) {
-    let ch = this.src[offset]
-    while (ch === '&' || ch === '!') {
-      const end = this.endIdentifier(offset)
-      const prop = ch === '&' ? 'anchor' : 'tag'
-      this[prop] = this.src.slice(offset + 1, end)
-      offset = this.endWhiteSpace(end)
-      ch = this.src[offset]
-      LOG && console.log('props', { prop, value: this[prop], offset, ch })
-    }
     return offset
   }
 
