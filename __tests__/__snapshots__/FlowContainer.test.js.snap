@@ -1,5 +1,964 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`parse deep array bare 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 7,
+        "start": 2,
+      },
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 7,
+        "start": 2,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 10,
+        "start": 9,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 10,
+        "start": 9,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 26,
+        "start": 16,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 26,
+        "start": 16,
+      },
+    },
+    ",",
+    FlowContainer {
+      "anchor": null,
+      "commentRange": null,
+      "items": Array [
+        "[",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 33,
+            "start": 29,
+          },
+          "tag": null,
+          "type": "PLAIN",
+          "valueRange": Range {
+            "end": 33,
+            "start": 29,
+          },
+        },
+        ",",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 40,
+            "start": 36,
+          },
+          "tag": null,
+          "type": "DOUBLE",
+          "valueRange": Range {
+            "end": 40,
+            "start": 36,
+          },
+        },
+        "]",
+      ],
+      "range": Range {
+        "end": 42,
+        "start": 28,
+      },
+      "tag": null,
+      "type": "FLOW_SEQ",
+      "valueRange": Range {
+        "end": 41,
+        "start": 28,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 43,
+    "start": 0,
+  },
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 43,
+    "start": 0,
+  },
+}
+`;
+
+exports[`parse deep array complex mapping key 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 9,
+        "start": 4,
+      },
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 9,
+        "start": 4,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 12,
+        "start": 11,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 12,
+        "start": 11,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 28,
+        "start": 18,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 28,
+        "start": 18,
+      },
+    },
+    ",",
+    FlowContainer {
+      "anchor": null,
+      "commentRange": null,
+      "items": Array [
+        "[",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 35,
+            "start": 31,
+          },
+          "tag": null,
+          "type": "PLAIN",
+          "valueRange": Range {
+            "end": 35,
+            "start": 31,
+          },
+        },
+        ",",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 42,
+            "start": 38,
+          },
+          "tag": null,
+          "type": "DOUBLE",
+          "valueRange": Range {
+            "end": 42,
+            "start": 38,
+          },
+        },
+        "]",
+      ],
+      "range": Range {
+        "end": 44,
+        "start": 30,
+      },
+      "tag": null,
+      "type": "FLOW_SEQ",
+      "valueRange": Range {
+        "end": 43,
+        "start": 30,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 46,
+    "start": 2,
+  },
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 45,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse deep array flow seq value 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 9,
+        "start": 4,
+      },
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 9,
+        "start": 4,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 12,
+        "start": 11,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 12,
+        "start": 11,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 28,
+        "start": 18,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 28,
+        "start": 18,
+      },
+    },
+    ",",
+    FlowContainer {
+      "anchor": null,
+      "commentRange": null,
+      "items": Array [
+        "[",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 35,
+            "start": 31,
+          },
+          "tag": null,
+          "type": "PLAIN",
+          "valueRange": Range {
+            "end": 35,
+            "start": 31,
+          },
+        },
+        ",",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 42,
+            "start": 38,
+          },
+          "tag": null,
+          "type": "DOUBLE",
+          "valueRange": Range {
+            "end": 42,
+            "start": 38,
+          },
+        },
+        "]",
+      ],
+      "range": Range {
+        "end": 44,
+        "start": 30,
+      },
+      "tag": null,
+      "type": "FLOW_SEQ",
+      "valueRange": Range {
+        "end": 43,
+        "start": 30,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 46,
+    "start": 2,
+  },
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 45,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse deep array indented block 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 13,
+        "start": 8,
+      },
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 13,
+        "start": 8,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 16,
+        "start": 15,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 16,
+        "start": 15,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 32,
+        "start": 22,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 32,
+        "start": 22,
+      },
+    },
+    ",",
+    FlowContainer {
+      "anchor": null,
+      "commentRange": null,
+      "items": Array [
+        "[",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 39,
+            "start": 35,
+          },
+          "tag": null,
+          "type": "PLAIN",
+          "valueRange": Range {
+            "end": 39,
+            "start": 35,
+          },
+        },
+        ",",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 46,
+            "start": 42,
+          },
+          "tag": null,
+          "type": "DOUBLE",
+          "valueRange": Range {
+            "end": 46,
+            "start": 42,
+          },
+        },
+        "]",
+      ],
+      "range": Range {
+        "end": 48,
+        "start": 34,
+      },
+      "tag": null,
+      "type": "FLOW_SEQ",
+      "valueRange": Range {
+        "end": 47,
+        "start": 34,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 49,
+    "start": 6,
+  },
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 49,
+    "start": 6,
+  },
+}
+`;
+
+exports[`parse deep array newline before & after 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 8,
+        "start": 3,
+      },
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 8,
+        "start": 3,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 11,
+        "start": 10,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 11,
+        "start": 10,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 27,
+        "start": 17,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 27,
+        "start": 17,
+      },
+    },
+    ",",
+    FlowContainer {
+      "anchor": null,
+      "commentRange": null,
+      "items": Array [
+        "[",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 34,
+            "start": 30,
+          },
+          "tag": null,
+          "type": "PLAIN",
+          "valueRange": Range {
+            "end": 34,
+            "start": 30,
+          },
+        },
+        ",",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 41,
+            "start": 37,
+          },
+          "tag": null,
+          "type": "DOUBLE",
+          "valueRange": Range {
+            "end": 41,
+            "start": 37,
+          },
+        },
+        "]",
+      ],
+      "range": Range {
+        "end": 43,
+        "start": 29,
+      },
+      "tag": null,
+      "type": "FLOW_SEQ",
+      "valueRange": Range {
+        "end": 42,
+        "start": 29,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 44,
+    "start": 1,
+  },
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 44,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse deep array seq value 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 9,
+        "start": 4,
+      },
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 9,
+        "start": 4,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 12,
+        "start": 11,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 12,
+        "start": 11,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 28,
+        "start": 18,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 28,
+        "start": 18,
+      },
+    },
+    ",",
+    FlowContainer {
+      "anchor": null,
+      "commentRange": null,
+      "items": Array [
+        "[",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 35,
+            "start": 31,
+          },
+          "tag": null,
+          "type": "PLAIN",
+          "valueRange": Range {
+            "end": 35,
+            "start": 31,
+          },
+        },
+        ",",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 42,
+            "start": 38,
+          },
+          "tag": null,
+          "type": "DOUBLE",
+          "valueRange": Range {
+            "end": 42,
+            "start": 38,
+          },
+        },
+        "]",
+      ],
+      "range": Range {
+        "end": 44,
+        "start": 30,
+      },
+      "tag": null,
+      "type": "FLOW_SEQ",
+      "valueRange": Range {
+        "end": 43,
+        "start": 30,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 45,
+    "start": 2,
+  },
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 45,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse deep array with comment 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 10,
+        "start": 5,
+      },
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 10,
+        "start": 5,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 13,
+        "start": 12,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 13,
+        "start": 12,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": Range {
+        "end": 31,
+        "start": 16,
+      },
+      "range": null,
+      "tag": null,
+      "type": "COMMENT",
+      "valueRange": Range {
+        "end": 15,
+        "start": 15,
+      },
+    },
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 46,
+        "start": 36,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 46,
+        "start": 36,
+      },
+    },
+    ",",
+    FlowContainer {
+      "anchor": null,
+      "commentRange": null,
+      "items": Array [
+        "[",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 53,
+            "start": 49,
+          },
+          "tag": null,
+          "type": "PLAIN",
+          "valueRange": Range {
+            "end": 53,
+            "start": 49,
+          },
+        },
+        ",",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 60,
+            "start": 56,
+          },
+          "tag": null,
+          "type": "DOUBLE",
+          "valueRange": Range {
+            "end": 60,
+            "start": 56,
+          },
+        },
+        "]",
+      ],
+      "range": Range {
+        "end": 62,
+        "start": 48,
+      },
+      "tag": null,
+      "type": "FLOW_SEQ",
+      "valueRange": Range {
+        "end": 61,
+        "start": 48,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 63,
+    "start": 3,
+  },
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 63,
+    "start": 3,
+  },
+}
+`;
+
+exports[`parse deep array with props 1`] = `
+FlowContainer {
+  "anchor": "anchor",
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 23,
+        "start": 18,
+      },
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 23,
+        "start": 18,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 26,
+        "start": 25,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 26,
+        "start": 25,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "range": Range {
+        "end": 42,
+        "start": 32,
+      },
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 42,
+        "start": 32,
+      },
+    },
+    ",",
+    FlowContainer {
+      "anchor": null,
+      "commentRange": null,
+      "items": Array [
+        "[",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 49,
+            "start": 45,
+          },
+          "tag": null,
+          "type": "PLAIN",
+          "valueRange": Range {
+            "end": 49,
+            "start": 45,
+          },
+        },
+        ",",
+        Scalar {
+          "anchor": null,
+          "blockStyle": null,
+          "commentRange": null,
+          "range": Range {
+            "end": 56,
+            "start": 52,
+          },
+          "tag": null,
+          "type": "DOUBLE",
+          "valueRange": Range {
+            "end": 56,
+            "start": 52,
+          },
+        },
+        "]",
+      ],
+      "range": Range {
+        "end": 58,
+        "start": 44,
+      },
+      "tag": null,
+      "type": "FLOW_SEQ",
+      "valueRange": Range {
+        "end": 57,
+        "start": 44,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 59,
+    "start": 2,
+  },
+  "tag": "tag!",
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 59,
+    "start": 16,
+  },
+}
+`;
+
 exports[`parse simple array bare 1`] = `
 FlowContainer {
   "anchor": null,

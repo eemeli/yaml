@@ -99,8 +99,8 @@ export default class Node {
     this.range = null
     this.valueRange = null
     this.commentRange = null
-    this.anchor = anchor
-    this.tag = tag
+    this.anchor = anchor || null
+    this.tag = tag || null
     this.type = type
   }
 
@@ -108,6 +108,10 @@ export default class Node {
     if (!this.commentRange) return null
     const { start, end } = this.commentRange
     return this.doc.src.slice(start, end)
+  }
+
+  get isScalar () {
+    return !this.items
   }
 
   get rawValue () {

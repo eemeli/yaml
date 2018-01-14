@@ -13,6 +13,9 @@ export const testParse = ({ pre, post, str, comment, expected, inFlow, startIdx,
     const lines = body.split('\n')
     lines[0] += ` #${comment}`
     body = lines.join('\n')
+    if (!expected && lines.some((line, i) => i > 0 && /\S/.test(line))) {
+      expected = body
+    }
   }
   const doc = new Document(pre + body + post)
   const indent = Node.endOfIndent(doc.src, 0)
@@ -20,7 +23,7 @@ export const testParse = ({ pre, post, str, comment, expected, inFlow, startIdx,
   expect(node.rawValue).toBe(expected || str)
   const expectedEnd = Node.endOfWhiteSpace(doc.src, pre.length + body.length)
   expect(node.range.end).toBe(expectedEnd)
-  if (comment) expect(node.comment).toBe(comment)
+  if (comment && node.isScalar) expect(node.comment).toBe(comment)
   if (customTest) customTest(node)
   expect(trimForSnapshot(node)).toMatchSnapshot()
 }

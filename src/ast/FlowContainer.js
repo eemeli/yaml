@@ -1,5 +1,6 @@
 import Node, { LOG } from './Node'
 import Range from './Range'
+import Scalar from './Scalar'
 
 export default class FlowContainer extends Node {
   constructor (doc, props) {
@@ -23,6 +24,11 @@ export default class FlowContainer extends Node {
         case ',': {
           this.items.push(ch)
           offset += 1
+        } break
+        case '#': {
+          const comment = new Scalar(this.doc, { type: Node.Type.COMMENT })
+          offset = comment.parse(offset, indent, true)
+          this.items.push(comment)
         } break
         default: {
           const node = this.doc.parseNode(offset, indent, true)

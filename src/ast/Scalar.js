@@ -96,6 +96,9 @@ export default class Scalar extends Node {
         start += 1
         end = Node.endOfIdentifier(src, start)
         break
+      case Node.Type.COMMENT:
+        end = start
+        break
       case Node.Type.DIRECTIVE:
         start += 1
         end = Scalar.endOfDirective(src, start)
