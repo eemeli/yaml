@@ -8,14 +8,15 @@ const testScalarParse = ({ pre, post, str, comment, expected, inFlow, startIdx, 
     lines[0] += ` #${comment}`
     body = lines.join('\n')
   }
-  const src = pre + body + post
-  const indent = Node.endOfIndent(src, 0)
-  const scalar = Document.parseNode(src, startIdx || pre.length, indent, inFlow || false)
+  const doc = new Document(pre + body + post)
+  const indent = Node.endOfIndent(doc.src, 0)
+  const scalar = doc.parseNode(startIdx || pre.length, indent, inFlow || false)
   expect(scalar.rawValue).toBe(expected || str)
-  const expectedEnd = Node.endOfWhiteSpace(src, pre.length + body.length)
+  const expectedEnd = Node.endOfWhiteSpace(doc.src, pre.length + body.length)
   expect(scalar.nodeRange.end).toBe(expectedEnd)
   if (comment) expect(scalar.comment).toBe(comment)
   if (customTest) customTest(scalar)
+  delete scalar.doc
   expect(scalar).toMatchSnapshot()
 }
 

@@ -94,8 +94,9 @@ export default class Node {
     return props
   }
 
-  constructor (src, { anchor, tag, type }) {
-    this.src = src
+  constructor (doc, { anchor, tag, type }) {
+    this.doc = doc
+    this.src = doc.src
     this.nodeRange = null
     this.valueRange = null
     this.commentRange = null

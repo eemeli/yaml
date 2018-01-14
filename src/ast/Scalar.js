@@ -83,8 +83,8 @@ export default class Scalar extends Node {
     return null
   }
 
-  constructor (src, props) {
-    super(src, props)
+  constructor (doc, props) {
+    super(doc, props)
     this.blockStyle = null
   }
 
