@@ -2,78 +2,78 @@ import Node, { LOG } from './Node'
 import Range from './Range'
 
 export default class Scalar extends Node {
-  constructor (src, props) {
-    super(src, props)
-    this.blockStyle = null
-  }
-
-  endDoubleQuote (offset) {
-    let ch = this.src[offset]
+  static endOfDoubleQuote (src, offset) {
+    let ch = src[offset]
     while (ch && ch !== '"') {
       offset += (ch === '\\') ? 2 : 1
-      ch = this.src[offset]
+      ch = src[offset]
     }
     return offset + 1
   }
 
-  endSingleQuote (offset) {
-    let ch = this.src[offset]
+  static endOfSingleQuote (src, offset) {
+    let ch = src[offset]
     while (ch) {
       if (ch === "'") {
-        if (this.src[offset + 1] !== "'") break
-        ch = this.src[offset += 2]
+        if (src[offset + 1] !== "'") break
+        ch = src[offset += 2]
       } else {
-        ch = this.src[offset += 1]
+        ch = src[offset += 1]
       }
     }
     return offset + 1
   }
 
-  endPlainLine (start, first, inFlow) {
-    let ch = this.src[start]
+  static endOfPlainLine (src, start, first, inFlow) {
+    let ch = src[start]
     if (first) {
       if (ch === '#' || ch === '\n') return start
       if (ch === ':' || ch === '?' || ch === '-') {
-        const next = this.src[start + 1]
+        const next = src[start + 1]
         if (next === '\n' || next === '\t' || next === ' ') return start
       }
     }
     let offset = start
     while (ch && ch !== '\n') {
       if (inFlow && (ch === '[' || ch === ']' || ch === '{' || ch === '}' || ch === ',')) break
-      const next = this.src[offset + 1]
+      const next = src[offset + 1]
       if (ch === ':' && (next === ' ' || next === '\t')) break
       if ((ch === ' ' || ch === '\t') && next === '#') break
       offset += 1
       ch = next
     }
     // last char can't be whitespace
-    ch = this.src[offset - 1]
+    ch = src[offset - 1]
     while (offset > start && (ch === ' ' || ch === '\t')) {
       offset -= 1
-      ch = this.src[offset - 1]
+      ch = src[offset - 1]
     }
     return offset
   }
 
-  endBlockStyle (offset) {
+  static endOfBlockStyle (src, offset) {
     const valid = ['-', '+', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-    let ch = this.src[offset]
-    while (valid.indexOf(ch) !== -1) ch = this.src[offset += 1]
+    let ch = src[offset]
+    while (valid.indexOf(ch) !== -1) ch = src[offset += 1]
     return offset
   }
 
-  endBlockIndent (indent, offset) {
-    const inEnd = Node.endOfIndent(this.src, offset)
+  static endOfBlockIndent (src, indent, offset) {
+    const inEnd = Node.endOfIndent(src, offset)
     if (inEnd > offset + indent) {
       return inEnd
     } else {
-      const wsEnd = Node.endOfWhiteSpace(this.src, inEnd)
-      if (this.src[wsEnd] === '\n') {
+      const wsEnd = Node.endOfWhiteSpace(src, inEnd)
+      if (src[wsEnd] === '\n') {
         return wsEnd
       }
     }
     return null
+  }
+
+  constructor (src, props) {
+    super(src, props)
+    this.blockStyle = null
   }
 
   parseInlineValue (start, inFlow) {
@@ -84,17 +84,17 @@ export default class Scalar extends Node {
         end = Node.endOfIdentifier(this.src, start)
         break
       case Node.Type.DOUBLE:
-        end = this.endDoubleQuote(start + 1)
+        end = Scalar.endOfDoubleQuote(this.src, start + 1)
         break
       case Node.Type.SINGLE:
-        end = this.endSingleQuote(start + 1)
+        end = Scalar.endOfSingleQuote(this.src, start + 1)
         break
       case Node.Type.BLOCK:
-        end = this.endBlockStyle(start + 1)
+        end = Scalar.endOfBlockStyle(this.src, start + 1)
         this.blockStyle = this.src.slice(start, end)
         break
       default: // Node.Type.PLAIN
-        end = this.endPlainLine(start, true, inFlow)
+        end = Scalar.endOfPlainLine(this.src, start, true, inFlow)
     }
     this.valueRange = new Range(start, end)
     LOG && console.log('value', { type: this.type, range: this.valueRange, value: this.rawValue })
@@ -102,20 +102,20 @@ export default class Scalar extends Node {
   }
 
   parseBlockValue (offset, indent, inFlow) {
-    const endLine = (this.type === Node.Type.BLOCK) ? (
-      (offset) => this.endLine(offset)
+    const endOfLine = (this.type === Node.Type.BLOCK) ? (
+      (offset) => Node.endOfLine(this.src, offset)
     ) : (this.type === Node.Type.PLAIN) ? (
-      (offset) => this.endPlainLine(offset, false, inFlow)
+      (offset) => Scalar.endOfPlainLine(this.src, offset, false, inFlow)
     ) : (
       null
     )
     let ch = this.src[offset]
-    if (endLine && ch === '\n') {
+    if (endOfLine && ch === '\n') {
       const start = offset + 1
       while (ch === '\n') {
-        const end = this.endBlockIndent(indent, offset + 1)
+        const end = Scalar.endOfBlockIndent(this.src, indent, offset + 1)
         if (end === null) break
-        offset = endLine(end)
+        offset = endOfLine(end)
         ch = this.src[offset]
       }
       if (this.type === Node.Type.PLAIN && !this.valueRange.isEmpty) {

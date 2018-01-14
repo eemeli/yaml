@@ -28,6 +28,12 @@ export default class Node {
     return offset
   }
 
+  static endOfLine (src, offset) {
+    let ch = src[offset]
+    while (ch && ch !== '\n') ch = src[offset += 1]
+    return offset
+  }
+
   static endOfWhiteSpace (src, offset) {
     let ch = src[offset]
     while (ch === '\t' || ch === ' ') ch = src[offset += 1]
@@ -88,16 +94,10 @@ export default class Node {
     return this.src.slice(start, end)
   }
 
-  endLine (offset) {
-    let ch = this.src[offset]
-    while (ch && ch !== '\n') ch = this.src[offset += 1]
-    return offset
-  }
-
   parseComment (offset) {
     if (this.src[offset] === '#') {
       const start = offset + 1
-      const end = this.endLine(start)
+      const end = Node.endOfLine(this.src, start)
       this.commentRange = new Range(start, end)
       LOG && console.log('comment', this.commentRange)
       return end
