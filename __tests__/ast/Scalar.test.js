@@ -13,7 +13,7 @@ const testScalarParse = ({ pre, post, str, comment, expected, inFlow, startIdx, 
   const scalar = doc.parseNode(startIdx || pre.length, indent, inFlow || false)
   expect(scalar.rawValue).toBe(expected || str)
   const expectedEnd = Node.endOfWhiteSpace(doc.src, pre.length + body.length)
-  expect(scalar.nodeRange.end).toBe(expectedEnd)
+  expect(scalar.range.end).toBe(expectedEnd)
   if (comment) expect(scalar.comment).toBe(comment)
   if (customTest) customTest(scalar)
   delete scalar.doc

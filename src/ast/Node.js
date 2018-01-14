@@ -97,7 +97,7 @@ export default class Node {
   constructor (doc, { anchor, tag, type }) {
     this.doc = doc
     this.src = doc.src
-    this.nodeRange = null
+    this.range = null
     this.valueRange = null
     this.commentRange = null
     this.anchor = anchor

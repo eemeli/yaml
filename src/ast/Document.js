@@ -26,8 +26,8 @@ export default class Document {
         node = new Scalar(this, props)
     }
     const end = node.parse(props.valueStart, indent, inFlow)
-    node.nodeRange = new Range(start, end)
-    LOG && console.log('node', node.type, node.nodeRange)
+    node.range = new Range(start, end)
+    LOG && console.log('node', node.type, node.range)
     return node
   }
 }
