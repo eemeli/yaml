@@ -11,7 +11,7 @@ export default class Node {
     FLOW_SEQ: 'FLOW_SEQ',
     MAP: 'MAP',
     PLAIN: 'PLAIN',
-    SEQ: 'SEQ',
+    SEQ_ITEM: 'SEQ_ITEM',
     SINGLE: 'SINGLE'
   }
 
@@ -65,7 +65,7 @@ export default class Node {
       case ':':
         return Node.isBlank(src, offset + 1) ? Node.Type.MAP : Node.Type.PLAIN
       case '-':
-        return Node.isBlank(src, offset + 1) ? Node.Type.SEQ : Node.Type.PLAIN
+        return Node.isBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
       case "'":
         return Node.Type.SINGLE
       default:
@@ -108,8 +108,12 @@ export default class Node {
     return this.doc.src.slice(start, end)
   }
 
+  get isSeqItem () {
+    return this.type === Node.Type.SEQ_ITEM
+  }
+
   get isScalar () {
-    return !this.items
+    return !this.items && !this.isSeqItem
   }
 
   get jsonLike () {

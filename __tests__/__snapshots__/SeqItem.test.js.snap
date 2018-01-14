@@ -1,0 +1,307 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parse simple seq items bare 1`] = `
+SeqItem {
+  "anchor": null,
+  "commentRange": null,
+  "indicator": "-",
+  "item": Scalar {
+    "anchor": null,
+    "blockStyle": null,
+    "commentRange": null,
+    "doc": Document {
+      "src": "- \\"value\\"",
+    },
+    "range": Range {
+      "end": 9,
+      "start": 2,
+    },
+    "tag": null,
+    "type": "DOUBLE",
+    "valueRange": Range {
+      "end": 9,
+      "start": 2,
+    },
+  },
+  "range": Range {
+    "end": 9,
+    "start": 0,
+  },
+  "raw": "- \\"value\\"",
+  "tag": null,
+  "type": "SEQ_ITEM",
+  "valueRange": Range {
+    "end": 9,
+    "start": 0,
+  },
+}
+`;
+
+exports[`parse simple seq items complex mapping key 1`] = `
+SeqItem {
+  "anchor": null,
+  "commentRange": null,
+  "indicator": "-",
+  "item": Scalar {
+    "anchor": null,
+    "blockStyle": null,
+    "commentRange": null,
+    "doc": Document {
+      "src": "? - \\"value\\" : ",
+    },
+    "range": Range {
+      "end": 12,
+      "start": 4,
+    },
+    "tag": null,
+    "type": "DOUBLE",
+    "valueRange": Range {
+      "end": 11,
+      "start": 4,
+    },
+  },
+  "range": Range {
+    "end": 12,
+    "start": 2,
+  },
+  "raw": "- \\"value\\"",
+  "tag": null,
+  "type": "SEQ_ITEM",
+  "valueRange": Range {
+    "end": 11,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse simple seq items flow seq value 1`] = `
+SeqItem {
+  "anchor": null,
+  "commentRange": null,
+  "indicator": "-",
+  "item": Scalar {
+    "anchor": null,
+    "blockStyle": null,
+    "commentRange": null,
+    "doc": Document {
+      "src": "[ - \\"value\\" ]",
+    },
+    "range": Range {
+      "end": 12,
+      "start": 4,
+    },
+    "tag": null,
+    "type": "DOUBLE",
+    "valueRange": Range {
+      "end": 11,
+      "start": 4,
+    },
+  },
+  "range": Range {
+    "end": 12,
+    "start": 2,
+  },
+  "raw": "- \\"value\\"",
+  "tag": null,
+  "type": "SEQ_ITEM",
+  "valueRange": Range {
+    "end": 11,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse simple seq items indented block 1`] = `
+SeqItem {
+  "anchor": null,
+  "commentRange": null,
+  "indicator": "-",
+  "item": Scalar {
+    "anchor": null,
+    "blockStyle": null,
+    "commentRange": null,
+    "doc": Document {
+      "src": "    - - \\"value\\"
+  x",
+    },
+    "range": Range {
+      "end": 15,
+      "start": 8,
+    },
+    "tag": null,
+    "type": "DOUBLE",
+    "valueRange": Range {
+      "end": 15,
+      "start": 8,
+    },
+  },
+  "range": Range {
+    "end": 15,
+    "start": 6,
+  },
+  "raw": "- \\"value\\"",
+  "tag": null,
+  "type": "SEQ_ITEM",
+  "valueRange": Range {
+    "end": 15,
+    "start": 6,
+  },
+}
+`;
+
+exports[`parse simple seq items newline before & after 1`] = `
+SeqItem {
+  "anchor": null,
+  "commentRange": null,
+  "indicator": "-",
+  "item": Scalar {
+    "anchor": null,
+    "blockStyle": null,
+    "commentRange": null,
+    "doc": Document {
+      "src": "
+- \\"value\\"
+",
+    },
+    "range": Range {
+      "end": 10,
+      "start": 3,
+    },
+    "tag": null,
+    "type": "DOUBLE",
+    "valueRange": Range {
+      "end": 10,
+      "start": 3,
+    },
+  },
+  "range": Range {
+    "end": 10,
+    "start": 1,
+  },
+  "raw": "- \\"value\\"",
+  "tag": null,
+  "type": "SEQ_ITEM",
+  "valueRange": Range {
+    "end": 10,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse simple seq items seq value 1`] = `
+SeqItem {
+  "anchor": null,
+  "commentRange": null,
+  "indicator": "-",
+  "item": Scalar {
+    "anchor": null,
+    "blockStyle": null,
+    "commentRange": null,
+    "doc": Document {
+      "src": "- - \\"value\\"
+- ",
+    },
+    "range": Range {
+      "end": 11,
+      "start": 4,
+    },
+    "tag": null,
+    "type": "DOUBLE",
+    "valueRange": Range {
+      "end": 11,
+      "start": 4,
+    },
+  },
+  "range": Range {
+    "end": 11,
+    "start": 2,
+  },
+  "raw": "- \\"value\\"",
+  "tag": null,
+  "type": "SEQ_ITEM",
+  "valueRange": Range {
+    "end": 11,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse simple seq items with comment 1`] = `
+SeqItem {
+  "anchor": null,
+  "commentRange": null,
+  "indicator": "-",
+  "item": Scalar {
+    "anchor": null,
+    "blockStyle": null,
+    "commentRange": Range {
+      "end": 29,
+      "start": 14,
+    },
+    "doc": Document {
+      "src": "
+  - \\"value\\" #comment # here!
+",
+    },
+    "range": Range {
+      "end": 29,
+      "start": 5,
+    },
+    "tag": null,
+    "type": "DOUBLE",
+    "valueRange": Range {
+      "end": 12,
+      "start": 5,
+    },
+  },
+  "range": Range {
+    "end": 29,
+    "start": 3,
+  },
+  "raw": "- \\"value\\"",
+  "tag": null,
+  "type": "SEQ_ITEM",
+  "valueRange": Range {
+    "end": 12,
+    "start": 3,
+  },
+}
+`;
+
+exports[`parse simple seq items with props 1`] = `
+SeqItem {
+  "anchor": "anchor",
+  "commentRange": null,
+  "indicator": "-",
+  "item": Scalar {
+    "anchor": null,
+    "blockStyle": null,
+    "commentRange": null,
+    "doc": Document {
+      "src": "- !tag! &anchor - \\"value\\"
+- ",
+    },
+    "range": Range {
+      "end": 25,
+      "start": 18,
+    },
+    "tag": null,
+    "type": "DOUBLE",
+    "valueRange": Range {
+      "end": 25,
+      "start": 18,
+    },
+  },
+  "range": Range {
+    "end": 25,
+    "start": 2,
+  },
+  "raw": "- \\"value\\"",
+  "tag": "tag!",
+  "type": "SEQ_ITEM",
+  "valueRange": Range {
+    "end": 25,
+    "start": 16,
+  },
+}
+`;
