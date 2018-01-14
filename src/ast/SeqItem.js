@@ -9,7 +9,7 @@ export default class SeqItem extends Node {
     this.item = null
   }
 
-  parse (start, indent) {
+  parse (start, indent, inFlow) {
     trace: ({ start, indent })
     const { src } = this.doc
     this.indicator = src[start] // -
@@ -34,7 +34,7 @@ export default class SeqItem extends Node {
       ch = src[offset]
     }
     if (ch && itemIndent > indent) {
-      this.item = this.doc.parseNode(offset, itemIndent, false)
+      this.item = this.doc.parseNode(offset, itemIndent, inFlow)
       offset = this.item.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1

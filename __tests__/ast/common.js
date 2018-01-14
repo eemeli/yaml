@@ -28,7 +28,7 @@ export const testParse = ({ pre, post, str, comment, expected, inFlow, startIdx,
   expect(node.range.end).toBe(expectedEnd)
   if (comment) {
     if (node.isScalar) expect(node.comment).toBe(comment)
-    else if (node.isSeqItem) expect(node.item.comment).toBe(comment)
+    else if (node.isSeqItem) expect(node.comment || node.item.comment).toBe(comment)
   }
   if (customTest) customTest(node)
   expect(cleanForSnapshot(node)).toMatchSnapshot()
