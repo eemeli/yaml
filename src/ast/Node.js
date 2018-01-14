@@ -96,7 +96,6 @@ export default class Node {
 
   constructor (doc, { anchor, tag, type }) {
     this.doc = doc
-    this.src = doc.src
     this.range = null
     this.valueRange = null
     this.commentRange = null
@@ -106,21 +105,21 @@ export default class Node {
   }
 
   get comment () {
-    if (!this.src || !this.commentRange) return null
+    if (!this.commentRange) return null
     const { start, end } = this.commentRange
-    return this.src.slice(start, end)
+    return this.doc.src.slice(start, end)
   }
 
   get rawValue () {
-    if (!this.src || !this.valueRange) return null
+    if (!this.valueRange) return null
     const { start, end } = this.valueRange
-    return this.src.slice(start, end)
+    return this.doc.src.slice(start, end)
   }
 
   parseComment (offset) {
-    if (this.src[offset] === '#') {
+    if (this.doc.src[offset] === '#') {
       const start = offset + 1
-      const end = Node.endOfLine(this.src, start)
+      const end = Node.endOfLine(this.doc.src, start)
       this.commentRange = new Range(start, end)
       LOG && console.log('comment', this.commentRange)
       return end

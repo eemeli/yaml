@@ -89,50 +89,52 @@ export default class Scalar extends Node {
   }
 
   parseInlineValue (start, inFlow) {
+    const { src } = this.doc
     let end
     switch (this.type) {
       case Node.Type.ALIAS:
         start += 1
-        end = Node.endOfIdentifier(this.src, start)
+        end = Node.endOfIdentifier(src, start)
         break
       case Node.Type.DIRECTIVE:
         start += 1
-        end = Scalar.endOfDirective(this.src, start)
+        end = Scalar.endOfDirective(src, start)
         break
       case Node.Type.DOUBLE:
-        end = Scalar.endOfDoubleQuote(this.src, start + 1)
+        end = Scalar.endOfDoubleQuote(src, start + 1)
         break
       case Node.Type.SINGLE:
-        end = Scalar.endOfSingleQuote(this.src, start + 1)
+        end = Scalar.endOfSingleQuote(src, start + 1)
         break
       case Node.Type.BLOCK:
-        end = Scalar.endOfBlockStyle(this.src, start + 1)
-        this.blockStyle = this.src.slice(start, end)
+        end = Scalar.endOfBlockStyle(src, start + 1)
+        this.blockStyle = src.slice(start, end)
         break
       default: // Node.Type.PLAIN
-        end = Scalar.endOfPlainLine(this.src, start, true, inFlow)
+        end = Scalar.endOfPlainLine(src, start, true, inFlow)
     }
     this.valueRange = new Range(start, end)
     LOG && console.log('value', { type: this.type, range: this.valueRange, value: this.rawValue })
-    return Node.endOfWhiteSpace(this.src, end)
+    return Node.endOfWhiteSpace(src, end)
   }
 
   parseBlockValue (offset, indent, inFlow) {
+    const { src } = this.doc
     const endOfLine = (this.type === Node.Type.BLOCK) ? (
-      (offset) => Node.endOfLine(this.src, offset)
+      (offset) => Node.endOfLine(src, offset)
     ) : (this.type === Node.Type.PLAIN) ? (
-      (offset) => Scalar.endOfPlainLine(this.src, offset, false, inFlow)
+      (offset) => Scalar.endOfPlainLine(src, offset, false, inFlow)
     ) : (
       null
     )
-    let ch = this.src[offset]
+    let ch = src[offset]
     if (endOfLine && ch === '\n') {
       const start = offset + 1
       while (ch === '\n') {
-        const end = Scalar.endOfBlockIndent(this.src, indent, offset + 1)
+        const end = Scalar.endOfBlockIndent(src, indent, offset + 1)
         if (end === null) break
         offset = endOfLine(end)
-        ch = this.src[offset]
+        ch = src[offset]
       }
       if (this.type === Node.Type.PLAIN) {
         if (offset > start) {

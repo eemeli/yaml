@@ -10,14 +10,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "[ \\"one\\", 2, three four ]",
-      },
       "range": Range {
         "end": 7,
         "start": 2,
       },
-      "src": "[ \\"one\\", 2, three four ]",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -30,14 +26,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "[ \\"one\\", 2, three four ]",
-      },
       "range": Range {
         "end": 10,
         "start": 9,
       },
-      "src": "[ \\"one\\", 2, three four ]",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -50,14 +42,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "[ \\"one\\", 2, three four ]",
-      },
       "range": Range {
         "end": 23,
         "start": 12,
       },
-      "src": "[ \\"one\\", 2, three four ]",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -71,7 +59,6 @@ FlowContainer {
     "end": 24,
     "start": 0,
   },
-  "src": "[ \\"one\\", 2, three four ]",
   "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
@@ -91,14 +78,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "? [ \\"one\\", 2, three four ] : ",
-      },
       "range": Range {
         "end": 9,
         "start": 4,
       },
-      "src": "? [ \\"one\\", 2, three four ] : ",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -111,14 +94,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "? [ \\"one\\", 2, three four ] : ",
-      },
       "range": Range {
         "end": 12,
         "start": 11,
       },
-      "src": "? [ \\"one\\", 2, three four ] : ",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -131,14 +110,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "? [ \\"one\\", 2, three four ] : ",
-      },
       "range": Range {
         "end": 25,
         "start": 14,
       },
-      "src": "? [ \\"one\\", 2, three four ] : ",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -152,7 +127,6 @@ FlowContainer {
     "end": 27,
     "start": 2,
   },
-  "src": "? [ \\"one\\", 2, three four ] : ",
   "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
@@ -172,14 +146,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "[ [ \\"one\\", 2, three four ] ]",
-      },
       "range": Range {
         "end": 9,
         "start": 4,
       },
-      "src": "[ [ \\"one\\", 2, three four ] ]",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -192,14 +162,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "[ [ \\"one\\", 2, three four ] ]",
-      },
       "range": Range {
         "end": 12,
         "start": 11,
       },
-      "src": "[ [ \\"one\\", 2, three four ] ]",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -212,14 +178,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "[ [ \\"one\\", 2, three four ] ]",
-      },
       "range": Range {
         "end": 25,
         "start": 14,
       },
-      "src": "[ [ \\"one\\", 2, three four ] ]",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -233,7 +195,6 @@ FlowContainer {
     "end": 27,
     "start": 2,
   },
-  "src": "[ [ \\"one\\", 2, three four ] ]",
   "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
@@ -253,16 +214,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "    - [ \\"one\\", 2, three four ]
-  x",
-      },
       "range": Range {
         "end": 13,
         "start": 8,
       },
-      "src": "    - [ \\"one\\", 2, three four ]
-  x",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -275,16 +230,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "    - [ \\"one\\", 2, three four ]
-  x",
-      },
       "range": Range {
         "end": 16,
         "start": 15,
       },
-      "src": "    - [ \\"one\\", 2, three four ]
-  x",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -297,16 +246,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "    - [ \\"one\\", 2, three four ]
-  x",
-      },
       "range": Range {
         "end": 29,
         "start": 18,
       },
-      "src": "    - [ \\"one\\", 2, three four ]
-  x",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -320,8 +263,6 @@ FlowContainer {
     "end": 30,
     "start": 6,
   },
-  "src": "    - [ \\"one\\", 2, three four ]
-  x",
   "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
@@ -341,18 +282,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "
-[ \\"one\\", 2, three four ]
-",
-      },
       "range": Range {
         "end": 8,
         "start": 3,
       },
-      "src": "
-[ \\"one\\", 2, three four ]
-",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -365,18 +298,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "
-[ \\"one\\", 2, three four ]
-",
-      },
       "range": Range {
         "end": 11,
         "start": 10,
       },
-      "src": "
-[ \\"one\\", 2, three four ]
-",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -389,18 +314,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "
-[ \\"one\\", 2, three four ]
-",
-      },
       "range": Range {
         "end": 24,
         "start": 13,
       },
-      "src": "
-[ \\"one\\", 2, three four ]
-",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -414,9 +331,6 @@ FlowContainer {
     "end": 25,
     "start": 1,
   },
-  "src": "
-[ \\"one\\", 2, three four ]
-",
   "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
@@ -436,16 +350,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "- [ \\"one\\", 2, three four ]
-- ",
-      },
       "range": Range {
         "end": 9,
         "start": 4,
       },
-      "src": "- [ \\"one\\", 2, three four ]
-- ",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -458,16 +366,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "- [ \\"one\\", 2, three four ]
-- ",
-      },
       "range": Range {
         "end": 12,
         "start": 11,
       },
-      "src": "- [ \\"one\\", 2, three four ]
-- ",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -480,16 +382,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "- [ \\"one\\", 2, three four ]
-- ",
-      },
       "range": Range {
         "end": 25,
         "start": 14,
       },
-      "src": "- [ \\"one\\", 2, three four ]
-- ",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -503,8 +399,6 @@ FlowContainer {
     "end": 26,
     "start": 2,
   },
-  "src": "- [ \\"one\\", 2, three four ]
-- ",
   "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
@@ -527,18 +421,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "
-  [ \\"one\\", 2, three four ] #comment # here!
-",
-      },
       "range": Range {
         "end": 10,
         "start": 5,
       },
-      "src": "
-  [ \\"one\\", 2, three four ] #comment # here!
-",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -551,18 +437,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "
-  [ \\"one\\", 2, three four ] #comment # here!
-",
-      },
       "range": Range {
         "end": 13,
         "start": 12,
       },
-      "src": "
-  [ \\"one\\", 2, three four ] #comment # here!
-",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -575,18 +453,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "
-  [ \\"one\\", 2, three four ] #comment # here!
-",
-      },
       "range": Range {
         "end": 26,
         "start": 15,
       },
-      "src": "
-  [ \\"one\\", 2, three four ] #comment # here!
-",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -600,9 +470,6 @@ FlowContainer {
     "end": 44,
     "start": 3,
   },
-  "src": "
-  [ \\"one\\", 2, three four ] #comment # here!
-",
   "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
@@ -622,16 +489,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
-- ",
-      },
       "range": Range {
         "end": 23,
         "start": 18,
       },
-      "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
-- ",
       "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
@@ -644,16 +505,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
-- ",
-      },
       "range": Range {
         "end": 26,
         "start": 25,
       },
-      "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
-- ",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -666,16 +521,10 @@ FlowContainer {
       "anchor": null,
       "blockStyle": null,
       "commentRange": null,
-      "doc": Document {
-        "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
-- ",
-      },
       "range": Range {
         "end": 39,
         "start": 28,
       },
-      "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
-- ",
       "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
@@ -689,8 +538,6 @@ FlowContainer {
     "end": 40,
     "start": 2,
   },
-  "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
-- ",
   "tag": "tag!",
   "type": "FLOW_SEQ",
   "valueRange": Range {

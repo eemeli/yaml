@@ -9,14 +9,15 @@ export default class FlowContainer extends Node {
 
   parse (start, indent) {
     LOG && console.log('flow-container parse start', { start, indent })
-    let ch = this.src[start] // { or [
+    const { src } = this.doc
+    let ch = src[start] // { or [
     this.items = [ch]
-    let offset = Node.endOfWhiteSpace(this.src, start + 1)
+    let offset = Node.endOfWhiteSpace(src, start + 1)
     while (ch && ch !== ']' && ch !== '}') {
       switch (ch) {
         case '\n': {
           const lineStart = offset + 1
-          offset = Node.endOfIndent(this.src, lineStart)
+          offset = Node.endOfIndent(src, lineStart)
           indent = offset - lineStart
         } break
         case ',': {
@@ -29,13 +30,13 @@ export default class FlowContainer extends Node {
           offset = node.range.end
         }
       }
-      offset = Node.endOfWhiteSpace(this.src, offset)
-      ch = this.src[offset]
+      offset = Node.endOfWhiteSpace(src, offset)
+      ch = src[offset]
     }
     this.valueRange = new Range(start, offset + 1)
     if (ch) {
       this.items.push(ch)
-      offset = Node.endOfWhiteSpace(this.src, offset + 1)
+      offset = Node.endOfWhiteSpace(src, offset + 1)
       offset = this.parseComment(offset)
     }
     LOG && console.log('flow-container items', this.items)

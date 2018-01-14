@@ -5,7 +5,7 @@ describe('internals', () => {
     const src = 'src'
     const props = { anchor: 'anchor', tag: 'tag', type: Node.Type.PLAIN }
     const node = new Node({ src }, props)
-    expect(node.src).toBe(src)
+    expect(node.doc.src).toBe(src)
     expect(node.anchor).toBe(props.anchor)
     expect(node.tag).toBe(props.tag)
     expect(node.type).toBe(props.type)

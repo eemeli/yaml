@@ -9,7 +9,6 @@ Scalar {
     "end": 7,
     "start": 0,
   },
-  "src": "\\"value\\"",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -28,7 +27,6 @@ Scalar {
     "end": 10,
     "start": 2,
   },
-  "src": "? \\"value\\" : ",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -47,10 +45,6 @@ Scalar {
     "end": 34,
     "start": 1,
   },
-  "src": "
-\\" #value\\\\\\\\
-with \\\\\\"more\\\\\\" lines\\\\\\"\\"
-",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -69,7 +63,6 @@ Scalar {
     "end": 10,
     "start": 2,
   },
-  "src": "[ \\"value\\" ]",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -88,8 +81,6 @@ Scalar {
     "end": 13,
     "start": 6,
   },
-  "src": "    - \\"value\\"
-  x",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -108,11 +99,6 @@ Scalar {
     "end": 24,
     "start": 1,
   },
-  "src": "
-\\"value
-with
-more lines\\"
-",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -131,9 +117,6 @@ Scalar {
     "end": 8,
     "start": 1,
   },
-  "src": "
-\\"value\\"
-",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -152,8 +135,6 @@ Scalar {
     "end": 9,
     "start": 2,
   },
-  "src": "- \\"value\\"
-- ",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -175,9 +156,6 @@ Scalar {
     "end": 27,
     "start": 3,
   },
-  "src": "
-  \\"value\\" #comment # here!
-",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -196,8 +174,6 @@ Scalar {
     "end": 23,
     "start": 2,
   },
-  "src": "- !tag! &anchor \\"value\\"
-- ",
   "tag": "tag!",
   "type": "DOUBLE",
   "valueRange": Range {
@@ -216,7 +192,6 @@ Scalar {
     "end": 8,
     "start": 1,
   },
-  "src": "{\\"value\\",",
   "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
@@ -238,7 +213,6 @@ Scalar {
     "end": 17,
     "start": 0,
   },
-  "src": " #comment # here!",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -260,8 +234,6 @@ Scalar {
     "end": 19,
     "start": 2,
   },
-  "src": "?  #comment # here!
-: ",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -283,8 +255,6 @@ Scalar {
     "end": 23,
     "start": 6,
   },
-  "src": "    -  #comment # here!
-  x",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -306,9 +276,6 @@ Scalar {
     "end": 18,
     "start": 1,
   },
-  "src": "
- #comment # here!
-",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -330,8 +297,6 @@ Scalar {
     "end": 19,
     "start": 2,
   },
-  "src": "-  #comment # here!
-- ",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -350,8 +315,6 @@ Scalar {
     "end": 30,
     "start": 0,
   },
-  "src": "%TAG !yaml! tag:yaml.org,2002:
-",
   "tag": null,
   "type": "DIRECTIVE",
   "valueRange": Range {
@@ -373,8 +336,6 @@ Scalar {
     "end": 18,
     "start": 0,
   },
-  "src": "%YAML 1.2 #comment
-",
   "tag": null,
   "type": "DIRECTIVE",
   "valueRange": Range {
@@ -393,7 +354,6 @@ Scalar {
     "end": 7,
     "start": 0,
   },
-  "src": "'value'",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -412,7 +372,6 @@ Scalar {
     "end": 10,
     "start": 2,
   },
-  "src": "? 'value' : ",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -431,10 +390,6 @@ Scalar {
     "end": 32,
     "start": 1,
   },
-  "src": "
-' #value
-with ''more'' lines'''
-",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -453,7 +408,6 @@ Scalar {
     "end": 10,
     "start": 2,
   },
-  "src": "[ 'value' ]",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -472,8 +426,6 @@ Scalar {
     "end": 13,
     "start": 6,
   },
-  "src": "    - 'value'
-  x",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -492,11 +444,6 @@ Scalar {
     "end": 24,
     "start": 1,
   },
-  "src": "
-'value
-with
-more lines'
-",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -515,9 +462,6 @@ Scalar {
     "end": 8,
     "start": 1,
   },
-  "src": "
-'value'
-",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -536,8 +480,6 @@ Scalar {
     "end": 9,
     "start": 2,
   },
-  "src": "- 'value'
-- ",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -559,9 +501,6 @@ Scalar {
     "end": 27,
     "start": 3,
   },
-  "src": "
-  'value' #comment # here!
-",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -580,8 +519,6 @@ Scalar {
     "end": 23,
     "start": 2,
   },
-  "src": "- !tag! &anchor 'value'
-- ",
   "tag": "tag!",
   "type": "SINGLE",
   "valueRange": Range {
@@ -600,7 +537,6 @@ Scalar {
     "end": 8,
     "start": 1,
   },
-  "src": "{'value',",
   "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
@@ -619,7 +555,6 @@ Scalar {
     "end": 6,
     "start": 0,
   },
-  "src": "*alias",
   "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
@@ -638,7 +573,6 @@ Scalar {
     "end": 9,
     "start": 2,
   },
-  "src": "? *alias : ",
   "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
@@ -657,7 +591,6 @@ Scalar {
     "end": 9,
     "start": 2,
   },
-  "src": "[ *alias ]",
   "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
@@ -676,8 +609,6 @@ Scalar {
     "end": 12,
     "start": 6,
   },
-  "src": "    - *alias
-  x",
   "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
@@ -696,9 +627,6 @@ Scalar {
     "end": 7,
     "start": 1,
   },
-  "src": "
-*alias
-",
   "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
@@ -717,8 +645,6 @@ Scalar {
     "end": 8,
     "start": 2,
   },
-  "src": "- *alias
-- ",
   "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
@@ -740,9 +666,6 @@ Scalar {
     "end": 26,
     "start": 3,
   },
-  "src": "
-  *alias #comment # here!
-",
   "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
@@ -761,8 +684,6 @@ Scalar {
     "end": 22,
     "start": 2,
   },
-  "src": "- !tag! &anchor *alias
-- ",
   "tag": "tag!",
   "type": "ALIAS",
   "valueRange": Range {
@@ -781,10 +702,6 @@ Scalar {
     "end": 34,
     "start": 0,
   },
-  "src": ">
-      #multiline
-  
-      	block",
   "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
@@ -803,11 +720,6 @@ Scalar {
     "end": 38,
     "start": 4,
   },
-  "src": "  ? >
-      #multiline
-  
-      	block
-: ",
   "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
@@ -826,11 +738,6 @@ Scalar {
     "end": 38,
     "start": 4,
   },
-  "src": "  [ >
-      #multiline
-  
-      	block
-]",
   "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
@@ -849,11 +756,6 @@ Scalar {
     "end": 40,
     "start": 6,
   },
-  "src": "    - >
-      #multiline
-  
-      	block
-  x",
   "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
@@ -872,12 +774,6 @@ Scalar {
     "end": 39,
     "start": 3,
   },
-  "src": "
-- |+2
-      #multiline
-  
-      	block
-",
   "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
@@ -896,12 +792,6 @@ Scalar {
     "end": 35,
     "start": 1,
   },
-  "src": "
->
-      #multiline
-  
-      	block
-",
   "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
@@ -920,11 +810,6 @@ Scalar {
     "end": 36,
     "start": 2,
   },
-  "src": "- >
-      #multiline
-  
-      	block
-- ",
   "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
@@ -946,12 +831,6 @@ Scalar {
     "end": 54,
     "start": 3,
   },
-  "src": "
-  > #comment # here!
-      #multiline
-  
-      	block
-",
   "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
@@ -970,11 +849,6 @@ Scalar {
     "end": 50,
     "start": 2,
   },
-  "src": "- !tag! &anchor >
-      #multiline
-  
-      	block
-- ",
   "tag": "tag!",
   "type": "BLOCK",
   "valueRange": Range {
@@ -993,10 +867,6 @@ Scalar {
     "end": 49,
     "start": 0,
   },
-  "src": ":first#
-      ? :multi line
-  
-      	plain value",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1015,11 +885,6 @@ Scalar {
     "end": 53,
     "start": 4,
   },
-  "src": "  ? :first#
-      ? :multi line
-  
-      	plain value
-: ",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1038,11 +903,6 @@ Scalar {
     "end": 53,
     "start": 4,
   },
-  "src": "  [ :first#
-      ? :multi line
-  
-      	plain value
-]",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1061,11 +921,6 @@ Scalar {
     "end": 55,
     "start": 6,
   },
-  "src": "    - :first#
-      ? :multi line
-  
-      	plain value
-  x",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1084,12 +939,6 @@ Scalar {
     "end": 50,
     "start": 1,
   },
-  "src": "
-:first#
-      ? :multi line
-  
-      	plain value
-",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1108,11 +957,6 @@ Scalar {
     "end": 51,
     "start": 2,
   },
-  "src": "- :first#
-      ? :multi line
-  
-      	plain value
-- ",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1134,12 +978,6 @@ Scalar {
     "end": 62,
     "start": 3,
   },
-  "src": "
-   #comment # here!
-      ? :multi line
-  
-      	plain value
-",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1158,11 +996,6 @@ Scalar {
     "end": 65,
     "start": 2,
   },
-  "src": "- !tag! &anchor :first#
-      ? :multi line
-  
-      	plain value
-- ",
   "tag": "tag!",
   "type": "PLAIN",
   "valueRange": Range {
@@ -1181,7 +1014,6 @@ Scalar {
     "end": 11,
     "start": 0,
   },
-  "src": "plain value",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1200,7 +1032,6 @@ Scalar {
     "end": 14,
     "start": 2,
   },
-  "src": "? plain value : ",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1219,7 +1050,6 @@ Scalar {
     "end": 3,
     "start": 2,
   },
-  "src": "-  : ",
   "tag": null,
   "type": "MAP",
   "valueRange": Range {
@@ -1238,7 +1068,6 @@ Scalar {
     "end": 6,
     "start": 0,
   },
-  "src": "-#:] ,: ",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1257,7 +1086,6 @@ Scalar {
     "end": 3,
     "start": 0,
   },
-  "src": "-#:] ,: ",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1276,7 +1104,6 @@ Scalar {
     "end": 14,
     "start": 2,
   },
-  "src": "[ plain value ]",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1295,8 +1122,6 @@ Scalar {
     "end": 17,
     "start": 6,
   },
-  "src": "    - plain value
-  x",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1315,9 +1140,6 @@ Scalar {
     "end": 12,
     "start": 1,
   },
-  "src": "
-plain value
-",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1336,8 +1158,6 @@ Scalar {
     "end": 13,
     "start": 2,
   },
-  "src": "- plain value
-- ",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1359,9 +1179,6 @@ Scalar {
     "end": 31,
     "start": 3,
   },
-  "src": "
-  plain value #comment # here!
-",
   "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
@@ -1380,8 +1197,6 @@ Scalar {
     "end": 27,
     "start": 2,
   },
-  "src": "- !tag! &anchor plain value
-- ",
   "tag": "tag!",
   "type": "PLAIN",
   "valueRange": Range {

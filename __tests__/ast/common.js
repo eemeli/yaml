@@ -1,6 +1,12 @@
 import Document from '../../src/ast/Document'
 import Node from '../../src/ast/Node'
 
+export const trimForSnapshot = (node) => {
+  delete node.doc
+  if (node.items) node.items.forEach(trimForSnapshot)
+  return node
+}
+
 export const testParse = ({ pre, post, str, comment, expected, inFlow, startIdx, test: customTest }) => {
   let body = str
   if (comment) {
@@ -16,8 +22,7 @@ export const testParse = ({ pre, post, str, comment, expected, inFlow, startIdx,
   expect(node.range.end).toBe(expectedEnd)
   if (comment) expect(node.comment).toBe(comment)
   if (customTest) customTest(node)
-  delete node.doc
-  expect(node).toMatchSnapshot()
+  expect(trimForSnapshot(node)).toMatchSnapshot()
 }
 
 export const commonTests = {
