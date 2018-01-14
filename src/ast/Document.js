@@ -1,3 +1,4 @@
+import FlowContainer from './FlowContainer'
 import Node, { LOG } from './Node'
 import Range from './Range'
 import Scalar from './Scalar'
@@ -22,6 +23,10 @@ export default class Document {
     const props = Node.parseProps(this.src, start)
     let node
     switch (props.type) {
+      case Node.Type.FLOW_MAP:
+      case Node.Type.FLOW_SEQ:
+        node = new FlowContainer(this, props)
+        break
       default:
         node = new Scalar(this, props)
     }

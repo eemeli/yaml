@@ -1,0 +1,701 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parse simple array bare 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "[ \\"one\\", 2, three four ]",
+      },
+      "range": Range {
+        "end": 7,
+        "start": 2,
+      },
+      "src": "[ \\"one\\", 2, three four ]",
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 7,
+        "start": 2,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "[ \\"one\\", 2, three four ]",
+      },
+      "range": Range {
+        "end": 10,
+        "start": 9,
+      },
+      "src": "[ \\"one\\", 2, three four ]",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 10,
+        "start": 9,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "[ \\"one\\", 2, three four ]",
+      },
+      "range": Range {
+        "end": 23,
+        "start": 12,
+      },
+      "src": "[ \\"one\\", 2, three four ]",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 22,
+        "start": 12,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 24,
+    "start": 0,
+  },
+  "src": "[ \\"one\\", 2, three four ]",
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 24,
+    "start": 0,
+  },
+}
+`;
+
+exports[`parse simple array complex mapping key 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "? [ \\"one\\", 2, three four ] : ",
+      },
+      "range": Range {
+        "end": 9,
+        "start": 4,
+      },
+      "src": "? [ \\"one\\", 2, three four ] : ",
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 9,
+        "start": 4,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "? [ \\"one\\", 2, three four ] : ",
+      },
+      "range": Range {
+        "end": 12,
+        "start": 11,
+      },
+      "src": "? [ \\"one\\", 2, three four ] : ",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 12,
+        "start": 11,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "? [ \\"one\\", 2, three four ] : ",
+      },
+      "range": Range {
+        "end": 25,
+        "start": 14,
+      },
+      "src": "? [ \\"one\\", 2, three four ] : ",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 24,
+        "start": 14,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 27,
+    "start": 2,
+  },
+  "src": "? [ \\"one\\", 2, three four ] : ",
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 26,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse simple array flow seq value 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "[ [ \\"one\\", 2, three four ] ]",
+      },
+      "range": Range {
+        "end": 9,
+        "start": 4,
+      },
+      "src": "[ [ \\"one\\", 2, three four ] ]",
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 9,
+        "start": 4,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "[ [ \\"one\\", 2, three four ] ]",
+      },
+      "range": Range {
+        "end": 12,
+        "start": 11,
+      },
+      "src": "[ [ \\"one\\", 2, three four ] ]",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 12,
+        "start": 11,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "[ [ \\"one\\", 2, three four ] ]",
+      },
+      "range": Range {
+        "end": 25,
+        "start": 14,
+      },
+      "src": "[ [ \\"one\\", 2, three four ] ]",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 24,
+        "start": 14,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 27,
+    "start": 2,
+  },
+  "src": "[ [ \\"one\\", 2, three four ] ]",
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 26,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse simple array indented block 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "    - [ \\"one\\", 2, three four ]
+  x",
+      },
+      "range": Range {
+        "end": 13,
+        "start": 8,
+      },
+      "src": "    - [ \\"one\\", 2, three four ]
+  x",
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 13,
+        "start": 8,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "    - [ \\"one\\", 2, three four ]
+  x",
+      },
+      "range": Range {
+        "end": 16,
+        "start": 15,
+      },
+      "src": "    - [ \\"one\\", 2, three four ]
+  x",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 16,
+        "start": 15,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "    - [ \\"one\\", 2, three four ]
+  x",
+      },
+      "range": Range {
+        "end": 29,
+        "start": 18,
+      },
+      "src": "    - [ \\"one\\", 2, three four ]
+  x",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 28,
+        "start": 18,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 30,
+    "start": 6,
+  },
+  "src": "    - [ \\"one\\", 2, three four ]
+  x",
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 30,
+    "start": 6,
+  },
+}
+`;
+
+exports[`parse simple array newline before & after 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "
+[ \\"one\\", 2, three four ]
+",
+      },
+      "range": Range {
+        "end": 8,
+        "start": 3,
+      },
+      "src": "
+[ \\"one\\", 2, three four ]
+",
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 8,
+        "start": 3,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "
+[ \\"one\\", 2, three four ]
+",
+      },
+      "range": Range {
+        "end": 11,
+        "start": 10,
+      },
+      "src": "
+[ \\"one\\", 2, three four ]
+",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 11,
+        "start": 10,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "
+[ \\"one\\", 2, three four ]
+",
+      },
+      "range": Range {
+        "end": 24,
+        "start": 13,
+      },
+      "src": "
+[ \\"one\\", 2, three four ]
+",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 23,
+        "start": 13,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 25,
+    "start": 1,
+  },
+  "src": "
+[ \\"one\\", 2, three four ]
+",
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 25,
+    "start": 1,
+  },
+}
+`;
+
+exports[`parse simple array seq value 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "- [ \\"one\\", 2, three four ]
+- ",
+      },
+      "range": Range {
+        "end": 9,
+        "start": 4,
+      },
+      "src": "- [ \\"one\\", 2, three four ]
+- ",
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 9,
+        "start": 4,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "- [ \\"one\\", 2, three four ]
+- ",
+      },
+      "range": Range {
+        "end": 12,
+        "start": 11,
+      },
+      "src": "- [ \\"one\\", 2, three four ]
+- ",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 12,
+        "start": 11,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "- [ \\"one\\", 2, three four ]
+- ",
+      },
+      "range": Range {
+        "end": 25,
+        "start": 14,
+      },
+      "src": "- [ \\"one\\", 2, three four ]
+- ",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 24,
+        "start": 14,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 26,
+    "start": 2,
+  },
+  "src": "- [ \\"one\\", 2, three four ]
+- ",
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 26,
+    "start": 2,
+  },
+}
+`;
+
+exports[`parse simple array with comment 1`] = `
+FlowContainer {
+  "anchor": null,
+  "commentRange": Range {
+    "end": 44,
+    "start": 29,
+  },
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "
+  [ \\"one\\", 2, three four ] #comment # here!
+",
+      },
+      "range": Range {
+        "end": 10,
+        "start": 5,
+      },
+      "src": "
+  [ \\"one\\", 2, three four ] #comment # here!
+",
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 10,
+        "start": 5,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "
+  [ \\"one\\", 2, three four ] #comment # here!
+",
+      },
+      "range": Range {
+        "end": 13,
+        "start": 12,
+      },
+      "src": "
+  [ \\"one\\", 2, three four ] #comment # here!
+",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 13,
+        "start": 12,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "
+  [ \\"one\\", 2, three four ] #comment # here!
+",
+      },
+      "range": Range {
+        "end": 26,
+        "start": 15,
+      },
+      "src": "
+  [ \\"one\\", 2, three four ] #comment # here!
+",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 25,
+        "start": 15,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 44,
+    "start": 3,
+  },
+  "src": "
+  [ \\"one\\", 2, three four ] #comment # here!
+",
+  "tag": null,
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 27,
+    "start": 3,
+  },
+}
+`;
+
+exports[`parse simple array with props 1`] = `
+FlowContainer {
+  "anchor": "anchor",
+  "commentRange": null,
+  "items": Array [
+    "[",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
+- ",
+      },
+      "range": Range {
+        "end": 23,
+        "start": 18,
+      },
+      "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
+- ",
+      "tag": null,
+      "type": "DOUBLE",
+      "valueRange": Range {
+        "end": 23,
+        "start": 18,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
+- ",
+      },
+      "range": Range {
+        "end": 26,
+        "start": 25,
+      },
+      "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
+- ",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 26,
+        "start": 25,
+      },
+    },
+    ",",
+    Scalar {
+      "anchor": null,
+      "blockStyle": null,
+      "commentRange": null,
+      "doc": Document {
+        "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
+- ",
+      },
+      "range": Range {
+        "end": 39,
+        "start": 28,
+      },
+      "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
+- ",
+      "tag": null,
+      "type": "PLAIN",
+      "valueRange": Range {
+        "end": 38,
+        "start": 28,
+      },
+    },
+    "]",
+  ],
+  "range": Range {
+    "end": 40,
+    "start": 2,
+  },
+  "src": "- !tag! &anchor [ \\"one\\", 2, three four ]
+- ",
+  "tag": "tag!",
+  "type": "FLOW_SEQ",
+  "valueRange": Range {
+    "end": 40,
+    "start": 16,
+  },
+}
+`;
