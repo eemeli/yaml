@@ -10,10 +10,16 @@ export default class Node {
 
   static Type = {
     ALIAS: 'ALIAS',
+    BLOCK: 'BLOCK',
+    COMMENT: 'COMMENT',
+    DIRECTIVE: 'DIRECTIVE',
     DOUBLE: 'DOUBLE',
-    SINGLE: 'SINGLE',
+    FLOW_MAP: 'FLOW_MAP',
+    FLOW_SEQ: 'FLOW_SEQ',
+    MAP: 'MAP',
     PLAIN: 'PLAIN',
-    BLOCK: 'BLOCK'
+    SEQ: 'SEQ',
+    SINGLE: 'SINGLE'
   }
 
   static endOfIdentifier (src, offset) {
@@ -40,22 +46,44 @@ export default class Node {
     return offset
   }
 
+  static isBlank (src, offset) {
+    const ch = src[offset]
+    return ch === '\n' || ch === '\t' || ch === ' '
+  }
+
   static parseType (src, offset) {
     switch (src[offset]) {
       case '*':
         return Node.Type.ALIAS
-      case '"':
-        return Node.Type.DOUBLE
-      case "'":
-        return Node.Type.SINGLE
       case '|':
       case '>':
         return Node.Type.BLOCK
+      case '#':
+        return Node.Type.COMMENT
+      case '%': {
+        const prev = src[offset - 1]
+        return !prev || prev === '\n' ? Node.Type.DIRECTIVE : Node.Type.PLAIN
+      }
+      case '"':
+        return Node.Type.DOUBLE
+      case '{':
+        return Node.Type.FLOW_MAP
+      case '[':
+        return Node.Type.FLOW_SEQ
+      case '?':
+      case ':':
+        return Node.isBlank(src, offset + 1) ? Node.Type.MAP : Node.Type.PLAIN
+      case '-':
+        return Node.isBlank(src, offset + 1) ? Node.Type.SEQ : Node.Type.PLAIN
+      case "'":
+        return Node.Type.SINGLE
       default:
         return Node.Type.PLAIN
     }
   }
 
+  // Anchor and tag are before type, which determines the node implementation
+  // class; hence this intermediate object.
   static parseProps (src, offset) {
     const props = { anchor: null, tag: null, type: null, valueStart: null }
     let ch = src[offset]

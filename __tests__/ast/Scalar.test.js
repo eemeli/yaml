@@ -98,3 +98,9 @@ describe("parse multi-line plain", () => {
     test(name, () => testScalarParse(props))
   }
 })
+
+describe('parse %directives', () => {
+  const tag = 'TAG !yaml! tag:yaml.org,2002:'
+  test('TAG', () => testScalarParse({ pre: '', post: '\n', str: `%${tag}`, expected: tag }))
+  test('YAML with comment', () => testScalarParse({ pre: '', post: '\n', str: '%YAML 1.2', expected: 'YAML 1.2', comment: 'comment' }))
+})

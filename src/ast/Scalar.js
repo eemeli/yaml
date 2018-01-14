@@ -2,6 +2,18 @@ import Node, { LOG } from './Node'
 import Range from './Range'
 
 export default class Scalar extends Node {
+  static endOfDirective (src, offset) {
+    let ch = src[offset]
+    while (ch && ch !== '\n' && ch !== '#') ch = src[offset += 1]
+    // last char can't be whitespace
+    ch = src[offset - 1]
+    while (ch === ' ' || ch === '\t') {
+      offset -= 1
+      ch = src[offset - 1]
+    }
+    return offset
+  }
+
   static endOfDoubleQuote (src, offset) {
     let ch = src[offset]
     while (ch && ch !== '"') {
@@ -82,6 +94,10 @@ export default class Scalar extends Node {
       case Node.Type.ALIAS:
         start += 1
         end = Node.endOfIdentifier(this.src, start)
+        break
+      case Node.Type.DIRECTIVE:
+        start += 1
+        end = Scalar.endOfDirective(this.src, start)
         break
       case Node.Type.DOUBLE:
         end = Scalar.endOfDoubleQuote(this.src, start + 1)
