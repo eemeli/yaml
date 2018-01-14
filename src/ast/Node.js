@@ -114,6 +114,16 @@ export default class Node {
     return !this.items
   }
 
+  get jsonLike () {
+    const jsonLikeTypes = [
+      Node.Type.DOUBLE,
+      Node.Type.FLOW_MAP,
+      Node.Type.FLOW_SEQ,
+      Node.Type.SINGLE
+    ]
+    return jsonLikeTypes.indexOf(this.type) !== -1
+  }
+
   get rawValue () {
     if (!this.valueRange) return null
     const { start, end } = this.valueRange

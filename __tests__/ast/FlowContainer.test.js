@@ -21,3 +21,10 @@ describe('parse deep array', () => {
     test(name, () => testParse(props))
   }
 })
+
+describe('parse simple object', () => {
+  for (const name in commonTests) {
+    const props = Object.assign({ str: '{ "first":"one", 2, three: four,?fi:ve }' }, commonTests[name])
+    test(name, () => testParse(props))
+  }
+})

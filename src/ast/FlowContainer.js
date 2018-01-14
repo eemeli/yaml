@@ -8,6 +8,15 @@ export default class FlowContainer extends Node {
     this.items = null
   }
 
+  prevNodeIsJsonLike (idx = this.items.length) {
+    const node = this.items[idx - 1]
+    return !!node && (
+      node.jsonLike || (
+        node.type === Node.Type.COMMENT && this.nodeIsJsonLike(idx - 1)
+      )
+    )
+  }
+
   parse (start, indent) {
     LOG && console.log('flow-container parse start', { start, indent })
     const { src } = this.doc
@@ -30,9 +39,24 @@ export default class FlowContainer extends Node {
           offset = comment.parse(offset, indent, true)
           this.items.push(comment)
         } break
+        case '?':
+        case ':': {
+          const next = src[offset + 1]
+          if (next === '\n' || next === '\t' || next === ' ' || (
+            // in-flow : after JSON-like key does not need to be followed by whitespace
+            ch === ':' && this.prevNodeIsJsonLike()
+          )) {
+            this.items.push(ch)
+            offset += 1
+            break
+          }
+          // fallthrough
+        }
         default: {
           const node = this.doc.parseNode(offset, indent, true)
           this.items.push(node)
+          // FIXME: prevents infinite loop
+          if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${node.range}`)
           offset = node.range.end
         }
       }
