@@ -2,20 +2,14 @@
 
 exports[`parse deep array bare 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 7,
         "start": 2,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 7,
@@ -24,15 +18,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 10,
         "start": 9,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 10,
@@ -41,15 +31,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 26,
         "start": 16,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 26,
@@ -58,20 +44,14 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 33,
             "start": 29,
           },
           "raw": "five",
-          "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
             "end": 33,
@@ -80,15 +60,11 @@ FlowContainer {
         },
         ",",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 40,
             "start": 36,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 40,
@@ -101,7 +77,6 @@ FlowContainer {
         "end": 42,
         "start": 28,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 41,
@@ -114,7 +89,6 @@ FlowContainer {
     "end": 43,
     "start": 0,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 43,
@@ -125,20 +99,14 @@ FlowContainer {
 
 exports[`parse deep array complex mapping key 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 9,
         "start": 4,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 9,
@@ -147,15 +115,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 12,
         "start": 11,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 12,
@@ -164,15 +128,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 28,
         "start": 18,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 28,
@@ -181,20 +141,14 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 35,
             "start": 31,
           },
           "raw": "five",
-          "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
             "end": 35,
@@ -203,15 +157,11 @@ FlowContainer {
         },
         ",",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 42,
             "start": 38,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 42,
@@ -224,7 +174,6 @@ FlowContainer {
         "end": 44,
         "start": 30,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 43,
@@ -237,7 +186,6 @@ FlowContainer {
     "end": 46,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 45,
@@ -248,20 +196,14 @@ FlowContainer {
 
 exports[`parse deep array flow seq value 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 9,
         "start": 4,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 9,
@@ -270,15 +212,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 12,
         "start": 11,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 12,
@@ -287,15 +225,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 28,
         "start": 18,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 28,
@@ -304,20 +238,14 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 35,
             "start": 31,
           },
           "raw": "five",
-          "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
             "end": 35,
@@ -326,15 +254,11 @@ FlowContainer {
         },
         ",",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 42,
             "start": 38,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 42,
@@ -347,7 +271,6 @@ FlowContainer {
         "end": 44,
         "start": 30,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 43,
@@ -360,7 +283,6 @@ FlowContainer {
     "end": 46,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 45,
@@ -371,20 +293,14 @@ FlowContainer {
 
 exports[`parse deep array indented block 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 13,
         "start": 8,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 13,
@@ -393,15 +309,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 16,
         "start": 15,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 16,
@@ -410,15 +322,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 32,
         "start": 22,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 32,
@@ -427,20 +335,14 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 39,
             "start": 35,
           },
           "raw": "five",
-          "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
             "end": 39,
@@ -449,15 +351,11 @@ FlowContainer {
         },
         ",",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 46,
             "start": 42,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 46,
@@ -470,7 +368,6 @@ FlowContainer {
         "end": 48,
         "start": 34,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 47,
@@ -483,7 +380,6 @@ FlowContainer {
     "end": 49,
     "start": 6,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 49,
@@ -494,20 +390,14 @@ FlowContainer {
 
 exports[`parse deep array newline before & after 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 8,
         "start": 3,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 8,
@@ -516,15 +406,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 11,
         "start": 10,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 11,
@@ -533,15 +419,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 27,
         "start": 17,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 27,
@@ -550,20 +432,14 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 34,
             "start": 30,
           },
           "raw": "five",
-          "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
             "end": 34,
@@ -572,15 +448,11 @@ FlowContainer {
         },
         ",",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 41,
             "start": 37,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 41,
@@ -593,7 +465,6 @@ FlowContainer {
         "end": 43,
         "start": 29,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 42,
@@ -606,7 +477,6 @@ FlowContainer {
     "end": 44,
     "start": 1,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 44,
@@ -617,20 +487,14 @@ FlowContainer {
 
 exports[`parse deep array seq value 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 9,
         "start": 4,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 9,
@@ -639,15 +503,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 12,
         "start": 11,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 12,
@@ -656,15 +516,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 28,
         "start": 18,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 28,
@@ -673,20 +529,14 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 35,
             "start": 31,
           },
           "raw": "five",
-          "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
             "end": 35,
@@ -695,15 +545,11 @@ FlowContainer {
         },
         ",",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 42,
             "start": 38,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 42,
@@ -716,7 +562,6 @@ FlowContainer {
         "end": 44,
         "start": 30,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 43,
@@ -729,7 +574,6 @@ FlowContainer {
     "end": 45,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 45,
@@ -740,20 +584,14 @@ FlowContainer {
 
 exports[`parse deep array with comment 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 10,
         "start": 5,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 10,
@@ -762,15 +600,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 13,
         "start": 12,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 13,
@@ -779,15 +613,12 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
       "commentRange": Range {
         "end": 31,
         "start": 16,
       },
-      "range": null,
       "raw": "",
-      "tag": null,
+      "rawComment": "comment # here!",
       "type": "COMMENT",
       "valueRange": Range {
         "end": 15,
@@ -795,15 +626,11 @@ FlowContainer {
       },
     },
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 46,
         "start": 36,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 46,
@@ -812,20 +639,14 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 53,
             "start": 49,
           },
           "raw": "five",
-          "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
             "end": 53,
@@ -834,15 +655,11 @@ FlowContainer {
         },
         ",",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 60,
             "start": 56,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 60,
@@ -855,7 +672,6 @@ FlowContainer {
         "end": 62,
         "start": 48,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 61,
@@ -868,7 +684,6 @@ FlowContainer {
     "end": 63,
     "start": 3,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 63,
@@ -880,19 +695,14 @@ FlowContainer {
 exports[`parse deep array with props 1`] = `
 FlowContainer {
   "anchor": "anchor",
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 23,
         "start": 18,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 23,
@@ -901,15 +711,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 26,
         "start": 25,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 26,
@@ -918,15 +724,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 42,
         "start": 32,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 42,
@@ -935,20 +737,14 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 49,
             "start": 45,
           },
           "raw": "five",
-          "tag": null,
           "type": "PLAIN",
           "valueRange": Range {
             "end": 49,
@@ -957,15 +753,11 @@ FlowContainer {
         },
         ",",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 56,
             "start": 52,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 56,
@@ -978,7 +770,6 @@ FlowContainer {
         "end": 58,
         "start": 44,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 57,
@@ -1002,21 +793,15 @@ FlowContainer {
 
 exports[`parse deep object bare 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     "?",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 8,
         "start": 3,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 8,
@@ -1025,15 +810,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 12,
         "start": 9,
       },
       "raw": "'2'",
-      "tag": null,
       "type": "SINGLE",
       "valueRange": Range {
         "end": 12,
@@ -1042,16 +823,13 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
       "blockStyle": ">+",
-      "commentRange": null,
       "range": Range {
         "end": 39,
         "start": 13,
       },
       "raw": "      three
       four,",
-      "tag": null,
       "type": "BLOCK",
       "valueRange": Range {
         "end": 39,
@@ -1060,25 +838,17 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         FlowContainer {
-          "anchor": null,
-          "commentRange": null,
           "items": Array [
             "{",
             Scalar {
-              "anchor": null,
-              "blockStyle": null,
-              "commentRange": null,
               "range": Range {
                 "end": 47,
                 "start": 43,
               },
               "raw": "five",
-              "tag": null,
               "type": "PLAIN",
               "valueRange": Range {
                 "end": 47,
@@ -1091,7 +861,6 @@ FlowContainer {
             "end": 48,
             "start": 42,
           },
-          "tag": null,
           "type": "FLOW_MAP",
           "valueRange": Range {
             "end": 48,
@@ -1100,15 +869,11 @@ FlowContainer {
         },
         ":",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 54,
             "start": 50,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 54,
@@ -1121,7 +886,6 @@ FlowContainer {
         "end": 56,
         "start": 41,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 55,
@@ -1134,7 +898,6 @@ FlowContainer {
     "end": 57,
     "start": 0,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 57,
@@ -1145,21 +908,15 @@ FlowContainer {
 
 exports[`parse deep object complex mapping key 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     "?",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 10,
         "start": 5,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 10,
@@ -1168,15 +925,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 14,
         "start": 11,
       },
       "raw": "'2'",
-      "tag": null,
       "type": "SINGLE",
       "valueRange": Range {
         "end": 14,
@@ -1185,16 +938,13 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
       "blockStyle": ">+",
-      "commentRange": null,
       "range": Range {
         "end": 41,
         "start": 15,
       },
       "raw": "      three
       four,",
-      "tag": null,
       "type": "BLOCK",
       "valueRange": Range {
         "end": 41,
@@ -1203,25 +953,17 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         FlowContainer {
-          "anchor": null,
-          "commentRange": null,
           "items": Array [
             "{",
             Scalar {
-              "anchor": null,
-              "blockStyle": null,
-              "commentRange": null,
               "range": Range {
                 "end": 49,
                 "start": 45,
               },
               "raw": "five",
-              "tag": null,
               "type": "PLAIN",
               "valueRange": Range {
                 "end": 49,
@@ -1234,7 +976,6 @@ FlowContainer {
             "end": 50,
             "start": 44,
           },
-          "tag": null,
           "type": "FLOW_MAP",
           "valueRange": Range {
             "end": 50,
@@ -1243,15 +984,11 @@ FlowContainer {
         },
         ":",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 56,
             "start": 52,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 56,
@@ -1264,7 +1001,6 @@ FlowContainer {
         "end": 58,
         "start": 43,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 57,
@@ -1277,7 +1013,6 @@ FlowContainer {
     "end": 60,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 59,
@@ -1288,21 +1023,15 @@ FlowContainer {
 
 exports[`parse deep object flow seq value 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     "?",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 10,
         "start": 5,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 10,
@@ -1311,15 +1040,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 14,
         "start": 11,
       },
       "raw": "'2'",
-      "tag": null,
       "type": "SINGLE",
       "valueRange": Range {
         "end": 14,
@@ -1328,16 +1053,13 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
       "blockStyle": ">+",
-      "commentRange": null,
       "range": Range {
         "end": 41,
         "start": 15,
       },
       "raw": "      three
       four,",
-      "tag": null,
       "type": "BLOCK",
       "valueRange": Range {
         "end": 41,
@@ -1346,25 +1068,17 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         FlowContainer {
-          "anchor": null,
-          "commentRange": null,
           "items": Array [
             "{",
             Scalar {
-              "anchor": null,
-              "blockStyle": null,
-              "commentRange": null,
               "range": Range {
                 "end": 49,
                 "start": 45,
               },
               "raw": "five",
-              "tag": null,
               "type": "PLAIN",
               "valueRange": Range {
                 "end": 49,
@@ -1377,7 +1091,6 @@ FlowContainer {
             "end": 50,
             "start": 44,
           },
-          "tag": null,
           "type": "FLOW_MAP",
           "valueRange": Range {
             "end": 50,
@@ -1386,15 +1099,11 @@ FlowContainer {
         },
         ":",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 56,
             "start": 52,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 56,
@@ -1407,7 +1116,6 @@ FlowContainer {
         "end": 58,
         "start": 43,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 57,
@@ -1420,7 +1128,6 @@ FlowContainer {
     "end": 60,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 59,
@@ -1431,21 +1138,15 @@ FlowContainer {
 
 exports[`parse deep object indented block 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     "?",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 14,
         "start": 9,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 14,
@@ -1454,15 +1155,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 18,
         "start": 15,
       },
       "raw": "'2'",
-      "tag": null,
       "type": "SINGLE",
       "valueRange": Range {
         "end": 18,
@@ -1471,16 +1168,13 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
       "blockStyle": ">+",
-      "commentRange": null,
       "range": Range {
         "end": 45,
         "start": 19,
       },
       "raw": "      three
       four,",
-      "tag": null,
       "type": "BLOCK",
       "valueRange": Range {
         "end": 45,
@@ -1489,25 +1183,17 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         FlowContainer {
-          "anchor": null,
-          "commentRange": null,
           "items": Array [
             "{",
             Scalar {
-              "anchor": null,
-              "blockStyle": null,
-              "commentRange": null,
               "range": Range {
                 "end": 53,
                 "start": 49,
               },
               "raw": "five",
-              "tag": null,
               "type": "PLAIN",
               "valueRange": Range {
                 "end": 53,
@@ -1520,7 +1206,6 @@ FlowContainer {
             "end": 54,
             "start": 48,
           },
-          "tag": null,
           "type": "FLOW_MAP",
           "valueRange": Range {
             "end": 54,
@@ -1529,15 +1214,11 @@ FlowContainer {
         },
         ":",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 60,
             "start": 56,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 60,
@@ -1550,7 +1231,6 @@ FlowContainer {
         "end": 62,
         "start": 47,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 61,
@@ -1563,7 +1243,6 @@ FlowContainer {
     "end": 63,
     "start": 6,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 63,
@@ -1574,21 +1253,15 @@ FlowContainer {
 
 exports[`parse deep object newline before & after 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     "?",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 9,
         "start": 4,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 9,
@@ -1597,15 +1270,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 13,
         "start": 10,
       },
       "raw": "'2'",
-      "tag": null,
       "type": "SINGLE",
       "valueRange": Range {
         "end": 13,
@@ -1614,16 +1283,13 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
       "blockStyle": ">+",
-      "commentRange": null,
       "range": Range {
         "end": 40,
         "start": 14,
       },
       "raw": "      three
       four,",
-      "tag": null,
       "type": "BLOCK",
       "valueRange": Range {
         "end": 40,
@@ -1632,25 +1298,17 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         FlowContainer {
-          "anchor": null,
-          "commentRange": null,
           "items": Array [
             "{",
             Scalar {
-              "anchor": null,
-              "blockStyle": null,
-              "commentRange": null,
               "range": Range {
                 "end": 48,
                 "start": 44,
               },
               "raw": "five",
-              "tag": null,
               "type": "PLAIN",
               "valueRange": Range {
                 "end": 48,
@@ -1663,7 +1321,6 @@ FlowContainer {
             "end": 49,
             "start": 43,
           },
-          "tag": null,
           "type": "FLOW_MAP",
           "valueRange": Range {
             "end": 49,
@@ -1672,15 +1329,11 @@ FlowContainer {
         },
         ":",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 55,
             "start": 51,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 55,
@@ -1693,7 +1346,6 @@ FlowContainer {
         "end": 57,
         "start": 42,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 56,
@@ -1706,7 +1358,6 @@ FlowContainer {
     "end": 58,
     "start": 1,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 58,
@@ -1717,21 +1368,15 @@ FlowContainer {
 
 exports[`parse deep object seq value 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     "?",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 10,
         "start": 5,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 10,
@@ -1740,15 +1385,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 14,
         "start": 11,
       },
       "raw": "'2'",
-      "tag": null,
       "type": "SINGLE",
       "valueRange": Range {
         "end": 14,
@@ -1757,16 +1398,13 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
       "blockStyle": ">+",
-      "commentRange": null,
       "range": Range {
         "end": 41,
         "start": 15,
       },
       "raw": "      three
       four,",
-      "tag": null,
       "type": "BLOCK",
       "valueRange": Range {
         "end": 41,
@@ -1775,25 +1413,17 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         FlowContainer {
-          "anchor": null,
-          "commentRange": null,
           "items": Array [
             "{",
             Scalar {
-              "anchor": null,
-              "blockStyle": null,
-              "commentRange": null,
               "range": Range {
                 "end": 49,
                 "start": 45,
               },
               "raw": "five",
-              "tag": null,
               "type": "PLAIN",
               "valueRange": Range {
                 "end": 49,
@@ -1806,7 +1436,6 @@ FlowContainer {
             "end": 50,
             "start": 44,
           },
-          "tag": null,
           "type": "FLOW_MAP",
           "valueRange": Range {
             "end": 50,
@@ -1815,15 +1444,11 @@ FlowContainer {
         },
         ":",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 56,
             "start": 52,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 56,
@@ -1836,7 +1461,6 @@ FlowContainer {
         "end": 58,
         "start": 43,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 57,
@@ -1849,7 +1473,6 @@ FlowContainer {
     "end": 59,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 59,
@@ -1860,21 +1483,15 @@ FlowContainer {
 
 exports[`parse deep object with comment 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     "?",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 11,
         "start": 6,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 11,
@@ -1883,15 +1500,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 15,
         "start": 12,
       },
       "raw": "'2'",
-      "tag": null,
       "type": "SINGLE",
       "valueRange": Range {
         "end": 15,
@@ -1900,7 +1513,6 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
       "blockStyle": ">+",
       "commentRange": Range {
         "end": 35,
@@ -1912,7 +1524,7 @@ FlowContainer {
       },
       "raw": "      three
       four,",
-      "tag": null,
+      "rawComment": "comment # here!",
       "type": "BLOCK",
       "valueRange": Range {
         "end": 59,
@@ -1921,25 +1533,17 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         FlowContainer {
-          "anchor": null,
-          "commentRange": null,
           "items": Array [
             "{",
             Scalar {
-              "anchor": null,
-              "blockStyle": null,
-              "commentRange": null,
               "range": Range {
                 "end": 67,
                 "start": 63,
               },
               "raw": "five",
-              "tag": null,
               "type": "PLAIN",
               "valueRange": Range {
                 "end": 67,
@@ -1952,7 +1556,6 @@ FlowContainer {
             "end": 68,
             "start": 62,
           },
-          "tag": null,
           "type": "FLOW_MAP",
           "valueRange": Range {
             "end": 68,
@@ -1961,15 +1564,11 @@ FlowContainer {
         },
         ":",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 74,
             "start": 70,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 74,
@@ -1982,7 +1581,6 @@ FlowContainer {
         "end": 76,
         "start": 61,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 75,
@@ -1995,7 +1593,6 @@ FlowContainer {
     "end": 77,
     "start": 3,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 77,
@@ -2007,20 +1604,15 @@ FlowContainer {
 exports[`parse deep object with props 1`] = `
 FlowContainer {
   "anchor": "anchor",
-  "commentRange": null,
   "items": Array [
     "{",
     "?",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 24,
         "start": 19,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 24,
@@ -2029,15 +1621,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 28,
         "start": 25,
       },
       "raw": "'2'",
-      "tag": null,
       "type": "SINGLE",
       "valueRange": Range {
         "end": 28,
@@ -2046,16 +1634,13 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
       "blockStyle": ">+",
-      "commentRange": null,
       "range": Range {
         "end": 55,
         "start": 29,
       },
       "raw": "      three
       four,",
-      "tag": null,
       "type": "BLOCK",
       "valueRange": Range {
         "end": 55,
@@ -2064,25 +1649,17 @@ FlowContainer {
     },
     ",",
     FlowContainer {
-      "anchor": null,
-      "commentRange": null,
       "items": Array [
         "[",
         FlowContainer {
-          "anchor": null,
-          "commentRange": null,
           "items": Array [
             "{",
             Scalar {
-              "anchor": null,
-              "blockStyle": null,
-              "commentRange": null,
               "range": Range {
                 "end": 63,
                 "start": 59,
               },
               "raw": "five",
-              "tag": null,
               "type": "PLAIN",
               "valueRange": Range {
                 "end": 63,
@@ -2095,7 +1672,6 @@ FlowContainer {
             "end": 64,
             "start": 58,
           },
-          "tag": null,
           "type": "FLOW_MAP",
           "valueRange": Range {
             "end": 64,
@@ -2104,15 +1680,11 @@ FlowContainer {
         },
         ":",
         Scalar {
-          "anchor": null,
-          "blockStyle": null,
-          "commentRange": null,
           "range": Range {
             "end": 70,
             "start": 66,
           },
           "raw": "\\"6,\\"",
-          "tag": null,
           "type": "DOUBLE",
           "valueRange": Range {
             "end": 70,
@@ -2125,7 +1697,6 @@ FlowContainer {
         "end": 72,
         "start": 57,
       },
-      "tag": null,
       "type": "FLOW_SEQ",
       "valueRange": Range {
         "end": 71,
@@ -2149,20 +1720,14 @@ FlowContainer {
 
 exports[`parse simple array bare 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 7,
         "start": 2,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 7,
@@ -2171,15 +1736,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 10,
         "start": 9,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 10,
@@ -2188,15 +1749,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 23,
         "start": 12,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 22,
@@ -2209,7 +1766,6 @@ FlowContainer {
     "end": 24,
     "start": 0,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 24,
@@ -2220,20 +1776,14 @@ FlowContainer {
 
 exports[`parse simple array complex mapping key 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 9,
         "start": 4,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 9,
@@ -2242,15 +1792,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 12,
         "start": 11,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 12,
@@ -2259,15 +1805,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 25,
         "start": 14,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 24,
@@ -2280,7 +1822,6 @@ FlowContainer {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 26,
@@ -2291,20 +1832,14 @@ FlowContainer {
 
 exports[`parse simple array flow seq value 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 9,
         "start": 4,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 9,
@@ -2313,15 +1848,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 12,
         "start": 11,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 12,
@@ -2330,15 +1861,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 25,
         "start": 14,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 24,
@@ -2351,7 +1878,6 @@ FlowContainer {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 26,
@@ -2362,20 +1888,14 @@ FlowContainer {
 
 exports[`parse simple array indented block 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 13,
         "start": 8,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 13,
@@ -2384,15 +1904,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 16,
         "start": 15,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 16,
@@ -2401,15 +1917,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 29,
         "start": 18,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 28,
@@ -2422,7 +1934,6 @@ FlowContainer {
     "end": 30,
     "start": 6,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 30,
@@ -2433,20 +1944,14 @@ FlowContainer {
 
 exports[`parse simple array newline before & after 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 8,
         "start": 3,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 8,
@@ -2455,15 +1960,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 11,
         "start": 10,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 11,
@@ -2472,15 +1973,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 24,
         "start": 13,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 23,
@@ -2493,7 +1990,6 @@ FlowContainer {
     "end": 25,
     "start": 1,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 25,
@@ -2504,20 +2000,14 @@ FlowContainer {
 
 exports[`parse simple array seq value 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 9,
         "start": 4,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 9,
@@ -2526,15 +2016,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 12,
         "start": 11,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 12,
@@ -2543,15 +2029,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 25,
         "start": 14,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 24,
@@ -2564,7 +2046,6 @@ FlowContainer {
     "end": 26,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 26,
@@ -2575,7 +2056,6 @@ FlowContainer {
 
 exports[`parse simple array with comment 1`] = `
 FlowContainer {
-  "anchor": null,
   "commentRange": Range {
     "end": 44,
     "start": 29,
@@ -2583,15 +2063,11 @@ FlowContainer {
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 10,
         "start": 5,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 10,
@@ -2600,15 +2076,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 13,
         "start": 12,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 13,
@@ -2617,15 +2089,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 26,
         "start": 15,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 25,
@@ -2638,7 +2106,7 @@ FlowContainer {
     "end": 44,
     "start": 3,
   },
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "FLOW_SEQ",
   "valueRange": Range {
     "end": 27,
@@ -2650,19 +2118,14 @@ FlowContainer {
 exports[`parse simple array with props 1`] = `
 FlowContainer {
   "anchor": "anchor",
-  "commentRange": null,
   "items": Array [
     "[",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 23,
         "start": 18,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 23,
@@ -2671,15 +2134,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 26,
         "start": 25,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 26,
@@ -2688,15 +2147,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 39,
         "start": 28,
       },
       "raw": "three four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 38,
@@ -2720,20 +2175,14 @@ FlowContainer {
 
 exports[`parse simple object bare 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 9,
         "start": 2,
       },
       "raw": "\\"first\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 9,
@@ -2742,15 +2191,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 15,
         "start": 10,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 15,
@@ -2759,15 +2204,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 18,
         "start": 17,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 18,
@@ -2776,15 +2217,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 25,
         "start": 20,
       },
       "raw": "three",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 25,
@@ -2793,15 +2230,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 31,
         "start": 27,
       },
       "raw": "four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 31,
@@ -2810,15 +2243,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 39,
         "start": 32,
       },
       "raw": "?fi:ve",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 38,
@@ -2831,7 +2260,6 @@ FlowContainer {
     "end": 40,
     "start": 0,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 40,
@@ -2842,20 +2270,14 @@ FlowContainer {
 
 exports[`parse simple object complex mapping key 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 11,
         "start": 4,
       },
       "raw": "\\"first\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 11,
@@ -2864,15 +2286,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 17,
         "start": 12,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 17,
@@ -2881,15 +2299,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 20,
         "start": 19,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 20,
@@ -2898,15 +2312,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 27,
         "start": 22,
       },
       "raw": "three",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 27,
@@ -2915,15 +2325,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 33,
         "start": 29,
       },
       "raw": "four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 33,
@@ -2932,15 +2338,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 41,
         "start": 34,
       },
       "raw": "?fi:ve",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 40,
@@ -2953,7 +2355,6 @@ FlowContainer {
     "end": 43,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 42,
@@ -2964,20 +2365,14 @@ FlowContainer {
 
 exports[`parse simple object flow seq value 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 11,
         "start": 4,
       },
       "raw": "\\"first\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 11,
@@ -2986,15 +2381,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 17,
         "start": 12,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 17,
@@ -3003,15 +2394,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 20,
         "start": 19,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 20,
@@ -3020,15 +2407,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 27,
         "start": 22,
       },
       "raw": "three",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 27,
@@ -3037,15 +2420,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 33,
         "start": 29,
       },
       "raw": "four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 33,
@@ -3054,15 +2433,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 41,
         "start": 34,
       },
       "raw": "?fi:ve",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 40,
@@ -3075,7 +2450,6 @@ FlowContainer {
     "end": 43,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 42,
@@ -3086,20 +2460,14 @@ FlowContainer {
 
 exports[`parse simple object indented block 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 15,
         "start": 8,
       },
       "raw": "\\"first\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 15,
@@ -3108,15 +2476,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 21,
         "start": 16,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 21,
@@ -3125,15 +2489,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 24,
         "start": 23,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 24,
@@ -3142,15 +2502,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 31,
         "start": 26,
       },
       "raw": "three",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 31,
@@ -3159,15 +2515,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 37,
         "start": 33,
       },
       "raw": "four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 37,
@@ -3176,15 +2528,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 45,
         "start": 38,
       },
       "raw": "?fi:ve",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 44,
@@ -3197,7 +2545,6 @@ FlowContainer {
     "end": 46,
     "start": 6,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 46,
@@ -3208,20 +2555,14 @@ FlowContainer {
 
 exports[`parse simple object newline before & after 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 10,
         "start": 3,
       },
       "raw": "\\"first\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 10,
@@ -3230,15 +2571,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 16,
         "start": 11,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 16,
@@ -3247,15 +2584,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 19,
         "start": 18,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 19,
@@ -3264,15 +2597,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 26,
         "start": 21,
       },
       "raw": "three",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 26,
@@ -3281,15 +2610,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 32,
         "start": 28,
       },
       "raw": "four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 32,
@@ -3298,15 +2623,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 40,
         "start": 33,
       },
       "raw": "?fi:ve",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 39,
@@ -3319,7 +2640,6 @@ FlowContainer {
     "end": 41,
     "start": 1,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 41,
@@ -3330,20 +2650,14 @@ FlowContainer {
 
 exports[`parse simple object seq value 1`] = `
 FlowContainer {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     "{",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 11,
         "start": 4,
       },
       "raw": "\\"first\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 11,
@@ -3352,15 +2666,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 17,
         "start": 12,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 17,
@@ -3369,15 +2679,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 20,
         "start": 19,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 20,
@@ -3386,15 +2692,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 27,
         "start": 22,
       },
       "raw": "three",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 27,
@@ -3403,15 +2705,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 33,
         "start": 29,
       },
       "raw": "four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 33,
@@ -3420,15 +2718,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 41,
         "start": 34,
       },
       "raw": "?fi:ve",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 40,
@@ -3441,7 +2735,6 @@ FlowContainer {
     "end": 42,
     "start": 2,
   },
-  "tag": null,
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 42,
@@ -3452,7 +2745,6 @@ FlowContainer {
 
 exports[`parse simple object with comment 1`] = `
 FlowContainer {
-  "anchor": null,
   "commentRange": Range {
     "end": 60,
     "start": 45,
@@ -3460,15 +2752,11 @@ FlowContainer {
   "items": Array [
     "{",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 12,
         "start": 5,
       },
       "raw": "\\"first\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 12,
@@ -3477,15 +2765,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 18,
         "start": 13,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 18,
@@ -3494,15 +2778,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 21,
         "start": 20,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 21,
@@ -3511,15 +2791,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 28,
         "start": 23,
       },
       "raw": "three",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 28,
@@ -3528,15 +2804,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 34,
         "start": 30,
       },
       "raw": "four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 34,
@@ -3545,15 +2817,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 42,
         "start": 35,
       },
       "raw": "?fi:ve",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 41,
@@ -3566,7 +2834,7 @@ FlowContainer {
     "end": 60,
     "start": 3,
   },
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "FLOW_MAP",
   "valueRange": Range {
     "end": 43,
@@ -3578,19 +2846,14 @@ FlowContainer {
 exports[`parse simple object with props 1`] = `
 FlowContainer {
   "anchor": "anchor",
-  "commentRange": null,
   "items": Array [
     "{",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 25,
         "start": 18,
       },
       "raw": "\\"first\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 25,
@@ -3599,15 +2862,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 31,
         "start": 26,
       },
       "raw": "\\"one\\"",
-      "tag": null,
       "type": "DOUBLE",
       "valueRange": Range {
         "end": 31,
@@ -3616,15 +2875,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 34,
         "start": 33,
       },
       "raw": "2",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 34,
@@ -3633,15 +2888,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 41,
         "start": 36,
       },
       "raw": "three",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 41,
@@ -3650,15 +2901,11 @@ FlowContainer {
     },
     ":",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 47,
         "start": 43,
       },
       "raw": "four",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 47,
@@ -3667,15 +2914,11 @@ FlowContainer {
     },
     ",",
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
-      "commentRange": null,
       "range": Range {
         "end": 55,
         "start": 48,
       },
       "raw": "?fi:ve",
-      "tag": null,
       "type": "PLAIN",
       "valueRange": Range {
         "end": 54,

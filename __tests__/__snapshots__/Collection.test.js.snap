@@ -2,23 +2,15 @@
 
 exports[`simple collections seq 1`] = `
 Collection {
-  "anchor": null,
-  "commentRange": null,
   "items": Array [
     CollectionItem {
-      "anchor": null,
-      "commentRange": null,
       "indicator": "-",
       "item": Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 12,
           "start": 3,
         },
         "raw": "one value",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 12,
@@ -29,7 +21,6 @@ Collection {
         "end": 12,
         "start": 1,
       },
-      "tag": null,
       "type": "SEQ_ITEM",
       "valueRange": Range {
         "end": 12,
@@ -37,12 +28,8 @@ Collection {
       },
     },
     CollectionItem {
-      "anchor": null,
-      "commentRange": null,
       "indicator": "-",
       "item": Scalar {
-        "anchor": null,
-        "blockStyle": null,
         "commentRange": Range {
           "end": 22,
           "start": 20,
@@ -52,7 +39,7 @@ Collection {
           "start": 15,
         },
         "raw": "'2'",
-        "tag": null,
+        "rawComment": "c1",
         "type": "SINGLE",
         "valueRange": Range {
           "end": 18,
@@ -63,7 +50,6 @@ Collection {
         "end": 22,
         "start": 13,
       },
-      "tag": null,
       "type": "SEQ_ITEM",
       "valueRange": Range {
         "end": 18,
@@ -71,15 +57,12 @@ Collection {
       },
     },
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
       "commentRange": Range {
         "end": 28,
         "start": 26,
       },
-      "range": null,
       "raw": "",
-      "tag": null,
+      "rawComment": "c2",
       "type": "COMMENT",
       "valueRange": Range {
         "end": 25,
@@ -87,13 +70,8 @@ Collection {
       },
     },
     CollectionItem {
-      "anchor": null,
-      "commentRange": null,
       "indicator": "-",
       "item": Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 43,
           "start": 31,
@@ -110,7 +88,6 @@ Collection {
         "end": 43,
         "start": 29,
       },
-      "tag": null,
       "type": "SEQ_ITEM",
       "valueRange": Range {
         "end": 43,
@@ -118,20 +95,15 @@ Collection {
       },
     },
     CollectionItem {
-      "anchor": null,
-      "commentRange": null,
       "indicator": "-",
       "item": Scalar {
-        "anchor": null,
         "blockStyle": ">",
-        "commentRange": null,
         "range": Range {
           "end": 61,
           "start": 46,
         },
         "raw": " four
    five",
-        "tag": null,
         "type": "BLOCK",
         "valueRange": Range {
           "end": 61,
@@ -142,7 +114,6 @@ Collection {
         "end": 61,
         "start": 44,
       },
-      "tag": null,
       "type": "SEQ_ITEM",
       "valueRange": Range {
         "end": 61,
@@ -150,29 +121,19 @@ Collection {
       },
     },
     CollectionItem {
-      "anchor": null,
-      "commentRange": null,
       "indicator": "-",
       "item": FlowContainer {
-        "anchor": null,
-        "commentRange": null,
         "items": Array [
           "[",
           FlowContainer {
-            "anchor": null,
-            "commentRange": null,
             "items": Array [
               "{",
               Scalar {
-                "anchor": null,
-                "blockStyle": null,
-                "commentRange": null,
                 "range": Range {
                   "end": 71,
                   "start": 66,
                 },
                 "raw": "\\"six\\"",
-                "tag": null,
                 "type": "DOUBLE",
                 "valueRange": Range {
                   "end": 71,
@@ -181,15 +142,11 @@ Collection {
               },
               ":",
               Scalar {
-                "anchor": null,
-                "blockStyle": null,
-                "commentRange": null,
                 "range": Range {
                   "end": 73,
                   "start": 72,
                 },
                 "raw": "7",
-                "tag": null,
                 "type": "PLAIN",
                 "valueRange": Range {
                   "end": 73,
@@ -202,7 +159,6 @@ Collection {
               "end": 74,
               "start": 65,
             },
-            "tag": null,
             "type": "FLOW_MAP",
             "valueRange": Range {
               "end": 74,
@@ -215,7 +171,6 @@ Collection {
           "end": 75,
           "start": 64,
         },
-        "tag": null,
         "type": "FLOW_SEQ",
         "valueRange": Range {
           "end": 75,
@@ -226,7 +181,6 @@ Collection {
         "end": 75,
         "start": 62,
       },
-      "tag": null,
       "type": "SEQ_ITEM",
       "valueRange": Range {
         "end": 75,
@@ -234,15 +188,12 @@ Collection {
       },
     },
     Scalar {
-      "anchor": null,
-      "blockStyle": null,
       "commentRange": Range {
         "end": 79,
         "start": 77,
       },
-      "range": null,
       "raw": "",
-      "tag": null,
+      "rawComment": "c3",
       "type": "COMMENT",
       "valueRange": Range {
         "end": 76,
@@ -250,8 +201,6 @@ Collection {
       },
     },
   ],
-  "range": null,
-  "tag": null,
   "type": "COLLECTION",
   "valueRange": Range {
     "end": 79,

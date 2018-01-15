@@ -2,27 +2,17 @@
 
 exports[`custom seq items seq in seq in seq 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": CollectionItem {
-    "anchor": null,
-    "commentRange": null,
     "indicator": "-",
     "item": CollectionItem {
-      "anchor": null,
-      "commentRange": null,
       "indicator": "-",
       "item": Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 16,
           "start": 11,
         },
         "raw": "value",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 16,
@@ -33,7 +23,6 @@ CollectionItem {
         "end": 16,
         "start": 9,
       },
-      "tag": null,
       "type": "SEQ_ITEM",
       "valueRange": Range {
         "end": 16,
@@ -44,7 +33,6 @@ CollectionItem {
       "end": 16,
       "start": 3,
     },
-    "tag": null,
     "type": "SEQ_ITEM",
     "valueRange": Range {
       "end": 16,
@@ -55,7 +43,6 @@ CollectionItem {
     "end": 16,
     "start": 1,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 16,
@@ -66,19 +53,13 @@ CollectionItem {
 
 exports[`map key "? *alias" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 8,
       "start": 2,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 8,
@@ -89,7 +70,6 @@ CollectionItem {
     "end": 8,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 8,
@@ -100,19 +80,13 @@ CollectionItem {
 
 exports[`map key "? *alias" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 4,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 10,
@@ -123,7 +97,6 @@ CollectionItem {
     "end": 10,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 10,
@@ -134,19 +107,13 @@ CollectionItem {
 
 exports[`map key "? *alias" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 4,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 10,
@@ -157,7 +124,6 @@ CollectionItem {
     "end": 10,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 10,
@@ -168,19 +134,13 @@ CollectionItem {
 
 exports[`map key "? *alias" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 14,
       "start": 8,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 14,
@@ -191,7 +151,6 @@ CollectionItem {
     "end": 14,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 14,
@@ -202,19 +161,13 @@ CollectionItem {
 
 exports[`map key "? *alias" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 9,
       "start": 3,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 9,
@@ -225,7 +178,6 @@ CollectionItem {
     "end": 9,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 9,
@@ -236,19 +188,13 @@ CollectionItem {
 
 exports[`map key "? *alias" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 4,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 10,
@@ -259,7 +205,6 @@ CollectionItem {
     "end": 10,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 10,
@@ -270,12 +215,8 @@ CollectionItem {
 
 exports[`map key "? *alias" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
     "commentRange": Range {
       "end": 28,
       "start": 13,
@@ -285,7 +226,7 @@ CollectionItem {
       "start": 5,
     },
     "raw": "alias",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "ALIAS",
     "valueRange": Range {
       "end": 11,
@@ -296,7 +237,6 @@ CollectionItem {
     "end": 28,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 11,
@@ -308,18 +248,13 @@ CollectionItem {
 exports[`map key "? *alias" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 24,
       "start": 18,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 24,
@@ -341,20 +276,15 @@ CollectionItem {
 
 exports[`map key "? >+2\\n       multiple\\n       lines" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 34,
       "start": 2,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 34,
@@ -365,7 +295,6 @@ CollectionItem {
     "end": 34,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 34,
@@ -376,20 +305,15 @@ CollectionItem {
 
 exports[`map key "? >+2\\n       multiple\\n       lines" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 36,
       "start": 4,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 36,
@@ -400,7 +324,6 @@ CollectionItem {
     "end": 36,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 36,
@@ -411,20 +334,15 @@ CollectionItem {
 
 exports[`map key "? >+2\\n       multiple\\n       lines" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 36,
       "start": 4,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 36,
@@ -435,7 +353,6 @@ CollectionItem {
     "end": 36,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 36,
@@ -446,20 +363,15 @@ CollectionItem {
 
 exports[`map key "? >+2\\n       multiple\\n       lines" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 40,
       "start": 8,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 40,
@@ -470,7 +382,6 @@ CollectionItem {
     "end": 40,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 40,
@@ -481,20 +392,15 @@ CollectionItem {
 
 exports[`map key "? >+2\\n       multiple\\n       lines" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 35,
       "start": 3,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 35,
@@ -505,7 +411,6 @@ CollectionItem {
     "end": 35,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 35,
@@ -516,20 +421,15 @@ CollectionItem {
 
 exports[`map key "? >+2\\n       multiple\\n       lines" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 36,
       "start": 4,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 36,
@@ -540,7 +440,6 @@ CollectionItem {
     "end": 36,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 36,
@@ -551,11 +450,8 @@ CollectionItem {
 
 exports[`map key "? >+2\\n       multiple\\n       lines" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
     "commentRange": Range {
       "end": 25,
@@ -567,7 +463,7 @@ CollectionItem {
     },
     "raw": "       multiple
        lines",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "BLOCK",
     "valueRange": Range {
       "end": 54,
@@ -578,7 +474,6 @@ CollectionItem {
     "end": 54,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 54,
@@ -590,19 +485,15 @@ CollectionItem {
 exports[`map key "? >+2\\n       multiple\\n       lines" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 50,
       "start": 18,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 50,
@@ -624,20 +515,14 @@ CollectionItem {
 
 exports[`map key "? \\"multiline\\nquote\\"" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 19,
       "start": 2,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 19,
@@ -648,7 +533,6 @@ quote\\"",
     "end": 19,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 19,
@@ -659,20 +543,14 @@ quote\\"",
 
 exports[`map key "? \\"multiline\\nquote\\"" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 21,
       "start": 4,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 21,
@@ -683,7 +561,6 @@ quote\\"",
     "end": 21,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 21,
@@ -694,20 +571,14 @@ quote\\"",
 
 exports[`map key "? \\"multiline\\nquote\\"" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 21,
       "start": 4,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 21,
@@ -718,7 +589,6 @@ quote\\"",
     "end": 21,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 21,
@@ -729,20 +599,14 @@ quote\\"",
 
 exports[`map key "? \\"multiline\\nquote\\"" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 25,
       "start": 8,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 25,
@@ -753,7 +617,6 @@ quote\\"",
     "end": 25,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 25,
@@ -764,20 +627,14 @@ quote\\"",
 
 exports[`map key "? \\"multiline\\nquote\\"" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 20,
       "start": 3,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 20,
@@ -788,7 +645,6 @@ quote\\"",
     "end": 20,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 20,
@@ -799,20 +655,14 @@ quote\\"",
 
 exports[`map key "? \\"multiline\\nquote\\"" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 21,
       "start": 4,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 21,
@@ -823,7 +673,6 @@ quote\\"",
     "end": 21,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 21,
@@ -835,19 +684,14 @@ quote\\"",
 exports[`map key "? \\"multiline\\nquote\\"" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 35,
       "start": 18,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 35,
@@ -869,19 +713,13 @@ quote\\"",
 
 exports[`map key "? -plain value" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 14,
       "start": 2,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 14,
@@ -892,7 +730,6 @@ CollectionItem {
     "end": 14,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 14,
@@ -903,19 +740,13 @@ CollectionItem {
 
 exports[`map key "? -plain value" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 16,
       "start": 4,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 16,
@@ -926,7 +757,6 @@ CollectionItem {
     "end": 16,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 16,
@@ -937,19 +767,13 @@ CollectionItem {
 
 exports[`map key "? -plain value" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 16,
       "start": 4,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 16,
@@ -960,7 +784,6 @@ CollectionItem {
     "end": 16,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 16,
@@ -971,19 +794,13 @@ CollectionItem {
 
 exports[`map key "? -plain value" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 20,
       "start": 8,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 20,
@@ -994,7 +811,6 @@ CollectionItem {
     "end": 20,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 20,
@@ -1005,19 +821,13 @@ CollectionItem {
 
 exports[`map key "? -plain value" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 15,
       "start": 3,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 15,
@@ -1028,7 +838,6 @@ CollectionItem {
     "end": 15,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 15,
@@ -1039,19 +848,13 @@ CollectionItem {
 
 exports[`map key "? -plain value" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 16,
       "start": 4,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 16,
@@ -1062,7 +865,6 @@ CollectionItem {
     "end": 16,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 16,
@@ -1073,12 +875,8 @@ CollectionItem {
 
 exports[`map key "? -plain value" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
     "commentRange": Range {
       "end": 34,
       "start": 19,
@@ -1088,7 +886,7 @@ CollectionItem {
       "start": 5,
     },
     "raw": "-plain value",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "PLAIN",
     "valueRange": Range {
       "end": 17,
@@ -1099,7 +897,6 @@ CollectionItem {
     "end": 34,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 17,
@@ -1111,18 +908,13 @@ CollectionItem {
 exports[`map key "? -plain value" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 30,
       "start": 18,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 30,
@@ -1144,19 +936,13 @@ CollectionItem {
 
 exports[`map key "?\\n  \\n\\n    multiline plain" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 25,
       "start": 10,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 25,
@@ -1167,7 +953,6 @@ CollectionItem {
     "end": 25,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 25,
@@ -1178,19 +963,13 @@ CollectionItem {
 
 exports[`map key "?\\n  \\n\\n    multiline plain" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 27,
       "start": 12,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 27,
@@ -1201,7 +980,6 @@ CollectionItem {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 27,
@@ -1212,19 +990,13 @@ CollectionItem {
 
 exports[`map key "?\\n  \\n\\n    multiline plain" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 27,
       "start": 12,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 27,
@@ -1235,7 +1007,6 @@ CollectionItem {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 27,
@@ -1246,19 +1017,13 @@ CollectionItem {
 
 exports[`map key "?\\n  \\n\\n    multiline plain" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 31,
       "start": 16,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 31,
@@ -1269,7 +1034,6 @@ CollectionItem {
     "end": 31,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 31,
@@ -1280,19 +1044,13 @@ CollectionItem {
 
 exports[`map key "?\\n  \\n\\n    multiline plain" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 26,
       "start": 11,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 26,
@@ -1303,7 +1061,6 @@ CollectionItem {
     "end": 26,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 26,
@@ -1314,19 +1071,13 @@ CollectionItem {
 
 exports[`map key "?\\n  \\n\\n    multiline plain" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 27,
       "start": 12,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 27,
@@ -1337,7 +1088,6 @@ CollectionItem {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 27,
@@ -1348,22 +1098,17 @@ CollectionItem {
 
 exports[`map key "?\\n  \\n\\n    multiline plain" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
   "commentRange": Range {
     "end": 21,
     "start": 6,
   },
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 45,
       "start": 30,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 45,
@@ -1374,7 +1119,7 @@ CollectionItem {
     "end": 45,
     "start": 3,
   },
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 45,
@@ -1386,18 +1131,13 @@ CollectionItem {
 exports[`map key "?\\n  \\n\\n    multiline plain" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 41,
       "start": 26,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 41,
@@ -1419,24 +1159,16 @@ CollectionItem {
 
 exports[`map key "?\\t[ 1, 2 ]" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 5,
           "start": 4,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 5,
@@ -1445,15 +1177,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 9,
           "start": 7,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 8,
@@ -1466,7 +1194,6 @@ CollectionItem {
       "end": 10,
       "start": 2,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 10,
@@ -1477,7 +1204,6 @@ CollectionItem {
     "end": 10,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 10,
@@ -1488,24 +1214,16 @@ CollectionItem {
 
 exports[`map key "?\\t[ 1, 2 ]" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 7,
           "start": 6,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 7,
@@ -1514,15 +1232,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 9,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 10,
@@ -1535,7 +1249,6 @@ CollectionItem {
       "end": 12,
       "start": 4,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 12,
@@ -1546,7 +1259,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 12,
@@ -1557,24 +1269,16 @@ CollectionItem {
 
 exports[`map key "?\\t[ 1, 2 ]" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 7,
           "start": 6,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 7,
@@ -1583,15 +1287,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 9,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 10,
@@ -1604,7 +1304,6 @@ CollectionItem {
       "end": 12,
       "start": 4,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 12,
@@ -1615,7 +1314,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 12,
@@ -1626,24 +1324,16 @@ CollectionItem {
 
 exports[`map key "?\\t[ 1, 2 ]" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 10,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 11,
@@ -1652,15 +1342,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 15,
           "start": 13,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 14,
@@ -1673,7 +1359,6 @@ CollectionItem {
       "end": 16,
       "start": 8,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 16,
@@ -1684,7 +1369,6 @@ CollectionItem {
     "end": 16,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 16,
@@ -1695,24 +1379,16 @@ CollectionItem {
 
 exports[`map key "?\\t[ 1, 2 ]" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 6,
           "start": 5,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 6,
@@ -1721,15 +1397,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 10,
           "start": 8,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 9,
@@ -1742,7 +1414,6 @@ CollectionItem {
       "end": 11,
       "start": 3,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 11,
@@ -1753,7 +1424,6 @@ CollectionItem {
     "end": 11,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 11,
@@ -1764,24 +1434,16 @@ CollectionItem {
 
 exports[`map key "?\\t[ 1, 2 ]" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 7,
           "start": 6,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 7,
@@ -1790,15 +1452,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 9,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 10,
@@ -1811,7 +1469,6 @@ CollectionItem {
       "end": 12,
       "start": 4,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 12,
@@ -1822,7 +1479,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 12,
@@ -1833,11 +1489,8 @@ CollectionItem {
 
 exports[`map key "?\\t[ 1, 2 ]" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": FlowContainer {
-    "anchor": null,
     "commentRange": Range {
       "end": 30,
       "start": 15,
@@ -1845,15 +1498,11 @@ CollectionItem {
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 8,
           "start": 7,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 8,
@@ -1862,15 +1511,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 12,
           "start": 10,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 11,
@@ -1883,7 +1528,7 @@ CollectionItem {
       "end": 30,
       "start": 5,
     },
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 13,
@@ -1894,7 +1539,6 @@ CollectionItem {
     "end": 30,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 13,
@@ -1906,23 +1550,16 @@ CollectionItem {
 exports[`map key "?\\t[ 1, 2 ]" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "?",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 21,
           "start": 20,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 21,
@@ -1931,15 +1568,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 25,
           "start": 23,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 24,
@@ -1952,7 +1585,6 @@ CollectionItem {
       "end": 26,
       "start": 18,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 26,
@@ -1974,19 +1606,13 @@ CollectionItem {
 
 exports[`map value ": *alias" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 8,
       "start": 2,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 8,
@@ -1997,7 +1623,6 @@ CollectionItem {
     "end": 8,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 8,
@@ -2008,19 +1633,13 @@ CollectionItem {
 
 exports[`map value ": *alias" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 4,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 10,
@@ -2031,7 +1650,6 @@ CollectionItem {
     "end": 10,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 10,
@@ -2042,19 +1660,13 @@ CollectionItem {
 
 exports[`map value ": *alias" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 4,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 10,
@@ -2065,7 +1677,6 @@ CollectionItem {
     "end": 10,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 10,
@@ -2076,19 +1687,13 @@ CollectionItem {
 
 exports[`map value ": *alias" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 14,
       "start": 8,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 14,
@@ -2099,7 +1704,6 @@ CollectionItem {
     "end": 14,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 14,
@@ -2110,19 +1714,13 @@ CollectionItem {
 
 exports[`map value ": *alias" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 9,
       "start": 3,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 9,
@@ -2133,7 +1731,6 @@ CollectionItem {
     "end": 9,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 9,
@@ -2144,19 +1741,13 @@ CollectionItem {
 
 exports[`map value ": *alias" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 4,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 10,
@@ -2167,7 +1758,6 @@ CollectionItem {
     "end": 10,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 10,
@@ -2178,12 +1768,8 @@ CollectionItem {
 
 exports[`map value ": *alias" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
     "commentRange": Range {
       "end": 28,
       "start": 13,
@@ -2193,7 +1779,7 @@ CollectionItem {
       "start": 5,
     },
     "raw": "alias",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "ALIAS",
     "valueRange": Range {
       "end": 11,
@@ -2204,7 +1790,6 @@ CollectionItem {
     "end": 28,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 11,
@@ -2216,18 +1801,13 @@ CollectionItem {
 exports[`map value ": *alias" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 24,
       "start": 18,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 24,
@@ -2249,20 +1829,15 @@ CollectionItem {
 
 exports[`map value ": >+2\\n       multiple\\n       lines" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 34,
       "start": 2,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 34,
@@ -2273,7 +1848,6 @@ CollectionItem {
     "end": 34,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 34,
@@ -2284,20 +1858,15 @@ CollectionItem {
 
 exports[`map value ": >+2\\n       multiple\\n       lines" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 36,
       "start": 4,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 36,
@@ -2308,7 +1877,6 @@ CollectionItem {
     "end": 36,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 36,
@@ -2319,20 +1887,15 @@ CollectionItem {
 
 exports[`map value ": >+2\\n       multiple\\n       lines" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 36,
       "start": 4,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 36,
@@ -2343,7 +1906,6 @@ CollectionItem {
     "end": 36,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 36,
@@ -2354,20 +1916,15 @@ CollectionItem {
 
 exports[`map value ": >+2\\n       multiple\\n       lines" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 40,
       "start": 8,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 40,
@@ -2378,7 +1935,6 @@ CollectionItem {
     "end": 40,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 40,
@@ -2389,20 +1945,15 @@ CollectionItem {
 
 exports[`map value ": >+2\\n       multiple\\n       lines" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 35,
       "start": 3,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 35,
@@ -2413,7 +1964,6 @@ CollectionItem {
     "end": 35,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 35,
@@ -2424,20 +1974,15 @@ CollectionItem {
 
 exports[`map value ": >+2\\n       multiple\\n       lines" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 36,
       "start": 4,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 36,
@@ -2448,7 +1993,6 @@ CollectionItem {
     "end": 36,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 36,
@@ -2459,11 +2003,8 @@ CollectionItem {
 
 exports[`map value ": >+2\\n       multiple\\n       lines" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
     "commentRange": Range {
       "end": 25,
@@ -2475,7 +2016,7 @@ CollectionItem {
     },
     "raw": "       multiple
        lines",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "BLOCK",
     "valueRange": Range {
       "end": 54,
@@ -2486,7 +2027,6 @@ CollectionItem {
     "end": 54,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 54,
@@ -2498,19 +2038,15 @@ CollectionItem {
 exports[`map value ": >+2\\n       multiple\\n       lines" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 50,
       "start": 18,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 50,
@@ -2532,20 +2068,14 @@ CollectionItem {
 
 exports[`map value ": \\"multiline\\nquote\\"" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 19,
       "start": 2,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 19,
@@ -2556,7 +2086,6 @@ quote\\"",
     "end": 19,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 19,
@@ -2567,20 +2096,14 @@ quote\\"",
 
 exports[`map value ": \\"multiline\\nquote\\"" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 21,
       "start": 4,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 21,
@@ -2591,7 +2114,6 @@ quote\\"",
     "end": 21,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 21,
@@ -2602,20 +2124,14 @@ quote\\"",
 
 exports[`map value ": \\"multiline\\nquote\\"" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 21,
       "start": 4,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 21,
@@ -2626,7 +2142,6 @@ quote\\"",
     "end": 21,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 21,
@@ -2637,20 +2152,14 @@ quote\\"",
 
 exports[`map value ": \\"multiline\\nquote\\"" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 25,
       "start": 8,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 25,
@@ -2661,7 +2170,6 @@ quote\\"",
     "end": 25,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 25,
@@ -2672,20 +2180,14 @@ quote\\"",
 
 exports[`map value ": \\"multiline\\nquote\\"" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 20,
       "start": 3,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 20,
@@ -2696,7 +2198,6 @@ quote\\"",
     "end": 20,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 20,
@@ -2707,20 +2208,14 @@ quote\\"",
 
 exports[`map value ": \\"multiline\\nquote\\"" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 21,
       "start": 4,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 21,
@@ -2731,7 +2226,6 @@ quote\\"",
     "end": 21,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 21,
@@ -2743,19 +2237,14 @@ quote\\"",
 exports[`map value ": \\"multiline\\nquote\\"" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 35,
       "start": 18,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 35,
@@ -2777,19 +2266,13 @@ quote\\"",
 
 exports[`map value ": -plain value" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 14,
       "start": 2,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 14,
@@ -2800,7 +2283,6 @@ CollectionItem {
     "end": 14,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 14,
@@ -2811,19 +2293,13 @@ CollectionItem {
 
 exports[`map value ": -plain value" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 16,
       "start": 4,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 16,
@@ -2834,7 +2310,6 @@ CollectionItem {
     "end": 16,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 16,
@@ -2845,19 +2320,13 @@ CollectionItem {
 
 exports[`map value ": -plain value" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 16,
       "start": 4,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 16,
@@ -2868,7 +2337,6 @@ CollectionItem {
     "end": 16,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 16,
@@ -2879,19 +2347,13 @@ CollectionItem {
 
 exports[`map value ": -plain value" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 20,
       "start": 8,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 20,
@@ -2902,7 +2364,6 @@ CollectionItem {
     "end": 20,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 20,
@@ -2913,19 +2374,13 @@ CollectionItem {
 
 exports[`map value ": -plain value" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 15,
       "start": 3,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 15,
@@ -2936,7 +2391,6 @@ CollectionItem {
     "end": 15,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 15,
@@ -2947,19 +2401,13 @@ CollectionItem {
 
 exports[`map value ": -plain value" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 16,
       "start": 4,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 16,
@@ -2970,7 +2418,6 @@ CollectionItem {
     "end": 16,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 16,
@@ -2981,12 +2428,8 @@ CollectionItem {
 
 exports[`map value ": -plain value" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
     "commentRange": Range {
       "end": 34,
       "start": 19,
@@ -2996,7 +2439,7 @@ CollectionItem {
       "start": 5,
     },
     "raw": "-plain value",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "PLAIN",
     "valueRange": Range {
       "end": 17,
@@ -3007,7 +2450,6 @@ CollectionItem {
     "end": 34,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 17,
@@ -3019,18 +2461,13 @@ CollectionItem {
 exports[`map value ": -plain value" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 30,
       "start": 18,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 30,
@@ -3052,19 +2489,13 @@ CollectionItem {
 
 exports[`map value ":\\n  \\n\\n    multiline plain" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 25,
       "start": 10,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 25,
@@ -3075,7 +2506,6 @@ CollectionItem {
     "end": 25,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 25,
@@ -3086,19 +2516,13 @@ CollectionItem {
 
 exports[`map value ":\\n  \\n\\n    multiline plain" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 27,
       "start": 12,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 27,
@@ -3109,7 +2533,6 @@ CollectionItem {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 27,
@@ -3120,19 +2543,13 @@ CollectionItem {
 
 exports[`map value ":\\n  \\n\\n    multiline plain" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 27,
       "start": 12,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 27,
@@ -3143,7 +2560,6 @@ CollectionItem {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 27,
@@ -3154,19 +2570,13 @@ CollectionItem {
 
 exports[`map value ":\\n  \\n\\n    multiline plain" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 31,
       "start": 16,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 31,
@@ -3177,7 +2587,6 @@ CollectionItem {
     "end": 31,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 31,
@@ -3188,19 +2597,13 @@ CollectionItem {
 
 exports[`map value ":\\n  \\n\\n    multiline plain" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 26,
       "start": 11,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 26,
@@ -3211,7 +2614,6 @@ CollectionItem {
     "end": 26,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 26,
@@ -3222,19 +2624,13 @@ CollectionItem {
 
 exports[`map value ":\\n  \\n\\n    multiline plain" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 27,
       "start": 12,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 27,
@@ -3245,7 +2641,6 @@ CollectionItem {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 27,
@@ -3256,22 +2651,17 @@ CollectionItem {
 
 exports[`map value ":\\n  \\n\\n    multiline plain" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
   "commentRange": Range {
     "end": 21,
     "start": 6,
   },
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 45,
       "start": 30,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 45,
@@ -3282,7 +2672,7 @@ CollectionItem {
     "end": 45,
     "start": 3,
   },
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 45,
@@ -3294,18 +2684,13 @@ CollectionItem {
 exports[`map value ":\\n  \\n\\n    multiline plain" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 41,
       "start": 26,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 41,
@@ -3327,24 +2712,16 @@ CollectionItem {
 
 exports[`map value ":\\t[ 1, 2 ]" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 5,
           "start": 4,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 5,
@@ -3353,15 +2730,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 9,
           "start": 7,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 8,
@@ -3374,7 +2747,6 @@ CollectionItem {
       "end": 10,
       "start": 2,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 10,
@@ -3385,7 +2757,6 @@ CollectionItem {
     "end": 10,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 10,
@@ -3396,24 +2767,16 @@ CollectionItem {
 
 exports[`map value ":\\t[ 1, 2 ]" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 7,
           "start": 6,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 7,
@@ -3422,15 +2785,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 9,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 10,
@@ -3443,7 +2802,6 @@ CollectionItem {
       "end": 12,
       "start": 4,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 12,
@@ -3454,7 +2812,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 12,
@@ -3465,24 +2822,16 @@ CollectionItem {
 
 exports[`map value ":\\t[ 1, 2 ]" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 7,
           "start": 6,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 7,
@@ -3491,15 +2840,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 9,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 10,
@@ -3512,7 +2857,6 @@ CollectionItem {
       "end": 12,
       "start": 4,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 12,
@@ -3523,7 +2867,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 12,
@@ -3534,24 +2877,16 @@ CollectionItem {
 
 exports[`map value ":\\t[ 1, 2 ]" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 10,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 11,
@@ -3560,15 +2895,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 15,
           "start": 13,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 14,
@@ -3581,7 +2912,6 @@ CollectionItem {
       "end": 16,
       "start": 8,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 16,
@@ -3592,7 +2922,6 @@ CollectionItem {
     "end": 16,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 16,
@@ -3603,24 +2932,16 @@ CollectionItem {
 
 exports[`map value ":\\t[ 1, 2 ]" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 6,
           "start": 5,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 6,
@@ -3629,15 +2950,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 10,
           "start": 8,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 9,
@@ -3650,7 +2967,6 @@ CollectionItem {
       "end": 11,
       "start": 3,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 11,
@@ -3661,7 +2977,6 @@ CollectionItem {
     "end": 11,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 11,
@@ -3672,24 +2987,16 @@ CollectionItem {
 
 exports[`map value ":\\t[ 1, 2 ]" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 7,
           "start": 6,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 7,
@@ -3698,15 +3005,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 9,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 10,
@@ -3719,7 +3022,6 @@ CollectionItem {
       "end": 12,
       "start": 4,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 12,
@@ -3730,7 +3032,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 12,
@@ -3741,11 +3042,8 @@ CollectionItem {
 
 exports[`map value ":\\t[ 1, 2 ]" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": FlowContainer {
-    "anchor": null,
     "commentRange": Range {
       "end": 30,
       "start": 15,
@@ -3753,15 +3051,11 @@ CollectionItem {
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 8,
           "start": 7,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 8,
@@ -3770,15 +3064,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 12,
           "start": 10,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 11,
@@ -3791,7 +3081,7 @@ CollectionItem {
       "end": 30,
       "start": 5,
     },
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 13,
@@ -3802,7 +3092,6 @@ CollectionItem {
     "end": 30,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 13,
@@ -3814,23 +3103,16 @@ CollectionItem {
 exports[`map value ":\\t[ 1, 2 ]" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": ":",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 21,
           "start": 20,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 21,
@@ -3839,15 +3121,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 25,
           "start": 23,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 24,
@@ -3860,7 +3138,6 @@ CollectionItem {
       "end": 26,
       "start": 18,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 26,
@@ -3882,19 +3159,13 @@ CollectionItem {
 
 exports[`parse simple map keys bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 9,
       "start": 2,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 9,
@@ -3905,7 +3176,6 @@ CollectionItem {
     "end": 9,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 9,
@@ -3916,19 +3186,13 @@ CollectionItem {
 
 exports[`parse simple map keys complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 12,
       "start": 4,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 11,
@@ -3939,7 +3203,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 11,
@@ -3950,19 +3213,13 @@ CollectionItem {
 
 exports[`parse simple map keys flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 12,
       "start": 4,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 11,
@@ -3973,7 +3230,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 11,
@@ -3984,19 +3240,13 @@ CollectionItem {
 
 exports[`parse simple map keys indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 15,
       "start": 8,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 15,
@@ -4007,7 +3257,6 @@ CollectionItem {
     "end": 15,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 15,
@@ -4018,19 +3267,13 @@ CollectionItem {
 
 exports[`parse simple map keys newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 3,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 10,
@@ -4041,7 +3284,6 @@ CollectionItem {
     "end": 10,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 10,
@@ -4052,19 +3294,13 @@ CollectionItem {
 
 exports[`parse simple map keys seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 11,
       "start": 4,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 11,
@@ -4075,7 +3311,6 @@ CollectionItem {
     "end": 11,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 11,
@@ -4086,12 +3321,8 @@ CollectionItem {
 
 exports[`parse simple map keys with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
     "commentRange": Range {
       "end": 29,
       "start": 14,
@@ -4101,7 +3332,7 @@ CollectionItem {
       "start": 5,
     },
     "raw": "\\"value\\"",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 12,
@@ -4112,7 +3343,6 @@ CollectionItem {
     "end": 29,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_KEY",
   "valueRange": Range {
     "end": 12,
@@ -4124,18 +3354,13 @@ CollectionItem {
 exports[`parse simple map keys with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "?",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 25,
       "start": 18,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 25,
@@ -4157,19 +3382,13 @@ CollectionItem {
 
 exports[`parse simple map values bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 9,
       "start": 2,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 9,
@@ -4180,7 +3399,6 @@ CollectionItem {
     "end": 9,
     "start": 0,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 9,
@@ -4191,19 +3409,13 @@ CollectionItem {
 
 exports[`parse simple map values complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 12,
       "start": 4,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 11,
@@ -4214,7 +3426,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 11,
@@ -4225,19 +3436,13 @@ CollectionItem {
 
 exports[`parse simple map values flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 12,
       "start": 4,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 11,
@@ -4248,7 +3453,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 11,
@@ -4259,19 +3463,13 @@ CollectionItem {
 
 exports[`parse simple map values indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 15,
       "start": 8,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 15,
@@ -4282,7 +3480,6 @@ CollectionItem {
     "end": 15,
     "start": 6,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 15,
@@ -4293,19 +3490,13 @@ CollectionItem {
 
 exports[`parse simple map values newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 3,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 10,
@@ -4316,7 +3507,6 @@ CollectionItem {
     "end": 10,
     "start": 1,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 10,
@@ -4327,19 +3517,13 @@ CollectionItem {
 
 exports[`parse simple map values seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 11,
       "start": 4,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 11,
@@ -4350,7 +3534,6 @@ CollectionItem {
     "end": 11,
     "start": 2,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 11,
@@ -4361,12 +3544,8 @@ CollectionItem {
 
 exports[`parse simple map values with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
     "commentRange": Range {
       "end": 29,
       "start": 14,
@@ -4376,7 +3555,7 @@ CollectionItem {
       "start": 5,
     },
     "raw": "\\"value\\"",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 12,
@@ -4387,7 +3566,6 @@ CollectionItem {
     "end": 29,
     "start": 3,
   },
-  "tag": null,
   "type": "MAP_VALUE",
   "valueRange": Range {
     "end": 12,
@@ -4399,18 +3577,13 @@ CollectionItem {
 exports[`parse simple map values with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": ":",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 25,
       "start": 18,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 25,
@@ -4432,19 +3605,13 @@ CollectionItem {
 
 exports[`parse simple seq items bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 9,
       "start": 2,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 9,
@@ -4455,7 +3622,6 @@ CollectionItem {
     "end": 9,
     "start": 0,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 9,
@@ -4466,19 +3632,13 @@ CollectionItem {
 
 exports[`parse simple seq items complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 12,
       "start": 4,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 11,
@@ -4489,7 +3649,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 11,
@@ -4500,19 +3659,13 @@ CollectionItem {
 
 exports[`parse simple seq items flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 12,
       "start": 4,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 11,
@@ -4523,7 +3676,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 11,
@@ -4534,19 +3686,13 @@ CollectionItem {
 
 exports[`parse simple seq items indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 15,
       "start": 8,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 15,
@@ -4557,7 +3703,6 @@ CollectionItem {
     "end": 15,
     "start": 6,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 15,
@@ -4568,19 +3713,13 @@ CollectionItem {
 
 exports[`parse simple seq items newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 3,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 10,
@@ -4591,7 +3730,6 @@ CollectionItem {
     "end": 10,
     "start": 1,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 10,
@@ -4602,19 +3740,13 @@ CollectionItem {
 
 exports[`parse simple seq items seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 11,
       "start": 4,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 11,
@@ -4625,7 +3757,6 @@ CollectionItem {
     "end": 11,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 11,
@@ -4636,12 +3767,8 @@ CollectionItem {
 
 exports[`parse simple seq items with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
     "commentRange": Range {
       "end": 29,
       "start": 14,
@@ -4651,7 +3778,7 @@ CollectionItem {
       "start": 5,
     },
     "raw": "\\"value\\"",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 12,
@@ -4662,7 +3789,6 @@ CollectionItem {
     "end": 29,
     "start": 3,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 12,
@@ -4674,18 +3800,13 @@ CollectionItem {
 exports[`parse simple seq items with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 25,
       "start": 18,
     },
     "raw": "\\"value\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 25,
@@ -4707,19 +3828,13 @@ CollectionItem {
 
 exports[`seq item "- *alias" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 8,
       "start": 2,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 8,
@@ -4730,7 +3845,6 @@ CollectionItem {
     "end": 8,
     "start": 0,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 8,
@@ -4741,19 +3855,13 @@ CollectionItem {
 
 exports[`seq item "- *alias" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 4,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 10,
@@ -4764,7 +3872,6 @@ CollectionItem {
     "end": 10,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 10,
@@ -4775,19 +3882,13 @@ CollectionItem {
 
 exports[`seq item "- *alias" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 4,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 10,
@@ -4798,7 +3899,6 @@ CollectionItem {
     "end": 10,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 10,
@@ -4809,19 +3909,13 @@ CollectionItem {
 
 exports[`seq item "- *alias" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 14,
       "start": 8,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 14,
@@ -4832,7 +3926,6 @@ CollectionItem {
     "end": 14,
     "start": 6,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 14,
@@ -4843,19 +3936,13 @@ CollectionItem {
 
 exports[`seq item "- *alias" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 9,
       "start": 3,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 9,
@@ -4866,7 +3953,6 @@ CollectionItem {
     "end": 9,
     "start": 1,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 9,
@@ -4877,19 +3963,13 @@ CollectionItem {
 
 exports[`seq item "- *alias" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 10,
       "start": 4,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 10,
@@ -4900,7 +3980,6 @@ CollectionItem {
     "end": 10,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 10,
@@ -4911,12 +3990,8 @@ CollectionItem {
 
 exports[`seq item "- *alias" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
     "commentRange": Range {
       "end": 28,
       "start": 13,
@@ -4926,7 +4001,7 @@ CollectionItem {
       "start": 5,
     },
     "raw": "alias",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "ALIAS",
     "valueRange": Range {
       "end": 11,
@@ -4937,7 +4012,6 @@ CollectionItem {
     "end": 28,
     "start": 3,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 11,
@@ -4949,18 +4023,13 @@ CollectionItem {
 exports[`seq item "- *alias" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 24,
       "start": 18,
     },
     "raw": "alias",
-    "tag": null,
     "type": "ALIAS",
     "valueRange": Range {
       "end": 24,
@@ -4982,20 +4051,15 @@ CollectionItem {
 
 exports[`seq item "- >+2\\n       multiple\\n       lines" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 34,
       "start": 2,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 34,
@@ -5006,7 +4070,6 @@ CollectionItem {
     "end": 34,
     "start": 0,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 34,
@@ -5017,20 +4080,15 @@ CollectionItem {
 
 exports[`seq item "- >+2\\n       multiple\\n       lines" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 36,
       "start": 4,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 36,
@@ -5041,7 +4099,6 @@ CollectionItem {
     "end": 36,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 36,
@@ -5052,20 +4109,15 @@ CollectionItem {
 
 exports[`seq item "- >+2\\n       multiple\\n       lines" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 36,
       "start": 4,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 36,
@@ -5076,7 +4128,6 @@ CollectionItem {
     "end": 36,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 36,
@@ -5087,20 +4138,15 @@ CollectionItem {
 
 exports[`seq item "- >+2\\n       multiple\\n       lines" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 40,
       "start": 8,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 40,
@@ -5111,7 +4157,6 @@ CollectionItem {
     "end": 40,
     "start": 6,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 40,
@@ -5122,20 +4167,15 @@ CollectionItem {
 
 exports[`seq item "- >+2\\n       multiple\\n       lines" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 35,
       "start": 3,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 35,
@@ -5146,7 +4186,6 @@ CollectionItem {
     "end": 35,
     "start": 1,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 35,
@@ -5157,20 +4196,15 @@ CollectionItem {
 
 exports[`seq item "- >+2\\n       multiple\\n       lines" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 36,
       "start": 4,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 36,
@@ -5181,7 +4215,6 @@ CollectionItem {
     "end": 36,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 36,
@@ -5192,11 +4225,8 @@ CollectionItem {
 
 exports[`seq item "- >+2\\n       multiple\\n       lines" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
     "commentRange": Range {
       "end": 25,
@@ -5208,7 +4238,7 @@ CollectionItem {
     },
     "raw": "       multiple
        lines",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "BLOCK",
     "valueRange": Range {
       "end": 54,
@@ -5219,7 +4249,6 @@ CollectionItem {
     "end": 54,
     "start": 3,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 54,
@@ -5231,19 +4260,15 @@ CollectionItem {
 exports[`seq item "- >+2\\n       multiple\\n       lines" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
     "blockStyle": ">+2",
-    "commentRange": null,
     "range": Range {
       "end": 50,
       "start": 18,
     },
     "raw": "       multiple
        lines",
-    "tag": null,
     "type": "BLOCK",
     "valueRange": Range {
       "end": 50,
@@ -5265,20 +4290,14 @@ CollectionItem {
 
 exports[`seq item "- \\"multiline\\nquote\\"" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 19,
       "start": 2,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 19,
@@ -5289,7 +4308,6 @@ quote\\"",
     "end": 19,
     "start": 0,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 19,
@@ -5300,20 +4318,14 @@ quote\\"",
 
 exports[`seq item "- \\"multiline\\nquote\\"" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 21,
       "start": 4,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 21,
@@ -5324,7 +4336,6 @@ quote\\"",
     "end": 21,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 21,
@@ -5335,20 +4346,14 @@ quote\\"",
 
 exports[`seq item "- \\"multiline\\nquote\\"" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 21,
       "start": 4,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 21,
@@ -5359,7 +4364,6 @@ quote\\"",
     "end": 21,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 21,
@@ -5370,20 +4374,14 @@ quote\\"",
 
 exports[`seq item "- \\"multiline\\nquote\\"" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 25,
       "start": 8,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 25,
@@ -5394,7 +4392,6 @@ quote\\"",
     "end": 25,
     "start": 6,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 25,
@@ -5405,20 +4402,14 @@ quote\\"",
 
 exports[`seq item "- \\"multiline\\nquote\\"" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 20,
       "start": 3,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 20,
@@ -5429,7 +4420,6 @@ quote\\"",
     "end": 20,
     "start": 1,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 20,
@@ -5440,20 +4430,14 @@ quote\\"",
 
 exports[`seq item "- \\"multiline\\nquote\\"" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 21,
       "start": 4,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 21,
@@ -5464,7 +4448,6 @@ quote\\"",
     "end": 21,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 21,
@@ -5476,19 +4459,14 @@ quote\\"",
 exports[`seq item "- \\"multiline\\nquote\\"" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 35,
       "start": 18,
     },
     "raw": "\\"multiline
 quote\\"",
-    "tag": null,
     "type": "DOUBLE",
     "valueRange": Range {
       "end": 35,
@@ -5510,19 +4488,13 @@ quote\\"",
 
 exports[`seq item "- -plain value" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 14,
       "start": 2,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 14,
@@ -5533,7 +4505,6 @@ CollectionItem {
     "end": 14,
     "start": 0,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 14,
@@ -5544,19 +4515,13 @@ CollectionItem {
 
 exports[`seq item "- -plain value" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 16,
       "start": 4,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 16,
@@ -5567,7 +4532,6 @@ CollectionItem {
     "end": 16,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 16,
@@ -5578,19 +4542,13 @@ CollectionItem {
 
 exports[`seq item "- -plain value" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 16,
       "start": 4,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 16,
@@ -5601,7 +4559,6 @@ CollectionItem {
     "end": 16,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 16,
@@ -5612,19 +4569,13 @@ CollectionItem {
 
 exports[`seq item "- -plain value" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 20,
       "start": 8,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 20,
@@ -5635,7 +4586,6 @@ CollectionItem {
     "end": 20,
     "start": 6,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 20,
@@ -5646,19 +4596,13 @@ CollectionItem {
 
 exports[`seq item "- -plain value" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 15,
       "start": 3,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 15,
@@ -5669,7 +4613,6 @@ CollectionItem {
     "end": 15,
     "start": 1,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 15,
@@ -5680,19 +4623,13 @@ CollectionItem {
 
 exports[`seq item "- -plain value" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 16,
       "start": 4,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 16,
@@ -5703,7 +4640,6 @@ CollectionItem {
     "end": 16,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 16,
@@ -5714,12 +4650,8 @@ CollectionItem {
 
 exports[`seq item "- -plain value" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
     "commentRange": Range {
       "end": 34,
       "start": 19,
@@ -5729,7 +4661,7 @@ CollectionItem {
       "start": 5,
     },
     "raw": "-plain value",
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "PLAIN",
     "valueRange": Range {
       "end": 17,
@@ -5740,7 +4672,6 @@ CollectionItem {
     "end": 34,
     "start": 3,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 17,
@@ -5752,18 +4683,13 @@ CollectionItem {
 exports[`seq item "- -plain value" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 30,
       "start": 18,
     },
     "raw": "-plain value",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 30,
@@ -5785,19 +4711,13 @@ CollectionItem {
 
 exports[`seq item "-\\n  \\n\\n    multiline plain" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 25,
       "start": 10,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 25,
@@ -5808,7 +4728,6 @@ CollectionItem {
     "end": 25,
     "start": 0,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 25,
@@ -5819,19 +4738,13 @@ CollectionItem {
 
 exports[`seq item "-\\n  \\n\\n    multiline plain" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 27,
       "start": 12,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 27,
@@ -5842,7 +4755,6 @@ CollectionItem {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 27,
@@ -5853,19 +4765,13 @@ CollectionItem {
 
 exports[`seq item "-\\n  \\n\\n    multiline plain" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 27,
       "start": 12,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 27,
@@ -5876,7 +4782,6 @@ CollectionItem {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 27,
@@ -5887,19 +4792,13 @@ CollectionItem {
 
 exports[`seq item "-\\n  \\n\\n    multiline plain" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 31,
       "start": 16,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 31,
@@ -5910,7 +4809,6 @@ CollectionItem {
     "end": 31,
     "start": 6,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 31,
@@ -5921,19 +4819,13 @@ CollectionItem {
 
 exports[`seq item "-\\n  \\n\\n    multiline plain" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 26,
       "start": 11,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 26,
@@ -5944,7 +4836,6 @@ CollectionItem {
     "end": 26,
     "start": 1,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 26,
@@ -5955,19 +4846,13 @@ CollectionItem {
 
 exports[`seq item "-\\n  \\n\\n    multiline plain" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 27,
       "start": 12,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 27,
@@ -5978,7 +4863,6 @@ CollectionItem {
     "end": 27,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 27,
@@ -5989,22 +4873,17 @@ CollectionItem {
 
 exports[`seq item "-\\n  \\n\\n    multiline plain" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
   "commentRange": Range {
     "end": 21,
     "start": 6,
   },
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 45,
       "start": 30,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 45,
@@ -6015,7 +4894,7 @@ CollectionItem {
     "end": 45,
     "start": 3,
   },
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 45,
@@ -6027,18 +4906,13 @@ CollectionItem {
 exports[`seq item "-\\n  \\n\\n    multiline plain" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "-",
   "item": Scalar {
-    "anchor": null,
-    "blockStyle": null,
-    "commentRange": null,
     "range": Range {
       "end": 41,
       "start": 26,
     },
     "raw": "multiline plain",
-    "tag": null,
     "type": "PLAIN",
     "valueRange": Range {
       "end": 41,
@@ -6060,24 +4934,16 @@ CollectionItem {
 
 exports[`seq item "-\\t[ 1, 2 ]" bare 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 5,
           "start": 4,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 5,
@@ -6086,15 +4952,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 9,
           "start": 7,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 8,
@@ -6107,7 +4969,6 @@ CollectionItem {
       "end": 10,
       "start": 2,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 10,
@@ -6118,7 +4979,6 @@ CollectionItem {
     "end": 10,
     "start": 0,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 10,
@@ -6129,24 +4989,16 @@ CollectionItem {
 
 exports[`seq item "-\\t[ 1, 2 ]" complex mapping key 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 7,
           "start": 6,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 7,
@@ -6155,15 +5007,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 9,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 10,
@@ -6176,7 +5024,6 @@ CollectionItem {
       "end": 12,
       "start": 4,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 12,
@@ -6187,7 +5034,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 12,
@@ -6198,24 +5044,16 @@ CollectionItem {
 
 exports[`seq item "-\\t[ 1, 2 ]" flow seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 7,
           "start": 6,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 7,
@@ -6224,15 +5062,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 9,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 10,
@@ -6245,7 +5079,6 @@ CollectionItem {
       "end": 12,
       "start": 4,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 12,
@@ -6256,7 +5089,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 12,
@@ -6267,24 +5099,16 @@ CollectionItem {
 
 exports[`seq item "-\\t[ 1, 2 ]" indented block 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 10,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 11,
@@ -6293,15 +5117,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 15,
           "start": 13,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 14,
@@ -6314,7 +5134,6 @@ CollectionItem {
       "end": 16,
       "start": 8,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 16,
@@ -6325,7 +5144,6 @@ CollectionItem {
     "end": 16,
     "start": 6,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 16,
@@ -6336,24 +5154,16 @@ CollectionItem {
 
 exports[`seq item "-\\t[ 1, 2 ]" newline before & after 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 6,
           "start": 5,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 6,
@@ -6362,15 +5172,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 10,
           "start": 8,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 9,
@@ -6383,7 +5189,6 @@ CollectionItem {
       "end": 11,
       "start": 3,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 11,
@@ -6394,7 +5199,6 @@ CollectionItem {
     "end": 11,
     "start": 1,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 11,
@@ -6405,24 +5209,16 @@ CollectionItem {
 
 exports[`seq item "-\\t[ 1, 2 ]" seq value 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 7,
           "start": 6,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 7,
@@ -6431,15 +5227,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 11,
           "start": 9,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 10,
@@ -6452,7 +5244,6 @@ CollectionItem {
       "end": 12,
       "start": 4,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 12,
@@ -6463,7 +5254,6 @@ CollectionItem {
     "end": 12,
     "start": 2,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 12,
@@ -6474,11 +5264,8 @@ CollectionItem {
 
 exports[`seq item "-\\t[ 1, 2 ]" with comment 1`] = `
 CollectionItem {
-  "anchor": null,
-  "commentRange": null,
   "indicator": "-",
   "item": FlowContainer {
-    "anchor": null,
     "commentRange": Range {
       "end": 30,
       "start": 15,
@@ -6486,15 +5273,11 @@ CollectionItem {
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 8,
           "start": 7,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 8,
@@ -6503,15 +5286,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 12,
           "start": 10,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 11,
@@ -6524,7 +5303,7 @@ CollectionItem {
       "end": 30,
       "start": 5,
     },
-    "tag": null,
+    "rawComment": "comment # here!",
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 13,
@@ -6535,7 +5314,6 @@ CollectionItem {
     "end": 30,
     "start": 3,
   },
-  "tag": null,
   "type": "SEQ_ITEM",
   "valueRange": Range {
     "end": 13,
@@ -6547,23 +5325,16 @@ CollectionItem {
 exports[`seq item "-\\t[ 1, 2 ]" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
-  "commentRange": null,
   "indicator": "-",
   "item": FlowContainer {
-    "anchor": null,
-    "commentRange": null,
     "items": Array [
       "[",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 21,
           "start": 20,
         },
         "raw": "1",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 21,
@@ -6572,15 +5343,11 @@ CollectionItem {
       },
       ",",
       Scalar {
-        "anchor": null,
-        "blockStyle": null,
-        "commentRange": null,
         "range": Range {
           "end": 25,
           "start": 23,
         },
         "raw": "2",
-        "tag": null,
         "type": "PLAIN",
         "valueRange": Range {
           "end": 24,
@@ -6593,7 +5360,6 @@ CollectionItem {
       "end": 26,
       "start": 18,
     },
-    "tag": null,
     "type": "FLOW_SEQ",
     "valueRange": Range {
       "end": 26,

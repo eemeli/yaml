@@ -1,6 +1,7 @@
 import CollectionItem from '../../src/ast/CollectionItem'
 import Document from '../../src/ast/Document'
 import Node from '../../src/ast/Node'
+import Range from '../../src/ast/Range';
 import Scalar from '../../src/ast/Scalar'
 
 export const cleanForSnapshot = (node) => {
@@ -8,6 +9,8 @@ export const cleanForSnapshot = (node) => {
     if (node.items) node.items.forEach(cleanForSnapshot)
     else if (node.item) cleanForSnapshot(node.item)
     else node.raw = node.rawValue
+    if (node.commentRange) node.rawComment = node.comment
+    for (const key in node) if (node[key] == null) delete node[key]
     delete node.doc
   }
   return node

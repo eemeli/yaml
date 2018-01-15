@@ -2,15 +2,11 @@
 
 exports[`parse "quoted" bare 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 7,
     "start": 0,
   },
   "raw": "\\"value\\"",
-  "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 7,
@@ -21,15 +17,11 @@ Scalar {
 
 exports[`parse "quoted" complex mapping key 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 10,
     "start": 2,
   },
   "raw": "\\"value\\"",
-  "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 9,
@@ -40,16 +32,12 @@ Scalar {
 
 exports[`parse "quoted" escaped 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 34,
     "start": 1,
   },
   "raw": "\\" #value\\\\\\\\
 with \\\\\\"more\\\\\\" lines\\\\\\"\\"",
-  "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 34,
@@ -60,15 +48,11 @@ with \\\\\\"more\\\\\\" lines\\\\\\"\\"",
 
 exports[`parse "quoted" flow seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 10,
     "start": 2,
   },
   "raw": "\\"value\\"",
-  "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 9,
@@ -79,15 +63,11 @@ Scalar {
 
 exports[`parse "quoted" indented block 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 13,
     "start": 6,
   },
   "raw": "\\"value\\"",
-  "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 13,
@@ -98,9 +78,6 @@ Scalar {
 
 exports[`parse "quoted" multi-line 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 24,
     "start": 1,
@@ -108,7 +85,6 @@ Scalar {
   "raw": "\\"value
 with
 more lines\\"",
-  "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 24,
@@ -119,15 +95,11 @@ more lines\\"",
 
 exports[`parse "quoted" newline before & after 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 8,
     "start": 1,
   },
   "raw": "\\"value\\"",
-  "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 8,
@@ -138,15 +110,11 @@ Scalar {
 
 exports[`parse "quoted" seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 9,
     "start": 2,
   },
   "raw": "\\"value\\"",
-  "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 9,
@@ -157,8 +125,6 @@ Scalar {
 
 exports[`parse "quoted" with comment 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 27,
     "start": 12,
@@ -168,7 +134,7 @@ Scalar {
     "start": 3,
   },
   "raw": "\\"value\\"",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 10,
@@ -180,8 +146,6 @@ Scalar {
 exports[`parse "quoted" with props 1`] = `
 Scalar {
   "anchor": "anchor",
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 23,
     "start": 2,
@@ -198,15 +162,11 @@ Scalar {
 
 exports[`parse "quoted" without spaces 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 8,
     "start": 1,
   },
   "raw": "\\"value\\"",
-  "tag": null,
   "type": "DOUBLE",
   "valueRange": Range {
     "end": 8,
@@ -217,8 +177,6 @@ Scalar {
 
 exports[`parse #comments bare 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 17,
     "start": 2,
@@ -228,7 +186,7 @@ Scalar {
     "start": 0,
   },
   "raw": "",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "PLAIN",
   "valueRange": Range {
     "end": 1,
@@ -239,8 +197,6 @@ Scalar {
 
 exports[`parse #comments complex mapping key 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 19,
     "start": 4,
@@ -250,7 +206,7 @@ Scalar {
     "start": 2,
   },
   "raw": "",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "PLAIN",
   "valueRange": Range {
     "end": 3,
@@ -261,8 +217,6 @@ Scalar {
 
 exports[`parse #comments indented block 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 23,
     "start": 8,
@@ -272,7 +226,7 @@ Scalar {
     "start": 6,
   },
   "raw": "",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "PLAIN",
   "valueRange": Range {
     "end": 7,
@@ -283,8 +237,6 @@ Scalar {
 
 exports[`parse #comments newline before & after 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 18,
     "start": 3,
@@ -294,7 +246,7 @@ Scalar {
     "start": 1,
   },
   "raw": "",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "PLAIN",
   "valueRange": Range {
     "end": 2,
@@ -305,8 +257,6 @@ Scalar {
 
 exports[`parse #comments seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 19,
     "start": 4,
@@ -316,7 +266,7 @@ Scalar {
     "start": 2,
   },
   "raw": "",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "PLAIN",
   "valueRange": Range {
     "end": 3,
@@ -327,15 +277,11 @@ Scalar {
 
 exports[`parse %directives TAG 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 30,
     "start": 0,
   },
   "raw": "TAG !yaml! tag:yaml.org,2002:",
-  "tag": null,
   "type": "DIRECTIVE",
   "valueRange": Range {
     "end": 30,
@@ -346,8 +292,6 @@ Scalar {
 
 exports[`parse %directives YAML with comment 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 18,
     "start": 11,
@@ -357,7 +301,7 @@ Scalar {
     "start": 0,
   },
   "raw": "YAML 1.2",
-  "tag": null,
+  "rawComment": "comment",
   "type": "DIRECTIVE",
   "valueRange": Range {
     "end": 9,
@@ -368,15 +312,11 @@ Scalar {
 
 exports[`parse 'quoted' bare 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 7,
     "start": 0,
   },
   "raw": "'value'",
-  "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
     "end": 7,
@@ -387,15 +327,11 @@ Scalar {
 
 exports[`parse 'quoted' complex mapping key 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 10,
     "start": 2,
   },
   "raw": "'value'",
-  "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
     "end": 9,
@@ -406,16 +342,12 @@ Scalar {
 
 exports[`parse 'quoted' escaped 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 32,
     "start": 1,
   },
   "raw": "' #value
 with ''more'' lines'''",
-  "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
     "end": 32,
@@ -426,15 +358,11 @@ with ''more'' lines'''",
 
 exports[`parse 'quoted' flow seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 10,
     "start": 2,
   },
   "raw": "'value'",
-  "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
     "end": 9,
@@ -445,15 +373,11 @@ Scalar {
 
 exports[`parse 'quoted' indented block 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 13,
     "start": 6,
   },
   "raw": "'value'",
-  "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
     "end": 13,
@@ -464,9 +388,6 @@ Scalar {
 
 exports[`parse 'quoted' multi-line 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 24,
     "start": 1,
@@ -474,7 +395,6 @@ Scalar {
   "raw": "'value
 with
 more lines'",
-  "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
     "end": 24,
@@ -485,15 +405,11 @@ more lines'",
 
 exports[`parse 'quoted' newline before & after 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 8,
     "start": 1,
   },
   "raw": "'value'",
-  "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
     "end": 8,
@@ -504,15 +420,11 @@ Scalar {
 
 exports[`parse 'quoted' seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 9,
     "start": 2,
   },
   "raw": "'value'",
-  "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
     "end": 9,
@@ -523,8 +435,6 @@ Scalar {
 
 exports[`parse 'quoted' with comment 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 27,
     "start": 12,
@@ -534,7 +444,7 @@ Scalar {
     "start": 3,
   },
   "raw": "'value'",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "SINGLE",
   "valueRange": Range {
     "end": 10,
@@ -546,8 +456,6 @@ Scalar {
 exports[`parse 'quoted' with props 1`] = `
 Scalar {
   "anchor": "anchor",
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 23,
     "start": 2,
@@ -564,15 +472,11 @@ Scalar {
 
 exports[`parse 'quoted' without spaces 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 8,
     "start": 1,
   },
   "raw": "'value'",
-  "tag": null,
   "type": "SINGLE",
   "valueRange": Range {
     "end": 8,
@@ -583,15 +487,11 @@ Scalar {
 
 exports[`parse *alias bare 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 6,
     "start": 0,
   },
   "raw": "alias",
-  "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
     "end": 6,
@@ -602,15 +502,11 @@ Scalar {
 
 exports[`parse *alias complex mapping key 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 9,
     "start": 2,
   },
   "raw": "alias",
-  "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
     "end": 8,
@@ -621,15 +517,11 @@ Scalar {
 
 exports[`parse *alias flow seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 9,
     "start": 2,
   },
   "raw": "alias",
-  "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
     "end": 8,
@@ -640,15 +532,11 @@ Scalar {
 
 exports[`parse *alias indented block 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 12,
     "start": 6,
   },
   "raw": "alias",
-  "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
     "end": 12,
@@ -659,15 +547,11 @@ Scalar {
 
 exports[`parse *alias newline before & after 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 7,
     "start": 1,
   },
   "raw": "alias",
-  "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
     "end": 7,
@@ -678,15 +562,11 @@ Scalar {
 
 exports[`parse *alias seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 8,
     "start": 2,
   },
   "raw": "alias",
-  "tag": null,
   "type": "ALIAS",
   "valueRange": Range {
     "end": 8,
@@ -697,8 +577,6 @@ Scalar {
 
 exports[`parse *alias with comment 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 26,
     "start": 11,
@@ -708,7 +586,7 @@ Scalar {
     "start": 3,
   },
   "raw": "alias",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "ALIAS",
   "valueRange": Range {
     "end": 9,
@@ -720,8 +598,6 @@ Scalar {
 exports[`parse *alias with props 1`] = `
 Scalar {
   "anchor": "anchor",
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 22,
     "start": 2,
@@ -738,9 +614,7 @@ Scalar {
 
 exports[`parse >block bare 1`] = `
 Scalar {
-  "anchor": null,
   "blockStyle": ">",
-  "commentRange": null,
   "range": Range {
     "end": 34,
     "start": 0,
@@ -748,7 +622,6 @@ Scalar {
   "raw": "      #multiline
   
       	block",
-  "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
     "end": 34,
@@ -759,9 +632,7 @@ Scalar {
 
 exports[`parse >block complex mapping key 1`] = `
 Scalar {
-  "anchor": null,
   "blockStyle": ">",
-  "commentRange": null,
   "range": Range {
     "end": 38,
     "start": 4,
@@ -769,7 +640,6 @@ Scalar {
   "raw": "      #multiline
   
       	block",
-  "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
     "end": 38,
@@ -780,9 +650,7 @@ Scalar {
 
 exports[`parse >block flow seq value 1`] = `
 Scalar {
-  "anchor": null,
   "blockStyle": ">",
-  "commentRange": null,
   "range": Range {
     "end": 38,
     "start": 4,
@@ -790,7 +658,6 @@ Scalar {
   "raw": "      #multiline
   
       	block",
-  "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
     "end": 38,
@@ -801,9 +668,7 @@ Scalar {
 
 exports[`parse >block indented block 1`] = `
 Scalar {
-  "anchor": null,
   "blockStyle": ">",
-  "commentRange": null,
   "range": Range {
     "end": 40,
     "start": 6,
@@ -811,7 +676,6 @@ Scalar {
   "raw": "      #multiline
   
       	block",
-  "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
     "end": 40,
@@ -822,9 +686,7 @@ Scalar {
 
 exports[`parse >block literal with header 1`] = `
 Scalar {
-  "anchor": null,
   "blockStyle": "|+2",
-  "commentRange": null,
   "range": Range {
     "end": 39,
     "start": 3,
@@ -832,7 +694,6 @@ Scalar {
   "raw": "      #multiline
   
       	block",
-  "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
     "end": 39,
@@ -843,9 +704,7 @@ Scalar {
 
 exports[`parse >block newline before & after 1`] = `
 Scalar {
-  "anchor": null,
   "blockStyle": ">",
-  "commentRange": null,
   "range": Range {
     "end": 35,
     "start": 1,
@@ -853,7 +712,6 @@ Scalar {
   "raw": "      #multiline
   
       	block",
-  "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
     "end": 35,
@@ -864,9 +722,7 @@ Scalar {
 
 exports[`parse >block seq value 1`] = `
 Scalar {
-  "anchor": null,
   "blockStyle": ">",
-  "commentRange": null,
   "range": Range {
     "end": 36,
     "start": 2,
@@ -874,7 +730,6 @@ Scalar {
   "raw": "      #multiline
   
       	block",
-  "tag": null,
   "type": "BLOCK",
   "valueRange": Range {
     "end": 36,
@@ -885,7 +740,6 @@ Scalar {
 
 exports[`parse >block with comment 1`] = `
 Scalar {
-  "anchor": null,
   "blockStyle": ">",
   "commentRange": Range {
     "end": 21,
@@ -898,7 +752,7 @@ Scalar {
   "raw": "      #multiline
   
       	block",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "BLOCK",
   "valueRange": Range {
     "end": 54,
@@ -911,7 +765,6 @@ exports[`parse >block with props 1`] = `
 Scalar {
   "anchor": "anchor",
   "blockStyle": ">",
-  "commentRange": null,
   "range": Range {
     "end": 50,
     "start": 2,
@@ -930,9 +783,6 @@ Scalar {
 
 exports[`parse multi-line plain bare 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 49,
     "start": 0,
@@ -941,7 +791,6 @@ Scalar {
       ? :multi line
   
       	plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 49,
@@ -952,9 +801,6 @@ Scalar {
 
 exports[`parse multi-line plain complex mapping key 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 53,
     "start": 4,
@@ -963,7 +809,6 @@ Scalar {
       ? :multi line
   
       	plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 53,
@@ -974,9 +819,6 @@ Scalar {
 
 exports[`parse multi-line plain flow seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 53,
     "start": 4,
@@ -985,7 +827,6 @@ Scalar {
       ? :multi line
   
       	plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 53,
@@ -996,9 +837,6 @@ Scalar {
 
 exports[`parse multi-line plain indented block 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 55,
     "start": 6,
@@ -1007,7 +845,6 @@ Scalar {
       ? :multi line
   
       	plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 55,
@@ -1018,9 +855,6 @@ Scalar {
 
 exports[`parse multi-line plain newline before & after 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 50,
     "start": 1,
@@ -1029,7 +863,6 @@ Scalar {
       ? :multi line
   
       	plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 50,
@@ -1040,9 +873,6 @@ Scalar {
 
 exports[`parse multi-line plain seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 51,
     "start": 2,
@@ -1051,7 +881,6 @@ Scalar {
       ? :multi line
   
       	plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 51,
@@ -1062,8 +891,6 @@ Scalar {
 
 exports[`parse multi-line plain with comment 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 20,
     "start": 5,
@@ -1075,7 +902,7 @@ Scalar {
   "raw": "      ? :multi line
   
       	plain value",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "PLAIN",
   "valueRange": Range {
     "end": 62,
@@ -1087,8 +914,6 @@ Scalar {
 exports[`parse multi-line plain with props 1`] = `
 Scalar {
   "anchor": "anchor",
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 65,
     "start": 2,
@@ -1108,15 +933,11 @@ Scalar {
 
 exports[`parse single-line plain bare 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 11,
     "start": 0,
   },
   "raw": "plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 11,
@@ -1127,15 +948,11 @@ Scalar {
 
 exports[`parse single-line plain complex mapping key 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 14,
     "start": 2,
   },
   "raw": "plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 13,
@@ -1146,15 +963,11 @@ Scalar {
 
 exports[`parse single-line plain empty 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 2,
     "start": 2,
   },
   "raw": "",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 2,
@@ -1165,15 +978,11 @@ Scalar {
 
 exports[`parse single-line plain empty in flow 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 6,
     "start": 5,
   },
   "raw": "",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 6,
@@ -1184,15 +993,11 @@ Scalar {
 
 exports[`parse single-line plain escaped 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 6,
     "start": 0,
   },
   "raw": "-#:] ,",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 6,
@@ -1203,15 +1008,11 @@ Scalar {
 
 exports[`parse single-line plain escaped in flow 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 3,
     "start": 0,
   },
   "raw": "-#:",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 3,
@@ -1222,15 +1023,11 @@ Scalar {
 
 exports[`parse single-line plain flow seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 14,
     "start": 2,
   },
   "raw": "plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 13,
@@ -1241,15 +1038,11 @@ Scalar {
 
 exports[`parse single-line plain indented block 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 17,
     "start": 6,
   },
   "raw": "plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 17,
@@ -1260,15 +1053,11 @@ Scalar {
 
 exports[`parse single-line plain newline before & after 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 12,
     "start": 1,
   },
   "raw": "plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 12,
@@ -1279,15 +1068,11 @@ Scalar {
 
 exports[`parse single-line plain seq value 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 13,
     "start": 2,
   },
   "raw": "plain value",
-  "tag": null,
   "type": "PLAIN",
   "valueRange": Range {
     "end": 13,
@@ -1298,8 +1083,6 @@ Scalar {
 
 exports[`parse single-line plain with comment 1`] = `
 Scalar {
-  "anchor": null,
-  "blockStyle": null,
   "commentRange": Range {
     "end": 31,
     "start": 16,
@@ -1309,7 +1092,7 @@ Scalar {
     "start": 3,
   },
   "raw": "plain value",
-  "tag": null,
+  "rawComment": "comment # here!",
   "type": "PLAIN",
   "valueRange": Range {
     "end": 14,
@@ -1321,8 +1104,6 @@ Scalar {
 exports[`parse single-line plain with props 1`] = `
 Scalar {
   "anchor": "anchor",
-  "blockStyle": null,
-  "commentRange": null,
   "range": Range {
     "end": 27,
     "start": 2,
