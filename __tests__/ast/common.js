@@ -16,7 +16,7 @@ export const cleanForSnapshot = (node) => {
   return node
 }
 
-export const testParse = ({ pre, post, str, comment, expected, inFlow, startIdx, test: customTest }) => {
+export const testParse = ({ pre, post, str, comment, expected, inCollection, inFlow, startIdx, test: customTest }) => {
   let body = str
   if (comment) {
     const lines = body.split('\n')
@@ -28,7 +28,7 @@ export const testParse = ({ pre, post, str, comment, expected, inFlow, startIdx,
   }
   const doc = new Document(pre + body + post)
   const indent = Node.endOfIndent(doc.src, 0)
-  const node = doc.parseNode(startIdx || pre.length, indent, inFlow || false)
+  const node = doc.parseNode(startIdx || pre.length, indent, inFlow || false, inCollection || false)
   expect(node.rawValue).toBe(expected || str)
   const expectedEnd = Node.endOfWhiteSpace(doc.src, pre.length + body.length)
   expect(node.range.end).toBe(expectedEnd)

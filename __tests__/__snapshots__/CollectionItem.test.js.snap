@@ -1,56 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`custom seq items seq in seq in seq 1`] = `
-CollectionItem {
-  "indicator": "-",
-  "item": CollectionItem {
-    "indicator": "-",
-    "item": CollectionItem {
-      "indicator": "-",
-      "item": Scalar {
-        "range": Range {
-          "end": 16,
-          "start": 11,
-        },
-        "raw": "value",
-        "type": "PLAIN",
-        "valueRange": Range {
-          "end": 16,
-          "start": 11,
-        },
-      },
-      "range": Range {
-        "end": 16,
-        "start": 9,
-      },
-      "type": "SEQ_ITEM",
-      "valueRange": Range {
-        "end": 16,
-        "start": 9,
-      },
-    },
-    "range": Range {
-      "end": 16,
-      "start": 3,
-    },
-    "type": "SEQ_ITEM",
-    "valueRange": Range {
-      "end": 16,
-      "start": 3,
-    },
-  },
-  "range": Range {
-    "end": 16,
-    "start": 1,
-  },
-  "type": "SEQ_ITEM",
-  "valueRange": Range {
-    "end": 16,
-    "start": 1,
-  },
-}
-`;
-
 exports[`map key "? *alias" bare 1`] = `
 CollectionItem {
   "indicator": "?",

@@ -33,7 +33,7 @@ export default class CollectionItem extends Node {
       ch = src[offset]
     }
     if (ch && itemIndent > indent) {
-      this.item = this.doc.parseNode(offset, indent, inFlow)
+      this.item = this.doc.parseNode(offset, indent, inFlow, false)
       offset = this.item.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1

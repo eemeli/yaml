@@ -1,8 +1,9 @@
+import Collection from './Collection'
+import CollectionItem from './CollectionItem'
 import FlowContainer from './FlowContainer'
 import Node from './Node'
 import Range from './Range'
 import Scalar from './Scalar'
-import CollectionItem from './CollectionItem'
 
 export default class Document {
   /**
@@ -20,9 +21,9 @@ export default class Document {
    * @param {boolean} inFlow - true if currently in a flow-in context
    * @returns {!number} - Index of the character after this node; may be `\n`
    */
-  parseNode (start, indent, inFlow) {
+  parseNode (start, indent, inFlow, inCollection) {
     trace: 'start', { indent, inFlow }, this.src.slice(start)
-    const props = Node.parseProps(this.src, start)
+    const { props, offset } = Node.parseProps(this.src, start)
     let node
     switch (props.type) {
       case Node.Type.FLOW_MAP:
@@ -31,13 +32,14 @@ export default class Document {
         break
       case Node.Type.MAP_KEY:
       case Node.Type.MAP_VALUE:
-      case Node.Type.SEQ_ITEM:
-        node = new CollectionItem(this, props)
-        break
+      case Node.Type.SEQ_ITEM: {
+        const item = new CollectionItem(this, props)
+        node = inCollection ? item : new Collection(item, offset)
+      } break
       default:
         node = new Scalar(this, props)
     }
-    const end = node.parse(props.valueStart, indent, inFlow)
+    const end = node.parse(offset, indent, inFlow)
     node.range = new Range(start, end)
     trace: 'node', { type: node.type, range: node.range }
     return node

@@ -1,5 +1,95 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`custom seq items seq in seq in seq 1`] = `
+Collection {
+  "items": Array [
+    CollectionItem {
+      "indicator": "-",
+      "item": Collection {
+        "items": Array [
+          CollectionItem {
+            "indicator": "-",
+            "item": Collection {
+              "items": Array [
+                CollectionItem {
+                  "indicator": "-",
+                  "item": Scalar {
+                    "range": Range {
+                      "end": 16,
+                      "start": 11,
+                    },
+                    "raw": "value",
+                    "type": "PLAIN",
+                    "valueRange": Range {
+                      "end": 16,
+                      "start": 11,
+                    },
+                  },
+                  "range": Range {
+                    "end": 16,
+                    "start": 9,
+                  },
+                  "type": "SEQ_ITEM",
+                  "valueRange": Range {
+                    "end": 16,
+                    "start": 9,
+                  },
+                },
+              ],
+              "range": Range {
+                "end": 16,
+                "start": 9,
+              },
+              "type": "COLLECTION",
+              "valueRange": Range {
+                "end": 16,
+                "start": 9,
+              },
+            },
+            "range": Range {
+              "end": 16,
+              "start": 3,
+            },
+            "type": "SEQ_ITEM",
+            "valueRange": Range {
+              "end": 16,
+              "start": 3,
+            },
+          },
+        ],
+        "range": Range {
+          "end": 16,
+          "start": 3,
+        },
+        "type": "COLLECTION",
+        "valueRange": Range {
+          "end": 16,
+          "start": 3,
+        },
+      },
+      "range": Range {
+        "end": 16,
+        "start": 1,
+      },
+      "type": "SEQ_ITEM",
+      "valueRange": Range {
+        "end": 16,
+        "start": 1,
+      },
+    },
+  ],
+  "range": Range {
+    "end": 16,
+    "start": 1,
+  },
+  "type": "COLLECTION",
+  "valueRange": Range {
+    "end": 16,
+    "start": 1,
+  },
+}
+`;
+
 exports[`simple collections seq 1`] = `
 Collection {
   "items": Array [
@@ -201,10 +291,14 @@ Collection {
       },
     },
   ],
+  "range": Range {
+    "end": 79,
+    "start": 1,
+  },
   "type": "COLLECTION",
   "valueRange": Range {
     "end": 79,
-    "start": 0,
+    "start": 1,
   },
 }
 `;

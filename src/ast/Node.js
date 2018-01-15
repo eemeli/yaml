@@ -79,7 +79,7 @@ export default class Node {
   // Anchor and tag are before type, which determines the node implementation
   // class; hence this intermediate object.
   static parseProps (src, offset) {
-    const props = { anchor: null, tag: null, type: null, valueStart: null }
+    const props = { anchor: null, tag: null, type: null }
     offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
     while (ch === '&' || ch === '!') {
@@ -89,10 +89,9 @@ export default class Node {
       offset = Node.endOfWhiteSpace(src, end)
       ch = src[offset]
     }
-    props.valueStart = offset
     props.type = Node.parseType(src, offset)
-    trace: props
-    return props
+    trace: props, offset
+    return { props, offset }
   }
 
   constructor (doc, { anchor, tag, type }) {

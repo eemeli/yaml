@@ -32,10 +32,12 @@ describe('internals', () => {
     const src = '!tag! &anchor *value #comment'
     const props = Node.parseProps(src, 0)
     expect(props).toMatchObject({
-      anchor: 'anchor',
-      tag: 'tag!',
-      type: Node.Type.ALIAS,
-      valueStart: src.indexOf('*')
+      offset: src.indexOf('*'),
+      props: {
+        anchor: 'anchor',
+        tag: 'tag!',
+        type: Node.Type.ALIAS
+      }
     })
   })
 })

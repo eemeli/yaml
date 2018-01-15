@@ -10,7 +10,7 @@ for (const dscName in simple) {
   const str = simple[dscName]
   describe(dscName, () => {
     for (const name in commonTests) {
-      const props = Object.assign({ str }, commonTests[name])
+      const props = Object.assign({ str, inCollection: true }, commonTests[name])
       test(name, () => testParse(props))
     }
   })
@@ -37,7 +37,7 @@ for (const namePrefix in indicators) {
     const typeTest = (node) => expect(node.item.type).toBe(expType)
     describe(`${namePrefix} ${JSON.stringify(str)}`, () => {
       for (const name in commonTests) {
-        const props = Object.assign({ str, test: typeTest }, commonTests[name])
+        const props = Object.assign({ str, test: typeTest, inCollection: true }, commonTests[name])
         if (expType === Node.Type.DOUBLE && props.comment) continue
         if (props.post && props.post[0] !== '\n' && str.indexOf('\n' !== -1)) {
           props.post = props.post.replace(/^\s?/, '\n')
@@ -47,12 +47,3 @@ for (const namePrefix in indicators) {
     })
   }
 }
-
-describe('custom seq items', () => {
-  test('seq in seq in seq', () => testParse({
-    pre: '\n',
-    str: '-\t-\n    - value',
-    post: '\n',
-    test: (node) => expect(node.item.item.item.rawValue).toBe('value')
-  }))
-})
