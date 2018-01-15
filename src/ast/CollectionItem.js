@@ -1,6 +1,5 @@
 import Node from './Node'
 import Range from './Range'
-import Scalar from './Scalar'
 
 export default class CollectionItem extends Node {
   constructor (doc, props) {
@@ -34,7 +33,7 @@ export default class CollectionItem extends Node {
       ch = src[offset]
     }
     if (ch && itemIndent > indent) {
-      this.item = this.doc.parseNode(offset, itemIndent, inFlow)
+      this.item = this.doc.parseNode(offset, indent, inFlow)
       offset = this.item.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1

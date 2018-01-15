@@ -4,6 +4,7 @@ export default class Node {
   static Type = {
     ALIAS: 'ALIAS',
     BLOCK: 'BLOCK',
+    COLLECTION: 'COLLECTION',
     COMMENT: 'COMMENT',
     DIRECTIVE: 'DIRECTIVE',
     DOUBLE: 'DOUBLE',
