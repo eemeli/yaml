@@ -3,7 +3,8 @@ import Range from './Range'
 export default class Node {
   static Type = {
     ALIAS: 'ALIAS',
-    BLOCK: 'BLOCK',
+    BLOCK_FOLDED: 'BLOCK_FOLDED',
+    BLOCK_LITERAL: 'BLOCK_LITERAL',
     COLLECTION: 'COLLECTION',
     COMMENT: 'COMMENT',
     DIRECTIVE: 'DIRECTIVE',
@@ -41,18 +42,45 @@ export default class Node {
     return offset
   }
 
-  static isBlank (src, offset) {
+  /**
+   * End of indentation, or null if the line's indent level is not more
+   * than `indent`
+   *
+   * @param {string} src
+   * @param {number} indent
+   * @param {number} lineStart
+   * @returns {?number}
+   */
+  static endOfBlockIndent (src, indent, lineStart) {
+    const inEnd = Node.endOfIndent(src, lineStart)
+    if (inEnd > lineStart + indent) {
+      return inEnd
+    } else {
+      const wsEnd = Node.endOfWhiteSpace(src, inEnd)
+      const ch = src[wsEnd]
+      if (!ch || ch === '\n') return wsEnd
+    }
+    return null
+  }
+
+  static atBlank (src, offset) {
     const ch = src[offset]
     return ch === '\n' || ch === '\t' || ch === ' '
+  }
+
+  static atCollectionItem (src, offset) {
+    const ch = src[offset]
+    return (ch === '?' || ch === ':' || ch === '-') && Node.atBlank(src, offset + 1)
   }
 
   static parseType (src, offset) {
     switch (src[offset]) {
       case '*':
         return Node.Type.ALIAS
-      case '|':
       case '>':
-        return Node.Type.BLOCK
+        return Node.Type.BLOCK_FOLDED
+      case '|':
+        return Node.Type.BLOCK_LITERAL
       case '%': {
         const prev = src[offset - 1]
         return !prev || prev === '\n' ? Node.Type.DIRECTIVE : Node.Type.PLAIN
@@ -64,11 +92,11 @@ export default class Node {
       case '[':
         return Node.Type.FLOW_SEQ
       case '?':
-        return Node.isBlank(src, offset + 1) ? Node.Type.MAP_KEY : Node.Type.PLAIN
+        return Node.atBlank(src, offset + 1) ? Node.Type.MAP_KEY : Node.Type.PLAIN
       case ':':
-        return Node.isBlank(src, offset + 1) ? Node.Type.MAP_VALUE : Node.Type.PLAIN
+        return Node.atBlank(src, offset + 1) ? Node.Type.MAP_VALUE : Node.Type.PLAIN
       case '-':
-        return Node.isBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
+        return Node.atBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
       case "'":
         return Node.Type.SINGLE
       default:

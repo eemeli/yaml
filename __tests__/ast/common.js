@@ -16,7 +16,19 @@ export const cleanForSnapshot = (node) => {
   return node
 }
 
-export const testParse = ({ pre, post, str, comment, expected, inCollection, inFlow, startIdx, test: customTest }) => {
+const lastNodeIsBlockNode = (node) => {
+  let lastNode = node
+  while (lastNode.item || lastNode.items) {
+    lastNode = lastNode.item || lastNode.items[lastNode.items.length - 1]
+  }
+  const { type } = lastNode
+  return type === Node.Type.BLOCK_FOLDED || type === Node.Type.BLOCK_LITERAL ||
+    (type === Node.Type.PLAIN && (!lastNode.commentRange || lastNode.commentRange.end < lastNode.valueRange.end))
+}
+
+export const testParse = ({
+  comment, expected, inCollection, inFlow, pre, post, str, startIdx, test: customTest, type
+}) => {
   let body = str
   if (comment) {
     const lines = body.split('\n')
@@ -29,9 +41,18 @@ export const testParse = ({ pre, post, str, comment, expected, inCollection, inF
   const doc = new Document(pre + body + post)
   const indent = Node.endOfIndent(doc.src, 0)
   const node = doc.parseNode(startIdx || pre.length, indent, inFlow || false, inCollection || false)
-  expect(node.rawValue).toBe(expected || str)
-  const expectedEnd = Node.endOfWhiteSpace(doc.src, pre.length + body.length)
-  expect(node.range.end).toBe(expectedEnd)
+  let expectedRawValue = expected || str
+  let expectedRangeEnd = Node.endOfWhiteSpace(doc.src, pre.length + body.length)
+  if (lastNodeIsBlockNode(node)) {
+    while (doc.src[expectedRangeEnd] === '\n') {
+      expectedRawValue += '\n'
+      expectedRangeEnd += 1
+    }
+  }
+  if (node.type === Node.Type.PLAIN) expectedRawValue = expectedRawValue.trim()
+  expect(node.rawValue).toBe(expectedRawValue)
+  expect(node.range.end).toBe(expectedRangeEnd)
+  if (type) expect(node.type).toBe(type)
   if (comment) {
     if (node instanceof Scalar) {
       expect(node.comment).toBe(comment)

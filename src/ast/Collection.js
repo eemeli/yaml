@@ -1,6 +1,5 @@
 import Node from './Node'
 import Range from './Range'
-import Scalar from './Scalar'
 
 export default class Collection extends Node {
   constructor (firstItem, valueStart) {
@@ -21,15 +20,15 @@ export default class Collection extends Node {
     while (ch) {
       while (ch === '\n' || ch === '#') {
         if (ch === '#') {
-          const comment = new Scalar(this.doc, { type: Node.Type.COMMENT })
-          offset = comment.parse(offset, indent, true)
+          const comment = new Node(this.doc, { type: Node.Type.COMMENT })
+          offset = comment.parseComment(offset)
           this.items.push(comment)
           this.valueRange.end = comment.commentRange.end
           if (offset >= src.length) break
         }
         lineStart = offset + 1
         offset = Node.endOfIndent(src, lineStart)
-        if (Node.isBlank(src, offset)) {
+        if (Node.atBlank(src, offset)) {
           const wsEnd = Node.endOfWhiteSpace(src, offset)
           const next = src[wsEnd]
           if (!next || next === '\n' || next === '#') {
