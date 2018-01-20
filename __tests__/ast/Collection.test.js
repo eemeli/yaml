@@ -32,4 +32,29 @@ describe('custom seq items', () => {
     post: '',
     test: (node) => expect(node.items[0].item.items[0].item.items[0].item.rawValue).toBe('value')
   }))
+
+  test('building a hierarchy', () => {
+    const tree = `
+- seq
+- rows
+- -	- h
+     i #c1
+  - #c2
+    #c3
+   j #c4
+
+-
+ - >+1	#c6
+     m
+  n
+\n\n\n`
+    const doc = new Document(tree)
+    const node = doc.parseNode(1, 0, false, false)
+    expect(node.type).toBe(Node.Type.COLLECTION)
+    expect(node.rawValue).toBe(tree.slice(1))
+    expect(node.range.end).toBe(tree.length)
+    expect(node.items.length).toBe(4)
+    expect(node.items[2].item.type).toBe(Node.Type.COLLECTION)
+    expect(cleanForSnapshot(node)).toMatchSnapshot()
+  })
 })

@@ -33,13 +33,15 @@ export default class CollectionItem extends Node {
       ch = src[offset]
     }
     if (ch && itemIndent > indent) {
+      if (Node.atCollectionItem(src, offset)) indent = itemIndent
       this.item = this.doc.parseNode(offset, indent, inFlow, false)
       offset = this.item.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1
     }
     const end = this.item ? this.item.valueRange.end : offset
+    trace: ({ start, end, offset })
     this.valueRange = new Range(start, end)
-    return Node.endOfWhiteSpace(src, offset)
+    return offset
   }
 }

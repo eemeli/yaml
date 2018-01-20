@@ -1,5 +1,255 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`custom seq items building a hierarchy 1`] = `
+Collection {
+  "items": Array [
+    CollectionItem {
+      "indicator": "-",
+      "item": PlainValue {
+        "range": Range {
+          "end": 7,
+          "start": 3,
+        },
+        "raw": "seq",
+        "type": "PLAIN",
+        "valueRange": Range {
+          "end": 7,
+          "start": 3,
+        },
+      },
+      "range": Range {
+        "end": 7,
+        "start": 1,
+      },
+      "type": "SEQ_ITEM",
+      "valueRange": Range {
+        "end": 7,
+        "start": 1,
+      },
+    },
+    CollectionItem {
+      "indicator": "-",
+      "item": PlainValue {
+        "range": Range {
+          "end": 14,
+          "start": 9,
+        },
+        "raw": "rows",
+        "type": "PLAIN",
+        "valueRange": Range {
+          "end": 14,
+          "start": 9,
+        },
+      },
+      "range": Range {
+        "end": 14,
+        "start": 7,
+      },
+      "type": "SEQ_ITEM",
+      "valueRange": Range {
+        "end": 14,
+        "start": 7,
+      },
+    },
+    CollectionItem {
+      "indicator": "-",
+      "item": Collection {
+        "items": Array [
+          CollectionItem {
+            "indicator": "-",
+            "item": Collection {
+              "items": Array [
+                CollectionItem {
+                  "indicator": "-",
+                  "item": PlainValue {
+                    "range": Range {
+                      "end": 28,
+                      "start": 20,
+                    },
+                    "raw": "h
+     i",
+                    "type": "PLAIN",
+                    "valueRange": Range {
+                      "end": 28,
+                      "start": 20,
+                    },
+                  },
+                  "range": Range {
+                    "end": 28,
+                    "start": 18,
+                  },
+                  "type": "SEQ_ITEM",
+                  "valueRange": Range {
+                    "end": 28,
+                    "start": 18,
+                  },
+                },
+                Node {
+                  "commentRange": Range {
+                    "end": 32,
+                    "start": 30,
+                  },
+                  "rawComment": "c1",
+                  "type": "COMMENT",
+                },
+              ],
+              "range": Range {
+                "end": 33,
+                "start": 18,
+              },
+              "type": "COLLECTION",
+              "valueRange": Range {
+                "end": 32,
+                "start": 18,
+              },
+            },
+            "range": Range {
+              "end": 33,
+              "start": 16,
+            },
+            "type": "SEQ_ITEM",
+            "valueRange": Range {
+              "end": 32,
+              "start": 16,
+            },
+          },
+          CollectionItem {
+            "commentRange": Range {
+              "end": 48,
+              "start": 38,
+            },
+            "indicator": "-",
+            "item": PlainValue {
+              "commentRange": Range {
+                "end": 57,
+                "start": 55,
+              },
+              "range": Range {
+                "end": 57,
+                "start": 52,
+              },
+              "raw": "j",
+              "rawComment": "c4",
+              "type": "PLAIN",
+              "valueRange": Range {
+                "end": 53,
+                "start": 52,
+              },
+            },
+            "range": Range {
+              "end": 57,
+              "start": 35,
+            },
+            "rawComment": "c2
+    #c3",
+            "type": "SEQ_ITEM",
+            "valueRange": Range {
+              "end": 53,
+              "start": 35,
+            },
+          },
+        ],
+        "range": Range {
+          "end": 59,
+          "start": 16,
+        },
+        "type": "COLLECTION",
+        "valueRange": Range {
+          "end": 53,
+          "start": 16,
+        },
+      },
+      "range": Range {
+        "end": 59,
+        "start": 14,
+      },
+      "type": "SEQ_ITEM",
+      "valueRange": Range {
+        "end": 53,
+        "start": 14,
+      },
+    },
+    CollectionItem {
+      "indicator": "-",
+      "item": Collection {
+        "items": Array [
+          CollectionItem {
+            "indicator": "-",
+            "item": BlockValue {
+              "blockStyle": ">+1",
+              "commentRange": Range {
+                "end": 71,
+                "start": 69,
+              },
+              "range": Range {
+                "end": 79,
+                "start": 64,
+              },
+              "raw": "     m
+",
+              "rawComment": "c6",
+              "type": "BLOCK_FOLDED",
+              "valueRange": Range {
+                "end": 79,
+                "start": 72,
+              },
+            },
+            "range": Range {
+              "end": 79,
+              "start": 62,
+            },
+            "type": "SEQ_ITEM",
+            "valueRange": Range {
+              "end": 79,
+              "start": 62,
+            },
+          },
+          PlainValue {
+            "range": Range {
+              "end": 86,
+              "start": 81,
+            },
+            "raw": "n",
+            "type": "PLAIN",
+            "valueRange": Range {
+              "end": 86,
+              "start": 81,
+            },
+          },
+        ],
+        "range": Range {
+          "end": 86,
+          "start": 62,
+        },
+        "type": "COLLECTION",
+        "valueRange": Range {
+          "end": 86,
+          "start": 62,
+        },
+      },
+      "range": Range {
+        "end": 86,
+        "start": 59,
+      },
+      "type": "SEQ_ITEM",
+      "valueRange": Range {
+        "end": 86,
+        "start": 59,
+      },
+    },
+  ],
+  "range": Range {
+    "end": 86,
+    "start": 1,
+  },
+  "type": "COLLECTION",
+  "valueRange": Range {
+    "end": 86,
+    "start": 1,
+  },
+}
+`;
+
 exports[`custom seq items seq in seq in seq 1`] = `
 Collection {
   "items": Array [
@@ -13,7 +263,7 @@ Collection {
               "items": Array [
                 CollectionItem {
                   "indicator": "-",
-                  "item": Scalar {
+                  "item": PlainValue {
                     "range": Range {
                       "end": 16,
                       "start": 11,
@@ -95,25 +345,25 @@ Collection {
   "items": Array [
     CollectionItem {
       "indicator": "-",
-      "item": Scalar {
+      "item": PlainValue {
         "range": Range {
-          "end": 12,
+          "end": 13,
           "start": 3,
         },
         "raw": "one value",
         "type": "PLAIN",
         "valueRange": Range {
-          "end": 12,
+          "end": 13,
           "start": 3,
         },
       },
       "range": Range {
-        "end": 12,
+        "end": 13,
         "start": 1,
       },
       "type": "SEQ_ITEM",
       "valueRange": Range {
-        "end": 12,
+        "end": 13,
         "start": 1,
       },
     },
@@ -146,18 +396,13 @@ Collection {
         "start": 13,
       },
     },
-    Scalar {
+    Node {
       "commentRange": Range {
         "end": 28,
         "start": 26,
       },
-      "raw": "",
       "rawComment": "c2",
       "type": "COMMENT",
-      "valueRange": Range {
-        "end": 25,
-        "start": 25,
-      },
     },
     CollectionItem {
       "indicator": "-",
@@ -186,27 +431,28 @@ Collection {
     },
     CollectionItem {
       "indicator": "-",
-      "item": Scalar {
+      "item": BlockValue {
         "blockStyle": ">",
         "range": Range {
-          "end": 61,
+          "end": 62,
           "start": 46,
         },
         "raw": " four
-   five",
-        "type": "BLOCK",
+   five
+",
+        "type": "BLOCK_FOLDED",
         "valueRange": Range {
-          "end": 61,
+          "end": 62,
           "start": 48,
         },
       },
       "range": Range {
-        "end": 61,
+        "end": 62,
         "start": 44,
       },
       "type": "SEQ_ITEM",
       "valueRange": Range {
-        "end": 61,
+        "end": 62,
         "start": 44,
       },
     },
@@ -231,7 +477,7 @@ Collection {
                 },
               },
               ":",
-              Scalar {
+              PlainValue {
                 "range": Range {
                   "end": 73,
                   "start": 72,
@@ -277,18 +523,13 @@ Collection {
         "start": 62,
       },
     },
-    Scalar {
+    Node {
       "commentRange": Range {
         "end": 79,
         "start": 77,
       },
-      "raw": "",
       "rawComment": "c3",
       "type": "COMMENT",
-      "valueRange": Range {
-        "end": 76,
-        "start": 76,
-      },
     },
   ],
   "range": Range {

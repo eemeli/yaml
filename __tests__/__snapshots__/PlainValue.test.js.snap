@@ -14,8 +14,8 @@ PlainValue {
   "rawComment": "comment # here!",
   "type": "PLAIN",
   "valueRange": Range {
-    "end": 1,
-    "start": 1,
+    "end": 17,
+    "start": 17,
   },
 }
 `;

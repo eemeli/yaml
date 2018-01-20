@@ -26,7 +26,7 @@ const items = {
   ' "multiline\nquote"': Node.Type.DOUBLE,
   '\t[ 1, 2 ]': Node.Type.FLOW_SEQ,
   ' *alias': Node.Type.ALIAS,
-  ' >+2\n       multiple\n       lines': Node.Type.BLOCK,
+  ' >+2\n       multiple\n       lines': Node.Type.BLOCK_FOLDED,
   '\n  \n\n    multiline plain': Node.Type.PLAIN
 }
 for (const namePrefix in indicators) {

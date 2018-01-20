@@ -50,7 +50,7 @@ export default class Document {
       default:
         node = new Scalar(this, props)
     }
-    const end = node.parse(offset, indent, inFlow)
+    let end = node.parse(offset, indent, inFlow)
     node.range = new Range(start, end)
     trace: node.type, { offset, indent, range: node.range }, JSON.stringify(node.rawValue)
     return node
