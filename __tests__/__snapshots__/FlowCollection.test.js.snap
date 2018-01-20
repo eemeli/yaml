@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`parse deep array bare 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -43,7 +43,7 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
         PlainValue {
@@ -98,7 +98,7 @@ FlowContainer {
 `;
 
 exports[`parse deep array complex mapping key 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -140,7 +140,7 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
         PlainValue {
@@ -195,7 +195,7 @@ FlowContainer {
 `;
 
 exports[`parse deep array flow seq value 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -237,7 +237,7 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
         PlainValue {
@@ -292,7 +292,7 @@ FlowContainer {
 `;
 
 exports[`parse deep array indented block 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -334,7 +334,7 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
         PlainValue {
@@ -389,7 +389,7 @@ FlowContainer {
 `;
 
 exports[`parse deep array newline before & after 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -431,7 +431,7 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
         PlainValue {
@@ -486,7 +486,7 @@ FlowContainer {
 `;
 
 exports[`parse deep array seq value 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -528,7 +528,7 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
         PlainValue {
@@ -583,7 +583,7 @@ FlowContainer {
 `;
 
 exports[`parse deep array with comment 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -633,7 +633,7 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
         PlainValue {
@@ -688,7 +688,7 @@ FlowContainer {
 `;
 
 exports[`parse deep array with props 1`] = `
-FlowContainer {
+FlowCollection {
   "anchor": "anchor",
   "items": Array [
     "[",
@@ -731,7 +731,7 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
         PlainValue {
@@ -787,7 +787,7 @@ FlowContainer {
 `;
 
 exports[`parse deep object bare 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     "?",
@@ -833,10 +833,10 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
-        FlowContainer {
+        FlowCollection {
           "items": Array [
             "{",
             PlainValue {
@@ -903,7 +903,7 @@ FlowContainer {
 `;
 
 exports[`parse deep object complex mapping key 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     "?",
@@ -949,10 +949,10 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
-        FlowContainer {
+        FlowCollection {
           "items": Array [
             "{",
             PlainValue {
@@ -1019,7 +1019,7 @@ FlowContainer {
 `;
 
 exports[`parse deep object flow seq value 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     "?",
@@ -1065,10 +1065,10 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
-        FlowContainer {
+        FlowCollection {
           "items": Array [
             "{",
             PlainValue {
@@ -1135,7 +1135,7 @@ FlowContainer {
 `;
 
 exports[`parse deep object indented block 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     "?",
@@ -1181,10 +1181,10 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
-        FlowContainer {
+        FlowCollection {
           "items": Array [
             "{",
             PlainValue {
@@ -1251,7 +1251,7 @@ FlowContainer {
 `;
 
 exports[`parse deep object newline before & after 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     "?",
@@ -1297,10 +1297,10 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
-        FlowContainer {
+        FlowCollection {
           "items": Array [
             "{",
             PlainValue {
@@ -1367,7 +1367,7 @@ FlowContainer {
 `;
 
 exports[`parse deep object seq value 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     "?",
@@ -1413,10 +1413,10 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
-        FlowContainer {
+        FlowCollection {
           "items": Array [
             "{",
             PlainValue {
@@ -1483,7 +1483,7 @@ FlowContainer {
 `;
 
 exports[`parse deep object with comment 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     "?",
@@ -1534,10 +1534,10 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
-        FlowContainer {
+        FlowCollection {
           "items": Array [
             "{",
             PlainValue {
@@ -1604,7 +1604,7 @@ FlowContainer {
 `;
 
 exports[`parse deep object with props 1`] = `
-FlowContainer {
+FlowCollection {
   "anchor": "anchor",
   "items": Array [
     "{",
@@ -1651,10 +1651,10 @@ FlowContainer {
       },
     },
     ",",
-    FlowContainer {
+    FlowCollection {
       "items": Array [
         "[",
-        FlowContainer {
+        FlowCollection {
           "items": Array [
             "{",
             PlainValue {
@@ -1722,7 +1722,7 @@ FlowContainer {
 `;
 
 exports[`parse simple array bare 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -1778,7 +1778,7 @@ FlowContainer {
 `;
 
 exports[`parse simple array complex mapping key 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -1834,7 +1834,7 @@ FlowContainer {
 `;
 
 exports[`parse simple array flow seq value 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -1890,7 +1890,7 @@ FlowContainer {
 `;
 
 exports[`parse simple array indented block 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -1946,7 +1946,7 @@ FlowContainer {
 `;
 
 exports[`parse simple array newline before & after 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -2002,7 +2002,7 @@ FlowContainer {
 `;
 
 exports[`parse simple array seq value 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "[",
     Scalar {
@@ -2058,7 +2058,7 @@ FlowContainer {
 `;
 
 exports[`parse simple array with comment 1`] = `
-FlowContainer {
+FlowCollection {
   "commentRange": Range {
     "end": 44,
     "start": 29,
@@ -2119,7 +2119,7 @@ FlowContainer {
 `;
 
 exports[`parse simple array with props 1`] = `
-FlowContainer {
+FlowCollection {
   "anchor": "anchor",
   "items": Array [
     "[",
@@ -2177,7 +2177,7 @@ FlowContainer {
 `;
 
 exports[`parse simple object bare 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     Scalar {
@@ -2272,7 +2272,7 @@ FlowContainer {
 `;
 
 exports[`parse simple object complex mapping key 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     Scalar {
@@ -2367,7 +2367,7 @@ FlowContainer {
 `;
 
 exports[`parse simple object flow seq value 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     Scalar {
@@ -2462,7 +2462,7 @@ FlowContainer {
 `;
 
 exports[`parse simple object indented block 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     Scalar {
@@ -2557,7 +2557,7 @@ FlowContainer {
 `;
 
 exports[`parse simple object newline before & after 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     Scalar {
@@ -2652,7 +2652,7 @@ FlowContainer {
 `;
 
 exports[`parse simple object seq value 1`] = `
-FlowContainer {
+FlowCollection {
   "items": Array [
     "{",
     Scalar {
@@ -2747,7 +2747,7 @@ FlowContainer {
 `;
 
 exports[`parse simple object with comment 1`] = `
-FlowContainer {
+FlowCollection {
   "commentRange": Range {
     "end": 60,
     "start": 45,
@@ -2847,7 +2847,7 @@ FlowContainer {
 `;
 
 exports[`parse simple object with props 1`] = `
-FlowContainer {
+FlowCollection {
   "anchor": "anchor",
   "items": Array [
     "{",

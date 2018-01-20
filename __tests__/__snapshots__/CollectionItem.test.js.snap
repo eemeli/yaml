@@ -1116,7 +1116,7 @@ CollectionItem {
 exports[`map key "?\\t[ 1, 2 ]" bare 1`] = `
 CollectionItem {
   "indicator": "?",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -1171,7 +1171,7 @@ CollectionItem {
 exports[`map key "?\\t[ 1, 2 ]" complex mapping key 1`] = `
 CollectionItem {
   "indicator": "?",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -1226,7 +1226,7 @@ CollectionItem {
 exports[`map key "?\\t[ 1, 2 ]" flow seq value 1`] = `
 CollectionItem {
   "indicator": "?",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -1281,7 +1281,7 @@ CollectionItem {
 exports[`map key "?\\t[ 1, 2 ]" indented block 1`] = `
 CollectionItem {
   "indicator": "?",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -1336,7 +1336,7 @@ CollectionItem {
 exports[`map key "?\\t[ 1, 2 ]" newline before & after 1`] = `
 CollectionItem {
   "indicator": "?",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -1391,7 +1391,7 @@ CollectionItem {
 exports[`map key "?\\t[ 1, 2 ]" seq value 1`] = `
 CollectionItem {
   "indicator": "?",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -1446,7 +1446,7 @@ CollectionItem {
 exports[`map key "?\\t[ 1, 2 ]" with comment 1`] = `
 CollectionItem {
   "indicator": "?",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "commentRange": Range {
       "end": 30,
       "start": 15,
@@ -1507,7 +1507,7 @@ exports[`map key "?\\t[ 1, 2 ]" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
   "indicator": "?",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -2676,7 +2676,7 @@ CollectionItem {
 exports[`map value ":\\t[ 1, 2 ]" bare 1`] = `
 CollectionItem {
   "indicator": ":",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -2731,7 +2731,7 @@ CollectionItem {
 exports[`map value ":\\t[ 1, 2 ]" complex mapping key 1`] = `
 CollectionItem {
   "indicator": ":",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -2786,7 +2786,7 @@ CollectionItem {
 exports[`map value ":\\t[ 1, 2 ]" flow seq value 1`] = `
 CollectionItem {
   "indicator": ":",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -2841,7 +2841,7 @@ CollectionItem {
 exports[`map value ":\\t[ 1, 2 ]" indented block 1`] = `
 CollectionItem {
   "indicator": ":",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -2896,7 +2896,7 @@ CollectionItem {
 exports[`map value ":\\t[ 1, 2 ]" newline before & after 1`] = `
 CollectionItem {
   "indicator": ":",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -2951,7 +2951,7 @@ CollectionItem {
 exports[`map value ":\\t[ 1, 2 ]" seq value 1`] = `
 CollectionItem {
   "indicator": ":",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -3006,7 +3006,7 @@ CollectionItem {
 exports[`map value ":\\t[ 1, 2 ]" with comment 1`] = `
 CollectionItem {
   "indicator": ":",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "commentRange": Range {
       "end": 30,
       "start": 15,
@@ -3067,7 +3067,7 @@ exports[`map value ":\\t[ 1, 2 ]" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
   "indicator": ":",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -4905,7 +4905,7 @@ CollectionItem {
 exports[`seq item "-\\t[ 1, 2 ]" bare 1`] = `
 CollectionItem {
   "indicator": "-",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -4960,7 +4960,7 @@ CollectionItem {
 exports[`seq item "-\\t[ 1, 2 ]" complex mapping key 1`] = `
 CollectionItem {
   "indicator": "-",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -5015,7 +5015,7 @@ CollectionItem {
 exports[`seq item "-\\t[ 1, 2 ]" flow seq value 1`] = `
 CollectionItem {
   "indicator": "-",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -5070,7 +5070,7 @@ CollectionItem {
 exports[`seq item "-\\t[ 1, 2 ]" indented block 1`] = `
 CollectionItem {
   "indicator": "-",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -5125,7 +5125,7 @@ CollectionItem {
 exports[`seq item "-\\t[ 1, 2 ]" newline before & after 1`] = `
 CollectionItem {
   "indicator": "-",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -5180,7 +5180,7 @@ CollectionItem {
 exports[`seq item "-\\t[ 1, 2 ]" seq value 1`] = `
 CollectionItem {
   "indicator": "-",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {
@@ -5235,7 +5235,7 @@ CollectionItem {
 exports[`seq item "-\\t[ 1, 2 ]" with comment 1`] = `
 CollectionItem {
   "indicator": "-",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "commentRange": Range {
       "end": 30,
       "start": 15,
@@ -5296,7 +5296,7 @@ exports[`seq item "-\\t[ 1, 2 ]" with props 1`] = `
 CollectionItem {
   "anchor": "anchor",
   "indicator": "-",
-  "item": FlowContainer {
+  "item": FlowCollection {
     "items": Array [
       "[",
       PlainValue {

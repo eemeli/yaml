@@ -1,7 +1,7 @@
 import BlockValue from './BlockValue'
 import Collection from './Collection'
 import CollectionItem from './CollectionItem'
-import FlowContainer from './FlowContainer'
+import FlowCollection from './FlowCollection'
 import Node from './Node'
 import PlainValue from './PlainValue'
 import Range from './Range'
@@ -73,7 +73,7 @@ export default function parseNode ({ src, indent, inFlow, inCollection }, start)
       break
     case Node.Type.FLOW_MAP:
     case Node.Type.FLOW_SEQ:
-      node = new FlowContainer(props)
+      node = new FlowCollection(props)
       break
     case Node.Type.MAP_KEY:
     case Node.Type.MAP_VALUE:

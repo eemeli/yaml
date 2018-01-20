@@ -1,7 +1,7 @@
 import Node from './Node'
 import Range from './Range'
 
-export default class FlowContainer extends Node {
+export default class FlowCollection extends Node {
   constructor (props) {
     super(props)
     this.items = null

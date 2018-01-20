@@ -458,10 +458,10 @@ Collection {
     },
     CollectionItem {
       "indicator": "-",
-      "item": FlowContainer {
+      "item": FlowCollection {
         "items": Array [
           "[",
-          FlowContainer {
+          FlowCollection {
             "items": Array [
               "{",
               Scalar {
