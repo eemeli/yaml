@@ -58,7 +58,7 @@ export default class FlowContainer extends Node {
           this.items.push(node)
           // FIXME: prevents infinite loop
           if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
-          offset = node.range.end
+          offset = Node.normalizeOffset(src, node.range.end)
         }
       }
       offset = Node.endOfWhiteSpace(src, offset)

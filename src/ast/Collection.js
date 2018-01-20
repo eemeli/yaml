@@ -2,14 +2,6 @@ import Node from './Node'
 import Range from './Range'
 
 export default class Collection extends Node {
-  // should be at line or string end, or at next non-whitespace char
-  static normalizeOffset (src, offset) {
-    const ch = src[offset]
-    return !ch ? offset
-      : ch !== '\n' && src[offset - 1] === '\n' ? offset - 1
-      : Node.endOfWhiteSpace(src, offset)
-  }
-
   constructor (firstItem, valueStart) {
     super(firstItem.doc, { type: Node.Type.COLLECTION })
     this.items = [firstItem]
@@ -24,7 +16,7 @@ export default class Collection extends Node {
     firstItem.range = new Range(this.valueRange.start, offset)
     trace: 'first-item', firstItem.type, { start, indent, range: firstItem.range }, JSON.stringify(firstItem.rawValue)
     this.valueRange.end = firstItem.valueRange.end
-    offset = Collection.normalizeOffset(src, offset)
+    offset = Node.normalizeOffset(src, offset)
     let lineStart = start - indent
     let ch = src[offset]
     trace: 'items-start', { offset, lineStart, ch: JSON.stringify(ch) }
@@ -65,7 +57,7 @@ export default class Collection extends Node {
       this.items.push(node)
       this.valueRange.end = node.valueRange.end
       if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
-      offset = Collection.normalizeOffset(src, node.range.end)
+      offset = Node.normalizeOffset(src, node.range.end)
       ch = src[offset]
       trace: 'item-end', node.type, { offset, ch: JSON.stringify(ch) }
     }

@@ -73,6 +73,14 @@ export default class Node {
     return (ch === '?' || ch === ':' || ch === '-') && Node.atBlank(src, offset + 1)
   }
 
+  // should be at line or string end, or at next non-whitespace char
+  static normalizeOffset (src, offset) {
+    const ch = src[offset]
+    return !ch ? offset
+      : ch !== '\n' && src[offset - 1] === '\n' ? offset - 1
+      : Node.endOfWhiteSpace(src, offset)
+  }
+
   static parseType (src, offset) {
     switch (src[offset]) {
       case '*':
