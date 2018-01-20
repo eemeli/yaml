@@ -62,7 +62,7 @@ export default class FlowContainer extends Node {
           // fallthrough
         }
         default: {
-          const node = this.context.parseNode(offset, indent, true, false)
+          const node = this.context.parseNode({ indent, inFlow: true, inCollection: false, src }, offset)
           this.items.push(node)
           // FIXME: prevents infinite loop
           if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)

@@ -1,5 +1,14 @@
 import Range from './Range'
 
+  /**
+   * @typedef {Object} NodeContext
+   * @param {string} src - Source of the YAML document
+   * @param {number} indent - Current level of indentation
+   * @param {boolean} inFlow - true if currently in a flow context
+   * @param {boolean} inCollection - true if currently in a collection context
+   */
+
+/** Root class of all nodes */
 export default class Node {
   static Type = {
     ALIAS: 'ALIAS',

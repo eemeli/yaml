@@ -1,11 +1,11 @@
 import Collection from '../../src/ast/Collection'
-import Document from '../../src/ast/Document'
 import Node from '../../src/ast/Node'
 import { cleanForSnapshot, commonTests, testParse } from './common'
+import parseNode from '../../src/ast/parseNode'
 
 describe('simple collections', () => {
   test('seq', () => {
-    const seq = `
+    const src = `
 - one value
 - '2' #c1
   #c2
@@ -15,11 +15,16 @@ describe('simple collections', () => {
    five
 - [{"six":7}]
 #c3`
-    const doc = new Document(seq)
-    const node = doc.parseNode(1, 0, false, false)
+    const context = {
+      indent: 0,
+      inFlow: false,
+      inCollection: false,
+      src
+    }
+    const node = parseNode(context, 1)
     expect(node.type).toBe(Node.Type.COLLECTION)
-    expect(node.rawValue).toBe(seq.slice(1))
-    expect(node.range.end).toBe(seq.length)
+    expect(node.rawValue).toBe(src.slice(1))
+    expect(node.range.end).toBe(src.length)
     expect(node.items.length).toBe(7)
     expect(cleanForSnapshot(node)).toMatchSnapshot()
   })
@@ -34,7 +39,7 @@ describe('custom seq items', () => {
   }))
 
   test('building a hierarchy', () => {
-    const tree = `
+    const src = `
 - seq
 - rows
 - -	- h
@@ -48,11 +53,16 @@ describe('custom seq items', () => {
      m
   n
 \n\n\n`
-    const doc = new Document(tree)
-    const node = doc.parseNode(1, 0, false, false)
+    const context = {
+      indent: 0,
+      inFlow: false,
+      inCollection: false,
+      src
+    }
+    const node = parseNode(context, 1)
     expect(node.type).toBe(Node.Type.COLLECTION)
-    expect(node.rawValue).toBe(tree.slice(1))
-    expect(node.range.end).toBe(tree.length)
+    expect(node.rawValue).toBe(src.slice(1))
+    expect(node.range.end).toBe(src.length)
     expect(node.items.length).toBe(4)
     expect(node.items[2].item.type).toBe(Node.Type.COLLECTION)
     expect(cleanForSnapshot(node)).toMatchSnapshot()

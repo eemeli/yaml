@@ -60,7 +60,7 @@ export default class Collection extends Node {
         break
       }
       trace: 'item-start', this.items.length, { ch: JSON.stringify(ch) }
-      const node = this.context.parseNode(offset, indent, inFlow, true)
+      const node = this.context.parseNode({ indent, inFlow, inCollection: true, src }, offset)
       this.items.push(node)
       this.valueRange.end = node.valueRange.end
       if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)

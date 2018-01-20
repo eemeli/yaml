@@ -1,8 +1,8 @@
 import CollectionItem from '../../src/ast/CollectionItem'
-import Document from '../../src/ast/Document'
 import Node from '../../src/ast/Node'
-import Range from '../../src/ast/Range';
+import Range from '../../src/ast/Range'
 import Scalar from '../../src/ast/Scalar'
+import parseNode from '../../src/ast/parseNode'
 
 export const cleanForSnapshot = (node) => {
   if (node instanceof Node) {
@@ -38,13 +38,18 @@ export const testParse = ({
       expected = body
     }
   }
-  const doc = new Document(pre + body + post)
-  const indent = Node.endOfIndent(doc.src, 0)
-  const node = doc.parseNode(startIdx || pre.length, indent, inFlow || false, inCollection || false)
+  const src = pre + body + post
+  const context = {
+    indent: Node.endOfIndent(src, 0),
+    inFlow: inFlow || false,
+    inCollection: inCollection || false,
+    src
+  }
+  const node = parseNode(context, startIdx || pre.length)
   let expectedRawValue = expected || str
-  let expectedRangeEnd = Node.endOfWhiteSpace(doc.src, pre.length + body.length)
+  let expectedRangeEnd = Node.endOfWhiteSpace(src, pre.length + body.length)
   if (lastNodeIsBlockNode(node)) {
-    while (doc.src[expectedRangeEnd] === '\n') {
+    while (src[expectedRangeEnd] === '\n') {
       expectedRawValue += '\n'
       expectedRangeEnd += 1
     }
