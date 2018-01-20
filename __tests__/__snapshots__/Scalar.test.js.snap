@@ -175,41 +175,6 @@ Scalar {
 }
 `;
 
-exports[`parse %directives TAG 1`] = `
-Scalar {
-  "range": Range {
-    "end": 30,
-    "start": 0,
-  },
-  "raw": "TAG !yaml! tag:yaml.org,2002:",
-  "type": "DIRECTIVE",
-  "valueRange": Range {
-    "end": 30,
-    "start": 1,
-  },
-}
-`;
-
-exports[`parse %directives YAML with comment 1`] = `
-Scalar {
-  "commentRange": Range {
-    "end": 18,
-    "start": 11,
-  },
-  "range": Range {
-    "end": 18,
-    "start": 0,
-  },
-  "raw": "YAML 1.2",
-  "rawComment": "comment",
-  "type": "DIRECTIVE",
-  "valueRange": Range {
-    "end": 9,
-    "start": 1,
-  },
-}
-`;
-
 exports[`parse 'quoted' bare 1`] = `
 Scalar {
   "range": Range {

@@ -63,6 +63,11 @@ export default class FlowCollection extends Node {
         }
         default: {
           const node = this.context.parseNode({ indent, inFlow: true, inCollection: false, src }, offset)
+          if (!node) {
+            // at next document start
+            this.valueRange = new Range(start, offset)
+            return offset
+          }
           this.items.push(node)
           // FIXME: prevents infinite loop
           if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)

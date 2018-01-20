@@ -43,7 +43,7 @@ export default class CollectionItem extends Node {
     if (ch && itemIndent > indent) {
       if (Node.atCollectionItem(src, offset)) indent = itemIndent
       this.item = this.context.parseNode({ indent, inFlow, inCollection: false, src }, offset)
-      offset = this.item.range.end
+      if (this.item) offset = this.item.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1
     }

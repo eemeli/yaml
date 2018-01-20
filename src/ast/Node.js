@@ -17,6 +17,7 @@ export default class Node {
     COLLECTION: 'COLLECTION',
     COMMENT: 'COMMENT',
     DIRECTIVE: 'DIRECTIVE',
+    DOCUMENT: 'DOCUMENT',
     DOUBLE: 'DOUBLE',
     FLOW_MAP: 'FLOW_MAP',
     FLOW_SEQ: 'FLOW_SEQ',
@@ -25,6 +26,17 @@ export default class Node {
     PLAIN: 'PLAIN',
     SEQ_ITEM: 'SEQ_ITEM',
     SINGLE: 'SINGLE'
+  }
+
+  // ^(---|...)
+  static atDocumentBoundary (src, offset) {
+    const prev = src[offset - 1]
+    if (prev && prev !== '\n') return false
+    const ch0 = src[offset]
+    if (ch0 !== '-' && ch0 !== '.') return false
+    const ch1 = src[offset + 1]
+    const ch2 = src[offset + 2]
+    return ch1 === ch0 && ch2 === ch0
   }
 
   static endOfIdentifier (src, offset) {

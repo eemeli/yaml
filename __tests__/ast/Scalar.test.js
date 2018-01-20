@@ -27,8 +27,10 @@ describe("parse *alias", () => {
   }
 })
 
+/*
 describe('parse %directives', () => {
   const tag = 'TAG !yaml! tag:yaml.org,2002:'
   test('TAG', () => testParse({ pre: '', post: '\n', str: `%${tag}`, expected: tag }))
   test('YAML with comment', () => testParse({ pre: '', post: '\n', str: '%YAML 1.2', expected: 'YAML 1.2', comment: 'comment' }))
 })
+*/

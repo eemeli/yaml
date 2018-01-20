@@ -15,10 +15,6 @@ const parseType = (src, offset) => {
       return Node.Type.BLOCK_FOLDED
     case '|':
       return Node.Type.BLOCK_LITERAL
-    case '%': {
-      const prev = src[offset - 1]
-      return !prev || prev === '\n' ? Node.Type.DIRECTIVE : Node.Type.PLAIN
-    }
     case '"':
       return Node.Type.DOUBLE
     case '{':
@@ -57,13 +53,14 @@ const parseProps  = (src, offset) => {
 }
 
 /**
- * Parses the node's type and value from the source
+ * Parses a node from the source
  * @param {NodeContext} context
  * @param {number} start - Index of first non-whitespace character for the node
- * @returns {number} - Index of the character after this node; may be `\n`
+ * @returns {?Node} - null if at a document boundary
  */
 export default function parseNode ({ src, indent, inFlow, inCollection }, start) {
   trace: '=== start', { start, indent, inFlow, inCollection }, JSON.stringify(src.slice(start))
+  if (Node.atDocumentBoundary(src, start)) return null
   const { props, offset } = parseProps(src, start)
   let node
   switch (props.type) {
