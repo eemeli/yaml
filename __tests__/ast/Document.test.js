@@ -1,6 +1,5 @@
-import Document from '../../src/ast/Document'
 import Node from '../../src/ast/Node'
-import parseNode from '../../src/ast/parseNode'
+import parseStream from '../../src/ast/parseStream';
 
 const spec = {
   prefix: {
@@ -8,13 +7,13 @@ const spec = {
 `\t# Comment
 # lines
 Document`,
-    result: {
+    result: [{
       contents: [
         { comment: ' Comment' },
         { comment: ' lines' },
         'Document'
       ]
-    }
+    }]
   },
   markers: {
     src:
@@ -22,10 +21,12 @@ Document`,
 ---
 Document
 ... # Suffix`,
-    tgt: {
+    tgt: [{
       directives: ['YAML 1.2'],
       contents: ['Document']
-    }
+    }, {
+      directives: [{ comment: ' Suffix' }]
+    }]
   },
   bare: {
     src:
@@ -36,9 +37,13 @@ document
 ...
 |
 %!PS-Adobe-2.0 # Not the first line`,
-    tgt: {
+    tgt: [{
       contents: ['Bare\ndocument']
-    }
+    }, {
+      directives: [{ comment: ' No document' }]
+    }, {
+      contents: ['%!PS-Adobe-2.0 # Not the first line']
+    }]
   },
   explicit: {
     src:
@@ -49,11 +54,13 @@ document
 ---
 # Empty
 ...`,
-    tgt: {
+    tgt: [{
       contents: [
         { items: ['{', 'matches\n%', ':', '20', '}'] }
       ]
-    }
+    }, {
+      contents: [{ comment: ' Empty' }]
+    }]
   },
   directives: {
     src:
@@ -61,14 +68,17 @@ document
 --- |
 %!PS-Adobe-2.0
 ...
-%YAML1.2
+%YAML 1.2
 ---
 # Empty
 ...`,
-    tgt: {
+    tgt: [{
       directives: ['YAML 1.2'],
       contents: ['%!PS-Adobe-2.0\n']
-    }
+    }, {
+      directives: ['YAML 1.2'],
+      contents: [{ comment: ' Empty' }]
+    }]
   },
   stream: {
     src:
@@ -79,9 +89,15 @@ document
 %YAML 1.2
 ---
 matches %: 20`,
-    tgt: {
+    tgt: [{
       contents: ['Document']
-    }
+    }, {
+      contents: [{ comment: ' Empty' }]
+    }, {
+      directives: ['YAML 1.2'],
+      // FIXME implicit keys is missing
+      // contents: [{ items: ['matches %', { indicator: ':', item: '20' }] }]
+    }]
   }
 }
 
@@ -102,16 +118,9 @@ describe('spec', () => {
   for (const name in spec) {
     test(name, () => {
       const { src, tgt } = spec[name]
-      const doc = new Document({ type: Node.Type.DOCUMENT })
-      const context = {
-        indent: 0,
-        inFlow: false,
-        inCollection: false,
-        parseNode,
-        src
-      }
-      const end = doc.parse(context, 0)
-      testSpec(doc, tgt)
+      const documents = parseStream(src)
+      trace: 'DOCUMENTS', documents
+      testSpec(documents, tgt)
     })
   }
 })

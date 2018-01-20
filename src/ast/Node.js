@@ -33,6 +33,7 @@ export default class Node {
     const prev = src[offset - 1]
     if (prev && prev !== '\n') return false
     const ch0 = src[offset]
+    if (!ch0) return true
     if (ch0 !== '-' && ch0 !== '.') return false
     const ch1 = src[offset + 1]
     const ch2 = src[offset + 2]

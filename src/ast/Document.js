@@ -30,8 +30,8 @@ export default class Document extends Node {
     )
   }
 
-  constructor (props) {
-    super(props)
+  constructor () {
+    super({ type: Node.Type.DOCUMENT })
     this.directives = null
     this.contents = null
   }
@@ -90,7 +90,7 @@ export default class Document extends Node {
           const iEnd = Node.endOfIndent(src, offset)
           const context = { indent: iEnd - offset - 1, inFlow: false, inCollection: false, src }
           const node = this.context.parseNode(context, iEnd)
-          if (!node) return offset // at next document start
+          if (!node) return iEnd // at next document start
           this.contents.push(node)
           this.valueRange.end = node.valueRange.end
           if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
