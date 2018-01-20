@@ -90,55 +90,6 @@ export default class Node {
       : Node.endOfWhiteSpace(src, offset)
   }
 
-  static parseType (src, offset) {
-    switch (src[offset]) {
-      case '*':
-        return Node.Type.ALIAS
-      case '>':
-        return Node.Type.BLOCK_FOLDED
-      case '|':
-        return Node.Type.BLOCK_LITERAL
-      case '%': {
-        const prev = src[offset - 1]
-        return !prev || prev === '\n' ? Node.Type.DIRECTIVE : Node.Type.PLAIN
-      }
-      case '"':
-        return Node.Type.DOUBLE
-      case '{':
-        return Node.Type.FLOW_MAP
-      case '[':
-        return Node.Type.FLOW_SEQ
-      case '?':
-        return Node.atBlank(src, offset + 1) ? Node.Type.MAP_KEY : Node.Type.PLAIN
-      case ':':
-        return Node.atBlank(src, offset + 1) ? Node.Type.MAP_VALUE : Node.Type.PLAIN
-      case '-':
-        return Node.atBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
-      case "'":
-        return Node.Type.SINGLE
-      default:
-        return Node.Type.PLAIN
-    }
-  }
-
-  // Anchor and tag are before type, which determines the node implementation
-  // class; hence this intermediate object.
-  static parseProps (src, offset) {
-    const props = { anchor: null, tag: null, type: null }
-    offset = Node.endOfWhiteSpace(src, offset)
-    let ch = src[offset]
-    while (ch === '&' || ch === '!') {
-      const end = Node.endOfIdentifier(src, offset)
-      const prop = ch === '&' ? 'anchor' : 'tag'
-      props[prop] = src.slice(offset + 1, end)
-      offset = Node.endOfWhiteSpace(src, end)
-      ch = src[offset]
-    }
-    props.type = Node.parseType(src, offset)
-    trace: props, offset
-    return { props, offset }
-  }
-
   constructor ({ anchor, tag, type }, context) {
     this.context = context || null
     this.range = null

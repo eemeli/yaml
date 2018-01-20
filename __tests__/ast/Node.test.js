@@ -27,17 +27,4 @@ describe('internals', () => {
     expect(node.comment).toBe('comment here')
     expect(end).toBe(src.indexOf('\n'))
   })
-
-  test('.parseProps', () => {
-    const src = '!tag! &anchor *value #comment'
-    const props = Node.parseProps(src, 0)
-    expect(props).toMatchObject({
-      offset: src.indexOf('*'),
-      props: {
-        anchor: 'anchor',
-        tag: 'tag!',
-        type: Node.Type.ALIAS
-      }
-    })
-  })
 })
