@@ -4,8 +4,8 @@ describe('internals', () => {
   test('constructor', () => {
     const src = 'src'
     const props = { anchor: 'anchor', tag: 'tag', type: Node.Type.PLAIN }
-    const node = new Node({ src }, props)
-    expect(node.doc.src).toBe(src)
+    const node = new Node(props, { src })
+    expect(node.context.src).toBe(src)
     expect(node.anchor).toBe(props.anchor)
     expect(node.tag).toBe(props.tag)
     expect(node.type).toBe(props.type)
@@ -22,7 +22,7 @@ describe('internals', () => {
 
   test('#parseComment', () => {
     const src = '#comment here\nnext'
-    const node = new Node({ src }, {})
+    const node = new Node({}, { src })
     const end = node.parseComment(0)
     expect(node.comment).toBe('comment here')
     expect(end).toBe(src.indexOf('\n'))

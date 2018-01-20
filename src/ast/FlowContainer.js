@@ -2,8 +2,8 @@ import Node from './Node'
 import Range from './Range'
 
 export default class FlowContainer extends Node {
-  constructor (doc, props) {
-    super(doc, props)
+  constructor (props) {
+    super(props)
     this.items = null
   }
 
@@ -16,9 +16,17 @@ export default class FlowContainer extends Node {
     )
   }
 
-  parse (start, indent) {
-    trace: ({ start, indent })
-    const { src } = this.doc
+  /**
+   *
+   * @param {!Object} context
+   * @param {!number} start - Index of first character
+   * @returns {!number} - Index of the character after this
+   */
+  parse (context, start) {
+    trace: context, { start }
+    this.context = context
+    const { src } = context
+    let { indent } = context
     let ch = src[start] // { or [
     this.items = [ch]
     let offset = Node.endOfWhiteSpace(src, start + 1)
@@ -36,7 +44,7 @@ export default class FlowContainer extends Node {
           offset += 1
         } break
         case '#': {
-          const comment = new Node(this.doc, { type: Node.Type.COMMENT })
+          const comment = new Node({ type: Node.Type.COMMENT }, context)
           offset = comment.parseComment(offset)
           this.items.push(comment)
         } break
@@ -54,7 +62,7 @@ export default class FlowContainer extends Node {
           // fallthrough
         }
         default: {
-          const node = this.doc.parseNode(offset, indent, true, false)
+          const node = this.context.parseNode(offset, indent, true, false)
           this.items.push(node)
           // FIXME: prevents infinite loop
           if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)

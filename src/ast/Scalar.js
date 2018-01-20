@@ -60,11 +60,13 @@ export default class Scalar extends Node {
    * where both forms of quoted string may extend across multiple rows
    * regardless of indentation.
    *
+   * @param {!Object} context
    * @param {!number} start - Index of first character
    * @returns {!number} - Index of the character after this scalar
    */
-  parse (start) {
-    const { src } = this.doc
+  parse (context, start) {
+    this.context = context
+    const { src } = context
     let offset
     switch (this.type) {
       case Node.Type.ALIAS:

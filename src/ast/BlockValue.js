@@ -9,13 +9,13 @@ export default class BlockValue extends Node {
     return offset
   }
 
-  constructor (doc, props) {
-    super(doc, props)
+  constructor (props) {
+    super(props)
     this.blockStyle = null
   }
 
-  parseBlockValue (start, indent, inFlow) {
-    const { src } = this.doc
+  parseBlockValue (start) {
+    const { indent, inFlow, src } = this.context
     let offset = start
     for (let ch = src[offset]; ch === '\n'; ch = src[offset]) {
       offset += 1
@@ -43,19 +43,19 @@ export default class BlockValue extends Node {
    * where the block style BS matches the regexp `[|>][-+1-9]*` and block lines
    * are empty or have an indent level greater than `indent`.
    *
+   * @param {!Object} context
    * @param {!number} start - Index of first character
-   * @param {!number} indent - Current level of indentation
-   * @param {boolean} inFlow - true if currently in a flow context
    * @returns {!number} - Index of the character after this block
    */
-  parse (start, indent, inFlow) {
-    trace: ({ start, indent, inFlow })
-    const { src } = this.doc
+  parse (context, start) {
+    this.context = context
+    trace: context, { start }
+    const { src } = context
     let offset = BlockValue.endOfBlockStyle(src, start + 1)
     this.blockStyle = src.slice(start, offset)
     offset = Node.endOfWhiteSpace(src, offset)
     offset = this.parseComment(offset)
-    offset = this.parseBlockValue(offset, indent, inFlow)
+    offset = this.parseBlockValue(offset)
     trace: this.type, { style: this.blockStyle, valueRange: this.valueRange, comment: this.comment }, JSON.stringify(this.rawValue)
     return offset
   }

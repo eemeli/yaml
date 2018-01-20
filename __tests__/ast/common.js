@@ -11,7 +11,7 @@ export const cleanForSnapshot = (node) => {
     else node.raw = node.rawValue
     if (node.commentRange) node.rawComment = node.comment
     for (const key in node) if (node[key] == null) delete node[key]
-    delete node.doc
+    delete node.context
   }
   return node
 }

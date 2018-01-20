@@ -3,16 +3,23 @@ import Range from './Range'
 
 export default class Collection extends Node {
   constructor (firstItem, valueStart) {
-    super(firstItem.doc, { type: Node.Type.COLLECTION })
+    super({ type: Node.Type.COLLECTION })
     this.items = [firstItem]
     this.valueRange = new Range(valueStart)
   }
 
-  parse (start, indent, inFlow) {
-    trace: ({ start, indent })
-    const { src } = this.doc
+  /**
+   *
+   * @param {!Object} context
+   * @param {!number} start - Index of first character
+   * @returns {!number} - Index of the character after this
+   */
+  parse (context, start) {
+    trace: context, { start }
+    this.context = context
+    const { indent, inFlow, src } = context
     const firstItem = this.items[0]
-    let offset = firstItem.parse(start, indent, inFlow)
+    let offset = firstItem.parse(context, start)
     firstItem.range = new Range(this.valueRange.start, offset)
     trace: 'first-item', firstItem.type, { start, indent, range: firstItem.range }, JSON.stringify(firstItem.rawValue)
     this.valueRange.end = firstItem.valueRange.end
@@ -23,7 +30,7 @@ export default class Collection extends Node {
     while (ch) {
       while (ch === '\n' || ch === '#') {
         if (ch === '#') {
-          const comment = new Node(this.doc, { type: Node.Type.COMMENT })
+          const comment = new Node({ type: Node.Type.COMMENT }, context)
           offset = comment.parseComment(offset)
           this.items.push(comment)
           this.valueRange.end = comment.commentRange.end
@@ -53,7 +60,7 @@ export default class Collection extends Node {
         break
       }
       trace: 'item-start', this.items.length, { ch: JSON.stringify(ch) }
-      const node = this.doc.parseNode(offset, indent, inFlow, true)
+      const node = this.context.parseNode(offset, indent, inFlow, true)
       this.items.push(node)
       this.valueRange.end = node.valueRange.end
       if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)

@@ -130,8 +130,8 @@ export default class Node {
     return { props, offset }
   }
 
-  constructor (doc, { anchor, tag, type }) {
-    this.doc = doc
+  constructor ({ anchor, tag, type }, context) {
+    this.context = context || null
     this.range = null
     this.valueRange = null
     this.commentRange = null
@@ -141,9 +141,9 @@ export default class Node {
   }
 
   get comment () {
-    if (!this.commentRange) return null
+    if (!this.commentRange || !this.context) return null
     const { start, end } = this.commentRange
-    return this.doc.src.slice(start, end)
+    return this.context.src.slice(start, end)
   }
 
   get jsonLike () {
@@ -157,17 +157,18 @@ export default class Node {
   }
 
   get rawValue () {
-    if (!this.valueRange) return null
+    if (!this.valueRange || !this.context) return null
     const { start, end } = this.valueRange
-    return this.doc.src.slice(start, end)
+    return this.context.src.slice(start, end)
   }
 
   parseComment (offset) {
-    if (this.doc.src[offset] === '#') {
+    const { src } = this.context
+    if (src[offset] === '#') {
       const start = offset + 1
-      const end = Node.endOfLine(this.doc.src, start)
+      const end = Node.endOfLine(src, start)
       this.commentRange = new Range(start, end)
-      trace: this.commentRange, this.doc.src.slice(this.commentRange.start, this.commentRange.end)
+      trace: this.commentRange, src.slice(this.commentRange.start, this.commentRange.end)
       return end
     }
     return offset

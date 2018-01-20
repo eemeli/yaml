@@ -25,32 +25,34 @@ export default class Document {
    * @returns {!number} - Index of the character after this node; may be `\n`
    */
   parseNode (start, indent, inFlow, inCollection) {
-    trace: '=== start', { start, indent, inFlow, inCollection }, JSON.stringify(this.src.slice(start))
-    const { props, offset } = Node.parseProps(this.src, start)
+    const { src } = this
+    trace: '=== start', { start, indent, inFlow, inCollection }, JSON.stringify(src.slice(start))
+    const { props, offset } = Node.parseProps(src, start)
     let node
     switch (props.type) {
       case Node.Type.BLOCK_FOLDED:
       case Node.Type.BLOCK_LITERAL:
-        node = new BlockValue(this, props)
+        node = new BlockValue(props)
         break
       case Node.Type.FLOW_MAP:
       case Node.Type.FLOW_SEQ:
-        node = new FlowContainer(this, props)
+        node = new FlowContainer(props)
         break
       case Node.Type.MAP_KEY:
       case Node.Type.MAP_VALUE:
       case Node.Type.SEQ_ITEM: {
-        const item = new CollectionItem(this, props)
+        const item = new CollectionItem(props)
         node = inCollection ? item : new Collection(item, offset)
       } break
       case Node.Type.COMMENT:
       case Node.Type.PLAIN:
-        node = new PlainValue(this, props)
+        node = new PlainValue(props)
         break
       default:
-        node = new Scalar(this, props)
+        node = new Scalar(props)
     }
-    let end = node.parse(offset, indent, inFlow)
+    const context = { indent, inCollection, inFlow, src, parseNode: this.parseNode.bind(this) }
+    let end = node.parse(context, offset)
     node.range = new Range(start, end)
     trace: node.type, { offset, indent, range: node.range }, JSON.stringify(node.rawValue)
     return node

@@ -21,8 +21,8 @@ export default class PlainValue extends Node {
     return super.rawValue.trim()
   }
 
-  parseBlockValue (start, indent, inFlow) {
-    const { src } = this.doc
+  parseBlockValue (start) {
+    const { indent, inFlow, src } = this.context
     let offset = start
     for (let ch = src[offset]; ch === '\n'; ch = src[offset]) {
       offset += 1
@@ -58,13 +58,13 @@ export default class PlainValue extends Node {
    * ```
    * where block lines are empty or have an indent level greater than `indent`.
    *
+   * @param {!Object} context
    * @param {!number} start - Index of first character
-   * @param {!number} indent - Current level of indentation
-   * @param {boolean} inFlow - true if currently in a flow context
    * @returns {!number} - Index of the character after this scalar, may be `\n`
    */
-  parse (start, indent, inFlow) {
-    const { src } = this.doc
+  parse (context, start) {
+    this.context = context
+    const { inFlow, src } = this.context
     let offset = start
     let ch = src[offset]
     if (ch && ch !== '#' && ch !== '\n') {
@@ -75,7 +75,7 @@ export default class PlainValue extends Node {
     offset = this.parseComment(offset)
     trace: 'first line', { valueRange: this.valueRange, comment: this.comment }, JSON.stringify(this.rawValue)
     if (!this.commentRange || this.valueRange.isEmpty) {
-      offset = this.parseBlockValue(offset, indent, inFlow)
+      offset = this.parseBlockValue(offset)
     }
     trace: this.type, { offset, valueRange: this.valueRange }, JSON.stringify(this.rawValue)
     return offset
