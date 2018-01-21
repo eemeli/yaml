@@ -7,7 +7,7 @@ describe("parse single-line plain", () => {
     const props = Object.assign({ str: 'plain value', type }, commonTests[name])
     test(name, () => testParse(props))
   }
-  test('escaped', () => testParse({ pre: '', str: '-#:] ,', post: ': ', type }))
+  test('escaped', () => testParse({ pre: '? ', str: '-#:] ,', post: ': ', type, parent: { type: Node.Type.MAP_KEY } }))
   test('escaped in flow', () => testParse({ pre: '', str: '-#:', post: '] ,: ', inFlow: true, type }))
   test('empty', () => testParse({ pre: '- ', str: '', post: '\n- ', type }))
   test('empty in flow', () => testParse({ pre: '{ x: ', str: '', post: ' , ', inFlow: true, type }))
@@ -34,7 +34,7 @@ describe('parse #comments', () => {
   const comment = 'comment # here!'
   test('bare', () => testParse({ pre: '', str: '', comment, post: '' }))
   test('newline before & after', () => testParse({ pre: '\n', str: '', comment, post: '\n' }))
-  test('complex mapping key', () => testParse({ pre: '? ', str: '', comment, post: '\n: ' }))
+  test('complex mapping key', () => testParse({ pre: '? ', str: '', comment, post: '\n: ', parent: { type: Node.Type.MAP_KEY } }))
   test('seq value', () => testParse({ pre: '- ', str: '', comment, post: '\n- ' }))
   test('indented block', () => testParse({ pre: '    - ', str: '', comment, post: '\n  x' }))
 })

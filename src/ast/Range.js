@@ -1,4 +1,8 @@
 export default class Range {
+  static copy (orig) {
+    return new Range(orig.start, orig.end)
+  }
+
   constructor (start, end) {
     this.start = start
     this.end = end || start

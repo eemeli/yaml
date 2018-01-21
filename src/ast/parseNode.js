@@ -7,6 +7,15 @@ import PlainValue from './PlainValue'
 import Range from './Range'
 import Scalar from './Scalar'
 
+/**
+ * @typedef {Object} ParseContext
+ * @param {boolean} inFlow - true if currently in a flow context
+ * @param {boolean} inCollection - true if currently in a collection context
+ * @param {number} indent - Current level of indentation
+ * @param {Node} parent - The parent of the node
+ * @param {string} src - Source of the YAML document
+ */
+
 const parseType = (src, offset) => {
   switch (src[offset]) {
     case '*':
@@ -49,19 +58,30 @@ const parseProps  = (src, offset) => {
   }
   props.type = parseType(src, offset)
   trace: props, offset
-  return { props, offset }
+  return { props, valueStart: offset }
+}
+
+const nodeStartsCollection = ({ inCollection, inFlow, src, parent }, node) => {
+  if (inCollection) return false
+  if (node instanceof CollectionItem) return true
+  if (inFlow || parent.type === Node.Type.MAP_KEY) return false
+  // check for implicit key
+  let offset = node.range.end
+  if (src[offset] === '\n') return false
+  offset = Node.endOfWhiteSpace(src, offset)
+  return src[offset] === ':'
 }
 
 /**
  * Parses a node from the source
- * @param {NodeContext} context
+ * @param {ParseContext} context
  * @param {number} start - Index of first non-whitespace character for the node
  * @returns {?Node} - null if at a document boundary
  */
-export default function parseNode ({ src, indent, inFlow, inCollection }, start) {
+export default function parseNode ({ src, indent, inFlow, inCollection, parent }, start) {
   trace: '=== start', { start, indent, inFlow, inCollection }, JSON.stringify(src.slice(start))
   if (Node.atDocumentBoundary(src, start)) return null
-  const { props, offset } = parseProps(src, start)
+  const { props, valueStart } = parseProps(src, start)
   let node
   switch (props.type) {
     case Node.Type.BLOCK_FOLDED:
@@ -74,10 +94,9 @@ export default function parseNode ({ src, indent, inFlow, inCollection }, start)
       break
     case Node.Type.MAP_KEY:
     case Node.Type.MAP_VALUE:
-    case Node.Type.SEQ_ITEM: {
-      const item = new CollectionItem(props)
-      node = inCollection ? item : new Collection(item, offset)
-    } break
+    case Node.Type.SEQ_ITEM:
+      node = new CollectionItem(props)
+    break
     case Node.Type.COMMENT:
     case Node.Type.PLAIN:
       node = new PlainValue(props)
@@ -85,9 +104,16 @@ export default function parseNode ({ src, indent, inFlow, inCollection }, start)
     default:
       node = new Scalar(props)
   }
-  const context = { indent, inCollection, inFlow, src, parseNode }
-  let end = node.parse(context, offset)
-  node.range = new Range(start, end)
-  trace: node.type, { offset, indent, range: node.range }, JSON.stringify(node.rawValue)
+  const context = { indent, inCollection, inFlow, src, parent, parseNode }
+  let offset = node.parse(context, valueStart)
+  node.range = new Range(start, offset)
+  trace: node.type, { valueStart, indent, range: node.range }, JSON.stringify(node.rawValue)
+  if (nodeStartsCollection(context, node)) {
+    const collection = new Collection(node)
+    offset = collection.parse(context, node.range.end)
+    collection.range = new Range(start, offset)
+    trace: collection.type, { valueStart, indent, range: collection.range }, JSON.stringify(collection.rawValue)
+    return collection
+  }
   return node
 }

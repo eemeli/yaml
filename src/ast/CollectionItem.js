@@ -9,15 +9,14 @@ export default class CollectionItem extends Node {
   }
 
   /**
-   *
-   * @param {!Object} context
+   * @param {ParseContext} context
    * @param {!number} start - Index of first character
    * @returns {!number} - Index of the character after this
    */
   parse (context, start) {
     this.context = context
     trace: context, { start }
-    const { inFlow, src } = context
+    const { inFlow, parseNode, src } = context
     let { indent } = context
     this.indicator = src[start] // ? or : or -
     let offset = Node.endOfWhiteSpace(src, start + 1)
@@ -42,7 +41,7 @@ export default class CollectionItem extends Node {
     }
     if (ch && itemIndent > indent) {
       if (Node.atCollectionItem(src, offset)) indent = itemIndent
-      this.item = this.context.parseNode({ indent, inFlow, inCollection: false, src }, offset)
+      this.item = parseNode({ indent, inFlow, inCollection: false, parent: this, src }, offset)
       if (this.item) offset = this.item.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1

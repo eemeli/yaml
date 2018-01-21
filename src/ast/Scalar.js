@@ -31,20 +31,15 @@ export default class Scalar extends Node {
    * ```
    * @alias
    *
-   * @alias #comment
-   *
    * "double \"quoted\" string"
    *
-   * "double \"quoted\" string" #comment
-   *
    * 'single ''quoted'' string'
-   *
-   * 'single ''quoted'' string' #comment
    * ```
    * where both forms of quoted string may extend across multiple rows
-   * regardless of indentation.
+   * regardless of indentation, and each form may be followed by a
+   * whitespace-separated #comment.
    *
-   * @param {!Object} context
+   * @param {ParseContext} context
    * @param {!number} start - Index of first character
    * @returns {!number} - Index of the character after this scalar
    */

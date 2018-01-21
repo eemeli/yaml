@@ -17,15 +17,14 @@ export default class FlowCollection extends Node {
   }
 
   /**
-   *
-   * @param {!Object} context
+   * @param {ParseContext} context
    * @param {!number} start - Index of first character
    * @returns {!number} - Index of the character after this
    */
   parse (context, start) {
     trace: context, { start }
     this.context = context
-    const { src } = context
+    const { parseNode, src } = context
     let { indent } = context
     let ch = src[start] // { or [
     this.items = [ch]
@@ -44,7 +43,7 @@ export default class FlowCollection extends Node {
           offset += 1
         } break
         case '#': {
-          const comment = new Node({ type: Node.Type.COMMENT }, context)
+          const comment = new Node({ type: Node.Type.COMMENT }, { src })
           offset = comment.parseComment(offset)
           this.items.push(comment)
         } break
@@ -62,7 +61,7 @@ export default class FlowCollection extends Node {
           // fallthrough
         }
         default: {
-          const node = this.context.parseNode({ indent, inFlow: true, inCollection: false, src }, offset)
+          const node = parseNode({ indent, inFlow: true, inCollection: false, parent: this, src }, offset)
           if (!node) {
             // at next document start
             this.valueRange = new Range(start, offset)

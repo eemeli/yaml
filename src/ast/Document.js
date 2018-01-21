@@ -47,14 +47,14 @@ export default class Document extends Node {
           offset += 1
           break
         case '#': {
-          const comment = new Node({ type: Node.Type.COMMENT }, this.context)
+          const comment = new Node({ type: Node.Type.COMMENT }, { src })
           offset = comment.parseComment(offset)
           this.directives.push(comment)
           trace: 'directive-comment', comment.commentRange, JSON.stringify(comment.comment)
         } break
         case '%': {
           const dirStart = offset
-          const directive = new Node({ type: Node.Type.DIRECTIVE }, this.context)
+          const directive = new Node({ type: Node.Type.DIRECTIVE }, { parent: this, src })
           offset = Document.endOfDirective(src, offset + 1)
           directive.valueRange = new Range(dirStart + 1, offset)
           offset = Node.endOfWhiteSpace(src, offset)
@@ -81,14 +81,14 @@ export default class Document extends Node {
           offset += 1
           break
         case '#': {
-          const comment = new Node({ type: Node.Type.COMMENT }, this.context)
+          const comment = new Node({ type: Node.Type.COMMENT }, { src })
           offset = comment.parseComment(offset)
           this.contents.push(comment)
           trace: 'content-comment', comment.commentRange, JSON.stringify(comment.comment)
         } break
         default: {
           const iEnd = Node.endOfIndent(src, offset)
-          const context = { indent: iEnd - offset - 1, inFlow: false, inCollection: false, src }
+          const context = { indent: iEnd - offset - 1, inFlow: false, inCollection: false, parent: this, src }
           const node = this.context.parseNode(context, iEnd)
           if (!node) return iEnd // at next document start
           this.contents.push(node)
@@ -104,8 +104,7 @@ export default class Document extends Node {
   }
 
   /**
-   *
-   * @param {!Object} context
+   * @param {ParseContext} context
    * @param {!number} start - Index of first character
    * @returns {!number} - Index of the character after this
    */

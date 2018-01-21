@@ -27,7 +27,7 @@ const lastNodeIsBlockNode = (node) => {
 }
 
 export const testParse = ({
-  comment, expected, inCollection, inFlow, pre, post, str, startIdx, test: customTest, type
+  comment, expected, inCollection, inFlow, pre, post, parent, str, startIdx, test: customTest, type
 }) => {
   let body = str
   if (comment) {
@@ -43,6 +43,7 @@ export const testParse = ({
     indent: Node.endOfIndent(src, 0),
     inFlow: inFlow || false,
     inCollection: inCollection || false,
+    parent: parent || {},
     src
   }
   const node = parseNode(context, startIdx || pre.length)
@@ -72,7 +73,7 @@ export const testParse = ({
 export const commonTests = {
   'bare': { pre: '', post: '' },
   'newline before & after': { pre: '\n', post: '\n' },
-  'complex mapping key': { pre: '? ', post: ' : ' },
+  'complex mapping key': { pre: '? ', post: ' : ', parent: { type: Node.Type.MAP_KEY } },
   'seq value': { pre: '- ', post: '\n- ' },
   'indented block': { pre: '    - ', post: '\n  x' },
   'flow seq value': { pre: '[ ', post: ' ]', inFlow: true },

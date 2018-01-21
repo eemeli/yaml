@@ -11,6 +11,7 @@ for (const dscName in simple) {
   describe(dscName, () => {
     for (const name in commonTests) {
       const props = Object.assign({ str, inCollection: true }, commonTests[name])
+      if (props.post && props.post.indexOf(':') !== -1) continue
       test(name, () => testParse(props))
     }
   })
@@ -39,6 +40,7 @@ for (const namePrefix in indicators) {
       for (const name in commonTests) {
         const props = Object.assign({ str, test: typeTest, inCollection: true }, commonTests[name])
         if (expType === Node.Type.DOUBLE && props.comment) continue
+        if (props.post && props.post.indexOf(':') !== -1) continue
         if (props.post && props.post[0] !== '\n' && str.indexOf('\n' !== -1)) {
           props.post = props.post.replace(/^\s?/, '\n')
         }

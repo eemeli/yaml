@@ -27,33 +27,6 @@ CollectionItem {
 }
 `;
 
-exports[`map key "? *alias" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "?",
-  "item": Scalar {
-    "range": Range {
-      "end": 10,
-      "start": 4,
-    },
-    "raw": "alias",
-    "type": "ALIAS",
-    "valueRange": Range {
-      "end": 10,
-      "start": 5,
-    },
-  },
-  "range": Range {
-    "end": 10,
-    "start": 2,
-  },
-  "type": "MAP_KEY",
-  "valueRange": Range {
-    "end": 10,
-    "start": 2,
-  },
-}
-`;
-
 exports[`map key "? *alias" flow seq value 1`] = `
 CollectionItem {
   "indicator": "?",
@@ -248,36 +221,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 34,
     "start": 0,
-  },
-}
-`;
-
-exports[`map key "? >+2\\n       multiple\\n       lines" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "?",
-  "item": BlockValue {
-    "blockStyle": ">+2",
-    "range": Range {
-      "end": 37,
-      "start": 4,
-    },
-    "raw": "       multiple
-       lines
-",
-    "type": "BLOCK_FOLDED",
-    "valueRange": Range {
-      "end": 37,
-      "start": 8,
-    },
-  },
-  "range": Range {
-    "end": 37,
-    "start": 2,
-  },
-  "type": "MAP_KEY",
-  "valueRange": Range {
-    "end": 37,
-    "start": 2,
   },
 }
 `;
@@ -497,34 +440,6 @@ quote\\"",
 }
 `;
 
-exports[`map key "? \\"multiline\\nquote\\"" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "?",
-  "item": Scalar {
-    "range": Range {
-      "end": 21,
-      "start": 4,
-    },
-    "raw": "\\"multiline
-quote\\"",
-    "type": "DOUBLE",
-    "valueRange": Range {
-      "end": 21,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 21,
-    "start": 2,
-  },
-  "type": "MAP_KEY",
-  "valueRange": Range {
-    "end": 21,
-    "start": 2,
-  },
-}
-`;
-
 exports[`map key "? \\"multiline\\nquote\\"" flow seq value 1`] = `
 CollectionItem {
   "indicator": "?",
@@ -690,33 +605,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 14,
     "start": 0,
-  },
-}
-`;
-
-exports[`map key "? -plain value" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "?",
-  "item": PlainValue {
-    "range": Range {
-      "end": 17,
-      "start": 4,
-    },
-    "raw": "-plain value",
-    "type": "PLAIN",
-    "valueRange": Range {
-      "end": 17,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 17,
-    "start": 2,
-  },
-  "type": "MAP_KEY",
-  "valueRange": Range {
-    "end": 17,
-    "start": 2,
   },
 }
 `;
@@ -913,33 +801,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 25,
     "start": 0,
-  },
-}
-`;
-
-exports[`map key "?\\n  \\n\\n    multiline plain" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "?",
-  "item": PlainValue {
-    "range": Range {
-      "end": 28,
-      "start": 12,
-    },
-    "raw": "multiline plain",
-    "type": "PLAIN",
-    "valueRange": Range {
-      "end": 28,
-      "start": 12,
-    },
-  },
-  "range": Range {
-    "end": 28,
-    "start": 2,
-  },
-  "type": "MAP_KEY",
-  "valueRange": Range {
-    "end": 28,
-    "start": 2,
   },
 }
 `;
@@ -1164,61 +1025,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 10,
     "start": 0,
-  },
-}
-`;
-
-exports[`map key "?\\t[ 1, 2 ]" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "?",
-  "item": FlowCollection {
-    "items": Array [
-      "[",
-      PlainValue {
-        "range": Range {
-          "end": 7,
-          "start": 6,
-        },
-        "raw": "1",
-        "type": "PLAIN",
-        "valueRange": Range {
-          "end": 7,
-          "start": 6,
-        },
-      },
-      ",",
-      PlainValue {
-        "range": Range {
-          "end": 11,
-          "start": 9,
-        },
-        "raw": "2",
-        "type": "PLAIN",
-        "valueRange": Range {
-          "end": 11,
-          "start": 9,
-        },
-      },
-      "]",
-    ],
-    "range": Range {
-      "end": 12,
-      "start": 4,
-    },
-    "type": "FLOW_SEQ",
-    "valueRange": Range {
-      "end": 12,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 12,
-    "start": 2,
-  },
-  "type": "MAP_KEY",
-  "valueRange": Range {
-    "end": 12,
-    "start": 2,
   },
 }
 `;
@@ -1587,33 +1393,6 @@ CollectionItem {
 }
 `;
 
-exports[`map value ": *alias" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": ":",
-  "item": Scalar {
-    "range": Range {
-      "end": 10,
-      "start": 4,
-    },
-    "raw": "alias",
-    "type": "ALIAS",
-    "valueRange": Range {
-      "end": 10,
-      "start": 5,
-    },
-  },
-  "range": Range {
-    "end": 10,
-    "start": 2,
-  },
-  "type": "MAP_VALUE",
-  "valueRange": Range {
-    "end": 10,
-    "start": 2,
-  },
-}
-`;
-
 exports[`map value ": *alias" flow seq value 1`] = `
 CollectionItem {
   "indicator": ":",
@@ -1808,36 +1587,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 34,
     "start": 0,
-  },
-}
-`;
-
-exports[`map value ": >+2\\n       multiple\\n       lines" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": ":",
-  "item": BlockValue {
-    "blockStyle": ">+2",
-    "range": Range {
-      "end": 37,
-      "start": 4,
-    },
-    "raw": "       multiple
-       lines
-",
-    "type": "BLOCK_FOLDED",
-    "valueRange": Range {
-      "end": 37,
-      "start": 8,
-    },
-  },
-  "range": Range {
-    "end": 37,
-    "start": 2,
-  },
-  "type": "MAP_VALUE",
-  "valueRange": Range {
-    "end": 37,
-    "start": 2,
   },
 }
 `;
@@ -2057,34 +1806,6 @@ quote\\"",
 }
 `;
 
-exports[`map value ": \\"multiline\\nquote\\"" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": ":",
-  "item": Scalar {
-    "range": Range {
-      "end": 21,
-      "start": 4,
-    },
-    "raw": "\\"multiline
-quote\\"",
-    "type": "DOUBLE",
-    "valueRange": Range {
-      "end": 21,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 21,
-    "start": 2,
-  },
-  "type": "MAP_VALUE",
-  "valueRange": Range {
-    "end": 21,
-    "start": 2,
-  },
-}
-`;
-
 exports[`map value ": \\"multiline\\nquote\\"" flow seq value 1`] = `
 CollectionItem {
   "indicator": ":",
@@ -2250,33 +1971,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 14,
     "start": 0,
-  },
-}
-`;
-
-exports[`map value ": -plain value" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": ":",
-  "item": PlainValue {
-    "range": Range {
-      "end": 17,
-      "start": 4,
-    },
-    "raw": "-plain value",
-    "type": "PLAIN",
-    "valueRange": Range {
-      "end": 17,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 17,
-    "start": 2,
-  },
-  "type": "MAP_VALUE",
-  "valueRange": Range {
-    "end": 17,
-    "start": 2,
   },
 }
 `;
@@ -2473,33 +2167,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 25,
     "start": 0,
-  },
-}
-`;
-
-exports[`map value ":\\n  \\n\\n    multiline plain" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": ":",
-  "item": PlainValue {
-    "range": Range {
-      "end": 28,
-      "start": 12,
-    },
-    "raw": "multiline plain",
-    "type": "PLAIN",
-    "valueRange": Range {
-      "end": 28,
-      "start": 12,
-    },
-  },
-  "range": Range {
-    "end": 28,
-    "start": 2,
-  },
-  "type": "MAP_VALUE",
-  "valueRange": Range {
-    "end": 28,
-    "start": 2,
   },
 }
 `;
@@ -2724,61 +2391,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 10,
     "start": 0,
-  },
-}
-`;
-
-exports[`map value ":\\t[ 1, 2 ]" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": ":",
-  "item": FlowCollection {
-    "items": Array [
-      "[",
-      PlainValue {
-        "range": Range {
-          "end": 7,
-          "start": 6,
-        },
-        "raw": "1",
-        "type": "PLAIN",
-        "valueRange": Range {
-          "end": 7,
-          "start": 6,
-        },
-      },
-      ",",
-      PlainValue {
-        "range": Range {
-          "end": 11,
-          "start": 9,
-        },
-        "raw": "2",
-        "type": "PLAIN",
-        "valueRange": Range {
-          "end": 11,
-          "start": 9,
-        },
-      },
-      "]",
-    ],
-    "range": Range {
-      "end": 12,
-      "start": 4,
-    },
-    "type": "FLOW_SEQ",
-    "valueRange": Range {
-      "end": 12,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 12,
-    "start": 2,
-  },
-  "type": "MAP_VALUE",
-  "valueRange": Range {
-    "end": 12,
-    "start": 2,
   },
 }
 `;
@@ -3147,33 +2759,6 @@ CollectionItem {
 }
 `;
 
-exports[`parse simple map keys complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "?",
-  "item": Scalar {
-    "range": Range {
-      "end": 12,
-      "start": 4,
-    },
-    "raw": "\\"value\\"",
-    "type": "DOUBLE",
-    "valueRange": Range {
-      "end": 11,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 12,
-    "start": 2,
-  },
-  "type": "MAP_KEY",
-  "valueRange": Range {
-    "end": 11,
-    "start": 2,
-  },
-}
-`;
-
 exports[`parse simple map keys flow seq value 1`] = `
 CollectionItem {
   "indicator": "?",
@@ -3366,33 +2951,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 9,
     "start": 0,
-  },
-}
-`;
-
-exports[`parse simple map values complex mapping key 1`] = `
-CollectionItem {
-  "indicator": ":",
-  "item": Scalar {
-    "range": Range {
-      "end": 12,
-      "start": 4,
-    },
-    "raw": "\\"value\\"",
-    "type": "DOUBLE",
-    "valueRange": Range {
-      "end": 11,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 12,
-    "start": 2,
-  },
-  "type": "MAP_VALUE",
-  "valueRange": Range {
-    "end": 11,
-    "start": 2,
   },
 }
 `;
@@ -3593,33 +3151,6 @@ CollectionItem {
 }
 `;
 
-exports[`parse simple seq items complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "-",
-  "item": Scalar {
-    "range": Range {
-      "end": 12,
-      "start": 4,
-    },
-    "raw": "\\"value\\"",
-    "type": "DOUBLE",
-    "valueRange": Range {
-      "end": 11,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 12,
-    "start": 2,
-  },
-  "type": "SEQ_ITEM",
-  "valueRange": Range {
-    "end": 11,
-    "start": 2,
-  },
-}
-`;
-
 exports[`parse simple seq items flow seq value 1`] = `
 CollectionItem {
   "indicator": "-",
@@ -3812,33 +3343,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 8,
     "start": 0,
-  },
-}
-`;
-
-exports[`seq item "- *alias" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "-",
-  "item": Scalar {
-    "range": Range {
-      "end": 10,
-      "start": 4,
-    },
-    "raw": "alias",
-    "type": "ALIAS",
-    "valueRange": Range {
-      "end": 10,
-      "start": 5,
-    },
-  },
-  "range": Range {
-    "end": 10,
-    "start": 2,
-  },
-  "type": "SEQ_ITEM",
-  "valueRange": Range {
-    "end": 10,
-    "start": 2,
   },
 }
 `;
@@ -4037,36 +3541,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 34,
     "start": 0,
-  },
-}
-`;
-
-exports[`seq item "- >+2\\n       multiple\\n       lines" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "-",
-  "item": BlockValue {
-    "blockStyle": ">+2",
-    "range": Range {
-      "end": 37,
-      "start": 4,
-    },
-    "raw": "       multiple
-       lines
-",
-    "type": "BLOCK_FOLDED",
-    "valueRange": Range {
-      "end": 37,
-      "start": 8,
-    },
-  },
-  "range": Range {
-    "end": 37,
-    "start": 2,
-  },
-  "type": "SEQ_ITEM",
-  "valueRange": Range {
-    "end": 37,
-    "start": 2,
   },
 }
 `;
@@ -4286,34 +3760,6 @@ quote\\"",
 }
 `;
 
-exports[`seq item "- \\"multiline\\nquote\\"" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "-",
-  "item": Scalar {
-    "range": Range {
-      "end": 21,
-      "start": 4,
-    },
-    "raw": "\\"multiline
-quote\\"",
-    "type": "DOUBLE",
-    "valueRange": Range {
-      "end": 21,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 21,
-    "start": 2,
-  },
-  "type": "SEQ_ITEM",
-  "valueRange": Range {
-    "end": 21,
-    "start": 2,
-  },
-}
-`;
-
 exports[`seq item "- \\"multiline\\nquote\\"" flow seq value 1`] = `
 CollectionItem {
   "indicator": "-",
@@ -4479,33 +3925,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 14,
     "start": 0,
-  },
-}
-`;
-
-exports[`seq item "- -plain value" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "-",
-  "item": PlainValue {
-    "range": Range {
-      "end": 17,
-      "start": 4,
-    },
-    "raw": "-plain value",
-    "type": "PLAIN",
-    "valueRange": Range {
-      "end": 17,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 17,
-    "start": 2,
-  },
-  "type": "SEQ_ITEM",
-  "valueRange": Range {
-    "end": 17,
-    "start": 2,
   },
 }
 `;
@@ -4702,33 +4121,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 25,
     "start": 0,
-  },
-}
-`;
-
-exports[`seq item "-\\n  \\n\\n    multiline plain" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "-",
-  "item": PlainValue {
-    "range": Range {
-      "end": 28,
-      "start": 12,
-    },
-    "raw": "multiline plain",
-    "type": "PLAIN",
-    "valueRange": Range {
-      "end": 28,
-      "start": 12,
-    },
-  },
-  "range": Range {
-    "end": 28,
-    "start": 2,
-  },
-  "type": "SEQ_ITEM",
-  "valueRange": Range {
-    "end": 28,
-    "start": 2,
   },
 }
 `;
@@ -4953,61 +4345,6 @@ CollectionItem {
   "valueRange": Range {
     "end": 10,
     "start": 0,
-  },
-}
-`;
-
-exports[`seq item "-\\t[ 1, 2 ]" complex mapping key 1`] = `
-CollectionItem {
-  "indicator": "-",
-  "item": FlowCollection {
-    "items": Array [
-      "[",
-      PlainValue {
-        "range": Range {
-          "end": 7,
-          "start": 6,
-        },
-        "raw": "1",
-        "type": "PLAIN",
-        "valueRange": Range {
-          "end": 7,
-          "start": 6,
-        },
-      },
-      ",",
-      PlainValue {
-        "range": Range {
-          "end": 11,
-          "start": 9,
-        },
-        "raw": "2",
-        "type": "PLAIN",
-        "valueRange": Range {
-          "end": 11,
-          "start": 9,
-        },
-      },
-      "]",
-    ],
-    "range": Range {
-      "end": 12,
-      "start": 4,
-    },
-    "type": "FLOW_SEQ",
-    "valueRange": Range {
-      "end": 12,
-      "start": 4,
-    },
-  },
-  "range": Range {
-    "end": 12,
-    "start": 2,
-  },
-  "type": "SEQ_ITEM",
-  "valueRange": Range {
-    "end": 12,
-    "start": 2,
   },
 }
 `;

@@ -2,27 +2,22 @@ import Node from './Node'
 import Range from './Range'
 
 export default class Collection extends Node {
-  constructor (firstItem, valueStart) {
+  constructor (firstItem) {
     super({ type: Node.Type.COLLECTION })
     this.items = [firstItem]
-    this.valueRange = new Range(valueStart)
   }
 
   /**
-   *
-   * @param {!Object} context
+   * @param {ParseContext} context
    * @param {!number} start - Index of first character
    * @returns {!number} - Index of the character after this
    */
   parse (context, start) {
     trace: context, { start }
     this.context = context
-    const { indent, inFlow, src } = context
-    const firstItem = this.items[0]
-    let offset = firstItem.parse(context, start)
-    firstItem.range = new Range(this.valueRange.start, offset)
-    trace: 'first-item', firstItem.type, { start, indent, range: firstItem.range }, JSON.stringify(firstItem.rawValue)
-    this.valueRange.end = firstItem.valueRange.end
+    this.valueRange = Range.copy(this.items[0].valueRange)
+    const { indent, inFlow, parseNode, src } = context
+    let offset = start
     offset = Node.normalizeOffset(src, offset)
     let lineStart = start - indent
     let ch = src[offset]
@@ -30,7 +25,7 @@ export default class Collection extends Node {
     while (ch) {
       while (ch === '\n' || ch === '#') {
         if (ch === '#') {
-          const comment = new Node({ type: Node.Type.COMMENT }, context)
+          const comment = new Node({ type: Node.Type.COMMENT }, { src })
           offset = comment.parseComment(offset)
           this.items.push(comment)
           this.valueRange.end = comment.commentRange.end
@@ -60,7 +55,7 @@ export default class Collection extends Node {
         break
       }
       trace: 'item-start', this.items.length, { ch: JSON.stringify(ch) }
-      const node = this.context.parseNode({ indent, inFlow, inCollection: true, src }, offset)
+      const node = parseNode({ indent, inFlow, inCollection: true, parent: this, src }, offset)
       if (!node) return offset // at next document start
       this.items.push(node)
       this.valueRange.end = node.valueRange.end
