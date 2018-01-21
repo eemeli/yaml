@@ -25,7 +25,7 @@ export default class FlowCollection extends Node {
     trace: context, { start }
     this.context = context
     const { parseNode, src } = context
-    let { indent } = context
+    let { lineStart } = context
     let ch = src[start] // { or [
     this.items = [ch]
     let offset = Node.endOfWhiteSpace(src, start + 1)
@@ -34,9 +34,8 @@ export default class FlowCollection extends Node {
       trace: 'item-start', this.items.length, ch
       switch (ch) {
         case '\n': {
-          const lineStart = offset + 1
+          lineStart = offset + 1
           offset = Node.endOfIndent(src, lineStart)
-          indent = offset - lineStart
         } break
         case ',': {
           this.items.push(ch)
@@ -61,7 +60,7 @@ export default class FlowCollection extends Node {
           // fallthrough
         }
         default: {
-          const node = parseNode({ indent, inFlow: true, inCollection: false, parent: this, src }, offset)
+          const node = parseNode({ inCollection: false, inFlow: true, indent: -1, lineStart, parent: this, src }, offset)
           if (!node) {
             // at next document start
             this.valueRange = new Range(start, offset)

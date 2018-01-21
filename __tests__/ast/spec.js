@@ -668,7 +668,7 @@ for (const section in spec) {
       test(name, () => {
         const { src, tgt } = spec[section][name]
         const documents = parseStream(src)
-        trace: 'DOCUMENTS', documents
+        trace: 'PARSED', documents
         testSpec(documents, tgt)
       })
     }

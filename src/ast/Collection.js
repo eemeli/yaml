@@ -15,13 +15,16 @@ export default class Collection extends Node {
   parse (context, start) {
     trace: context, { start }
     this.context = context
-    this.valueRange = Range.copy(this.items[0].valueRange)
-    const { indent, inFlow, parseNode, src } = context
+    const { inFlow, parseNode, src } = context
+    let { lineStart } = context
+    const firstItem = this.items[0]
+    this.valueRange = Range.copy(firstItem.valueRange)
+    const indent = firstItem.valueRange.start - firstItem.context.lineStart
     let offset = start
     offset = Node.normalizeOffset(src, offset)
-    let lineStart = start - indent
     let ch = src[offset]
-    trace: 'items-start', { offset, lineStart, ch: JSON.stringify(ch) }
+    let atLineStart = false
+    trace: 'items-start', { offset, indent, lineStart, ch: JSON.stringify(ch) }
     while (ch) {
       while (ch === '\n' || ch === '#') {
         if (ch === '#') {
@@ -44,24 +47,26 @@ export default class Collection extends Node {
           }
         }
         ch = src[offset]
+        atLineStart = true
       }
       if (!ch) {
-        trace: 'string-end', { offset }
+        trace: 'src-end', { offset }
         break
       }
-      if (offset !== lineStart + indent) {
-        trace: 'unindent', { offset, lineStart, indent }
+      if (offset !== lineStart + indent && (atLineStart || ch !== ':')) {
+        trace: 'unindent', { offset, lineStart, indent, ch: JSON.stringify(ch) }
         if (lineStart > start) offset = lineStart
         break
       }
       trace: 'item-start', this.items.length, { ch: JSON.stringify(ch) }
-      const node = parseNode({ indent, inFlow, inCollection: true, parent: this, src }, offset)
+      const node = parseNode({ inCollection: true, inFlow, indent, lineStart, parent: this, src }, offset)
       if (!node) return offset // at next document start
       this.items.push(node)
       this.valueRange.end = node.valueRange.end
       if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
       offset = Node.normalizeOffset(src, node.range.end)
       ch = src[offset]
+      atLineStart = false
       trace: 'item-end', node.type, { offset, ch: JSON.stringify(ch) }
     }
     trace: 'items', this.items

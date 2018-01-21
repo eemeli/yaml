@@ -73,12 +73,15 @@ export default class Document extends Node {
   parseContents (start) {
     const { src } = this.context
     this.contents = []
+    let lineStart = start
+    while (src[lineStart - 1] === '-') lineStart -= 1
     let offset = Node.endOfWhiteSpace(src, start)
     this.valueRange = new Range(offset)
     while (!Document.atDocumentEnd(src, offset)) {
       switch (src[offset]) {
         case '\n':
           offset += 1
+          lineStart = offset
           break
         case '#': {
           const comment = new Node({ type: Node.Type.COMMENT }, { src })
@@ -88,7 +91,7 @@ export default class Document extends Node {
         } break
         default: {
           const iEnd = Node.endOfIndent(src, offset)
-          const context = { indent: iEnd - offset - 1, inFlow: false, inCollection: false, parent: this, src }
+          const context = { indent: -1, inFlow: false, inCollection: false, lineStart, parent: this, src }
           const node = this.context.parseNode(context, iEnd)
           if (!node) return iEnd // at next document start
           this.contents.push(node)
@@ -109,11 +112,12 @@ export default class Document extends Node {
    * @returns {!number} - Index of the character after this
    */
   parse (context, start) {
-    trace: context, { start }
     this.context = context
     const { src } = context
+    trace: 'DOC START', JSON.stringify(src.slice(start))
     let offset = this.parseDirectives(start)
     offset = this.parseContents(offset)
+    trace: 'DOC', this.contents
     return offset
   }
 }

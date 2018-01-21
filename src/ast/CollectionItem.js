@@ -17,11 +17,11 @@ export default class CollectionItem extends Node {
     this.context = context
     trace: context, { start }
     const { inFlow, parseNode, src } = context
-    let { indent } = context
-    this.indicator = src[start] // ? or : or -
+    let { lineStart } = context
+    const indent = start - lineStart
+    this.indicator = src[start] // '?' or ':' or '-'
     let offset = Node.endOfWhiteSpace(src, start + 1)
-    let lineStart = start - indent
-    let itemIndent = offset - lineStart
+    // let itemIndent = offset - lineStart
     let ch = src[offset]
     while (ch === '\n' || ch === '#') {
       const next = offset + 1
@@ -35,13 +35,12 @@ export default class CollectionItem extends Node {
       } else {
         lineStart = offset
         offset = Node.endOfWhiteSpace(src, next) // against spec, to match \t allowed after indicator
-        itemIndent = offset - lineStart
+        // itemIndent = offset - lineStart
       }
       ch = src[offset]
     }
-    if (ch && itemIndent > indent) {
-      if (Node.atCollectionItem(src, offset)) indent = itemIndent
-      this.item = parseNode({ indent, inFlow, inCollection: false, parent: this, src }, offset)
+    if (ch && offset > lineStart + indent) {
+      this.item = parseNode({ inCollection: false, inFlow, indent, lineStart, parent: this, src }, offset)
       if (this.item) offset = this.item.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1

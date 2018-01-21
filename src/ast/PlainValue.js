@@ -8,7 +8,7 @@ export default class PlainValue extends Node {
     while (ch && ch !== '\n') {
       if (inFlow && (ch === '[' || ch === ']' || ch === '{' || ch === '}' || ch === ',')) break
       const next = src[offset + 1]
-      if (ch === ':' && (next === ' ' || next === '\t')) break
+      if (ch === ':' && (next === '\n' || next === '\t' || next === ' ')) break
       if ((ch === ' ' || ch === '\t') && next === '#') break
       offset += 1
       ch = next

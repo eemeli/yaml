@@ -62,9 +62,9 @@ const parseProps  = (src, offset) => {
 }
 
 const nodeStartsCollection = ({ inCollection, inFlow, src, parent }, node) => {
-  if (inCollection) return false
+  if (inCollection || inFlow) return false
   if (node instanceof CollectionItem) return true
-  if (inFlow || parent.type === Node.Type.MAP_KEY) return false
+  if (parent.type === Node.Type.MAP_KEY) return false
   // check for implicit key
   let offset = node.range.end
   if (src[offset] === '\n') return false
@@ -78,10 +78,10 @@ const nodeStartsCollection = ({ inCollection, inFlow, src, parent }, node) => {
  * @param {number} start - Index of first non-whitespace character for the node
  * @returns {?Node} - null if at a document boundary
  */
-export default function parseNode ({ src, indent, inFlow, inCollection, parent }, start) {
-  trace: '=== start', { start, indent, inFlow, inCollection }, JSON.stringify(src.slice(start))
+export default function parseNode ({ inCollection, inFlow, indent, lineStart, parent, src }, start) {
   if (Node.atDocumentBoundary(src, start)) return null
   const { props, valueStart } = parseProps(src, start)
+  trace: 'START', props, { inCollection, inFlow, indent, lineStart }
   let node
   switch (props.type) {
     case Node.Type.BLOCK_FOLDED:
@@ -104,15 +104,15 @@ export default function parseNode ({ src, indent, inFlow, inCollection, parent }
     default:
       node = new Scalar(props)
   }
-  const context = { indent, inCollection, inFlow, src, parent, parseNode }
+  const context = { inCollection, inFlow, indent, lineStart, parent, parseNode, src }
   let offset = node.parse(context, valueStart)
   node.range = new Range(start, offset)
-  trace: node.type, { valueStart, indent, range: node.range }, JSON.stringify(node.rawValue)
+  trace: node.type, { valueStart, indent, lineStart }, node.range, JSON.stringify(node.rawValue)
   if (nodeStartsCollection(context, node)) {
     const collection = new Collection(node)
     offset = collection.parse(context, node.range.end)
     collection.range = new Range(start, offset)
-    trace: collection.type, { valueStart, indent, range: collection.range }, JSON.stringify(collection.rawValue)
+    trace: collection.type, collection.range, JSON.stringify(collection.rawValue)
     return collection
   }
   return node
