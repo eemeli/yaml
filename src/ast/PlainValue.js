@@ -31,7 +31,6 @@ export default class PlainValue extends Node {
       if (end === null) break
       offset = PlainValue.endOfLine(src, end, false, inFlow)
     }
-    trace: ({ start, offset, ch: JSON.stringify(src[offset]), origRange: this.valueRange }), JSON.stringify(this.rawValue)
     if (this.valueRange.isEmpty) this.valueRange.start = start
     this.valueRange.end = offset
     trace: this.valueRange, JSON.stringify(this.rawValue)

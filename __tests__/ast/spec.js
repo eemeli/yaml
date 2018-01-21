@@ -126,7 +126,7 @@ grave-accent: \`text`,
 quoted: "Quoted \t"
 block:\t|
   void main() {
-  \tprintf("Hello, world!\n");
+  \tprintf("Hello, world!\\n");
   }`,
       tgt: [{
         directives: [{ comment: ' Tabs and spaces' }],
@@ -134,7 +134,7 @@ block:\t|
           'quoted',
           { indicator: ':', item: '"Quoted \t"' },
           'block',
-          { indicator: ':', item: '  void main() {\n  \tprintf("Hello, world!\\n");  }' }
+          { indicator: ':', item: '  void main() {\n  \tprintf("Hello, world!\\n");\n  }' }
         ]}]
       }]
     },
@@ -181,12 +181,12 @@ Not indented:
             { indicator: ':', item: '    By four\n      spaces\n' },
             'Flow style',
             { indicator: ':', item: { items: [
-              '[', { comment: 'Leading spaces' },
-              'By two', ',', { comment: 'in flow style' },
-              'Also by two', ',', { comment: 'are neither' },
-              'Still by two', { comment: 'content nor' },
+              '[', { comment: ' Leading spaces' },
+              'By two', ',', { comment: ' in flow style' },
+              'Also by two', ',', { comment: ' are neither' },
+              { rawValue: 'Still by two', comment: ' content nor' },
               ']'
-            ] }, comment: ' indentation.' }
+            ], comment: ' indentation.' } }
           ] } }
         ]}]
       }]
@@ -459,7 +459,7 @@ bar`,
       tgt: [{ contents: [{ items: [
         { tag: '!str', anchor: 'a1', rawValue: '"foo"' },
         { indicator: ':', item: { tag: '!str', rawValue: 'bar' } },
-        { anchor: 'a2', rawValue: 'baz' },,
+        { anchor: 'a2', rawValue: 'baz' },
         { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: 'a1' } }
       ] }] }]
     },
@@ -467,7 +467,7 @@ bar`,
     'Example 6.24. Verbatim Tags': {
       src:
 `!<tag:yaml.org,2002:str> foo :
-!<!bar> baz`,
+  !<!bar> baz`,
       tgt: [{ contents: [{ items: [
         { tag: '<tag:yaml.org,2002:str>', rawValue: 'foo' },
         { indicator: ':', item: { tag: '<!bar>', rawValue: 'baz' } }
@@ -542,7 +542,7 @@ bar`,
 Second occurrence: *anchor`,
       tgt: [{ contents: [{ items: [
         'First occurrence',
-        { indicator: ':', item: { anchro: 'anchor', rawValue: 'Value' } },
+        { indicator: ':', item: { anchor: 'anchor', rawValue: 'Value' } },
         'Second occurrence',
         { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: 'anchor' } }
       ] }] }]
@@ -655,9 +655,11 @@ const testSpec = (res, exp) => {
     expect(value).toBe(exp)
   } else if (Array.isArray(exp)) {
     expect(res).toBeInstanceOf(Array)
+    trace: 'test-array', exp
     exp.forEach((e, i) => testSpec(res[i], e))
   } else {
     expect(res).toBeInstanceOf(Object)
+    trace: 'test-object', exp
     for (const key in exp) testSpec(res[key], exp[key])
   }
 }

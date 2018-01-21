@@ -60,7 +60,7 @@ export default class FlowCollection extends Node {
           // fallthrough
         }
         default: {
-          const node = parseNode({ inCollection: false, inFlow: true, indent: -1, lineStart, parent: this, src }, offset)
+          const node = parseNode({ atLineStart: false, inCollection: false, inFlow: true, indent: -1, lineStart, parent: this, src }, offset)
           if (!node) {
             // at next document start
             this.valueRange = new Range(start, offset)
@@ -81,7 +81,7 @@ export default class FlowCollection extends Node {
       offset = Node.endOfWhiteSpace(src, offset + 1)
       offset = this.parseComment(offset)
     }
-    trace: 'items', this.items
+    trace: 'items', this.items, JSON.stringify(this.comment)
     return offset
   }
 }

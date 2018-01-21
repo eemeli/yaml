@@ -101,7 +101,7 @@ export default class Node {
     this.valueRange = null
     this.commentRange = null
     this.anchor = anchor || null
-    this.tag = tag || null
+    this.tag = typeof tag === 'string' ? tag : null
     this.type = type
   }
 

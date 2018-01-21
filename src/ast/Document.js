@@ -76,12 +76,14 @@ export default class Document extends Node {
     let lineStart = start
     while (src[lineStart - 1] === '-') lineStart -= 1
     let offset = Node.endOfWhiteSpace(src, start)
+    let atLineStart = lineStart === start
     this.valueRange = new Range(offset)
     while (!Document.atDocumentEnd(src, offset)) {
       switch (src[offset]) {
         case '\n':
           offset += 1
           lineStart = offset
+          atLineStart = true
           break
         case '#': {
           const comment = new Node({ type: Node.Type.COMMENT }, { src })
@@ -91,13 +93,14 @@ export default class Document extends Node {
         } break
         default: {
           const iEnd = Node.endOfIndent(src, offset)
-          const context = { indent: -1, inFlow: false, inCollection: false, lineStart, parent: this, src }
+          const context = { atLineStart, indent: -1, inFlow: false, inCollection: false, lineStart, parent: this, src }
           const node = this.context.parseNode(context, iEnd)
           if (!node) return iEnd // at next document start
           this.contents.push(node)
           this.valueRange.end = node.valueRange.end
           if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
           offset = node.range.end
+          atLineStart = false
           trace: 'content-node', { valueRange: node.valueRange, commentRange: node.commentRange }, JSON.stringify(node.rawValue)
         }
       }

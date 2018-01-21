@@ -9,9 +9,11 @@ import Scalar from './Scalar'
 
 /**
  * @typedef {Object} ParseContext
+ * @param {boolean} atLineStart - Node starts at beginning of line
  * @param {boolean} inFlow - true if currently in a flow context
  * @param {boolean} inCollection - true if currently in a collection context
  * @param {number} indent - Current level of indentation
+ * @param {number} lineStart - Start of the current line
  * @param {Node} parent - The parent of the node
  * @param {string} src - Source of the YAML document
  */
@@ -78,7 +80,7 @@ const nodeStartsCollection = ({ inCollection, inFlow, src, parent }, node) => {
  * @param {number} start - Index of first non-whitespace character for the node
  * @returns {?Node} - null if at a document boundary
  */
-export default function parseNode ({ inCollection, inFlow, indent, lineStart, parent, src }, start) {
+export default function parseNode ({ atLineStart, inCollection, inFlow, indent, lineStart, parent, src }, start) {
   if (Node.atDocumentBoundary(src, start)) return null
   const { props, valueStart } = parseProps(src, start)
   trace: 'START', props, { inCollection, inFlow, indent, lineStart }
@@ -104,11 +106,12 @@ export default function parseNode ({ inCollection, inFlow, indent, lineStart, pa
     default:
       node = new Scalar(props)
   }
-  const context = { inCollection, inFlow, indent, lineStart, parent, parseNode, src }
+  const context = { atLineStart, inCollection, inFlow, indent, lineStart, parent, parseNode, src }
   let offset = node.parse(context, valueStart)
   node.range = new Range(start, offset)
-  trace: node.type, { valueStart, indent, lineStart }, node.range, JSON.stringify(node.rawValue)
+  trace: node.type, { anchor: node.anchor, tag: node.tag, valueStart, indent, lineStart }, node.range, JSON.stringify(node.rawValue)
   if (nodeStartsCollection(context, node)) {
+    trace: 'collection-start'
     const collection = new Collection(node)
     offset = collection.parse(context, node.range.end)
     collection.range = new Range(start, offset)

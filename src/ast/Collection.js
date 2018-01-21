@@ -19,7 +19,7 @@ export default class Collection extends Node {
     let { lineStart } = context
     const firstItem = this.items[0]
     this.valueRange = Range.copy(firstItem.valueRange)
-    const indent = firstItem.valueRange.start - firstItem.context.lineStart
+    const indent = firstItem.range.start - firstItem.context.lineStart
     let offset = start
     offset = Node.normalizeOffset(src, offset)
     let ch = src[offset]
@@ -50,16 +50,21 @@ export default class Collection extends Node {
         atLineStart = true
       }
       if (!ch) {
-        trace: 'src-end', { offset }
+        trace: 'end:src', { offset }
         break
       }
       if (offset !== lineStart + indent && (atLineStart || ch !== ':')) {
-        trace: 'unindent', { offset, lineStart, indent, ch: JSON.stringify(ch) }
+        trace: 'end:unindent', { offset, lineStart, indent, ch: JSON.stringify(ch) }
+        if (lineStart > start) offset = lineStart
+        break
+      }
+      if ((firstItem.type === Node.Type.SEQ_ITEM) !== (ch === '-')) {
+        trace: 'end:typeswitch', { offset, lineStart, indent, ch: JSON.stringify(ch) }
         if (lineStart > start) offset = lineStart
         break
       }
       trace: 'item-start', this.items.length, { ch: JSON.stringify(ch) }
-      const node = parseNode({ inCollection: true, inFlow, indent, lineStart, parent: this, src }, offset)
+      const node = parseNode({ atLineStart, inCollection: true, inFlow, indent, lineStart, parent: this, src }, offset)
       if (!node) return offset // at next document start
       this.items.push(node)
       this.valueRange.end = node.valueRange.end

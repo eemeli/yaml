@@ -2,6 +2,12 @@ import Node from './Node'
 import Range from './Range'
 
 export default class CollectionItem extends Node {
+  static nextNodeIsIndented (ch, indentDiff) {
+    if (!ch || indentDiff < 0) return false
+    if (indentDiff > 0) return true
+    return ch === '-' || ch === '?' || ch === ':'
+  }
+
   constructor (props) {
     super(props)
     this.indicator = null
@@ -15,10 +21,10 @@ export default class CollectionItem extends Node {
    */
   parse (context, start) {
     this.context = context
-    trace: context, { start }
+    trace: 'item-start', context, { start }
     const { inFlow, parseNode, src } = context
-    let { lineStart } = context
-    const indent = start - lineStart
+    let { atLineStart, lineStart } = context
+    const indent = atLineStart ? start - lineStart : context.indent
     this.indicator = src[start] // '?' or ':' or '-'
     let offset = Node.endOfWhiteSpace(src, start + 1)
     // let itemIndent = offset - lineStart
@@ -33,20 +39,21 @@ export default class CollectionItem extends Node {
           this.commentRange = new Range(next, offset)
         }
       } else {
-        lineStart = offset
+        lineStart = next
         offset = Node.endOfWhiteSpace(src, next) // against spec, to match \t allowed after indicator
         // itemIndent = offset - lineStart
       }
       ch = src[offset]
     }
-    if (ch && offset > lineStart + indent) {
-      this.item = parseNode({ inCollection: false, inFlow, indent, lineStart, parent: this, src }, offset)
+    trace: 'item-parse?', { offset, atLineStart, lineStart, indent, ch: ch && JSON.stringify(ch) }
+    if (CollectionItem.nextNodeIsIndented(ch, offset - (lineStart + indent))) {
+      this.item = parseNode({ atLineStart, inCollection: false, inFlow, indent, lineStart, parent: this, src }, offset)
       if (this.item) offset = this.item.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1
     }
     const end = this.item ? this.item.valueRange.end : offset
-    trace: ({ start, end, offset })
+    trace: 'item-end', { start, end, offset }
     this.valueRange = new Range(start, end)
     return offset
   }
