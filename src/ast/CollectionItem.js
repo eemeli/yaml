@@ -21,7 +21,7 @@ export default class CollectionItem extends Node {
    */
   parse (context, start) {
     this.context = context
-    trace: 'item-start', context, { start }
+    trace: 'item-start', context.pretty, { start }
     const { parseNode, src } = context
     let { atLineStart, lineStart } = context
     const indent = atLineStart ? start - lineStart : context.indent

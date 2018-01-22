@@ -54,6 +54,19 @@ export default class ParseContext {
     this.src = orig.src
   }
 
+  // for logging
+  get pretty () {
+    const obj = {
+      start: `${this.lineStart} + ${this.indent}`,
+      in: [],
+      parent: this.parent.type
+    }
+    if (!this.atLineStart) obj.start += ' + N'
+    if (this.inCollection) obj.in.push('collection')
+    if (this.inFlow) obj.in.push('flow')
+    return obj
+  }
+
   nodeStartsCollection (node) {
     const { inCollection, inFlow, src, parent } = this
     if (inCollection || inFlow) return false
@@ -90,7 +103,6 @@ export default class ParseContext {
       ch = src[offset]
     }
     props.type = ParseContext.parseType(src, offset)
-    trace: props, offset
     return { props, valueStart: offset }
   }
 
@@ -104,7 +116,7 @@ export default class ParseContext {
     if (Node.atDocumentBoundary(this.src, start)) return null
     const context = new ParseContext(this, overlay)
     const { props, valueStart } = context.parseProps(start)
-    trace: 'START', props, { inCollection, inFlow, indent, lineStart }
+    trace: 'START', valueStart, props, context.pretty
     let node
     switch (props.type) {
       case Node.Type.BLOCK_FOLDED:
@@ -129,7 +141,7 @@ export default class ParseContext {
     }
     let offset = node.parse(context, valueStart)
     node.range = new Range(start, offset)
-    trace: node.type, { anchor: node.anchor, tag: node.tag, valueStart, indent, lineStart }, node.range, JSON.stringify(node.rawValue)
+    trace: node.type, node.range, JSON.stringify(node.rawValue)
     if (context.nodeStartsCollection(node)) {
       trace: 'collection-start'
       const collection = new Collection(node)

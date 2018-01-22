@@ -50,7 +50,7 @@ export default class BlockValue extends Node {
    */
   parse (context, start) {
     this.context = context
-    trace: context, { start }
+    trace: 'block-start', context.pretty, { start }
     const { src } = context
     let offset = BlockValue.endOfBlockStyle(src, start + 1)
     this.blockStyle = src.slice(start, offset)

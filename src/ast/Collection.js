@@ -13,7 +13,7 @@ export default class Collection extends Node {
    * @returns {number} - Index of the character after this
    */
   parse (context, start) {
-    trace: context, { start }
+    trace: 'collection-start', context.pretty, { start }
     this.context = context
     const { parseNode, src } = context
     let { lineStart } = context

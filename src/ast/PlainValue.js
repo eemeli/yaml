@@ -64,7 +64,8 @@ export default class PlainValue extends Node {
    */
   parse (context, start) {
     this.context = context
-    const { inFlow, src } = this.context
+    trace: 'plain-start', context.pretty, { start }
+    const { inFlow, src } = context
     let offset = start
     let ch = src[offset]
     if (ch && ch !== '#' && ch !== '\n') {
