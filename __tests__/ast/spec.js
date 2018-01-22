@@ -549,9 +549,750 @@ Second occurrence: *anchor`,
     },
   },
 
-// 7. Flow Styles
+  '7.1. Alias Nodes': {
+    'Example 7.1. Alias Nodes': {
+      src:
+`First occurrence: &anchor Foo
+Second occurrence: *anchor
+Override anchor: &anchor Bar
+Reuse anchor: *anchor`,
+      tgt: [ { contents: [ { items: [
+        'First occurrence',
+        { indicator: ':', item: { anchor: 'anchor', rawValue: 'Foo' } },
+        'Second occurrence',
+        { indicator: ':', item: 'anchor' },
+        'Override anchor',
+        { indicator: ':', item: { anchor: 'anchor', rawValue: 'Bar' } },
+        'Reuse anchor',
+        { indicator: ':', item: 'anchor' }
+      ] } ] } ]
+    },
+  },
 
-// 8. Block Styles
+  '7.2. Empty Nodes': {
+    'Example 7.2. Empty Content': {
+      src:
+`{
+  foo : !!str,
+  !!str : bar,
+}`,
+      tgt: [ { contents: [ { items: [
+        '{', 'foo', ':', { tag: '!str' }, ',', { tag: '!str' }, ':', 'bar', ',', '}'
+      ] } ] } ]
+    },
+
+    'Example 7.3. Completely Empty Flow Nodes': {
+      src:
+`{
+  ? foo :,
+  : bar,
+}`,
+      tgt: [ { contents: [ { items: [ '{', '?', 'foo', ':', ',', ':', 'bar', ',', '}' ] } ] } ]
+    },
+  },
+
+  '7.3.1. Double-Quoted Style': {
+    'Example 7.4. Double Quoted Implicit Keys': {
+      src:
+`"implicit block key" : [
+  "implicit flow key" : value,
+ ]`,
+      tgt: [ { contents: [ { items: [
+        '"implicit block key"',
+        { indicator: ':', item: { items: [
+          '[', '"implicit flow key"', ':', 'value', ',', ']'
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 7.5. Double Quoted Line Breaks': {
+      src:
+`"folded
+to a space,\t
+
+to a line feed, or \t\
+ \ \tnon-content"`,
+      tgt: [ { contents: [ '"folded\nto a space,\t\n\nto a line feed, or \t  \tnon-content"' ] } ]
+    },
+
+    'Example 7.6. Double Quoted Lines': {
+      src:
+`" 1st non-empty
+
+ 2nd non-empty
+\t3rd non-empty "`,
+      tgt: [ { contents: [ '" 1st non-empty\n\n 2nd non-empty\n\t3rd non-empty "' ] } ]
+    },
+  },
+
+  '7.3.2. Single-Quoted Style': {
+    'Example 7.7. Single Quoted Characters': {
+      src:
+` 'here''s to "quotes"'`,
+      tgt: [ { contents: [ '\'here\'\'s to "quotes"\'' ] } ]
+    },
+
+    'Example 7.8. Single Quoted Implicit Keys': {
+      src:
+`'implicit block key' : [
+  'implicit flow key' : value,
+ ]`,
+      tgt: [ { contents: [ { items: [
+        '\'implicit block key\'',
+        { indicator: ':', item: { items: [
+          '[', '\'implicit flow key\'', ':', 'value', ',', ']'
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 7.9. Single Quoted Lines': {
+      src:
+`' 1st non-empty
+
+ 2nd non-empty
+\t3rd non-empty '`,
+      tgt: [ { contents: [ '\' 1st non-empty\n\n 2nd non-empty\n\t3rd non-empty \'' ] } ]
+    },
+  },
+
+  '7.3.3. Plain Style': {
+    'Example 7.10. Plain Characters': {
+      src:
+`# Outside flow collection:
+- ::vector
+- ": - ()"
+- Up, up, and away!
+- -123
+- http://example.com/foo#bar
+# Inside flow collection:
+- [ ::vector,
+  ": - ()",
+  "Up, up and away!",
+  -123,
+  http://example.com/foo#bar ]`,
+      tgt: [ {
+        directives: [ { comment: ' Outside flow collection:' } ],
+        contents: [ { items: [
+          { indicator: '-', item: '::vector' },
+          { indicator: '-', item: '": - ()"' },
+          { indicator: '-', item: 'Up, up, and away!' },
+          { indicator: '-', item: '-123' },
+          { indicator: '-', item: 'http://example.com/foo#bar' },
+          { comment: ' Inside flow collection:' },
+          { indicator: '-', item: { items: [
+            '[', '::vector', ',', '": - ()"', ',', '"Up, up and away!"', ',',
+            '-123', ',', 'http://example.com/foo#bar', ']'
+          ] } }
+        ] } ]
+      } ]
+    },
+
+    'Example 7.11. Plain Implicit Keys': {
+      src:
+`implicit block key : [
+  implicit flow key : value,
+ ]`,
+      tgt: [ { contents:
+        [ { items:
+             [ 'implicit block key',
+               { indicator: ':',
+                 item: { items: [ '[', 'implicit flow key', ':', 'value', ',', ']' ] } } ] } ] } ]
+    },
+
+    'Example 7.12. Plain Lines': {
+      src:
+`1st non-empty
+
+ 2nd non-empty
+\t3rd non-empty`,
+      tgt: [ { contents: [ '1st non-empty\n\n 2nd non-empty\n\t3rd non-empty' ] } ]
+    },
+  },
+
+  '7.4.1. Flow Sequences': {
+    'Example 7.13. Flow Sequence': {
+      src:
+`- [ one, two, ]
+- [three ,four]`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: { items: [ '[', 'one', ',', 'two', ',', ']' ] } },
+        { indicator: '-', item: { items: [ '[', 'three', ',', 'four', ']' ] } }
+      ] } ] } ]
+    },
+
+    'Example 7.14. Flow Sequence Entries': {
+      src:
+`[
+"double
+ quoted", 'single
+           quoted',
+plain
+ text, [ nested ],
+single: pair,
+]`,
+      tgt: [ { contents: [ { items: [
+        '[', '"double\n quoted"', ',', '\'single\n           quoted\'', ',',
+        'plain\n text', ',', { items: [ '[', 'nested', ']' ] }, ',', 'single',
+        ':', 'pair', ',', ']'
+      ] } ] } ]
+    },
+  },
+
+  '7.4.2. Flow Mappings': {
+    'Example 7.15. Flow Mappings': {
+      src:
+`- { one : two , three: four , }
+- {five: six,seven : eight}`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: { items: [ '{', 'one', ':', 'two', ',', 'three', ':', 'four', ',', '}' ] } },
+        { indicator: '-', item: { items: [ '{', 'five', ':', 'six', ',', 'seven', ':', 'eight', '}' ] } }
+      ] } ] } ]
+    },
+
+    'Example 7.16. Flow Mapping Entries': {
+      src:
+`{
+? explicit: entry,
+implicit: entry,
+?
+}`,
+      tgt: [ { contents: [ { items: [
+        '{', '?', 'explicit', ':', 'entry', ',', 'implicit', ':', 'entry', ',', '?', '}'
+      ] } ] } ]
+    },
+
+    'Example 7.17. Flow Mapping Separate Values': {
+      src:
+`{
+unquoted : "separate",
+http://foo.com,
+omitted value:,
+: omitted key,
+}`,
+      tgt: [ { contents: [ { items: [
+        '{', 'unquoted', ':', '"separate"', ',', 'http://foo.com', ',', 'omitted value:', ',', ':', 'omitted key', ',', '}'
+      ] } ] } ]
+    },
+
+    'Example 7.18. Flow Mapping Adjacent Values': {
+      src:
+`{
+"adjacent":value,
+"readable": value,
+"empty":
+}`,
+      tgt: [ { contents: [ { items: [
+        '{', '"adjacent"', ':', 'value', ',', '"readable"', ':', 'value', ',', '"empty"', ':', '}'
+      ] } ] } ]
+    },
+
+    'Example 7.19. Single Pair Flow Mappings': {
+      src:
+`[
+foo: bar
+]`,
+      tgt: [ { contents: [ { items: [ '[', 'foo', ':', 'bar', ']' ] } ] } ]
+    },
+
+    'Example 7.20. Single Pair Explicit Entry': {
+      src:
+`[
+? foo
+ bar : baz
+]`,
+      tgt: [ { contents: [ { items: [ '[', '?', 'foo\n bar', ':', 'baz', ']' ] } ] } ]
+    },
+
+    'Example 7.21. Single Pair Implicit Entries': {
+      src:
+`- [ YAML : separate ]
+- [ : empty key entry ]
+- [ {JSON: like}:adjacent ]`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: { items: [ '[', 'YAML', ':', 'separate', ']' ] } },
+        { indicator: '-', item: { items: [ '[', ':', 'empty key entry', ']' ] } },
+        { indicator: '-', item: { items: [
+          '[', { items: [ '{', 'JSON', ':', 'like', '}' ] }, ':', 'adjacent', ']'
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 7.22. Invalid Implicit Keys': {
+      src:
+`[ foo
+ bar: invalid,
+ "foo...>1K characters...bar": invalid ]`,
+      tgt: [ { contents: [ { items: [
+        '[', 'foo\n bar', ':', 'invalid', ',', '"foo...>1K characters...bar"', ':', 'invalid', ']'
+      ] } ] } ]
+      // ERROR: The foo bar key spans multiple lines
+      // ERROR: The foo...bar key is too long
+    },
+  },
+
+  '7.5. Flow Nodes': {
+    'Example 7.23. Flow Content': {
+      src:
+`- [ a, b ]
+- { a: b }
+- "a"
+- 'b'
+- c`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: { items: [ '[', 'a', ',', 'b', ']' ] } },
+        { indicator: '-', item: { items: [ '{', 'a', ':', 'b', '}' ] } },
+        { indicator: '-', item: '"a"' },
+        { indicator: '-', item: "'b'" },
+        { indicator: '-', item: 'c' }
+      ] } ] } ]
+    },
+
+    'Example 7.24. Flow Nodes': {
+      src:
+`- !!str "a"
+- 'b'
+- &anchor "c"
+- *anchor
+- !!str`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: { tag: '!str', rawValue: '"a"' } },
+        { indicator: '-', item: "'b'" },
+        { indicator: '-', item: { anchor: 'anchor', rawValue: '"c"' } },
+        { indicator: '-', item: 'anchor' },
+        { indicator: '-', item: { tag: '!str' } }
+      ] } ] } ]
+    },
+  },
+
+  '8.1.1. Block Scalar Headers': {
+    'Example 8.1. Block Scalar Header': {
+      src:
+`- | # Empty header
+ literal
+- >1 # Indentation indicator
+  folded
+- |+ # Chomping indicator
+ keep
+
+- >1- # Both indicators
+  strip`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: { comment: ' Empty header', rawValue: ' literal\n' } },
+        { indicator: '-', item: { comment: ' Indentation indicator', rawValue: '  folded\n' } },
+        { indicator: '-', item: { comment: ' Chomping indicator', rawValue: ' keep\n\n' } },
+        { indicator: '-', item: { comment: ' Both indicators', rawValue: '  strip' } }
+      ] } ] } ]
+    },
+
+    'Example 8.2. Block Indentation Indicator': {
+      src:
+`- |
+ detected
+- >
+
+
+  # detected
+- |1
+  explicit
+- >
+ \t
+ detected`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: ' detected\n' },
+        { indicator: '-', item: '\n\n  # detected\n' },
+        { indicator: '-', item: '  explicit\n' },
+        { indicator: '-', item: ' \t\n detected' }
+      ] } ] } ]
+    },
+
+    'Example 8.3. Invalid Block Scalar Indentation Indicators': {
+      src:
+`- |
+
+ text
+- >
+  text
+ text
+- |2
+ text`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: '\n text\n' },
+        { indicator: '-', item: '  text\n text\n' },
+        { indicator: '-', item: ' text' }
+      ] } ] } ]
+      // ERROR: A leading all-space line must not have too many spaces.
+      // ERROR: A following text line must not be less indented.
+      // ERROR: The text is less indented than the indicated level.
+    },
+
+    'Example 8.4. Chomping Final Line Break': {
+      src:
+`strip: |-
+  text
+clip: |
+  text
+keep: |+
+  text\n`,
+      tgt: [ { contents: [ { items: [
+        'strip',
+        { indicator: ':', item: '  text\n' },
+        'clip',
+        { indicator: ':', item: '  text\n' },
+        'keep',
+        { indicator: ':', item: '  text\n' }
+      ] } ] } ]
+    },
+
+    'Example 8.5. Chomping Trailing Lines': {
+      src:
+`
+ # Strip
+  # Comments:
+strip: |-
+  # text
+
+ # Clip
+  # comments:
+
+clip: |
+  # text
+
+ # Keep
+  # comments:
+
+keep: |+
+  # text
+
+ # Trail
+  # comments.`,
+      tgt: [ {
+        directives: [ { comment: ' Strip' }, { comment: ' Comments:' } ],
+        contents: [ { items: [
+          'strip',
+          { indicator: ':', item: '  # text\n\n # Clip\n  # comments:\n\n' },
+          'clip',
+          { indicator: ':', item: '  # text\n\n # Keep\n  # comments:\n\n' },
+          'keep',
+          { indicator: ':', item: '  # text\n\n # Trail\n  # comments.' }
+        ] } ]
+      } ]
+    },
+
+    'Example 8.6. Empty Scalar Chomping': {
+      src:
+`strip: >-
+
+clip: >
+
+keep: |+\n\n`,
+      tgt: [ { contents: [ { items: [
+        'strip',
+        { indicator: ':', item: '\n' },
+        'clip',
+        { indicator: ':', item: '\n' },
+        'keep',
+        { indicator: ':', item: '\n' }
+      ] } ] } ]
+    },
+  },
+
+  '8.1.2. Literal Style': {
+    'Example 8.7. Literal Scalar': {
+      src:
+`|
+ literal
+ \ttext\n\n`,
+      tgt: [ { contents: [ ' literal\n \ttext\n\n' ] } ]
+    },
+
+    'Example 8.8. Literal Content': {
+      src:
+`|
+
+
+  literal
+
+
+  text
+
+ # Comment`,
+      tgt: [ { contents: [ '\n\n  literal\n\n\n  text\n\n # Comment' ] } ]
+    },
+  },
+
+  '8.1.3. Folded Style': {
+    'Example 8.9. Folded Scalar': {
+      src:
+`>
+ folded
+ text\n\n`,
+      tgt: [ { contents: [ ' folded\n text\n\n' ] } ]
+    },
+
+    'Example 8.10. Folded Lines': {
+      src:
+`>
+
+ folded
+ line
+
+ next
+ line
+   * bullet
+
+   * list
+   * lines
+
+ last
+ line
+
+# Comment`,
+      tgt: [ { contents: [
+        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment'
+      ] } ]
+    },
+
+    'Example 8.11. More Indented Lines': {
+      src:
+`>
+
+ folded
+ line
+
+ next
+ line
+   * bullet
+
+   * list
+   * lines
+
+ last
+ line
+
+# Comment`,
+      tgt: [ { contents: [
+        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment'
+      ] } ]
+    },
+
+    'Example 8.12. Empty Separation Lines': {
+      src:
+`>
+
+ folded
+ line
+
+ next
+ line
+   * bullet
+
+   * list
+   * line
+
+ last
+ line
+
+# Comment`,
+      tgt: [ { contents: [
+        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n# Comment'
+      ] } ]
+    },
+
+    'Example 8.13. Final Empty Lines': {
+      src:
+`>
+ folded
+ line
+
+ next
+ line
+   * bullet
+
+   * list
+   * line
+
+ last
+ line
+
+# Comment`,
+      tgt: [ { contents: [
+        ' folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n# Comment'
+      ] } ]
+    },
+  },
+
+  '8.2.1. Block Sequences': {
+    'Example 8.14. Block Sequence': {
+      src:
+`block sequence:
+  - one
+  - two : three\n`,
+      tgt: [ { contents: [ { items: [
+        'block sequence',
+        { indicator: ':', item: { items: [
+          { indicator: '-', item: 'one' },
+          { indicator: '-', item: { items: [
+            'two',
+            { indicator: ':', item: 'three' }
+          ] } }
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 8.15. Block Sequence Entry Types': {
+      src:
+`- # Empty
+- |
+ block node
+- - one # Compact
+  - two # sequence
+- one: two # Compact mapping`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: '', comment: ' Empty' },
+        { indicator: '-', item: ' block node\n' },
+        { indicator: '-', item: { items: [
+          { indicator: '-', item: { comment: ' Compact', rawValue: 'one' } },
+          { indicator: '-', item: { comment: ' sequence', rawValue: 'two' } }
+        ] } },
+        { indicator: '-', item: { items: [
+          'one',
+          { indicator: ':', item: { comment: ' Compact mapping', rawValue: 'two' } }
+        ] } }
+      ] } ] } ]
+    },
+  },
+
+  '8.2.2. Block Mappings': {
+    'Example 8.16. Block Mappings': {
+      src:
+`block mapping:
+ key: value\n`,
+      tgt: [ { contents: [ { items: [
+        'block mapping',
+        { indicator: ':', item: { items: [
+          'key',
+          { indicator: ':', item: 'value' }
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 8.17. Explicit Block Mapping Entries': {
+      src:
+`? explicit key # Empty value
+? |
+  block key
+: - one # Explicit compact
+  - two # block value\n`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '?', item: { comment: ' Empty value', rawValue: 'explicit key' } },
+        { indicator: '?', item: '  block key\n' },
+        { indicator: ':', item: { items: [
+          { indicator: '-', item: { comment: ' Explicit compact', rawValue: 'one' } },
+          { indicator: '-', item: { comment: ' block value', rawValue: 'two' } }
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 8.18. Implicit Block Mapping Entries': {
+      src:
+`plain key: in-line value
+: # Both empty
+"quoted key":
+- entry`,
+      tgt: [ { contents: [ { items: [
+        'plain key',
+        { indicator: ':', item: 'in-line value' },
+        { indicator: ':', item: { comment: ' Both empty' } },
+        '"quoted key"',
+        { indicator: ':', item: { items: [
+          { indicator: '-', item: 'entry' }
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 8.19. Compact Block Mappings': {
+      src:
+`- sun: yellow
+- ? earth: blue
+  : moon: white\n`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: { items: [
+          'sun',
+          { indicator: ':', item: 'yellow' }
+        ] } },
+        { indicator: '-', item: { items: [
+          { indicator: '?', item: { items: [
+            'earth',
+            { indicator: ':', item: 'blue' }
+          ] } },
+          { indicator: ':', item: { items: [
+            'moon',
+            { indicator: ':', item: 'white' }
+          ] } }
+        ] } }
+      ] } ] } ]
+    },
+  },
+
+  '8.2.3. Block Nodes': {
+    'Example 8.20. Block Node Types': {
+      src:
+`-
+  "flow in block"
+- >
+ Block scalar
+- !!map # Block collection
+  foo : bar\n`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: '"flow in block"' },
+        { indicator: '-', item: ' Block scalar\n' },
+        { indicator: '-', item: { items: [
+          { tag: '!map', comment: ' Block collection', rawValue: 'foo' },
+          { indicator: ':', item: 'bar\n' }
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 8.21. Block Scalar Nodes': {
+      src:
+`literal: |2
+  value
+folded:
+   !foo
+  >1
+ value`,
+      tgt: [ { contents: [ { items: [
+        'literal',
+        { indicator: ':', item: '  value\n' },
+        'folded',
+        { indicator: ':', item: { tag: 'foo', rawValue: 'value' } }
+      ] } ] } ]
+    },
+
+    'Example 8.22. Block Collection Nodes': {
+      src:
+`sequence: !!seq
+- entry
+- !!seq
+ - nested
+mapping: !!map
+ foo: bar`,
+      tgt: [ { contents: [ { items: [
+        'sequence',
+        { indicator: ':', item: { tag: '!seq', items: [
+          { indicator: '-', item: 'entry' },
+          { indicator: '-', item: { tag: '!seq', items: [
+            { indicator: '-', item: 'nested' }
+          ] } }
+        ] } },
+        'mapping',
+        { indicator: ':', item: { tag: '!map', items: [
+          'foo',
+          { indicator: ':', item: 'bar' }
+        ] } }
+      ] } ] } ]
+    },
+  },
 
   '9.1. Documents': {
 
