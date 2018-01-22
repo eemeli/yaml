@@ -1,8 +1,8 @@
 import Document from './Document'
-import parseNode from './parseNode';
+import ParseContext from './ParseContext'
 
 export default function parseStream (src) {
-  const context = { parent: {}, parseNode, src }
+  const context = new ParseContext({ src })
   const documents = []
   let offset = 0
   while (offset < src.length) {

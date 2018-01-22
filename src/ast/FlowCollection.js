@@ -18,8 +18,8 @@ export default class FlowCollection extends Node {
 
   /**
    * @param {ParseContext} context
-   * @param {!number} start - Index of first character
-   * @returns {!number} - Index of the character after this
+   * @param {number} start - Index of first character
+   * @returns {number} - Index of the character after this
    */
   parse (context, start) {
     trace: context, { start }
@@ -60,7 +60,7 @@ export default class FlowCollection extends Node {
           // fallthrough
         }
         default: {
-          const node = parseNode({ atLineStart: false, inCollection: false, inFlow: true, indent: -1, lineStart, parent: this, src }, offset)
+          const node = parseNode({ atLineStart: false, inCollection: false, inFlow: true, indent: -1, lineStart, parent: this }, offset)
           if (!node) {
             // at next document start
             this.valueRange = new Range(start, offset)

@@ -1,0 +1,143 @@
+import BlockValue from './BlockValue'
+import Collection from './Collection'
+import CollectionItem from './CollectionItem'
+import FlowCollection from './FlowCollection'
+import Node from './Node'
+import PlainValue from './PlainValue'
+import Range from './Range'
+import Scalar from './Scalar'
+
+/**
+ * @param {boolean} atLineStart - Node starts at beginning of line
+ * @param {boolean} inFlow - true if currently in a flow context
+ * @param {boolean} inCollection - true if currently in a collection context
+ * @param {number} indent - Current level of indentation
+ * @param {number} lineStart - Start of the current line
+ * @param {Node} parent - The parent of the node
+ * @param {string} src - Source of the YAML document
+ */
+export default class ParseContext {
+  static parseType (src, offset) {
+    switch (src[offset]) {
+      case '*':
+        return Node.Type.ALIAS
+      case '>':
+        return Node.Type.BLOCK_FOLDED
+      case '|':
+        return Node.Type.BLOCK_LITERAL
+      case '"':
+        return Node.Type.DOUBLE
+      case '{':
+        return Node.Type.FLOW_MAP
+      case '[':
+        return Node.Type.FLOW_SEQ
+      case '?':
+        return Node.atBlank(src, offset + 1) ? Node.Type.MAP_KEY : Node.Type.PLAIN
+      case ':':
+        return Node.atBlank(src, offset + 1) ? Node.Type.MAP_VALUE : Node.Type.PLAIN
+      case '-':
+        return Node.atBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
+      case "'":
+        return Node.Type.SINGLE
+      default:
+        return Node.Type.PLAIN
+    }
+  }
+
+  constructor (orig = {}, { atLineStart, inCollection, inFlow, indent, lineStart, parent } = {}) {
+    this.atLineStart = atLineStart != null ? atLineStart : orig.lineStart || false
+    this.inCollection = inCollection != null ? inCollection : orig.inCollection || false
+    this.inFlow = inFlow != null ? inFlow : orig.inFlow || false
+    this.indent = indent != null ? indent : orig.indent
+    this.lineStart = lineStart != null ? lineStart : orig.lineStart
+    this.parent = parent != null ? parent : orig.parent || {}
+    this.src = orig.src
+  }
+
+  nodeStartsCollection (node) {
+    const { inCollection, inFlow, src, parent } = this
+    if (inCollection || inFlow) return false
+    if (node instanceof CollectionItem) return true
+    if (parent.type === Node.Type.MAP_KEY) return false
+    // check for implicit key
+    let offset = node.range.end
+    if (src[offset] === '\n') return false
+    offset = Node.endOfWhiteSpace(src, offset)
+    return src[offset] === ':'
+  }
+
+  // Anchor and tag are before type, which determines the node implementation
+  // class; hence this intermediate step.
+  parseProps (offset) {
+    const props = { anchor: null, tag: null, type: null }
+    const { src } = this
+    offset = Node.endOfWhiteSpace(src, offset)
+    let ch = src[offset]
+    while (ch === '&' || ch === '!' || ch === '\n') {
+      if (ch === '\n') {
+        const lineStart = offset + 1
+        const inEnd = Node.endOfIndent(src, lineStart)
+        if (inEnd <= lineStart + this.indent) break
+        this.atLineStart = true
+        this.lineStart = lineStart
+        offset = inEnd
+      } else {
+        const end = Node.endOfIdentifier(src, offset + 1)
+        const prop = ch === '&' ? 'anchor' : 'tag'
+        props[prop] = src.slice(offset + 1, end)
+        offset = Node.endOfWhiteSpace(src, end)
+      }
+      ch = src[offset]
+    }
+    props.type = ParseContext.parseType(src, offset)
+    trace: props, offset
+    return { props, valueStart: offset }
+  }
+
+  /**
+   * Parses a node from the source
+   * @param {ParseContext} overlay
+   * @param {number} start - Index of first non-whitespace character for the node
+   * @returns {?Node} - null if at a document boundary
+   */
+  parseNode = (overlay, start) => {
+    if (Node.atDocumentBoundary(this.src, start)) return null
+    const context = new ParseContext(this, overlay)
+    const { props, valueStart } = context.parseProps(start)
+    trace: 'START', props, { inCollection, inFlow, indent, lineStart }
+    let node
+    switch (props.type) {
+      case Node.Type.BLOCK_FOLDED:
+      case Node.Type.BLOCK_LITERAL:
+        node = new BlockValue(props)
+        break
+      case Node.Type.FLOW_MAP:
+      case Node.Type.FLOW_SEQ:
+        node = new FlowCollection(props)
+        break
+      case Node.Type.MAP_KEY:
+      case Node.Type.MAP_VALUE:
+      case Node.Type.SEQ_ITEM:
+        node = new CollectionItem(props)
+      break
+      case Node.Type.COMMENT:
+      case Node.Type.PLAIN:
+        node = new PlainValue(props)
+        break
+      default:
+        node = new Scalar(props)
+    }
+    let offset = node.parse(context, valueStart)
+    node.range = new Range(start, offset)
+    trace: node.type, { anchor: node.anchor, tag: node.tag, valueStart, indent, lineStart }, node.range, JSON.stringify(node.rawValue)
+    if (context.nodeStartsCollection(node)) {
+      trace: 'collection-start'
+      const collection = new Collection(node)
+      offset = collection.parse(context, node.range.end)
+      collection.range = new Range(start, offset)
+      trace: collection.type, collection.range, JSON.stringify(collection.rawValue)
+      return collection
+    }
+    return node
+  }
+}

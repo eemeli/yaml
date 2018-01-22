@@ -71,7 +71,7 @@ export default class Document extends Node {
   }
 
   parseContents (start) {
-    const { src } = this.context
+    const { parseNode, src } = this.context
     this.contents = []
     let lineStart = start
     while (src[lineStart - 1] === '-') lineStart -= 1
@@ -93,8 +93,8 @@ export default class Document extends Node {
         } break
         default: {
           const iEnd = Node.endOfIndent(src, offset)
-          const context = { atLineStart, indent: -1, inFlow: false, inCollection: false, lineStart, parent: this, src }
-          const node = this.context.parseNode(context, iEnd)
+          const context = { atLineStart, indent: -1, inFlow: false, inCollection: false, lineStart, parent: this }
+          const node = parseNode(context, iEnd)
           if (!node) return iEnd // at next document start
           this.contents.push(node)
           this.valueRange.end = node.valueRange.end
@@ -111,8 +111,8 @@ export default class Document extends Node {
 
   /**
    * @param {ParseContext} context
-   * @param {!number} start - Index of first character
-   * @returns {!number} - Index of the character after this
+   * @param {number} start - Index of first character
+   * @returns {number} - Index of the character after this
    */
   parse (context, start) {
     this.context = context

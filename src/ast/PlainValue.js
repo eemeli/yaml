@@ -58,9 +58,9 @@ export default class PlainValue extends Node {
    * ```
    * where block lines are empty or have an indent level greater than `indent`.
    *
-   * @param {!Object} context
-   * @param {!number} start - Index of first character
-   * @returns {!number} - Index of the character after this scalar, may be `\n`
+   * @param {ParseContext} context
+   * @param {number} start - Index of first character
+   * @returns {number} - Index of the character after this scalar, may be `\n`
    */
   parse (context, start) {
     this.context = context

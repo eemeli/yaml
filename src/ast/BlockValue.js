@@ -44,9 +44,9 @@ export default class BlockValue extends Node {
    * where the block style BS matches the regexp `[|>][-+1-9]*` and block lines
    * are empty or have an indent level greater than `indent`.
    *
-   * @param {!Object} context
-   * @param {!number} start - Index of first character
-   * @returns {!number} - Index of the character after this block
+   * @param {ParseContext} context
+   * @param {number} start - Index of first character
+   * @returns {number} - Index of the character after this block
    */
   parse (context, start) {
     this.context = context

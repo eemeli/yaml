@@ -40,8 +40,8 @@ export default class Scalar extends Node {
    * whitespace-separated #comment.
    *
    * @param {ParseContext} context
-   * @param {!number} start - Index of first character
-   * @returns {!number} - Index of the character after this scalar
+   * @param {number} start - Index of first character
+   * @returns {number} - Index of the character after this scalar
    */
   parse (context, start) {
     this.context = context

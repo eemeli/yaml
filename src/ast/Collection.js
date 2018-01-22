@@ -9,13 +9,13 @@ export default class Collection extends Node {
 
   /**
    * @param {ParseContext} context
-   * @param {!number} start - Index of first character
-   * @returns {!number} - Index of the character after this
+   * @param {number} start - Index of first character
+   * @returns {number} - Index of the character after this
    */
   parse (context, start) {
     trace: context, { start }
     this.context = context
-    const { inFlow, parseNode, src } = context
+    const { parseNode, src } = context
     let { lineStart } = context
     const firstItem = this.items[0]
     this.valueRange = Range.copy(firstItem.valueRange)
@@ -64,7 +64,7 @@ export default class Collection extends Node {
         break
       }
       trace: 'item-start', this.items.length, { ch: JSON.stringify(ch) }
-      const node = parseNode({ atLineStart, inCollection: true, inFlow, indent, lineStart, parent: this, src }, offset)
+      const node = parseNode({ atLineStart, inCollection: true, indent, lineStart, parent: this }, offset)
       if (!node) return offset // at next document start
       this.items.push(node)
       this.valueRange.end = node.valueRange.end
