@@ -34,7 +34,12 @@ export default class Node {
 
   static endOfIdentifier (src, offset) {
     let ch = src[offset]
-    while (ch && ch !== '\n' && ch !== '\t' && ch !== ' ') ch = src[offset += 1]
+    const isVerbatim = (ch === '<')
+    const notOk = isVerbatim
+      ? ['\n', '\t', ' ', '>']
+      : ['\n', '\t', ' ', '[', ']', '{', '}', ',']
+    while (ch && notOk.indexOf(ch) === -1) ch = src[offset += 1]
+    if (isVerbatim && ch === '>') offset += 1
     return offset
   }
 
