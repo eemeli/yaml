@@ -49,7 +49,7 @@ export default class FlowCollection extends Node {
         case '?':
         case ':': {
           const next = src[offset + 1]
-          if (next === '\n' || next === '\t' || next === ' ' || (
+          if (next === '\n' || next === '\t' || next === ' ' || next === ',' || (
             // in-flow : after JSON-like key does not need to be followed by whitespace
             ch === ':' && this.prevNodeIsJsonLike()
           )) {
