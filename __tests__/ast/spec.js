@@ -1246,8 +1246,8 @@ keep: |+\n\n`,
       tgt: [ { contents: [ { items: [
         { indicator: '-', item: '"flow in block"' },
         { indicator: '-', item: ' Block scalar\n' },
-        { indicator: '-', item: { tag: '!map', items: [
-          { comment: ' Block collection', rawValue: 'foo' },
+        { indicator: '-', item: { tag: '!map', comment: ' Block collection', items: [
+          'foo',
           { indicator: ':', item: 'bar' }
         ] } }
       ] } ] } ]

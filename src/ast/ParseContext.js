@@ -85,7 +85,7 @@ export default class ParseContext {
     const props = []
     offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
-    while (ch === Node.Prop.ANCHOR || ch === Node.Prop.TAG || ch === '\n') {
+    while (ch === Node.Prop.ANCHOR || ch === Node.Prop.COMMENT || ch === Node.Prop.TAG || ch === '\n') {
       if (ch === '\n') {
         const lineStart = offset + 1
         const inEnd = Node.endOfIndent(src, lineStart)
@@ -93,6 +93,10 @@ export default class ParseContext {
         this.atLineStart = true
         this.lineStart = lineStart
         offset = inEnd
+      } else if (ch === Node.Prop.COMMENT) {
+        const end = Node.endOfLine(src, offset + 1)
+        props.push(new Range(offset, end))
+        offset = end
       } else {
         const end = Node.endOfIdentifier(src, offset + 1)
         props.push(new Range(offset, end))
