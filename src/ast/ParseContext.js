@@ -68,13 +68,12 @@ export default class ParseContext {
   }
 
   nodeStartsCollection (node) {
-    const { inCollection, inFlow, src, parent } = this
+    const { inCollection, inFlow, src } = this
     if (inCollection || inFlow) return false
     if (node instanceof CollectionItem) return true
-    if (parent.type === Node.Type.MAP_KEY) return false
     // check for implicit key
     let offset = node.range.end
-    if (src[offset] === '\n') return false
+    if (src[offset] === '\n' || src[offset - 1] === '\n') return false
     offset = Node.endOfWhiteSpace(src, offset)
     return src[offset] === ':'
   }
