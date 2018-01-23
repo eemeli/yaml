@@ -2,6 +2,651 @@ import Node from '../../src/ast/Node'
 import parseStream from '../../src/ast/parseStream'
 
 const spec = {
+  '2.1. Collections': {
+    'Example 2.1. Sequence of Scalars': {
+      src:
+`- Mark McGwire
+- Sammy Sosa
+- Ken Griffey`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: 'Mark McGwire' },
+        { indicator: '-', item: 'Sammy Sosa' },
+        { indicator: '-', item: 'Ken Griffey' }
+      ] } ] } ]
+    },
+
+    'Example 2.2. Mapping Scalars to Scalars': {
+      src:
+`hr:  65    # Home runs
+avg: 0.278 # Batting average
+rbi: 147   # Runs Batted In`,
+      tgt: [ { contents: [ { items: [
+        'hr', { indicator: ':', item: { comment: ' Home runs', rawValue: '65' } },
+        'avg', { indicator: ':', item: { comment: ' Batting average', rawValue: '0.278' } },
+        'rbi', { indicator: ':', item: { comment: ' Runs Batted In', rawValue: '147' } }
+      ] } ] } ]
+    },
+
+    'Example 2.3. Mapping Scalars to Sequences': {
+      src:
+`american:
+  - Boston Red Sox
+  - Detroit Tigers
+  - New York Yankees
+national:
+  - New York Mets
+  - Chicago Cubs
+  - Atlanta Braves`,
+      tgt: [ { contents: [ { items: [
+        'american', { indicator: ':', item: { items: [
+          { indicator: '-', item: 'Boston Red Sox' },
+          { indicator: '-', item: 'Detroit Tigers' },
+          { indicator: '-', item: 'New York Yankees' }
+        ] } },
+        'national', { indicator: ':', item: { items: [
+          { indicator: '-', item: 'New York Mets' },
+          { indicator: '-', item: 'Chicago Cubs' },
+          { indicator: '-', item: 'Atlanta Braves' }
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 2.4. Sequence of Mappings': {
+      src:
+`-
+  name: Mark McGwire
+  hr:   65
+  avg:  0.278
+-
+  name: Sammy Sosa
+  hr:   63
+  avg:  0.288`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: { items: [
+          'name', { indicator: ':', item: 'Mark McGwire' },
+          'hr', { indicator: ':', item: '65' },
+          'avg', { indicator: ':', item: '0.278' }
+        ] } },
+        { indicator: '-', item: { items: [
+          'name', { indicator: ':', item: 'Sammy Sosa' },
+          'hr', { indicator: ':', item: '63' },
+          'avg', { indicator: ':', item: '0.288' }
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 2.5. Sequence of Sequences': {
+      src:
+`- [name        , hr, avg  ]
+- [Mark McGwire, 65, 0.278]
+- [Sammy Sosa  , 63, 0.288]`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '-', item: { items: [ '[', 'name', ',', 'hr', ',', 'avg', ']' ] } },
+        { indicator: '-', item: { items: [ '[', 'Mark McGwire', ',', '65', ',', '0.278', ']' ] } },
+        { indicator: '-', item: { items: [ '[', 'Sammy Sosa', ',', '63', ',', '0.288', ']' ] } }
+      ] } ] } ]
+    },
+
+    'Example 2.6. Mapping of Mappings': {
+      src:
+`Mark McGwire: {hr: 65, avg: 0.278}
+Sammy Sosa: {
+    hr: 63,
+    avg: 0.288
+  }`,
+      tgt: [ { contents: [ { items: [
+        'Mark McGwire', { indicator: ':', item: { items: [ '{', 'hr', ':', '65', ',', 'avg', ':', '0.278', '}' ] } },
+        'Sammy Sosa', { indicator: ':', item: { items: [ '{', 'hr', ':', '63', ',', 'avg', ':', '0.288', '}' ] } }
+      ] } ] } ]
+    },
+  },
+
+  '2.2. Structures': {
+    'Example 2.7. Two Documents in a Stream': {
+      src:
+`# Ranking of 1998 home runs
+---
+- Mark McGwire
+- Sammy Sosa
+- Ken Griffey
+
+# Team ranking
+---
+- Chicago Cubs
+- St Louis Cardinals`,
+      tgt: [
+        {
+          directives: [ { comment: ' Ranking of 1998 home runs' } ],
+          contents: [ { items: [
+            { indicator: '-', item: 'Mark McGwire' },
+            { indicator: '-', item: 'Sammy Sosa' },
+            { indicator: '-', item: 'Ken Griffey' },
+            { comment: ' Team ranking' }
+          ] } ]
+        }, {
+          contents: [ { items: [
+            { indicator: '-', item: 'Chicago Cubs' },
+            { indicator: '-', item: 'St Louis Cardinals' }
+          ] } ]
+        }
+      ]
+    },
+
+    'Example 2.8. Play by Play Feed': {
+      src:
+`---
+time: 20:03:20
+player: Sammy Sosa
+action: strike (miss)
+...
+---
+time: 20:03:47
+player: Sammy Sosa
+action: grand slam
+...`,
+      tgt: [
+        { contents: [ { items: [
+          'time', { indicator: ':', item: '20:03:20' },
+          'player', { indicator: ':', item: 'Sammy Sosa' },
+          'action', { indicator: ':', item: 'strike (miss)' }
+        ] } ] },
+        { contents: [ { items: [
+          'time', { indicator: ':', item: '20:03:47' },
+          'player', { indicator: ':', item: 'Sammy Sosa' },
+          'action', { indicator: ':', item: 'grand slam' }
+        ] } ] }
+      ]
+    },
+
+    'Example 2.9. Single Document with Two Comments': {
+      src:
+`---
+hr: # 1998 hr ranking
+  - Mark McGwire
+  - Sammy Sosa
+rbi:
+  # 1998 rbi ranking
+  - Sammy Sosa
+  - Ken Griffey`,
+      tgt: [ { contents: [ { items: [
+        'hr', { comment: ' 1998 hr ranking', indicator: ':', item: { items: [
+          { indicator: '-', item: 'Mark McGwire' },
+          { indicator: '-', item: 'Sammy Sosa' }
+        ] } },
+        'rbi', { comment: ' 1998 rbi ranking', indicator: ':', item: { items: [
+          { indicator: '-', item: 'Sammy Sosa' },
+          { indicator: '-', item: 'Ken Griffey' }
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 2.10. Node for “Sammy Sosa” appears twice in this document': {
+      src:
+`---
+hr:
+  - Mark McGwire
+  # Following node labeled SS
+  - &SS Sammy Sosa
+rbi:
+  - *SS # Subsequent occurrence
+  - Ken Griffey`,
+      tgt: [ { contents: [ { items: [
+        'hr', { indicator: ':', item: { items: [
+          { indicator: '-', item: 'Mark McGwire' },
+          { comment: ' Following node labeled SS' },
+          { indicator: '-', item: { anchor: 'SS', rawValue: 'Sammy Sosa' } }
+        ] } },
+        'rbi', { indicator: ':', item: { items: [
+          { indicator: '-', item: { comment: ' Subsequent occurrence', rawValue: 'SS' } },
+          { indicator: '-', item: 'Ken Griffey' }
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 2.11. Mapping between Sequences': {
+      src:
+`? - Detroit Tigers
+  - Chicago cubs
+:
+  - 2001-07-23
+
+? [ New York Yankees,
+    Atlanta Braves ]
+: [ 2001-07-02, 2001-08-12,
+    2001-08-14 ]`,
+      tgt: [ { contents: [ { items: [
+        { indicator: '?', item: { items: [
+          { indicator: '-', item: 'Detroit Tigers' },
+          { indicator: '-', item: 'Chicago cubs' }
+        ] } },
+        { indicator: ':', item: { items: [
+          { indicator: '-', item: '2001-07-23' }
+        ] } },
+        { indicator: '?', item: { items: [
+          '[', 'New York Yankees', ',', 'Atlanta Braves', ']'
+        ] } },
+        { indicator: ':', item: { items: [
+          '[', '2001-07-02', ',', '2001-08-12', ',', '2001-08-14', ']'
+        ] } }
+      ] } ] } ]
+    },
+
+    'Example 2.12. Compact Nested Mapping': {
+      src:
+`---
+# Products purchased
+- item    : Super Hoop
+  quantity: 1
+- item    : Basketball
+  quantity: 4
+- item    : Big Shoes
+  quantity: 1`,
+      tgt: [ { contents: [
+        { comment: ' Products purchased' },
+        { items: [
+          { indicator: '-', item: { items: [
+            'item', { indicator: ':', item: 'Super Hoop' },
+            'quantity', { indicator: ':', item: '1' }
+          ] } },
+          { indicator: '-', item: { items: [
+            'item', { indicator: ':', item: 'Basketball' },
+            'quantity', { indicator: ':', item: '4' }
+          ] } },
+          { indicator: '-', item: { items: [
+            'item', { indicator: ':', item: 'Big Shoes' },
+            'quantity', { indicator: ':', item: '1' }
+          ] } }
+        ] }
+      ] } ]
+    },
+  },
+
+  '2.3. Scalars': {
+    'Example 2.13. In literals, newlines are preserved': {
+      src:
+`# ASCII Art
+--- |
+  \\//||\\/||
+  // ||  ||__`,
+      tgt: [ {
+        directives: [ { comment: ' ASCII Art' } ],
+        contents: [ '  \\//||\\/||\n  // ||  ||__' ]
+      } ]
+    },
+
+    'Example 2.14. In the folded scalars, newlines become spaces': {
+      src:
+`--- >
+  Mark McGwire's
+  year was crippled
+  by a knee injury.`,
+      tgt: [ { contents: [ '  Mark McGwire\'s\n  year was crippled\n  by a knee injury.' ] } ]
+    },
+
+    'Example 2.15. Folded newlines are preserved for "more indented" and blank lines': {
+      src:
+`>
+ Sammy Sosa completed another
+ fine season with great stats.
+
+   63 Home Runs
+   0.288 Batting Average
+
+ What a year!`,
+      tgt:[ { contents: [ ' Sammy Sosa completed another\n fine season with great stats.\n\n   63 Home Runs\n   0.288 Batting Average\n\n What a year!' ] } ]
+    },
+
+    'Example 2.16. Indentation determines scope': {
+      src:
+`name: Mark McGwire
+accomplishment: >
+  Mark set a major league
+  home run record in 1998.
+stats: |
+  65 Home Runs
+  0.278 Batting Average`,
+      tgt: [ { contents: [ { items: [
+        'name', { indicator: ':', item: 'Mark McGwire' },
+        'accomplishment', { indicator: ':', item: '  Mark set a major league\n  home run record in 1998.\n' },
+        'stats', { indicator: ':', item: '  65 Home Runs\n  0.278 Batting Average' }
+      ] } ] } ]
+    },
+
+    'Example 2.17. Quoted Scalars': {
+      src:
+`unicode: "Sosa did fine.\u263A"
+control: "\b1998\t1999\t2000\n"
+hex esc: "\x0d\x0a is \r\n"
+
+single: '"Howdy!" he cried.'
+quoted: ' # Not a ''comment''.'
+tie-fighter: '|\-*-/|'`,
+      tgt: [ { contents: [ { items: [
+        'unicode', { indicator: ':', item: '"Sosa did fine.☺"' },
+        'control', { indicator: ':', item: '"\b1998\t1999\t2000\n"' },
+        'hex esc', { indicator: ':', item: '"\r\n is \r\n"' },
+        'single', { indicator: ':', item: '\'"Howdy!" he cried.\'' },
+        'quoted', { indicator: ':', item: '\' # Not a \'\'comment\'\'.\'' },
+        'tie-fighter', { indicator: ':', item: '\'|-*-/|\'' }
+      ] } ] } ]
+    },
+
+    'Example 2.18. Multi-line Flow Scalars': {
+      src:
+`plain:
+  This unquoted scalar
+  spans many lines.
+
+quoted: "So does this
+  quoted scalar.\n"`,
+      tgt: [ { contents: [ { items: [
+        'plain', { indicator: ':', item: 'This unquoted scalar\n  spans many lines.' },
+        'quoted', { indicator: ':', item: '"So does this\n  quoted scalar.\n"' }
+      ] } ] } ]
+    },
+  },
+
+  '2.4. Tags': {
+    'Example 2.19. Integers': {
+      src:
+`canonical: 12345
+decimal: +12345
+octal: 0o14
+hexadecimal: 0xC`,
+      tgt: [ { contents: [ { items: [
+        'canonical', { indicator: ':', item: '12345' },
+        'decimal', { indicator: ':', item: '+12345' },
+        'octal', { indicator: ':', item: '0o14' },
+        'hexadecimal', { indicator: ':', item: '0xC' }
+      ] } ] } ]
+    },
+
+    'Example 2.20. Floating Point': {
+      src:
+`canonical: 1.23015e+3
+exponential: 12.3015e+02
+fixed: 1230.15
+negative infinity: -.inf
+not a number: .NaN`,
+      tgt: [ { contents: [ { items: [
+        'canonical', { indicator: ':', item: '1.23015e+3' },
+        'exponential', { indicator: ':', item: '12.3015e+02' },
+        'fixed', { indicator: ':', item: '1230.15' },
+        'negative infinity', { indicator: ':', item: '-.inf' },
+        'not a number', { indicator: ':', item: '.NaN' }
+      ] } ] } ]
+    },
+
+    'Example 2.21. Miscellaneous': {
+      src:
+`null:
+booleans: [ true, false ]
+string: '012345'`,
+      tgt: [ { contents: [ { items: [
+        'null', { indicator: ':', item: null },
+        'booleans', { indicator: ':', item: { items: [ '[', 'true', ',', 'false', ']' ] } },
+        'string', { indicator: ':', item: '\'012345\'' }
+      ] } ] } ]
+    },
+
+    'Example 2.22. Timestamps': {
+      src:
+`canonical: 2001-12-15T02:59:43.1Z
+iso8601: 2001-12-14t21:59:43.10-05:00
+spaced: 2001-12-14 21:59:43.10 -5
+date: 2002-12-14`,
+      tgt: [ { contents: [ { items: [
+        'canonical', { indicator: ':', item: '2001-12-15T02:59:43.1Z' },
+        'iso8601', { indicator: ':', item: '2001-12-14t21:59:43.10-05:00' },
+        'spaced', { indicator: ':', item: '2001-12-14 21:59:43.10 -5' },
+        'date', { indicator: ':', item: '2002-12-14' }
+      ] } ] } ]
+    },
+
+    'Example 2.23. Various Explicit Tags': {
+      src:
+`---
+not-date: !!str 2002-04-28
+
+picture: !!binary |
+ R0lGODlhDAAMAIQAAP//9/X
+ 17unp5WZmZgAAAOfn515eXv
+ Pz7Y6OjuDg4J+fn5OTk6enp
+ 56enmleECcgggoBADs=
+
+application specific tag: !something |
+ The semantics of the tag
+ above may be different for
+ different documents.`,
+      tgt: [ { contents: [ { items: [
+        'not-date', { indicator: ':', item: { tag: '!str', rawValue: '2002-04-28' } },
+        'picture', { indicator: ':', item: { tag: '!binary', rawValue:
+          ' R0lGODlhDAAMAIQAAP//9/X\n 17unp5WZmZgAAAOfn515eXv\n Pz7Y6OjuDg4J+fn5OTk6enp\n 56enmleECcgggoBADs=\n\n'
+        } },
+        'application specific tag', { indicator: ':', item: { tag: 'something', rawValue:
+          ' The semantics of the tag\n above may be different for\n different documents.'
+        } }
+      ] } ] } ]
+    },
+
+    'Example 2.24. Global Tags': {
+      src:
+`%TAG ! tag:clarkevans.com,2002:
+--- !shape
+  # Use the ! handle for presenting
+  # tag:clarkevans.com,2002:circle
+- !circle
+  center: &ORIGIN {x: 73, y: 129}
+  radius: 7
+- !line
+  start: *ORIGIN
+  finish: { x: 89, y: 102 }
+- !label
+  start: *ORIGIN
+  color: 0xFFEEBB
+  text: Pretty vector drawing.`,
+      tgt: [ {
+        directives: [ 'TAG ! tag:clarkevans.com,2002:' ],
+        contents: [ {
+          tag: 'shape',
+          comment: ' Use the ! handle for presenting\n tag:clarkevans.com,2002:circle',
+          items: [
+            { indicator: '-', item: { tag: 'circle', items: [
+              'center', { indicator: ':', item: { anchor: 'ORIGIN', items: [
+                '{', 'x', ':', '73', ',', 'y', ':', '129', '}'
+              ] } },
+              'radius', { indicator: ':', item: '7' }
+            ] } },
+            { indicator: '-', item: { tag: 'line', items: [
+              'start', { indicator: ':', item: 'ORIGIN' },
+              'finish', { indicator: ':', item: { items: [ '{', 'x', ':', '89', ',', 'y', ':', '102', '}' ] } }
+            ] } },
+            { indicator: '-', item: { tag: 'label', items: [
+              'start', { indicator: ':', item: 'ORIGIN' },
+              'color', { indicator: ':', item: '0xFFEEBB' },
+              'text', { indicator: ':', item: 'Pretty vector drawing.' }
+            ] } }
+          ]
+        } ]
+      } ]
+    },
+
+    'Example 2.25. Unordered Sets': {
+      src:
+`# Sets are represented as a
+# Mapping where each key is
+# associated with a null value
+--- !!set
+? Mark McGwire
+? Sammy Sosa
+? Ken Griff`,
+      tgt: [ {
+        directives: [
+          { comment: ' Sets are represented as a' },
+          { comment: ' Mapping where each key is' },
+          { comment: ' associated with a null value' }
+        ],
+        contents: [ { tag: '!set', items: [
+          { indicator: '?', item: 'Mark McGwire' },
+          { indicator: '?', item: 'Sammy Sosa' },
+          { indicator: '?', item: 'Ken Griff' }
+        ] } ]
+      } ]
+    },
+
+    'Example 2.26. Ordered Mappings': {
+      src:
+`# Ordered maps are represented as
+# A sequence of mappings, with
+# each mapping having one key
+--- !!omap
+- Mark McGwire: 65
+- Sammy Sosa: 63
+- Ken Griffy: 58\n\n`,
+      tgt: [ {
+        directives: [
+          { comment: ' Ordered maps are represented as' },
+          { comment: ' A sequence of mappings, with' },
+          { comment: ' each mapping having one key' }
+        ],
+        contents: [ { tag: '!omap', items: [
+          { indicator: '-', item: { items: [ 'Mark McGwire', { indicator: ':', item: '65' } ] } },
+          { indicator: '-', item: { items: [ 'Sammy Sosa', { indicator: ':', item: '63' } ] } },
+          { indicator: '-', item: { items: [ 'Ken Griffy', { indicator: ':', item: '58' } ] } }
+        ] } ]
+      } ]
+    },
+  },
+
+  '2.5. Full Length Example': {
+    'Example 2.27. Invoice': {
+      src:
+`--- !<tag:clarkevans.com,2002:invoice>
+invoice: 34843
+date   : 2001-01-23
+bill-to: &id001
+    given  : Chris
+    family : Dumars
+    address:
+        lines: |
+            458 Walkman Dr.
+            Suite #292
+        city    : Royal Oak
+        state   : MI
+        postal  : 48046
+ship-to: *id001
+product:
+    - sku         : BL394D
+      quantity    : 4
+      description : Basketball
+      price       : 450.00
+    - sku         : BL4438H
+      quantity    : 1
+      description : Super Hoop
+      price       : 2392.00
+tax  : 251.42
+total: 4443.52
+comments:
+    Late afternoon is best.
+    Backup contact is Nancy
+    Billsmer @ 338-4338.`,
+      tgt: [ { contents: [ {
+        tag: '<tag:clarkevans.com,2002:invoice>',
+        items: [
+          'invoice', { indicator: ':', item: '34843' },
+          'date', { indicator: ':', item: '2001-01-23' },
+          'bill-to', { indicator: ':', item: { anchor: 'id001', items: [
+            'given', { indicator: ':', item: 'Chris' },
+            'family', { indicator: ':', item: 'Dumars' },
+            'address', { indicator: ':', item: { items: [
+              'lines', { indicator: ':', item: '            458 Walkman Dr.\n            Suite #292\n' },
+              'city', { indicator: ':', item: 'Royal Oak' },
+              'state', { indicator: ':', item: 'MI' },
+              'postal', { indicator: ':', item: '48046' }
+            ] } }
+          ] } },
+          'ship-to', { indicator: ':', item: 'id001' },
+          'product', { indicator: ':', item: { items: [
+            { indicator: '-', item: { items: [
+              'sku', { indicator: ':', item: 'BL394D' },
+              'quantity', { indicator: ':', item: '4' },
+              'description', { indicator: ':', item: 'Basketball' },
+              'price', { indicator: ':', item: '450.00' }
+            ] } },
+            { indicator: '-', item: { items: [
+              'sku', { indicator: ':', item: 'BL4438H' },
+              'quantity', { indicator: ':', item: '1' },
+              'description', { indicator: ':', item: 'Super Hoop' },
+              'price', { indicator: ':', item: '2392.00' }
+            ] } }
+          ] } },
+          'tax', { indicator: ':', item: '251.42' },
+          'total', { indicator: ':', item: '4443.52' },
+          'comments', { indicator: ':', item: 'Late afternoon is best.\n    Backup contact is Nancy\n    Billsmer @ 338-4338.' }
+        ]
+      } ] } ]
+    },
+
+    'Example 2.28. Log File': {
+      src:
+`---
+Time: 2001-11-23 15:01:42 -5
+User: ed
+Warning:
+  This is an error message
+  for the log file
+---
+Time: 2001-11-23 15:02:31 -5
+User: ed
+Warning:
+  A slightly different error
+  message.
+---
+Date: 2001-11-23 15:03:17 -5
+User: ed
+Fatal:
+  Unknown variable "bar"
+Stack:
+  - file: TopClass.py
+    line: 23
+    code: |
+      x = MoreObject("345\\n")
+  - file: MoreClass.py
+    line: 58
+    code: |-
+      foo = bar\n`,
+      tgt: [
+        { contents: [ { items: [
+          'Time', { indicator: ':', item: '2001-11-23 15:01:42 -5' },
+          'User', { indicator: ':', item: 'ed' },
+          'Warning', { indicator: ':', item: 'This is an error message\n  for the log file' }
+        ] } ] },
+        { contents: [ { items: [
+          'Time', { indicator: ':', item: '2001-11-23 15:02:31 -5' },
+          'User', { indicator: ':', item: 'ed' },
+          'Warning', { indicator: ':', item: 'A slightly different error\n  message.' }
+        ] } ] },
+        { contents: [ { items: [
+          'Date', { indicator: ':', item: '2001-11-23 15:03:17 -5' },
+          'User', { indicator: ':', item: 'ed' },
+          'Fatal', { indicator: ':', item: 'Unknown variable "bar"' },
+          'Stack', { indicator: ':', item: { items: [
+            { indicator: '-', item: { items: [
+              'file', { indicator: ':', item: 'TopClass.py' },
+              'line', { indicator: ':', item: '23' },
+              'code', { indicator: ':', item: '      x = MoreObject("345\\n")\n' }
+            ] } },
+            { indicator: '-', item: { items: [
+              'file', { indicator: ':', item: 'MoreClass.py' },
+              'line', { indicator: ':', item: '58' },
+              'code', { indicator: ':', item: '      foo = bar\n' }
+            ] } }
+          ] } }
+        ] } ] }
+      ]
+    },
+  },
+
   '5.3. Indicator Characters': {
     'Example 5.3. Block Structure Indicators': {
       src:
