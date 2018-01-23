@@ -770,7 +770,7 @@ omitted value:,
 : omitted key,
 }`,
       tgt: [ { contents: [ { items: [
-        '{', 'unquoted', ':', '"separate"', ',', 'http://foo.com', ',', 'omitted value:', ',', ':', 'omitted key', ',', '}'
+        '{', 'unquoted', ':', '"separate"', ',', 'http://foo.com', ',', 'omitted value', ':', ',', ':', 'omitted key', ',', '}'
       ] } ] } ]
     },
 
@@ -1148,7 +1148,7 @@ keep: |+\n\n`,
   - two # sequence
 - one: two # Compact mapping`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: '', comment: ' Empty' },
+        { indicator: '-', item: null, comment: ' Empty' },
         { indicator: '-', item: ' block node\n' },
         { indicator: '-', item: { items: [
           { indicator: '-', item: { comment: ' Compact', rawValue: 'one' } },
@@ -1202,7 +1202,7 @@ keep: |+\n\n`,
       tgt: [ { contents: [ { items: [
         'plain key',
         { indicator: ':', item: 'in-line value' },
-        { indicator: ':', item: { comment: ' Both empty' } },
+        { indicator: ':', item: null, comment: ' Both empty' },
         '"quoted key"',
         { indicator: ':', item: { items: [
           { indicator: '-', item: 'entry' }
@@ -1246,9 +1246,9 @@ keep: |+\n\n`,
       tgt: [ { contents: [ { items: [
         { indicator: '-', item: '"flow in block"' },
         { indicator: '-', item: ' Block scalar\n' },
-        { indicator: '-', item: { items: [
-          { tag: '!map', comment: ' Block collection', rawValue: 'foo' },
-          { indicator: ':', item: 'bar\n' }
+        { indicator: '-', item: { tag: '!map', items: [
+          { comment: ' Block collection', rawValue: 'foo' },
+          { indicator: ':', item: 'bar' }
         ] } }
       ] } ] } ]
     },
@@ -1265,7 +1265,7 @@ folded:
         'literal',
         { indicator: ':', item: '  value\n' },
         'folded',
-        { indicator: ':', item: { tag: 'foo', rawValue: 'value' } }
+        { indicator: ':', item: { tag: 'foo', rawValue: ' value' } }
       ] } ] } ]
     },
 
@@ -1398,10 +1398,12 @@ const testSpec = (res, exp) => {
     expect(res).toBeInstanceOf(Array)
     trace: 'test-array', exp
     exp.forEach((e, i) => testSpec(res[i], e))
-  } else {
+  } else if (exp) {
     expect(res).toBeInstanceOf(Object)
     trace: 'test-object', exp
     for (const key in exp) testSpec(res[key], exp[key])
+  } else {
+    expect(res).toBeNull()
   }
 }
 
