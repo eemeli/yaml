@@ -3,15 +3,15 @@ import Range from './Range'
 
 export default class Collection extends Node {
   constructor (firstItem) {
-    super({ type: Node.Type.COLLECTION })
+    super(Node.Type.COLLECTION)
     this.items = [firstItem]
-    if (firstItem.anchor) {
-      this.anchor = firstItem.anchor
-      firstItem.anchor = null
-    }
-    if (firstItem.tag) {
-      this.tag = firstItem.tag
-      firstItem.tag = null
+    for (let i = firstItem.props.length - 1; i >= 0; --i) {
+      if (firstItem.props[i].start < firstItem.context.lineStart) {
+        // props on previous line are assumed by the collection
+        this.props = firstItem.props.slice(0, i + 1)
+        firstItem.props = firstItem.props.splice(i)
+        break
+      }
     }
     firstItem.range.start = firstItem.valueRange.start
   }
@@ -37,7 +37,7 @@ export default class Collection extends Node {
     while (ch) {
       while (ch === '\n' || ch === '#') {
         if (ch === '#') {
-          const comment = new Node({ type: Node.Type.COMMENT }, { src })
+          const comment = new Node(Node.Type.COMMENT, null, { src })
           offset = comment.parseComment(offset)
           this.items.push(comment)
           this.valueRange.end = comment.commentRange.end

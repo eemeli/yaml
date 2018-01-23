@@ -9,8 +9,8 @@ export default class BlockValue extends Node {
     return offset
   }
 
-  constructor (props) {
-    super(props)
+  constructor (type, props) {
+    super(type, props)
     this.blockStyle = null
   }
 

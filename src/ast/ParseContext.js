@@ -81,8 +81,8 @@ export default class ParseContext {
   // Anchor and tag are before type, which determines the node implementation
   // class; hence this intermediate step.
   parseProps (offset) {
-    const props = { anchor: null, tag: null, type: null }
     const { inFlow, src } = this
+    const props = []
     offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
     while (ch === '&' || ch === '!' || ch === '\n') {
@@ -95,14 +95,13 @@ export default class ParseContext {
         offset = inEnd
       } else {
         const end = Node.endOfIdentifier(src, offset + 1)
-        const prop = ch === '&' ? 'anchor' : 'tag'
-        props[prop] = src.slice(offset + 1, end)
+        props.push(new Range(offset, end))
         offset = Node.endOfWhiteSpace(src, end)
       }
       ch = src[offset]
     }
-    props.type = ParseContext.parseType(src, offset, inFlow)
-    return { props, valueStart: offset }
+    const type = ParseContext.parseType(src, offset, inFlow)
+    return { props, type, valueStart: offset }
   }
 
   /**
@@ -114,29 +113,29 @@ export default class ParseContext {
   parseNode = (overlay, start) => {
     if (Node.atDocumentBoundary(this.src, start)) return null
     const context = new ParseContext(this, overlay)
-    const { props, valueStart } = context.parseProps(start)
-    trace: 'START', valueStart, props, context.pretty
+    const { props, type, valueStart } = context.parseProps(start)
+    trace: 'START', valueStart, type, props, context.pretty
     let node
-    switch (props.type) {
+    switch (type) {
       case Node.Type.BLOCK_FOLDED:
       case Node.Type.BLOCK_LITERAL:
-        node = new BlockValue(props)
+        node = new BlockValue(type, props)
         break
       case Node.Type.FLOW_MAP:
       case Node.Type.FLOW_SEQ:
-        node = new FlowCollection(props)
+        node = new FlowCollection(type, props)
         break
       case Node.Type.MAP_KEY:
       case Node.Type.MAP_VALUE:
       case Node.Type.SEQ_ITEM:
-        node = new CollectionItem(props)
+        node = new CollectionItem(type, props)
       break
       case Node.Type.COMMENT:
       case Node.Type.PLAIN:
-        node = new PlainValue(props)
+        node = new PlainValue(type, props)
         break
       default:
-        node = new Scalar(props)
+        node = new Scalar(type, props)
     }
     let offset = node.parse(context, valueStart)
     node.range = new Range(start, offset)

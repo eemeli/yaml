@@ -106,14 +106,28 @@ export default class Node {
       : Node.endOfWhiteSpace(src, offset)
   }
 
-  constructor ({ anchor, tag, type }, context) {
+  constructor (type, props, context) {
     this.context = context || null
     this.range = null
     this.valueRange = null
     this.commentRange = null
-    this.anchor = anchor || null
-    this.tag = typeof tag === 'string' ? tag : null
+    this.props = props || []
     this.type = type
+  }
+
+  getPropValue (idx, key) {
+    if (!this.context) return null
+    const { src } = this.context
+    const prop = this.props[idx]
+    return prop && (src[prop.start] === key) ? src.slice(prop.start + 1, prop.end) : null
+  }
+
+  get anchor () {
+    for (let i = 0; i < this.props.length; ++i) {
+      const anchor = this.getPropValue(i, '&')
+      if (anchor != null) return anchor
+    }
+    return null
   }
 
   get comment () {
@@ -136,6 +150,14 @@ export default class Node {
     if (!this.valueRange || !this.context) return null
     const { start, end } = this.valueRange
     return this.context.src.slice(start, end)
+  }
+
+  get tag () {
+    for (let i = 0; i < this.props.length; ++i) {
+      const tag = this.getPropValue(i, '!')
+      if (tag != null) return tag
+    }
+    return null
   }
 
   parseComment (offset) {

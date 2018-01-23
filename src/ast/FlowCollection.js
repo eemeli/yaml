@@ -2,8 +2,8 @@ import Node from './Node'
 import Range from './Range'
 
 export default class FlowCollection extends Node {
-  constructor (props) {
-    super(props)
+  constructor (type, props) {
+    super(type, props)
     this.items = null
   }
 
@@ -42,7 +42,7 @@ export default class FlowCollection extends Node {
           offset += 1
         } break
         case '#': {
-          const comment = new Node({ type: Node.Type.COMMENT }, { src })
+          const comment = new Node(Node.Type.COMMENT, null, { src })
           offset = comment.parseComment(offset)
           this.items.push(comment)
         } break

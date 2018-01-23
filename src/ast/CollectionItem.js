@@ -2,8 +2,8 @@ import Node from './Node'
 import Range from './Range'
 
 export default class CollectionItem extends Node {
-  constructor (props) {
-    super(props)
+  constructor (type, props) {
+    super(type, props)
     this.indicator = null
     this.item = null
   }

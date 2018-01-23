@@ -31,7 +31,7 @@ export default class Document extends Node {
   }
 
   constructor () {
-    super({ type: Node.Type.DOCUMENT })
+    super(Node.Type.DOCUMENT)
     this.directives = null
     this.contents = null
   }
@@ -47,14 +47,14 @@ export default class Document extends Node {
           offset += 1
           break
         case '#': {
-          const comment = new Node({ type: Node.Type.COMMENT }, { src })
+          const comment = new Node(Node.Type.COMMENT, null, { src })
           offset = comment.parseComment(offset)
           this.directives.push(comment)
           trace: 'directive-comment', comment.commentRange, JSON.stringify(comment.comment)
         } break
         case '%': {
           const dirStart = offset
-          const directive = new Node({ type: Node.Type.DIRECTIVE }, { parent: this, src })
+          const directive = new Node(Node.Type.DIRECTIVE, null, { parent: this, src })
           offset = Document.endOfDirective(src, offset + 1)
           directive.valueRange = new Range(dirStart + 1, offset)
           offset = Node.endOfWhiteSpace(src, offset)
@@ -86,7 +86,7 @@ export default class Document extends Node {
           atLineStart = true
           break
         case '#': {
-          const comment = new Node({ type: Node.Type.COMMENT }, { src })
+          const comment = new Node(Node.Type.COMMENT, null, { src })
           offset = comment.parseComment(offset)
           this.contents.push(comment)
           trace: 'content-comment', comment.commentRange, JSON.stringify(comment.comment)
