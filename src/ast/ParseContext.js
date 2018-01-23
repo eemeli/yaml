@@ -17,7 +17,7 @@ import Scalar from './Scalar'
  * @param {string} src - Source of the YAML document
  */
 export default class ParseContext {
-  static parseType (src, offset) {
+  static parseType (src, offset, inFlow) {
     switch (src[offset]) {
       case '*':
         return Node.Type.ALIAS
@@ -32,11 +32,11 @@ export default class ParseContext {
       case '[':
         return Node.Type.FLOW_SEQ
       case '?':
-        return Node.atBlank(src, offset + 1) ? Node.Type.MAP_KEY : Node.Type.PLAIN
+        return !inFlow && Node.atBlank(src, offset + 1) ? Node.Type.MAP_KEY : Node.Type.PLAIN
       case ':':
-        return Node.atBlank(src, offset + 1) ? Node.Type.MAP_VALUE : Node.Type.PLAIN
+        return !inFlow && Node.atBlank(src, offset + 1) ? Node.Type.MAP_VALUE : Node.Type.PLAIN
       case '-':
-        return Node.atBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
+        return !inFlow && Node.atBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
       case "'":
         return Node.Type.SINGLE
       default:
@@ -82,7 +82,7 @@ export default class ParseContext {
   // class; hence this intermediate step.
   parseProps (offset) {
     const props = { anchor: null, tag: null, type: null }
-    const { src } = this
+    const { inFlow, src } = this
     offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
     while (ch === '&' || ch === '!' || ch === '\n') {
@@ -101,7 +101,7 @@ export default class ParseContext {
       }
       ch = src[offset]
     }
-    props.type = ParseContext.parseType(src, offset)
+    props.type = ParseContext.parseType(src, offset, inFlow)
     return { props, valueStart: offset }
   }
 
