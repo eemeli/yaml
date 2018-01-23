@@ -271,7 +271,7 @@ Not indented:
   value\n`,
       tgt: [{ contents: [{ items: [
         'key',
-        { indicator: ':', comment: ' Comment\n        # lines', item: 'value' }
+        { indicator: ':', comment: ' Comment\n lines', item: 'value' }
       ] }] }]
     },
 

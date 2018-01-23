@@ -75,7 +75,7 @@ export default class PlainValue extends Node {
     offset = Node.endOfWhiteSpace(src, offset)
     offset = this.parseComment(offset)
     trace: 'first line', { valueRange: this.valueRange, comment: this.comment }, JSON.stringify(this.rawValue)
-    if (!this.commentRange || this.valueRange.isEmpty) {
+    if (!this.hasComment || this.valueRange.isEmpty) {
       offset = this.parseBlockValue(offset)
     }
     trace: this.type, { offset, valueRange: this.valueRange }, JSON.stringify(this.rawValue)

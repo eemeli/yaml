@@ -9,11 +9,12 @@ export default class Collection extends Node {
       if (firstItem.props[i].start < firstItem.context.lineStart) {
         // props on previous line are assumed by the collection
         this.props = firstItem.props.slice(0, i + 1)
-        firstItem.props = firstItem.props.splice(i)
+        firstItem.props = firstItem.props.slice(i + 1)
+        const itemRange = firstItem.props[0] || firstItem.valueRange
+        firstItem.range.start = itemRange.start
         break
       }
     }
-    firstItem.range.start = firstItem.valueRange.start
   }
 
   /**
@@ -40,7 +41,7 @@ export default class Collection extends Node {
           const comment = new Node(Node.Type.COMMENT, null, { src })
           offset = comment.parseComment(offset)
           this.items.push(comment)
-          this.valueRange.end = comment.commentRange.end
+          this.valueRange.end = offset
           if (offset >= src.length) {
             ch = null
             break

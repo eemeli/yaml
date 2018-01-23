@@ -2,6 +2,11 @@ import Range from './Range'
 
 /** Root class of all nodes */
 export default class Node {
+  static Prop = {
+    ANCHOR: '&',
+    COMMENT: '#',
+    TAG: '!'
+  }
   static Type = {
     ALIAS: 'ALIAS',
     BLOCK_FOLDED: 'BLOCK_FOLDED',
@@ -110,7 +115,6 @@ export default class Node {
     this.context = context || null
     this.range = null
     this.valueRange = null
-    this.commentRange = null
     this.props = props || []
     this.type = type
   }
@@ -124,16 +128,29 @@ export default class Node {
 
   get anchor () {
     for (let i = 0; i < this.props.length; ++i) {
-      const anchor = this.getPropValue(i, '&')
+      const anchor = this.getPropValue(i, Node.Prop.ANCHOR)
       if (anchor != null) return anchor
     }
     return null
   }
 
   get comment () {
-    if (!this.commentRange || !this.context) return null
-    const { start, end } = this.commentRange
-    return this.context.src.slice(start, end)
+    const comments = []
+    for (let i = 0; i < this.props.length; ++i) {
+      const comment = this.getPropValue(i, Node.Prop.COMMENT)
+      if (comment != null) comments.push(comment)
+    }
+    return comments.length > 0 ? comments.join('\n') : null
+  }
+
+  get hasComment () {
+    if (this.context) {
+      const { src } = this.context
+      for (let i = 0; i < this.props.length; ++i) {
+        if (src[this.props[i].start] === Node.Prop.COMMENT) return true
+      }
+    }
+    return false
   }
 
   get jsonLike () {
@@ -154,22 +171,22 @@ export default class Node {
 
   get tag () {
     for (let i = 0; i < this.props.length; ++i) {
-      const tag = this.getPropValue(i, '!')
+      const tag = this.getPropValue(i, Node.Prop.TAG)
       if (tag != null) return tag
     }
     return null
   }
 
-  parseComment (offset) {
+  parseComment (start) {
     const { src } = this.context
-    if (src[offset] === '#') {
-      const start = offset + 1
-      const end = Node.endOfLine(src, start)
-      this.commentRange = new Range(start, end)
-      trace: this.commentRange, src.slice(this.commentRange.start, this.commentRange.end)
+    if (src[start] === Node.Prop.COMMENT) {
+      const end = Node.endOfLine(src, start + 1)
+      const commentRange = new Range(start, end)
+      this.props.push(commentRange)
+      trace: commentRange, JSON.stringify(this.getPropValue(this.props.length - 1, Node.Prop.COMMENT))
       return end
     }
-    return offset
+    return start
   }
 
 }

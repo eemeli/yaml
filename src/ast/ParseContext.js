@@ -85,7 +85,7 @@ export default class ParseContext {
     const props = []
     offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
-    while (ch === '&' || ch === '!' || ch === '\n') {
+    while (ch === Node.Prop.ANCHOR || ch === Node.Prop.TAG || ch === '\n') {
       if (ch === '\n') {
         const lineStart = offset + 1
         const inEnd = Node.endOfIndent(src, lineStart)

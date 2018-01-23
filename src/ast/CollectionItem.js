@@ -25,12 +25,9 @@ export default class CollectionItem extends Node {
     while (ch === '\n' || ch === '#') {
       const next = offset + 1
       if (ch === '#') {
-        offset = Node.endOfLine(src, next)
-        if (this.commentRange) {
-          this.commentRange.end = offset
-        } else {
-          this.commentRange = new Range(next, offset)
-        }
+        const end = Node.endOfLine(src, next)
+        this.props.push(new Range(offset, end))
+        offset = end
       } else {
         atLineStart = true
         lineStart = next

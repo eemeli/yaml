@@ -50,7 +50,7 @@ export default class Document extends Node {
           const comment = new Node(Node.Type.COMMENT, null, { src })
           offset = comment.parseComment(offset)
           this.directives.push(comment)
-          trace: 'directive-comment', comment.commentRange, JSON.stringify(comment.comment)
+          trace: 'directive-comment', comment.comment
         } break
         case '%': {
           const dirStart = offset
@@ -61,7 +61,7 @@ export default class Document extends Node {
           offset = directive.parseComment(offset)
           directive.range = new Range(dirStart, offset)
           this.directives.push(directive)
-          trace: 'directive', { valueRange: directive.valueRange, commentRange: directive.commentRange }, JSON.stringify(directive.rawValue)
+          trace: 'directive', { valueRange: directive.valueRange, comment: directive.comment }, JSON.stringify(directive.rawValue)
         } break
         default:
           return offset
@@ -89,7 +89,7 @@ export default class Document extends Node {
           const comment = new Node(Node.Type.COMMENT, null, { src })
           offset = comment.parseComment(offset)
           this.contents.push(comment)
-          trace: 'content-comment', comment.commentRange, JSON.stringify(comment.comment)
+          trace: 'content-comment', comment.comment
         } break
         default: {
           const iEnd = Node.endOfIndent(src, offset)
@@ -101,7 +101,7 @@ export default class Document extends Node {
           if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
           offset = node.range.end
           atLineStart = false
-          trace: 'content-node', { valueRange: node.valueRange, commentRange: node.commentRange }, JSON.stringify(node.rawValue)
+          trace: 'content-node', { valueRange: node.valueRange, comment: node.comment }, JSON.stringify(node.rawValue)
         }
       }
       offset = Document.startCommentOrEndBlankLine(src, offset)
