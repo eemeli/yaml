@@ -5,6 +5,15 @@ export default class Collection extends Node {
   constructor (firstItem) {
     super({ type: Node.Type.COLLECTION })
     this.items = [firstItem]
+    if (firstItem.anchor) {
+      this.anchor = firstItem.anchor
+      firstItem.anchor = null
+    }
+    if (firstItem.tag) {
+      this.tag = firstItem.tag
+      firstItem.tag = null
+    }
+    firstItem.range.start = firstItem.valueRange.start
   }
 
   /**
