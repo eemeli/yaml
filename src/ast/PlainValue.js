@@ -29,7 +29,7 @@ export default class PlainValue extends Node {
       if (Node.atDocumentBoundary(src, offset)) break
       const end = Node.endOfBlockIndent(src, indent, offset)
       if (end === null) break
-      offset = PlainValue.endOfLine(src, end, false, inFlow)
+      offset = PlainValue.endOfLine(src, end, inFlow)
     }
     if (this.valueRange.isEmpty) this.valueRange.start = start
     this.valueRange.end = offset
