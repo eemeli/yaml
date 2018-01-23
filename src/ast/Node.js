@@ -92,6 +92,12 @@ export default class Node {
     return (ch === '?' || ch === ':' || ch === '-') && Node.atBlank(src, offset + 1)
   }
 
+  static nextNodeIsIndented (ch, indentDiff) {
+    if (!ch || indentDiff < 0) return false
+    if (indentDiff > 0) return true
+    return ch === '-' || ch === '?' || ch === ':'
+  }
+
   // should be at line or string end, or at next non-whitespace char
   static normalizeOffset (src, offset) {
     const ch = src[offset]

@@ -89,7 +89,7 @@ export default class ParseContext {
       if (ch === '\n') {
         const lineStart = offset + 1
         const inEnd = Node.endOfIndent(src, lineStart)
-        if (inEnd <= lineStart + this.indent) break
+        if (!Node.nextNodeIsIndented(src[inEnd], inEnd - (lineStart + this.indent))) break
         this.atLineStart = true
         this.lineStart = lineStart
         offset = inEnd

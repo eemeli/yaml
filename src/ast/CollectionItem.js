@@ -2,12 +2,6 @@ import Node from './Node'
 import Range from './Range'
 
 export default class CollectionItem extends Node {
-  static nextNodeIsIndented (ch, indentDiff) {
-    if (!ch || indentDiff < 0) return false
-    if (indentDiff > 0) return true
-    return ch === '-' || ch === '?' || ch === ':'
-  }
-
   constructor (props) {
     super(props)
     this.indicator = null
@@ -47,7 +41,7 @@ export default class CollectionItem extends Node {
       ch = src[offset]
     }
     trace: 'item-parse?', { offset, atLineStart, lineStart, indent, ch: ch && JSON.stringify(ch) }
-    if (CollectionItem.nextNodeIsIndented(ch, offset - (lineStart + indent))) {
+    if (Node.nextNodeIsIndented(ch, offset - (lineStart + indent))) {
       this.item = parseNode({ atLineStart, inCollection: false, indent, lineStart, parent: this }, offset)
       if (this.item) offset = this.item.range.end
     } else if (lineStart > start + 1) {
