@@ -1,3 +1,4 @@
+import Comment from './Comment'
 import Node from './Node'
 import Range from './Range'
 
@@ -38,10 +39,8 @@ export default class Collection extends Node {
     while (ch) {
       while (ch === '\n' || ch === '#') {
         if (ch === '#') {
-          const comment = new Node(Node.Type.COMMENT, null, { src })
-          const cEnd = comment.parseComment(offset)
-          comment.range = new Range(offset, cEnd)
-          offset = cEnd
+          const comment = new Comment()
+          offset = comment.parse({ src }, offset)
           this.items.push(comment)
           this.valueRange.end = offset
           if (offset >= src.length) {

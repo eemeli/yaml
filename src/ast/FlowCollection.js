@@ -1,3 +1,4 @@
+import Comment from './Comment'
 import Node from './Node'
 import Range from './Range'
 
@@ -42,11 +43,9 @@ export default class FlowCollection extends Node {
           offset += 1
         } break
         case '#': {
-          const comment = new Node(Node.Type.COMMENT, null, { src })
-          const cEnd = comment.parseComment(offset)
-          comment.range = new Range(offset, cEnd)
+          const comment = new Comment()
+          offset = comment.parse({ src }, offset)
           this.items.push(comment)
-          offset = cEnd
         } break
         case '?':
         case ':': {

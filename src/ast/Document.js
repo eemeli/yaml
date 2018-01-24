@@ -1,3 +1,4 @@
+import Comment from './Comment'
 import Node from './Node'
 import Range from './Range'
 
@@ -48,9 +49,8 @@ export default class Document extends Node {
           offset += 1
           break
         case '#': {
-          const comment = new Node(Node.Type.COMMENT, null, { src })
-          offset = comment.parseComment(offset)
-          comment.range = new Range(dirStart, offset)
+          const comment = new Comment()
+          offset = comment.parse({ src }, offset)
           this.directives.push(comment)
           trace: 'directive-comment', comment.comment
         } break
@@ -87,11 +87,9 @@ export default class Document extends Node {
           atLineStart = true
           break
         case '#': {
-          const comment = new Node(Node.Type.COMMENT, null, { src })
-          const cEnd = comment.parseComment(offset)
-          comment.range = new Range(offset, cEnd)
+          const comment = new Comment()
+          offset = comment.parse({ src }, offset)
           this.contents.push(comment)
-          offset = cEnd
           trace: 'content-comment', comment.comment
         } break
         default: {
