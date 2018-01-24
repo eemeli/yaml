@@ -270,7 +270,7 @@ rbi:
   // ||  ||__`,
       tgt: [ {
         directives: [ { comment: ' ASCII Art' } ],
-        contents: [ '  \\//||\\/||\n  // ||  ||__' ]
+        contents: [ '  \\//||\\/||\n  // ||  ||__\n' ]
       } ]
     },
 
@@ -280,7 +280,7 @@ rbi:
   Mark McGwire's
   year was crippled
   by a knee injury.`,
-      tgt: [ { contents: [ '  Mark McGwire\'s\n  year was crippled\n  by a knee injury.' ] } ]
+      tgt: [ { contents: [ '  Mark McGwire\'s\n  year was crippled\n  by a knee injury.\n' ] } ]
     },
 
     'Example 2.15. Folded newlines are preserved for "more indented" and blank lines': {
@@ -293,7 +293,7 @@ rbi:
    0.288 Batting Average
 
  What a year!`,
-      tgt:[ { contents: [ ' Sammy Sosa completed another\n fine season with great stats.\n\n   63 Home Runs\n   0.288 Batting Average\n\n What a year!' ] } ]
+      tgt:[ { contents: [ ' Sammy Sosa completed another\n fine season with great stats.\n\n   63 Home Runs\n   0.288 Batting Average\n\n What a year!\n' ] } ]
     },
 
     'Example 2.16. Indentation determines scope': {
@@ -308,7 +308,7 @@ stats: |
       tgt: [ { contents: [ { items: [
         'name', { indicator: ':', item: 'Mark McGwire' },
         'accomplishment', { indicator: ':', item: '  Mark set a major league\n  home run record in 1998.\n' },
-        'stats', { indicator: ':', item: '  65 Home Runs\n  0.278 Batting Average' }
+        'stats', { indicator: ':', item: '  65 Home Runs\n  0.278 Batting Average\n' }
       ] } ] } ]
     },
 
@@ -424,7 +424,7 @@ application specific tag: !something |
           ' R0lGODlhDAAMAIQAAP//9/X\n 17unp5WZmZgAAAOfn515eXv\n Pz7Y6OjuDg4J+fn5OTk6enp\n 56enmleECcgggoBADs=\n\n'
         } },
         'application specific tag', { indicator: ':', item: { tag: 'something', rawValue:
-          ' The semantics of the tag\n above may be different for\n different documents.'
+          ' The semantics of the tag\n above may be different for\n different documents.\n'
         } }
       ] } ] } ]
     },
@@ -779,7 +779,7 @@ block:\t|
           'quoted',
           { indicator: ':', item: '"Quoted \t"' },
           'block',
-          { indicator: ':', item: '  void main() {\n  \tprintf("Hello, world!\\n");\n  }' }
+          { indicator: ':', item: '  void main() {\n  \tprintf("Hello, world!\\n");\n  }\n' }
         ]}]
       }]
     },
@@ -1525,7 +1525,7 @@ foo: bar
         { indicator: '-', item: { comment: ' Empty header', rawValue: ' literal\n' } },
         { indicator: '-', item: { comment: ' Indentation indicator', rawValue: '  folded\n' } },
         { indicator: '-', item: { comment: ' Chomping indicator', rawValue: ' keep\n\n' } },
-        { indicator: '-', item: { comment: ' Both indicators', rawValue: '  strip' } }
+        { indicator: '-', item: { comment: ' Both indicators', rawValue: '  strip\n' } }
       ] } ] } ]
     },
 
@@ -1546,7 +1546,7 @@ foo: bar
         { indicator: '-', item: ' detected\n' },
         { indicator: '-', item: '\n\n  # detected\n' },
         { indicator: '-', item: '  explicit\n' },
-        { indicator: '-', item: ' \t\n detected' }
+        { indicator: '-', item: ' \t\n detected\n' }
       ] } ] } ]
     },
 
@@ -1563,7 +1563,7 @@ foo: bar
       tgt: [ { contents: [ { items: [
         { indicator: '-', item: '\n text\n' },
         { indicator: '-', item: '  text\n text\n' },
-        { indicator: '-', item: ' text' }
+        { indicator: '-', item: ' text\n' }
       ] } ] } ]
       // ERROR: A leading all-space line must not have too many spaces.
       // ERROR: A following text line must not be less indented.
@@ -1618,7 +1618,7 @@ keep: |+
           'clip',
           { indicator: ':', item: '  # text\n\n # Keep\n  # comments:\n\n' },
           'keep',
-          { indicator: ':', item: '  # text\n\n # Trail\n  # comments.' }
+          { indicator: ':', item: '  # text\n\n # Trail\n  # comments.\n' }
         ] } ]
       } ]
     },
@@ -1661,7 +1661,7 @@ keep: |+\n\n`,
   text
 
  # Comment`,
-      tgt: [ { contents: [ '\n\n  literal\n\n\n  text\n\n # Comment' ] } ]
+      tgt: [ { contents: [ '\n\n  literal\n\n\n  text\n\n # Comment\n' ] } ]
     },
   },
 
@@ -1693,7 +1693,7 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment'
+        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment\n'
       ] } ]
     },
 
@@ -1716,7 +1716,7 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment'
+        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment\n'
       ] } ]
     },
 
@@ -1739,7 +1739,7 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n# Comment'
+        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n# Comment\n'
       ] } ]
     },
 
@@ -1761,7 +1761,7 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        ' folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n# Comment'
+        ' folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n# Comment\n'
       ] } ]
     },
   },
@@ -1910,7 +1910,7 @@ folded:
         'literal',
         { indicator: ':', item: '  value\n' },
         'folded',
-        { indicator: ':', item: { tag: 'foo', rawValue: ' value' } }
+        { indicator: ':', item: { tag: 'foo', rawValue: ' value\n' } }
       ] } ] } ]
     },
 
@@ -1971,7 +1971,7 @@ document
       }, {
         directives: [{ comment: ' No document' }]
       }, {
-        contents: ['%!PS-Adobe-2.0 # Not the first line']
+        contents: ['%!PS-Adobe-2.0 # Not the first line\n']
       }]
     },
 

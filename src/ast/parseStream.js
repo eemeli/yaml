@@ -10,6 +10,6 @@ export default function parseStream (src) {
     offset = doc.parse(context, offset)
     documents.push(doc)
   }
-  documents.toString = () => documents.join('\n...\n')
+  documents.toString = () => documents.join('...\n')
   return documents
 }

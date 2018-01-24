@@ -134,6 +134,8 @@ export default class Document extends Node {
       contents.length > 0 && contents[0].type === Node.Type.COMMENT
     )
     const prefix = includeDirEndLine ? directives.concat('---') : []
-    return prefix.concat(contents).join('\n')
+    let str = prefix.concat(contents).join('\n')
+    if (str[str.length - 1] !== '\n') str += '\n'
+    return str
   }
 }

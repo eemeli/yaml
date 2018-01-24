@@ -14,6 +14,12 @@ export default class BlockValue extends Node {
     this.blockStyle = null
   }
 
+  // a block value should always end with '\n'
+  get rawValue () {
+    const str = super.rawValue
+    return str[str.length - 1] === '\n' ? str : str + '\n'
+  }
+
   parseBlockValue (start) {
     const { indent, inFlow, src } = this.context
     let offset = start
@@ -59,5 +65,10 @@ export default class BlockValue extends Node {
     offset = this.parseBlockValue(offset)
     trace: this.type, { style: this.blockStyle, valueRange: this.valueRange, comment: this.comment }, JSON.stringify(this.rawValue)
     return offset
+  }
+
+  toString () {
+    const str = super.toString()
+    return str[str.length - 1] === '\n' ? str : str + '\n'
   }
 }
