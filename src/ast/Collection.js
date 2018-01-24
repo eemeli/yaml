@@ -39,7 +39,9 @@ export default class Collection extends Node {
       while (ch === '\n' || ch === '#') {
         if (ch === '#') {
           const comment = new Node(Node.Type.COMMENT, null, { src })
-          offset = comment.parseComment(offset)
+          const cEnd = comment.parseComment(offset)
+          comment.range = new Range(offset, cEnd)
+          offset = cEnd
           this.items.push(comment)
           this.valueRange.end = offset
           if (offset >= src.length) {
