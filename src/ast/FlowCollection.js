@@ -68,8 +68,6 @@ export default class FlowCollection extends Node {
             return offset
           }
           this.items.push(node)
-          // FIXME: prevents infinite loop
-          if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
           offset = Node.normalizeOffset(src, node.range.end)
         }
       }

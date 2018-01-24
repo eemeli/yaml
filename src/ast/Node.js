@@ -119,6 +119,7 @@ export default class Node {
 
   constructor (type, props, context) {
     this.context = context || null
+    this.error = null
     this.range = null
     this.valueRange = null
     this.props = props || []

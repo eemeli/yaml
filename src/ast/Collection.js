@@ -80,7 +80,6 @@ export default class Collection extends Node {
       if (!node) return offset // at next document start
       this.items.push(node)
       this.valueRange.end = node.valueRange.end
-      if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
       offset = Node.normalizeOffset(src, node.range.end)
       ch = src[offset]
       atLineStart = false

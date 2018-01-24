@@ -59,7 +59,8 @@ export default class Scalar extends Node {
         offset = Scalar.endOfSingleQuote(src, start + 1)
         break
       default:
-        throw new Error(`Unknown node type: ${JSON.stringify(this.type)}`)
+        this.error = new Error(`Unknown node type: ${JSON.stringify(this.type)}`)
+        offset = start + 1
     }
     this.valueRange = new Range(start, offset)
     offset = Node.endOfWhiteSpace(src, offset)

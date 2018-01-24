@@ -99,7 +99,6 @@ export default class Document extends Node {
           if (!node) return iEnd // at next document start
           this.contents.push(node)
           this.valueRange.end = node.valueRange.end
-          if (node.range.end <= offset) throw new Error(`empty node ${node.type} ${JSON.stringify(node.range)}`)
           offset = node.range.end
           atLineStart = false
           trace: 'content-node', { valueRange: node.valueRange, comment: node.comment }, JSON.stringify(node.rawValue)
