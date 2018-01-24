@@ -52,10 +52,10 @@ export default class Scalar extends Node {
         start += 1
         offset = Node.endOfIdentifier(src, start)
         break
-      case Node.Type.DOUBLE:
+      case Node.Type.QUOTE_DOUBLE:
         offset = Scalar.endOfDoubleQuote(src, start + 1)
         break
-      case Node.Type.SINGLE:
+      case Node.Type.QUOTE_SINGLE:
         offset = Scalar.endOfSingleQuote(src, start + 1)
         break
       default:

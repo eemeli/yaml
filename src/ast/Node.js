@@ -15,14 +15,14 @@ export default class Node {
     COMMENT: 'COMMENT',
     DIRECTIVE: 'DIRECTIVE',
     DOCUMENT: 'DOCUMENT',
-    DOUBLE: 'DOUBLE',
     FLOW_MAP: 'FLOW_MAP',
     FLOW_SEQ: 'FLOW_SEQ',
     MAP_KEY: 'MAP_KEY',
     MAP_VALUE: 'MAP_VALUE',
     PLAIN: 'PLAIN',
-    SEQ_ITEM: 'SEQ_ITEM',
-    SINGLE: 'SINGLE'
+    QUOTE_DOUBLE: 'QUOTE_DOUBLE',
+    QUOTE_SINGLE: 'QUOTE_SINGLE',
+    SEQ_ITEM: 'SEQ_ITEM'
   }
 
   static addStringTerminator (src, offset, str) {
@@ -163,10 +163,10 @@ export default class Node {
 
   get jsonLike () {
     const jsonLikeTypes = [
-      Node.Type.DOUBLE,
       Node.Type.FLOW_MAP,
       Node.Type.FLOW_SEQ,
-      Node.Type.SINGLE
+      Node.Type.QUOTE_DOUBLE,
+      Node.Type.QUOTE_SINGLE
     ]
     return jsonLikeTypes.indexOf(this.type) !== -1
   }

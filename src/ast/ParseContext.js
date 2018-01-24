@@ -25,8 +25,6 @@ export default class ParseContext {
         return Node.Type.BLOCK_FOLDED
       case '|':
         return Node.Type.BLOCK_LITERAL
-      case '"':
-        return Node.Type.DOUBLE
       case '{':
         return Node.Type.FLOW_MAP
       case '[':
@@ -37,8 +35,10 @@ export default class ParseContext {
         return !inFlow && Node.atBlank(src, offset + 1) ? Node.Type.MAP_VALUE : Node.Type.PLAIN
       case '-':
         return !inFlow && Node.atBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
+      case '"':
+        return Node.Type.QUOTE_DOUBLE
       case "'":
-        return Node.Type.SINGLE
+        return Node.Type.QUOTE_SINGLE
       default:
         return Node.Type.PLAIN
     }
