@@ -47,4 +47,14 @@ export default class CollectionItem extends Node {
     this.valueRange = new Range(start, end)
     return offset
   }
+
+  toString () {
+    const { context: { atLineStart, indent, src }, item, range, value } = this
+    if (value != null) return value
+    if (!item) return src.slice(range.start, range.end)
+    let prefix = ''
+    if (atLineStart) for (let i = 0; i < indent; ++i) prefix += ' '
+    prefix += src.slice(range.start, item.range.start)
+    return prefix + String(item)
+  }
 }

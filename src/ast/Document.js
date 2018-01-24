@@ -126,4 +126,11 @@ export default class Document extends Node {
     trace: 'DOC', this.contents
     return offset
   }
+
+  toString () {
+    const { contents, context: { src }, directives, value } = this
+    if (value != null) return value
+    const prefix = directives.length > 0 ? directives.concat('---') : []
+    return prefix.concat(contents).join('\n')
+  }
 }

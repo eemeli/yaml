@@ -117,6 +117,7 @@ export default class Node {
     this.valueRange = null
     this.props = props || []
     this.type = type
+    this.value = null
   }
 
   getPropValue (idx, key) {
@@ -189,4 +190,9 @@ export default class Node {
     return start
   }
 
+  toString () {
+    const { context, range, value } = this
+    if (value != null) return value
+    return context.src.slice(range.start, range.end)
+  }
 }

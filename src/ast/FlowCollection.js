@@ -86,4 +86,18 @@ export default class FlowCollection extends Node {
     trace: 'items', this.items, JSON.stringify(this.comment)
     return offset
   }
+
+  toString () {
+    const { context: { src }, items, range, value } = this
+    if (value != null) return value
+    const nodes = items.filter(item => item instanceof Node)
+    let str = ''
+    let prevEnd = range.start
+    nodes.forEach((node) => {
+      const prefix = src.slice(prevEnd, node.range.start)
+      prevEnd = node.range.end
+      str += prefix + String(node)
+    })
+    return str + src.slice(prevEnd, range.end)
+  }
 }
