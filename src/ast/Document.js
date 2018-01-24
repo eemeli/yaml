@@ -130,7 +130,10 @@ export default class Document extends Node {
   toString () {
     const { contents, context: { src }, directives, value } = this
     if (value != null) return value
-    const prefix = directives.length > 0 ? directives.concat('---') : []
+    const includeDirEndLine = directives.length > 0 || (
+      contents.length > 0 && contents[0].type === Node.Type.COMMENT
+    )
+    const prefix = includeDirEndLine ? directives.concat('---') : []
     return prefix.concat(contents).join('\n')
   }
 }
