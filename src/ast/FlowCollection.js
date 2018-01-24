@@ -43,8 +43,10 @@ export default class FlowCollection extends Node {
         } break
         case '#': {
           const comment = new Node(Node.Type.COMMENT, null, { src })
-          offset = comment.parseComment(offset)
+          const cEnd = comment.parseComment(offset)
+          comment.range = new Range(offset, cEnd)
           this.items.push(comment)
+          offset = cEnd
         } break
         case '?':
         case ':': {

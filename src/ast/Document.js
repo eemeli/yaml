@@ -42,6 +42,7 @@ export default class Document extends Node {
     let offset = start
     while (!Document.atDirectivesEnd(src, offset)) {
       offset = Document.startCommentOrEndBlankLine(src, offset)
+      const dirStart = offset
       switch (src[offset]) {
         case '\n':
           offset += 1
@@ -49,11 +50,11 @@ export default class Document extends Node {
         case '#': {
           const comment = new Node(Node.Type.COMMENT, null, { src })
           offset = comment.parseComment(offset)
+          comment.range = new Range(dirStart, offset)
           this.directives.push(comment)
           trace: 'directive-comment', comment.comment
         } break
         case '%': {
-          const dirStart = offset
           const directive = new Node(Node.Type.DIRECTIVE, null, { parent: this, src })
           offset = Document.endOfDirective(src, offset + 1)
           directive.valueRange = new Range(dirStart + 1, offset)
@@ -87,8 +88,10 @@ export default class Document extends Node {
           break
         case '#': {
           const comment = new Node(Node.Type.COMMENT, null, { src })
-          offset = comment.parseComment(offset)
+          const cEnd = comment.parseComment(offset)
+          comment.range = new Range(offset, cEnd)
           this.contents.push(comment)
+          offset = cEnd
           trace: 'content-comment', comment.comment
         } break
         default: {

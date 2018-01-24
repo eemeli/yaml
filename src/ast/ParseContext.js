@@ -142,12 +142,13 @@ export default class ParseContext {
         node = new Scalar(type, props)
     }
     let offset = node.parse(context, valueStart)
-    node.range = new Range(start, offset)
+    const nodeEnd = this.src[offset] === '\n' ? offset + 1 : offset
+    node.range = new Range(start, nodeEnd)
     trace: node.type, node.range, JSON.stringify(node.rawValue)
     if (context.nodeStartsCollection(node)) {
       trace: 'collection-start'
       const collection = new Collection(node)
-      offset = collection.parse(context, node.range.end)
+      offset = collection.parse(context, offset)
       collection.range = new Range(start, offset)
       trace: collection.type, collection.range, JSON.stringify(collection.rawValue)
       return collection
