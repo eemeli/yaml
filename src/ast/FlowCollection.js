@@ -97,6 +97,7 @@ export default class FlowCollection extends Node {
       prevEnd = node.range.end
       str += prefix + String(node)
     })
-    return str + src.slice(prevEnd, range.end)
+    str += src.slice(prevEnd, range.end)
+    return Node.addStringTerminator(src, range.end, str)
   }
 }

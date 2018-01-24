@@ -25,6 +25,12 @@ export default class Node {
     SINGLE: 'SINGLE'
   }
 
+  static addStringTerminator (src, offset, str) {
+    if (str[str.length - 1] === '\n') return str
+    const next = Node.endOfWhiteSpace(src, offset)
+    return next >= src.length || src[next] === '\n' ? str + '\n' : str
+  }
+
   // ^(---|...)
   static atDocumentBoundary (src, offset) {
     const prev = src[offset - 1]
@@ -191,8 +197,9 @@ export default class Node {
   }
 
   toString () {
-    const { context, range, value } = this
+    const { context: { src }, range, value } = this
     if (value != null) return value
-    return context.src.slice(range.start, range.end)
+    const str = src.slice(range.start, range.end)
+    return Node.addStringTerminator(src, range.end, str)
   }
 }

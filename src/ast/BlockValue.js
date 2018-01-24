@@ -66,9 +66,4 @@ export default class BlockValue extends Node {
     trace: this.type, { style: this.blockStyle, valueRange: this.valueRange, comment: this.comment }, JSON.stringify(this.rawValue)
     return offset
   }
-
-  toString () {
-    const str = super.toString()
-    return str[str.length - 1] === '\n' ? str : str + '\n'
-  }
 }

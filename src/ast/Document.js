@@ -128,11 +128,11 @@ export default class Document extends Node {
   toString () {
     const { contents, context: { src }, directives, value } = this
     if (value != null) return value
-    const includeDirEndLine = directives.length > 0 || (
-      contents.length > 0 && contents[0].type === Node.Type.COMMENT
-    )
-    const prefix = includeDirEndLine ? directives.concat('---') : []
-    let str = prefix.concat(contents).join('\n')
+    let str = directives.join('')
+    if (contents.length > 0) {
+      if (directives.length > 0 || contents[0].type === Node.Type.COMMENT) str += '---\n'
+      str += contents.join('')
+    }
     if (str[str.length - 1] !== '\n') str += '\n'
     return str
   }

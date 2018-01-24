@@ -90,12 +90,13 @@ export default class Collection extends Node {
   }
 
   toString () {
-    const { context, items, range, value } = this
+    const { context: { src }, items, range, value } = this
     if (value != null) return value
     const { indent } = items[0].context
     let inStr = ''
     for (let i = 0; i < indent; ++i) inStr += ' '
-    const prefix = context.src.slice(range.start, items[0].range.start)
-    return prefix + items.join(inStr)
+    const prefix = src.slice(range.start, items[0].range.start)
+    const str = prefix + items.join(inStr)
+    return Node.addStringTerminator(src, range.end, str)
   }
 }
