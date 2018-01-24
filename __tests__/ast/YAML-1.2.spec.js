@@ -1,5 +1,5 @@
 import Node from '../../src/ast/Node'
-import parseStream from '../../src/ast/parseStream'
+import parseStream from '../../src/ast/index'
 
 const spec = {
   '2.1. Collections': {
