@@ -5,7 +5,7 @@ A maximally liberal [YAML 1.2] parser:
 - Will do its best to turn any string input into a YAML-ish AST representation
 - Fully supports programmatic handling of YAML comments and multi-document streams
 - Does practically no error checking, and should never throw -- but if you feed it garbage, you'll likely get a garbage AST as well
-- Has no runtime dependencies and compresses to under 9Kb
+- Has no runtime dependencies and compresses to under 9kB
 - Minimises memory consumption by being really lazy; doesn't even calculate raw string values until you specifically ask for them
 - Output object overrides `toString` at all levels to provide an idempotent YAML string representation
 - Allows (slightly clumsy) editing with a settable `Node#value`
@@ -50,7 +50,7 @@ ast[1]            // the second document, which contains a sequence
   .rawValue       // ' Block scalar\n'
 ```
 
-### `parseYAML(str: string): Array<Document>`
+### `parseYAML(string): Array<Document>`
 
 The public API of the library is a single function which returns an array of parsed YAML documents (see below for details). The array and its contained nodes override the default `toString` method, each returning a YAML representation of its contents.
 
@@ -105,7 +105,7 @@ class Node {
     'ALIAS' | 'BLOCK_FOLDED' | 'BLOCK_LITERAL' | 'COLLECTION' | 'COMMENT' |
     'DIRECTIVE' | 'DOCUMENT' | 'FLOW_MAP' | 'FLOW_SEQ' | 'MAP_KEY' |
     'MAP_VALUE' | 'PLAIN' | 'QUOTE_DOUBLE' | 'QUOTE_SINGLE' | 'SEQ_ITEM',
-  value: ?string            // if non-null, overrides string value
+  value: ?string            // if non-null, overrides source value
   get anchor(): ?string,    // this node's anchor, if set
   get comment(): ?string,   // this node's newline-delimited comment(s), if any
   get rawValue(): ?string,  // an unprocessed slice of context.src determining
@@ -134,8 +134,8 @@ class CollectionItem extends Node {
 }
 
 class Collection extends Node {
-  items: Array<Node>,       // in addition to CollectionItem, may include
-                            //   implicit keys of nearly any type
+  // in addition to CollectionItem, may include implicit keys of nearly any type
+  items: Array<Node>,
   type: 'COLLECTION'
 }
 
