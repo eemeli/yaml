@@ -1,3 +1,4 @@
+import CollectionItem from './CollectionItem'
 import Comment from './Comment'
 import Node from './Node'
 import Range from './Range'
@@ -92,11 +93,13 @@ export default class Collection extends Node {
   toString () {
     const { context: { src }, items, range, value } = this
     if (value != null) return value
-    const { indent } = items[0].context
-    let inStr = ''
-    for (let i = 0; i < indent; ++i) inStr += ' '
-    const prefix = src.slice(range.start, items[0].range.start)
-    const str = prefix + items.join(inStr)
+    let str = src.slice(range.start, items[0].range.start) + String(items[0])
+    for (let i = 1; i < items.length; ++i) {
+      const item = items[i]
+      const { atLineStart, indent } = item.context
+      if (atLineStart) for (let i = 0; i < indent; ++i) str += ' '
+      str += String(item)
+    }
     return Node.addStringTerminator(src, range.end, str)
   }
 }

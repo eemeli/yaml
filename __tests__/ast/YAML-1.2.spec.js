@@ -2083,7 +2083,7 @@ for (const section in spec) {
         trace: 'PARSED', console.dir(pretty(documents), { depth: null }) || ''
         testSpec(documents, tgt)
         const reSrc = String(documents)
-        trace: 'RE-STRUNG\n', reSrc
+        trace: 'RE-STRUNG', '\n' + reSrc
         // expect(reSrc).toBe(src)
         const reDoc = parseStream(reSrc)
         trace: 'RE-PARSED', console.dir(pretty(reDoc), { depth: null }) || ''

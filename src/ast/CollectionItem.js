@@ -49,15 +49,13 @@ export default class CollectionItem extends Node {
   }
 
   toString () {
-    const { context: { atLineStart, indent, src }, item, range, value } = this
+    const { context: { src }, item, range, value } = this
     if (value != null) return value
-    let str = ''
-    if (atLineStart) for (let i = 0; i < indent; ++i) str += ' '
-    if (item) {
-      str += src.slice(range.start, item.range.start) + String(item)
-    } else {
-      str += src.slice(range.start, range.end)
-    }
+    const str = item ? (
+      src.slice(range.start, item.range.start) + String(item)
+    ) : (
+      src.slice(range.start, range.end)
+    )
     return Node.addStringTerminator(src, range.end, str)
   }
 }
