@@ -1,0 +1,54 @@
+{
+  "name": "yaml",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "license": "ISC",
+  "author": "Eemeli Aro <eemeli@gmail.com>",
+  "repository": "github:eemeli/yaml",
+  "description": "YAML for JavaScript",
+  "keywords": [
+    "YAML"
+  ],
+  "homepage": "https://github.com/eemeli/yaml#readme",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "babel src/ --out-dir dist/",
+    "test": "TRACE_LEVEL=log jest",
+    "test:trace": "TRACE_LEVEL=trace,log jest --no-cache",
+    "preversion": "npm test && npm run build",
+    "version": "git commit -am \"Update version\" && git add -f dist/",
+    "postversion": "git reset --hard HEAD^",
+    "prepublishOnly": "npm test && npm run build"
+  },
+  "babel": {
+    "presets": [
+      "@babel/env",
+      "@babel/stage-3"
+    ],
+    "plugins": [
+      [
+        "trace",
+        {
+          "strip": true
+        }
+      ]
+    ]
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "__tests__/common"
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.37",
+    "@babel/core": "^7.0.0-beta.37",
+    "@babel/preset-env": "^7.0.0-beta.37",
+    "@babel/preset-stage-3": "^7.0.0-beta.37",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^22.0.6",
+    "babel-plugin-trace": "eemeli/babel-plugin-trace#babel7-build",
+    "jest": "^22.0.6"
+  }
+}
