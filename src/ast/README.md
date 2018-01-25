@@ -23,7 +23,7 @@ npm install raw-yaml
 
 To use:
 ```js
-import parseYAML from 'raw-yaml'
+import parse from 'raw-yaml'
 
 const str = `
 sequence: [ one, two, ]
@@ -36,12 +36,12 @@ mapping: { sky: blue, sea: green }
 - !!map # Block collection
   foo : bar`
 
-const ast = parseYAML(str)
+const ast = parse(str)
 
 ast[0]            // the first document, which contains a map with two keys
   .contents[0]    // the contents (as opposed to directives) of the document
   .items[3].item  // the last item, a flow map
-  .items[3]       // the third token, parsed as a plain value
+  .items[3]       // the fourth token, parsed as a plain value
   .rawValue       // 'blue'
 
 ast[1]            // the second document, which contains a sequence
@@ -50,7 +50,7 @@ ast[1]            // the second document, which contains a sequence
   .rawValue       // ' Block scalar\n'
 ```
 
-### `parseYAML(string): Array<Document>`
+### `parse(string): Array<Document>`
 
 The public API of the library is a single function which returns an array of parsed YAML documents (see below for details). The array and its contained nodes override the default `toString` method, each returning a YAML representation of its contents.
 
@@ -83,81 +83,100 @@ For an example, here's what the first few lines of this file look like when pars
 } ]
 ```
 
-Each node in the AST extends a common ancestor `Node`:
+Each node in the AST extends a common ancestor `Node` (using flow-ish notation, so `+` as a prefix indicates a read-only property:
 
 ```js
 class Range {
-  start: number,            // offset of first character
-  end: number,              // offset after last character
-  get isEmpty(): boolean    // true if end is not greater than start
+  start: number,        // offset of first character
+  end: number,          // offset after last character
+  +isEmpty: boolean     // true if end is not greater than start
 }
 
 class Node {
   context: {
-    atLineStart: boolean,   // is this node the first one on this line
-    indent: number,         // the current level of indentation (may be -1)
-    src: string             // the full original source
+    atLineStart: boolean, // is this node the first one on this line
+    indent: number,     // the current level of indentation (may be -1)
+    src: string         // the full original source
   },
-  error: ?Error,            // if not null, indicates a parser failure
-  props: Array<Range>,      // anchors, tags and comments
-  range: Range,             // span of context.src parsed into this node
-  type:                     // specific node type
-    'ALIAS' | 'BLOCK_FOLDED' | 'BLOCK_LITERAL' | 'COLLECTION' | 'COMMENT' |
-    'DIRECTIVE' | 'DOCUMENT' | 'FLOW_MAP' | 'FLOW_SEQ' | 'MAP_KEY' |
-    'MAP_VALUE' | 'PLAIN' | 'QUOTE_DOUBLE' | 'QUOTE_SINGLE' | 'SEQ_ITEM',
-  value: ?string            // if non-null, overrides source value
-  get anchor(): ?string,    // this node's anchor, if set
-  get comment(): ?string,   // this node's newline-delimited comment(s), if any
-  get rawValue(): ?string,  // an unprocessed slice of context.src determining
-                            //   this node's value
-  get tag(): ?string,       // this node's tag, if set
-  toString(): string        // a YAML string representation of this node
+  error: ?Error,        // if not null, indicates a parser failure
+  props: Array<Range>,  // anchors, tags and comments
+  range: Range,         // span of context.src parsed into this node
+  type:                 // specific node type
+    'ALIAS' | 'BLOCK_FOLDED' | 'BLOCK_LITERAL' | 'COMMENT' | 'DIRECTIVE' |
+    'DOCUMENT' | 'FLOW_MAP' | 'FLOW_SEQ' | 'MAP' | 'MAP_KEY' | 'MAP_VALUE' |
+    'PLAIN' | 'QUOTE_DOUBLE' | 'QUOTE_SINGLE' | 'SEQ' | 'SEQ_ITEM',
+  value: ?string        // if non-null, overrides source value
+  +anchor: ?string,     // this node's anchor, if set
+  +comment: ?string,    // this node's newline-delimited comment(s), if any
+  +rawValue: ?string,   // an unprocessed slice of context.src determining
+                        //   this node's value
+  +tag: ?string,        // this node's tag, if set
+  toString(): string    // a YAML string representation of this node
+}
+
+class Scalar extends Node {
+  type: 'ALIAS' | 'PLAIN' | 'QUOTE_DOUBLE' | 'QUOTE_SINGLE'
 }
 
 class BlockValue extends Node {
-  blockStyle: string,       // matches the regexp `[|>][-+1-9]*`
+  blockStyle: string,   // matches the regexp `[|>][-+1-9]*`
   type: 'BLOCK_FOLDED' | 'BLOCK_LITERAL'
 }
 
 class Comment extends Node {
-  type: 'COMMENT',          // PLAIN nodes may also turn out to be comment-only
-  get anchor(): null,
-  get comment(): string,
-  get rawValue(): null,
-  get tag(): null
+  type: 'COMMENT',      // PLAIN nodes may also turn out to be comment-only
+  +anchor: null,
+  +comment: string,
+  +rawValue: null,
+  +tag: null
 }
 
-class CollectionItem extends Node {
-  indicator: '?' | ':' | '-',
-  item: ?Node,
-  type: 'MAP_KEY' | 'MAP_VALUE' | 'SEQ_ITEM'
+class MapItem extends Node {
+  indicator: '?' | ':',
+  item: ContentNode | null,
+  type: 'MAP_KEY' | 'MAP_VALUE'
 }
 
-class Collection extends Node {
-  // in addition to CollectionItem, may include implicit keys of nearly any type
-  items: Array<Node>,
-  type: 'COLLECTION'
+class Map extends Node {
+  // implicit keys are not wrapped; BlockValue here isn't valid YAML
+  items: Array<Comment | MapItem | Scalar | BlockValue>,
+  type: 'MAP'
 }
+
+class SeqItem extends Node {
+  indicator: '-',
+  item: ContentNode | null,
+  type: 'SEQ_ITEM'
+}
+
+class Seq extends Node {
+  items: Array<Comment | SeqItem>,
+  type: 'SEQ'
+}
+
+type FlowChar = '{' | '}' | '[' | ']' | ',' | '?' | ':'
 
 class FlowCollection extends Node {
-  // may contains nodes with type:
-  //   ALIAS, COMMENT, FLOW_MAP, FLOW_SEQ, PLAIN, QUOTE_DOUBLE, or QUOTE_SINGLE
-  items: Array<'{' | '}' | '[' | ']' | ',' | '?' | ':' | Node>,
+  items: Array<FlowChar | Scalar | Comment | FlowCollection>,
   type: 'FLOW_MAP' | 'FLOW_SEQ'
 }
 
+type ContentNode = Scalar | BlockValue | Comment | Map | Seq | FlowCollection
+
 class Directive extends Node {
   type: 'DIRECTIVE',
-  get anchor(): null,
-  get tag(): null
+  +anchor: null,
+  +tag: null
 }
 
 class Document extends Node {
   directives: Array<Comment | Directive>,
-  contents: Array<Node>,
+  contents: Array<ContentNode>,
   type: 'DOCUMENT',
-  get anchor(): null,
-  get comment(): null,
-  get tag(): null
+  +anchor: null,
+  +comment: null,
+  +tag: null
 }
 ```
+
+In actual code, `MapItem` and `SeqItem` are implemented as `CollectionItem`, and correspondingly `Map` and `Seq` as `Collection`. Due to parsing differences, `PLAIN` scalars are instances of `PlainValue` rather than `Scalar`. Additional undocumented properties are available for `Node`, but are likely only useful during parsing.
