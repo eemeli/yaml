@@ -38,14 +38,14 @@ mapping: { sky: blue, sea: green }
 
 const ast = parse(str)
 
-ast[0]            // the first document, which contains a map with two keys
-  .contents[0]    // the contents (as opposed to directives) of the document
+ast[0]            // first document, containing a map with two keys
+  .contents[0]    // document contents (as opposed to directives)
   .items[3].item  // the last item, a flow map
   .items[3]       // the fourth token, parsed as a plain value
   .rawValue       // 'blue'
 
-ast[1]            // the second document, which contains a sequence
-  .contents[0]    // the contents (as opposed to directives) of the document
+ast[1]            // second document, containing a sequence
+  .contents[0]    // document contents (as opposed to directives)
   .items[1].item  // the second item, a block value
   .rawValue       // ' Block scalar\n'
 ```
@@ -95,21 +95,22 @@ class Range {
 class Node {
   context: {
     atLineStart: boolean, // is this node the first one on this line
-    indent: number,     // the current level of indentation (may be -1)
+    indent: number,     // current level of indentation (may be -1)
     src: string         // the full original source
   },
   error: ?Error,        // if not null, indicates a parser failure
   props: Array<Range>,  // anchors, tags and comments
   range: Range,         // span of context.src parsed into this node
   type:                 // specific node type
-    'ALIAS' | 'BLOCK_FOLDED' | 'BLOCK_LITERAL' | 'COMMENT' | 'DIRECTIVE' |
-    'DOCUMENT' | 'FLOW_MAP' | 'FLOW_SEQ' | 'MAP' | 'MAP_KEY' | 'MAP_VALUE' |
-    'PLAIN' | 'QUOTE_DOUBLE' | 'QUOTE_SINGLE' | 'SEQ' | 'SEQ_ITEM',
+    'ALIAS' | 'BLOCK_FOLDED' | 'BLOCK_LITERAL' | 'COMMENT' |
+    'DIRECTIVE' | 'DOCUMENT' | 'FLOW_MAP' | 'FLOW_SEQ' |
+    'MAP' | 'MAP_KEY' | 'MAP_VALUE' | 'PLAIN' |
+    'QUOTE_DOUBLE' | 'QUOTE_SINGLE' | 'SEQ' | 'SEQ_ITEM',
   value: ?string        // if non-null, overrides source value
-  +anchor: ?string,     // this node's anchor, if set
-  +comment: ?string,    // this node's newline-delimited comment(s), if any
-  +rawValue: ?string,   // an unprocessed slice of context.src determining
-                        //   this node's value
+  +anchor: ?string,     // anchor, if set
+  +comment: ?string,    // newline-delimited comment(s), if any
+  +rawValue: ?string,   // an unprocessed slice of context.src
+                        //   determining this node's value
   +tag: ?string,        // this node's tag, if set
   toString(): string    // a YAML string representation of this node
 }
@@ -124,7 +125,7 @@ class BlockValue extends Node {
 }
 
 class Comment extends Node {
-  type: 'COMMENT',      // PLAIN nodes may also turn out to be comment-only
+  type: 'COMMENT',      // PLAIN nodes may also be comment-only
   +anchor: null,
   +comment: string,
   +rawValue: null,
@@ -161,7 +162,8 @@ class FlowCollection extends Node {
   type: 'FLOW_MAP' | 'FLOW_SEQ'
 }
 
-type ContentNode = Scalar | BlockValue | Comment | Map | Seq | FlowCollection
+type ContentNode =
+  Scalar | BlockValue | Comment | Map | Seq | FlowCollection
 
 class Directive extends Node {
   type: 'DIRECTIVE',
