@@ -50,5 +50,8 @@
     "babel-jest": "^22.0.6",
     "babel-plugin-trace": "eemeli/babel-plugin-trace#babel7-build",
     "jest": "^22.0.6"
+  },
+  "dependencies": {
+    "raw-yaml": "^0.2.2"
   }
 }
