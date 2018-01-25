@@ -5,7 +5,7 @@ import Range from './Range'
 
 export default class Collection extends Node {
   constructor (firstItem) {
-    super(Node.Type.COLLECTION)
+    super(firstItem.type === Node.Type.SEQ_ITEM ? Node.Type.SEQ : Node.Type.MAP)
     this.items = [firstItem]
     for (let i = firstItem.props.length - 1; i >= 0; --i) {
       if (firstItem.props[i].start < firstItem.context.lineStart) {

@@ -9,7 +9,7 @@ const spec = {
 `- Mark McGwire
 - Sammy Sosa
 - Ken Griffey`,
-      tgt: [ { contents: [ { items: [
+      tgt: [ { contents: [ { type: Node.Type.SEQ, items: [
         { indicator: '-', item: 'Mark McGwire' },
         { indicator: '-', item: 'Sammy Sosa' },
         { indicator: '-', item: 'Ken Griffey' }
@@ -21,7 +21,7 @@ const spec = {
 `hr:  65    # Home runs
 avg: 0.278 # Batting average
 rbi: 147   # Runs Batted In`,
-      tgt: [ { contents: [ { items: [
+      tgt: [ { contents: [ { type: Node.Type.MAP, items: [
         'hr', { indicator: ':', item: { comment: ' Home runs', rawValue: '65' } },
         'avg', { indicator: ':', item: { comment: ' Batting average', rawValue: '0.278' } },
         'rbi', { indicator: ':', item: { comment: ' Runs Batted In', rawValue: '147' } }
