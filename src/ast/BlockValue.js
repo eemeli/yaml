@@ -48,11 +48,17 @@ export default class BlockValue extends Node {
   parseBlockValue (start) {
     const { indent, inFlow, src } = this.context
     let offset = start
+    let bi = this.blockIndent ? indent + this.blockIndent - 1 : indent
     for (let ch = src[offset]; ch === '\n'; ch = src[offset]) {
       offset += 1
       if (Node.atDocumentBoundary(src, offset)) break
-      const end = Node.endOfBlockIndent(src, indent, offset)
+      const end = Node.endOfBlockIndent(src, bi, offset)
       if (end === null) break
+      if (!this.blockIndent && src[end] !== '\n') {
+        // at first line, without explicit block indent
+        this.blockIndent = end - (offset + indent)
+        bi = indent + this.blockIndent - 1
+      }
       offset = Node.endOfLine(src, end)
     }
     this.valueRange = new Range(start + 1, offset)

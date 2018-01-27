@@ -1616,11 +1616,13 @@ foo: bar
  text
 - |2
  text`,
-      tgt: [ { contents: [ { items: [
-        { indicator: '-', item: '\n text\n' },
-        { indicator: '-', item: '  text\n text\n' },
-        { indicator: '-', item: ' text\n' }
-      ] } ] } ]
+      tgt: [ { contents: [
+        { items: [
+          { indicator: '-', item: '\n text\n' },
+          { indicator: '-', item: '  text\n' },
+        ] },
+        'text - |2 text'
+      ] } ]
       // ERROR: A leading all-space line must not have too many spaces.
       // ERROR: A following text line must not be less indented.
       // ERROR: The text is less indented than the indicated level.
@@ -1670,11 +1672,17 @@ keep: |+
         directives: [ { comment: ' Strip' }, { comment: ' Comments:' } ],
         contents: [ { items: [
           'strip',
-          { indicator: ':', item: '  # text\n\n # Clip\n  # comments:\n\n' },
+          { indicator: ':', item: '  # text\n\n' },
+          { comment: ' Clip' },
+          { comment: ' comments:' },
           'clip',
-          { indicator: ':', item: '  # text\n\n # Keep\n  # comments:\n\n' },
+          { indicator: ':', item: '  # text\n\n' },
+          { comment: ' Keep' },
+          { comment: ' comments:' },
           'keep',
-          { indicator: ':', item: '  # text\n\n # Trail\n  # comments.\n' }
+          { indicator: ':', item: '  # text\n\n' },
+          { comment: ' Trail' },
+          { comment: ' comments.' }
         ] } ]
       } ]
     },
@@ -1717,7 +1725,10 @@ keep: |+\n\n`,
   text
 
  # Comment`,
-      tgt: [ { contents: [ '\n\n  literal\n\n\n  text\n\n # Comment\n' ] } ]
+      tgt: [ { contents: [
+        '\n\n  literal\n\n\n  text\n\n',
+        { comment: ' Comment' }
+      ] } ]
     },
   },
 
@@ -1749,7 +1760,8 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment\n'
+        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n',
+        { comment: ' Comment' }
       ] } ]
     },
 
@@ -1772,7 +1784,8 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n# Comment\n'
+        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n',
+        { comment: ' Comment' }
       ] } ]
     },
 
@@ -1795,7 +1808,8 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n# Comment\n'
+        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n',
+        { comment: ' Comment' }
       ] } ]
     },
 
@@ -1817,7 +1831,8 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        ' folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n# Comment\n'
+        ' folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n',
+        { comment: ' Comment' }
       ] } ]
     },
   },
