@@ -315,17 +315,17 @@ stats: |
 
     'Example 2.17. Quoted Scalars': {
       src:
-`unicode: "Sosa did fine.\u263A"
-control: "\b1998\t1999\t2000\n"
-hex esc: "\x0d\x0a is \r\n"
+`unicode: "Sosa did fine.\\u263A"
+control: "\\b1998\\t1999\\t2000\\n"
+hex esc: "\\x0d\\x0a is \\r\\n"
 
 single: '"Howdy!" he cried.'
 quoted: ' # Not a ''comment''.'
 tie-fighter: '|\\-*-/|'`,
       tgt: [ { contents: [ { items: [
-        'unicode', { indicator: ':', item: '"Sosa did fine.☺"' },
-        'control', { indicator: ':', item: '"\b1998\t1999\t2000\n"' },
-        'hex esc', { indicator: ':', item: '"\r\n is \r\n"' },
+        'unicode', { indicator: ':', item: 'Sosa did fine.☺' },
+        'control', { indicator: ':', item: '\b1998\t1999\t2000\n' },
+        'hex esc', { indicator: ':', item: '\r\n is \r\n' },
         'single', { indicator: ':', item: '"Howdy!" he cried.' },
         'quoted', { indicator: ':', item: ' # Not a \'comment\'.' },
         'tie-fighter', { indicator: ':', item: '|\\-*-/|' }
@@ -342,7 +342,7 @@ quoted: "So does this
   quoted scalar.\n"`,
       tgt: [ { contents: [ { items: [
         'plain', { indicator: ':', item: 'This unquoted scalar\n  spans many lines.' },
-        'quoted', { indicator: ':', item: '"So does this\n  quoted scalar.\n"' }
+        'quoted', { indicator: ':', item: 'So does this quoted scalar. ' }
       ] } ] } ]
     },
   },
@@ -733,7 +733,7 @@ double: "text"`,
         'single',
         { indicator: ':', item: 'text' },
         'double',
-        { indicator: ':', item: '"text"' }
+        { indicator: ':', item: 'text' }
       ]}]}]
     },
 
@@ -778,28 +778,41 @@ block:\t|
         directives: [{ comment: ' Tabs and spaces' }],
         contents: [{ items: [
           'quoted',
-          { indicator: ':', item: '"Quoted \t"' },
+          { indicator: ':', item: 'Quoted \t' },
           'block',
           { indicator: ':', item: '  void main() {\n  \tprintf("Hello, world!\\n");\n  }\n' }
         ]}]
       }]
     },
-
-// # 5.6. Miscellaneous Characters
-
-// # 5.7. Escaped Characters
-
-// Example 5.13. Escaped Characters
-
-// "Fun with \\
-// \" \a \b \e \f \
-// \n \r \t \v \0 \
-// \  \_ \N \L \P \
-// \x41 \u0041 \U00000041"
-
-// Example 5.14. Invalid Escaped Characters
-
   },
+
+  '5.7. Escaped Characters': {
+    'Example 5.13. Escaped Characters': {
+      src:
+`"Fun with \\\\
+\\" \\a \\b \\e \\f \\
+\\n \\r \\t \\v \\0 \\
+\\  \\_ \\N \\L \\P \\
+\\x41 \\u0041 \\U00000041"`,
+      tgt: [ { contents: [
+        'Fun with \x5C \x22 \x07 \x08 \x1B \x0C \x0A \x0D \x09 \x0B \x00 \x20 \xA0 \x85 \u2028 \u2029 A A A'
+      ] } ]
+    },
+
+    'Example 5.14. Invalid Escaped Characters': {
+      src:
+`Bad escapes:
+  "\\c
+  \\xq-"`,
+      tgt: [ { contents: [ { items: [
+        'Bad escapes',
+        { indicator: ':', item: { rawValue: '"\\c\n  \\xq-"' }}
+      ] } ] } ]
+      // ERROR: c is an invalid escaped character.
+      // ERROR: q and - are invalid hex digits.
+    },
+  },
+
   '6.1. Indentation Spaces': {
     'Example 6.1. Indentation Spaces': {
       src:
@@ -855,8 +868,8 @@ Not indented:
         ] } }
       ]}]}]
     },
-
   },
+
   '6.2. Separation Spaces': {
     'Example 6.3. Separation Spaces': {
       src:
@@ -874,24 +887,66 @@ Not indented:
         ] } }
       ]}]}]
     },
+  },
 
-// # 6.3. Line Prefixes
+  '6.3. Line Prefixes': {
+    'Example 6.4. Line Prefixes': {
+      src:
+`plain: text
+  lines
+quoted: "text
+  \tlines"
+block: |
+  text
+   \tlines`,
+      tgt: [{ contents: [{ items: [
+        'plain',
+        { indicator: ':', item: {} /*'text lines'*/ },
+        'quoted',
+        { indicator: ':', item: 'text lines' },
+        'block',
+        { indicator: ':', item: {} /*'text\n \tlines\n'*/ },
+      ]}]}]
+    },
+  },
 
-// Example 6.4. Line Prefixes
+  '6.4. Empty Lines': {
+    'Example 6.5. Empty Lines': {
+      src:
+`Folding:
+  "Empty line
+   \t
+  as a line feed"
+Chomping: |
+  Clipped empty lines
+ `,
+      tgt: [{ contents: [{ items: [
+        'Folding',
+        { indicator: ':', item: 'Empty line\nas a line feed' },
+        'Chomping',
+        { indicator: ':', item: {} /*'Clipped empty lines\n'*/ },
+      ]}]}]
+    },
+  },
 
-// # 6.4. Empty Lines
-
-// Example 6.5. Empty Lines
-
-// # 6.5. Line Folding
-
+  '6.5. Line Folding': {
 // Example 6.6. Line Folding
 
 // Example 6.7. Block Folding
 
-// Example 6.8. Flow Folding
+    'Example 6.8. Flow Folding': {
+      src:
+`"
+  foo\t
+\t
+  \t bar
 
+  baz
+"`,
+      tgt: [ { contents: [' foo\nbar\nbaz '] } ]
+    },
   },
+
   '6.6. Comments': {
     'Example 6.9. Separated Comment': {
       src:
@@ -956,7 +1011,7 @@ Not indented:
           { rawValue: 'FOO  bar baz', comment: ' Should be ignored' },
           { comment: ' with a warning.' }
         ],
-        contents: ['"foo"']
+        contents: ['foo']
       }]
     },
 
@@ -973,7 +1028,7 @@ Not indented:
           { rawValue: 'YAML 1.3', comment: ' Attempt parsing' },
           { comment: ' with a warning' }
         ],
-        contents: ['"foo"']
+        contents: ['foo']
       }]
     },
 
@@ -998,7 +1053,7 @@ foo`,
 !yaml!str "foo"`,
       tgt: [{
         directives: ['TAG !yaml! tag:yaml.org,2002:'],
-        contents: [{ tag: 'yaml!str', rawValue: '"foo"' }]
+        contents: [{ tag: 'yaml!str', strValue: 'foo' }]
       }]
     },
 
@@ -1026,11 +1081,11 @@ bar`,
       tgt: [
         {
           directives: [{ comment: ' Private' }],
-          contents: [{ tag: 'foo', rawValue: '"bar"' }]
+          contents: [{ tag: 'foo', strValue: 'bar' }]
         },
         {
           directives: [{ comment: ' Global' }, 'TAG ! tag:example.com,2000:app/'],
-          contents: [{ tag: 'foo', rawValue: '"bar"' }]
+          contents: [{ tag: 'foo', strValue: 'bar' }]
         }
       ]
     },
@@ -1053,7 +1108,7 @@ bar`,
 !e!foo "bar"`,
       tgt: [{
         directives: ['TAG !e! tag:example.com,2000:app/'],
-        contents: [{ tag: 'e!foo', rawValue: '"bar"' }]
+        contents: [{ tag: 'e!foo', strValue: 'bar' }]
       }]
     },
 
@@ -1090,7 +1145,7 @@ bar`,
       tgt: [{
         directives: ['TAG !e! tag:example.com,2000:app/'],
         contents: [{ items: [
-          { indicator: '-', item: { tag: 'e!foo', rawValue: '"bar"' } }
+          { indicator: '-', item: { tag: 'e!foo', strValue: 'bar' } }
         ] }]
       }]
     },
@@ -1103,7 +1158,7 @@ bar`,
   !!str bar
 &a2 baz : *a1`,
       tgt: [{ contents: [{ items: [
-        { tag: '!str', anchor: 'a1', rawValue: '"foo"' },
+        { tag: '!str', anchor: 'a1', strValue: 'foo' },
         { indicator: ':', item: { tag: '!str', rawValue: 'bar' } },
         { anchor: 'a2', rawValue: 'baz' },
         { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*a1' } }
@@ -1175,7 +1230,7 @@ bar`,
       tgt: [{
         directives: [{ comment: ' Assuming conventional resolution:' }],
         contents: [{ items: [
-          { indicator: '-', item: '"12"' },
+          { indicator: '-', item: '12' },
           { indicator: '-', item: '12' },
           { indicator: '-', item: { tag: '', rawValue: '12' } }
         ] }]
@@ -1244,9 +1299,9 @@ Reuse anchor: *anchor`,
   "implicit flow key" : value,
  ]`,
       tgt: [ { contents: [ { items: [
-        '"implicit block key"',
+        'implicit block key',
         { indicator: ':', item: { items: [
-          '[', '"implicit flow key"', ':', 'value', ',', ']'
+          '[', 'implicit flow key', ':', 'value', ',', ']'
         ] } }
       ] } ] } ]
     },
@@ -1256,9 +1311,9 @@ Reuse anchor: *anchor`,
 `"folded
 to a space,\t
 
-to a line feed, or \t\
- \ \tnon-content"`,
-      tgt: [ { contents: [ '"folded\nto a space,\t\n\nto a line feed, or \t  \tnon-content"' ] } ]
+to a line feed, or \t\\
+ \\ \tnon-content"`,
+      tgt: [ { contents: [ 'folded to a space,\nto a line feed, or \t \tnon-content' ] } ]
     },
 
     'Example 7.6. Double Quoted Lines': {
@@ -1267,7 +1322,7 @@ to a line feed, or \t\
 
  2nd non-empty
 \t3rd non-empty "`,
-      tgt: [ { contents: [ '" 1st non-empty\n\n 2nd non-empty\n\t3rd non-empty "' ] } ]
+      tgt: [ { contents: [ ' 1st non-empty\n2nd non-empty 3rd non-empty ' ] } ]
     },
   },
 
@@ -1320,13 +1375,13 @@ to a line feed, or \t\
         directives: [ { comment: ' Outside flow collection:' } ],
         contents: [ { items: [
           { indicator: '-', item: '::vector' },
-          { indicator: '-', item: '": - ()"' },
+          { indicator: '-', item: ': - ()' },
           { indicator: '-', item: 'Up, up, and away!' },
           { indicator: '-', item: '-123' },
           { indicator: '-', item: 'http://example.com/foo#bar' },
           { comment: ' Inside flow collection:' },
           { indicator: '-', item: { items: [
-            '[', '::vector', ',', '": - ()"', ',', '"Up, up and away!"', ',',
+            '[', '::vector', ',', ': - ()', ',', 'Up, up and away!', ',',
             '-123', ',', 'http://example.com/foo#bar', ']'
           ] } }
         ] } ]
@@ -1377,7 +1432,7 @@ plain
 single: pair,
 ]`,
       tgt: [ { contents: [ { items: [
-        '[', '"double\n quoted"', ',', 'single quoted', ',',
+        '[', 'double quoted', ',', 'single quoted', ',',
         'plain\n text', ',', { items: [ '[', 'nested', ']' ] }, ',', 'single',
         ':', 'pair', ',', ']'
       ] } ] } ]
@@ -1416,7 +1471,7 @@ omitted value:,
 : omitted key,
 }`,
       tgt: [ { contents: [ { items: [
-        '{', 'unquoted', ':', '"separate"', ',', 'http://foo.com', ',', 'omitted value', ':', ',', ':', 'omitted key', ',', '}'
+        '{', 'unquoted', ':', 'separate', ',', 'http://foo.com', ',', 'omitted value', ':', ',', ':', 'omitted key', ',', '}'
       ] } ] } ]
     },
 
@@ -1428,7 +1483,7 @@ omitted value:,
 "empty":
 }`,
       tgt: [ { contents: [ { items: [
-        '{', '"adjacent"', ':', 'value', ',', '"readable"', ':', 'value', ',', '"empty"', ':', '}'
+        '{', 'adjacent', ':', 'value', ',', 'readable', ':', 'value', ',', 'empty', ':', '}'
       ] } ] } ]
     },
 
@@ -1469,7 +1524,7 @@ foo: bar
  bar: invalid,
  "foo...>1K characters...bar": invalid ]`,
       tgt: [ { contents: [ { items: [
-        '[', 'foo\n bar', ':', 'invalid', ',', '"foo...>1K characters...bar"', ':', 'invalid', ']'
+        '[', 'foo\n bar', ':', 'invalid', ',', 'foo...>1K characters...bar', ':', 'invalid', ']'
       ] } ] } ]
       // ERROR: The foo bar key spans multiple lines
       // ERROR: The foo...bar key is too long
@@ -1487,7 +1542,7 @@ foo: bar
       tgt: [ { contents: [ { items: [
         { indicator: '-', item: { items: [ '[', 'a', ',', 'b', ']' ] } },
         { indicator: '-', item: { items: [ '{', 'a', ':', 'b', '}' ] } },
-        { indicator: '-', item: '"a"' },
+        { indicator: '-', item: 'a' },
         { indicator: '-', item: 'b' },
         { indicator: '-', item: 'c' }
       ] } ] } ]
@@ -1501,9 +1556,9 @@ foo: bar
 - *anchor
 - !!str`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { tag: '!str', rawValue: '"a"' } },
+        { indicator: '-', item: { tag: '!str', strValue: 'a' } },
         { indicator: '-', item: 'b' },
-        { indicator: '-', item: { anchor: 'anchor', rawValue: '"c"' } },
+        { indicator: '-', item: { anchor: 'anchor', strValue: 'c' } },
         { indicator: '-', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } },
         { indicator: '-', item: { tag: '!str' } }
       ] } ] } ]
@@ -1849,7 +1904,7 @@ keep: |+\n\n`,
         'plain key',
         { indicator: ':', item: 'in-line value' },
         { indicator: ':', item: null, comment: ' Both empty' },
-        '"quoted key"',
+        'quoted key',
         { indicator: ':', item: { items: [
           { indicator: '-', item: 'entry' }
         ] } }
@@ -1890,7 +1945,7 @@ keep: |+\n\n`,
 - !!map # Block collection
   foo : bar\n`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: '"flow in block"' },
+        { indicator: '-', item: 'flow in block' },
         { indicator: '-', item: ' Block scalar\n' },
         { indicator: '-', item: { tag: '!map', comment: ' Block collection', items: [
           'foo',

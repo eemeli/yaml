@@ -15,6 +15,8 @@ export const pretty = (node) => {
   } else if (typeof node.item !== 'undefined') {
     res.indicator = node.indicator
     res.item = pretty(node.item)
+  } else if (node.strValue) {
+    res.strValue = node.strValue
   } else if (node.rawValue) {
     res.rawValue = node.rawValue
   }
