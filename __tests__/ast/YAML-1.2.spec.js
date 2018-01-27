@@ -1963,7 +1963,16 @@ mapping: !!map
 
   '9.1. Documents': {
 
-// Example 9.1. Document Prefix
+    'Example 9.1. Document Prefix': {
+      src:
+`\u{FEFF}# Comment
+# lines
+Document`,
+      tgt: [{
+        directives: [{ comment: ' Comment' }, { comment: ' lines' }],
+        contents: ['Document']
+      }]
+    },
 
     'Example 9.2. Document Markers': {
       src:

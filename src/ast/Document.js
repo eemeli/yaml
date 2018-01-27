@@ -118,7 +118,8 @@ export default class Document extends Node {
     this.context = context
     const { src } = context
     trace: 'DOC START', JSON.stringify(src.slice(start))
-    let offset = this.parseDirectives(start)
+    let offset = src.charCodeAt(start) === 0xFEFF ? start + 1 : start  // skip BOM
+    offset = this.parseDirectives(offset)
     offset = this.parseContents(offset)
     trace: 'DOC', this.contents
     return offset
