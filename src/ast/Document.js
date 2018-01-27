@@ -1,20 +1,9 @@
 import Comment from './Comment'
+import Directive from './Directive'
 import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class Document extends Node {
-  static endOfDirective (src, offset) {
-    let ch = src[offset]
-    while (ch && ch !== '\n' && ch !== '#') ch = src[offset += 1]
-    // last char can't be whitespace
-    ch = src[offset - 1]
-    while (ch === ' ' || ch === '\t') {
-      offset -= 1
-      ch = src[offset - 1]
-    }
-    return offset
-  }
-
   static startCommentOrEndBlankLine (src, start) {
     const offset = Node.endOfWhiteSpace(src, start)
     const ch = src[offset]
@@ -43,7 +32,6 @@ export default class Document extends Node {
     let offset = start
     while (!Document.atDirectivesEnd(src, offset)) {
       offset = Document.startCommentOrEndBlankLine(src, offset)
-      const dirStart = offset
       switch (src[offset]) {
         case '\n':
           offset += 1
@@ -55,12 +43,8 @@ export default class Document extends Node {
           trace: 'directive-comment', comment.comment
         } break
         case '%': {
-          const directive = new Node(Type.DIRECTIVE, null, { parent: this, src })
-          offset = Document.endOfDirective(src, offset + 1)
-          directive.valueRange = new Range(dirStart + 1, offset)
-          offset = Node.endOfWhiteSpace(src, offset)
-          offset = directive.parseComment(offset)
-          directive.range = new Range(dirStart, offset)
+          const directive = new Directive()
+          offset = directive.parse({ parent: this, src }, offset)
           this.directives.push(directive)
           trace: 'directive', { valueRange: directive.valueRange, comment: directive.comment }, JSON.stringify(directive.rawValue)
         } break
