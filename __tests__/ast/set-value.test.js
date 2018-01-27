@@ -1,5 +1,5 @@
 import Node, { Type } from '../../src/ast/Node'
-import parseStream from '../../src/ast/index'
+import parse from '../../src/ast/index'
 import { pretty, testSpec } from './common'
 import CollectionItem from '../../src/ast/CollectionItem';
 
@@ -9,7 +9,7 @@ test('set value in collection', () => {
 - Sammy Sosa
 - Ken Griffey
 `
-  const ast = parseStream(src)
+  const ast = parse(src)
   ast[0].contents[0].items[1].item.value = 'TEST\n'
   expect(String(ast)).toBe(src.replace(/Sammy Sosa/, 'TEST'))
 })
@@ -20,7 +20,7 @@ test('replace entire contents', () => {
 - Sammy Sosa
 - Ken Griffey
 `
-  const ast = parseStream(src)
+  const ast = parse(src)
   ast[0].contents[0].value = 'TEST: true\n'
   expect(String(ast)).toBe('TEST: true\n')
 })
@@ -31,7 +31,7 @@ test('remove map key/value pair', () => {
 avg: 0.278 # Batting average
 rbi: 147   # Runs Batted In
 `
-  const ast = parseStream(src)
+  const ast = parse(src)
   ast[0].contents[0].items[2].value = ''
   ast[0].contents[0].items[3].value = ''
   expect(String(ast)).toBe(src.replace(/avg.*\n/, ''))
@@ -48,7 +48,7 @@ national:
   - Chicago Cubs
   - Atlanta Braves
 `
-  const ast = parseStream(src)
+  const ast = parse(src)
   const seq = ast[0].contents[0].items[3].item
   const item = new CollectionItem(Type.SEQ_ITEM)
   item.context = seq.items[2].context

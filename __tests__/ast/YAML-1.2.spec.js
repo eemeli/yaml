@@ -1,14 +1,14 @@
 import Node, { Type } from '../../src/ast/Node'
-import parseStream from '../../src/ast/index'
+import parse from '../../src/ast/index'
 import { pretty, testSpec } from './common'
 
 const spec = {
   '2.1. Collections': {
     'Example 2.1. Sequence of Scalars': {
       src:
-`- Mark McGwire
-- Sammy Sosa
-- Ken Griffey`,
+`- Mark McGwire\r
+- Sammy Sosa\r
+- Ken Griffey\r`,
       tgt: [ { contents: [ { type: Type.SEQ, items: [
         { indicator: '-', item: 'Mark McGwire' },
         { indicator: '-', item: 'Sammy Sosa' },
@@ -18,8 +18,8 @@ const spec = {
 
     'Example 2.2. Mapping Scalars to Scalars': {
       src:
-`hr:  65    # Home runs
-avg: 0.278 # Batting average
+`hr:  65    # Home runs\r
+avg: 0.278 # Batting average\r
 rbi: 147   # Runs Batted In`,
       tgt: [ { contents: [ { type: Type.MAP, items: [
         'hr', { indicator: ':', item: { comment: ' Home runs', strValue: '65' } },
@@ -30,13 +30,13 @@ rbi: 147   # Runs Batted In`,
 
     'Example 2.3. Mapping Scalars to Sequences': {
       src:
-`american:
-  - Boston Red Sox
-  - Detroit Tigers
-  - New York Yankees
-national:
-  - New York Mets
-  - Chicago Cubs
+`american:\r
+  - Boston Red Sox\r
+  - Detroit Tigers\r
+  - New York Yankees\r
+national:\r
+  - New York Mets\r
+  - Chicago Cubs\r
   - Atlanta Braves`,
       tgt: [ { contents: [ { items: [
         'american', { indicator: ':', item: { items: [
@@ -2062,13 +2062,13 @@ for (const section in spec) {
     for (const name in spec[section]) {
       test(name, () => {
         const { src, tgt } = spec[section][name]
-        const documents = parseStream(src)
+        const documents = parse(src)
         trace: 'PARSED', console.dir(pretty(documents), { depth: null }) || ''
         testSpec(documents, tgt)
         const reSrc = String(documents)
         trace: 'RE-STRUNG', '\n' + reSrc
         // expect(reSrc).toBe(src)
-        const reDoc = parseStream(reSrc)
+        const reDoc = parse(reSrc)
         trace: 'RE-PARSED', console.dir(pretty(reDoc), { depth: null }) || ''
         testSpec(reDoc, tgt)
       })
