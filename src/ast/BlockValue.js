@@ -1,17 +1,17 @@
 import Node from './Node'
 import Range from './Range'
 
-export default class BlockValue extends Node {
-  static Chomp = {
-    CLIP: 'CLIP',
-    KEEP: 'KEEP',
-    STRIP: 'STRIP'
-  }
+export const Chomp = {
+  CLIP: 'CLIP',
+  KEEP: 'KEEP',
+  STRIP: 'STRIP'
+}
 
+export default class BlockValue extends Node {
   constructor (type, props) {
     super(type, props)
     this.blockIndent = null
-    this.chomping = BlockValue.Chomp.CLIP
+    this.chomping = Chomp.CLIP
   }
 
   // a block value should always end with '\n'
@@ -28,10 +28,10 @@ export default class BlockValue extends Node {
       let ch = src[offset]
       switch (ch) {
         case '-':
-          this.chomping = BlockValue.Chomp.STRIP
+          this.chomping = Chomp.STRIP
           break
         case '+':
-          this.chomping = BlockValue.Chomp.KEEP
+          this.chomping = Chomp.KEEP
           break
         case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9':
