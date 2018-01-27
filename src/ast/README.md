@@ -169,8 +169,10 @@ type ContentNode =
   Comment | Alias | Scalar | Map | Seq | FlowCollection
 
 class Directive extends Node {
+  name: string,  // for YAML 1.2 should be 'TAG' or 'YAML'
   type: 'DIRECTIVE',
   +anchor: null,
+  +parameters: Array<string>
   +tag: null
 }
 

@@ -454,7 +454,7 @@ application specific tag: !something |
   color: 0xFFEEBB
   text: Pretty vector drawing.`,
       tgt: [ {
-        directives: [ 'TAG ! tag:clarkevans.com,2002:' ],
+        directives: [{ name: 'TAG', parameters: ['!', 'tag:clarkevans.com,2002:'] }],
         contents: [ {
           tag: 'shape',
           comment: ' Use the ! handle for presenting\n tag:clarkevans.com,2002:circle',
@@ -749,7 +749,7 @@ double: "text"`,
 `%YAML 1.2
 --- text`,
       tgt: [{
-        directives: ['YAML 1.2'],
+        directives: [{ name: 'YAML', parameters: ['1.2'] }],
         contents: ['text']
       }]
     },
@@ -1030,7 +1030,7 @@ Chomping: |
 --- "foo"`,
       tgt: [{
         directives: [
-          { rawValue: 'FOO  bar baz', comment: ' Should be ignored' },
+          { name: 'FOO', parameters: ['bar', 'baz'], comment: ' Should be ignored' },
           { comment: ' with a warning.' }
         ],
         contents: ['foo']
@@ -1047,7 +1047,7 @@ Chomping: |
 "foo"`,
       tgt: [{
         directives: [
-          { rawValue: 'YAML 1.3', comment: ' Attempt parsing' },
+          { name: 'YAML', parameters: ['1.3'], comment: ' Attempt parsing' },
           { comment: ' with a warning' }
         ],
         contents: ['foo']
@@ -1060,7 +1060,10 @@ Chomping: |
 %YAML 1.1
 foo`,
       tgt: [{
-        directives: ['YAML 1.2', 'YAML 1.1'],
+        directives: [
+          { name: 'YAML', parameters: ['1.2'] },
+          { name: 'YAML', parameters: ['1.1'] }
+        ],
         contents: ['foo']
       }]
       // ERROR: The YAML directive must only be given at most once per document.
@@ -1074,7 +1077,7 @@ foo`,
 ---
 !yaml!str "foo"`,
       tgt: [{
-        directives: ['TAG !yaml! tag:yaml.org,2002:'],
+        directives: [{ name: 'TAG', parameters: ['!yaml!', 'tag:yaml.org,2002:'] }],
         contents: [{ tag: 'yaml!str', strValue: 'foo' }]
       }]
     },
@@ -1085,7 +1088,7 @@ foo`,
 %TAG ! !foo
 bar`,
       tgt: [{
-        directives: ['TAG ! !foo', 'TAG ! !foo'],
+        directives: [{ name: 'TAG', parameters: ['!', '!foo'] }, { name: 'TAG', parameters: ['!', '!foo'] }],
         contents: ['bar']
       }]
       // ERROR: The TAG directive must only be given at most once per handle in the same document.
@@ -1106,7 +1109,7 @@ bar`,
           contents: [{ tag: 'foo', strValue: 'bar' }]
         },
         {
-          directives: [{ comment: ' Global' }, 'TAG ! tag:example.com,2000:app/'],
+          directives: [{ comment: ' Global' }, { name: 'TAG', parameters: ['!', 'tag:example.com,2000:app/'] }],
           contents: [{ tag: 'foo', strValue: 'bar' }]
         }
       ]
@@ -1118,7 +1121,7 @@ bar`,
 ---
 !!int 1 - 3 # Interval, not integer`,
       tgt: [{
-        directives: ['TAG !! tag:example.com,2000:app/'],
+        directives: [{ name: 'TAG', parameters: ['!!', 'tag:example.com,2000:app/'] }],
         contents: [{ tag: '!int', strValue: '1 - 3', comment: ' Interval, not integer' }]
       }]
     },
@@ -1129,7 +1132,7 @@ bar`,
 ---
 !e!foo "bar"`,
       tgt: [{
-        directives: ['TAG !e! tag:example.com,2000:app/'],
+        directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example.com,2000:app/'] }],
         contents: [{ tag: 'e!foo', strValue: 'bar' }]
       }]
     },
@@ -1144,14 +1147,14 @@ bar`,
 --- # Color here
 !m!light green`,
       tgt: [  {
-        directives: ['TAG !m! !my-'],
+        directives: [{ name: 'TAG', parameters: ['!m!', '!my-'] }],
         contents: [
           { comment: ' Bulb here' },
           { tag: 'm!light', strValue: 'fluorescent' }
         ]
       },
       {
-        directives: ['TAG !m! !my-'],
+        directives: [{ name: 'TAG', parameters: ['!m!', '!my-'] }],
         contents: [
           { comment: ' Color here' },
           { tag: 'm!light', strValue: 'green' }
@@ -1165,7 +1168,7 @@ bar`,
 ---
 - !e!foo "bar"`,
       tgt: [{
-        directives: ['TAG !e! tag:example.com,2000:app/'],
+        directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example.com,2000:app/'] }],
         contents: [{ items: [
           { indicator: '-', item: { tag: 'e!foo', strValue: 'bar' } }
         ] }]
@@ -1217,7 +1220,7 @@ bar`,
 - !!str bar
 - !e!tag%21 baz`,
       tgt: [{
-        directives: ['TAG !e! tag:example.com,2000:app/'],
+        directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example.com,2000:app/'] }],
         contents: [{ items: [
           { indicator: '-', item: { tag: 'local', strValue: 'foo' } },
           { indicator: '-', item: { tag: '!str', strValue: 'bar' } },
@@ -1233,7 +1236,7 @@ bar`,
 - !e! foo
 - !h!bar baz`,
       tgt: [{
-        directives: ['TAG !e! tag:example,2000:app/'],
+        directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example,2000:app/'] }],
         contents: [{ items: [
           { indicator: '-', item: { tag: 'e!', strValue: 'foo' } },
           { indicator: '-', item: { tag: 'h!bar', strValue: 'baz' } }
@@ -1981,7 +1984,7 @@ Document`,
 Document
 ... # Suffix`,
       tgt: [{
-        directives: ['YAML 1.2'],
+        directives: [{ name: 'YAML', parameters: ['1.2'] }],
         contents: ['Document']
       }, {
         directives: [{ comment: ' Suffix' }]
@@ -2035,10 +2038,10 @@ document
 # Empty
 ...`,
       tgt: [{
-        directives: ['YAML 1.2'],
+        directives: [{ name: 'YAML', parameters: ['1.2'] }],
         contents: ['%!PS-Adobe-2.0\n']
       }, {
-        directives: ['YAML 1.2'],
+        directives: [{ name: 'YAML', parameters: ['1.2'] }],
         contents: [{ comment: ' Empty' }]
       }]
     },
@@ -2059,7 +2062,7 @@ matches %: 20`,
       }, {
         contents: [{ comment: ' Empty' }]
       }, {
-        directives: ['YAML 1.2'],
+        directives: [{ name: 'YAML', parameters: ['1.2'] }],
         contents: [{ items: ['matches %', { indicator: ':', item: '20' }] }]
       }]
     }
