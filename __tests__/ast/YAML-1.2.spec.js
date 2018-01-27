@@ -321,14 +321,14 @@ hex esc: "\x0d\x0a is \r\n"
 
 single: '"Howdy!" he cried.'
 quoted: ' # Not a ''comment''.'
-tie-fighter: '|\-*-/|'`,
+tie-fighter: '|\\-*-/|'`,
       tgt: [ { contents: [ { items: [
         'unicode', { indicator: ':', item: '"Sosa did fine.☺"' },
         'control', { indicator: ':', item: '"\b1998\t1999\t2000\n"' },
         'hex esc', { indicator: ':', item: '"\r\n is \r\n"' },
-        'single', { indicator: ':', item: '\'"Howdy!" he cried.\'' },
-        'quoted', { indicator: ':', item: '\' # Not a \'\'comment\'\'.\'' },
-        'tie-fighter', { indicator: ':', item: '\'|-*-/|\'' }
+        'single', { indicator: ':', item: '"Howdy!" he cried.' },
+        'quoted', { indicator: ':', item: ' # Not a \'comment\'.' },
+        'tie-fighter', { indicator: ':', item: '|\\-*-/|' }
       ] } ] } ]
     },
 
@@ -386,7 +386,7 @@ string: '012345'`,
       tgt: [ { contents: [ { items: [
         'null', { indicator: ':', item: null },
         'booleans', { indicator: ':', item: { items: [ '[', 'true', ',', 'false', ']' ] } },
-        'string', { indicator: ':', item: '\'012345\'' }
+        'string', { indicator: ':', item: '012345' }
       ] } ] } ]
     },
 
@@ -731,7 +731,7 @@ folded: >
 double: "text"`,
       tgt: [{ contents: [{ items: [
         'single',
-        { indicator: ':', item: "'text'" },
+        { indicator: ':', item: 'text' },
         'double',
         { indicator: ':', item: '"text"' }
       ]}]}]
@@ -1275,7 +1275,7 @@ to a line feed, or \t\
     'Example 7.7. Single Quoted Characters': {
       src:
 ` 'here''s to "quotes"'`,
-      tgt: [ { contents: [ '\'here\'\'s to "quotes"\'' ] } ]
+      tgt: [ { contents: [ 'here\'s to "quotes"' ] } ]
     },
 
     'Example 7.8. Single Quoted Implicit Keys': {
@@ -1284,9 +1284,9 @@ to a line feed, or \t\
   'implicit flow key' : value,
  ]`,
       tgt: [ { contents: [ { items: [
-        '\'implicit block key\'',
+        'implicit block key',
         { indicator: ':', item: { items: [
-          '[', '\'implicit flow key\'', ':', 'value', ',', ']'
+          '[', 'implicit flow key', ':', 'value', ',', ']'
         ] } }
       ] } ] } ]
     },
@@ -1295,9 +1295,9 @@ to a line feed, or \t\
       src:
 `' 1st non-empty
 
- 2nd non-empty
+ 2nd non-empty\t
 \t3rd non-empty '`,
-      tgt: [ { contents: [ '\' 1st non-empty\n\n 2nd non-empty\n\t3rd non-empty \'' ] } ]
+      tgt: [ { contents: [ ' 1st non-empty\n2nd non-empty 3rd non-empty ' ] } ]
     },
   },
 
@@ -1377,7 +1377,7 @@ plain
 single: pair,
 ]`,
       tgt: [ { contents: [ { items: [
-        '[', '"double\n quoted"', ',', '\'single\n           quoted\'', ',',
+        '[', '"double\n quoted"', ',', 'single quoted', ',',
         'plain\n text', ',', { items: [ '[', 'nested', ']' ] }, ',', 'single',
         ':', 'pair', ',', ']'
       ] } ] } ]
@@ -1488,7 +1488,7 @@ foo: bar
         { indicator: '-', item: { items: [ '[', 'a', ',', 'b', ']' ] } },
         { indicator: '-', item: { items: [ '{', 'a', ':', 'b', '}' ] } },
         { indicator: '-', item: '"a"' },
-        { indicator: '-', item: "'b'" },
+        { indicator: '-', item: 'b' },
         { indicator: '-', item: 'c' }
       ] } ] } ]
     },
@@ -1502,7 +1502,7 @@ foo: bar
 - !!str`,
       tgt: [ { contents: [ { items: [
         { indicator: '-', item: { tag: '!str', rawValue: '"a"' } },
-        { indicator: '-', item: "'b'" },
+        { indicator: '-', item: 'b' },
         { indicator: '-', item: { anchor: 'anchor', rawValue: '"c"' } },
         { indicator: '-', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } },
         { indicator: '-', item: { tag: '!str' } }

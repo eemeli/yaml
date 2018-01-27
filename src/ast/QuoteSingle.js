@@ -15,6 +15,15 @@ export default class QuoteSingle extends Node {
     return offset + 1
   }
 
+  get strValue () {
+    if (!this.valueRange || !this.context) return null
+    const { start, end } = this.valueRange
+    return this.context.src.slice(start + 1, end - 1)
+      .replace(/''/g, "'")
+      .replace(/[ \t]*\n[ \t]*/g, '\n')
+      .replace(/\n+/g, nl => nl.length === 1 ? ' ' : '\n')
+  }
+
   /**
    * Parses a 'single quoted' value from the source
    *
