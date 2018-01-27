@@ -1,31 +1,32 @@
 import Range from './Range'
 
+export const Type = {
+  ALIAS: 'ALIAS',
+  BLOCK_FOLDED: 'BLOCK_FOLDED',
+  BLOCK_LITERAL: 'BLOCK_LITERAL',
+  COMMENT: 'COMMENT',
+  DIRECTIVE: 'DIRECTIVE',
+  DOCUMENT: 'DOCUMENT',
+  FLOW_MAP: 'FLOW_MAP',
+  FLOW_SEQ: 'FLOW_SEQ',
+  MAP: 'MAP',
+  MAP_KEY: 'MAP_KEY',
+  MAP_VALUE: 'MAP_VALUE',
+  PLAIN: 'PLAIN',
+  QUOTE_DOUBLE: 'QUOTE_DOUBLE',
+  QUOTE_SINGLE: 'QUOTE_SINGLE',
+  SEQ: 'SEQ',
+  SEQ_ITEM: 'SEQ_ITEM'
+}
+
+export const Prop = {
+  ANCHOR: '&',
+  COMMENT: '#',
+  TAG: '!'
+}
+
 /** Root class of all nodes */
 export default class Node {
-  static Prop = {
-    ANCHOR: '&',
-    COMMENT: '#',
-    TAG: '!'
-  }
-  static Type = {
-    ALIAS: 'ALIAS',
-    BLOCK_FOLDED: 'BLOCK_FOLDED',
-    BLOCK_LITERAL: 'BLOCK_LITERAL',
-    COMMENT: 'COMMENT',
-    DIRECTIVE: 'DIRECTIVE',
-    DOCUMENT: 'DOCUMENT',
-    FLOW_MAP: 'FLOW_MAP',
-    FLOW_SEQ: 'FLOW_SEQ',
-    MAP: 'MAP',
-    MAP_KEY: 'MAP_KEY',
-    MAP_VALUE: 'MAP_VALUE',
-    PLAIN: 'PLAIN',
-    QUOTE_DOUBLE: 'QUOTE_DOUBLE',
-    QUOTE_SINGLE: 'QUOTE_SINGLE',
-    SEQ: 'SEQ',
-    SEQ_ITEM: 'SEQ_ITEM'
-  }
-
   static addStringTerminator (src, offset, str) {
     if (str[str.length - 1] === '\n') return str
     const next = Node.endOfWhiteSpace(src, offset)
@@ -137,7 +138,7 @@ export default class Node {
 
   get anchor () {
     for (let i = 0; i < this.props.length; ++i) {
-      const anchor = this.getPropValue(i, Node.Prop.ANCHOR)
+      const anchor = this.getPropValue(i, Prop.ANCHOR)
       if (anchor != null) return anchor
     }
     return null
@@ -146,7 +147,7 @@ export default class Node {
   get comment () {
     const comments = []
     for (let i = 0; i < this.props.length; ++i) {
-      const comment = this.getPropValue(i, Node.Prop.COMMENT)
+      const comment = this.getPropValue(i, Prop.COMMENT)
       if (comment != null) comments.push(comment)
     }
     return comments.length > 0 ? comments.join('\n') : null
@@ -156,7 +157,7 @@ export default class Node {
     if (this.context) {
       const { src } = this.context
       for (let i = 0; i < this.props.length; ++i) {
-        if (src[this.props[i].start] === Node.Prop.COMMENT) return true
+        if (src[this.props[i].start] === Prop.COMMENT) return true
       }
     }
     return false
@@ -164,10 +165,10 @@ export default class Node {
 
   get jsonLike () {
     const jsonLikeTypes = [
-      Node.Type.FLOW_MAP,
-      Node.Type.FLOW_SEQ,
-      Node.Type.QUOTE_DOUBLE,
-      Node.Type.QUOTE_SINGLE
+      Type.FLOW_MAP,
+      Type.FLOW_SEQ,
+      Type.QUOTE_DOUBLE,
+      Type.QUOTE_SINGLE
     ]
     return jsonLikeTypes.indexOf(this.type) !== -1
   }
@@ -180,7 +181,7 @@ export default class Node {
 
   get tag () {
     for (let i = 0; i < this.props.length; ++i) {
-      const tag = this.getPropValue(i, Node.Prop.TAG)
+      const tag = this.getPropValue(i, Prop.TAG)
       if (tag != null) return tag
     }
     return null
@@ -188,11 +189,11 @@ export default class Node {
 
   parseComment (start) {
     const { src } = this.context
-    if (src[start] === Node.Prop.COMMENT) {
+    if (src[start] === Prop.COMMENT) {
       const end = Node.endOfLine(src, start + 1)
       const commentRange = new Range(start, end)
       this.props.push(commentRange)
-      trace: commentRange, JSON.stringify(this.getPropValue(this.props.length - 1, Node.Prop.COMMENT))
+      trace: commentRange, JSON.stringify(this.getPropValue(this.props.length - 1, Prop.COMMENT))
       return end
     }
     return start

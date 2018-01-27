@@ -1,4 +1,4 @@
-import Node from './Node'
+import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class CollectionItem extends Node {
@@ -36,7 +36,7 @@ export default class CollectionItem extends Node {
       ch = src[offset]
     }
     trace: 'item-parse?', { indentDiff: offset - (lineStart + indent), ch: ch && JSON.stringify(ch) }
-    if (Node.nextNodeIsIndented(ch, offset - (lineStart + indent), this.type !== Node.Type.SEQ_ITEM)) {
+    if (Node.nextNodeIsIndented(ch, offset - (lineStart + indent), this.type !== Type.SEQ_ITEM)) {
       this.item = parseNode({ atLineStart, inCollection: false, indent, lineStart, parent: this }, offset)
       if (this.item) offset = this.item.range.end
     } else if (lineStart > start + 1) {

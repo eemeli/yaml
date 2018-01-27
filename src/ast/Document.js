@@ -1,5 +1,5 @@
 import Comment from './Comment'
-import Node from './Node'
+import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class Document extends Node {
@@ -32,7 +32,7 @@ export default class Document extends Node {
   }
 
   constructor () {
-    super(Node.Type.DOCUMENT)
+    super(Type.DOCUMENT)
     this.directives = null
     this.contents = null
   }
@@ -55,7 +55,7 @@ export default class Document extends Node {
           trace: 'directive-comment', comment.comment
         } break
         case '%': {
-          const directive = new Node(Node.Type.DIRECTIVE, null, { parent: this, src })
+          const directive = new Node(Type.DIRECTIVE, null, { parent: this, src })
           offset = Document.endOfDirective(src, offset + 1)
           directive.valueRange = new Range(dirStart + 1, offset)
           offset = Node.endOfWhiteSpace(src, offset)
@@ -129,7 +129,7 @@ export default class Document extends Node {
     if (value != null) return value
     let str = directives.join('')
     if (contents.length > 0) {
-      if (directives.length > 0 || contents[0].type === Node.Type.COMMENT) str += '---\n'
+      if (directives.length > 0 || contents[0].type === Type.COMMENT) str += '---\n'
       str += contents.join('')
     }
     if (str[str.length - 1] !== '\n') str += '\n'

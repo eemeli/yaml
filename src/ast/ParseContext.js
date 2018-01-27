@@ -3,7 +3,7 @@ import BlockValue from './BlockValue'
 import Collection from './Collection'
 import CollectionItem from './CollectionItem'
 import FlowCollection from './FlowCollection'
-import Node from './Node'
+import Node, { Prop, Type } from './Node'
 import PlainValue from './PlainValue'
 import QuoteDouble from './QuoteDouble'
 import QuoteSingle from './QuoteSingle'
@@ -22,27 +22,27 @@ export default class ParseContext {
   static parseType (src, offset, inFlow) {
     switch (src[offset]) {
       case '*':
-        return Node.Type.ALIAS
+        return Type.ALIAS
       case '>':
-        return Node.Type.BLOCK_FOLDED
+        return Type.BLOCK_FOLDED
       case '|':
-        return Node.Type.BLOCK_LITERAL
+        return Type.BLOCK_LITERAL
       case '{':
-        return Node.Type.FLOW_MAP
+        return Type.FLOW_MAP
       case '[':
-        return Node.Type.FLOW_SEQ
+        return Type.FLOW_SEQ
       case '?':
-        return !inFlow && Node.atBlank(src, offset + 1) ? Node.Type.MAP_KEY : Node.Type.PLAIN
+        return !inFlow && Node.atBlank(src, offset + 1) ? Type.MAP_KEY : Type.PLAIN
       case ':':
-        return !inFlow && Node.atBlank(src, offset + 1) ? Node.Type.MAP_VALUE : Node.Type.PLAIN
+        return !inFlow && Node.atBlank(src, offset + 1) ? Type.MAP_VALUE : Type.PLAIN
       case '-':
-        return !inFlow && Node.atBlank(src, offset + 1) ? Node.Type.SEQ_ITEM : Node.Type.PLAIN
+        return !inFlow && Node.atBlank(src, offset + 1) ? Type.SEQ_ITEM : Type.PLAIN
       case '"':
-        return Node.Type.QUOTE_DOUBLE
+        return Type.QUOTE_DOUBLE
       case "'":
-        return Node.Type.QUOTE_SINGLE
+        return Type.QUOTE_SINGLE
       default:
-        return Node.Type.PLAIN
+        return Type.PLAIN
     }
   }
 
@@ -87,7 +87,7 @@ export default class ParseContext {
     const props = []
     offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
-    while (ch === Node.Prop.ANCHOR || ch === Node.Prop.COMMENT || ch === Node.Prop.TAG || ch === '\n') {
+    while (ch === Prop.ANCHOR || ch === Prop.COMMENT || ch === Prop.TAG || ch === '\n') {
       if (ch === '\n') {
         const lineStart = offset + 1
         const inEnd = Node.endOfIndent(src, lineStart)
@@ -95,7 +95,7 @@ export default class ParseContext {
         this.atLineStart = true
         this.lineStart = lineStart
         offset = inEnd
-      } else if (ch === Node.Prop.COMMENT) {
+      } else if (ch === Prop.COMMENT) {
         const end = Node.endOfLine(src, offset + 1)
         props.push(new Range(offset, end))
         offset = end
@@ -123,30 +123,30 @@ export default class ParseContext {
     trace: 'START', valueStart, type, props, context.pretty
     let node
     switch (type) {
-      case Node.Type.ALIAS:
+      case Type.ALIAS:
         node = new Alias(type, props)
         break
-      case Node.Type.BLOCK_FOLDED:
-      case Node.Type.BLOCK_LITERAL:
+      case Type.BLOCK_FOLDED:
+      case Type.BLOCK_LITERAL:
         node = new BlockValue(type, props)
         break
-      case Node.Type.FLOW_MAP:
-      case Node.Type.FLOW_SEQ:
+      case Type.FLOW_MAP:
+      case Type.FLOW_SEQ:
         node = new FlowCollection(type, props)
         break
-      case Node.Type.MAP_KEY:
-      case Node.Type.MAP_VALUE:
-      case Node.Type.SEQ_ITEM:
+      case Type.MAP_KEY:
+      case Type.MAP_VALUE:
+      case Type.SEQ_ITEM:
         node = new CollectionItem(type, props)
         break
-      case Node.Type.COMMENT:
-      case Node.Type.PLAIN:
+      case Type.COMMENT:
+      case Type.PLAIN:
         node = new PlainValue(type, props)
         break
-      case Node.Type.QUOTE_DOUBLE:
+      case Type.QUOTE_DOUBLE:
         node = new QuoteDouble(type, props)
         break
-      case Node.Type.QUOTE_SINGLE:
+      case Type.QUOTE_SINGLE:
         node = new QuoteSingle(type, props)
         break
       default:

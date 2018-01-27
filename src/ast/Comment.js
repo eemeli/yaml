@@ -1,9 +1,9 @@
-import Node from './Node'
+import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class Comment extends Node {
   constructor () {
-    super(Node.Type.COMMENT)
+    super(Type.COMMENT)
   }
 
   /**

@@ -1,4 +1,4 @@
-import Node from '../../src/ast/Node'
+import Node, { Type } from '../../src/ast/Node'
 import parseStream from '../../src/ast/index'
 import { pretty, testSpec } from './common'
 
@@ -9,7 +9,7 @@ const spec = {
 `- Mark McGwire
 - Sammy Sosa
 - Ken Griffey`,
-      tgt: [ { contents: [ { type: Node.Type.SEQ, items: [
+      tgt: [ { contents: [ { type: Type.SEQ, items: [
         { indicator: '-', item: 'Mark McGwire' },
         { indicator: '-', item: 'Sammy Sosa' },
         { indicator: '-', item: 'Ken Griffey' }
@@ -21,7 +21,7 @@ const spec = {
 `hr:  65    # Home runs
 avg: 0.278 # Batting average
 rbi: 147   # Runs Batted In`,
-      tgt: [ { contents: [ { type: Node.Type.MAP, items: [
+      tgt: [ { contents: [ { type: Type.MAP, items: [
         'hr', { indicator: ':', item: { comment: ' Home runs', strValue: '65' } },
         'avg', { indicator: ':', item: { comment: ' Batting average', strValue: '0.278' } },
         'rbi', { indicator: ':', item: { comment: ' Runs Batted In', strValue: '147' } }
@@ -198,7 +198,7 @@ rbi:
           { indicator: '-', item: { anchor: 'SS', strValue: 'Sammy Sosa' } }
         ] } },
         'rbi', { indicator: ':', item: { items: [
-          { indicator: '-', item: { comment: ' Subsequent occurrence', type: Node.Type.ALIAS, rawValue: '*SS' } },
+          { indicator: '-', item: { comment: ' Subsequent occurrence', type: Type.ALIAS, rawValue: '*SS' } },
           { indicator: '-', item: 'Ken Griffey' }
         ] } }
       ] } ] } ]
@@ -466,11 +466,11 @@ application specific tag: !something |
               'radius', { indicator: ':', item: '7' }
             ] } },
             { indicator: '-', item: { tag: 'line', items: [
-              'start', { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*ORIGIN' } },
+              'start', { indicator: ':', item: { type: Type.ALIAS, rawValue: '*ORIGIN' } },
               'finish', { indicator: ':', item: { items: [ '{', 'x', ':', '89', ',', 'y', ':', '102', '}' ] } }
             ] } },
             { indicator: '-', item: { tag: 'label', items: [
-              'start', { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*ORIGIN' } },
+              'start', { indicator: ':', item: { type: Type.ALIAS, rawValue: '*ORIGIN' } },
               'color', { indicator: ':', item: '0xFFEEBB' },
               'text', { indicator: ':', item: 'Pretty vector drawing.' }
             ] } }
@@ -573,7 +573,7 @@ comments:
               'postal', { indicator: ':', item: '48046' }
             ] } }
           ] } },
-          'ship-to', { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*id001' } },
+          'ship-to', { indicator: ':', item: { type: Type.ALIAS, rawValue: '*id001' } },
           'product', { indicator: ':', item: { items: [
             { indicator: '-', item: { items: [
               'sku', { indicator: ':', item: 'BL394D' },
@@ -711,7 +711,7 @@ alias: *anchor`,
         'anchored',
         { indicator: ':', item: { tag: 'local', anchor: 'anchor', strValue: 'value' } },
         'alias',
-        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } }
+        { indicator: ':', item: { type: Type.ALIAS, rawValue: '*anchor' } }
       ]}]}]
     },
 
@@ -1183,7 +1183,7 @@ bar`,
         { tag: '!str', anchor: 'a1', strValue: 'foo' },
         { indicator: ':', item: { tag: '!str', strValue: 'bar' } },
         { anchor: 'a2', strValue: 'baz' },
-        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*a1' } }
+        { indicator: ':', item: { type: Type.ALIAS, rawValue: '*a1' } }
       ] }] }]
     },
 
@@ -1267,7 +1267,7 @@ Second occurrence: *anchor`,
         'First occurrence',
         { indicator: ':', item: { anchor: 'anchor', strValue: 'Value' } },
         'Second occurrence',
-        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } }
+        { indicator: ':', item: { type: Type.ALIAS, rawValue: '*anchor' } }
       ] }] }]
     },
   },
@@ -1283,11 +1283,11 @@ Reuse anchor: *anchor`,
         'First occurrence',
         { indicator: ':', item: { anchor: 'anchor', strValue: 'Foo' } },
         'Second occurrence',
-        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } },
+        { indicator: ':', item: { type: Type.ALIAS, rawValue: '*anchor' } },
         'Override anchor',
         { indicator: ':', item: { anchor: 'anchor', strValue: 'Bar' } },
         'Reuse anchor',
-        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } }
+        { indicator: ':', item: { type: Type.ALIAS, rawValue: '*anchor' } }
       ] } ] } ]
     },
   },
@@ -1581,7 +1581,7 @@ foo: bar
         { indicator: '-', item: { tag: '!str', strValue: 'a' } },
         { indicator: '-', item: 'b' },
         { indicator: '-', item: { anchor: 'anchor', strValue: 'c' } },
-        { indicator: '-', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } },
+        { indicator: '-', item: { type: Type.ALIAS, rawValue: '*anchor' } },
         { indicator: '-', item: { tag: '!str' } }
       ] } ] } ]
     },
@@ -1902,7 +1902,7 @@ keep: |+\n\n`,
   },
 
   '8.2.3. Block Nodes': {
-    'Example 8.20. Block Node Types': {
+    'Example 8.20. Block Types': {
       src:
 `-
   "flow in block"

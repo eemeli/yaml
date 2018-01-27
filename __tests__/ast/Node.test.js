@@ -1,15 +1,15 @@
-import Node from '../../src/ast/Node'
+import Node, { Type } from '../../src/ast/Node'
 import Range from '../../src/ast/Range'
 
 describe('internals', () => {
   test('constructor', () => {
     const src = '&anchor !tag src'
     const props = [new Range(0, 7), new Range(8, 12)]
-    const node = new Node(Node.Type.PLAIN, props, { src })
+    const node = new Node(Type.PLAIN, props, { src })
     expect(node.context.src).toBe(src)
     expect(node.anchor).toBe('anchor')
     expect(node.tag).toBe('tag')
-    expect(node.type).toBe(Node.Type.PLAIN)
+    expect(node.type).toBe(Type.PLAIN)
   })
 
   test('.endOfIndent', () => {
@@ -23,7 +23,7 @@ describe('internals', () => {
 
   test('#parseComment', () => {
     const src = '#comment here\nnext'
-    const node = new Node(Node.Type.COMMENT, null, { src })
+    const node = new Node(Type.COMMENT, null, { src })
     const end = node.parseComment(0)
     expect(node.comment).toBe('comment here')
     expect(end).toBe(src.indexOf('\n'))

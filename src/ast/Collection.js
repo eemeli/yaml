@@ -1,11 +1,11 @@
 import CollectionItem from './CollectionItem'
 import Comment from './Comment'
-import Node from './Node'
+import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class Collection extends Node {
   constructor (firstItem) {
-    super(firstItem.type === Node.Type.SEQ_ITEM ? Node.Type.SEQ : Node.Type.MAP)
+    super(firstItem.type === Type.SEQ_ITEM ? Type.SEQ : Type.MAP)
     this.items = [firstItem]
     for (let i = firstItem.props.length - 1; i >= 0; --i) {
       if (firstItem.props[i].start < firstItem.context.lineStart) {
@@ -70,7 +70,7 @@ export default class Collection extends Node {
         if (lineStart > start) offset = lineStart
         break
       }
-      if ((firstItem.type === Node.Type.SEQ_ITEM) !== (ch === '-')) {
+      if ((firstItem.type === Type.SEQ_ITEM) !== (ch === '-')) {
         trace: 'end:typeswitch', { offset, lineStart, indent, ch: JSON.stringify(ch) }
         if (lineStart > start) offset = lineStart
         break

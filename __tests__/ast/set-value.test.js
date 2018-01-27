@@ -1,4 +1,4 @@
-import Node from '../../src/ast/Node'
+import Node, { Type } from '../../src/ast/Node'
 import parseStream from '../../src/ast/index'
 import { pretty, testSpec } from './common'
 import CollectionItem from '../../src/ast/CollectionItem';
@@ -50,7 +50,7 @@ national:
 `
   const ast = parseStream(src)
   const seq = ast[0].contents[0].items[3].item
-  const item = new CollectionItem(Node.Type.SEQ_ITEM)
+  const item = new CollectionItem(Type.SEQ_ITEM)
   item.context = seq.items[2].context
   item.value = '- "TEST"\n'
   seq.items.push(item)

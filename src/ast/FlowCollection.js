@@ -1,5 +1,5 @@
 import Comment from './Comment'
-import Node from './Node'
+import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class FlowCollection extends Node {
@@ -12,7 +12,7 @@ export default class FlowCollection extends Node {
     const node = this.items[idx - 1]
     return !!node && (
       node.jsonLike || (
-        node.type === Node.Type.COMMENT && this.nodeIsJsonLike(idx - 1)
+        node.type === Type.COMMENT && this.nodeIsJsonLike(idx - 1)
       )
     )
   }

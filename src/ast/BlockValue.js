@@ -1,4 +1,4 @@
-import Node from './Node'
+import Node, { Type } from './Node'
 import Range from './Range'
 
 export const Chomp = {
@@ -29,7 +29,7 @@ export default class BlockValue extends Node {
       if (lastNewLine) end = this.chomping === Chomp.STRIP ? lastNewLine : lastNewLine + 1
     }
     const bi = indent + this.blockIndent
-    const folded = (this.type === Node.Type.BLOCK_FOLDED)
+    const folded = (this.type === Type.BLOCK_FOLDED)
     let str = ''
     let sep = ''
     let prevMoreIndented = false
