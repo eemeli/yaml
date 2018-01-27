@@ -22,9 +22,9 @@ const spec = {
 avg: 0.278 # Batting average
 rbi: 147   # Runs Batted In`,
       tgt: [ { contents: [ { type: Node.Type.MAP, items: [
-        'hr', { indicator: ':', item: { comment: ' Home runs', rawValue: '65' } },
-        'avg', { indicator: ':', item: { comment: ' Batting average', rawValue: '0.278' } },
-        'rbi', { indicator: ':', item: { comment: ' Runs Batted In', rawValue: '147' } }
+        'hr', { indicator: ':', item: { comment: ' Home runs', strValue: '65' } },
+        'avg', { indicator: ':', item: { comment: ' Batting average', strValue: '0.278' } },
+        'rbi', { indicator: ':', item: { comment: ' Runs Batted In', strValue: '147' } }
       ] } ] } ]
     },
 
@@ -195,7 +195,7 @@ rbi:
         'hr', { indicator: ':', item: { items: [
           { indicator: '-', item: 'Mark McGwire' },
           { comment: ' Following node labeled SS' },
-          { indicator: '-', item: { anchor: 'SS', rawValue: 'Sammy Sosa' } }
+          { indicator: '-', item: { anchor: 'SS', strValue: 'Sammy Sosa' } }
         ] } },
         'rbi', { indicator: ':', item: { items: [
           { indicator: '-', item: { comment: ' Subsequent occurrence', type: Node.Type.ALIAS, rawValue: '*SS' } },
@@ -341,7 +341,7 @@ tie-fighter: '|\\-*-/|'`,
 quoted: "So does this
   quoted scalar.\n"`,
       tgt: [ { contents: [ { items: [
-        'plain', { indicator: ':', item: 'This unquoted scalar\n  spans many lines.' },
+        'plain', { indicator: ':', item: 'This unquoted scalar spans many lines.' },
         'quoted', { indicator: ':', item: 'So does this quoted scalar. ' }
       ] } ] } ]
     },
@@ -420,7 +420,7 @@ application specific tag: !something |
  above may be different for
  different documents.`,
       tgt: [ { contents: [ { items: [
-        'not-date', { indicator: ':', item: { tag: '!str', rawValue: '2002-04-28' } },
+        'not-date', { indicator: ':', item: { tag: '!str', strValue: '2002-04-28' } },
         'picture', { indicator: ':', item: { tag: '!binary', rawValue:
           ' R0lGODlhDAAMAIQAAP//9/X\n 17unp5WZmZgAAAOfn515eXv\n Pz7Y6OjuDg4J+fn5OTk6enp\n 56enmleECcgggoBADs=\n\n'
         } },
@@ -583,7 +583,7 @@ comments:
           ] } },
           'tax', { indicator: ':', item: '251.42' },
           'total', { indicator: ':', item: '4443.52' },
-          'comments', { indicator: ':', item: 'Late afternoon is best.\n    Backup contact is Nancy\n    Billsmer @ 338-4338.' }
+          'comments', { indicator: ':', item: 'Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.' }
         ]
       } ] } ]
     },
@@ -620,12 +620,12 @@ Stack:
         { contents: [ { items: [
           'Time', { indicator: ':', item: '2001-11-23 15:01:42 -5' },
           'User', { indicator: ':', item: 'ed' },
-          'Warning', { indicator: ':', item: 'This is an error message\n  for the log file' }
+          'Warning', { indicator: ':', item: 'This is an error message for the log file' }
         ] } ] },
         { contents: [ { items: [
           'Time', { indicator: ':', item: '2001-11-23 15:02:31 -5' },
           'User', { indicator: ':', item: 'ed' },
-          'Warning', { indicator: ':', item: 'A slightly different error\n  message.' }
+          'Warning', { indicator: ':', item: 'A slightly different error message.' }
         ] } ] },
         { contents: [ { items: [
           'Date', { indicator: ':', item: '2001-11-23 15:03:17 -5' },
@@ -702,7 +702,7 @@ mapping: { sky: blue, sea: green }`,
 alias: *anchor`,
       tgt: [{ contents: [{ items: [
         'anchored',
-        { indicator: ':', item: { tag: 'local', anchor: 'anchor', rawValue: 'value' } },
+        { indicator: ':', item: { tag: 'local', anchor: 'anchor', strValue: 'value' } },
         'alias',
         { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } }
       ]}]}]
@@ -843,7 +843,7 @@ Not indented:
               '[', { comment: ' Leading spaces' },
               'By two', ',', { comment: ' in flow style' },
               'Also by two', ',', { comment: ' are neither' },
-              { rawValue: 'Still by two', comment: ' content nor' },
+              { strValue: 'Still by two', comment: ' content nor' },
               ']'
             ], comment: ' indentation.' } }
           ] } }
@@ -901,7 +901,7 @@ block: |
    \tlines`,
       tgt: [{ contents: [{ items: [
         'plain',
-        { indicator: ':', item: {} /*'text lines'*/ },
+        { indicator: ':', item: 'text lines' },
         'quoted',
         { indicator: ':', item: 'text lines' },
         'block',
@@ -1097,7 +1097,7 @@ bar`,
 !!int 1 - 3 # Interval, not integer`,
       tgt: [{
         directives: ['TAG !! tag:example.com,2000:app/'],
-        contents: [{ tag: '!int', rawValue: '1 - 3', comment: ' Interval, not integer' }]
+        contents: [{ tag: '!int', strValue: '1 - 3', comment: ' Interval, not integer' }]
       }]
     },
 
@@ -1125,14 +1125,14 @@ bar`,
         directives: ['TAG !m! !my-'],
         contents: [
           { comment: ' Bulb here' },
-          { tag: 'm!light', rawValue: 'fluorescent' }
+          { tag: 'm!light', strValue: 'fluorescent' }
         ]
       },
       {
         directives: ['TAG !m! !my-'],
         contents: [
           { comment: ' Color here' },
-          { tag: 'm!light', rawValue: 'green' }
+          { tag: 'm!light', strValue: 'green' }
         ]
       }]
     },
@@ -1159,8 +1159,8 @@ bar`,
 &a2 baz : *a1`,
       tgt: [{ contents: [{ items: [
         { tag: '!str', anchor: 'a1', strValue: 'foo' },
-        { indicator: ':', item: { tag: '!str', rawValue: 'bar' } },
-        { anchor: 'a2', rawValue: 'baz' },
+        { indicator: ':', item: { tag: '!str', strValue: 'bar' } },
+        { anchor: 'a2', strValue: 'baz' },
         { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*a1' } }
       ] }] }]
     },
@@ -1170,8 +1170,8 @@ bar`,
 `!<tag:yaml.org,2002:str> foo :
   !<!bar> baz`,
       tgt: [{ contents: [{ items: [
-        { tag: '<tag:yaml.org,2002:str>', rawValue: 'foo' },
-        { indicator: ':', item: { tag: '<!bar>', rawValue: 'baz' } }
+        { tag: '<tag:yaml.org,2002:str>', strValue: 'foo' },
+        { indicator: ':', item: { tag: '<!bar>', strValue: 'baz' } }
       ] }] }]
     },
 
@@ -1180,8 +1180,8 @@ bar`,
 `- !<!> foo
 - !<$:?> bar`,
       tgt: [{ contents: [{ items: [
-        { indicator: '-', item: { tag: '<!>', rawValue: 'foo' } },
-        { indicator: '-', item: { tag: '<$:?>', rawValue: 'bar' } }
+        { indicator: '-', item: { tag: '<!>', strValue: 'foo' } },
+        { indicator: '-', item: { tag: '<$:?>', strValue: 'bar' } }
       ] }] }]
       // ERROR: Verbatim tags aren't resolved, so ! is invalid.
       // ERROR: The $:? tag is neither a global URI tag nor a local tag starting with “!”.
@@ -1197,9 +1197,9 @@ bar`,
       tgt: [{
         directives: ['TAG !e! tag:example.com,2000:app/'],
         contents: [{ items: [
-          { indicator: '-', item: { tag: 'local', rawValue: 'foo' } },
-          { indicator: '-', item: { tag: '!str', rawValue: 'bar' } },
-          { indicator: '-', item: { tag: 'e!tag%21', rawValue: 'baz' } }
+          { indicator: '-', item: { tag: 'local', strValue: 'foo' } },
+          { indicator: '-', item: { tag: '!str', strValue: 'bar' } },
+          { indicator: '-', item: { tag: 'e!tag%21', strValue: 'baz' } }
         ] }]
       }]
     },
@@ -1213,8 +1213,8 @@ bar`,
       tgt: [{
         directives: ['TAG !e! tag:example,2000:app/'],
         contents: [{ items: [
-          { indicator: '-', item: { tag: 'e!', rawValue: 'foo' } },
-          { indicator: '-', item: { tag: 'h!bar', rawValue: 'baz' } }
+          { indicator: '-', item: { tag: 'e!', strValue: 'foo' } },
+          { indicator: '-', item: { tag: 'h!bar', strValue: 'baz' } }
         ] }]
       }]
       // ERROR: The !o! handle has no suffix.
@@ -1232,7 +1232,7 @@ bar`,
         contents: [{ items: [
           { indicator: '-', item: '12' },
           { indicator: '-', item: '12' },
-          { indicator: '-', item: { tag: '', rawValue: '12' } }
+          { indicator: '-', item: { tag: '', strValue: '12' } }
         ] }]
       }]
     },
@@ -1243,7 +1243,7 @@ bar`,
 Second occurrence: *anchor`,
       tgt: [{ contents: [{ items: [
         'First occurrence',
-        { indicator: ':', item: { anchor: 'anchor', rawValue: 'Value' } },
+        { indicator: ':', item: { anchor: 'anchor', strValue: 'Value' } },
         'Second occurrence',
         { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } }
       ] }] }]
@@ -1259,11 +1259,11 @@ Override anchor: &anchor Bar
 Reuse anchor: *anchor`,
       tgt: [ { contents: [ { items: [
         'First occurrence',
-        { indicator: ':', item: { anchor: 'anchor', rawValue: 'Foo' } },
+        { indicator: ':', item: { anchor: 'anchor', strValue: 'Foo' } },
         'Second occurrence',
         { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } },
         'Override anchor',
-        { indicator: ':', item: { anchor: 'anchor', rawValue: 'Bar' } },
+        { indicator: ':', item: { anchor: 'anchor', strValue: 'Bar' } },
         'Reuse anchor',
         { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } }
       ] } ] } ]
@@ -1406,7 +1406,7 @@ to a line feed, or \t\\
 
  2nd non-empty
 \t3rd non-empty`,
-      tgt: [ { contents: [ '1st non-empty\n\n 2nd non-empty\n\t3rd non-empty' ] } ]
+      tgt: [ { contents: [ '1st non-empty\n2nd non-empty 3rd non-empty' ] } ]
     },
   },
 
@@ -1433,7 +1433,7 @@ single: pair,
 ]`,
       tgt: [ { contents: [ { items: [
         '[', 'double quoted', ',', 'single quoted', ',',
-        'plain\n text', ',', { items: [ '[', 'nested', ']' ] }, ',', 'single',
+        'plain text', ',', { items: [ '[', 'nested', ']' ] }, ',', 'single',
         ':', 'pair', ',', ']'
       ] } ] } ]
     },
@@ -1501,7 +1501,7 @@ foo: bar
 ? foo
  bar : baz
 ]`,
-      tgt: [ { contents: [ { items: [ '[', '?', 'foo\n bar', ':', 'baz', ']' ] } ] } ]
+      tgt: [ { contents: [ { items: [ '[', '?', 'foo bar', ':', 'baz', ']' ] } ] } ]
     },
 
     'Example 7.21. Single Pair Implicit Entries': {
@@ -1524,7 +1524,7 @@ foo: bar
  bar: invalid,
  "foo...>1K characters...bar": invalid ]`,
       tgt: [ { contents: [ { items: [
-        '[', 'foo\n bar', ':', 'invalid', ',', 'foo...>1K characters...bar', ':', 'invalid', ']'
+        '[', 'foo bar', ':', 'invalid', ',', 'foo...>1K characters...bar', ':', 'invalid', ']'
       ] } ] } ]
       // ERROR: The foo bar key spans multiple lines
       // ERROR: The foo...bar key is too long
@@ -1852,12 +1852,12 @@ keep: |+\n\n`,
         { indicator: '-', item: null, comment: ' Empty' },
         { indicator: '-', item: ' block node\n' },
         { indicator: '-', item: { items: [
-          { indicator: '-', item: { comment: ' Compact', rawValue: 'one' } },
-          { indicator: '-', item: { comment: ' sequence', rawValue: 'two' } }
+          { indicator: '-', item: { comment: ' Compact', strValue: 'one' } },
+          { indicator: '-', item: { comment: ' sequence', strValue: 'two' } }
         ] } },
         { indicator: '-', item: { items: [
           'one',
-          { indicator: ':', item: { comment: ' Compact mapping', rawValue: 'two' } }
+          { indicator: ':', item: { comment: ' Compact mapping', strValue: 'two' } }
         ] } }
       ] } ] } ]
     },
@@ -1885,11 +1885,11 @@ keep: |+\n\n`,
 : - one # Explicit compact
   - two # block value\n`,
       tgt: [ { contents: [ { items: [
-        { indicator: '?', item: { comment: ' Empty value', rawValue: 'explicit key' } },
+        { indicator: '?', item: { comment: ' Empty value', strValue: 'explicit key' } },
         { indicator: '?', item: '  block key\n' },
         { indicator: ':', item: { items: [
-          { indicator: '-', item: { comment: ' Explicit compact', rawValue: 'one' } },
-          { indicator: '-', item: { comment: ' block value', rawValue: 'two' } }
+          { indicator: '-', item: { comment: ' Explicit compact', strValue: 'one' } },
+          { indicator: '-', item: { comment: ' block value', strValue: 'two' } }
         ] } }
       ] } ] } ]
     },
@@ -2023,7 +2023,7 @@ document
 |
 %!PS-Adobe-2.0 # Not the first line`,
       tgt: [{
-        contents: ['Bare\ndocument']
+        contents: ['Bare document']
       }, {
         directives: [{ comment: ' No document' }]
       }, {
@@ -2042,7 +2042,7 @@ document
 ...`,
       tgt: [{
         contents: [
-          { items: ['{', 'matches\n%', ':', '20', '}'] }
+          { items: ['{', 'matches %', ':', '20', '}'] }
         ]
       }, {
         contents: [{ comment: ' Empty' }]

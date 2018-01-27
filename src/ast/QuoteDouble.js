@@ -19,6 +19,7 @@ export default class QuoteDouble extends Node {
     return offset + 1
   }
 
+  /** @throws {SyntaxError} on invalid \ escape */
   get strValue () {
     if (!this.valueRange || !this.context) return null
     const { start, end } = this.valueRange

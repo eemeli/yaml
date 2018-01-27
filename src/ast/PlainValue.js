@@ -16,9 +16,41 @@ export default class PlainValue extends Node {
     return offset
   }
 
-  // a plain value must not contain leading or trailing white space characters
-  get rawValue () {
-    return super.rawValue.trim()
+  get strValue () {
+    if (!this.valueRange || !this.context) return null
+    let { start, end } = this.valueRange
+    const { src } = this.context
+    let ch = src[end - 1]
+    while (start < end && (ch === '\n' || ch === '\t' || ch === ' ')) ch = src[--end - 1]
+    ch = src[start]
+    while (start < end && (ch === '\n' || ch === '\t' || ch === ' ')) ch = src[++start]
+    let str = ''
+    for (let i = start; i < end; ++i) {
+      let ch = src[i]
+      if (ch === '\n') {
+        // fold single newline into space, multiple newlines to just one
+        let nlCount = 1
+        ch = src[i + 1]
+        while (ch === ' ' || ch === '\t' || ch === '\n') {
+          if (ch === '\n') ++nlCount
+          i += 1
+          ch = src[i + 1]
+        }
+        str += nlCount > 1 ? '\n' : ' '
+      } else if (ch === ' ' || ch === '\t') {
+        // trim trailing whitespace
+        const wsStart = i
+        let next = src[i + 1]
+        while (i < end && (next === ' ' || next === '\t')) {
+          i += 1
+          next = src[i + 1]
+        }
+        if (next !== '\n') str += i > wsStart ? src.slice(wsStart, i + 1) : ch
+      } else {
+        str += ch
+      }
+    }
+    return str
   }
 
   parseBlockValue (start) {
