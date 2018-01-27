@@ -271,7 +271,7 @@ rbi:
   // ||  ||__`,
       tgt: [ {
         directives: [ { comment: ' ASCII Art' } ],
-        contents: [ '  \\//||\\/||\n  // ||  ||__\n' ]
+        contents: [ '\\//||\\/||\n// ||  ||__\n' ]
       } ]
     },
 
@@ -281,7 +281,7 @@ rbi:
   Mark McGwire's
   year was crippled
   by a knee injury.`,
-      tgt: [ { contents: [ '  Mark McGwire\'s\n  year was crippled\n  by a knee injury.\n' ] } ]
+      tgt: [ { contents: [ 'Mark McGwire\'s\nyear was crippled\nby a knee injury.\n' ] } ]
     },
 
     'Example 2.15. Folded newlines are preserved for "more indented" and blank lines': {
@@ -294,7 +294,7 @@ rbi:
    0.288 Batting Average
 
  What a year!`,
-      tgt:[ { contents: [ ' Sammy Sosa completed another\n fine season with great stats.\n\n   63 Home Runs\n   0.288 Batting Average\n\n What a year!\n' ] } ]
+      tgt:[ { contents: [ 'Sammy Sosa completed another\nfine season with great stats.\n\n  63 Home Runs\n  0.288 Batting Average\n\nWhat a year!\n' ] } ]
     },
 
     'Example 2.16. Indentation determines scope': {
@@ -308,8 +308,8 @@ stats: |
   0.278 Batting Average`,
       tgt: [ { contents: [ { items: [
         'name', { indicator: ':', item: 'Mark McGwire' },
-        'accomplishment', { indicator: ':', item: '  Mark set a major league\n  home run record in 1998.\n' },
-        'stats', { indicator: ':', item: '  65 Home Runs\n  0.278 Batting Average\n' }
+        'accomplishment', { indicator: ':', item: 'Mark set a major league\nhome run record in 1998.\n' },
+        'stats', { indicator: ':', item: '65 Home Runs\n0.278 Batting Average\n' }
       ] } ] } ]
     },
 
@@ -421,11 +421,11 @@ application specific tag: !something |
  different documents.`,
       tgt: [ { contents: [ { items: [
         'not-date', { indicator: ':', item: { tag: '!str', strValue: '2002-04-28' } },
-        'picture', { indicator: ':', item: { tag: '!binary', rawValue:
-          ' R0lGODlhDAAMAIQAAP//9/X\n 17unp5WZmZgAAAOfn515eXv\n Pz7Y6OjuDg4J+fn5OTk6enp\n 56enmleECcgggoBADs=\n\n'
+        'picture', { indicator: ':', item: { tag: '!binary', strValue:
+          'R0lGODlhDAAMAIQAAP//9/X\n17unp5WZmZgAAAOfn515eXv\nPz7Y6OjuDg4J+fn5OTk6enp\n56enmleECcgggoBADs=\n'
         } },
-        'application specific tag', { indicator: ':', item: { tag: 'something', rawValue:
-          ' The semantics of the tag\n above may be different for\n different documents.\n'
+        'application specific tag', { indicator: ':', item: { tag: 'something', strValue:
+          'The semantics of the tag\nabove may be different for\ndifferent documents.\n'
         } }
       ] } ] } ]
     },
@@ -560,7 +560,7 @@ comments:
             'given', { indicator: ':', item: 'Chris' },
             'family', { indicator: ':', item: 'Dumars' },
             'address', { indicator: ':', item: { items: [
-              'lines', { indicator: ':', item: '            458 Walkman Dr.\n            Suite #292\n' },
+              'lines', { indicator: ':', item: '458 Walkman Dr.\nSuite #292\n' },
               'city', { indicator: ':', item: 'Royal Oak' },
               'state', { indicator: ':', item: 'MI' },
               'postal', { indicator: ':', item: '48046' }
@@ -635,12 +635,12 @@ Stack:
             { indicator: '-', item: { items: [
               'file', { indicator: ':', item: 'TopClass.py' },
               'line', { indicator: ':', item: '23' },
-              'code', { indicator: ':', item: '      x = MoreObject("345\\n")\n' }
+              'code', { indicator: ':', item: 'x = MoreObject("345\\n")\n' }
             ] } },
             { indicator: '-', item: { items: [
               'file', { indicator: ':', item: 'MoreClass.py' },
               'line', { indicator: ':', item: '58' },
-              'code', { indicator: ':', item: '      foo = bar\n' }
+              'code', { indicator: ':', item: 'foo = bar' }
             ] } }
           ] } }
         ] } ] }
@@ -780,7 +780,7 @@ block:\t|
           'quoted',
           { indicator: ':', item: 'Quoted \t' },
           'block',
-          { indicator: ':', item: '  void main() {\n  \tprintf("Hello, world!\\n");\n  }\n' }
+          { indicator: ':', item: 'void main() {\n\tprintf("Hello, world!\\n");\n}\n' }
         ]}]
       }]
     },
@@ -837,7 +837,7 @@ Not indented:
           'Not indented',
           { indicator: ':', item: { items: [
             'By one space',
-            { indicator: ':', item: '    By four\n      spaces\n' },
+            { indicator: ':', item: 'By four\n  spaces\n' },
             'Flow style',
             { indicator: ':', item: { items: [
               '[', { comment: ' Leading spaces' },
@@ -1578,48 +1578,48 @@ foo: bar
 - >1- # Both indicators
   strip`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { comment: ' Empty header', rawValue: ' literal\n' } },
-        { indicator: '-', item: { comment: ' Indentation indicator', rawValue: '  folded\n' } },
-        { indicator: '-', item: { comment: ' Chomping indicator', rawValue: ' keep\n\n' } },
-        { indicator: '-', item: { comment: ' Both indicators', rawValue: '  strip\n' } }
+        { indicator: '-', item: { comment: ' Empty header', strValue: 'literal\n' } },
+        { indicator: '-', item: { comment: ' Indentation indicator', strValue: ' folded\n' } },
+        { indicator: '-', item: { comment: ' Chomping indicator', strValue: 'keep\n\n' } },
+        { indicator: '-', item: { comment: ' Both indicators', strValue: ' strip' } }
       ] } ] } ]
     },
 
     'Example 8.2. Block Indentation Indicator': {
       src:
 `- |
- detected
+·detected
 - >
-
-
-  # detected
+·
+··
+··# detected
 - |1
-  explicit
+··explicit
 - >
- \t
- detected`,
+·\t
+·detected`.replace(/·/g, ' '),
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: ' detected\n' },
-        { indicator: '-', item: '\n\n  # detected\n' },
-        { indicator: '-', item: '  explicit\n' },
-        { indicator: '-', item: ' \t\n detected\n' }
+        { indicator: '-', item: 'detected\n' },
+        { indicator: '-', item: '\n\n# detected\n' },
+        { indicator: '-', item: ' explicit\n' },
+        { indicator: '-', item: '\t\ndetected\n' }
       ] } ] } ]
     },
 
     'Example 8.3. Invalid Block Scalar Indentation Indicators': {
       src:
 `- |
-
- text
+··
+·text
 - >
-  text
- text
+··text
+·text
 - |2
- text`,
+·text`.replace(/·/g, ' '),
       tgt: [ { contents: [
         { items: [
-          { indicator: '-', item: '\n text\n' },
-          { indicator: '-', item: '  text\n' },
+          { indicator: '-', item: 'text\n' },
+          { indicator: '-', item: 'text\n' },
         ] },
         'text - |2 text'
       ] } ]
@@ -1638,11 +1638,11 @@ keep: |+
   text\n`,
       tgt: [ { contents: [ { items: [
         'strip',
-        { indicator: ':', item: '  text\n' },
+        { indicator: ':', item: 'text' },
         'clip',
-        { indicator: ':', item: '  text\n' },
+        { indicator: ':', item: 'text\n' },
         'keep',
-        { indicator: ':', item: '  text\n' }
+        { indicator: ':', item: 'text\n' }
       ] } ] } ]
     },
 
@@ -1672,15 +1672,15 @@ keep: |+
         directives: [ { comment: ' Strip' }, { comment: ' Comments:' } ],
         contents: [ { items: [
           'strip',
-          { indicator: ':', item: '  # text\n\n' },
+          { indicator: ':', item: '# text' },
           { comment: ' Clip' },
           { comment: ' comments:' },
           'clip',
-          { indicator: ':', item: '  # text\n\n' },
+          { indicator: ':', item: '# text\n' },
           { comment: ' Keep' },
           { comment: ' comments:' },
           'keep',
-          { indicator: ':', item: '  # text\n\n' },
+          { indicator: ':', item: '# text\n\n' },
           { comment: ' Trail' },
           { comment: ' comments.' }
         ] } ]
@@ -1711,22 +1711,22 @@ keep: |+\n\n`,
 `|
  literal
  \ttext\n\n`,
-      tgt: [ { contents: [ ' literal\n \ttext\n\n' ] } ]
+      tgt: [ { contents: [ 'literal\n\ttext\n' ] } ]
     },
 
     'Example 8.8. Literal Content': {
       src:
 `|
+·
+··
+··literal
+···
+··
+··text
 
-
-  literal
-
-
-  text
-
- # Comment`,
+·# Comment`.replace(/·/g, ' '),
       tgt: [ { contents: [
-        '\n\n  literal\n\n\n  text\n\n',
+        '\n\nliteral\n \n\ntext\n',
         { comment: ' Comment' }
       ] } ]
     },
@@ -1738,7 +1738,7 @@ keep: |+\n\n`,
 `>
  folded
  text\n\n`,
-      tgt: [ { contents: [ ' folded\n text\n\n' ] } ]
+      tgt: [ { contents: [ 'folded\ntext\n\n' ] } ]
     },
 
     'Example 8.10. Folded Lines': {
@@ -1831,7 +1831,7 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        ' folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n',
+        'folded line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n',
         { comment: ' Comment' }
       ] } ]
     },
@@ -1865,7 +1865,7 @@ keep: |+\n\n`,
 - one: two # Compact mapping`,
       tgt: [ { contents: [ { items: [
         { indicator: '-', item: null, comment: ' Empty' },
-        { indicator: '-', item: ' block node\n' },
+        { indicator: '-', item: 'block node\n' },
         { indicator: '-', item: { items: [
           { indicator: '-', item: { comment: ' Compact', strValue: 'one' } },
           { indicator: '-', item: { comment: ' sequence', strValue: 'two' } }
@@ -1901,7 +1901,7 @@ keep: |+\n\n`,
   - two # block value\n`,
       tgt: [ { contents: [ { items: [
         { indicator: '?', item: { comment: ' Empty value', strValue: 'explicit key' } },
-        { indicator: '?', item: '  block key\n' },
+        { indicator: '?', item: 'block key\n' },
         { indicator: ':', item: { items: [
           { indicator: '-', item: { comment: ' Explicit compact', strValue: 'one' } },
           { indicator: '-', item: { comment: ' block value', strValue: 'two' } }
@@ -1961,7 +1961,7 @@ keep: |+\n\n`,
   foo : bar\n`,
       tgt: [ { contents: [ { items: [
         { indicator: '-', item: 'flow in block' },
-        { indicator: '-', item: ' Block scalar\n' },
+        { indicator: '-', item: 'Block scalar\n' },
         { indicator: '-', item: { tag: '!map', comment: ' Block collection', items: [
           'foo',
           { indicator: ':', item: 'bar' }
@@ -1979,9 +1979,9 @@ folded:
  value`,
       tgt: [ { contents: [ { items: [
         'literal',
-        { indicator: ':', item: '  value\n' },
+        { indicator: ':', item: 'value\n' },
         'folded',
-        { indicator: ':', item: { tag: 'foo', rawValue: ' value\n' } }
+        { indicator: ':', item: { tag: 'foo', strValue: 'value\n' } }  // trailing \n against spec
       ] } ] } ]
     },
 

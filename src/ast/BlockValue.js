@@ -14,10 +14,27 @@ export default class BlockValue extends Node {
     this.chomping = Chomp.CLIP
   }
 
-  // a block value should always end with '\n'
-  get rawValue () {
-    const str = super.rawValue
-    return str[str.length - 1] === '\n' ? str : str + '\n'
+  get strValue () {
+    if (!this.valueRange || !this.context) return null
+    let { start, end } = this.valueRange
+    const { indent, src } = this.context
+    if (this.chomping !== Chomp.KEEP) {
+      let lastNewLine = null
+      let ch = src[end - 1]
+      while (start < end && (ch === '\n' || ch === '\t' || ch === ' ')) {
+        end -= 1
+        if (ch === '\n') lastNewLine = end
+        ch = src[end - 1]
+      }
+      if (lastNewLine) end = this.chomping === Chomp.STRIP ? lastNewLine : lastNewLine + 1
+    }
+    const bi = indent + this.blockIndent
+    let str = src.slice(start, end)
+    if (bi > 0) str = str.replace(RegExp(`^ {1,${bi}}`, 'gm'), '')
+    if (this.chomping !== Chomp.STRIP && str[str.length - 1] !== '\n') {
+      str += '\n' // against spec, but only way to maintain consistency
+    }
+    return str
   }
 
   parseBlockHeader (start) {
