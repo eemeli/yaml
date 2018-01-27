@@ -42,12 +42,12 @@ ast[0]            // first document, containing a map with two keys
   .contents[0]    // document contents (as opposed to directives)
   .items[3].item  // the last item, a flow map
   .items[3]       // the fourth token, parsed as a plain value
-  .rawValue       // 'blue'
+  .strValue       // 'blue'
 
 ast[1]            // second document, containing a sequence
   .contents[0]    // document contents (as opposed to directives)
   .items[1].item  // the second item, a block value
-  .rawValue       // ' Block scalar\n'
+  .strValue       // 'Block scalar\n'
 ```
 
 ### `parse(string): Array<Document>`
@@ -115,13 +115,16 @@ class Node {
   toString(): string    // a YAML string representation of this node
 }
 
-class Scalar extends Node {
-  type: 'ALIAS' | 'PLAIN' | 'QUOTE_DOUBLE' | 'QUOTE_SINGLE'
+class Alias extends Node {
+  // rawValue will contain the * prefix, followed by the anchor
+  type: 'ALIAS'
 }
 
-class BlockValue extends Node {
-  blockStyle: string,   // matches the regexp `[|>][-+1-9]*`
-  type: 'BLOCK_FOLDED' | 'BLOCK_LITERAL'
+class Scalar extends Node {
+  type: 'PLAIN' | 'QUOTE_DOUBLE' | 'QUOTE_SINGLE' |
+    'BLOCK_FOLDED' | 'BLOCK_LITERAL'
+  +strValue: ?string    // unescaped string value; may throw for
+                        //   QUOTE_DOUBLE on bad escape sequences
 }
 
 class Comment extends Node {
@@ -139,8 +142,8 @@ class MapItem extends Node {
 }
 
 class Map extends Node {
-  // implicit keys are not wrapped; BlockValue here isn't valid YAML
-  items: Array<Comment | MapItem | Scalar | BlockValue>,
+  // implicit keys are not wrapped
+  items: Array<Comment | Alias | Scalar | MapItem>,
   type: 'MAP'
 }
 
@@ -158,12 +161,12 @@ class Seq extends Node {
 type FlowChar = '{' | '}' | '[' | ']' | ',' | '?' | ':'
 
 class FlowCollection extends Node {
-  items: Array<FlowChar | Scalar | Comment | FlowCollection>,
+  items: Array<FlowChar | Comment | Alias | Scalar | FlowCollection>,
   type: 'FLOW_MAP' | 'FLOW_SEQ'
 }
 
 type ContentNode =
-  Scalar | BlockValue | Comment | Map | Seq | FlowCollection
+  Comment | Alias | Scalar | Map | Seq | FlowCollection
 
 class Directive extends Node {
   type: 'DIRECTIVE',
