@@ -2,22 +2,47 @@ import Node from './Node'
 import Range from './Range'
 
 export default class BlockValue extends Node {
-  static endOfBlockStyle (src, offset) {
-    const valid = ['-', '+', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-    let ch = src[offset]
-    while (valid.indexOf(ch) !== -1) ch = src[offset += 1]
-    return offset
+  static Chomp = {
+    CLIP: 'CLIP',
+    KEEP: 'KEEP',
+    STRIP: 'STRIP'
   }
 
   constructor (type, props) {
     super(type, props)
-    this.blockStyle = null
+    this.blockIndent = null
+    this.chomping = BlockValue.Chomp.CLIP
   }
 
   // a block value should always end with '\n'
   get rawValue () {
     const str = super.rawValue
     return str[str.length - 1] === '\n' ? str : str + '\n'
+  }
+
+  parseBlockHeader (start) {
+    const { src } = this.context
+    let offset = start + 1
+    let bi = ''
+    while (true) {
+      let ch = src[offset]
+      switch (ch) {
+        case '-':
+          this.chomping = BlockValue.Chomp.STRIP
+          break
+        case '+':
+          this.chomping = BlockValue.Chomp.KEEP
+          break
+        case '0': case '1': case '2': case '3': case '4':
+        case '5': case '6': case '7': case '8': case '9':
+          bi += ch
+          break
+        default:
+          this.blockIndent = Number(bi) || null
+          return offset
+      }
+      offset += 1
+    }
   }
 
   parseBlockValue (start) {
@@ -58,8 +83,7 @@ export default class BlockValue extends Node {
     this.context = context
     trace: 'block-start', context.pretty, { start }
     const { src } = context
-    let offset = BlockValue.endOfBlockStyle(src, start + 1)
-    this.blockStyle = src.slice(start, offset)
+    let offset = this.parseBlockHeader(start)
     offset = Node.endOfWhiteSpace(src, offset)
     offset = this.parseComment(offset)
     offset = this.parseBlockValue(offset)
