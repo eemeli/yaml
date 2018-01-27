@@ -281,7 +281,7 @@ rbi:
   Mark McGwire's
   year was crippled
   by a knee injury.`,
-      tgt: [ { contents: [ 'Mark McGwire\'s\nyear was crippled\nby a knee injury.\n' ] } ]
+      tgt: [ { contents: [ 'Mark McGwire\'s year was crippled by a knee injury.\n' ] } ]
     },
 
     'Example 2.15. Folded newlines are preserved for "more indented" and blank lines': {
@@ -294,7 +294,14 @@ rbi:
    0.288 Batting Average
 
  What a year!`,
-      tgt:[ { contents: [ 'Sammy Sosa completed another\nfine season with great stats.\n\n  63 Home Runs\n  0.288 Batting Average\n\nWhat a year!\n' ] } ]
+      tgt:[ { contents: [
+`Sammy Sosa completed another fine season with great stats.
+
+  63 Home Runs
+  0.288 Batting Average
+
+What a year!\n`
+      ] } ]
     },
 
     'Example 2.16. Indentation determines scope': {
@@ -308,7 +315,7 @@ stats: |
   0.278 Batting Average`,
       tgt: [ { contents: [ { items: [
         'name', { indicator: ':', item: 'Mark McGwire' },
-        'accomplishment', { indicator: ':', item: 'Mark set a major league\nhome run record in 1998.\n' },
+        'accomplishment', { indicator: ':', item: 'Mark set a major league home run record in 1998.\n' },
         'stats', { indicator: ':', item: '65 Home Runs\n0.278 Batting Average\n' }
       ] } ] } ]
     },
@@ -719,9 +726,9 @@ folded: >
 `,
       tgt: [{ contents: [{ items: [
         'literal',
-        { indicator: ':', item: { type: Node.Type.BLOCK_LITERAL, rawValue: '  some\n  text\n' } },
+        { indicator: ':', item: 'some\ntext\n' },
         'folded',
-        { indicator: ':', item: { type: Node.Type.BLOCK_FOLDED, rawValue: '  some\n  text\n' } }
+        { indicator: ':', item: 'some text\n' }
       ]}]}]
     },
 
@@ -759,10 +766,6 @@ grave-accent: \`text`,
       ]}]}]
       // ERROR: Reserved indicators can't start a plain scalar.
     },
-
-// # 5.4. Line Break Characters
-
-// Example 5.11. Line Break Characters
 
   },
   '5.5. White Space Characters': {
@@ -905,7 +908,7 @@ block: |
         'quoted',
         { indicator: ':', item: 'text lines' },
         'block',
-        { indicator: ':', item: {} /*'text\n \tlines\n'*/ },
+        { indicator: ':', item: 'text\n \tlines\n' },
       ]}]}]
     },
   },
@@ -924,15 +927,34 @@ Chomping: |
         'Folding',
         { indicator: ':', item: 'Empty line\nas a line feed' },
         'Chomping',
-        { indicator: ':', item: {} /*'Clipped empty lines\n'*/ },
+        { indicator: ':', item: 'Clipped empty lines\n' },
       ]}]}]
     },
   },
 
   '6.5. Line Folding': {
-// Example 6.6. Line Folding
+    'Example 6.6. Line Folding': {
+      src:
+`>-
+  trimmed
+··
+·
 
-// Example 6.7. Block Folding
+··as
+··space`.replace(/·/g, ' '),
+      tgt: [ { contents: [ 'trimmed\n\n\nas space' ] } ]
+    },
+
+    'Example 6.7. Block Folding': {
+      src:
+`>
+··foo·
+·
+··\t·bar
+
+··baz\n`.replace(/·/g, ' '),
+      tgt: [ { contents: [ 'foo \n\n\t bar\n\nbaz\n' ] } ]
+    },
 
     'Example 6.8. Flow Folding': {
       src:
@@ -1618,7 +1640,7 @@ foo: bar
 ·text`.replace(/·/g, ' '),
       tgt: [ { contents: [
         { items: [
-          { indicator: '-', item: 'text\n' },
+          { indicator: '-', item: ' \ntext\n' },
           { indicator: '-', item: 'text\n' },
         ] },
         'text - |2 text'
@@ -1738,7 +1760,7 @@ keep: |+\n\n`,
 `>
  folded
  text\n\n`,
-      tgt: [ { contents: [ 'folded\ntext\n\n' ] } ]
+      tgt: [ { contents: [ 'folded text\n' ] } ]
     },
 
     'Example 8.10. Folded Lines': {
@@ -1760,78 +1782,7 @@ keep: |+\n\n`,
 
 # Comment`,
       tgt: [ { contents: [
-        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n',
-        { comment: ' Comment' }
-      ] } ]
-    },
-
-    'Example 8.11. More Indented Lines': {
-      src:
-`>
-
- folded
- line
-
- next
- line
-   * bullet
-
-   * list
-   * lines
-
- last
- line
-
-# Comment`,
-      tgt: [ { contents: [
-        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * lines\n\n last\n line\n\n',
-        { comment: ' Comment' }
-      ] } ]
-    },
-
-    'Example 8.12. Empty Separation Lines': {
-      src:
-`>
-
- folded
- line
-
- next
- line
-   * bullet
-
-   * list
-   * line
-
- last
- line
-
-# Comment`,
-      tgt: [ { contents: [
-        '\n folded\n line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n',
-        { comment: ' Comment' }
-      ] } ]
-    },
-
-    'Example 8.13. Final Empty Lines': {
-      src:
-`>
- folded
- line
-
- next
- line
-   * bullet
-
-   * list
-   * line
-
- last
- line
-
-# Comment`,
-      tgt: [ { contents: [
-        'folded line\n\n next\n line\n   * bullet\n\n   * list\n   * line\n\n last\n line\n\n',
+        '\nfolded line\nnext line\n  * bullet\n\n  * list\n  * lines\n\nlast line\n',
         { comment: ' Comment' }
       ] } ]
     },

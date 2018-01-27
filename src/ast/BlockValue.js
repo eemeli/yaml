@@ -29,10 +29,38 @@ export default class BlockValue extends Node {
       if (lastNewLine) end = this.chomping === Chomp.STRIP ? lastNewLine : lastNewLine + 1
     }
     const bi = indent + this.blockIndent
-    let str = src.slice(start, end)
-    if (bi > 0) str = str.replace(RegExp(`^ {1,${bi}}`, 'gm'), '')
-    if (this.chomping !== Chomp.STRIP && str[str.length - 1] !== '\n') {
-      str += '\n' // against spec, but only way to maintain consistency
+    const folded = (this.type === Node.Type.BLOCK_FOLDED)
+    let str = ''
+    let sep = ''
+    let prevMoreIndented = false
+    for (let i = start; i < end; ++i) {
+      for (let j = 0; j < bi; ++j) {
+        if (src[i] !== ' ') break
+        i += 1
+      }
+      let ch = src[i]
+      if (ch === '\n') {
+        if (sep === '\n') str += '\n'
+        else sep = '\n'
+      } else {
+        const lineEnd = Node.endOfLine(src, i)
+        let line = src.slice(i, lineEnd)
+        i = lineEnd
+        if (folded && (ch === ' ' || ch === '\t')) {
+          if (sep === ' ') sep = '\n'
+          else if (!prevMoreIndented && sep === '\n') sep = '\n\n'
+          str += sep + line //+ ((lineEnd < end && src[lineEnd]) || '')
+          sep = (lineEnd < end && src[lineEnd]) || ''
+          prevMoreIndented = true
+        } else {
+          str += sep + line
+          sep = folded ? ' ' : '\n'
+          prevMoreIndented = false
+        }
+      }
+    }
+    if (this.chomping !== Chomp.STRIP && (sep === '\n' || str[str.length - 1] !== '\n')) {
+      return str + '\n' // against spec, but only way to maintain consistency
     }
     return str
   }
