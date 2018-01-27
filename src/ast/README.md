@@ -181,4 +181,4 @@ class Document extends Node {
 }
 ```
 
-In actual code, `MapItem` and `SeqItem` are implemented as `CollectionItem`, and correspondingly `Map` and `Seq` as `Collection`. Due to parsing differences, `PLAIN` scalars are instances of `PlainValue` rather than `Scalar`. Additional undocumented properties are available for `Node`, but are likely only useful during parsing.
+In actual code, `MapItem` and `SeqItem` are implemented as `CollectionItem`, and correspondingly `Map` and `Seq` as `Collection`. Due to parsing differences, each scalar type is implemented using its own class. Additional undocumented properties are available for `Node`, but are likely only useful during parsing.

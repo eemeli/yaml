@@ -1,11 +1,13 @@
+import Alias from './Alias'
 import BlockValue from './BlockValue'
 import Collection from './Collection'
 import CollectionItem from './CollectionItem'
 import FlowCollection from './FlowCollection'
 import Node from './Node'
 import PlainValue from './PlainValue'
+import QuoteDouble from './QuoteDouble'
+import QuoteSingle from './QuoteSingle'
 import Range from './Range'
-import Scalar from './Scalar'
 
 /**
  * @param {boolean} atLineStart - Node starts at beginning of line
@@ -121,6 +123,9 @@ export default class ParseContext {
     trace: 'START', valueStart, type, props, context.pretty
     let node
     switch (type) {
+      case Node.Type.ALIAS:
+        node = new Alias(type, props)
+        break
       case Node.Type.BLOCK_FOLDED:
       case Node.Type.BLOCK_LITERAL:
         node = new BlockValue(type, props)
@@ -133,13 +138,21 @@ export default class ParseContext {
       case Node.Type.MAP_VALUE:
       case Node.Type.SEQ_ITEM:
         node = new CollectionItem(type, props)
-      break
+        break
       case Node.Type.COMMENT:
       case Node.Type.PLAIN:
         node = new PlainValue(type, props)
         break
+      case Node.Type.QUOTE_DOUBLE:
+        node = new QuoteDouble(type, props)
+        break
+      case Node.Type.QUOTE_SINGLE:
+        node = new QuoteSingle(type, props)
+        break
       default:
-        node = new Scalar(type, props)
+        node.error = new Error(`Unknown node type: ${JSON.stringify(type)}`)
+        node.range = new Range(start, start + 1)
+        return node
     }
     let offset = node.parse(context, valueStart)
     let nodeEnd = this.src[offset] === '\n' ? offset + 1 : offset
