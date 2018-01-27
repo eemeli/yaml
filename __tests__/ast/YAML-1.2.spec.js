@@ -198,7 +198,7 @@ rbi:
           { indicator: '-', item: { anchor: 'SS', rawValue: 'Sammy Sosa' } }
         ] } },
         'rbi', { indicator: ':', item: { items: [
-          { indicator: '-', item: { comment: ' Subsequent occurrence', rawValue: 'SS' } },
+          { indicator: '-', item: { comment: ' Subsequent occurrence', type: Node.Type.ALIAS, rawValue: '*SS' } },
           { indicator: '-', item: 'Ken Griffey' }
         ] } }
       ] } ] } ]
@@ -459,11 +459,11 @@ application specific tag: !something |
               'radius', { indicator: ':', item: '7' }
             ] } },
             { indicator: '-', item: { tag: 'line', items: [
-              'start', { indicator: ':', item: 'ORIGIN' },
+              'start', { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*ORIGIN' } },
               'finish', { indicator: ':', item: { items: [ '{', 'x', ':', '89', ',', 'y', ':', '102', '}' ] } }
             ] } },
             { indicator: '-', item: { tag: 'label', items: [
-              'start', { indicator: ':', item: 'ORIGIN' },
+              'start', { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*ORIGIN' } },
               'color', { indicator: ':', item: '0xFFEEBB' },
               'text', { indicator: ':', item: 'Pretty vector drawing.' }
             ] } }
@@ -566,7 +566,7 @@ comments:
               'postal', { indicator: ':', item: '48046' }
             ] } }
           ] } },
-          'ship-to', { indicator: ':', item: 'id001' },
+          'ship-to', { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*id001' } },
           'product', { indicator: ':', item: { items: [
             { indicator: '-', item: { items: [
               'sku', { indicator: ':', item: 'BL394D' },
@@ -704,7 +704,7 @@ alias: *anchor`,
         'anchored',
         { indicator: ':', item: { tag: 'local', anchor: 'anchor', rawValue: 'value' } },
         'alias',
-        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: 'anchor' } }
+        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } }
       ]}]}]
     },
 
@@ -1106,7 +1106,7 @@ bar`,
         { tag: '!str', anchor: 'a1', rawValue: '"foo"' },
         { indicator: ':', item: { tag: '!str', rawValue: 'bar' } },
         { anchor: 'a2', rawValue: 'baz' },
-        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: 'a1' } }
+        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*a1' } }
       ] }] }]
     },
 
@@ -1190,7 +1190,7 @@ Second occurrence: *anchor`,
         'First occurrence',
         { indicator: ':', item: { anchor: 'anchor', rawValue: 'Value' } },
         'Second occurrence',
-        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: 'anchor' } }
+        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } }
       ] }] }]
     },
   },
@@ -1206,11 +1206,11 @@ Reuse anchor: *anchor`,
         'First occurrence',
         { indicator: ':', item: { anchor: 'anchor', rawValue: 'Foo' } },
         'Second occurrence',
-        { indicator: ':', item: 'anchor' },
+        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } },
         'Override anchor',
         { indicator: ':', item: { anchor: 'anchor', rawValue: 'Bar' } },
         'Reuse anchor',
-        { indicator: ':', item: 'anchor' }
+        { indicator: ':', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } }
       ] } ] } ]
     },
   },
@@ -1504,7 +1504,7 @@ foo: bar
         { indicator: '-', item: { tag: '!str', rawValue: '"a"' } },
         { indicator: '-', item: "'b'" },
         { indicator: '-', item: { anchor: 'anchor', rawValue: '"c"' } },
-        { indicator: '-', item: 'anchor' },
+        { indicator: '-', item: { type: Node.Type.ALIAS, rawValue: '*anchor' } },
         { indicator: '-', item: { tag: '!str' } }
       ] } ] } ]
     },

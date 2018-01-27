@@ -49,8 +49,7 @@ export default class Scalar extends Node {
     let offset
     switch (this.type) {
       case Node.Type.ALIAS:
-        start += 1
-        offset = Node.endOfIdentifier(src, start)
+        offset = Node.endOfIdentifier(src, start + 1)
         break
       case Node.Type.QUOTE_DOUBLE:
         offset = Scalar.endOfDoubleQuote(src, start + 1)
