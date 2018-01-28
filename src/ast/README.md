@@ -40,13 +40,13 @@ const ast = parse(str)
 
 ast[0]            // first document, containing a map with two keys
   .contents[0]    // document contents (as opposed to directives)
-  .items[3].item  // the last item, a flow map
+  .items[3].node  // the last item, a flow map
   .items[3]       // the fourth token, parsed as a plain value
   .strValue       // 'blue'
 
 ast[1]            // second document, containing a sequence
   .contents[0]    // document contents (as opposed to directives)
-  .items[1].item  // the second item, a block value
+  .items[1].node  // the second item, a block value
   .strValue       // 'Block scalar\n'
 ```
 
@@ -68,15 +68,15 @@ For an example, here's what the first few lines of this file look like when pars
 ```js
 [ {
   directives: [
-    { comment: ' raw-yaml' },
-    { comment: '## Read anything as YAML' }
+    { type: 'COMMENT', comment: ' raw-yaml' },
+    { type: 'COMMENT', comment: '## Read anything as YAML' }
   ],
   contents: [
-    { items: [
-      'A maximally liberal YAML 1.2 parser',
-      { indicator: ':', item: { items: [
-        { indicator: '-', item: 'Will do its best...' },
-        { indicator: '-', item: 'Fully supports...' }
+    { type: 'MAP', items: [
+      { type: 'PLAIN', strValue: 'A maximally liberal YAML 1.2...' },
+      { type: 'MAP_VALUE', node: { type: 'SEQ', items: [
+        { type: 'SEQ_ITEM', node: { strValue: 'Will do its...' } },
+        { type: 'SEQ_ITEM', node: { strValue: 'Fully supports...' } }
       ] } }
     ] }
   ]
@@ -137,8 +137,7 @@ class Comment extends Node {
 }
 
 class MapItem extends Node {
-  indicator: '?' | ':',
-  item: ContentNode | null,
+  node: ContentNode | null,
   type: 'MAP_KEY' | 'MAP_VALUE'
 }
 
@@ -149,8 +148,7 @@ class Map extends Node {
 }
 
 class SeqItem extends Node {
-  indicator: '-',
-  item: ContentNode | null,
+  node: ContentNode | null,
   type: 'SEQ_ITEM'
 }
 

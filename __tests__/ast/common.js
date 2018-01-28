@@ -11,13 +11,15 @@ export const pretty = (node) => {
     if (node.directives.length > 0) res.directives = node.directives.map(pretty)
     if (node.contents.length > 0) res.contents = node.contents.map(pretty)
   } else if (node.items) {
+    res.type = node.type
     res.items = node.items.map(pretty)
-  } else if (typeof node.item !== 'undefined') {
-    res.indicator = node.indicator
-    res.item = pretty(node.item)
+  } else if (typeof node.node !== 'undefined') {
+    res.type = node.type
+    res.node = pretty(node.node)
   } else if (node.strValue) {
     res.strValue = node.strValue
   } else if (node.rawValue) {
+    res.type = node.type
     res.rawValue = node.rawValue
   }
   if (Object.keys(res).every(key => key === 'rawValue')) return res.rawValue

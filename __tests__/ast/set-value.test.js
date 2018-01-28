@@ -10,7 +10,7 @@ test('set value in collection', () => {
 - Ken Griffey
 `
   const ast = parse(src)
-  ast[0].contents[0].items[1].item.value = 'TEST\n'
+  ast[0].contents[0].items[1].node.value = 'TEST\n'
   expect(String(ast)).toBe(src.replace(/Sammy Sosa/, 'TEST'))
 })
 
@@ -49,7 +49,7 @@ national:
   - Atlanta Braves
 `
   const ast = parse(src)
-  const seq = ast[0].contents[0].items[3].item
+  const seq = ast[0].contents[0].items[3].node
   const item = new CollectionItem(Type.SEQ_ITEM)
   item.context = seq.items[2].context
   item.value = '- "TEST"\n'

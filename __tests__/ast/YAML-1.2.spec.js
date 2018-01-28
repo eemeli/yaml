@@ -10,9 +10,9 @@ const spec = {
 - Sammy Sosa\r
 - Ken Griffey\r`,
       tgt: [ { contents: [ { type: Type.SEQ, items: [
-        { indicator: '-', item: 'Mark McGwire' },
-        { indicator: '-', item: 'Sammy Sosa' },
-        { indicator: '-', item: 'Ken Griffey' }
+        { type: Type.SEQ_ITEM, node: 'Mark McGwire' },
+        { type: Type.SEQ_ITEM, node: 'Sammy Sosa' },
+        { type: Type.SEQ_ITEM, node: 'Ken Griffey' }
       ] } ] } ]
     },
 
@@ -22,9 +22,9 @@ const spec = {
 avg: 0.278 # Batting average\r
 rbi: 147   # Runs Batted In`,
       tgt: [ { contents: [ { type: Type.MAP, items: [
-        'hr', { indicator: ':', item: { comment: ' Home runs', strValue: '65' } },
-        'avg', { indicator: ':', item: { comment: ' Batting average', strValue: '0.278' } },
-        'rbi', { indicator: ':', item: { comment: ' Runs Batted In', strValue: '147' } }
+        'hr', { type: Type.MAP_VALUE, node: { comment: ' Home runs', strValue: '65' } },
+        'avg', { type: Type.MAP_VALUE, node: { comment: ' Batting average', strValue: '0.278' } },
+        'rbi', { type: Type.MAP_VALUE, node: { comment: ' Runs Batted In', strValue: '147' } }
       ] } ] } ]
     },
 
@@ -39,15 +39,15 @@ national:\r
   - Chicago Cubs\r
   - Atlanta Braves`,
       tgt: [ { contents: [ { items: [
-        'american', { indicator: ':', item: { items: [
-          { indicator: '-', item: 'Boston Red Sox' },
-          { indicator: '-', item: 'Detroit Tigers' },
-          { indicator: '-', item: 'New York Yankees' }
+        'american', { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'Boston Red Sox' },
+          { type: Type.SEQ_ITEM, node: 'Detroit Tigers' },
+          { type: Type.SEQ_ITEM, node: 'New York Yankees' }
         ] } },
-        'national', { indicator: ':', item: { items: [
-          { indicator: '-', item: 'New York Mets' },
-          { indicator: '-', item: 'Chicago Cubs' },
-          { indicator: '-', item: 'Atlanta Braves' }
+        'national', { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'New York Mets' },
+          { type: Type.SEQ_ITEM, node: 'Chicago Cubs' },
+          { type: Type.SEQ_ITEM, node: 'Atlanta Braves' }
         ] } }
       ] } ] } ]
     },
@@ -63,15 +63,15 @@ national:\r
   hr:   63
   avg:  0.288`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { items: [
-          'name', { indicator: ':', item: 'Mark McGwire' },
-          'hr', { indicator: ':', item: '65' },
-          'avg', { indicator: ':', item: '0.278' }
+        { type: Type.SEQ_ITEM, node: { items: [
+          'name', { type: Type.MAP_VALUE, node: 'Mark McGwire' },
+          'hr', { type: Type.MAP_VALUE, node: '65' },
+          'avg', { type: Type.MAP_VALUE, node: '0.278' }
         ] } },
-        { indicator: '-', item: { items: [
-          'name', { indicator: ':', item: 'Sammy Sosa' },
-          'hr', { indicator: ':', item: '63' },
-          'avg', { indicator: ':', item: '0.288' }
+        { type: Type.SEQ_ITEM, node: { items: [
+          'name', { type: Type.MAP_VALUE, node: 'Sammy Sosa' },
+          'hr', { type: Type.MAP_VALUE, node: '63' },
+          'avg', { type: Type.MAP_VALUE, node: '0.288' }
         ] } }
       ] } ] } ]
     },
@@ -82,9 +82,9 @@ national:\r
 - [Mark McGwire, 65, 0.278]
 - [Sammy Sosa  , 63, 0.288]`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { items: [ '[', 'name', ',', 'hr', ',', 'avg', ']' ] } },
-        { indicator: '-', item: { items: [ '[', 'Mark McGwire', ',', '65', ',', '0.278', ']' ] } },
-        { indicator: '-', item: { items: [ '[', 'Sammy Sosa', ',', '63', ',', '0.288', ']' ] } }
+        { type: Type.SEQ_ITEM, node: { items: [ '[', 'name', ',', 'hr', ',', 'avg', ']' ] } },
+        { type: Type.SEQ_ITEM, node: { items: [ '[', 'Mark McGwire', ',', '65', ',', '0.278', ']' ] } },
+        { type: Type.SEQ_ITEM, node: { items: [ '[', 'Sammy Sosa', ',', '63', ',', '0.288', ']' ] } }
       ] } ] } ]
     },
 
@@ -96,8 +96,8 @@ Sammy Sosa: {
     avg: 0.288
   }`,
       tgt: [ { contents: [ { items: [
-        'Mark McGwire', { indicator: ':', item: { items: [ '{', 'hr', ':', '65', ',', 'avg', ':', '0.278', '}' ] } },
-        'Sammy Sosa', { indicator: ':', item: { items: [ '{', 'hr', ':', '63', ',', 'avg', ':', '0.288', '}' ] } }
+        'Mark McGwire', { type: Type.MAP_VALUE, node: { items: [ '{', 'hr', ':', '65', ',', 'avg', ':', '0.278', '}' ] } },
+        'Sammy Sosa', { type: Type.MAP_VALUE, node: { items: [ '{', 'hr', ':', '63', ',', 'avg', ':', '0.288', '}' ] } }
       ] } ] } ]
     },
   },
@@ -119,15 +119,15 @@ Sammy Sosa: {
         {
           directives: [ { comment: ' Ranking of 1998 home runs' } ],
           contents: [ { items: [
-            { indicator: '-', item: 'Mark McGwire' },
-            { indicator: '-', item: 'Sammy Sosa' },
-            { indicator: '-', item: 'Ken Griffey' },
+            { type: Type.SEQ_ITEM, node: 'Mark McGwire' },
+            { type: Type.SEQ_ITEM, node: 'Sammy Sosa' },
+            { type: Type.SEQ_ITEM, node: 'Ken Griffey' },
             { comment: ' Team ranking' }
           ] } ]
         }, {
           contents: [ { items: [
-            { indicator: '-', item: 'Chicago Cubs' },
-            { indicator: '-', item: 'St Louis Cardinals' }
+            { type: Type.SEQ_ITEM, node: 'Chicago Cubs' },
+            { type: Type.SEQ_ITEM, node: 'St Louis Cardinals' }
           ] } ]
         }
       ]
@@ -147,14 +147,14 @@ action: grand slam
 ...`,
       tgt: [
         { contents: [ { items: [
-          'time', { indicator: ':', item: '20:03:20' },
-          'player', { indicator: ':', item: 'Sammy Sosa' },
-          'action', { indicator: ':', item: 'strike (miss)' }
+          'time', { type: Type.MAP_VALUE, node: '20:03:20' },
+          'player', { type: Type.MAP_VALUE, node: 'Sammy Sosa' },
+          'action', { type: Type.MAP_VALUE, node: 'strike (miss)' }
         ] } ] },
         { contents: [ { items: [
-          'time', { indicator: ':', item: '20:03:47' },
-          'player', { indicator: ':', item: 'Sammy Sosa' },
-          'action', { indicator: ':', item: 'grand slam' }
+          'time', { type: Type.MAP_VALUE, node: '20:03:47' },
+          'player', { type: Type.MAP_VALUE, node: 'Sammy Sosa' },
+          'action', { type: Type.MAP_VALUE, node: 'grand slam' }
         ] } ] }
       ]
     },
@@ -170,13 +170,13 @@ rbi:
   - Sammy Sosa
   - Ken Griffey`,
       tgt: [ { contents: [ { items: [
-        'hr', { comment: ' 1998 hr ranking', indicator: ':', item: { items: [
-          { indicator: '-', item: 'Mark McGwire' },
-          { indicator: '-', item: 'Sammy Sosa' }
+        'hr', { comment: ' 1998 hr ranking', type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'Mark McGwire' },
+          { type: Type.SEQ_ITEM, node: 'Sammy Sosa' }
         ] } },
-        'rbi', { comment: ' 1998 rbi ranking', indicator: ':', item: { items: [
-          { indicator: '-', item: 'Sammy Sosa' },
-          { indicator: '-', item: 'Ken Griffey' }
+        'rbi', { comment: ' 1998 rbi ranking', type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'Sammy Sosa' },
+          { type: Type.SEQ_ITEM, node: 'Ken Griffey' }
         ] } }
       ] } ] } ]
     },
@@ -192,14 +192,14 @@ rbi:
   - *SS # Subsequent occurrence
   - Ken Griffey`,
       tgt: [ { contents: [ { items: [
-        'hr', { indicator: ':', item: { items: [
-          { indicator: '-', item: 'Mark McGwire' },
+        'hr', { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'Mark McGwire' },
           { comment: ' Following node labeled SS' },
-          { indicator: '-', item: { anchor: 'SS', strValue: 'Sammy Sosa' } }
+          { type: Type.SEQ_ITEM, node: { anchor: 'SS', strValue: 'Sammy Sosa' } }
         ] } },
-        'rbi', { indicator: ':', item: { items: [
-          { indicator: '-', item: { comment: ' Subsequent occurrence', type: Type.ALIAS, rawValue: 'SS' } },
-          { indicator: '-', item: 'Ken Griffey' }
+        'rbi', { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: { comment: ' Subsequent occurrence', type: Type.ALIAS, rawValue: 'SS' } },
+          { type: Type.SEQ_ITEM, node: 'Ken Griffey' }
         ] } }
       ] } ] } ]
     },
@@ -216,17 +216,17 @@ rbi:
 : [ 2001-07-02, 2001-08-12,
     2001-08-14 ]`,
       tgt: [ { contents: [ { items: [
-        { indicator: '?', item: { items: [
-          { indicator: '-', item: 'Detroit Tigers' },
-          { indicator: '-', item: 'Chicago cubs' }
+        { type: Type.MAP_KEY, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'Detroit Tigers' },
+          { type: Type.SEQ_ITEM, node: 'Chicago cubs' }
         ] } },
-        { indicator: ':', item: { items: [
-          { indicator: '-', item: '2001-07-23' }
+        { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: '2001-07-23' }
         ] } },
-        { indicator: '?', item: { items: [
+        { type: Type.MAP_KEY, node: { items: [
           '[', 'New York Yankees', ',', 'Atlanta Braves', ']'
         ] } },
-        { indicator: ':', item: { items: [
+        { type: Type.MAP_VALUE, node: { items: [
           '[', '2001-07-02', ',', '2001-08-12', ',', '2001-08-14', ']'
         ] } }
       ] } ] } ]
@@ -245,17 +245,17 @@ rbi:
       tgt: [ { contents: [
         { comment: ' Products purchased' },
         { items: [
-          { indicator: '-', item: { items: [
-            'item', { indicator: ':', item: 'Super Hoop' },
-            'quantity', { indicator: ':', item: '1' }
+          { type: Type.SEQ_ITEM, node: { items: [
+            'item', { type: Type.MAP_VALUE, node: 'Super Hoop' },
+            'quantity', { type: Type.MAP_VALUE, node: '1' }
           ] } },
-          { indicator: '-', item: { items: [
-            'item', { indicator: ':', item: 'Basketball' },
-            'quantity', { indicator: ':', item: '4' }
+          { type: Type.SEQ_ITEM, node: { items: [
+            'item', { type: Type.MAP_VALUE, node: 'Basketball' },
+            'quantity', { type: Type.MAP_VALUE, node: '4' }
           ] } },
-          { indicator: '-', item: { items: [
-            'item', { indicator: ':', item: 'Big Shoes' },
-            'quantity', { indicator: ':', item: '1' }
+          { type: Type.SEQ_ITEM, node: { items: [
+            'item', { type: Type.MAP_VALUE, node: 'Big Shoes' },
+            'quantity', { type: Type.MAP_VALUE, node: '1' }
           ] } }
         ] }
       ] } ]
@@ -314,9 +314,9 @@ stats: |
   65 Home Runs
   0.278 Batting Average`,
       tgt: [ { contents: [ { items: [
-        'name', { indicator: ':', item: 'Mark McGwire' },
-        'accomplishment', { indicator: ':', item: 'Mark set a major league home run record in 1998.\n' },
-        'stats', { indicator: ':', item: '65 Home Runs\n0.278 Batting Average\n' }
+        'name', { type: Type.MAP_VALUE, node: 'Mark McGwire' },
+        'accomplishment', { type: Type.MAP_VALUE, node: 'Mark set a major league home run record in 1998.\n' },
+        'stats', { type: Type.MAP_VALUE, node: '65 Home Runs\n0.278 Batting Average\n' }
       ] } ] } ]
     },
 
@@ -330,12 +330,12 @@ single: '"Howdy!" he cried.'
 quoted: ' # Not a ''comment''.'
 tie-fighter: '|\\-*-/|'`,
       tgt: [ { contents: [ { items: [
-        'unicode', { indicator: ':', item: 'Sosa did fine.☺' },
-        'control', { indicator: ':', item: '\b1998\t1999\t2000\n' },
-        'hex esc', { indicator: ':', item: '\r\n is \r\n' },
-        'single', { indicator: ':', item: '"Howdy!" he cried.' },
-        'quoted', { indicator: ':', item: ' # Not a \'comment\'.' },
-        'tie-fighter', { indicator: ':', item: '|\\-*-/|' }
+        'unicode', { type: Type.MAP_VALUE, node: 'Sosa did fine.☺' },
+        'control', { type: Type.MAP_VALUE, node: '\b1998\t1999\t2000\n' },
+        'hex esc', { type: Type.MAP_VALUE, node: '\r\n is \r\n' },
+        'single', { type: Type.MAP_VALUE, node: '"Howdy!" he cried.' },
+        'quoted', { type: Type.MAP_VALUE, node: ' # Not a \'comment\'.' },
+        'tie-fighter', { type: Type.MAP_VALUE, node: '|\\-*-/|' }
       ] } ] } ]
     },
 
@@ -348,8 +348,8 @@ tie-fighter: '|\\-*-/|'`,
 quoted: "So does this
   quoted scalar.\n"`,
       tgt: [ { contents: [ { items: [
-        'plain', { indicator: ':', item: 'This unquoted scalar spans many lines.' },
-        'quoted', { indicator: ':', item: 'So does this quoted scalar. ' }
+        'plain', { type: Type.MAP_VALUE, node: 'This unquoted scalar spans many lines.' },
+        'quoted', { type: Type.MAP_VALUE, node: 'So does this quoted scalar. ' }
       ] } ] } ]
     },
   },
@@ -362,10 +362,10 @@ decimal: +12345
 octal: 0o14
 hexadecimal: 0xC`,
       tgt: [ { contents: [ { items: [
-        'canonical', { indicator: ':', item: '12345' },
-        'decimal', { indicator: ':', item: '+12345' },
-        'octal', { indicator: ':', item: '0o14' },
-        'hexadecimal', { indicator: ':', item: '0xC' }
+        'canonical', { type: Type.MAP_VALUE, node: '12345' },
+        'decimal', { type: Type.MAP_VALUE, node: '+12345' },
+        'octal', { type: Type.MAP_VALUE, node: '0o14' },
+        'hexadecimal', { type: Type.MAP_VALUE, node: '0xC' }
       ] } ] } ]
     },
 
@@ -377,11 +377,11 @@ fixed: 1230.15
 negative infinity: -.inf
 not a number: .NaN`,
       tgt: [ { contents: [ { items: [
-        'canonical', { indicator: ':', item: '1.23015e+3' },
-        'exponential', { indicator: ':', item: '12.3015e+02' },
-        'fixed', { indicator: ':', item: '1230.15' },
-        'negative infinity', { indicator: ':', item: '-.inf' },
-        'not a number', { indicator: ':', item: '.NaN' }
+        'canonical', { type: Type.MAP_VALUE, node: '1.23015e+3' },
+        'exponential', { type: Type.MAP_VALUE, node: '12.3015e+02' },
+        'fixed', { type: Type.MAP_VALUE, node: '1230.15' },
+        'negative infinity', { type: Type.MAP_VALUE, node: '-.inf' },
+        'not a number', { type: Type.MAP_VALUE, node: '.NaN' }
       ] } ] } ]
     },
 
@@ -391,9 +391,9 @@ not a number: .NaN`,
 booleans: [ true, false ]
 string: '012345'`,
       tgt: [ { contents: [ { items: [
-        'null', { indicator: ':', item: null },
-        'booleans', { indicator: ':', item: { items: [ '[', 'true', ',', 'false', ']' ] } },
-        'string', { indicator: ':', item: '012345' }
+        'null', { type: Type.MAP_VALUE, node: null },
+        'booleans', { type: Type.MAP_VALUE, node: { items: [ '[', 'true', ',', 'false', ']' ] } },
+        'string', { type: Type.MAP_VALUE, node: '012345' }
       ] } ] } ]
     },
 
@@ -404,10 +404,10 @@ iso8601: 2001-12-14t21:59:43.10-05:00
 spaced: 2001-12-14 21:59:43.10 -5
 date: 2002-12-14`,
       tgt: [ { contents: [ { items: [
-        'canonical', { indicator: ':', item: '2001-12-15T02:59:43.1Z' },
-        'iso8601', { indicator: ':', item: '2001-12-14t21:59:43.10-05:00' },
-        'spaced', { indicator: ':', item: '2001-12-14 21:59:43.10 -5' },
-        'date', { indicator: ':', item: '2002-12-14' }
+        'canonical', { type: Type.MAP_VALUE, node: '2001-12-15T02:59:43.1Z' },
+        'iso8601', { type: Type.MAP_VALUE, node: '2001-12-14t21:59:43.10-05:00' },
+        'spaced', { type: Type.MAP_VALUE, node: '2001-12-14 21:59:43.10 -5' },
+        'date', { type: Type.MAP_VALUE, node: '2002-12-14' }
       ] } ] } ]
     },
 
@@ -427,11 +427,11 @@ application specific tag: !something |
  above may be different for
  different documents.`,
       tgt: [ { contents: [ { items: [
-        'not-date', { indicator: ':', item: { tag: { handle: '!!', suffix: 'str' }, strValue: '2002-04-28' } },
-        'picture', { indicator: ':', item: { tag: { handle: '!!', suffix: 'binary' }, strValue:
+        'not-date', { type: Type.MAP_VALUE, node: { tag: { handle: '!!', suffix: 'str' }, strValue: '2002-04-28' } },
+        'picture', { type: Type.MAP_VALUE, node: { tag: { handle: '!!', suffix: 'binary' }, strValue:
           'R0lGODlhDAAMAIQAAP//9/X\n17unp5WZmZgAAAOfn515eXv\nPz7Y6OjuDg4J+fn5OTk6enp\n56enmleECcgggoBADs=\n'
         } },
-        'application specific tag', { indicator: ':', item: { tag: { handle: '!', suffix: 'something' }, strValue:
+        'application specific tag', { type: Type.MAP_VALUE, node: { tag: { handle: '!', suffix: 'something' }, strValue:
           'The semantics of the tag\nabove may be different for\ndifferent documents.\n'
         } }
       ] } ] } ]
@@ -459,20 +459,20 @@ application specific tag: !something |
           tag: { handle: '!', suffix: 'shape' },
           comment: ' Use the ! handle for presenting\n tag:clarkevans.com,2002:circle',
           items: [
-            { indicator: '-', item: { tag: { handle: '!', suffix: 'circle' }, items: [
-              'center', { indicator: ':', item: { anchor: 'ORIGIN', items: [
+            { type: Type.SEQ_ITEM, node: { tag: { handle: '!', suffix: 'circle' }, items: [
+              'center', { type: Type.MAP_VALUE, node: { anchor: 'ORIGIN', items: [
                 '{', 'x', ':', '73', ',', 'y', ':', '129', '}'
               ] } },
-              'radius', { indicator: ':', item: '7' }
+              'radius', { type: Type.MAP_VALUE, node: '7' }
             ] } },
-            { indicator: '-', item: { tag: { handle: '!', suffix: 'line' }, items: [
-              'start', { indicator: ':', item: { type: Type.ALIAS, rawValue: 'ORIGIN' } },
-              'finish', { indicator: ':', item: { items: [ '{', 'x', ':', '89', ',', 'y', ':', '102', '}' ] } }
+            { type: Type.SEQ_ITEM, node: { tag: { handle: '!', suffix: 'line' }, items: [
+              'start', { type: Type.MAP_VALUE, node: { type: Type.ALIAS, rawValue: 'ORIGIN' } },
+              'finish', { type: Type.MAP_VALUE, node: { items: [ '{', 'x', ':', '89', ',', 'y', ':', '102', '}' ] } }
             ] } },
-            { indicator: '-', item: { tag: { handle: '!', suffix: 'label' }, items: [
-              'start', { indicator: ':', item: { type: Type.ALIAS, rawValue: 'ORIGIN' } },
-              'color', { indicator: ':', item: '0xFFEEBB' },
-              'text', { indicator: ':', item: 'Pretty vector drawing.' }
+            { type: Type.SEQ_ITEM, node: { tag: { handle: '!', suffix: 'label' }, items: [
+              'start', { type: Type.MAP_VALUE, node: { type: Type.ALIAS, rawValue: 'ORIGIN' } },
+              'color', { type: Type.MAP_VALUE, node: '0xFFEEBB' },
+              'text', { type: Type.MAP_VALUE, node: 'Pretty vector drawing.' }
             ] } }
           ]
         } ]
@@ -495,9 +495,9 @@ application specific tag: !something |
           { comment: ' associated with a null value' }
         ],
         contents: [ { tag: { handle: '!!', suffix: 'set' }, items: [
-          { indicator: '?', item: 'Mark McGwire' },
-          { indicator: '?', item: 'Sammy Sosa' },
-          { indicator: '?', item: 'Ken Griff' }
+          { type: Type.MAP_KEY, node: 'Mark McGwire' },
+          { type: Type.MAP_KEY, node: 'Sammy Sosa' },
+          { type: Type.MAP_KEY, node: 'Ken Griff' }
         ] } ]
       } ]
     },
@@ -518,9 +518,9 @@ application specific tag: !something |
           { comment: ' each mapping having one key' }
         ],
         contents: [ { tag: { handle: '!!', suffix: 'omap' }, items: [
-          { indicator: '-', item: { items: [ 'Mark McGwire', { indicator: ':', item: '65' } ] } },
-          { indicator: '-', item: { items: [ 'Sammy Sosa', { indicator: ':', item: '63' } ] } },
-          { indicator: '-', item: { items: [ 'Ken Griffy', { indicator: ':', item: '58' } ] } }
+          { type: Type.SEQ_ITEM, node: { items: [ 'Mark McGwire', { type: Type.MAP_VALUE, node: '65' } ] } },
+          { type: Type.SEQ_ITEM, node: { items: [ 'Sammy Sosa', { type: Type.MAP_VALUE, node: '63' } ] } },
+          { type: Type.SEQ_ITEM, node: { items: [ 'Ken Griffy', { type: Type.MAP_VALUE, node: '58' } ] } }
         ] } ]
       } ]
     },
@@ -561,36 +561,36 @@ comments:
       tgt: [ { contents: [ {
         tag: { verbatim: 'tag:clarkevans.com,2002:invoice' },
         items: [
-          'invoice', { indicator: ':', item: '34843' },
-          'date', { indicator: ':', item: '2001-01-23' },
-          'bill-to', { indicator: ':', item: { anchor: 'id001', items: [
-            'given', { indicator: ':', item: 'Chris' },
-            'family', { indicator: ':', item: 'Dumars' },
-            'address', { indicator: ':', item: { items: [
-              'lines', { indicator: ':', item: '458 Walkman Dr.\nSuite #292\n' },
-              'city', { indicator: ':', item: 'Royal Oak' },
-              'state', { indicator: ':', item: 'MI' },
-              'postal', { indicator: ':', item: '48046' }
+          'invoice', { type: Type.MAP_VALUE, node: '34843' },
+          'date', { type: Type.MAP_VALUE, node: '2001-01-23' },
+          'bill-to', { type: Type.MAP_VALUE, node: { anchor: 'id001', items: [
+            'given', { type: Type.MAP_VALUE, node: 'Chris' },
+            'family', { type: Type.MAP_VALUE, node: 'Dumars' },
+            'address', { type: Type.MAP_VALUE, node: { items: [
+              'lines', { type: Type.MAP_VALUE, node: '458 Walkman Dr.\nSuite #292\n' },
+              'city', { type: Type.MAP_VALUE, node: 'Royal Oak' },
+              'state', { type: Type.MAP_VALUE, node: 'MI' },
+              'postal', { type: Type.MAP_VALUE, node: '48046' }
             ] } }
           ] } },
-          'ship-to', { indicator: ':', item: { type: Type.ALIAS, rawValue: 'id001' } },
-          'product', { indicator: ':', item: { items: [
-            { indicator: '-', item: { items: [
-              'sku', { indicator: ':', item: 'BL394D' },
-              'quantity', { indicator: ':', item: '4' },
-              'description', { indicator: ':', item: 'Basketball' },
-              'price', { indicator: ':', item: '450.00' }
+          'ship-to', { type: Type.MAP_VALUE, node: { type: Type.ALIAS, rawValue: 'id001' } },
+          'product', { type: Type.MAP_VALUE, node: { items: [
+            { type: Type.SEQ_ITEM, node: { items: [
+              'sku', { type: Type.MAP_VALUE, node: 'BL394D' },
+              'quantity', { type: Type.MAP_VALUE, node: '4' },
+              'description', { type: Type.MAP_VALUE, node: 'Basketball' },
+              'price', { type: Type.MAP_VALUE, node: '450.00' }
             ] } },
-            { indicator: '-', item: { items: [
-              'sku', { indicator: ':', item: 'BL4438H' },
-              'quantity', { indicator: ':', item: '1' },
-              'description', { indicator: ':', item: 'Super Hoop' },
-              'price', { indicator: ':', item: '2392.00' }
+            { type: Type.SEQ_ITEM, node: { items: [
+              'sku', { type: Type.MAP_VALUE, node: 'BL4438H' },
+              'quantity', { type: Type.MAP_VALUE, node: '1' },
+              'description', { type: Type.MAP_VALUE, node: 'Super Hoop' },
+              'price', { type: Type.MAP_VALUE, node: '2392.00' }
             ] } }
           ] } },
-          'tax', { indicator: ':', item: '251.42' },
-          'total', { indicator: ':', item: '4443.52' },
-          'comments', { indicator: ':', item: 'Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.' }
+          'tax', { type: Type.MAP_VALUE, node: '251.42' },
+          'total', { type: Type.MAP_VALUE, node: '4443.52' },
+          'comments', { type: Type.MAP_VALUE, node: 'Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.' }
         ]
       } ] } ]
     },
@@ -625,29 +625,29 @@ Stack:
       foo = bar\n`,
       tgt: [
         { contents: [ { items: [
-          'Time', { indicator: ':', item: '2001-11-23 15:01:42 -5' },
-          'User', { indicator: ':', item: 'ed' },
-          'Warning', { indicator: ':', item: 'This is an error message for the log file' }
+          'Time', { type: Type.MAP_VALUE, node: '2001-11-23 15:01:42 -5' },
+          'User', { type: Type.MAP_VALUE, node: 'ed' },
+          'Warning', { type: Type.MAP_VALUE, node: 'This is an error message for the log file' }
         ] } ] },
         { contents: [ { items: [
-          'Time', { indicator: ':', item: '2001-11-23 15:02:31 -5' },
-          'User', { indicator: ':', item: 'ed' },
-          'Warning', { indicator: ':', item: 'A slightly different error message.' }
+          'Time', { type: Type.MAP_VALUE, node: '2001-11-23 15:02:31 -5' },
+          'User', { type: Type.MAP_VALUE, node: 'ed' },
+          'Warning', { type: Type.MAP_VALUE, node: 'A slightly different error message.' }
         ] } ] },
         { contents: [ { items: [
-          'Date', { indicator: ':', item: '2001-11-23 15:03:17 -5' },
-          'User', { indicator: ':', item: 'ed' },
-          'Fatal', { indicator: ':', item: 'Unknown variable "bar"' },
-          'Stack', { indicator: ':', item: { items: [
-            { indicator: '-', item: { items: [
-              'file', { indicator: ':', item: 'TopClass.py' },
-              'line', { indicator: ':', item: '23' },
-              'code', { indicator: ':', item: 'x = MoreObject("345\\n")\n' }
+          'Date', { type: Type.MAP_VALUE, node: '2001-11-23 15:03:17 -5' },
+          'User', { type: Type.MAP_VALUE, node: 'ed' },
+          'Fatal', { type: Type.MAP_VALUE, node: 'Unknown variable "bar"' },
+          'Stack', { type: Type.MAP_VALUE, node: { items: [
+            { type: Type.SEQ_ITEM, node: { items: [
+              'file', { type: Type.MAP_VALUE, node: 'TopClass.py' },
+              'line', { type: Type.MAP_VALUE, node: '23' },
+              'code', { type: Type.MAP_VALUE, node: 'x = MoreObject("345\\n")\n' }
             ] } },
-            { indicator: '-', item: { items: [
-              'file', { indicator: ':', item: 'MoreClass.py' },
-              'line', { indicator: ':', item: '58' },
-              'code', { indicator: ':', item: 'foo = bar' }
+            { type: Type.SEQ_ITEM, node: { items: [
+              'file', { type: Type.MAP_VALUE, node: 'MoreClass.py' },
+              'line', { type: Type.MAP_VALUE, node: '58' },
+              'code', { type: Type.MAP_VALUE, node: 'foo = bar' }
             ] } }
           ] } }
         ] } ] }
@@ -667,16 +667,16 @@ mapping:
   sea : green`,
       tgt: [{ contents: [{ items: [
         'sequence',
-        { indicator: ':', item: { items: [
-          { indicator: '-', item: 'one' },
-          { indicator: '-', item: 'two' }
+        { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'one' },
+          { type: Type.SEQ_ITEM, node: 'two' }
         ] } },
         'mapping',
-        { indicator: ':', item: { items: [
-          { indicator: '?', item: 'sky' },
-          { indicator: ':', item: 'blue' },
+        { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.MAP_KEY, node: 'sky' },
+          { type: Type.MAP_VALUE, node: 'blue' },
           'sea',
-          { indicator: ':', item: 'green' }
+          { type: Type.MAP_VALUE, node: 'green' }
         ] } }
       ] }] }]
     },
@@ -687,11 +687,11 @@ mapping:
 mapping: { sky: blue, sea: green }`,
       tgt: [{ contents: [{ items: [
         'sequence',
-        { indicator: ':', item: { items: [
+        { type: Type.MAP_VALUE, node: { items: [
           '[', 'one', ',', 'two', ',', ']'
         ] } },
         'mapping',
-        { indicator: ':', item: { items: [
+        { type: Type.MAP_VALUE, node: { items: [
           '{', 'sky', ':', 'blue', ',', 'sea', ':', 'green', '}'
         ] } }
       ] }] }]
@@ -709,9 +709,9 @@ mapping: { sky: blue, sea: green }`,
 alias: *anchor`,
       tgt: [{ contents: [{ items: [
         'anchored',
-        { indicator: ':', item: { tag: { handle: '!', suffix: 'local' }, anchor: 'anchor', strValue: 'value' } },
+        { type: Type.MAP_VALUE, node: { tag: { handle: '!', suffix: 'local' }, anchor: 'anchor', strValue: 'value' } },
         'alias',
-        { indicator: ':', item: { type: Type.ALIAS, rawValue: 'anchor' } }
+        { type: Type.MAP_VALUE, node: { type: Type.ALIAS, rawValue: 'anchor' } }
       ]}]}]
     },
 
@@ -726,9 +726,9 @@ folded: >
 `,
       tgt: [{ contents: [{ items: [
         'literal',
-        { indicator: ':', item: 'some\ntext\n' },
+        { type: Type.MAP_VALUE, node: 'some\ntext\n' },
         'folded',
-        { indicator: ':', item: 'some text\n' }
+        { type: Type.MAP_VALUE, node: 'some text\n' }
       ]}]}]
     },
 
@@ -738,9 +738,9 @@ folded: >
 double: "text"`,
       tgt: [{ contents: [{ items: [
         'single',
-        { indicator: ':', item: 'text' },
+        { type: Type.MAP_VALUE, node: 'text' },
         'double',
-        { indicator: ':', item: 'text' }
+        { type: Type.MAP_VALUE, node: 'text' }
       ]}]}]
     },
 
@@ -760,9 +760,9 @@ double: "text"`,
 grave-accent: \`text`,
       tgt: [{ contents: [{ items: [
         'commercial-at',
-        { indicator: ':', item: '@text' },
+        { type: Type.MAP_VALUE, node: '@text' },
         'grave-accent',
-        { indicator: ':', item: '`text' }
+        { type: Type.MAP_VALUE, node: '`text' }
       ]}]}]
       // ERROR: Reserved indicators can't start a plain scalar.
     },
@@ -781,9 +781,9 @@ block:\t|
         directives: [{ comment: ' Tabs and spaces' }],
         contents: [{ items: [
           'quoted',
-          { indicator: ':', item: 'Quoted \t' },
+          { type: Type.MAP_VALUE, node: 'Quoted \t' },
           'block',
-          { indicator: ':', item: 'void main() {\n\tprintf("Hello, world!\\n");\n}\n' }
+          { type: Type.MAP_VALUE, node: 'void main() {\n\tprintf("Hello, world!\\n");\n}\n' }
         ]}]
       }]
     },
@@ -809,7 +809,7 @@ block:\t|
   \\xq-"`,
       tgt: [ { contents: [ { items: [
         'Bad escapes',
-        { indicator: ':', item: { rawValue: '"\\c\n  \\xq-"' }}
+        { type: Type.MAP_VALUE, node: { rawValue: '"\\c\n  \\xq-"' }}
       ] } ] } ]
       // ERROR: c is an invalid escaped character.
       // ERROR: q and - are invalid hex digits.
@@ -838,11 +838,11 @@ Not indented:
         ],
         contents: [{ items: [
           'Not indented',
-          { indicator: ':', item: { items: [
+          { type: Type.MAP_VALUE, node: { items: [
             'By one space',
-            { indicator: ':', item: 'By four\n  spaces\n' },
+            { type: Type.MAP_VALUE, node: 'By four\n  spaces\n' },
             'Flow style',
-            { indicator: ':', item: { items: [
+            { type: Type.MAP_VALUE, node: { items: [
               '[', { comment: ' Leading spaces' },
               'By two', ',', { comment: ' in flow style' },
               'Also by two', ',', { comment: ' are neither' },
@@ -861,12 +861,12 @@ Not indented:
   -  -\tc
      - d`,
       tgt: [{ contents: [{ items: [
-        { indicator: '?', item: 'a' },
-        { indicator: ':', item: { items: [
-          { indicator: '-', item: 'b' },
-          { indicator: '-', item: { items: [
-            { indicator: '-', item: 'c' },
-            { indicator: '-', item: 'd' },
+        { type: Type.MAP_KEY, node: 'a' },
+        { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'b' },
+          { type: Type.SEQ_ITEM, node: { items: [
+            { type: Type.SEQ_ITEM, node: 'c' },
+            { type: Type.SEQ_ITEM, node: 'd' },
           ] } }
         ] } }
       ]}]}]
@@ -880,13 +880,13 @@ Not indented:
 - - baz
   -\tbaz`,
       tgt: [{ contents: [{ items: [
-        { indicator: '-', item: { items: [
+        { type: Type.SEQ_ITEM, node: { items: [
           'foo',
-          { indicator: ':', item: 'bar' }
+          { type: Type.MAP_VALUE, node: 'bar' }
         ] } },
-        { indicator: '-', item: { items: [
-          { indicator: '-', item: 'baz' },
-          { indicator: '-', item: 'baz' },
+        { type: Type.SEQ_ITEM, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'baz' },
+          { type: Type.SEQ_ITEM, node: 'baz' },
         ] } }
       ]}]}]
     },
@@ -904,11 +904,11 @@ block: |
    \tlines`,
       tgt: [{ contents: [{ items: [
         'plain',
-        { indicator: ':', item: 'text lines' },
+        { type: Type.MAP_VALUE, node: 'text lines' },
         'quoted',
-        { indicator: ':', item: 'text lines' },
+        { type: Type.MAP_VALUE, node: 'text lines' },
         'block',
-        { indicator: ':', item: 'text\n \tlines\n' },
+        { type: Type.MAP_VALUE, node: 'text\n \tlines\n' },
       ]}]}]
     },
   },
@@ -925,9 +925,9 @@ Chomping: |
  `,
       tgt: [{ contents: [{ items: [
         'Folding',
-        { indicator: ':', item: 'Empty line\nas a line feed' },
+        { type: Type.MAP_VALUE, node: 'Empty line\nas a line feed' },
         'Chomping',
-        { indicator: ':', item: 'Clipped empty lines\n' },
+        { type: Type.MAP_VALUE, node: 'Clipped empty lines\n' },
       ]}]}]
     },
   },
@@ -976,7 +976,7 @@ Chomping: |
   value`,
       tgt: [{ contents: [{ items: [
         'key',
-        { indicator: ':', comment: ' Comment', item: 'value' }
+        { type: Type.MAP_VALUE, comment: ' Comment', node: 'value' }
       ]}]}]
     },
 
@@ -994,7 +994,7 @@ Chomping: |
   value\n`,
       tgt: [{ contents: [{ items: [
         'key',
-        { indicator: ':', comment: ' Comment\n lines', item: 'value' }
+        { type: Type.MAP_VALUE, comment: ' Comment\n lines', node: 'value' }
       ] }] }]
     },
 
@@ -1012,11 +1012,11 @@ Chomping: |
         { items: [
           '{', 'first', ':', 'Sammy', ',', 'last', ':', 'Sosa', '}'
         ] },
-        { indicator: ':', comment: ' Statistics:', item: { items: [
+        { type: Type.MAP_VALUE, comment: ' Statistics:', node: { items: [
           'hr',
-          { indicator: ':', comment: ' Home runs', item: '65' },
+          { type: Type.MAP_VALUE, comment: ' Home runs', node: '65' },
           'avg',
-          { indicator: ':', comment: ' Average', item: '0.278' }
+          { type: Type.MAP_VALUE, comment: ' Average', node: '0.278' }
         ] } }
       ]}]}]
     },
@@ -1170,7 +1170,7 @@ bar`,
       tgt: [{
         directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example.com,2000:app/'] }],
         contents: [{ items: [
-          { indicator: '-', item: { tag: { handle: '!e!', suffix: 'foo' }, strValue: 'bar' } }
+          { type: Type.SEQ_ITEM, node: { tag: { handle: '!e!', suffix: 'foo' }, strValue: 'bar' } }
         ] }]
       }]
     },
@@ -1184,9 +1184,9 @@ bar`,
 &a2 baz : *a1`,
       tgt: [{ contents: [{ items: [
         { tag: { handle: '!!', suffix: 'str' }, anchor: 'a1', strValue: 'foo' },
-        { indicator: ':', item: { tag: { handle: '!!', suffix: 'str' }, strValue: 'bar' } },
+        { type: Type.MAP_VALUE, node: { tag: { handle: '!!', suffix: 'str' }, strValue: 'bar' } },
         { anchor: 'a2', strValue: 'baz' },
-        { indicator: ':', item: { type: Type.ALIAS, rawValue: 'a1' } }
+        { type: Type.MAP_VALUE, node: { type: Type.ALIAS, rawValue: 'a1' } }
       ] }] }]
     },
 
@@ -1196,7 +1196,7 @@ bar`,
   !<!bar> baz`,
       tgt: [{ contents: [{ items: [
         { tag: { verbatim: 'tag:yaml.org,2002:str' }, strValue: 'foo' },
-        { indicator: ':', item: { tag: { verbatim: '!bar' }, strValue: 'baz' } }
+        { type: Type.MAP_VALUE, node: { tag: { verbatim: '!bar' }, strValue: 'baz' } }
       ] }] }]
     },
 
@@ -1205,8 +1205,8 @@ bar`,
 `- !<!> foo
 - !<$:?> bar`,
       tgt: [{ contents: [{ items: [
-        { indicator: '-', item: { tag: { verbatim: '!' }, strValue: 'foo' } },
-        { indicator: '-', item: { tag: { verbatim: '$:?' }, strValue: 'bar' } }
+        { type: Type.SEQ_ITEM, node: { tag: { verbatim: '!' }, strValue: 'foo' } },
+        { type: Type.SEQ_ITEM, node: { tag: { verbatim: '$:?' }, strValue: 'bar' } }
       ] }] }]
       // ERROR: Verbatim tags aren't resolved, so ! is invalid.
       // ERROR: The $:? tag is neither a global URI tag nor a local tag starting with “!”.
@@ -1222,9 +1222,9 @@ bar`,
       tgt: [{
         directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example.com,2000:app/'] }],
         contents: [{ items: [
-          { indicator: '-', item: { tag: { handle: '!', suffix: 'local' }, strValue: 'foo' } },
-          { indicator: '-', item: { tag: { handle: '!!', suffix: 'str' }, strValue: 'bar' } },
-          { indicator: '-', item: { tag: { handle: '!e!', suffix: 'tag%21' }, strValue: 'baz' } }
+          { type: Type.SEQ_ITEM, node: { tag: { handle: '!', suffix: 'local' }, strValue: 'foo' } },
+          { type: Type.SEQ_ITEM, node: { tag: { handle: '!!', suffix: 'str' }, strValue: 'bar' } },
+          { type: Type.SEQ_ITEM, node: { tag: { handle: '!e!', suffix: 'tag%21' }, strValue: 'baz' } }
         ] }]
       }]
     },
@@ -1238,8 +1238,8 @@ bar`,
       tgt: [{
         directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example,2000:app/'] }],
         contents: [{ items: [
-          { indicator: '-', item: { tag: { handle: '!e!', suffix: '' }, strValue: 'foo' } },
-          { indicator: '-', item: { tag: { handle: '!h!', suffix: 'bar' }, strValue: 'baz' } }
+          { type: Type.SEQ_ITEM, node: { tag: { handle: '!e!', suffix: '' }, strValue: 'foo' } },
+          { type: Type.SEQ_ITEM, node: { tag: { handle: '!h!', suffix: 'bar' }, strValue: 'baz' } }
         ] }]
       }]
       // ERROR: The !e! handle has no suffix.
@@ -1255,9 +1255,9 @@ bar`,
       tgt: [{
         directives: [{ comment: ' Assuming conventional resolution:' }],
         contents: [{ items: [
-          { indicator: '-', item: '12' },
-          { indicator: '-', item: '12' },
-          { indicator: '-', item: { tag: { handle: '!', suffix: '' }, strValue: '12' } }
+          { type: Type.SEQ_ITEM, node: '12' },
+          { type: Type.SEQ_ITEM, node: '12' },
+          { type: Type.SEQ_ITEM, node: { tag: { handle: '!', suffix: '' }, strValue: '12' } }
         ] }]
       }]
     },
@@ -1268,9 +1268,9 @@ bar`,
 Second occurrence: *anchor`,
       tgt: [{ contents: [{ items: [
         'First occurrence',
-        { indicator: ':', item: { anchor: 'anchor', strValue: 'Value' } },
+        { type: Type.MAP_VALUE, node: { anchor: 'anchor', strValue: 'Value' } },
         'Second occurrence',
-        { indicator: ':', item: { type: Type.ALIAS, rawValue: 'anchor' } }
+        { type: Type.MAP_VALUE, node: { type: Type.ALIAS, rawValue: 'anchor' } }
       ] }] }]
     },
   },
@@ -1284,13 +1284,13 @@ Override anchor: &anchor Bar
 Reuse anchor: *anchor`,
       tgt: [ { contents: [ { items: [
         'First occurrence',
-        { indicator: ':', item: { anchor: 'anchor', strValue: 'Foo' } },
+        { type: Type.MAP_VALUE, node: { anchor: 'anchor', strValue: 'Foo' } },
         'Second occurrence',
-        { indicator: ':', item: { type: Type.ALIAS, rawValue: 'anchor' } },
+        { type: Type.MAP_VALUE, node: { type: Type.ALIAS, rawValue: 'anchor' } },
         'Override anchor',
-        { indicator: ':', item: { anchor: 'anchor', strValue: 'Bar' } },
+        { type: Type.MAP_VALUE, node: { anchor: 'anchor', strValue: 'Bar' } },
         'Reuse anchor',
-        { indicator: ':', item: { type: Type.ALIAS, rawValue: 'anchor' } }
+        { type: Type.MAP_VALUE, node: { type: Type.ALIAS, rawValue: 'anchor' } }
       ] } ] } ]
     },
   },
@@ -1325,7 +1325,7 @@ Reuse anchor: *anchor`,
  ]`,
       tgt: [ { contents: [ { items: [
         'implicit block key',
-        { indicator: ':', item: { items: [
+        { type: Type.MAP_VALUE, node: { items: [
           '[', 'implicit flow key', ':', 'value', ',', ']'
         ] } }
       ] } ] } ]
@@ -1365,7 +1365,7 @@ to a line feed, or \t\\
  ]`,
       tgt: [ { contents: [ { items: [
         'implicit block key',
-        { indicator: ':', item: { items: [
+        { type: Type.MAP_VALUE, node: { items: [
           '[', 'implicit flow key', ':', 'value', ',', ']'
         ] } }
       ] } ] } ]
@@ -1399,13 +1399,13 @@ to a line feed, or \t\\
       tgt: [ {
         directives: [ { comment: ' Outside flow collection:' } ],
         contents: [ { items: [
-          { indicator: '-', item: '::vector' },
-          { indicator: '-', item: ': - ()' },
-          { indicator: '-', item: 'Up, up, and away!' },
-          { indicator: '-', item: '-123' },
-          { indicator: '-', item: 'http://example.com/foo#bar' },
+          { type: Type.SEQ_ITEM, node: '::vector' },
+          { type: Type.SEQ_ITEM, node: ': - ()' },
+          { type: Type.SEQ_ITEM, node: 'Up, up, and away!' },
+          { type: Type.SEQ_ITEM, node: '-123' },
+          { type: Type.SEQ_ITEM, node: 'http://example.com/foo#bar' },
           { comment: ' Inside flow collection:' },
-          { indicator: '-', item: { items: [
+          { type: Type.SEQ_ITEM, node: { items: [
             '[', '::vector', ',', ': - ()', ',', 'Up, up and away!', ',',
             '-123', ',', 'http://example.com/foo#bar', ']'
           ] } }
@@ -1421,8 +1421,8 @@ to a line feed, or \t\\
       tgt: [ { contents:
         [ { items:
              [ 'implicit block key',
-               { indicator: ':',
-                 item: { items: [ '[', 'implicit flow key', ':', 'value', ',', ']' ] } } ] } ] } ]
+               { type: Type.MAP_VALUE,
+                 node: { items: [ '[', 'implicit flow key', ':', 'value', ',', ']' ] } } ] } ] } ]
     },
 
     'Example 7.12. Plain Lines': {
@@ -1441,8 +1441,8 @@ to a line feed, or \t\\
 `- [ one, two, ]
 - [three ,four]`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { items: [ '[', 'one', ',', 'two', ',', ']' ] } },
-        { indicator: '-', item: { items: [ '[', 'three', ',', 'four', ']' ] } }
+        { type: Type.SEQ_ITEM, node: { items: [ '[', 'one', ',', 'two', ',', ']' ] } },
+        { type: Type.SEQ_ITEM, node: { items: [ '[', 'three', ',', 'four', ']' ] } }
       ] } ] } ]
     },
 
@@ -1470,8 +1470,8 @@ single: pair,
 `- { one : two , three: four , }
 - {five: six,seven : eight}`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { items: [ '{', 'one', ':', 'two', ',', 'three', ':', 'four', ',', '}' ] } },
-        { indicator: '-', item: { items: [ '{', 'five', ':', 'six', ',', 'seven', ':', 'eight', '}' ] } }
+        { type: Type.SEQ_ITEM, node: { items: [ '{', 'one', ':', 'two', ',', 'three', ':', 'four', ',', '}' ] } },
+        { type: Type.SEQ_ITEM, node: { items: [ '{', 'five', ':', 'six', ',', 'seven', ':', 'eight', '}' ] } }
       ] } ] } ]
     },
 
@@ -1535,9 +1535,9 @@ foo: bar
 - [ : empty key entry ]
 - [ {JSON: like}:adjacent ]`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { items: [ '[', 'YAML', ':', 'separate', ']' ] } },
-        { indicator: '-', item: { items: [ '[', ':', 'empty key entry', ']' ] } },
-        { indicator: '-', item: { items: [
+        { type: Type.SEQ_ITEM, node: { items: [ '[', 'YAML', ':', 'separate', ']' ] } },
+        { type: Type.SEQ_ITEM, node: { items: [ '[', ':', 'empty key entry', ']' ] } },
+        { type: Type.SEQ_ITEM, node: { items: [
           '[', { items: [ '{', 'JSON', ':', 'like', '}' ] }, ':', 'adjacent', ']'
         ] } }
       ] } ] } ]
@@ -1565,11 +1565,11 @@ foo: bar
 - 'b'
 - c`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { items: [ '[', 'a', ',', 'b', ']' ] } },
-        { indicator: '-', item: { items: [ '{', 'a', ':', 'b', '}' ] } },
-        { indicator: '-', item: 'a' },
-        { indicator: '-', item: 'b' },
-        { indicator: '-', item: 'c' }
+        { type: Type.SEQ_ITEM, node: { items: [ '[', 'a', ',', 'b', ']' ] } },
+        { type: Type.SEQ_ITEM, node: { items: [ '{', 'a', ':', 'b', '}' ] } },
+        { type: Type.SEQ_ITEM, node: 'a' },
+        { type: Type.SEQ_ITEM, node: 'b' },
+        { type: Type.SEQ_ITEM, node: 'c' }
       ] } ] } ]
     },
 
@@ -1581,11 +1581,11 @@ foo: bar
 - *anchor
 - !!str`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { tag: { handle: '!!', suffix: 'str' }, strValue: 'a' } },
-        { indicator: '-', item: 'b' },
-        { indicator: '-', item: { anchor: 'anchor', strValue: 'c' } },
-        { indicator: '-', item: { type: Type.ALIAS, rawValue: 'anchor' } },
-        { indicator: '-', item: { tag: { handle: '!!', suffix: 'str' } } }
+        { type: Type.SEQ_ITEM, node: { tag: { handle: '!!', suffix: 'str' }, strValue: 'a' } },
+        { type: Type.SEQ_ITEM, node: 'b' },
+        { type: Type.SEQ_ITEM, node: { anchor: 'anchor', strValue: 'c' } },
+        { type: Type.SEQ_ITEM, node: { type: Type.ALIAS, rawValue: 'anchor' } },
+        { type: Type.SEQ_ITEM, node: { tag: { handle: '!!', suffix: 'str' } } }
       ] } ] } ]
     },
   },
@@ -1603,10 +1603,10 @@ foo: bar
 - >1- # Both indicators
   strip`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { comment: ' Empty header', strValue: 'literal\n' } },
-        { indicator: '-', item: { comment: ' Indentation indicator', strValue: ' folded\n' } },
-        { indicator: '-', item: { comment: ' Chomping indicator', strValue: 'keep\n\n' } },
-        { indicator: '-', item: { comment: ' Both indicators', strValue: ' strip' } }
+        { type: Type.SEQ_ITEM, node: { comment: ' Empty header', strValue: 'literal\n' } },
+        { type: Type.SEQ_ITEM, node: { comment: ' Indentation indicator', strValue: ' folded\n' } },
+        { type: Type.SEQ_ITEM, node: { comment: ' Chomping indicator', strValue: 'keep\n\n' } },
+        { type: Type.SEQ_ITEM, node: { comment: ' Both indicators', strValue: ' strip' } }
       ] } ] } ]
     },
 
@@ -1624,10 +1624,10 @@ foo: bar
 ·\t
 ·detected`.replace(/·/g, ' '),
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: 'detected\n' },
-        { indicator: '-', item: '\n\n# detected\n' },
-        { indicator: '-', item: ' explicit\n' },
-        { indicator: '-', item: '\t\ndetected\n' }
+        { type: Type.SEQ_ITEM, node: 'detected\n' },
+        { type: Type.SEQ_ITEM, node: '\n\n# detected\n' },
+        { type: Type.SEQ_ITEM, node: ' explicit\n' },
+        { type: Type.SEQ_ITEM, node: '\t\ndetected\n' }
       ] } ] } ]
     },
 
@@ -1643,8 +1643,8 @@ foo: bar
 ·text`.replace(/·/g, ' '),
       tgt: [ { contents: [
         { items: [
-          { indicator: '-', item: ' \ntext\n' },
-          { indicator: '-', item: 'text\n' },
+          { type: Type.SEQ_ITEM, node: ' \ntext\n' },
+          { type: Type.SEQ_ITEM, node: 'text\n' },
         ] },
         'text - |2 text'
       ] } ]
@@ -1663,11 +1663,11 @@ keep: |+
   text\n`,
       tgt: [ { contents: [ { items: [
         'strip',
-        { indicator: ':', item: 'text' },
+        { type: Type.MAP_VALUE, node: 'text' },
         'clip',
-        { indicator: ':', item: 'text\n' },
+        { type: Type.MAP_VALUE, node: 'text\n' },
         'keep',
-        { indicator: ':', item: 'text\n' }
+        { type: Type.MAP_VALUE, node: 'text\n' }
       ] } ] } ]
     },
 
@@ -1697,15 +1697,15 @@ keep: |+
         directives: [ { comment: ' Strip' }, { comment: ' Comments:' } ],
         contents: [ { items: [
           'strip',
-          { indicator: ':', item: '# text' },
+          { type: Type.MAP_VALUE, node: '# text' },
           { comment: ' Clip' },
           { comment: ' comments:' },
           'clip',
-          { indicator: ':', item: '# text\n' },
+          { type: Type.MAP_VALUE, node: '# text\n' },
           { comment: ' Keep' },
           { comment: ' comments:' },
           'keep',
-          { indicator: ':', item: '# text\n\n' },
+          { type: Type.MAP_VALUE, node: '# text\n\n' },
           { comment: ' Trail' },
           { comment: ' comments.' }
         ] } ]
@@ -1721,11 +1721,11 @@ clip: >
 keep: |+\n\n`,
       tgt: [ { contents: [ { items: [
         'strip',
-        { indicator: ':', item: '\n' },
+        { type: Type.MAP_VALUE, node: '\n' },
         'clip',
-        { indicator: ':', item: '\n' },
+        { type: Type.MAP_VALUE, node: '\n' },
         'keep',
-        { indicator: ':', item: '\n' }
+        { type: Type.MAP_VALUE, node: '\n' }
       ] } ] } ]
     },
   },
@@ -1799,11 +1799,11 @@ keep: |+\n\n`,
   - two : three\n`,
       tgt: [ { contents: [ { items: [
         'block sequence',
-        { indicator: ':', item: { items: [
-          { indicator: '-', item: 'one' },
-          { indicator: '-', item: { items: [
+        { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'one' },
+          { type: Type.SEQ_ITEM, node: { items: [
             'two',
-            { indicator: ':', item: 'three' }
+            { type: Type.MAP_VALUE, node: 'three' }
           ] } }
         ] } }
       ] } ] } ]
@@ -1818,15 +1818,15 @@ keep: |+\n\n`,
   - two # sequence
 - one: two # Compact mapping`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: null, comment: ' Empty' },
-        { indicator: '-', item: 'block node\n' },
-        { indicator: '-', item: { items: [
-          { indicator: '-', item: { comment: ' Compact', strValue: 'one' } },
-          { indicator: '-', item: { comment: ' sequence', strValue: 'two' } }
+        { type: Type.SEQ_ITEM, node: null, comment: ' Empty' },
+        { type: Type.SEQ_ITEM, node: 'block node\n' },
+        { type: Type.SEQ_ITEM, node: { items: [
+          { type: Type.SEQ_ITEM, node: { comment: ' Compact', strValue: 'one' } },
+          { type: Type.SEQ_ITEM, node: { comment: ' sequence', strValue: 'two' } }
         ] } },
-        { indicator: '-', item: { items: [
+        { type: Type.SEQ_ITEM, node: { items: [
           'one',
-          { indicator: ':', item: { comment: ' Compact mapping', strValue: 'two' } }
+          { type: Type.MAP_VALUE, node: { comment: ' Compact mapping', strValue: 'two' } }
         ] } }
       ] } ] } ]
     },
@@ -1839,9 +1839,9 @@ keep: |+\n\n`,
  key: value\n`,
       tgt: [ { contents: [ { items: [
         'block mapping',
-        { indicator: ':', item: { items: [
+        { type: Type.MAP_VALUE, node: { items: [
           'key',
-          { indicator: ':', item: 'value' }
+          { type: Type.MAP_VALUE, node: 'value' }
         ] } }
       ] } ] } ]
     },
@@ -1854,11 +1854,11 @@ keep: |+\n\n`,
 : - one # Explicit compact
   - two # block value\n`,
       tgt: [ { contents: [ { items: [
-        { indicator: '?', item: { comment: ' Empty value', strValue: 'explicit key' } },
-        { indicator: '?', item: 'block key\n' },
-        { indicator: ':', item: { items: [
-          { indicator: '-', item: { comment: ' Explicit compact', strValue: 'one' } },
-          { indicator: '-', item: { comment: ' block value', strValue: 'two' } }
+        { type: Type.MAP_KEY, node: { comment: ' Empty value', strValue: 'explicit key' } },
+        { type: Type.MAP_KEY, node: 'block key\n' },
+        { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: { comment: ' Explicit compact', strValue: 'one' } },
+          { type: Type.SEQ_ITEM, node: { comment: ' block value', strValue: 'two' } }
         ] } }
       ] } ] } ]
     },
@@ -1871,11 +1871,11 @@ keep: |+\n\n`,
 - entry`,
       tgt: [ { contents: [ { items: [
         'plain key',
-        { indicator: ':', item: 'in-line value' },
-        { indicator: ':', item: null, comment: ' Both empty' },
+        { type: Type.MAP_VALUE, node: 'in-line value' },
+        { type: Type.MAP_VALUE, node: null, comment: ' Both empty' },
         'quoted key',
-        { indicator: ':', item: { items: [
-          { indicator: '-', item: 'entry' }
+        { type: Type.MAP_VALUE, node: { items: [
+          { type: Type.SEQ_ITEM, node: 'entry' }
         ] } }
       ] } ] } ]
     },
@@ -1886,18 +1886,18 @@ keep: |+\n\n`,
 - ? earth: blue
   : moon: white\n`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { items: [
+        { type: Type.SEQ_ITEM, node: { items: [
           'sun',
-          { indicator: ':', item: 'yellow' }
+          { type: Type.MAP_VALUE, node: 'yellow' }
         ] } },
-        { indicator: '-', item: { items: [
-          { indicator: '?', item: { items: [
+        { type: Type.SEQ_ITEM, node: { items: [
+          { type: Type.MAP_KEY, node: { items: [
             'earth',
-            { indicator: ':', item: 'blue' }
+            { type: Type.MAP_VALUE, node: 'blue' }
           ] } },
-          { indicator: ':', item: { items: [
+          { type: Type.MAP_VALUE, node: { items: [
             'moon',
-            { indicator: ':', item: 'white' }
+            { type: Type.MAP_VALUE, node: 'white' }
           ] } }
         ] } }
       ] } ] } ]
@@ -1914,11 +1914,11 @@ keep: |+\n\n`,
 - !!map # Block collection
   foo : bar\n`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: 'flow in block' },
-        { indicator: '-', item: 'Block scalar\n' },
-        { indicator: '-', item: { tag: { handle: '!!', suffix: 'map' }, comment: ' Block collection', items: [
+        { type: Type.SEQ_ITEM, node: 'flow in block' },
+        { type: Type.SEQ_ITEM, node: 'Block scalar\n' },
+        { type: Type.SEQ_ITEM, node: { tag: { handle: '!!', suffix: 'map' }, comment: ' Block collection', items: [
           'foo',
-          { indicator: ':', item: 'bar' }
+          { type: Type.MAP_VALUE, node: 'bar' }
         ] } }
       ] } ] } ]
     },
@@ -1933,9 +1933,9 @@ folded:
  value`,
       tgt: [ { contents: [ { items: [
         'literal',
-        { indicator: ':', item: 'value\n' },
+        { type: Type.MAP_VALUE, node: 'value\n' },
         'folded',
-        { indicator: ':', item: { tag: { handle: '!', suffix: 'foo' }, strValue: 'value\n' } }  // trailing \n against spec
+        { type: Type.MAP_VALUE, node: { tag: { handle: '!', suffix: 'foo' }, strValue: 'value\n' } }  // trailing \n against spec
       ] } ] } ]
     },
 
@@ -1949,16 +1949,16 @@ mapping: !!map
  foo: bar`,
       tgt: [ { contents: [ { items: [
         'sequence',
-        { indicator: ':', item: { tag: { handle: '!!', suffix: 'seq' }, items: [
-          { indicator: '-', item: 'entry' },
-          { indicator: '-', item: { tag: { handle: '!!', suffix: 'seq' }, items: [
-            { indicator: '-', item: 'nested' }
+        { type: Type.MAP_VALUE, node: { tag: { handle: '!!', suffix: 'seq' }, items: [
+          { type: Type.SEQ_ITEM, node: 'entry' },
+          { type: Type.SEQ_ITEM, node: { tag: { handle: '!!', suffix: 'seq' }, items: [
+            { type: Type.SEQ_ITEM, node: 'nested' }
           ] } }
         ] } },
         'mapping',
-        { indicator: ':', item: { tag: { handle: '!!', suffix: 'map' }, items: [
+        { type: Type.MAP_VALUE, node: { tag: { handle: '!!', suffix: 'map' }, items: [
           'foo',
-          { indicator: ':', item: 'bar' }
+          { type: Type.MAP_VALUE, node: 'bar' }
         ] } }
       ] } ] } ]
     },
@@ -2063,7 +2063,7 @@ matches %: 20`,
         contents: [{ comment: ' Empty' }]
       }, {
         directives: [{ name: 'YAML', parameters: ['1.2'] }],
-        contents: [{ items: ['matches %', { indicator: ':', item: '20' }] }]
+        contents: [{ items: ['matches %', { type: Type.MAP_VALUE, node: '20' }] }]
       }]
     }
   }

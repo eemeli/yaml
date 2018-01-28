@@ -4,8 +4,7 @@ import Range from './Range'
 export default class CollectionItem extends Node {
   constructor (type, props) {
     super(type, props)
-    this.indicator = null
-    this.item = null
+    this.node = null
   }
 
   /**
@@ -19,7 +18,6 @@ export default class CollectionItem extends Node {
     const { parseNode, src } = context
     let { atLineStart, lineStart } = context
     const indent = atLineStart ? start - lineStart : context.indent
-    this.indicator = src[start] // '?' or ':' or '-'
     let offset = Node.endOfWhiteSpace(src, start + 1)
     let ch = src[offset]
     while (ch === '\n' || ch === '#') {
@@ -37,22 +35,22 @@ export default class CollectionItem extends Node {
     }
     trace: 'item-parse?', { indentDiff: offset - (lineStart + indent), ch: ch && JSON.stringify(ch) }
     if (Node.nextNodeIsIndented(ch, offset - (lineStart + indent), this.type !== Type.SEQ_ITEM)) {
-      this.item = parseNode({ atLineStart, inCollection: false, indent, lineStart, parent: this }, offset)
-      if (this.item) offset = this.item.range.end
+      this.node = parseNode({ atLineStart, inCollection: false, indent, lineStart, parent: this }, offset)
+      if (this.node) offset = this.node.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1
     }
-    const end = this.item ? this.item.valueRange.end : offset
+    const end = this.node ? this.node.valueRange.end : offset
     trace: 'item-end', { start, end, offset }
     this.valueRange = new Range(start, end)
     return offset
   }
 
   toString () {
-    const { context: { src }, item, range, value } = this
+    const { context: { src }, node, range, value } = this
     if (value != null) return value
-    const str = item ? (
-      src.slice(range.start, item.range.start) + String(item)
+    const str = node ? (
+      src.slice(range.start, node.range.start) + String(node)
     ) : (
       src.slice(range.start, range.end)
     )
