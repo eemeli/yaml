@@ -5,8 +5,8 @@ A maximally liberal [YAML 1.2] parser:
 - Will do its best to turn any string input into a YAML-ish AST representation
 - Fully supports programmatic handling of YAML comments and multi-document streams
 - Does practically no error checking, and should never throw -- but if you feed it garbage, you'll likely get a garbage AST as well
-- Has no runtime dependencies and compresses to under 9kB
-- Minimises memory consumption by being really lazy; doesn't even calculate raw string values until you specifically ask for them
+- Has no runtime dependencies and compresses to 11kB
+- Minimises memory consumption by being really lazy; doesn't calculate node string values until you specifically ask for them
 - Output object overrides `toString` at all levels to provide an idempotent YAML string representation
 - Allows (slightly clumsy) editing with a settable `Node#value`
 - Tested against all examples included in the YAML 1.2 spec
@@ -117,7 +117,7 @@ class Node {
 }
 
 class Alias extends Node {
-  // rawValue will contain the * prefix, followed by the anchor
+  // rawValue will contain the anchor without the * prefix
   type: 'ALIAS'
 }
 

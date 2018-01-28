@@ -13,7 +13,7 @@ export default class Alias extends Node {
     this.context = context
     const { src } = context
     let offset = Node.endOfIdentifier(src, start + 1)
-    this.valueRange = new Range(start, offset)
+    this.valueRange = new Range(start + 1, offset)
     offset = Node.endOfWhiteSpace(src, offset)
     offset = this.parseComment(offset)
     trace: this.type, { valueRange: this.valueRange, comment: this.comment }, JSON.stringify(this.rawValue)
