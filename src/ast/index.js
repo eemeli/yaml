@@ -1,6 +1,8 @@
 import Document from './Document'
 import ParseContext from './ParseContext'
 
+export { Type } from './Node'
+
 export default function parse (src) {
   if (src.indexOf('\r') !== -1) src = src.replace(/\r\n?/g, '\n')
   const context = new ParseContext({ src })
