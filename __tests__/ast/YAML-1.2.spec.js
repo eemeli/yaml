@@ -427,11 +427,11 @@ application specific tag: !something |
  above may be different for
  different documents.`,
       tgt: [ { contents: [ { items: [
-        'not-date', { indicator: ':', item: { tag: '!str', strValue: '2002-04-28' } },
-        'picture', { indicator: ':', item: { tag: '!binary', strValue:
+        'not-date', { indicator: ':', item: { tag: { handle: '!!', suffix: 'str' }, strValue: '2002-04-28' } },
+        'picture', { indicator: ':', item: { tag: { handle: '!!', suffix: 'binary' }, strValue:
           'R0lGODlhDAAMAIQAAP//9/X\n17unp5WZmZgAAAOfn515eXv\nPz7Y6OjuDg4J+fn5OTk6enp\n56enmleECcgggoBADs=\n'
         } },
-        'application specific tag', { indicator: ':', item: { tag: 'something', strValue:
+        'application specific tag', { indicator: ':', item: { tag: { handle: '!', suffix: 'something' }, strValue:
           'The semantics of the tag\nabove may be different for\ndifferent documents.\n'
         } }
       ] } ] } ]
@@ -456,20 +456,20 @@ application specific tag: !something |
       tgt: [ {
         directives: [{ name: 'TAG', parameters: ['!', 'tag:clarkevans.com,2002:'] }],
         contents: [ {
-          tag: 'shape',
+          tag: { handle: '!', suffix: 'shape' },
           comment: ' Use the ! handle for presenting\n tag:clarkevans.com,2002:circle',
           items: [
-            { indicator: '-', item: { tag: 'circle', items: [
+            { indicator: '-', item: { tag: { handle: '!', suffix: 'circle' }, items: [
               'center', { indicator: ':', item: { anchor: 'ORIGIN', items: [
                 '{', 'x', ':', '73', ',', 'y', ':', '129', '}'
               ] } },
               'radius', { indicator: ':', item: '7' }
             ] } },
-            { indicator: '-', item: { tag: 'line', items: [
+            { indicator: '-', item: { tag: { handle: '!', suffix: 'line' }, items: [
               'start', { indicator: ':', item: { type: Type.ALIAS, rawValue: '*ORIGIN' } },
               'finish', { indicator: ':', item: { items: [ '{', 'x', ':', '89', ',', 'y', ':', '102', '}' ] } }
             ] } },
-            { indicator: '-', item: { tag: 'label', items: [
+            { indicator: '-', item: { tag: { handle: '!', suffix: 'label' }, items: [
               'start', { indicator: ':', item: { type: Type.ALIAS, rawValue: '*ORIGIN' } },
               'color', { indicator: ':', item: '0xFFEEBB' },
               'text', { indicator: ':', item: 'Pretty vector drawing.' }
@@ -494,7 +494,7 @@ application specific tag: !something |
           { comment: ' Mapping where each key is' },
           { comment: ' associated with a null value' }
         ],
-        contents: [ { tag: '!set', items: [
+        contents: [ { tag: { handle: '!!', suffix: 'set' }, items: [
           { indicator: '?', item: 'Mark McGwire' },
           { indicator: '?', item: 'Sammy Sosa' },
           { indicator: '?', item: 'Ken Griff' }
@@ -517,7 +517,7 @@ application specific tag: !something |
           { comment: ' A sequence of mappings, with' },
           { comment: ' each mapping having one key' }
         ],
-        contents: [ { tag: '!omap', items: [
+        contents: [ { tag: { handle: '!!', suffix: 'omap' }, items: [
           { indicator: '-', item: { items: [ 'Mark McGwire', { indicator: ':', item: '65' } ] } },
           { indicator: '-', item: { items: [ 'Sammy Sosa', { indicator: ':', item: '63' } ] } },
           { indicator: '-', item: { items: [ 'Ken Griffy', { indicator: ':', item: '58' } ] } }
@@ -559,7 +559,7 @@ comments:
     Backup contact is Nancy
     Billsmer @ 338-4338.`,
       tgt: [ { contents: [ {
-        tag: '<tag:clarkevans.com,2002:invoice>',
+        tag: { verbatim: 'tag:clarkevans.com,2002:invoice' },
         items: [
           'invoice', { indicator: ':', item: '34843' },
           'date', { indicator: ':', item: '2001-01-23' },
@@ -709,7 +709,7 @@ mapping: { sky: blue, sea: green }`,
 alias: *anchor`,
       tgt: [{ contents: [{ items: [
         'anchored',
-        { indicator: ':', item: { tag: 'local', anchor: 'anchor', strValue: 'value' } },
+        { indicator: ':', item: { tag: { handle: '!', suffix: 'local' }, anchor: 'anchor', strValue: 'value' } },
         'alias',
         { indicator: ':', item: { type: Type.ALIAS, rawValue: '*anchor' } }
       ]}]}]
@@ -1078,7 +1078,7 @@ foo`,
 !yaml!str "foo"`,
       tgt: [{
         directives: [{ name: 'TAG', parameters: ['!yaml!', 'tag:yaml.org,2002:'] }],
-        contents: [{ tag: 'yaml!str', strValue: 'foo' }]
+        contents: [{ tag: { handle: '!yaml!', suffix: 'str' }, strValue: 'foo' }]
       }]
     },
 
@@ -1106,11 +1106,11 @@ bar`,
       tgt: [
         {
           directives: [{ comment: ' Private' }],
-          contents: [{ tag: 'foo', strValue: 'bar' }]
+          contents: [{ tag: { handle: '!', suffix: 'foo' }, strValue: 'bar' }]
         },
         {
           directives: [{ comment: ' Global' }, { name: 'TAG', parameters: ['!', 'tag:example.com,2000:app/'] }],
-          contents: [{ tag: 'foo', strValue: 'bar' }]
+          contents: [{ tag: { handle: '!', suffix: 'foo' }, strValue: 'bar' }]
         }
       ]
     },
@@ -1122,7 +1122,7 @@ bar`,
 !!int 1 - 3 # Interval, not integer`,
       tgt: [{
         directives: [{ name: 'TAG', parameters: ['!!', 'tag:example.com,2000:app/'] }],
-        contents: [{ tag: '!int', strValue: '1 - 3', comment: ' Interval, not integer' }]
+        contents: [{ tag: { handle: '!!', suffix: 'int' }, strValue: '1 - 3', comment: ' Interval, not integer' }]
       }]
     },
 
@@ -1133,7 +1133,7 @@ bar`,
 !e!foo "bar"`,
       tgt: [{
         directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example.com,2000:app/'] }],
-        contents: [{ tag: 'e!foo', strValue: 'bar' }]
+        contents: [{ tag: { handle: '!e!', suffix: 'foo' }, strValue: 'bar' }]
       }]
     },
 
@@ -1150,14 +1150,14 @@ bar`,
         directives: [{ name: 'TAG', parameters: ['!m!', '!my-'] }],
         contents: [
           { comment: ' Bulb here' },
-          { tag: 'm!light', strValue: 'fluorescent' }
+          { tag: { handle: '!m!', suffix: 'light' }, strValue: 'fluorescent' }
         ]
       },
       {
         directives: [{ name: 'TAG', parameters: ['!m!', '!my-'] }],
         contents: [
           { comment: ' Color here' },
-          { tag: 'm!light', strValue: 'green' }
+          { tag: { handle: '!m!', suffix: 'light' }, strValue: 'green' }
         ]
       }]
     },
@@ -1170,7 +1170,7 @@ bar`,
       tgt: [{
         directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example.com,2000:app/'] }],
         contents: [{ items: [
-          { indicator: '-', item: { tag: 'e!foo', strValue: 'bar' } }
+          { indicator: '-', item: { tag: { handle: '!e!', suffix: 'foo' }, strValue: 'bar' } }
         ] }]
       }]
     },
@@ -1183,8 +1183,8 @@ bar`,
   !!str bar
 &a2 baz : *a1`,
       tgt: [{ contents: [{ items: [
-        { tag: '!str', anchor: 'a1', strValue: 'foo' },
-        { indicator: ':', item: { tag: '!str', strValue: 'bar' } },
+        { tag: { handle: '!!', suffix: 'str' }, anchor: 'a1', strValue: 'foo' },
+        { indicator: ':', item: { tag: { handle: '!!', suffix: 'str' }, strValue: 'bar' } },
         { anchor: 'a2', strValue: 'baz' },
         { indicator: ':', item: { type: Type.ALIAS, rawValue: '*a1' } }
       ] }] }]
@@ -1195,8 +1195,8 @@ bar`,
 `!<tag:yaml.org,2002:str> foo :
   !<!bar> baz`,
       tgt: [{ contents: [{ items: [
-        { tag: '<tag:yaml.org,2002:str>', strValue: 'foo' },
-        { indicator: ':', item: { tag: '<!bar>', strValue: 'baz' } }
+        { tag: { verbatim: 'tag:yaml.org,2002:str' }, strValue: 'foo' },
+        { indicator: ':', item: { tag: { verbatim: '!bar' }, strValue: 'baz' } }
       ] }] }]
     },
 
@@ -1205,8 +1205,8 @@ bar`,
 `- !<!> foo
 - !<$:?> bar`,
       tgt: [{ contents: [{ items: [
-        { indicator: '-', item: { tag: '<!>', strValue: 'foo' } },
-        { indicator: '-', item: { tag: '<$:?>', strValue: 'bar' } }
+        { indicator: '-', item: { tag: { verbatim: '!' }, strValue: 'foo' } },
+        { indicator: '-', item: { tag: { verbatim: '$:?' }, strValue: 'bar' } }
       ] }] }]
       // ERROR: Verbatim tags aren't resolved, so ! is invalid.
       // ERROR: The $:? tag is neither a global URI tag nor a local tag starting with “!”.
@@ -1222,9 +1222,9 @@ bar`,
       tgt: [{
         directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example.com,2000:app/'] }],
         contents: [{ items: [
-          { indicator: '-', item: { tag: 'local', strValue: 'foo' } },
-          { indicator: '-', item: { tag: '!str', strValue: 'bar' } },
-          { indicator: '-', item: { tag: 'e!tag%21', strValue: 'baz' } }
+          { indicator: '-', item: { tag: { handle: '!', suffix: 'local' }, strValue: 'foo' } },
+          { indicator: '-', item: { tag: { handle: '!!', suffix: 'str' }, strValue: 'bar' } },
+          { indicator: '-', item: { tag: { handle: '!e!', suffix: 'tag%21' }, strValue: 'baz' } }
         ] }]
       }]
     },
@@ -1238,11 +1238,11 @@ bar`,
       tgt: [{
         directives: [{ name: 'TAG', parameters: ['!e!', 'tag:example,2000:app/'] }],
         contents: [{ items: [
-          { indicator: '-', item: { tag: 'e!', strValue: 'foo' } },
-          { indicator: '-', item: { tag: 'h!bar', strValue: 'baz' } }
+          { indicator: '-', item: { tag: { handle: '!e!', suffix: '' }, strValue: 'foo' } },
+          { indicator: '-', item: { tag: { handle: '!h!', suffix: 'bar' }, strValue: 'baz' } }
         ] }]
       }]
-      // ERROR: The !o! handle has no suffix.
+      // ERROR: The !e! handle has no suffix.
       // ERROR: The !h! handle wasn't declared.
     },
 
@@ -1257,7 +1257,7 @@ bar`,
         contents: [{ items: [
           { indicator: '-', item: '12' },
           { indicator: '-', item: '12' },
-          { indicator: '-', item: { tag: '', strValue: '12' } }
+          { indicator: '-', item: { tag: { handle: '!', suffix: '' }, strValue: '12' } }
         ] }]
       }]
     },
@@ -1303,7 +1303,7 @@ Reuse anchor: *anchor`,
   !!str : bar,
 }`,
       tgt: [ { contents: [ { items: [
-        '{', 'foo', ':', { tag: '!str' }, ',', { tag: '!str' }, ':', 'bar', ',', '}'
+        '{', 'foo', ':', { tag: { handle: '!!', suffix: 'str' } }, ',', { tag: { handle: '!!', suffix: 'str' } }, ':', 'bar', ',', '}'
       ] } ] } ]
     },
 
@@ -1581,11 +1581,11 @@ foo: bar
 - *anchor
 - !!str`,
       tgt: [ { contents: [ { items: [
-        { indicator: '-', item: { tag: '!str', strValue: 'a' } },
+        { indicator: '-', item: { tag: { handle: '!!', suffix: 'str' }, strValue: 'a' } },
         { indicator: '-', item: 'b' },
         { indicator: '-', item: { anchor: 'anchor', strValue: 'c' } },
         { indicator: '-', item: { type: Type.ALIAS, rawValue: '*anchor' } },
-        { indicator: '-', item: { tag: '!str' } }
+        { indicator: '-', item: { tag: { handle: '!!', suffix: 'str' } } }
       ] } ] } ]
     },
   },
@@ -1916,7 +1916,7 @@ keep: |+\n\n`,
       tgt: [ { contents: [ { items: [
         { indicator: '-', item: 'flow in block' },
         { indicator: '-', item: 'Block scalar\n' },
-        { indicator: '-', item: { tag: '!map', comment: ' Block collection', items: [
+        { indicator: '-', item: { tag: { handle: '!!', suffix: 'map' }, comment: ' Block collection', items: [
           'foo',
           { indicator: ':', item: 'bar' }
         ] } }
@@ -1935,7 +1935,7 @@ folded:
         'literal',
         { indicator: ':', item: 'value\n' },
         'folded',
-        { indicator: ':', item: { tag: 'foo', strValue: 'value\n' } }  // trailing \n against spec
+        { indicator: ':', item: { tag: { handle: '!', suffix: 'foo' }, strValue: 'value\n' } }  // trailing \n against spec
       ] } ] } ]
     },
 
@@ -1949,14 +1949,14 @@ mapping: !!map
  foo: bar`,
       tgt: [ { contents: [ { items: [
         'sequence',
-        { indicator: ':', item: { tag: '!seq', items: [
+        { indicator: ':', item: { tag: { handle: '!!', suffix: 'seq' }, items: [
           { indicator: '-', item: 'entry' },
-          { indicator: '-', item: { tag: '!seq', items: [
+          { indicator: '-', item: { tag: { handle: '!!', suffix: 'seq' }, items: [
             { indicator: '-', item: 'nested' }
           ] } }
         ] } },
         'mapping',
-        { indicator: ':', item: { tag: '!map', items: [
+        { indicator: ':', item: { tag: { handle: '!!', suffix: 'map' }, items: [
           'foo',
           { indicator: ':', item: 'bar' }
         ] } }

@@ -129,16 +129,16 @@ export default class Node {
     this.value = null
   }
 
-  getPropValue (idx, key) {
+  getPropValue (idx, key, skipKey) {
     if (!this.context) return null
     const { src } = this.context
     const prop = this.props[idx]
-    return prop && (src[prop.start] === key) ? src.slice(prop.start + 1, prop.end) : null
+    return prop && (src[prop.start] === key) ? src.slice(prop.start + (skipKey ? 1 : 0), prop.end) : null
   }
 
   get anchor () {
     for (let i = 0; i < this.props.length; ++i) {
-      const anchor = this.getPropValue(i, Prop.ANCHOR)
+      const anchor = this.getPropValue(i, Prop.ANCHOR, true)
       if (anchor != null) return anchor
     }
     return null
@@ -147,7 +147,7 @@ export default class Node {
   get comment () {
     const comments = []
     for (let i = 0; i < this.props.length; ++i) {
-      const comment = this.getPropValue(i, Prop.COMMENT)
+      const comment = this.getPropValue(i, Prop.COMMENT, true)
       if (comment != null) comments.push(comment)
     }
     return comments.length > 0 ? comments.join('\n') : null
@@ -181,8 +181,15 @@ export default class Node {
 
   get tag () {
     for (let i = 0; i < this.props.length; ++i) {
-      const tag = this.getPropValue(i, Prop.TAG)
-      if (tag != null) return tag
+      const tag = this.getPropValue(i, Prop.TAG, false)
+      if (tag != null) {
+        if (tag[1] === '<') {
+          return { verbatim: tag.slice(2, -1) }
+        } else {
+          const [_, handle, suffix] = tag.match(/^(.*!)([^!]*)$/)
+          return { handle, suffix }
+        }
+      }
     }
     return null
   }
@@ -193,7 +200,7 @@ export default class Node {
       const end = Node.endOfLine(src, start + 1)
       const commentRange = new Range(start, end)
       this.props.push(commentRange)
-      trace: commentRange, JSON.stringify(this.getPropValue(this.props.length - 1, Prop.COMMENT))
+      trace: commentRange, JSON.stringify(this.getPropValue(this.props.length - 1, Prop.COMMENT, true))
       return end
     }
     return start

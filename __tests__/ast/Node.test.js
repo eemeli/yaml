@@ -8,7 +8,7 @@ describe('internals', () => {
     const node = new Node(Type.PLAIN, props, { src })
     expect(node.context.src).toBe(src)
     expect(node.anchor).toBe('anchor')
-    expect(node.tag).toBe('tag')
+    expect(node.tag).toMatchObject({ handle: '!', suffix: 'tag' })
     expect(node.type).toBe(Type.PLAIN)
   })
 

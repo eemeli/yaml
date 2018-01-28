@@ -111,7 +111,8 @@ class Node {
   +comment: ?string,    // newline-delimited comment(s), if any
   +rawValue: ?string,   // an unprocessed slice of context.src
                         //   determining this node's value
-  +tag: ?string,        // this node's tag, if set
+  +tag: null |          // this node's tag, if set
+    { verbatim: string } | { handle: string, suffix: string },
   toString(): string    // a YAML string representation of this node
 }
 
@@ -172,7 +173,7 @@ class Directive extends Node {
   name: string,  // for YAML 1.2 should be 'TAG' or 'YAML'
   type: 'DIRECTIVE',
   +anchor: null,
-  +parameters: Array<string>
+  +parameters: Array<string>,
   +tag: null
 }
 
