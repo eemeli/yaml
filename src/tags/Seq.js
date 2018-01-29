@@ -3,7 +3,7 @@ import { Type } from 'raw-yaml'
 import { YAMLSyntaxError } from '../errors'
 import Collection, { Pair, toJSON } from './Collection'
 
-export default class Seq extends Collection {
+export default class YAMLSeq extends Collection {
   constructor (doc, node) {
     super()
     node.resolved = this
