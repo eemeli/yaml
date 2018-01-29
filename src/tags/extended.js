@@ -1,5 +1,5 @@
-import resolveMap from './map'
-import resolveSeq from './seq'
+import Map from './Map'
+import Seq from './Seq'
 
 const parseSexagesimal = (sign, parts) => {
   const n = parts.split(':').reduce((n, p) => n * 60 + Number(p), 0)
@@ -9,11 +9,11 @@ const parseSexagesimal = (sign, parts) => {
 export default [
   {
     tag: 'tag:yaml.org,2002:map',
-    resolve: resolveMap
+    resolve: (doc, node) => new Map(doc, node)
   },
   {
     tag: 'tag:yaml.org,2002:seq',
-    resolve: resolveSeq
+    resolve: (doc, node) => new Seq(doc, node)
   },
   {
     tag: 'tag:yaml.org,2002:str',

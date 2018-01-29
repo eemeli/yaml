@@ -1,6 +1,7 @@
 import { Type } from 'raw-yaml'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
-import { DefaultTagPrefixes, DefaultTags } from './tags'
+import { DefaultTagPrefixes, DefaultTags } from './Tags'
+import { toJSON } from './tags/Collection'
 
 export default class Document {
   parseTagDirective (directive) {
@@ -63,6 +64,10 @@ export default class Document {
       ))
     })
     this.contents = contentNode ? this.resolveNode(contentNode) : null
+  }
+
+  toJSON () {
+    return toJSON(this.contents)
   }
 
   resolveTagName (node) {
