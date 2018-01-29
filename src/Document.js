@@ -57,7 +57,7 @@ export default class Document {
     })
     let contentNode = null
     contents.forEach(node => {
-      if (node.valueRange.isEmpty) return
+      if (!node.valueRange || node.valueRange.isEmpty) return
       if (!contentNode) contentNode = node
       else this.errors.push(new YAMLSyntaxError(node,
         'Document is not valid YAML (bad indentation?)'
@@ -116,6 +116,7 @@ export default class Document {
   }
 
   resolveNode (node) {
+    if (!node) return null
     const { anchors, errors, tags } = this
     const anchor = node.anchor
     if (anchor) anchors[anchor] = node

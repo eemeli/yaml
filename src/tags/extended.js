@@ -36,13 +36,13 @@ export default [
   },
   {
     tag: 'tag:yaml.org,2002:int',
-    test: /^0b[0-1_]+$/,
-    resolve: (str) => parseInt(str.replace(/_/g, ''), 2)
+    test: /^0b([0-1_]+)$/,
+    resolve: (str, bin) => parseInt(bin.replace(/_/g, ''), 2)
   },
   {
     tag: 'tag:yaml.org,2002:int',
-    test: /^0o[0-7_]+$/,
-    resolve: (str) => parseInt(str.replace(/_/g, ''), 8)
+    test: /^0o([0-7_]+)$/,
+    resolve: (str, oct) => parseInt(oct.replace(/_/g, ''), 8)
   },
   {
     tag: 'tag:yaml.org,2002:int',
@@ -51,8 +51,8 @@ export default [
   },
   {
     tag: 'tag:yaml.org,2002:int',
-    test: /^0x[0-9a-fA-F_]+$/,
-    resolve: (str) => parseInt(str.replace(/_/g, ''), 16)
+    test: /^0x([0-9a-fA-F_]+)$/,
+    resolve: (str, hex) => parseInt(hex.replace(/_/g, ''), 16)
   },
   {
     tag: 'tag:yaml.org,2002:int',

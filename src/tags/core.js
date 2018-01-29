@@ -26,8 +26,8 @@ export default [
   },
   {
     tag: 'tag:yaml.org,2002:int',
-    test: /^0o[0-7]+$/,
-    resolve: (str) => parseInt(str, 8)
+    test: /^0o([0-7]+)$/,
+    resolve: (str, oct) => parseInt(oct, 8)
   },
   {
     tag: 'tag:yaml.org,2002:int',
@@ -36,8 +36,8 @@ export default [
   },
   {
     tag: 'tag:yaml.org,2002:int',
-    test: /^0x[0-9a-fA-F]+$/,
-    resolve: (str) => parseInt(str, 16)
+    test: /^0x([0-9a-fA-F]+)$/,
+    resolve: (str, hex) => parseInt(hex, 16)
   },
   {
     tag: 'tag:yaml.org,2002:float',

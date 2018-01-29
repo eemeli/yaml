@@ -44,6 +44,7 @@ export default class Map extends Collection {
           key = doc.resolveNode(item)
       }
     }
+    if (key !== undefined) this.items.push(new Pair(key))
   }
 
   resolveFlowMapItems (doc, map) {
