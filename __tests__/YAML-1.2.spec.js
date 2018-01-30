@@ -355,7 +355,15 @@ date: 2002-12-14`,
         canonical: '2001-12-15T02:59:43.1Z',
         iso8601: '2001-12-14t21:59:43.10-05:00',
         spaced: '2001-12-14 21:59:43.10 -5',
-        date: '2002-12-14' } ]
+        date: '2002-12-14' } ],
+      special: (src) => {
+        const doc = resolve(src, { extended: true })[0]
+        const { canonical, iso8601, spaced, date } = doc.toJSON()
+        expect(canonical).toBe(new Date('2001-12-15T02:59:43.1Z').toJSON())
+        expect(iso8601).toBe(new Date('2001-12-14t21:59:43.10-05:00').toJSON())
+        expect(spaced).toBe(new Date('2001-12-14 21:59:43.10 -5').toJSON())
+        expect(date).toBe(new Date('2002-12-14').toJSON())
+      }
     },
 
     'Example 2.23. Various Explicit Tags': {
@@ -571,6 +579,127 @@ Stack:
     },
   },
 
+  '5.3. Indicator Characters': {
+    'Example 5.3. Block Structure Indicators': {
+      src:
+`sequence:
+- one
+- two
+mapping:
+  ? sky
+  : blue
+  sea : green`,
+      tgt: [ {
+        sequence: [ 'one', 'two' ],
+        mapping: { sky: 'blue', sea: 'green' } } ]
+    },
+
+    'Example 5.4. Flow Collection Indicators': {
+      src:
+`sequence: [ one, two, ]
+mapping: { sky: blue, sea: green }`,
+      tgt: [ {
+        sequence: [ 'one', 'two' ],
+        mapping: { sky: 'blue', sea: 'green' } } ]
+    },
+
+    'Example 5.5. Comment Indicator': {
+      src:
+`# Comment only.`,
+      tgt: [ null ]
+    },
+
+    'Example 5.6. Node Property Indicators': {
+      src:
+`anchored: !local &anchor value
+alias: *anchor`,
+      tgt: [ { anchored: null, alias: null } ],
+      errors: [ [ 'The tag !local is unavailable' ] ],
+      special: (src) => {
+        log: 'FIXME'
+      }
+    },
+
+    'Example 5.7. Block Scalar Indicators': {
+      src:
+`literal: |
+  some
+  text
+folded: >
+  some
+  text
+`,
+      tgt: [ {
+        literal: 'some\ntext\n',
+        folded: 'some text\n' } ]
+    },
+
+    'Example 5.8. Quoted Scalar Indicators': {
+      src:
+`single: 'text'
+double: "text"`,
+      tgt: [ { single: 'text', double: 'text' } ]
+    },
+
+    'Example 5.9. Directive Indicator': {
+      src:
+`%YAML 1.2
+--- text`,
+      tgt: [ 'text' ],
+      special: (src) => {
+        const doc = resolve(src)[0]
+        expect(doc.version).toBe('1.2')
+      }
+    },
+
+    'Example 5.10. Invalid use of Reserved Indicators': {
+      src:
+`commercial-at: @text
+grave-accent: \`text`,
+      tgt: [ { 'commercial-at': '@text', 'grave-accent': '`text' } ]
+      // ERROR: Reserved indicators can't start a plain scalar.
+    },
+
+  },
+  '5.5. White Space Characters': {
+    'Example 5.12. Tabs and Spaces': {
+      src:
+`# Tabs and spaces
+quoted: "Quoted \t"
+block:\t|
+  void main() {
+  \tprintf("Hello, world!\\n");
+  }`,
+      tgt: [ {
+        quoted: 'Quoted \t',
+        block: 'void main() {\n\tprintf("Hello, world!\\n");\n}\n' } ]
+    },
+  },
+
+  '5.7. Escaped Characters': {
+    'Example 5.13. Escaped Characters': {
+      src:
+`"Fun with \\\\
+\\" \\a \\b \\e \\f \\
+\\n \\r \\t \\v \\0 \\
+\\  \\_ \\N \\L \\P \\
+\\x41 \\u0041 \\U00000041"`,
+      tgt: ['Fun with \x5C \x22 \x07 \x08 \x1B \x0C \x0A \x0D \x09 \x0B \x00 \x20 \xA0 \x85 \u2028 \u2029 A A A']
+    },
+
+    'Example 5.14. Invalid Escaped Characters': {
+      src:
+`Bad escapes:
+  "\\c
+  \\xq-"`,
+      tgt: [ { 'Bad escapes': null } ],
+      // ERROR: c is an invalid escaped character.
+      // ERROR: q and - are invalid hex digits.
+      errors: [ [
+        'Invalid escape sequence \\c'
+      ] ]
+    },
+  }
 }
 
 for (const section in spec) {

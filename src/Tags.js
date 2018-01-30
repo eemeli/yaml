@@ -1,5 +1,5 @@
 import { Type } from 'raw-yaml'
-import { YAMLReferenceError } from './errors'
+import { YAMLReferenceError, YAMLSyntaxError } from './errors'
 import coreTags from './tags/core'
 import extendedTags from './tags/extended'
 
@@ -40,10 +40,17 @@ export default class Tags {
   resolveNode (doc, node, tagName) {
     const tags = this.list.filter(({ tag }) => tag === tagName)
     const generic = tags.find(({ test }) => !test)
-    if (generic) return node.resolved = generic.resolve(doc, node)
-    const str = node.strValue
-    if (typeof str === 'string' && tags.length > 0) {
-      return node.resolved = this.resolveScalar(str, tags)
+    try {
+      if (generic) return node.resolved = generic.resolve(doc, node)
+      const str = node.strValue
+      if (typeof str === 'string' && tags.length > 0) {
+        return node.resolved = this.resolveScalar(str, tags)
+      }
+    } catch (error) {
+      if (error instanceof SyntaxError) error = new YAMLSyntaxError(node, error.message)
+      else error.source = node
+      doc.errors.push(error)
+      node.resolved = null
     }
     return null
   }
