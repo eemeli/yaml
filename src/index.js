@@ -1,6 +1,6 @@
 import parse from 'raw-yaml'
 import Document from './Document'
-import Tags from './tags'
+import Tags from './Tags'
 
 export default function resolve (src, options = {}) {
   const ast = parse(src)
