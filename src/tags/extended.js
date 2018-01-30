@@ -1,3 +1,4 @@
+import { YAMLReferenceError } from '../errors'
 import Map from './Map'
 import Seq from './Seq'
 
@@ -98,5 +99,35 @@ export default [
       }
       return new Date(date)
     }
+  },
+  {
+    tag: 'tag:yaml.org,2002:binary',
+    /**
+     * Returns a Buffer in node and an Uint8Array in browsers
+     *
+     * To use the resulting buffer as an image, you'll want to do something like:
+     *
+     *   const blob = new Blob([buffer], { type: 'image/jpeg' })
+     *   document.querySelector('#photo').src = URL.createObjectURL(blob)
+     */
+    resolve: (doc, node) => {
+      if (typeof Buffer === 'function') {
+        return Buffer.from(node.strValue, 'base64')
+      } else if (typeof atob === 'function') {
+        const str = atob(node.strValue)
+        const buffer = new Uint8Array(str.length)
+        for (let i = 0; i < str.length; ++i) buffer[i] = str.charCodeAt(i)
+        return buffer
+      } else {
+        doc.errors.push(new YAMLReferenceError(node,
+          'This environment does not support binary tags; either Buffer or atob is required'))
+        return null
+      }
+    }
+    // function bufferToBase64(buf) {
+    //   let str = ''
+    //   for (let i = 0; i < buf.length; ++i) str += String.fromCharCode(buf[i])
+    //   return btoa(str)
+    // }
   }
 ]

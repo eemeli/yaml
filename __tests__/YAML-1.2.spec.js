@@ -381,7 +381,13 @@ application specific tag: !something |
       errors: [ [
         'The tag tag:yaml.org,2002:binary is unavailable',
         'The tag !something is unavailable'
-      ] ]
+      ] ],
+      special: (src) => {
+        const doc = resolve(src, { extended: true })[0]
+        const data = doc.contents.items[1].value
+        expect(data).toBeInstanceOf(Uint8Array)
+        expect(data.byteLength).toBe(65)
+      }
     },
 
     'Example 2.24. Global Tags': {
@@ -571,7 +577,7 @@ for (const section in spec) {
   describe(section, () => {
     for (const name in spec[section]) {
       test(name, () => {
-        const { src, tgt, errors } = spec[section][name]
+        const { src, tgt, errors, special } = spec[section][name]
         const documents = resolve(src)
         const json = documents.map(doc => doc.toJSON())
         trace: name, console.dir(json, { depth: null }) || ''
@@ -580,6 +586,7 @@ for (const section in spec) {
           if (!errors || !errors[i]) expect(doc.errors).toHaveLength(0)
           else errors[i].forEach((err, j) => expect(doc.errors[j].message).toBe(err))
         })
+        if (special) special(src)
       })
     }
   })
