@@ -340,7 +340,7 @@ not a number: .NaN`,
 booleans: [ true, false ]
 string: '012345'`,
       tgt: [ {
-        null: null,
+        '': null,
         booleans: [ true, false ],
         string: '012345' } ]
     },
@@ -1157,7 +1157,7 @@ Reuse anchor: *anchor`,
   ? foo :,
   : bar,
 }`,
-      tgt: [ { foo: null, null: 'bar' } ]
+      tgt: [ { foo: null, '': 'bar' } ]
     },
   },
 
@@ -1305,7 +1305,7 @@ single: pair,
 implicit: entry,
 ?
 }`,
-      tgt: [ { explicit: 'entry', implicit: 'entry', null: null } ]
+      tgt: [ { explicit: 'entry', implicit: 'entry', '': null } ]
     },
 
     'Example 7.17. Flow Mapping Separate Values': {
@@ -1320,7 +1320,7 @@ omitted value:,
         unquoted: 'separate',
         'http://foo.com': null,
         'omitted value': null,
-        null: 'omitted key' } ]
+        '': 'omitted key' } ]
     },
 
     'Example 7.18. Flow Mapping Adjacent Values': {
@@ -1357,7 +1357,7 @@ foo: bar
 - [ {JSON: like}:adjacent ]`,
       tgt: [ [ [
         { YAML: 'separate' } ],
-        [ { null: 'empty key entry' } ],
+        [ { '': 'empty key entry' } ],
         [ { '{"JSON":"like"}': 'adjacent' } ] ] ]
     },
 
@@ -1628,7 +1628,7 @@ last line
 - entry`,
       tgt: [ {
         'plain key': 'in-line value',
-        null: null,
+        '': null,
         'quoted key': [ 'entry' ] } ]
     },
 

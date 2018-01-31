@@ -20,6 +20,7 @@ export class Pair {
 
   get stringKey () {
     const key = toJSON(this.key)
+    if (key === null) return ''
     if (typeof key === 'object') try { return JSON.stringify(key) }
     catch (e) { /* should not happen, but let's ignore in any case */ }
     return String(key)

@@ -61,7 +61,7 @@ english: null
       empty: null,
       canonical: null,
       english: null,
-      null: 'null key'
+      '': 'null key'
     })
   })
 })
@@ -165,7 +165,7 @@ english: null
       empty: null,
       canonical: null,
       english: null,
-      null: 'null key'
+      '': 'null key'
     })
   })
 
