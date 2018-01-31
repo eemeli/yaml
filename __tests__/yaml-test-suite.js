@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
+import { YAMLWarning } from '../src/errors'
 import resolve from '../src/index'
 
 const testDirs = fs.readdirSync(path.resolve(__dirname, 'yaml-test-suite'))
@@ -28,7 +29,8 @@ testDirs.forEach(dir => {
     if (error) {
       expect(stream[0].errors).not.toHaveLength(0)
     } else {
-      expect(stream[0].errors).toHaveLength(0)
+      const errors = stream[0].errors.filter(err => !(err instanceof YAMLWarning))
+      expect(errors).toHaveLength(0)
     }
   })
 })

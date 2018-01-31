@@ -1,5 +1,5 @@
 import { Type } from 'raw-yaml'
-import { YAMLReferenceError, YAMLSyntaxError } from './errors'
+import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import coreTags from './type/core'
 import extendedTags from './type/extended'
 
@@ -63,12 +63,15 @@ export default class Tags {
   resolve (doc, node, tagName) {
     const res = this.resolveNode(doc, node, tagName)
     if (node.hasOwnProperty('resolved')) return res
-    const err = new YAMLReferenceError(node, `The tag ${tagName} is unavailable`)
-    doc.errors.push(err)
     const fallback = isMap(node) ? DefaultTags.MAP : isSeq(node) ? DefaultTags.SEQ : null
     if (fallback) {
-      err.message += `, falling back to ${fallback}`
+      const err =
+      doc.errors.push(new YAMLWarning(node,
+        `The tag ${tagName} is unavailable, falling back to ${fallback}`))
       return this.resolveNode(doc, node, fallback)
+    } else {
+      doc.errors.push(new YAMLReferenceError(node,
+        `The tag ${tagName} is unavailable`))
     }
     return null
   }
