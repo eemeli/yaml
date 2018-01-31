@@ -616,7 +616,13 @@ alias: *anchor`,
       tgt: [ { anchored: null, alias: null } ],
       errors: [ [ 'The tag !local is unavailable' ] ],
       special: (src) => {
-        log: 'FIXME'
+        const tag = {
+          tag: '!local',
+          resolve: (doc, node) => 'local:' + node.strValue
+        }
+        const doc = resolve(src, { tags: [tag] })[0]
+        expect(doc.toJSON()).toMatchObject({ anchored: 'local:value', alias: 'local:value' })
+        expect(doc.errors).toHaveLength(0)
       }
     },
 
