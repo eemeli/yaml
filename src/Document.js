@@ -55,15 +55,21 @@ export default class Document {
           ))
       }
     })
-    let contentNode = null
-    contents.forEach(node => {
-      if (!node.valueRange || node.valueRange.isEmpty) return
-      if (!contentNode) contentNode = node
-      else this.errors.push(new YAMLSyntaxError(node,
-        'Document is not valid YAML (bad indentation?)'
-      ))
-    })
-    this.contents = contentNode ? this.resolveNode(contentNode) : null
+    const contentNodes = contents
+      .filter(node => node.valueRange && !node.valueRange.isEmpty)
+      .map(node => this.resolveNode(node))
+    switch (contentNodes.length) {
+      case 0:
+        this.contents = null
+        break
+      case 1:
+        this.contents = contentNodes[0]
+        break
+      default:
+        this.errors.push(new YAMLSyntaxError(null,
+          'Document is not valid YAML (bad indentation?)'))
+        this.contents = contentNodes
+    }
   }
 
   toJSON () {

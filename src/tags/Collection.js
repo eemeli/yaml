@@ -1,10 +1,10 @@
 import { YAMLSyntaxError } from '../errors'
 
-export const toJSON = (value) => (
-  value &&
-  typeof value === 'object' &&
-  ('toJSON' in value)
-) ? value.toJSON() : value
+export const toJSON = (value) => Array.isArray(value) ? (
+  value.map(toJSON)
+ ) : value && typeof value === 'object' && ('toJSON' in value) ? (
+   value.toJSON()
+ ) : value
 
 export class Pair {
   constructor (key, value = null) {
