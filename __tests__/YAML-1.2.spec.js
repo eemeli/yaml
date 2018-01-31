@@ -699,6 +699,424 @@ block:\t|
         'Invalid escape sequence \\c'
       ] ]
     },
+  },
+
+  '6.1. Indentation Spaces': {
+    'Example 6.1. Indentation Spaces': {
+      src:
+`  # Leading comment line spaces are
+   # neither content nor indentation.
+
+Not indented:
+ By one space: |
+    By four
+      spaces
+ Flow style: [    # Leading spaces
+   By two,        # in flow style
+  Also by two,    # are neither
+  \tStill by two   # content nor
+    ]             # indentation.`,
+      tgt: [ {
+        'Not indented': {
+          'By one space': 'By four\n  spaces\n',
+          'Flow style': [ 'By two', 'Also by two', 'Still by two' ]
+        }
+      } ]
+    },
+
+    'Example 6.2. Indentation Indicators': {
+      src:
+`? a
+: -\tb
+  -  -\tc
+     - d`,
+      tgt: [ { a: [ 'b', [ 'c', 'd' ] ] } ]
+    },
+  },
+
+  '6.2. Separation Spaces': {
+    'Example 6.3. Separation Spaces': {
+      src:
+`- foo:\t bar
+- - baz
+  -\tbaz`,
+      tgt: [ [
+        { foo: 'bar' },
+        [ 'baz', 'baz' ]
+      ] ]
+    },
+  },
+
+  '6.3. Line Prefixes': {
+    'Example 6.4. Line Prefixes': {
+      src:
+`plain: text
+  lines
+quoted: "text
+  \tlines"
+block: |
+  text
+   \tlines`,
+      tgt: [ {
+        plain: 'text lines',
+        quoted: 'text lines',
+        block: 'text\n \tlines\n' } ]
+    },
+  },
+
+  '6.4. Empty Lines': {
+    'Example 6.5. Empty Lines': {
+      src:
+`Folding:
+  "Empty line
+   \t
+  as a line feed"
+Chomping: |
+  Clipped empty lines
+ `,
+      tgt: [ {
+        Folding: 'Empty line\nas a line feed',
+        Chomping: 'Clipped empty lines\n' } ]
+    },
+  },
+
+  '6.5. Line Folding': {
+    'Example 6.6. Line Folding': {
+      src:
+`>-
+  trimmed
+··
+·
+
+··as
+··space`.replace(/·/g, ' '),
+      tgt: [ 'trimmed\n\n\nas space' ]
+    },
+
+    'Example 6.7. Block Folding': {
+      src:
+`>
+··foo·
+·
+··\t·bar
+
+··baz\n`.replace(/·/g, ' '),
+      tgt: [ 'foo \n\n\t bar\n\nbaz\n' ]
+    },
+
+    'Example 6.8. Flow Folding': {
+      src:
+`"
+  foo\t
+\t
+  \t bar
+
+  baz
+"`,
+      tgt: [ ' foo\nbar\nbaz ' ]
+    },
+  },
+
+  '6.6. Comments': {
+    'Example 6.9. Separated Comment': {
+      src:
+`key:    # Comment
+  value`,
+      tgt: [ { key: 'value' } ]
+    },
+
+    'Example 6.10. Comment Lines': {
+      src:
+`  # Comment
+   \n\n`,
+      tgt: [ null ]
+    },
+
+    'Example 6.11. Multi-Line Comments': {
+      src:
+`key:    # Comment
+        # lines
+  value\n`,
+      tgt: [ { key: 'value' } ]
+    },
+
+  },
+  '6.7. Separation Lines': {
+    'Example 6.12. Separation Spaces': {
+      src:
+`{ first: Sammy, last: Sosa }:
+# Statistics:
+  hr:  # Home runs
+     65
+  avg: # Average
+   0.278`,
+      tgt: [ { '{"first":"Sammy","last":"Sosa"}': { hr: 65, avg: 0.278 } } ]
+    },
+
+  },
+  '6.8. Directives': {
+    'Example 6.13. Reserved Directives': {
+      src:
+`%FOO  bar baz # Should be ignored
+# with a warning.
+--- "foo"`,
+      tgt: [ 'foo' ],
+      errors: [ [ 'YAML 1.2 only supports TAG and YAML directives, and not FOO' ] ]
+    },
+
+  },
+  '6.8.1. “YAML” Directives': {
+    'Example 6.14. “YAML” directive': {
+      src:
+`%YAML 1.3 # Attempt parsing
+           # with a warning
+---
+"foo"`,
+      tgt: [ 'foo' ],
+      errors: [ [ 'Document will be parsed as YAML 1.2 rather than YAML 1.3' ] ],
+      special: (src) => {
+        const doc = resolve(src)[0]
+        expect(doc.version).toBe('1.3')
+      }
+    },
+
+    'Example 6.15. Invalid Repeated YAML directive': {
+      src:
+`%YAML 1.2
+%YAML 1.1
+foo`,
+      tgt: [ 'foo' ],
+      errors: [ [
+        'The YAML directive must only be given at most once per document.',
+        'Document will be parsed as YAML 1.2 rather than YAML 1.1' ] ],
+      special: (src) => {
+        const doc = resolve(src)[0]
+        expect(doc.version).toBe('1.1')
+      }
+    },
+
+  },
+  '6.8.2. “TAG” Directives': {
+    'Example 6.16. “TAG” directive': {
+      src:
+`%TAG !yaml! tag:yaml.org,2002:
+---
+!yaml!str "foo"`,
+      tgt: [ 'foo' ]
+    },
+
+    'Example 6.17. Invalid Repeated TAG directive': {
+      src:
+`%TAG ! !foo
+%TAG ! !foo
+bar`,
+      tgt: [ 'bar' ],
+      errors: [ [ 'The TAG directive must only be given at most once per handle in the same document.' ] ],
+      special: (src) => {
+        const doc = resolve(src)[0]
+        expect(doc.tagPrefixes).toMatchObject({ '!': '!foo' })
+      }
+    },
+
+    'Example 6.18. Primary Tag Handle': {
+      src:
+`# Private
+!foo "bar"
+...
+# Global
+%TAG ! tag:example.com,2000:app/
+---
+!foo "bar"`,
+      tgt: [ null, null ],
+      errors: [
+        [ 'The tag !foo is unavailable' ],
+        [ 'The tag tag:example.com,2000:app/foo is unavailable' ]
+      ],
+      special: (src) => {
+        const tags = [ {
+          tag: '!foo',
+          resolve: (doc, node) => 'private'
+        }, {
+          tag: 'tag:example.com,2000:app/foo',
+          resolve: (doc, node) => 'global'
+        } ]
+        const documents = resolve(src, { tags })
+        expect(documents.map(doc => doc.toJSON())).toMatchObject(['private', 'global'])
+        documents.forEach(doc => expect(doc.errors).toHaveLength(0))
+      }
+    },
+
+    'Example 6.19. Secondary Tag Handle': {
+      src:
+`%TAG !! tag:example.com,2000:app/
+---
+!!int 1 - 3 # Interval, not integer`,
+      tgt: [ null ],
+      errors: [ [ 'The tag tag:example.com,2000:app/int is unavailable' ] ],
+      special: (src) => {
+        const tag = {
+          tag: 'tag:example.com,2000:app/int',
+          resolve: (doc, node) => 'interval'
+        }
+        const doc = resolve(src, { tags: [tag] })[0]
+        expect(doc.toJSON()).toBe('interval')
+        expect(doc.errors).toHaveLength(0)
+      }
+    },
+
+    'Example 6.20. Tag Handles': {
+      src:
+`%TAG !e! tag:example.com,2000:app/
+---
+!e!foo "bar"`,
+      tgt: [ null ],
+      errors: [ [ 'The tag tag:example.com,2000:app/foo is unavailable' ] ],
+      special: (src) => {
+        const tag = {
+          tag: 'tag:example.com,2000:app/foo',
+          resolve: (doc, node) => 'foo' + node.strValue
+        }
+        const doc = resolve(src, { tags: [tag] })[0]
+        expect(doc.toJSON()).toBe('foobar')
+        expect(doc.errors).toHaveLength(0)
+      }
+    },
+
+    'Example 6.21. Local Tag Prefix': {
+      src:
+`%TAG !m! !my-
+--- # Bulb here
+!m!light fluorescent
+...
+%TAG !m! !my-
+--- # Color here
+!m!light green`,
+      tgt: [ null, null ],
+      errors: [
+        [ 'The tag !my-light is unavailable' ],
+        [ 'The tag !my-light is unavailable' ] ],
+      special: (src) => {
+        const tag = {
+          tag: '!my-light',
+          resolve: (doc, node) => 'light:' + node.strValue
+        }
+        const documents = resolve(src, { tags: [tag] })
+        const tgt = ['light:fluorescent', 'light:green']
+        expect(documents.map(doc => doc.toJSON())).toMatchObject(tgt)
+        documents.forEach(doc => expect(doc.errors).toHaveLength(0))
+      }
+    },
+
+    'Example 6.22. Global Tag Prefix': {
+      src:
+`%TAG !e! tag:example.com,2000:app/
+---
+- !e!foo "bar"`,
+      tgt: [ [ null ] ],
+      errors: [ [ 'The tag tag:example.com,2000:app/foo is unavailable' ] ],
+      special: (src) => {
+        const tag = {
+          tag: 'tag:example.com,2000:app/foo',
+          resolve: (doc, node) => 'foo' + node.strValue
+        }
+        const doc = resolve(src, { tags: [tag] })[0]
+        expect(doc.toJSON()).toMatchObject(['foobar'])
+        expect(doc.errors).toHaveLength(0)
+      }
+    },
+
+  },
+  '6.9. Node Properties': {
+    'Example 6.23. Node Properties': {
+      src:
+`!!str &a1 "foo":
+  !!str bar
+&a2 baz : *a1`,
+      tgt: [ { foo: 'bar', baz: 'foo' } ]
+    },
+
+    'Example 6.24. Verbatim Tags': {
+      src:
+`!<tag:yaml.org,2002:str> foo :
+  !<!bar> baz`,
+      tgt: [ { foo: null } ],
+      errors: [ [ 'The tag !bar is unavailable' ] ],
+      special: (src) => {
+        const tag = {
+          tag: '!bar',
+          resolve: (doc, node) => 'bar' + node.strValue
+        }
+        const doc = resolve(src, { tags: [tag] })[0]
+        expect(doc.toJSON()).toMatchObject({ foo: 'barbaz' })
+        expect(doc.errors).toHaveLength(0)
+      }
+    },
+
+    'Example 6.25. Invalid Verbatim Tags': {
+      src:
+`- !<!> foo
+- !<$:?> bar`,
+      tgt: [ [ 'foo', null ] ],
+      errors: [ [
+        'Verbatim tags aren\'t resolved, so ! is invalid.',
+        'The tag $:? is unavailable'
+      ]]
+    },
+
+    'Example 6.26. Tag Shorthands': {
+      src:
+`%TAG !e! tag:example.com,2000:app/
+---
+- !local foo
+- !!str bar
+- !e!tag%21 baz`,
+      tgt: [ [ null, 'bar', null ] ],
+      errors: [ [
+        'The tag !local is unavailable',
+        'The tag tag:example.com,2000:app/tag%21 is unavailable' ] ],
+      special: (src) => {
+        const tags = [ {
+          tag: '!local',
+          resolve: (doc, node) => 'local:' + node.strValue
+        }, {
+          tag: 'tag:example.com,2000:app/tag%21',
+          resolve: (doc, node) => 'tag!' + node.strValue
+        } ]
+        const doc = resolve(src, { tags })[0]
+        expect(doc.toJSON()).toMatchObject(['local:foo', 'bar', 'tag!baz'])
+        expect(doc.errors).toHaveLength(0)
+      }
+    },
+
+    'Example 6.27. Invalid Tag Shorthands': {
+      src:
+`%TAG !e! tag:example,2000:app/
+---
+- !e! foo
+- !h!bar baz`,
+      tgt: [ [ 'foo', 'baz' ] ],
+      errors: [ [
+        'The !e! tag has no suffix.',
+        'The !h! tag handle is non-default and was not declared.' ] ]
+    },
+
+    'Example 6.28. Non-Specific Tags': {
+      src:
+`# Assuming conventional resolution:
+- "12"
+- 12
+- ! 12`,
+      tgt: [ [ '12', 12, '12' ] ]
+    },
+
+    'Example 6.29. Node Anchors': {
+      src:
+`First occurrence: &anchor Value
+Second occurrence: *anchor`,
+      tgt: [ {
+        'First occurrence': 'Value',
+        'Second occurrence': 'Value' } ]
+    }
   }
 }
 
