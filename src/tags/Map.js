@@ -16,7 +16,8 @@ export default class YAMLMap extends Collection {
       const { key } = this.items[i]
       for (let j = i + 1; j < this.items.length; ++j) {
         if (this.items[j].key === key) {
-          doc.errors.push(new YAMLSyntaxError(node, `Map keys must be unique; ${key} is repeated`))
+          doc.errors.push(new YAMLSyntaxError(node,
+            `Map keys must be unique; "${key}" is repeated`))
           break
         }
       }
@@ -25,6 +26,7 @@ export default class YAMLMap extends Collection {
 
   resolveBlockMapItems (doc, map) {
     let key = undefined
+    let keyStart = null
     for (let i = 0; i < map.items.length; ++i) {
       const item = map.items[i]
       switch (item.type) {
@@ -34,14 +36,18 @@ export default class YAMLMap extends Collection {
         case Type.MAP_KEY:
           if (key !== undefined) this.items.push(new Pair(key))
           key = doc.resolveNode(item.node)
+          keyStart = null
           break
         case Type.MAP_VALUE:
           this.items.push(new Pair(key, doc.resolveNode(item.node)))
+          Collection.checkKeyLength(doc, map, i, key, keyStart)
           key = undefined
+          keyStart = null
           break
         default:
           if (key !== undefined) this.items.push(new Pair(key))
           key = doc.resolveNode(item)
+          keyStart = item.range.start
       }
     }
     if (key !== undefined) this.items.push(new Pair(key))
@@ -49,9 +55,11 @@ export default class YAMLMap extends Collection {
 
   resolveFlowMapItems (doc, map) {
     let key = undefined
+    let keyStart = null
     let explicitKey = false
     let next = '{'
     for (let i = 0; i < map.items.length; ++i) {
+      Collection.checkKeyLength(doc, map, i, key, keyStart)
       const item = map.items[i]
       if (typeof item === 'string') {
         if (item === '?' && key === undefined && !explicitKey) {
@@ -67,17 +75,18 @@ export default class YAMLMap extends Collection {
           }
         } else {
           if (explicitKey) {
-            if (key === undefined) key = null
+            if (key === undefined && item !== ',') key = null
             explicitKey = false
           }
           if (key !== undefined) {
             this.items.push(new Pair(key))
             key = undefined
+            keyStart = null
           }
         }
         if (item === '}') {
           if (i === map.items.length - 1) continue
-        } else if (item === next) {
+        } else if (item === next || (next === ':' && item === ',')) {
           next = ':'
           continue
         }
@@ -87,6 +96,7 @@ export default class YAMLMap extends Collection {
       } else if (key === undefined) {
         if (next === ',') doc.errors.push(new YAMLSyntaxError(item, 'Separator , missing in flow map'))
         key = doc.resolveNode(item)
+        keyStart = explicitKey ? null : item.range.start
         // TODO: add error for non-explicit multiline plain key
       } else {
         if (next !== ',') doc.errors.push(new YAMLSyntaxError(item, 'Indicator : missing in flow map entry'))

@@ -656,8 +656,10 @@ double: "text"`,
       src:
 `commercial-at: @text
 grave-accent: \`text`,
-      tgt: [ { 'commercial-at': '@text', 'grave-accent': '`text' } ]
-      // ERROR: Reserved indicators can't start a plain scalar.
+      tgt: [ { 'commercial-at': '@text', 'grave-accent': '`text' } ],
+      errors: [ [
+        // ERROR: Reserved indicators can't start a plain scalar.
+      ] ]
     },
 
   },
@@ -693,10 +695,9 @@ block:\t|
   "\\c
   \\xq-"`,
       tgt: [ { 'Bad escapes': null } ],
-      // ERROR: c is an invalid escaped character.
-      // ERROR: q and - are invalid hex digits.
       errors: [ [
         'Invalid escape sequence \\c'
+        // ERROR: q and - are invalid hex digits.
       ] ]
     },
   },
@@ -1117,6 +1118,279 @@ Second occurrence: *anchor`,
         'First occurrence': 'Value',
         'Second occurrence': 'Value' } ]
     }
+  },
+
+  '7.1. Alias Nodes': {
+    'Example 7.1. Alias Nodes': {
+      src:
+`First occurrence: &anchor Foo
+Second occurrence: *anchor
+Override anchor: &anchor Bar
+Reuse anchor: *anchor`,
+      tgt: [ {
+        'First occurrence': 'Foo',
+        'Second occurrence': 'Foo',
+        'Override anchor': 'Bar',
+        'Reuse anchor': 'Bar' } ]
+    },
+  },
+
+  '7.2. Empty Nodes': {
+    'Example 7.2. Empty Content': {
+      src:
+`{
+  foo : !!str,
+  !!str : bar,
+}`,
+      tgt: [ { foo: '', '': 'bar' } ]
+    },
+
+    'Example 7.3. Completely Empty Flow Nodes': {
+      src:
+`{
+  ? foo :,
+  : bar,
+}`,
+      tgt: [ { foo: null, null: 'bar' } ]
+    },
+  },
+
+  '7.3.1. Double-Quoted Style': {
+    'Example 7.4. Double Quoted Implicit Keys': {
+      src:
+`"implicit block key" : [
+  "implicit flow key" : value,
+ ]`,
+      tgt: [ { 'implicit block key': [ { 'implicit flow key': 'value' } ] } ]
+    },
+
+    'Example 7.5. Double Quoted Line Breaks': {
+      src:
+`"folded
+to a space,\t
+
+to a line feed, or \t\\
+ \\ \tnon-content"`,
+      tgt: [ 'folded to a space,\nto a line feed, or \t \tnon-content' ]
+    },
+
+    'Example 7.6. Double Quoted Lines': {
+      src:
+`" 1st non-empty
+
+ 2nd non-empty
+\t3rd non-empty "`,
+      tgt: [ ' 1st non-empty\n2nd non-empty 3rd non-empty ' ]
+    },
+  },
+
+  '7.3.2. Single-Quoted Style': {
+    'Example 7.7. Single Quoted Characters': {
+      src:
+` 'here''s to "quotes"'`,
+      tgt: [ 'here\'s to "quotes"' ]
+    },
+
+    'Example 7.8. Single Quoted Implicit Keys': {
+      src:
+`'implicit block key' : [
+  'implicit flow key' : value,
+ ]`,
+      tgt: [ { 'implicit block key': [ { 'implicit flow key': 'value' } ] } ]
+    },
+
+    'Example 7.9. Single Quoted Lines': {
+      src:
+`' 1st non-empty
+
+ 2nd non-empty\t
+\t3rd non-empty '`,
+      tgt: [ ' 1st non-empty\n2nd non-empty 3rd non-empty ' ]
+    },
+  },
+
+  '7.3.3. Plain Style': {
+    'Example 7.10. Plain Characters': {
+      src:
+`# Outside flow collection:
+- ::vector
+- ": - ()"
+- Up, up, and away!
+- -123
+- http://example.com/foo#bar
+# Inside flow collection:
+- [ ::vector,
+  ": - ()",
+  "Up, up and away!",
+  -123,
+  http://example.com/foo#bar ]`,
+      tgt: [ [
+        '::vector',
+        ': - ()',
+        'Up, up, and away!',
+        -123,
+        'http://example.com/foo#bar',
+        [ '::vector',
+          ': - ()',
+          'Up, up and away!',
+          -123,
+          'http://example.com/foo#bar' ] ] ]
+    },
+
+    'Example 7.11. Plain Implicit Keys': {
+      src:
+`implicit block key : [
+  implicit flow key : value,
+ ]`,
+      tgt: [ { 'implicit block key': [ { 'implicit flow key': 'value' } ] } ]
+    },
+
+    'Example 7.12. Plain Lines': {
+      src:
+`1st non-empty
+
+ 2nd non-empty
+\t3rd non-empty`,
+      tgt: [ '1st non-empty\n2nd non-empty 3rd non-empty' ]
+    },
+  },
+
+  '7.4.1. Flow Sequences': {
+    'Example 7.13. Flow Sequence': {
+      src:
+`- [ one, two, ]
+- [three ,four]`,
+      tgt: [ [ [ 'one', 'two' ], [ 'three', 'four' ] ] ]
+    },
+
+    'Example 7.14. Flow Sequence Entries': {
+      src:
+`[
+"double
+ quoted", 'single
+           quoted',
+plain
+ text, [ nested ],
+single: pair,
+]`,
+      tgt: [ [
+        'double quoted',
+        'single quoted',
+        'plain text',
+        [ 'nested' ],
+        { single: 'pair' } ] ]
+    },
+  },
+
+  '7.4.2. Flow Mappings': {
+    'Example 7.15. Flow Mappings': {
+      src:
+`- { one : two , three: four , }
+- {five: six,seven : eight}`,
+      tgt: [ [
+        { one: 'two', three: 'four' },
+        { five: 'six', seven: 'eight' } ] ]
+    },
+
+    'Example 7.16. Flow Mapping Entries': {
+      src:
+`{
+? explicit: entry,
+implicit: entry,
+?
+}`,
+      tgt: [ { explicit: 'entry', implicit: 'entry', null: null } ]
+    },
+
+    'Example 7.17. Flow Mapping Separate Values': {
+      src:
+`{
+unquoted : "separate",
+http://foo.com,
+omitted value:,
+: omitted key,
+}`,
+      tgt: [ {
+        unquoted: 'separate',
+        'http://foo.com': null,
+        'omitted value': null,
+        null: 'omitted key' } ]
+    },
+
+    'Example 7.18. Flow Mapping Adjacent Values': {
+      src:
+`{
+"adjacent":value,
+"readable": value,
+"empty":
+}`,
+      tgt: [ { adjacent: 'value', readable: 'value', empty: null } ]
+    },
+
+    'Example 7.19. Single Pair Flow Mappings': {
+      src:
+`[
+foo: bar
+]`,
+      tgt: [ [ { foo: 'bar' } ] ]
+    },
+
+    'Example 7.20. Single Pair Explicit Entry': {
+      src:
+`[
+? foo
+ bar : baz
+]`,
+      tgt: [ [ { 'foo bar': 'baz' } ] ]
+    },
+
+    'Example 7.21. Single Pair Implicit Entries': {
+      src:
+`- [ YAML : separate ]
+- [ : empty key entry ]
+- [ {JSON: like}:adjacent ]`,
+      tgt: [ [ [
+        { YAML: 'separate' } ],
+        [ { null: 'empty key entry' } ],
+        [ { '{"JSON":"like"}': 'adjacent' } ] ] ]
+    },
+
+    'Example 7.22. Invalid Implicit Keys': {
+      src:
+`[ foo
+ bar: invalid,
+ "foo ${'x'.repeat(1024)} bar": invalid ]`,
+      tgt: [ [
+        { 'foo bar': 'invalid' },
+        { 'foo xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx bar': 'invalid' }
+      ] ],
+      errors: [ [
+        'The "foo xxxx...xxxx bar" key is too long'
+        // ERROR: The foo bar key spans multiple lines
+      ] ]
+    },
+  },
+
+  '7.5. Flow Nodes': {
+    'Example 7.23. Flow Content': {
+      src:
+`- [ a, b ]
+- { a: b }
+- "a"
+- 'b'
+- c`,
+      tgt: [ [ [ 'a', 'b' ], { a: 'b' }, 'a', 'b', 'c' ] ]
+    },
+
+    'Example 7.24. Flow Nodes': {
+      src:
+`- !!str "a"
+- 'b'
+- &anchor "c"
+- *anchor
+- !!str`,
+      tgt: [ [ 'a', 'b', 'c', 'c', '' ] ]
+    }
   }
 }
 
@@ -1127,7 +1401,7 @@ for (const section in spec) {
         const { src, tgt, errors, special } = spec[section][name]
         const documents = resolve(src)
         const json = documents.map(doc => doc.toJSON())
-        trace: name, console.dir(json, { depth: null }) || ''
+        trace: name, console.dir({ json, errors }, { depth: null }) || ''
         expect(json).toMatchObject(tgt)
         documents.forEach((doc, i) => {
           if (!errors || !errors[i]) expect(doc.errors).toHaveLength(0)
