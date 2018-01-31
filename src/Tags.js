@@ -19,8 +19,13 @@ const isMap = ({ type }) => (type === Type.FLOW_MAP || type === Type.MAP)
 const isSeq = ({ type }) => (type === Type.FLOW_SEQ || type === Type.SEQ)
 
 export default class Tags {
-  constructor ({ extended = false }) {
+  constructor ({ extended = false, tags }) {
     this.list = extended ? extendedTags : coreTags
+    if (Array.isArray(tags)) {
+      this.list = this.list.concat(tags)
+    } else if (typeof tags === 'function') {
+      this.list = tags(this.list.slice())
+    }
   }
 
   // falls back to string on no match
