@@ -1,7 +1,7 @@
 import { Type } from 'raw-yaml'
 import { YAMLReferenceError, YAMLSyntaxError } from './errors'
-import coreTags from './tags/core'
-import extendedTags from './tags/extended'
+import coreTags from './type/core'
+import extendedTags from './type/extended'
 
 export const DefaultTagPrefixes = {
   '!': '!',
