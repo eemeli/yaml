@@ -1,7 +1,73 @@
 import resolve from '../src/index'
 
+describe('core', () => {
+  test('!!bool', () => {
+    const src =
+`canonical: true
+answer: FALSE
+logical: True
+option: TruE`
+
+    const doc = resolve(src)[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: true,
+      answer: false,
+      logical: true,
+      option: true
+    })
+  })
+
+  test('!!float', () => {
+    const src =
+`canonical: 6.8523015e+5
+fixed: 685230.15
+negative infinity: -.inf
+not a number: .NaN`
+
+    const doc = resolve(src)[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: 685230.15,
+      fixed: 685230.15,
+      'negative infinity': Number.NEGATIVE_INFINITY,
+      'not a number': NaN
+    })
+  })
+
+  test('!!int', () => {
+    const src =
+`canonical: 685230
+decimal: +685230
+octal: 0o2472256
+hexadecimal: 0x0A74AE`
+
+    const doc = resolve(src)[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: 685230,
+      decimal: 685230,
+      octal: 685230,
+      hexadecimal: 685230
+    })
+  })
+
+  test('!!null', () => {
+    const src =
+`empty:
+canonical: ~
+english: null
+~: null key`
+
+    const doc = resolve(src)[0]
+    expect(doc.toJSON()).toMatchObject({
+      empty: null,
+      canonical: null,
+      english: null,
+      null: 'null key'
+    })
+  })
+})
+
 describe('extended', () => {
-  test('binary', () => {
+  test('!!binary', () => {
     const src =
 `canonical: !!binary "\
  R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5\
@@ -30,6 +96,97 @@ description:
     expect(canonicalStr).toBe(genericStr)
     expect(canonicalStr.substr(0,3)).toBe('GIF')
   })
+
+  test('!!bool', () => {
+    const src =
+`canonical: y
+answer: NO
+logical: True
+option: on`
+
+    const doc = resolve(src, { extended: true })[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: true,
+      answer: false,
+      logical: true,
+      option: true
+    })
+  })
+
+  test('!!float', () => {
+    const src =
+`canonical: 6.8523015e+5
+exponential: 685.230_15e+03
+fixed: 685_230.15
+sexagesimal: 190:20:30.15
+negative infinity: -.inf
+not a number: .NaN`
+
+    const doc = resolve(src, { extended: true })[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: 685230.15,
+      exponential: 685230.15,
+      fixed: 685230.15,
+      sexagesimal: 685230.15,
+      'negative infinity': Number.NEGATIVE_INFINITY,
+      'not a number': NaN
+    })
+  })
+
+  test('!!int', () => {
+    const src =
+`canonical: 685230
+decimal: +685_230
+octal: 0o2472256
+hexadecimal: 0x_0A_74_AE
+binary: 0b1010_0111_0100_1010_1110
+sexagesimal: 190:20:30`
+
+    const doc = resolve(src, { extended: true })[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: 685230,
+      decimal: 685230,
+      octal: 685230,
+      hexadecimal: 685230,
+      binary: 685230,
+      sexagesimal: 685230
+    })
+  })
+
+  test('!!null', () => {
+    const src =
+`empty:
+canonical: ~
+english: null
+~: null key`
+
+    const doc = resolve(src, { extended: true })[0]
+    expect(doc.toJSON()).toMatchObject({
+      empty: null,
+      canonical: null,
+      english: null,
+      null: 'null key'
+    })
+  })
+
+  test('!!timestamp', () => {
+    const src =
+`canonical:       2001-12-15T02:59:43.1Z
+valid iso8601:    2001-12-14t21:59:43.10-05:00
+space separated:  2001-12-14 21:59:43.10 -5
+no time zone (Z): 2001-12-15 2:59:43.10
+date (00:00:00Z): 2002-12-14`
+
+    const doc = resolve(src, { extended: true })[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: '2001-12-15T02:59:43.100Z',
+      'valid iso8601': '2001-12-15T02:59:43.100Z',
+      'space separated': '2001-12-15T02:59:43.100Z',
+      'no time zone (Z)': '2001-12-15T02:59:43.100Z',
+      'date (00:00:00Z)': '2002-12-14T00:00:00.000Z'
+    })
+  })
+
 })
 
 describe('merge <<', () => {
