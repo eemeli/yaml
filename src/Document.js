@@ -32,10 +32,11 @@ export default class Document {
     this.version = version
   }
 
-  constructor (tags, { directives = [], contents = [] } = {}) {
+  constructor (tags, { directives = [], contents = [] } = {}, { merge } = {}) {
     this.anchors = []
     this.directives = directives
     this.errors = []
+    this.options = { merge: merge !== false }
     this.rawContents = contents
     this.tagPrefixes = {}
     this.tags = tags

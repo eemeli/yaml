@@ -2,6 +2,7 @@ import { Type } from 'raw-yaml'
 
 import { YAMLSyntaxError } from '../errors'
 import Collection, { Pair, toJSON } from './Collection'
+import YAMLSeq from './Seq'
 
 export default class YAMLMap extends Collection {
   constructor (doc, node) {
@@ -12,7 +13,7 @@ export default class YAMLMap extends Collection {
     } else {
       this.resolveBlockMapItems(doc, node)
     }
-    for (let i = 0; i < this.items.length - 1; ++i) {
+    for (let i = 0; i < this.items.length; ++i) {
       const { key } = this.items[i]
       for (let j = i + 1; j < this.items.length; ++j) {
         if (this.items[j].key === key) {
@@ -20,6 +21,18 @@ export default class YAMLMap extends Collection {
             `Map keys must be unique; "${key}" is repeated`))
           break
         }
+      }
+      if (doc.options.merge && key === '<<') {
+        const src = this.items[i].value
+        const srcItems = src instanceof YAMLSeq ? (
+          src.items.reduce((acc, { items }) => acc.concat(items), [])
+        ) : src.items
+        const toAdd = srcItems.reduce((toAdd, pair) => {
+          const exists = this.items.some(({ key }) => key === pair.key) || toAdd.some(({ key }) => key === pair.key)
+          return exists ? toAdd : toAdd.concat(pair)
+        }, [])
+        Array.prototype.splice.apply(this.items, [i, 1, ...toAdd])
+        i += toAdd.length - 1
       }
     }
   }
