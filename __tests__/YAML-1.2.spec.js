@@ -1391,6 +1391,374 @@ foo: bar
 - !!str`,
       tgt: [ [ 'a', 'b', 'c', 'c', '' ] ]
     }
+  },
+
+  '8.1.1. Block Scalar Headers': {
+    'Example 8.1. Block Scalar Header': {
+      src:
+`- | # Empty header
+ literal
+- >1 # Indentation indicator
+  folded
+- |+ # Chomping indicator
+ keep
+
+- >1- # Both indicators
+  strip`,
+      tgt: [ [
+        'literal\n',
+        ' folded\n',
+        'keep\n\n',
+        ' strip' ] ]
+    },
+
+    'Example 8.2. Block Indentation Indicator': {
+      src:
+`- |
+·detected
+- >
+·
+··
+··# detected
+- |1
+··explicit
+- >
+·\t
+·detected`.replace(/·/g, ' '),
+      tgt: [ [
+        'detected\n',
+        '\n\n# detected\n',
+        ' explicit\n',
+        '\t\ndetected\n' ] ]
+    },
+
+    'Example 8.3. Invalid Block Scalar Indentation Indicators': {
+      src:
+`- |
+··
+·text
+- >
+··text
+·text
+- |2
+·text`.replace(/·/g, ' '),
+      tgt: [ [
+        [ ' \ntext\n', 'text\n' ],
+        'text - |2 text'  // FIXME?
+      ] ],
+      errors: [ [
+        // ERROR: A leading all-space line must not have too many spaces.
+        'Document is not valid YAML (bad indentation?)'
+        // ERROR: The text is less indented than the indicated level.
+      ] ],
+      special: (src) => {
+        const doc = resolve(src)[0]
+        expect(doc.contents).toHaveLength(2)
+      }
+    },
+
+    'Example 8.4. Chomping Final Line Break': {
+      src:
+`strip: |-
+  text
+clip: |
+  text
+keep: |+
+  text\n`,
+      tgt: [ { strip: 'text', clip: 'text\n', keep: 'text\n' } ]
+    },
+
+    'Example 8.5. Chomping Trailing Lines': {
+      src:
+`
+ # Strip
+  # Comments:
+strip: |-
+  # text
+
+ # Clip
+  # comments:
+
+clip: |
+  # text
+
+ # Keep
+  # comments:
+
+keep: |+
+  # text
+
+ # Trail
+  # comments.`,
+      tgt: [ { strip: '# text', clip: '# text\n', keep: '# text\n\n' } ]
+    },
+
+    'Example 8.6. Empty Scalar Chomping': {
+      src:
+`strip: >-
+
+clip: >
+
+keep: |+\n\n`,
+      tgt: [ { strip: '', clip: '\n', keep: '\n' } ]
+    },
+  },
+
+  '8.1.2. Literal Style': {
+    'Example 8.7. Literal Scalar': {
+      src:
+`|
+ literal
+ \ttext\n\n`,
+      tgt: [ 'literal\n\ttext\n' ]
+    },
+
+    'Example 8.8. Literal Content': {
+      src:
+`|
+·
+··
+··literal
+···
+··
+··text
+
+·# Comment`.replace(/·/g, ' '),
+      tgt: [ '\n\nliteral\n \n\ntext\n' ]
+    },
+  },
+
+  '8.1.3. Folded Style': {
+    'Example 8.9. Folded Scalar': {
+      src:
+`>
+ folded
+ text\n\n`,
+      tgt: [ 'folded text\n' ]
+    },
+
+    'Example 8.10. Folded Lines': {
+      src:
+`>
+
+ folded
+ line
+
+ next
+ line
+   * bullet
+
+   * list
+   * lines
+
+ last
+ line
+
+# Comment`,
+      tgt: [
+`
+folded line
+next line
+  * bullet
+
+  * list
+  * lines
+
+last line
+` ]
+    },
+  },
+
+  '8.2.1. Block Sequences': {
+    'Example 8.14. Block Sequence': {
+      src:
+`block sequence:
+  - one
+  - two : three\n`,
+      tgt: [ { 'block sequence': [ 'one', { two: 'three' } ] } ]
+    },
+
+    'Example 8.15. Block Sequence Entry Types': {
+      src:
+`- # Empty
+- |
+ block node
+- - one # Compact
+  - two # sequence
+- one: two # Compact mapping`,
+      tgt: [ [
+        null,
+        'block node\n',
+        [ 'one', 'two' ],
+        { one: 'two' } ] ]
+    },
+  },
+
+  '8.2.2. Block Mappings': {
+    'Example 8.16. Block Mappings': {
+      src:
+`block mapping:
+ key: value\n`,
+      tgt: [ { 'block mapping': { key: 'value' } } ]
+    },
+
+    'Example 8.17. Explicit Block Mapping Entries': {
+      src:
+`? explicit key # Empty value
+? |
+  block key
+: - one # Explicit compact
+  - two # block value\n`,
+      tgt: [ {
+        'explicit key': null, // FIXME: maybe ''?
+        'block key\n': [ 'one', 'two' ] } ]
+    },
+
+    'Example 8.18. Implicit Block Mapping Entries': {
+      src:
+`plain key: in-line value
+: # Both empty
+"quoted key":
+- entry`,
+      tgt: [ {
+        'plain key': 'in-line value',
+        null: null,
+        'quoted key': [ 'entry' ] } ]
+    },
+
+    'Example 8.19. Compact Block Mappings': {
+      src:
+`- sun: yellow
+- ? earth: blue
+  : moon: white\n`,
+      tgt: [ [
+        { sun: 'yellow' },
+        { '{"earth":"blue"}': { moon: 'white' } } ] ]
+    },
+  },
+
+  '8.2.3. Block Nodes': {
+    'Example 8.20. Block Types': {
+      src:
+`-
+  "flow in block"
+- >
+ Block scalar
+- !!map # Block collection
+  foo : bar\n`,
+      tgt: [ [ 'flow in block', 'Block scalar\n', { foo: 'bar' } ] ]
+    },
+
+    'Example 8.21. Block Scalar Nodes': {
+      src:
+`literal: |2
+  value
+folded:
+   !foo
+  >1
+ value`,
+      tgt: [ { literal: 'value\n', folded: null } ],
+      errors: [ [ 'The tag !foo is unavailable' ] ],
+      special: (src) => {
+        const tag = { tag: '!foo', resolve: (doc, node) => 'foo' + node.strValue }
+        const doc = resolve(src, { tags: [tag] })[0]
+        expect(doc.toJSON()).toMatchObject({  literal: 'value\n', folded: 'foovalue\n' })
+        expect(doc.errors).toHaveLength(0)
+      }
+    },
+
+    'Example 8.22. Block Collection Nodes': {
+      src:
+`sequence: !!seq
+- entry
+- !!seq
+ - nested
+mapping: !!map
+ foo: bar`,
+      tgt: [ {
+        sequence: [ 'entry', [ 'nested' ] ],
+        mapping: { foo: 'bar' } } ]
+    },
+  },
+
+  '9.1. Documents': {
+
+    'Example 9.1. Document Prefix': {
+      src:
+`\u{FEFF}# Comment
+# lines
+Document`,
+      tgt: [ 'Document' ]
+    },
+
+    'Example 9.2. Document Markers': {
+      src:
+`%YAML 1.2
+---
+Document
+... # Suffix`,
+      tgt: [ 'Document', null ],
+      special: (src) => expect(resolve(src)[0].version).toBe('1.2')
+    },
+
+    'Example 9.3. Bare Documents': {
+      src:
+`Bare
+document
+...
+# No document
+...
+|
+%!PS-Adobe-2.0 # Not the first line`,
+      tgt: [
+        'Bare document',
+        null,
+        '%!PS-Adobe-2.0 # Not the first line\n' ]
+    },
+
+    'Example 9.4. Explicit Documents': {
+      src:
+`---
+{ matches
+% : 20 }
+...
+---
+# Empty
+...`,
+      tgt: [ { 'matches %': 20 }, null ]
+    },
+
+    'Example 9.5. Directives Documents': {
+      src:
+`%YAML 1.2
+--- |
+%!PS-Adobe-2.0
+...
+%YAML 1.2
+---
+# Empty
+...`,
+      tgt: [ '%!PS-Adobe-2.0\n', null ],
+      special: (src) => resolve(src).forEach(doc => expect(doc.version).toBe('1.2'))
+    },
+  },
+
+  '9.2. Streams': {
+    'Example 9.6. Stream': {
+      src:
+`Document
+---
+# Empty
+...
+%YAML 1.2
+---
+matches %: 20`,
+      tgt: [ 'Document', null, { 'matches %': 20 } ],
+      special: (src) => {
+        const versions = resolve(src).map(doc => doc.version)
+        expect(versions).toMatchObject([null, null, '1.2'])
+      }
+    }
   }
 }
 
