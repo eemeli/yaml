@@ -57,10 +57,9 @@ export default class PlainValue extends Node {
     const { indent, inFlow, src } = this.context
     let offset = start
     for (let ch = src[offset]; ch === '\n'; ch = src[offset]) {
-      offset += 1
-      if (Node.atDocumentBoundary(src, offset)) break
-      const end = Node.endOfBlockIndent(src, indent, offset)
-      if (end === null) break
+      if (Node.atDocumentBoundary(src, offset + 1)) break
+      const end = Node.endOfBlockIndent(src, indent, offset + 1)
+      if (end === null || src[end] === '#') break
       offset = PlainValue.endOfLine(src, end, inFlow)
     }
     if (this.valueRange.isEmpty) this.valueRange.start = start
