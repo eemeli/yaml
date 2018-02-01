@@ -1636,18 +1636,27 @@ foo: bar
 `- |
 ··
 ·text
+---
 - >
 ··text
 ·text
+---
 - |2
 ·text`.replace(/·/g, ' '),
-      tgt: [ { contents: [
-        { items: [
-          { type: Type.SEQ_ITEM, node: ' \ntext\n' },
-          { type: Type.SEQ_ITEM, node: 'text\n' },
+      tgt: [
+        { contents: [
+          { items: [ { node: '' } ] },
+          'text'
         ] },
-        'text - |2 text'
-      ] } ]
+        { contents: [
+          { items: [ { node: 'text\n' } ] },
+          'text'
+        ] },
+        { contents: [
+          { items: [ { node: '' } ] },
+          'text'
+        ] }
+      ]
       // ERROR: A leading all-space line must not have too many spaces.
       // ERROR: A following text line must not be less indented.
       // ERROR: The text is less indented than the indicated level.
@@ -2075,7 +2084,7 @@ for (const section in spec) {
       test(name, () => {
         const { src, tgt } = spec[section][name]
         const documents = parse(src)
-        trace: 'PARSED', console.dir(pretty(documents), { depth: null }) || ''
+        trace: 'PARSED', JSON.stringify(pretty(documents), null, '  ')
         testSpec(documents, tgt)
         const reSrc = String(documents)
         trace: 'RE-STRUNG', '\n' + reSrc

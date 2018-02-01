@@ -96,15 +96,27 @@ export default class BlockValue extends Node {
     const { indent, inFlow, src } = this.context
     let offset = start
     let bi = this.blockIndent ? indent + this.blockIndent - 1 : indent
+    let minBlockIndent = 1
     for (let ch = src[offset]; ch === '\n'; ch = src[offset]) {
       offset += 1
       if (Node.atDocumentBoundary(src, offset)) break
-      const end = Node.endOfBlockIndent(src, bi, offset)
+      const end = Node.endOfBlockIndent(src, bi, offset) // should not include tab?
       if (end === null) break
-      if (!this.blockIndent && src[end] !== '\n') {
-        // at first line, without explicit block indent
-        this.blockIndent = end - (offset + indent)
-        bi = indent + this.blockIndent - 1
+      if (!this.blockIndent) {
+        // no explicit block indent, none yet detected
+        const lineIndent = end - (offset + indent)
+        if (src[end] !== '\n') {
+          // first line with non-whitespace content
+          if (lineIndent < minBlockIndent) {
+            offset -= 1
+            break
+          }
+          this.blockIndent = lineIndent
+          bi = indent + this.blockIndent - 1
+        } else if (lineIndent > minBlockIndent) {
+          // empty line with more whitespace
+          minBlockIndent = lineIndent
+        }
       }
       offset = Node.endOfLine(src, end)
     }
