@@ -2075,6 +2075,31 @@ matches %: 20`,
         contents: [{ items: ['matches %', { type: Type.MAP_VALUE, node: '20' }] }]
       }]
     }
+  },
+
+  'yaml-test-suite': {
+    '2EBW: Allowed characters in keys': {
+      src:
+`a!"#$%&'()*+,-./09:;<=>?@AZ[\\]^_\`az{|}~: safe
+?foo: safe question mark
+:foo: safe colon
+-foo: safe dash
+this is#not: a comment`,
+      tgt: [ { 'contents': [
+            { 'items': [
+                'a!"#$%&\'()*+,-./09:;<=>?@AZ[\\]^_`az{|}~',
+                { 'node': 'safe' },
+                '?foo',
+                { 'node': 'safe question mark' },
+                ':foo',
+                { 'node': 'safe colon' },
+                '-foo',
+                { 'node': 'safe dash' },
+                'this is#not',
+                { 'node': 'a comment' }
+            ] }
+          ] } ]
+    }
   }
 }
 

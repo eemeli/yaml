@@ -71,9 +71,17 @@ export default class Collection extends Node {
         break
       }
       if ((firstItem.type === Type.SEQ_ITEM) !== (ch === '-')) {
-        trace: 'end:typeswitch', { offset, lineStart, indent, ch: JSON.stringify(ch) }
-        if (lineStart > start) offset = lineStart
-        break
+        let typeswitch = true
+        if (ch === '-') {
+          // map key may start with -, as long as it's followed by a non-whitespace char
+          const next = src[offset + 1]
+          typeswitch = !next || next === '\n' || next === '\t' || next === ' '
+        }
+        if (typeswitch) {
+          trace: 'end:typeswitch', { offset, lineStart, indent, ch: JSON.stringify(ch) }
+          if (lineStart > start) offset = lineStart
+          break
+        }
       }
       trace: 'item-start', this.items.length, { ch: JSON.stringify(ch) }
       const node = parseNode({ atLineStart, inCollection: true, indent, lineStart, parent: this }, offset)
