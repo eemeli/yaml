@@ -3,7 +3,7 @@ import BlockValue from './BlockValue'
 import Collection from './Collection'
 import CollectionItem from './CollectionItem'
 import FlowCollection from './FlowCollection'
-import Node, { Prop, Type } from './Node'
+import Node, { Char, Type } from './Node'
 import PlainValue from './PlainValue'
 import QuoteDouble from './QuoteDouble'
 import QuoteSingle from './QuoteSingle'
@@ -87,7 +87,7 @@ export default class ParseContext {
     const props = []
     offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
-    while (ch === Prop.ANCHOR || ch === Prop.COMMENT || ch === Prop.TAG || ch === '\n') {
+    while (ch === Char.ANCHOR || ch === Char.COMMENT || ch === Char.TAG || ch === '\n') {
       if (ch === '\n') {
         const lineStart = offset + 1
         const inEnd = Node.endOfIndent(src, lineStart)
@@ -95,7 +95,7 @@ export default class ParseContext {
         this.atLineStart = true
         this.lineStart = lineStart
         offset = inEnd
-      } else if (ch === Prop.COMMENT) {
+      } else if (ch === Char.COMMENT) {
         const end = Node.endOfLine(src, offset + 1)
         props.push(new Range(offset, end))
         offset = end

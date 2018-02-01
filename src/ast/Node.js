@@ -19,10 +19,12 @@ export const Type = {
   SEQ_ITEM: 'SEQ_ITEM'
 }
 
-export const Prop = {
+export const Char = {
   ANCHOR: '&',
   COMMENT: '#',
-  TAG: '!'
+  TAG: '!',
+  DIRECTIVES_END: '-',
+  DOCUMENT_END: '.'
 }
 
 /** Root class of all nodes */
@@ -34,15 +36,21 @@ export default class Node {
   }
 
   // ^(---|...)
-  static atDocumentBoundary (src, offset) {
+  static atDocumentBoundary (src, offset, sep) {
     const prev = src[offset - 1]
     if (prev && prev !== '\n') return false
     const ch0 = src[offset]
     if (!ch0) return true
-    if (ch0 !== '-' && ch0 !== '.') return false
+    if (sep) {
+      if (ch0 !== sep) return false
+    } else {
+      if (ch0 !== Char.DIRECTIVES_END && ch0 !== Char.DOCUMENT_END) return false
+    }
     const ch1 = src[offset + 1]
     const ch2 = src[offset + 2]
-    return ch1 === ch0 && ch2 === ch0
+    if (ch1 !== ch0 || ch2 !== ch0) return false
+    const ch3 = src[offset + 3]
+    return !ch3 || ch3 === '\n' || ch3 === '\t' || ch3 === ' '
   }
 
   static endOfIdentifier (src, offset) {
@@ -138,7 +146,7 @@ export default class Node {
 
   get anchor () {
     for (let i = 0; i < this.props.length; ++i) {
-      const anchor = this.getPropValue(i, Prop.ANCHOR, true)
+      const anchor = this.getPropValue(i, Char.ANCHOR, true)
       if (anchor != null) return anchor
     }
     return null
@@ -147,7 +155,7 @@ export default class Node {
   get comment () {
     const comments = []
     for (let i = 0; i < this.props.length; ++i) {
-      const comment = this.getPropValue(i, Prop.COMMENT, true)
+      const comment = this.getPropValue(i, Char.COMMENT, true)
       if (comment != null) comments.push(comment)
     }
     return comments.length > 0 ? comments.join('\n') : null
@@ -157,7 +165,7 @@ export default class Node {
     if (this.context) {
       const { src } = this.context
       for (let i = 0; i < this.props.length; ++i) {
-        if (src[this.props[i].start] === Prop.COMMENT) return true
+        if (src[this.props[i].start] === Char.COMMENT) return true
       }
     }
     return false
@@ -181,7 +189,7 @@ export default class Node {
 
   get tag () {
     for (let i = 0; i < this.props.length; ++i) {
-      const tag = this.getPropValue(i, Prop.TAG, false)
+      const tag = this.getPropValue(i, Char.TAG, false)
       if (tag != null) {
         if (tag[1] === '<') {
           return { verbatim: tag.slice(2, -1) }
@@ -196,11 +204,11 @@ export default class Node {
 
   parseComment (start) {
     const { src } = this.context
-    if (src[start] === Prop.COMMENT) {
+    if (src[start] === Char.COMMENT) {
       const end = Node.endOfLine(src, start + 1)
       const commentRange = new Range(start, end)
       this.props.push(commentRange)
-      trace: commentRange, JSON.stringify(this.getPropValue(this.props.length - 1, Prop.COMMENT, true))
+      trace: commentRange, JSON.stringify(this.getPropValue(this.props.length - 1, Char.COMMENT, true))
       return end
     }
     return start

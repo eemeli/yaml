@@ -1,23 +1,14 @@
 import Comment from './Comment'
 import Directive from './Directive'
-import Node, { Type } from './Node'
+import Node, { Char, Type } from './Node'
 import Range from './Range'
+
 
 export default class Document extends Node {
   static startCommentOrEndBlankLine (src, start) {
     const offset = Node.endOfWhiteSpace(src, start)
     const ch = src[offset]
     return ch === '#' || ch === '\n' ? offset : start
-  }
-
-  static atDirectivesEnd (src, offset) {
-    return src[offset] === '-' && src[offset + 1] === '-' && src[offset + 2] === '-'
-  }
-
-  static atDocumentEnd (src, offset) {
-    return !src[offset] || (
-      src[offset] === '.' && src[offset + 1] === '.' && src[offset + 2] === '.'
-    )
   }
 
   constructor () {
@@ -30,7 +21,7 @@ export default class Document extends Node {
     const { src } = this.context
     this.directives = []
     let offset = start
-    while (!Document.atDirectivesEnd(src, offset)) {
+    while (!Document.atDocumentBoundary(src, offset, Char.DIRECTIVES_END)) {
       offset = Document.startCommentOrEndBlankLine(src, offset)
       switch (src[offset]) {
         case '\n':
@@ -52,7 +43,7 @@ export default class Document extends Node {
           return offset
       }
     }
-    return offset + 3
+    return src[offset] ? offset + 3 : offset
   }
 
   parseContents (start) {
@@ -63,7 +54,7 @@ export default class Document extends Node {
     let offset = Node.endOfWhiteSpace(src, start)
     let atLineStart = lineStart === start
     this.valueRange = new Range(offset)
-    while (!Document.atDocumentEnd(src, offset)) {
+    while (!Document.atDocumentBoundary(src, offset, Char.DOCUMENT_END)) {
       switch (src[offset]) {
         case '\n':
           offset += 1
