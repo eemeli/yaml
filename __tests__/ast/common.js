@@ -28,7 +28,9 @@ export const pretty = (node) => {
 
 export const testSpec = (res, exp) => {
   if (typeof exp === 'string') {
-    const value = res instanceof Node ? res.strValue || res.rawValue : res
+    const value = res instanceof Node ? (
+      'strValue' in res ? res.strValue : res.rawValue
+    ) : res
     expect(value).toBe(exp)
   } else if (Array.isArray(exp)) {
     expect(res).toBeInstanceOf(Array)

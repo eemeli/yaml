@@ -19,10 +19,12 @@ export default class BlockValue extends Node {
     let { start, end } = this.valueRange
     const { indent, src } = this.context
     if (this.chomping !== Chomp.KEEP) {
+      if (this.valueRange.isEmpty) return ''
       let lastNewLine = null
       let ch = src[end - 1]
-      while (start < end && (ch === '\n' || ch === '\t' || ch === ' ')) {
+      while (ch === '\n' || ch === '\t' || ch === ' ') {
         end -= 1
+        if (end <= start) return ''
         if (ch === '\n') lastNewLine = end
         ch = src[end - 1]
       }

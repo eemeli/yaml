@@ -1721,9 +1721,9 @@ clip: >
 keep: |+\n\n`,
       tgt: [ { contents: [ { items: [
         'strip',
-        { type: Type.MAP_VALUE, node: '\n' },
+        { type: Type.MAP_VALUE, node: '' },
         'clip',
-        { type: Type.MAP_VALUE, node: '\n' },
+        { type: Type.MAP_VALUE, node: '' },
         'keep',
         { type: Type.MAP_VALUE, node: '\n' }
       ] } ] } ]
