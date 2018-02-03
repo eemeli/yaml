@@ -2,6 +2,7 @@ import { Type } from 'raw-yaml'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import coreTags from './type/core'
 import extendedTags from './type/extended'
+import jsonTags from './type/json'
 
 export const DefaultTagPrefixes = {
   '!': '!',
@@ -16,7 +17,8 @@ export const DefaultTags = {
 
 export const Schema = {
   CORE: 'core',
-  EXTENDED: 'extended'
+  EXTENDED: 'extended',
+  JSON: 'json'
 }
 
 const isMap = ({ type }) => (type === Type.FLOW_MAP || type === Type.MAP)
@@ -27,9 +29,14 @@ export default class Tags {
   static defaultSchema = Schema.CORE
 
   constructor ({ schema = Tags.defaultSchema, tags }) {
+    this.scalarFallback = (str) => str
     switch (schema) {
       case Schema.CORE: this.list = coreTags; break
       case Schema.EXTENDED: this.list = extendedTags; break
+      case Schema.JSON:
+        this.list = jsonTags
+        this.scalarFallback = (str) => { throw new YAMLSyntaxError(null, `Unresolved plain scalar ${JSON.stringify(str)}`) }
+        break
       default:
         if (Array.isArray(schema)) this.list = schema
         else throw new Error("Unknown schema; use 'core', 'json', 'extended', or { tag, test, resolve }[]")
@@ -51,7 +58,7 @@ export default class Tags {
         if (match) return resolve.apply(null, match)
       }
     }
-    return str
+    return this.scalarFallback(str)
   }
 
   // sets node.resolved on success

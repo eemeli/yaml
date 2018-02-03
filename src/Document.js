@@ -135,7 +135,13 @@ export default class Document {
     }
     const tagName = this.resolveTagName(node)
     if (tagName) return node.resolved = tags.resolve(this, node, tagName)
-    if (node.type === Type.PLAIN) return node.resolved = tags.resolveScalar(node.strValue || '')
+    if (node.type === Type.PLAIN) try {
+      return node.resolved = tags.resolveScalar(node.strValue || '')
+    } catch (error) {
+      error.source = node
+      errors.push(error)
+      return null
+    }
     errors.push(new YAMLSyntaxError(node, `Failed to resolve ${node.type} node here`))
     return null
   }

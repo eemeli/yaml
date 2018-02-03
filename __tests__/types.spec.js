@@ -1,7 +1,77 @@
 import resolve from '../src/index'
 import { Schema } from '../src/Tags'
 
-describe('core', () => {
+describe(Schema.JSON, () => {
+  test('!!bool', () => {
+    const src =
+`"canonical": true
+"answer": false
+"logical": True
+"option": TruE`
+
+    const doc = resolve(src, { schema: Schema.JSON })[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: true,
+      answer: false,
+      logical: null,
+      option: null
+    })
+    expect(doc.errors).toHaveLength(2)
+  })
+
+  test('!!float', () => {
+    const src =
+`"canonical": 6.8523015e+5
+"fixed": 685230.15
+"negative infinity": -.inf
+"not a number": .NaN`
+
+    const doc = resolve(src, { schema: Schema.JSON })[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: 685230.15,
+      fixed: 685230.15,
+      'negative infinity': null,
+      'not a number': null
+    })
+    expect(doc.errors).toHaveLength(2)
+  })
+
+  test('!!int', () => {
+    const src =
+`"canonical": 685230
+"decimal": -685230
+"octal": 0o2472256
+"hexadecimal": 0x0A74AE`
+
+    const doc = resolve(src, { schema: Schema.JSON })[0]
+    expect(doc.toJSON()).toMatchObject({
+      canonical: 685230,
+      decimal: -685230,
+      octal: null,
+      hexadecimal: null
+    })
+    expect(doc.errors).toHaveLength(2)
+  })
+
+  test('!!null', () => {
+    const src =
+`"empty":
+"canonical": ~
+"english": null
+~: 'null key'`
+
+    const doc = resolve(src, { schema: Schema.JSON })[0]
+    expect(doc.toJSON()).toMatchObject({
+      empty: null,
+      canonical: null,
+      english: null,
+      '': 'null key'
+    })
+    expect(doc.errors).toHaveLength(2)
+  })
+})
+
+describe(Schema.CORE, () => {
   test('!!bool', () => {
     const src =
 `canonical: true
