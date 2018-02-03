@@ -2099,6 +2099,37 @@ this is#not: a comment`,
                 { 'node': 'a comment' }
             ] }
           ] } ]
+    },
+
+    'PW8X: Anchors on Empty Scalars' : {
+      src:
+`- &a
+- a
+-
+  &a : a
+  b: &b
+  &c : &a
+-
+  ? &d
+  ? &e
+  : &a`,
+      tgt: [ { contents: [ { items: [
+        { node: { anchor: 'a' } },
+        { node: 'a' },
+        { node: { items: [
+          { anchor: 'a' },
+          { type: Type.MAP_VALUE, node: 'a' },
+          'b',
+          { type: Type.MAP_VALUE, node: { anchor: 'b' } },
+          { anchor: 'c' },
+          { type: Type.MAP_VALUE, node: { anchor: 'a' } }
+        ] } },
+        { node: { items: [
+          { type: Type.MAP_KEY, node: { anchor: 'd' } },
+          { type: Type.MAP_KEY, node: { anchor: 'e' } },
+          { type: Type.MAP_VALUE, node: { anchor: 'a' } }
+        ] } }
+      ] } ] } ]
     }
   }
 }
@@ -2115,7 +2146,7 @@ for (const section in spec) {
         trace: 'RE-STRUNG', '\n' + reSrc
         // expect(reSrc).toBe(src)
         const reDoc = parse(reSrc)
-        trace: 'RE-PARSED', console.dir(pretty(reDoc), { depth: null }) || ''
+        trace: 'RE-PARSED', JSON.stringify(pretty(reDoc), null, '  ')
         testSpec(reDoc, tgt)
       })
     }

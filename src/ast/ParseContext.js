@@ -83,17 +83,21 @@ export default class ParseContext {
   // Anchor and tag are before type, which determines the node implementation
   // class; hence this intermediate step.
   parseProps (offset) {
-    const { inFlow, src } = this
+    const { inFlow, parent, src } = this
     const props = []
+    let lineHasProps = false
     offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
     while (ch === Char.ANCHOR || ch === Char.COMMENT || ch === Char.TAG || ch === '\n') {
       if (ch === '\n') {
         const lineStart = offset + 1
         const inEnd = Node.endOfIndent(src, lineStart)
-        if (!Node.nextNodeIsIndented(src[inEnd], inEnd - (lineStart + this.indent), true)) break
+        const indentDiff = inEnd - (lineStart + this.indent)
+        const noIndicatorAsIndent = (parent instanceof CollectionItem) && parent.context.atLineStart
+        if (!Node.nextNodeIsIndented(src[inEnd], indentDiff, !noIndicatorAsIndent)) break
         this.atLineStart = true
         this.lineStart = lineStart
+        lineHasProps = false
         offset = inEnd
       } else if (ch === Char.COMMENT) {
         const end = Node.endOfLine(src, offset + 1)
@@ -102,11 +106,15 @@ export default class ParseContext {
       } else {
         const end = Node.endOfIdentifier(src, offset + 1)
         props.push(new Range(offset, end))
+        lineHasProps = true
         offset = Node.endOfWhiteSpace(src, end)
       }
       ch = src[offset]
     }
+    // '- &a : b' has an anchor on an empty PLAIN node
+    if (lineHasProps && Node.atCollectionItem(src, offset)) offset -= 1
     const type = ParseContext.parseType(src, offset, inFlow)
+    trace: 'props', type, { props, offset }
     return { props, type, valueStart: offset }
   }
 
