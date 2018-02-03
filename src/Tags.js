@@ -14,13 +14,26 @@ export const DefaultTags = {
   STR: 'tag:yaml.org,2002:str'
 }
 
+export const Schema = {
+  CORE: 'core',
+  EXTENDED: 'extended'
+}
+
 const isMap = ({ type }) => (type === Type.FLOW_MAP || type === Type.MAP)
 
 const isSeq = ({ type }) => (type === Type.FLOW_SEQ || type === Type.SEQ)
 
 export default class Tags {
-  constructor ({ extended = false, tags }) {
-    this.list = extended ? extendedTags : coreTags
+  static defaultSchema = Schema.CORE
+
+  constructor ({ schema = Tags.defaultSchema, tags }) {
+    switch (schema) {
+      case Schema.CORE: this.list = coreTags; break
+      case Schema.EXTENDED: this.list = extendedTags; break
+      default:
+        if (Array.isArray(schema)) this.list = schema
+        else throw new Error("Unknown schema; use 'core', 'json', 'extended', or { tag, test, resolve }[]")
+    }
     if (Array.isArray(tags)) {
       this.list = this.list.concat(tags)
     } else if (typeof tags === 'function') {

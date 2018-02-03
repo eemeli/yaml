@@ -1,4 +1,5 @@
 import resolve from '../src/index'
+import { Schema } from '../src/Tags'
 
 describe('core', () => {
   test('!!bool', () => {
@@ -66,7 +67,7 @@ english: null
   })
 })
 
-describe('extended', () => {
+describe(Schema.EXTENDED, () => {
   test('!!binary', () => {
     const src =
 `canonical: !!binary "\
@@ -82,7 +83,7 @@ generic: !!binary |
 description:
  The binary value above is a tiny arrow encoded as a gif image.`
 
-    const doc = resolve(src, { extended: true })[0]
+    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
     const canonical = doc.contents.items[0].value
     const generic = doc.contents.items[1].value
     expect(canonical).toBeInstanceOf(Uint8Array)
@@ -104,7 +105,7 @@ answer: NO
 logical: True
 option: on`
 
-    const doc = resolve(src, { extended: true })[0]
+    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: true,
       answer: false,
@@ -122,7 +123,7 @@ sexagesimal: 190:20:30.15
 negative infinity: -.inf
 not a number: .NaN`
 
-    const doc = resolve(src, { extended: true })[0]
+    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: 685230.15,
       exponential: 685230.15,
@@ -142,7 +143,7 @@ hexadecimal: 0x_0A_74_AE
 binary: 0b1010_0111_0100_1010_1110
 sexagesimal: 190:20:30`
 
-    const doc = resolve(src, { extended: true })[0]
+    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: 685230,
       decimal: 685230,
@@ -160,7 +161,7 @@ canonical: ~
 english: null
 ~: null key`
 
-    const doc = resolve(src, { extended: true })[0]
+    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
     expect(doc.toJSON()).toMatchObject({
       empty: null,
       canonical: null,
@@ -177,7 +178,7 @@ space separated:  2001-12-14 21:59:43.10 -5
 no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
-    const doc = resolve(src, { extended: true })[0]
+    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: '2001-12-15T02:59:43.100Z',
       'valid iso8601': '2001-12-15T02:59:43.100Z',
