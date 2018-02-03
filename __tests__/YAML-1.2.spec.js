@@ -383,12 +383,12 @@ application specific tag: !something |
  different documents.`,
       tgt: [ {
         'not-date': '2002-04-28',
-        picture: null,
-        'application specific tag': null
+        picture: 'R0lGODlhDAAMAIQAAP//9/X\n17unp5WZmZgAAAOfn515eXv\nPz7Y6OjuDg4J+fn5OTk6enp\n56enmleECcgggoBADs=\n',
+        'application specific tag': 'The semantics of the tag\nabove may be different for\ndifferent documents.\n'
       } ],
       errors: [ [
-        'The tag tag:yaml.org,2002:binary is unavailable',
-        'The tag !something is unavailable'
+        'The tag tag:yaml.org,2002:binary is unavailable, falling back to tag:yaml.org,2002:str',
+        'The tag !something is unavailable, falling back to tag:yaml.org,2002:str'
       ] ],
       special: (src) => {
         const doc = resolve(src, { extended: true })[0]
@@ -613,8 +613,8 @@ mapping: { sky: blue, sea: green }`,
       src:
 `anchored: !local &anchor value
 alias: *anchor`,
-      tgt: [ { anchored: null, alias: null } ],
-      errors: [ [ 'The tag !local is unavailable' ] ],
+      tgt: [ { anchored: 'value', alias: 'value' } ],
+      errors: [ [ 'The tag !local is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: '!local',
@@ -934,10 +934,10 @@ bar`,
 %TAG ! tag:example.com,2000:app/
 ---
 !foo "bar"`,
-      tgt: [ null, null ],
+      tgt: [ 'bar', 'bar' ],
       errors: [
-        [ 'The tag !foo is unavailable' ],
-        [ 'The tag tag:example.com,2000:app/foo is unavailable' ]
+        [ 'The tag !foo is unavailable, falling back to tag:yaml.org,2002:str' ],
+        [ 'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str' ]
       ],
       special: (src) => {
         const tags = [ {
@@ -958,8 +958,8 @@ bar`,
 `%TAG !! tag:example.com,2000:app/
 ---
 !!int 1 - 3 # Interval, not integer`,
-      tgt: [ null ],
-      errors: [ [ 'The tag tag:example.com,2000:app/int is unavailable' ] ],
+      tgt: [ '1 - 3' ],
+      errors: [ [ 'The tag tag:example.com,2000:app/int is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: 'tag:example.com,2000:app/int',
@@ -976,8 +976,8 @@ bar`,
 `%TAG !e! tag:example.com,2000:app/
 ---
 !e!foo "bar"`,
-      tgt: [ null ],
-      errors: [ [ 'The tag tag:example.com,2000:app/foo is unavailable' ] ],
+      tgt: [ 'bar' ],
+      errors: [ [ 'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
@@ -998,10 +998,10 @@ bar`,
 %TAG !m! !my-
 --- # Color here
 !m!light green`,
-      tgt: [ null, null ],
+      tgt: [ 'fluorescent', 'green' ],
       errors: [
-        [ 'The tag !my-light is unavailable' ],
-        [ 'The tag !my-light is unavailable' ] ],
+        [ 'The tag !my-light is unavailable, falling back to tag:yaml.org,2002:str' ],
+        [ 'The tag !my-light is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: '!my-light',
@@ -1019,8 +1019,8 @@ bar`,
 `%TAG !e! tag:example.com,2000:app/
 ---
 - !e!foo "bar"`,
-      tgt: [ [ null ] ],
-      errors: [ [ 'The tag tag:example.com,2000:app/foo is unavailable' ] ],
+      tgt: [ [ 'bar' ] ],
+      errors: [ [ 'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
@@ -1046,8 +1046,8 @@ bar`,
       src:
 `!<tag:yaml.org,2002:str> foo :
   !<!bar> baz`,
-      tgt: [ { foo: null } ],
-      errors: [ [ 'The tag !bar is unavailable' ] ],
+      tgt: [ { foo: 'baz' } ],
+      errors: [ [ 'The tag !bar is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: '!bar',
@@ -1063,10 +1063,10 @@ bar`,
       src:
 `- !<!> foo
 - !<$:?> bar`,
-      tgt: [ [ 'foo', null ] ],
+      tgt: [ [ 'foo', 'bar' ] ],
       errors: [ [
         'Verbatim tags aren\'t resolved, so ! is invalid.',
-        'The tag $:? is unavailable'
+        'The tag $:? is unavailable, falling back to tag:yaml.org,2002:str'
       ]]
     },
 
@@ -1077,10 +1077,10 @@ bar`,
 - !local foo
 - !!str bar
 - !e!tag%21 baz`,
-      tgt: [ [ null, 'bar', null ] ],
+      tgt: [ [ 'foo', 'bar', 'baz' ] ],
       errors: [ [
-        'The tag !local is unavailable',
-        'The tag tag:example.com,2000:app/tag%21 is unavailable' ] ],
+        'The tag !local is unavailable, falling back to tag:yaml.org,2002:str',
+        'The tag tag:example.com,2000:app/tag%21 is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tags = [ {
           tag: '!local',
@@ -1443,24 +1443,23 @@ foo: bar
 `- |
 ··
 ·text
+---
 - >
 ··text
 ·text
+---
 - |2
 ·text`.replace(/·/g, ' '),
-      tgt: [ [
-        [ ' \ntext\n', 'text\n' ],
-        'text - |2 text'  // FIXME?
-      ] ],
-      errors: [ [
-        // ERROR: A leading all-space line must not have too many spaces.
-        'Document is not valid YAML (bad indentation?)'
-        // ERROR: The text is less indented than the indicated level.
-      ] ],
-      special: (src) => {
-        const doc = resolve(src)[0]
-        expect(doc.contents).toHaveLength(2)
-      }
+      tgt: [
+        [ [ '' ], 'text' ],
+        [ [ 'text\n' ], 'text' ],
+        [ [ '' ], 'text' ]
+      ],
+      errors: [
+        [ 'Document is not valid YAML (bad indentation?)' ],
+        [ 'Document is not valid YAML (bad indentation?)' ],
+        [ 'Document is not valid YAML (bad indentation?)' ]
+      ]
     },
 
     'Example 8.4. Chomping Final Line Break': {
@@ -1506,7 +1505,7 @@ keep: |+
 clip: >
 
 keep: |+\n\n`,
-      tgt: [ { strip: '', clip: '\n', keep: '\n' } ]
+      tgt: [ { strip: '', clip: '', keep: '\n' } ]
     },
   },
 
@@ -1663,8 +1662,8 @@ folded:
    !foo
   >1
  value`,
-      tgt: [ { literal: 'value\n', folded: null } ],
-      errors: [ [ 'The tag !foo is unavailable' ] ],
+      tgt: [ { literal: 'value\n', folded: 'value\n' } ],
+      errors: [ [ 'The tag !foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = { tag: '!foo', resolve: (doc, node) => 'foo' + node.strValue }
         const doc = resolve(src, { tags: [tag] })[0]
@@ -1775,7 +1774,8 @@ for (const section in spec) {
         const { src, tgt, errors, special } = spec[section][name]
         const documents = resolve(src)
         const json = documents.map(doc => doc.toJSON())
-        trace: name, console.dir({ json, errors }, { depth: null }) || ''
+        const docErrors = documents.map(doc => doc.errors.map(err => err.message))
+        trace: name, '\n' + JSON.stringify(json, null, '  '), { errors: docErrors }
         expect(json).toMatchObject(tgt)
         documents.forEach((doc, i) => {
           if (!errors || !errors[i]) expect(doc.errors).toHaveLength(0)

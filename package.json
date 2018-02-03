@@ -52,6 +52,6 @@
     "jest": "^22.0.6"
   },
   "dependencies": {
-    "raw-yaml": "^0.2.2"
+    "raw-yaml": "^0.2.3"
   }
 }
