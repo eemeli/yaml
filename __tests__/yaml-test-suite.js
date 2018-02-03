@@ -18,7 +18,7 @@ testDirs.forEach(dir => {
   test(`${dir}: ${name}`, () => {
     const stream = resolve(yaml)
     if (json) {
-      const received = stream[0].toJSON()
+      const received = stream[0] ? stream[0].toJSON() : null
       const expected = JSON.parse(json)
       if (!received || typeof received !== 'object') {
         expect(received).toBe(expected)
@@ -29,7 +29,9 @@ testDirs.forEach(dir => {
     if (error) {
       expect(stream[0].errors).not.toHaveLength(0)
     } else {
-      const errors = stream[0].errors.filter(err => !(err instanceof YAMLWarning))
+      const errors = stream
+        .map(doc => doc.errors.filter(err => !(err instanceof YAMLWarning)))
+        .filter(docErrors => docErrors.length > 0)
       expect(errors).toHaveLength(0)
     }
   })
