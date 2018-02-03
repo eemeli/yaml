@@ -63,7 +63,11 @@ export default class Tags {
   resolve (doc, node, tagName) {
     const res = this.resolveNode(doc, node, tagName)
     if (node.hasOwnProperty('resolved')) return res
-    const fallback = isMap(node) ? DefaultTags.MAP : isSeq(node) ? DefaultTags.SEQ : null
+    const fallback = (
+      isMap(node) ? DefaultTags.MAP
+      : isSeq(node) ? DefaultTags.SEQ
+      : DefaultTags.STR
+    )
     if (fallback) {
       const err =
       doc.errors.push(new YAMLWarning(node,
