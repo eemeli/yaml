@@ -1,3 +1,4 @@
 [submodule "__tests__/yaml-test-suite"]
 	path = __tests__/yaml-test-suite
-	url = https://github.com/yaml/yaml-test-suite.git
+	url = https://github.com/eemeli/yaml-test-suite.git
+	branch = fixed-data
