@@ -1,7 +1,6 @@
 import resolve from '../src/index'
-import { Schema } from '../src/Tags'
 
-describe(Schema.JSON, () => {
+describe('json', () => {
   test('!!bool', () => {
     const src =
 `"canonical": true
@@ -9,7 +8,7 @@ describe(Schema.JSON, () => {
 "logical": True
 "option": TruE`
 
-    const doc = resolve(src, { schema: Schema.JSON })[0]
+    const doc = resolve(src, { schema: 'json' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: true,
       answer: false,
@@ -26,7 +25,7 @@ describe(Schema.JSON, () => {
 "negative infinity": -.inf
 "not a number": .NaN`
 
-    const doc = resolve(src, { schema: Schema.JSON })[0]
+    const doc = resolve(src, { schema: 'json' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: 685230.15,
       fixed: 685230.15,
@@ -43,7 +42,7 @@ describe(Schema.JSON, () => {
 "octal": 0o2472256
 "hexadecimal": 0x0A74AE`
 
-    const doc = resolve(src, { schema: Schema.JSON })[0]
+    const doc = resolve(src, { schema: 'json' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: 685230,
       decimal: -685230,
@@ -60,7 +59,7 @@ describe(Schema.JSON, () => {
 "english": null
 ~: 'null key'`
 
-    const doc = resolve(src, { schema: Schema.JSON })[0]
+    const doc = resolve(src, { schema: 'json' })[0]
     expect(doc.toJSON()).toMatchObject({
       empty: null,
       canonical: null,
@@ -71,7 +70,7 @@ describe(Schema.JSON, () => {
   })
 })
 
-describe(Schema.CORE, () => {
+describe('core', () => {
   test('!!bool', () => {
     const src =
 `canonical: true
@@ -137,13 +136,13 @@ english: null
   })
 })
 
-describe(Schema.EXTENDED, () => {
+describe('extended', () => {
   test('!!binary', () => {
     const src =
-`canonical: !!binary "\
- R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5\
- OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+\
- +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC\
+`canonical: !!binary "\\
+ R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5\\
+ OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+\\
+ +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC\\
  AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs="
 generic: !!binary |
  R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5
@@ -153,7 +152,7 @@ generic: !!binary |
 description:
  The binary value above is a tiny arrow encoded as a gif image.`
 
-    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
+    const doc = resolve(src, { schema: 'extended' })[0]
     const canonical = doc.contents.items[0].value
     const generic = doc.contents.items[1].value
     expect(canonical).toBeInstanceOf(Uint8Array)
@@ -165,7 +164,7 @@ description:
     for (let i = 0; i < canonical.length; ++i) canonicalStr += String.fromCharCode(canonical[i])
     for (let i = 0; i < generic.length; ++i) genericStr += String.fromCharCode(generic[i])
     expect(canonicalStr).toBe(genericStr)
-    expect(canonicalStr.substr(0,3)).toBe('GIF')
+    expect(canonicalStr.substr(0,5)).toBe('GIF89')
   })
 
   test('!!bool', () => {
@@ -175,7 +174,7 @@ answer: NO
 logical: True
 option: on`
 
-    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
+    const doc = resolve(src, { schema: 'extended' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: true,
       answer: false,
@@ -193,7 +192,7 @@ sexagesimal: 190:20:30.15
 negative infinity: -.inf
 not a number: .NaN`
 
-    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
+    const doc = resolve(src, { schema: 'extended' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: 685230.15,
       exponential: 685230.15,
@@ -208,12 +207,12 @@ not a number: .NaN`
     const src =
 `canonical: 685230
 decimal: +685_230
-octal: 0o2472256
+octal: 02472256
 hexadecimal: 0x_0A_74_AE
 binary: 0b1010_0111_0100_1010_1110
 sexagesimal: 190:20:30`
 
-    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
+    const doc = resolve(src, { schema: 'extended' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: 685230,
       decimal: 685230,
@@ -231,7 +230,7 @@ canonical: ~
 english: null
 ~: null key`
 
-    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
+    const doc = resolve(src, { schema: 'extended' })[0]
     expect(doc.toJSON()).toMatchObject({
       empty: null,
       canonical: null,
@@ -248,7 +247,7 @@ space separated:  2001-12-14 21:59:43.10 -5
 no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
-    const doc = resolve(src, { schema: Schema.EXTENDED })[0]
+    const doc = resolve(src, { schema: 'extended' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: '2001-12-15T02:59:43.100Z',
       'valid iso8601': '2001-12-15T02:59:43.100Z',

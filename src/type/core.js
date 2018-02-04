@@ -1,19 +1,6 @@
-import Map from './Map'
-import Seq from './Seq'
+import failsafe from './failsafe'
 
-export default [
-  {
-    tag: 'tag:yaml.org,2002:map',
-    resolve: (doc, node) => new Map(doc, node)
-  },
-  {
-    tag: 'tag:yaml.org,2002:seq',
-    resolve: (doc, node) => new Seq(doc, node)
-  },
-  {
-    tag: 'tag:yaml.org,2002:str',
-    resolve: (doc, node) => node.strValue || ''
-  },
+export default failsafe.concat([
   {
     tag: 'tag:yaml.org,2002:null',
     test: /^(?:~|null)?$/i,
@@ -51,4 +38,4 @@ export default [
     test: /^[-+]?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][-+]?[0-9]+)?$/,
     resolve: (str) => parseFloat(str)
   }
-]
+])

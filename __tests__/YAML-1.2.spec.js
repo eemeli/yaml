@@ -1,6 +1,5 @@
 import { Type } from 'raw-yaml'
 import resolve from '../src/index'
-import { Schema } from '../src/Tags'
 
 const spec = {
   '2.1. Collections': {
@@ -358,7 +357,7 @@ date: 2002-12-14`,
         spaced: '2001-12-14 21:59:43.10 -5',
         date: '2002-12-14' } ],
       special: (src) => {
-        const doc = resolve(src, { schema: Schema.EXTENDED })[0]
+        const doc = resolve(src, { schema: 'extended' })[0]
         const { canonical, iso8601, spaced, date } = doc.toJSON()
         expect(canonical).toBe(new Date('2001-12-15T02:59:43.1Z').toJSON())
         expect(iso8601).toBe(new Date('2001-12-14t21:59:43.10-05:00').toJSON())
@@ -392,7 +391,7 @@ application specific tag: !something |
         'The tag !something is unavailable, falling back to tag:yaml.org,2002:str'
       ] ],
       special: (src) => {
-        const doc = resolve(src, { schema: Schema.EXTENDED })[0]
+        const doc = resolve(src, { schema: 'extended' })[0]
         const data = doc.contents.items[1].value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)

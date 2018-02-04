@@ -138,7 +138,8 @@ export default class Document {
     if (node.type === Type.PLAIN) try {
       return node.resolved = tags.resolveScalar(node.strValue || '')
     } catch (error) {
-      error.source = node
+      if (error instanceof SyntaxError) error = new YAMLSyntaxError(node, error.message)
+      else error.source = node
       errors.push(error)
       return null
     }

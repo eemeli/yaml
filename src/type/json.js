@@ -1,19 +1,6 @@
-import Map from './Map'
-import Seq from './Seq'
+import failsafe from './failsafe'
 
-export default [
-  {
-    tag: 'tag:yaml.org,2002:map',
-    resolve: (doc, node) => new Map(doc, node)
-  },
-  {
-    tag: 'tag:yaml.org,2002:seq',
-    resolve: (doc, node) => new Seq(doc, node)
-  },
-  {
-    tag: 'tag:yaml.org,2002:str',
-    resolve: (doc, node) => node.strValue || ''
-  },
+const schema = failsafe.concat([
   {
     tag: 'tag:yaml.org,2002:null',
     test: /^null$/,
@@ -39,5 +26,10 @@ export default [
     test: /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][-+]?[0-9]+)?$/,
     resolve: (str) => parseFloat(str)
   }
-]
+])
 
+schema.scalarFallback = (str) => {
+  throw new SyntaxError(`Unresolved plain scalar ${JSON.stringify(str)}`)
+}
+
+export default schema

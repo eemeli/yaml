@@ -1,8 +1,6 @@
 import { Type } from 'raw-yaml'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
-import coreTags from './type/core'
-import extendedTags from './type/extended'
-import jsonTags from './type/json'
+import availableSchema from './type'
 
 export const DefaultTagPrefixes = {
   '!': '!',
@@ -15,42 +13,30 @@ export const DefaultTags = {
   STR: 'tag:yaml.org,2002:str'
 }
 
-export const Schema = {
-  CORE: 'core',
-  EXTENDED: 'extended',
-  JSON: 'json'
-}
-
 const isMap = ({ type }) => (type === Type.FLOW_MAP || type === Type.MAP)
 
 const isSeq = ({ type }) => (type === Type.FLOW_SEQ || type === Type.SEQ)
 
 export default class Tags {
-  static defaultSchema = Schema.CORE
-
-  constructor ({ schema = Tags.defaultSchema, tags }) {
-    this.scalarFallback = (str) => str
-    switch (schema) {
-      case Schema.CORE: this.list = coreTags; break
-      case Schema.EXTENDED: this.list = extendedTags; break
-      case Schema.JSON:
-        this.list = jsonTags
-        this.scalarFallback = (str) => { throw new YAMLSyntaxError(null, `Unresolved plain scalar ${JSON.stringify(str)}`) }
-        break
-      default:
-        if (Array.isArray(schema)) this.list = schema
-        else throw new Error("Unknown schema; use 'core', 'json', 'extended', or { tag, test, resolve }[]")
+  constructor ({ schema, tags }) {
+    this.schema = Array.isArray(schema) ? schema : availableSchema[schema || '']
+    if (!this.schema) {
+      const keys = Object.keys(availableSchema)
+        .filter(key => key)
+        .map(key => JSON.stringify(key))
+        .join(', ')
+      throw new Error(`Unknown schema; use ${keys}, or { tag, test, resolve }[]`)
     }
     if (Array.isArray(tags)) {
-      this.list = this.list.concat(tags)
+      this.schema = this.schema.concat(tags)
     } else if (typeof tags === 'function') {
-      this.list = tags(this.list.slice())
+      this.schema = tags(this.schema.slice())
     }
   }
 
   // falls back to string on no match
   resolveScalar (str, tags) {
-    if (!tags) tags = this.list
+    if (!tags) tags = this.schema
     for (let i = 0; i < tags.length; ++i) {
       const { test, resolve } = tags[i]
       if (test) {
@@ -58,12 +44,12 @@ export default class Tags {
         if (match) return resolve.apply(null, match)
       }
     }
-    return this.scalarFallback(str)
+    return this.schema.scalarFallback ? this.schema.scalarFallback(str) : str
   }
 
   // sets node.resolved on success
   resolveNode (doc, node, tagName) {
-    const tags = this.list.filter(({ tag }) => tag === tagName)
+    const tags = this.schema.filter(({ tag }) => tag === tagName)
     const generic = tags.find(({ test }) => !test)
     try {
       if (generic) return node.resolved = generic.resolve(doc, node)

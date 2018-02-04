@@ -1,25 +1,12 @@
 import { YAMLReferenceError } from '../errors'
-import Map from './Map'
-import Seq from './Seq'
+import failsafe from './failsafe'
 
 const parseSexagesimal = (sign, parts) => {
   const n = parts.split(':').reduce((n, p) => n * 60 + Number(p), 0)
   return sign === '-' ? -n : n
 }
 
-export default [
-  {
-    tag: 'tag:yaml.org,2002:map',
-    resolve: (doc, node) => new Map(doc, node)
-  },
-  {
-    tag: 'tag:yaml.org,2002:seq',
-    resolve: (doc, node) => new Seq(doc, node)
-  },
-  {
-    tag: 'tag:yaml.org,2002:str',
-    resolve: (doc, node) => node.strValue || ''
-  },
+export default failsafe.concat([
   {
     tag: 'tag:yaml.org,2002:null',
     test: /^(?:~|null)?$/i,
@@ -42,8 +29,8 @@ export default [
   },
   {
     tag: 'tag:yaml.org,2002:int',
-    test: /^0o([0-7_]+)$/,
-    resolve: (str, oct) => parseInt(oct.replace(/_/g, ''), 8)
+    test: /^[-+]?0[0-7_]+$/,
+    resolve: (str) => parseInt(str.replace(/_/g, ''), 8)
   },
   {
     tag: 'tag:yaml.org,2002:int',
@@ -130,4 +117,4 @@ export default [
     //   return btoa(str)
     // }
   }
-]
+])
