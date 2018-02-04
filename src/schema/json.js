@@ -1,6 +1,13 @@
-import failsafe from './failsafe'
+import { map, seq } from './failsafe'
 
-const schema = failsafe.concat([
+const schema = [
+  map,
+  seq,
+  {
+    tag: 'tag:yaml.org,2002:str',
+    resolve: (doc, node) => node.strValue || '',
+    stringify: JSON.stringify
+  },
   {
     tag: 'tag:yaml.org,2002:null',
     test: /^null$/,
@@ -26,7 +33,7 @@ const schema = failsafe.concat([
     test: /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][-+]?[0-9]+)?$/,
     resolve: (str) => parseFloat(str)
   }
-])
+]
 
 schema.scalarFallback = (str) => {
   throw new SyntaxError(`Unresolved plain scalar ${JSON.stringify(str)}`)

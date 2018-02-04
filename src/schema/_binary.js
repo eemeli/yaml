@@ -25,6 +25,7 @@ export const binary = {
     }
   },
   class: Uint8Array,  // Buffer inherits from Uint8Array
+  options: { lineWidth: 76 },
   stringify: (value) => {
     let str
     if (typeof Buffer === 'function') {
@@ -40,11 +41,11 @@ export const binary = {
     } else {
       throw new Error('This environment does not support writing binary tags; either Buffer or btoa is required')
     }
-    const lineLength = 76
-    const n = Math.ceil(str.length / lineLength)
+    const { lineWidth } = binary.options
+    const n = Math.ceil(str.length / lineWidth)
     const lines = new Array(n)
-    for (let i = 0, o = 0; i < n; ++i, o += lineLength) {
-      lines[i] = str.substr(o, lineLength)
+    for (let i = 0, o = 0; i < n; ++i, o += lineWidth) {
+      lines[i] = str.substr(o, lineWidth)
     }
     return lines.join('\n')
   }
