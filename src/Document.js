@@ -1,7 +1,7 @@
 import { Type } from 'raw-yaml'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import { DefaultTagPrefixes, DefaultTags } from './Tags'
-import { toJSON } from './type/Collection'
+import { toJSON } from './schema/Collection'
 
 export default class Document {
   parseTagDirective (directive) {

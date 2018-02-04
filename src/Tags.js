@@ -1,6 +1,6 @@
 import { Type } from 'raw-yaml'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
-import availableSchema from './type'
+import availableSchema from './schema'
 
 export const DefaultTagPrefixes = {
   '!': '!',
