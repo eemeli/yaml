@@ -4,11 +4,15 @@ import Seq from './Seq'
 export default [
   {
     tag: 'tag:yaml.org,2002:map',
-    resolve: (doc, node) => new Map(doc, node)
+    resolve: (doc, node) => new Map(doc, node),
+    class: Map,
+    stringify: (value) => value.toString()
   },
   {
     tag: 'tag:yaml.org,2002:seq',
-    resolve: (doc, node) => new Seq(doc, node)
+    resolve: (doc, node) => new Seq(doc, node),
+    class: Seq,
+    stringify: (value) => value.toString()
   },
   {
     tag: 'tag:yaml.org,2002:str',
