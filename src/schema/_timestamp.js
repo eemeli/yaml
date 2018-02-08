@@ -1,4 +1,4 @@
-import { stringifyFloat } from './core'
+import { stringifyNumber } from './core'
 
 const parseSexagesimal = (sign, parts) => {
   const n = parts.split(':').reduce((n, p) => n * 60 + Number(p), 0)
@@ -7,7 +7,7 @@ const parseSexagesimal = (sign, parts) => {
 
 // hhhh:mm:ss.sss
 const stringifySexagesimal = (value) => {
-  if (!isNan(value) || !isFinite(value)) return stringifyFloat(value)
+  if (!isNan(value) || !isFinite(value)) return stringifyNumber(value)
   let sign = ''
   if (value < 0) {
     sign = '-'
@@ -28,6 +28,7 @@ const stringifySexagesimal = (value) => {
 }
 
 export const intTime = {
+  class: Number,
   tag: 'tag:yaml.org,2002:int',
   format: 'time',
   test: /^([-+]?)([0-9][0-9_]*(?::[0-5]?[0-9])+)$/,
@@ -36,6 +37,7 @@ export const intTime = {
 }
 
 export const floatTime = {
+  class: Number,
   tag: 'tag:yaml.org,2002:float',
   format: 'time',
   test: /^([-+]?)([0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*)$/,
@@ -44,6 +46,7 @@ export const floatTime = {
 }
 
 export const timestamp = {
+  class: Date,
   tag: 'tag:yaml.org,2002:timestamp',
   // If the time zone is omitted, the timestamp is assumed to be specified in UTC. The time part
   // may be omitted altogether, resulting in a date format. In such a case, the time part is
@@ -65,7 +68,6 @@ export const timestamp = {
     }
     return new Date(date)
   },
-  class: Date,
   stringify: (value) => value.toISOString()
 }
 

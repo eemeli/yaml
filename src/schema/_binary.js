@@ -1,6 +1,7 @@
 import { YAMLReferenceError } from '../errors'
 
 export const binary = {
+  class: Uint8Array,  // Buffer inherits from Uint8Array
   tag: 'tag:yaml.org,2002:binary',
   /**
    * Returns a Buffer in node and an Uint8Array in browsers
@@ -24,7 +25,6 @@ export const binary = {
       return null
     }
   },
-  class: Uint8Array,  // Buffer inherits from Uint8Array
   options: { lineWidth: 76 },
   stringify: (value) => {
     let str

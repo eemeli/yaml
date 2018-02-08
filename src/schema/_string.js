@@ -123,6 +123,7 @@ function plainString (value, implicitKey, inFlow) {
 }
 
 export const str = {
+  class: String,
   tag: 'tag:yaml.org,2002:str',
   resolve: (doc, node) => node.strValue || '',
   options: { defaultType: Type.PLAIN, dropCR: true },
