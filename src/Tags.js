@@ -18,6 +18,10 @@ const isMap = ({ type }) => (type === Type.FLOW_MAP || type === Type.MAP)
 const isSeq = ({ type }) => (type === Type.FLOW_SEQ || type === Type.SEQ)
 
 export default class Tags {
+  static defaultStringifier (value) {
+    return JSON.stringify(value)
+  }
+
   constructor ({ schema, tags }) {
     this.schema = Array.isArray(schema) ? schema : availableSchema[schema || '']
     if (!this.schema) {
@@ -84,5 +88,28 @@ export default class Tags {
         `The tag ${tagName} is unavailable`))
     }
     return null
+  }
+
+  getStringifier (value, tag, format) {
+    let match
+    if (tag) {
+      match = this.schema.filter(t => t.tag === tag && (!format || t.format === format))
+      if (match.length === 0) throw new Error(`Tag not available: ${tag}${format ? ', format ' + format : ''}`)
+    } else if (value == null) {
+      match = this.schema.filter(t => t.class === null && !t.format)
+      if (match.length === 0) match = this.schema.filter(t => t.class === String && !t.format)
+    } else {
+      let obj
+      switch (typeof value) {
+        case 'boolean': obj = new Boolean; break
+        case 'number':  obj = new Number; break
+        case 'string':  obj = new String; break
+        default:        obj = value
+      }
+      match = this.schema.filter(t => obj instanceof t.class && !t.format)
+      if (match.length === 0) throw new Error(`Tag not resolved for ${obj && obj.constructor ? obj.constructor.name : typeof obj}`)
+      // TODO: Handle bare arrays and objects
+    }
+    return match[0].stringify || Tags.defaultStringifier
   }
 }
