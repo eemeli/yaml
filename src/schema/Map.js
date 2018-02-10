@@ -6,7 +6,7 @@ import YAMLSeq from './Seq'
 
 export default class YAMLMap extends Collection {
   constructor (doc, node) {
-    super()
+    super(doc)
     node.resolved = this
     if (node.type === Type.FLOW_MAP) {
       this.resolveFlowMapItems(doc, node)
@@ -126,5 +126,17 @@ export default class YAMLMap extends Collection {
       map[stringKey] = toJSON(value)
       return map
     }, {})
+  }
+
+  toString (indent, inFlow) {
+    const { tags } = this.doc
+    const options = { indent, inFlow, type: null }
+    const items = this.items.map(pair => pair.toString(tags, options))
+    if (inFlow) {
+      // return `{\n  ${indent}${items.join(`,\n  ${indent}`)}\n${indent}}`
+      return `{ ${items.join(', ')} }`
+    } else {
+      return items.join(`\n${indent}`)
+    }
   }
 }

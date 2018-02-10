@@ -5,7 +5,7 @@ import Collection, { Pair, toJSON } from './Collection'
 
 export default class YAMLSeq extends Collection {
   constructor (doc, node) {
-    super()
+    super(doc)
     node.resolved = this
     if (node.type === Type.FLOW_SEQ) {
       this.resolveFlowSeqItems(doc, node)
@@ -89,5 +89,16 @@ export default class YAMLSeq extends Collection {
 
   toJSON () {
     return this.items.map(toJSON)
+  }
+
+  toString (indent, inFlow) {
+    const { tags } = this.doc
+    const options = { implicitKey: false, indent: indent + '  ', inFlow, type: null }
+    const items = this.items.map(node => tags.getStringifier(node)(node, options))
+    if (inFlow) {
+      return `[ ${items.join(', ')} ]`
+    } else {
+      return items.map(item => `$- ${item}`).join(`\n${indent}`)
+    }
   }
 }
