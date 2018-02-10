@@ -1,6 +1,6 @@
 import { Type } from 'raw-yaml'
 
-function doubleQuotedString (value, oneLine) {
+function doubleQuotedString (value, indent, oneLine) {
   const json = JSON.stringify(value)
   let str = ''
   let start = 0
@@ -42,6 +42,7 @@ function doubleQuotedString (value, oneLine) {
             str += '\n'
             i += 2
           }
+          str += indent
           // space after newline needs to be escaped to not be folded
           if (json[i + 2] === ' ') str += '\\'
           i += 1
@@ -55,20 +56,21 @@ function doubleQuotedString (value, oneLine) {
   return start ? str + json.slice(start) : json
 }
 
-function singleQuotedString (value, oneLine) {
+function singleQuotedString (value, indent, oneLine) {
   if (oneLine) {
-    if (/\n/.test(value)) return doubleQuotedString(value, true)
+    if (/\n/.test(value)) return doubleQuotedString(value, indent, true)
   } else {
     // single quoted string can't have leading or trailing whitespace around newline
-    if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, false)
+    if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, indent, false)
   }
-  value = value.replace(/'/g, "''").replace(/\n+/g, '\n$&')
+  value = value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`)
   return `'${value}'`
 }
 
-function blockString (value, literal) {
+function blockString (value, indent, literal) {
   // block can't end in whitespace unless the last line is non-empty
-  if (/\n[\t ]+$/.test(value)) return doubleQuotedString(value, false)
+  if (/\n[\t ]+$/.test(value)) return doubleQuotedString(value, indent, false)
+  const indentSize = indent ? '2' : '1'  // root is at -1
   let header = literal ? '|' : '>'
   if (!value) return header + '\n'
   let wsStart = ''
@@ -86,26 +88,31 @@ function blockString (value, literal) {
       return ''
     })
     .replace(/^[\n ]+/, (ws) => {
-      if (ws.indexOf(' ') !== -1) header += '\v' // replaced in wrapper
+      if (ws.indexOf(' ') !== -1) header += indentSize
       wsStart = ws
       return ''
     })
-  if (!value) return header + '\v\n' + wsEnd
-  if (!literal) {
+  if (wsEnd) wsEnd = wsEnd.replace(/\n+/g, `$&${indent}`)
+  if (wsStart) wsStart = wsStart.replace(/\n+/g, `$&${indent}`)
+  if (!value) return `${header}${indentSize}\n${indent}${wsEnd}`
+  if (literal) {
+    value = value.replace(/\n+/g, `$&${indent}`)
+  } else {
     value = value
       .replace(/\n+/g, '\n$&')
       .replace(/\n([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
       //          ^ ind.line  ^ empty     ^ capture next empty lines only at end of indent
+      .replace(/\n+(?![\t ])/g, `$&${indent}`)
   }
-  return header + '\n' + wsStart + value + wsEnd
+  return `${header}\n${indent}${wsStart}${value}${wsEnd}`
 }
 
-function plainString (value, implicitKey, inFlow) {
+function plainString (value, indent, implicitKey, inFlow) {
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
   ) {
-    return doubleQuotedString(value, implicitKey)
+    return doubleQuotedString(value, indent, implicitKey)
   }
   if (!value || /^[?-]?[ \t]|[\n:][ \t]|[ \t](#|\n|$)/.test(value)) {
     // not allowed:
@@ -114,12 +121,12 @@ function plainString (value, implicitKey, inFlow) {
     // - '\n ', ': ', ' #' or ' \n' anywhere
     // - end with ' '
     return inFlow ? (
-      doubleQuotedString(value, implicitKey)
+      doubleQuotedString(value, indent, implicitKey)
     ) : (
-      blockString(value, false)
+      blockString(value, indent, false)
     )
   }
-  return value.replace(/\n+/g, '\n$&')
+  return value.replace(/\n+/g, `$&\n${indent}`)
 }
 
 export const str = {
@@ -127,16 +134,16 @@ export const str = {
   tag: 'tag:yaml.org,2002:str',
   resolve: (doc, node) => node.strValue || '',
   options: { defaultType: Type.PLAIN, dropCR: true },
-  stringify: (value, { implicitKey, inFlow, type } = {}) => {
+  stringify: (value, { implicitKey, indent, inFlow, type } = {}) => {
     if (typeof value !== 'string') value = String(value)
     if (str.options.dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')
     const _stringify = (_type) => {
       switch (_type) {
-        case Type.BLOCK_FOLDED: return blockString(value, false)
-        case Type.BLOCK_LITERAL: return blockString(value, true)
-        case Type.QUOTE_DOUBLE: return doubleQuotedString(value, implicitKey)
-        case Type.QUOTE_SINGLE: return singleQuotedString(value, implicitKey)
-        case Type.PLAIN: return plainString(value, implicitKey, inFlow)
+        case Type.BLOCK_FOLDED: return blockString(value, indent, false)
+        case Type.BLOCK_LITERAL: return blockString(value, indent, true)
+        case Type.QUOTE_DOUBLE: return doubleQuotedString(value, indent, implicitKey)
+        case Type.QUOTE_SINGLE: return singleQuotedString(value, indent, implicitKey)
+        case Type.PLAIN: return plainString(value, indent, implicitKey, inFlow)
         default: return null
       }
     }
