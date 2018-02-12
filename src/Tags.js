@@ -109,10 +109,15 @@ export default class Tags {
         case 'string':  obj = new String; break
         default:        obj = value
       }
-      match = this.schema.filter(t => obj instanceof t.class && !t.format)
+      match = this.schema.filter(t => t.class && (obj instanceof t.class) && !t.format)
       if (match.length === 0) throw new Error(`Tag not resolved for ${obj && obj.constructor ? obj.constructor.name : typeof obj}`)
       // TODO: Handle bare arrays and objects
     }
     return match[0].stringify || Tags.defaultStringifier
+  }
+
+  stringify (value, options, tag, format) {
+    const stringifier = this.getStringifier(value, tag, format)
+    return stringifier(value, options)
   }
 }

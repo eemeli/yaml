@@ -80,19 +80,24 @@ function blockString (value, indent, literal) {
       const n = ws.indexOf('\n')
       if (n === -1) {
         header += '-' // strip
-        ws += '\n'
-      } else if (n !== ws.length - 1) {
+      } else if (value === ws || n !== ws.length - 1) {
         header += '+' // keep
       }
-      wsEnd = ws // last char is always \n
+      wsEnd = ws.replace(/\n$/, '')
       return ''
     })
-    .replace(/^[\n ]+/, (ws) => {
+    .replace(/^[\n ]*/, (ws) => {
       if (ws.indexOf(' ') !== -1) header += indentSize
-      wsStart = ws
-      return ''
+      const m = ws.match(/ +$/)
+      if (m) {
+        wsStart = ws.slice(0, -m[0].length)
+        return m[0]
+      } else {
+        wsStart = ws
+        return ''
+      }
     })
-  if (wsEnd) wsEnd = wsEnd.replace(/\n+/g, `$&${indent}`)
+  if (wsEnd) wsEnd = wsEnd.replace(/\n+(?!\n|$)/g, `$&${indent}`)
   if (wsStart) wsStart = wsStart.replace(/\n+/g, `$&${indent}`)
   if (!value) return `${header}${indentSize}\n${indent}${wsEnd}`
   if (literal) {
@@ -100,9 +105,9 @@ function blockString (value, indent, literal) {
   } else {
     value = value
       .replace(/\n+/g, '\n$&')
-      .replace(/\n([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
-      //          ^ ind.line  ^ empty     ^ capture next empty lines only at end of indent
-      .replace(/\n+(?![\t ])/g, `$&${indent}`)
+      .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
+      //         ^ ind.line  ^ empty     ^ capture next empty lines only at end of indent
+      .replace(/\n+/g, `$&${indent}`)
   }
   return `${header}\n${indent}${wsStart}${value}${wsEnd}`
 }
@@ -114,11 +119,12 @@ function plainString (value, indent, implicitKey, inFlow) {
   ) {
     return doubleQuotedString(value, indent, implicitKey)
   }
-  if (!value || /^[?-]?[ \t]|[\n:][ \t]|[ \t](#|\n|$)/.test(value)) {
+  if (!value || /^[\n\t #]|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t ]$/.test(value)) {
     // not allowed:
     // - empty string
     // - start with ' ', '? ' or '- '
-    // - '\n ', ': ', ' #' or ' \n' anywhere
+    // - '\n ', ': ' or ' \n' anywhere
+    // - '#' not preceded by a non-space char
     // - end with ' '
     return inFlow ? (
       doubleQuotedString(value, indent, implicitKey)

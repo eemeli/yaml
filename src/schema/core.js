@@ -7,13 +7,16 @@ export const stringifyNumber = (value) => (
   : '.inf'
 )
 
+export const nullOptions = { nullStr: 'null' }
+
 export default failsafe.concat([
   {
     class: null,
     tag: 'tag:yaml.org,2002:null',
     test: /^(?:~|null)?$/i,
     resolve: () => null,
-    stringify: (value, { nullStr }) => nullStr
+    options: nullOptions,
+    stringify: (value) => nullOptions.nullStr
   },
   {
     class: Boolean,

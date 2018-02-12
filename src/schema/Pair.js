@@ -24,10 +24,10 @@ export default class Pair {
     const { key, value } = this
     const { indent } = options
     const opt = Object.assign({}, options, { implicitKey: true })
+    opt.indent += '  '
     const stringifyKey = tags ? tags.getStringifier(key) : Tags.defaultStringifier
     const keyStr = stringifyKey(key, opt)
     opt.implicitKey = false
-    opt.indent += '  '
     const stringifyValue = tags ? tags.getStringifier(value) : Tags.defaultStringifier
     const valueStr = stringifyValue(value, opt)
     if (key instanceof Collection) {

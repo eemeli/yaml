@@ -95,11 +95,11 @@ export default class YAMLSeq extends Collection {
   toString (indent, inFlow) {
     const { tags } = this.doc
     const options = { implicitKey: false, indent: indent + '  ', inFlow, type: null }
-    const items = this.items.map(node => tags.getStringifier(node)(node, options))
+    const items = this.items.map(node => tags.stringify(node, options))
     if (inFlow) {
       return `[ ${items.join(', ')} ]`
     } else {
-      return items.map(item => `$- ${item}`).join(`\n${indent}`)
+      return items.map(item => `- ${item}`).join(`\n${indent}`)
     }
   }
 }

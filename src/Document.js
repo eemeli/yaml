@@ -73,10 +73,6 @@ export default class Document {
     }
   }
 
-  toJSON () {
-    return toJSON(this.contents)
-  }
-
   resolveTagName (node) {
     const { tag, type } = node
     let nonSpecific = false
@@ -145,5 +141,18 @@ export default class Document {
     }
     errors.push(new YAMLSyntaxError(node, `Failed to resolve ${node.type} node here`))
     return null
+  }
+
+  toJSON () {
+    return toJSON(this.contents)
+  }
+
+  toString () {
+    if (Array.isArray(this.contents)) {
+      return this.contents.map(c => (
+        this.tags.stringify(c, { indent: '' })
+      )).join('\n---\n') + '\n'
+    }
+    return this.tags.stringify(this.contents, { indent: '' }) + '\n'
   }
 }
