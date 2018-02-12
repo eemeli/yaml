@@ -1767,6 +1767,17 @@ matches %: 20`,
   }
 }
 
+const skipStringify = [
+  'Example 2.17. Quoted Scalars',
+  'Example 2.21. Miscellaneous',
+  'Example 5.13. Escaped Characters',
+  'Example 6.6. Line Folding',
+  'Example 6.28. Non-Specific Tags',
+  'Example 8.1. Block Scalar Header',
+  'Example 8.3. Invalid Block Scalar Indentation Indicators',
+  'Example 8.5. Chomping Trailing Lines'
+]
+
 for (const section in spec) {
   describe(section, () => {
     for (const name in spec[section]) {
@@ -1782,6 +1793,18 @@ for (const section in spec) {
           else errors[i].forEach((err, j) => expect(doc.errors[j].message).toBe(err))
         })
         if (special) special(src)
+        if (!skipStringify.includes(name)) {
+          const src2 = documents.map(doc => String(doc)).join('\n---\n')
+          const documents2 = resolve(src2)
+          const json2 = documents2.map(doc => doc.toJSON())
+          trace: name,
+            '\nIN\n' + src,
+            '\nJSON\n' + JSON.stringify(json, null, '  '),
+            '\n\nOUT\n' + src2,
+            '\nOUT-JSON\n' + JSON.stringify(src2),
+            '\nRE-JSON\n' + JSON.stringify(json2, null, '  ')
+          expect(json2).toMatchObject(tgt)
+        }
       })
     }
   })
