@@ -1,6 +1,7 @@
 import { Type } from 'raw-yaml'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import availableSchema from './schema'
+import Pair from './schema/Pair'
 
 export const DefaultTagPrefixes = {
   '!': '!',
@@ -98,6 +99,8 @@ export default class Tags {
     } else if (value == null) {
       match = this.schema.filter(t => t.class === null && !t.format)
       if (match.length === 0) match = this.schema.filter(t => t.class === String && !t.format)
+    } else if (value instanceof Pair) {
+      return (value, options) => value.toString(this, options)
     } else {
       let obj
       switch (typeof value) {

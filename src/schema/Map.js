@@ -1,7 +1,8 @@
 import { Type } from 'raw-yaml'
 
 import { YAMLSyntaxError } from '../errors'
-import Collection, { Pair, toJSON } from './Collection'
+import Collection, { toJSON } from './Collection'
+import Pair from './Pair'
 import YAMLSeq from './Seq'
 
 export default class YAMLMap extends Collection {
