@@ -8,7 +8,7 @@ Note: `yaml` 0.x and 1.x are rather different implementations. For the earlier `
 ## Usage
 
 ```
-npm install yaml
+npm install yaml@next
 ```
 
 ```js
@@ -80,3 +80,4 @@ The [AST level] of the library has been released separately, and is fully functi
 - Item add/remove should keep tags and comments in place
 - Not all parser errors are reported
 - API needs finalising
+- Better documentation
