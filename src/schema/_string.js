@@ -1,7 +1,18 @@
 import { Type } from 'raw-yaml'
 
+export const strOptions = {
+  defaultType: Type.PLAIN,
+  dropCR: false,
+  doubleQuoted: {
+    jsonEncoding: false,
+    minMultiLineLength: 40
+  }
+}
+
 function doubleQuotedString (value, indent, oneLine) {
+  const { jsonEncoding, minMultiLineLength } = strOptions.doubleQuoted
   const json = JSON.stringify(value)
+  if (jsonEncoding) return json
   let str = ''
   let start = 0
   for (let i = 0, ch = json[i]; ch; ch = json[++i]) {
@@ -30,15 +41,15 @@ function doubleQuotedString (value, indent, oneLine) {
             else str += json.substr(i, 6)
         }
         i += 5
-        start = i
+        start = i + 1
         break
       case 'n':
-        if (oneLine) {
+        if (oneLine || json[i + 2] === '"' || json.length < minMultiLineLength) {
           i += 1
         } else {
           // folding will eat first newline
-          str += json.slice(start, i - 1) + '\n\n'
-          while (json[i + 2] === '\\' && json[i + 3] === 'n') {
+          str += json.slice(start, i) + '\n\n'
+          while (json[i + 2] === '\\' && json[i + 3] === 'n' && json[i + 4] !== '"') {
             str += '\n'
             i += 2
           }
@@ -46,7 +57,7 @@ function doubleQuotedString (value, indent, oneLine) {
           // space after newline needs to be escaped to not be folded
           if (json[i + 2] === ' ') str += '\\'
           i += 1
-          start = i
+          start = i + 1
         }
         break
       default:
@@ -119,10 +130,10 @@ function plainString (value, indent, implicitKey, inFlow) {
   ) {
     return doubleQuotedString(value, indent, implicitKey)
   }
-  if (!value || /^[\n\t #]|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t ]$/.test(value)) {
+  if (!value || /^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t ]$/.test(value)) {
     // not allowed:
     // - empty string
-    // - start with ' ', '? ' or '- '
+    // - start with an indicator character (except [?:-]) or /[?-] /
     // - '\n ', ': ' or ' \n' anywhere
     // - '#' not preceded by a non-space char
     // - end with ' '
@@ -139,10 +150,11 @@ export const str = {
   class: String,
   tag: 'tag:yaml.org,2002:str',
   resolve: (doc, node) => node.strValue || '',
-  options: { defaultType: Type.PLAIN, dropCR: true },
+  options: strOptions,
   stringify: (value, { implicitKey, indent, inFlow, type } = {}) => {
+    const { dropCR, defaultType } = strOptions
     if (typeof value !== 'string') value = String(value)
-    if (str.options.dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')
+    if (dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')
     const _stringify = (_type) => {
       switch (_type) {
         case Type.BLOCK_FOLDED: return blockString(value, indent, false)
@@ -162,8 +174,8 @@ export const str = {
     }
     let res = _stringify(type)
     if (res === null) {
-      res = _stringify(str.options.defaultType)
-      if (res === null) throw new Error(`Unsupported default string type ${str.options.defaultType}`)
+      res = _stringify(defaultType)
+      if (res === null) throw new Error(`Unsupported default string type ${defaultType}`)
     }
     return res
   }
