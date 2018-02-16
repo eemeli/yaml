@@ -1768,9 +1768,7 @@ matches %: 20`,
 }
 
 const skipStringify = [
-  'Example 2.21. Miscellaneous',
   'Example 6.6. Line Folding',
-  'Example 6.28. Non-Specific Tags',
   'Example 8.1. Block Scalar Header',
   'Example 8.3. Invalid Block Scalar Indentation Indicators',
   'Example 8.5. Chomping Trailing Lines'

@@ -21,15 +21,14 @@ export default class Pair {
   }
 
   toString (tags, options) {
+    if (!tags) return JSON.stringify(this)
     const { key, value } = this
     const { indent } = options
     const opt = Object.assign({}, options, { implicitKey: true })
     opt.indent += '  '
-    const stringifyKey = tags ? tags.getStringifier(key) : Tags.defaultStringifier
-    const keyStr = stringifyKey(key, opt)
+    const keyStr = tags.stringify(key, opt)
     opt.implicitKey = false
-    const stringifyValue = tags ? tags.getStringifier(value) : Tags.defaultStringifier
-    const valueStr = stringifyValue(value, opt)
+    const valueStr = tags.stringify(value, opt)
     if (key instanceof Collection) {
       return `? ${keyStr}\n${indent}: ${valueStr}`
     } else if (value instanceof Collection) {

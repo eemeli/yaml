@@ -118,6 +118,7 @@ export default class Tags {
 
   stringify (value, options, tag, format) {
     const stringifier = this.getStringifier(value, tag, format)
+    options.tags = this
     return stringifier(value, options)
   }
 }

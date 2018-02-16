@@ -123,7 +123,7 @@ function blockString (value, indent, literal) {
   return `${header}\n${indent}${wsStart}${value}${wsEnd}`
 }
 
-function plainString (value, indent, implicitKey, inFlow) {
+function plainString (value, indent, implicitKey, inFlow, tags) {
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
@@ -143,7 +143,10 @@ function plainString (value, indent, implicitKey, inFlow) {
       blockString(value, indent, false)
     )
   }
-  return value.replace(/\n+/g, `$&\n${indent}`)
+  // Need to verify that output will be parsed as a string
+  const str = value.replace(/\n+/g, `$&\n${indent}`)
+  const res = tags.resolveScalar(str)
+  return typeof res === 'string' ? str : doubleQuotedString(value, indent, implicitKey)
 }
 
 export const str = {
@@ -151,7 +154,7 @@ export const str = {
   tag: 'tag:yaml.org,2002:str',
   resolve: (doc, node) => node.strValue || '',
   options: strOptions,
-  stringify: (value, { implicitKey, indent, inFlow, type } = {}) => {
+  stringify: (value, { implicitKey, indent, inFlow, tags, type } = {}) => {
     const { dropCR, defaultType } = strOptions
     if (typeof value !== 'string') value = String(value)
     if (dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')
@@ -161,7 +164,7 @@ export const str = {
         case Type.BLOCK_LITERAL: return blockString(value, indent, true)
         case Type.QUOTE_DOUBLE: return doubleQuotedString(value, indent, implicitKey)
         case Type.QUOTE_SINGLE: return singleQuotedString(value, indent, implicitKey)
-        case Type.PLAIN: return plainString(value, indent, implicitKey, inFlow)
+        case Type.PLAIN: return plainString(value, indent, implicitKey, inFlow, tags)
         default: return null
       }
     }
