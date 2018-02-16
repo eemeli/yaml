@@ -1770,7 +1770,6 @@ matches %: 20`,
 const skipStringify = [
   'Example 6.6. Line Folding',
   'Example 8.1. Block Scalar Header',
-  'Example 8.3. Invalid Block Scalar Indentation Indicators',
   'Example 8.5. Chomping Trailing Lines'
 ]
 
@@ -1789,7 +1788,7 @@ for (const section in spec) {
           else errors[i].forEach((err, j) => expect(doc.errors[j].message).toBe(err))
         })
         if (special) special(src)
-        if (!skipStringify.includes(name)) {
+        if (!errors && !skipStringify.includes(name)) {
           const src2 = documents.map(doc => String(doc)).join('\n---\n')
           const documents2 = resolve(src2)
           const json2 = documents2.map(doc => doc.toJSON())
