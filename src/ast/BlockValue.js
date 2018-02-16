@@ -18,17 +18,26 @@ export default class BlockValue extends Node {
     if (!this.valueRange || !this.context) return null
     let { start, end } = this.valueRange
     const { indent, src } = this.context
-    if (this.chomping !== Chomp.KEEP) {
-      if (this.valueRange.isEmpty) return ''
-      let lastNewLine = null
-      let ch = src[end - 1]
-      while (ch === '\n' || ch === '\t' || ch === ' ') {
-        end -= 1
-        if (end <= start) return ''
-        if (ch === '\n') lastNewLine = end
-        ch = src[end - 1]
+    if (this.valueRange.isEmpty) return ''
+    let lastNewLine = null
+    let ch = src[end - 1]
+    while (ch === '\n' || ch === '\t' || ch === ' ') {
+      end -= 1
+      if (end <= start) {
+        if (this.chomping === Chomp.KEEP) break
+        else return ''
       }
-      if (lastNewLine) end = this.chomping === Chomp.STRIP ? lastNewLine : lastNewLine + 1
+      if (ch === '\n') lastNewLine = end
+      ch = src[end - 1]
+    }
+    let keepStart = end
+    if (lastNewLine) {
+      if (this.chomping === Chomp.KEEP) {
+        keepStart = lastNewLine
+        end = this.valueRange.end
+      } else {
+        end = lastNewLine
+      }
     }
     const bi = indent + this.blockIndent
     const folded = (this.type === Type.BLOCK_FOLDED)
@@ -56,15 +65,12 @@ export default class BlockValue extends Node {
           prevMoreIndented = true
         } else {
           str += sep + line
-          sep = folded ? ' ' : '\n'
+          sep = folded && i < keepStart ? ' ' : '\n'
           prevMoreIndented = false
         }
       }
     }
-    if (this.chomping !== Chomp.STRIP && (sep === '\n' || str[str.length - 1] !== '\n')) {
-      return str + '\n' // against spec, but only way to maintain consistency
-    }
-    return str
+    return this.chomping === Chomp.STRIP ? str : str + '\n'
   }
 
   parseBlockHeader (start) {
