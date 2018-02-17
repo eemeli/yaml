@@ -1767,12 +1767,6 @@ matches %: 20`,
   }
 }
 
-const skipStringify = [
-  'Example 6.6. Line Folding',
-  'Example 8.1. Block Scalar Header',
-  'Example 8.5. Chomping Trailing Lines'
-]
-
 for (const section in spec) {
   describe(section, () => {
     for (const name in spec[section]) {
@@ -1788,7 +1782,7 @@ for (const section in spec) {
           else errors[i].forEach((err, j) => expect(doc.errors[j].message).toBe(err))
         })
         if (special) special(src)
-        if (!errors && !skipStringify.includes(name)) {
+        if (!errors) {
           const src2 = documents.map(doc => String(doc)).join('\n---\n')
           const documents2 = resolve(src2)
           const json2 = documents2.map(doc => doc.toJSON())
