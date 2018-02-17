@@ -20,7 +20,6 @@ const matchJson = (stream, json) => {
 
 const skipStringify = [
   '6FWR', // Block Scalar Keep
-  '6H3V', // Backslashes in singlequotes
 ]
 
 testDirs.forEach(dir => {

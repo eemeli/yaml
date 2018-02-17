@@ -137,7 +137,7 @@ function plainString (value, indent, implicitKey, inFlow, tags) {
     // - '\n ', ': ' or ' \n' anywhere
     // - '#' not preceded by a non-space char
     // - end with ' '
-    return inFlow ? (
+    return implicitKey || inFlow ? (
       doubleQuotedString(value, indent, implicitKey)
     ) : (
       blockString(value, indent, false)
