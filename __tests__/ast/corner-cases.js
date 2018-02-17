@@ -2,10 +2,18 @@ import Node, { Type } from '../../src/ast/Node'
 import parse from '../../src/ast/index'
 import { pretty } from './common'
 
-test('folded block with chomp: keep', () => {
-  const src = `>+\nblock\n\n`
-  const doc = parse(src)[0]
-  expect(doc.contents[0].strValue).toBe('block\n\n')
+describe('folded block with chomp: keep', () => {
+  test('nl + nl', () => {
+    const src = `>+\nblock\n\n`
+    const doc = parse(src)[0]
+    expect(doc.contents[0].strValue).toBe('block\n\n')
+  })
+
+  test('nl + nl + sp + nl', () => {
+    const src = ">+\nab\n\n \n"
+    const doc = parse(src)[0]
+    expect(doc.contents[0].strValue).toBe('ab\n\n \n')
+  })
 })
 
 test('multiple linebreaks in plain scalar', () => {

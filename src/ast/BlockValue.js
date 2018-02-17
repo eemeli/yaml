@@ -30,7 +30,7 @@ export default class BlockValue extends Node {
       if (ch === '\n') lastNewLine = end
       ch = src[end - 1]
     }
-    let keepStart = end
+    let keepStart = end + 1
     if (lastNewLine) {
       if (this.chomping === Chomp.KEEP) {
         keepStart = lastNewLine
@@ -57,7 +57,7 @@ export default class BlockValue extends Node {
         const lineEnd = Node.endOfLine(src, i)
         let line = src.slice(i, lineEnd)
         i = lineEnd
-        if (folded && (ch === ' ' || ch === '\t')) {
+        if (folded && (ch === ' ' || ch === '\t') && i < keepStart) {
           if (sep === ' ') sep = '\n'
           else if (!prevMoreIndented && sep === '\n') sep = '\n\n'
           str += sep + line //+ ((lineEnd < end && src[lineEnd]) || '')
