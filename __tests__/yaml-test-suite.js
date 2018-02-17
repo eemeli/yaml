@@ -21,8 +21,6 @@ const matchJson = (stream, json) => {
 const skipStringify = [
   '6FWR', // Block Scalar Keep
   '6H3V', // Backslashes in singlequotes
-  'LP6E', // Whitespace After Scalars in Flow
-  'Q5MG'  // Tab at beginning of line followed by a flow mapping
 ]
 
 testDirs.forEach(dir => {
