@@ -18,10 +18,6 @@ const matchJson = (stream, json) => {
   }
 }
 
-const skipStringify = [
-  '6FWR', // Block Scalar Keep
-]
-
 testDirs.forEach(dir => {
   const root = path.resolve(__dirname, 'yaml-test-suite', dir)
   const name = fs.readFileSync(path.resolve(root, '==='), 'utf8')
@@ -40,8 +36,7 @@ testDirs.forEach(dir => {
         .map(doc => doc.errors.filter(err => !(err instanceof YAMLWarning)))
         .filter(docErrors => docErrors.length > 0)
       expect(errors).toHaveLength(0)
-      if (skipStringify.includes(dir)) return
-      const src2 = stream.map(doc => String(doc)).join('\n---\n')
+      const src2 = stream.map(doc => String(doc).replace(/\n$/, '')).join('\n---\n') + '\n'
       const stream2 = resolve(src2)
       trace: name,
         '\nIN\n' + yaml,
