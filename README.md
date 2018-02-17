@@ -66,10 +66,8 @@ The [AST level] of the library has been released separately, and is fully functi
 [AST level]: https://www.npmjs.com/package/raw-yaml
 
 #### Stringifying
-- `Document#toString()` mostly works, producing idempotent YAML from all but a few [corner cases]
+- `Document#toString()` produces idempotent YAML from all non-error spec examples and test suite cases
 - `AST#toString()` works completely, but is clumsy to use
-
-[corner cases]: https://github.com/eemeli/yaml/commit/b237e55e00071700ae02a748dff3a857cea8674a
 
 
 ### Still Needs Work
