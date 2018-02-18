@@ -21,3 +21,9 @@ test('multiple linebreaks in plain scalar', () => {
   const doc = parse(src)[0]
   expect(doc.contents[0].strValue).toBe('trimmed\n\n\nlines')
 })
+
+test('no null document for document-end marker', () => {
+  const src = '---\nx\n...\n'
+  const stream = parse(src)
+  expect(stream).toHaveLength(1)
+})

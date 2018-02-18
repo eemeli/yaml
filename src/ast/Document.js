@@ -81,7 +81,11 @@ export default class Document extends Node {
       }
       offset = Document.startCommentOrEndBlankLine(src, offset)
     }
-    return src[offset] ? offset + 3 : offset
+    if (src[offset]) {
+      offset += 3
+      if (src[offset]) offset += 1
+    }
+    return offset
   }
 
   /**
