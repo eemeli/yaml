@@ -19,7 +19,6 @@ const matchJson = (stream, json) => {
 }
 
 const skipOutYaml = [
-  '4ABK',
   '5WE3',
   '6BFJ',
   '7T8X',
