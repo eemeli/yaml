@@ -18,14 +18,24 @@ const matchJson = (stream, json) => {
   }
 }
 
+const skipOutYaml = [
+  '4ABK',
+  '5WE3',
+  '6BFJ',
+  '7T8X',
+  'RTP8',
+  'WZ62'
+]
+
 testDirs.forEach(dir => {
   const root = path.resolve(__dirname, 'yaml-test-suite', dir)
   const name = fs.readFileSync(path.resolve(root, '==='), 'utf8')
   const yaml = fs.readFileSync(path.resolve(root, 'in.yaml'), 'utf8')
-  let json, error
+  let json, error, outYaml
   try { json = fs.readFileSync(path.resolve(root, 'in.json'), 'utf8') } catch (e) {}
   try { fs.readFileSync(path.resolve(root, 'error'), 'utf8'); error = true } catch (e) {}
-  if (!error && !json) return
+  try { outYaml = fs.readFileSync(path.resolve(root, 'out.yaml'), 'utf8') } catch (e) {}
+  if (!error && !json && !outYaml) return
   test(`${dir}: ${name}`, () => {
     const stream = resolve(yaml)
     matchJson(stream, json)
@@ -45,6 +55,12 @@ testDirs.forEach(dir => {
         '\nOUT-JSON\n' + JSON.stringify(src2),
         '\nRE-JSON\n' + JSON.stringify(stream2[0], null, '  ')
       matchJson(stream2, json)
+      if (outYaml && !skipOutYaml.includes(dir)) {
+        const expStream = resolve(outYaml)
+        const resJson = stream.map(doc => doc.toJSON())
+        const expJson = expStream.map(doc => doc.toJSON())
+        expect(resJson).toMatchObject(expJson)
+      }
     }
   })
 })
