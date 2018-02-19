@@ -1702,7 +1702,7 @@ Document`,
 ---
 Document
 ... # Suffix`,
-      tgt: [ 'Document', null ],
+      tgt: [ 'Document' ],
       special: (src) => expect(resolve(src)[0].version).toBe('1.2')
     },
 

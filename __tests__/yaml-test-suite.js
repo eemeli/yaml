@@ -18,12 +18,6 @@ const matchJson = (stream, json) => {
   }
 }
 
-const skipOutYaml = [
-  '5WE3',
-  '6BFJ',
-  'RTP8',
-]
-
 testDirs.forEach(dir => {
   const root = path.resolve(__dirname, 'yaml-test-suite', dir)
   const name = fs.readFileSync(path.resolve(root, '==='), 'utf8')
@@ -52,7 +46,7 @@ testDirs.forEach(dir => {
         '\nOUT-JSON\n' + JSON.stringify(src2),
         '\nRE-JSON\n' + JSON.stringify(stream2[0], null, '  ')
       matchJson(stream2, json)
-      if (outYaml && !skipOutYaml.includes(dir)) {
+      if (outYaml) {
         const expStream = resolve(outYaml)
         const resJson = stream.map(doc => doc.toJSON())
         const expJson = expStream.map(doc => doc.toJSON())
