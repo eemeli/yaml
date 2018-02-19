@@ -27,3 +27,20 @@ test('no null document for document-end marker', () => {
   const stream = parse(src)
   expect(stream).toHaveLength(1)
 })
+
+test('explicit key after empty value', () => {
+  const src = 'one:\n? two\n'
+  const doc = parse(src)[0]
+  const raw = doc.contents[0].items.map(it => it.rawValue)
+  expect(raw).toMatchObject([
+    'one', ':',
+    '? two'
+  ])
+})
+
+test('seq with anchor as explicit key', () => {
+  const src = '? &key\n- a\n'
+  const doc = parse(src)[0]
+  expect(doc.contents).toHaveLength(1)
+  expect(doc.contents[0].items[0].node.rawValue).toBe('- a')
+})

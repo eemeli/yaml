@@ -93,7 +93,7 @@ export default class ParseContext {
         const lineStart = offset + 1
         const inEnd = Node.endOfIndent(src, lineStart)
         const indentDiff = inEnd - (lineStart + this.indent)
-        const noIndicatorAsIndent = (parent instanceof CollectionItem) && parent.context.atLineStart
+        const noIndicatorAsIndent = parent.type === Type.SEQ_ITEM && parent.context.atLineStart
         if (!Node.nextNodeIsIndented(src[inEnd], indentDiff, !noIndicatorAsIndent)) break
         this.atLineStart = true
         this.lineStart = lineStart

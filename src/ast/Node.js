@@ -116,7 +116,7 @@ export default class Node {
   static nextNodeIsIndented (ch, indentDiff, indicatorAsIndent) {
     if (!ch || indentDiff < 0) return false
     if (indentDiff > 0) return true
-    return indicatorAsIndent && (ch === '-' || ch === '?' || ch === ':')
+    return indicatorAsIndent && (ch === '-')
   }
 
   // should be at line or string end, or at next non-whitespace char
