@@ -83,7 +83,16 @@ export default class Document extends Node {
     }
     if (src[offset]) {
       offset += 3
-      if (src[offset]) offset += 1
+      if (src[offset]) {
+        offset = Node.endOfWhiteSpace(src, offset)
+        if (src[offset] === '#') {
+          const comment = new Comment()
+          offset = comment.parse({ src }, offset)
+          this.contents.push(comment)
+          trace: 'document-suffix-comment', comment.comment
+        }
+        if (src[offset] === '\n') offset += 1
+      }
     }
     return offset
   }

@@ -1994,9 +1994,7 @@ Document
 ... # Suffix`,
       tgt: [{
         directives: [{ name: 'YAML', parameters: ['1.2'] }],
-        contents: ['Document']
-      }, {
-        directives: [{ comment: ' Suffix' }]
+        contents: ['Document', { comment: ' Suffix' }]
       }]
     },
 
