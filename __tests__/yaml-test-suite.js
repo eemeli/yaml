@@ -22,7 +22,6 @@ const skipOutYaml = [
   '5WE3',
   '6BFJ',
   'RTP8',
-  'WZ62'
 ]
 
 testDirs.forEach(dir => {
