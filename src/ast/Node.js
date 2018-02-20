@@ -211,6 +211,16 @@ export default class Node {
     return null
   }
 
+  get valueRangeContainsNewline () {
+    if (!this.valueRange || !this.context) return false
+    const { start, end } = this.valueRange
+    const { src } = this.context
+    for (let i = start; i < end; ++i) {
+      if (src[i] === '\n') return true
+    }
+    return false
+  }
+
   parseComment (start) {
     const { src } = this.context
     if (src[start] === Char.COMMENT) {
