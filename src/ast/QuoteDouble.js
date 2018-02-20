@@ -19,11 +19,12 @@ export default class QuoteDouble extends Node {
     return offset + 1
   }
 
-  /** @throws {SyntaxError} on invalid \ escape */
+  /** @throws {SyntaxError} on invalid \ escape and missing closing quote */
   get strValue () {
     if (!this.valueRange || !this.context) return null
     const { start, end } = this.valueRange
     const { src } = this.context
+    if (src[end - 1] !== '"') throw new SyntaxError('Missing closing "quote')
     // Using String#replace is too painful with escaped newlines preceded by
     // escaped backslashes; also, this should be faster.
     let str = ''
