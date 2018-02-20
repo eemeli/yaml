@@ -18,6 +18,37 @@ const matchJson = (stream, json) => {
   }
 }
 
+const skipErrors = [
+  '236B',
+  '2CMS',
+  '3HFZ',
+  '4JVG',
+  '5TRB',
+  '5U3A',
+  '7LBH',
+  '7MNF',
+  '9C9N',
+  '9CWY',
+  '9KBC',
+  'B63P',
+  'C2SP',
+  'CQ3W',
+  'D49Q',
+  'EW3V',
+  'G7JE',
+  'GDY7',
+  'HU3P',
+  'QB6E',
+  'RXY3',
+  'SR86',
+  'SU5Z',
+  'SU74',
+  'SY6V',
+  'X4QW',
+  'ZCZ6',
+  'ZL4Z',
+]
+
 testDirs.forEach(dir => {
   const root = path.resolve(__dirname, 'yaml-test-suite', dir)
   const name = fs.readFileSync(path.resolve(root, '==='), 'utf8')
@@ -31,7 +62,13 @@ testDirs.forEach(dir => {
     const stream = resolve(yaml)
     matchJson(stream, json)
     if (error) {
-      //expect(stream[0].errors).not.toHaveLength(0)
+      if (skipErrors.includes(dir)) return
+      if (stream[0].errors.length === 0) {
+        log: dir, name,
+          '\nIN\n' + yaml,
+          '\nJSON\n' + JSON.stringify(stream[0], null, '  ')
+      }
+      expect(stream[0].errors).not.toHaveLength(0)
     } else {
       const errors = stream
         .map(doc => doc.errors.filter(err => !(err instanceof YAMLWarning)))
