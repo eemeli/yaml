@@ -1,4 +1,4 @@
-import { Type } from './ast/Node'
+import { Char, Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import { DefaultTagPrefixes, DefaultTags } from './Tags'
 import { toJSON } from './schema/Collection'
@@ -121,8 +121,25 @@ export default class Document {
   resolveNode (node) {
     if (!node) return null
     const { anchors, errors, tags } = this
-    node.errorComments.forEach(() => {
-      errors.push(new YAMLSyntaxError(node, 'Comments must be separated from other tokens by white space characters'))
+    let hasAnchor = false
+    let hasTag = false
+    node.props.forEach(({ start, end }) => {
+      switch (node.context.src[start]) {
+        case Char.COMMENT:
+          if (!node.commentHasRequiredWhitespace(start)) errors.push(new YAMLSyntaxError(node,
+            'Comments must be separated from other tokens by white space characters'))
+          break
+        case Char.ANCHOR:
+          if (hasAnchor) errors.push(new YAMLSyntaxError(node,
+            'A node can have at most one anchor'))
+          hasAnchor = true
+          break
+        case Char.TAG:
+          if (hasTag) errors.push(new YAMLSyntaxError(node,
+            'A node can have at most one tag'))
+          hasTag = true
+          break
+      }
     })
     const { anchor } = node
     if (anchor) anchors[anchor] = node
