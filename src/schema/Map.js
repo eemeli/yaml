@@ -62,6 +62,8 @@ export default class YAMLMap extends Collection {
           if (key !== undefined) this.items.push(new Pair(key))
           key = doc.resolveNode(item)
           keyStart = item.range.start
+          if (map.items[i + 1].type !== Type.MAP_VALUE) doc.errors.push(new YAMLSyntaxError(node,
+            'Implicit map keys need to be followed by map values'))
       }
     }
     if (key !== undefined) this.items.push(new Pair(key))
