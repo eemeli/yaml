@@ -121,7 +121,10 @@ export default class Document {
   resolveNode (node) {
     if (!node) return null
     const { anchors, errors, tags } = this
-    const anchor = node.anchor
+    node.errorComments.forEach(() => {
+      errors.push(new YAMLSyntaxError(node, 'Comments must be separated from other tokens by white space characters'))
+    })
+    const { anchor } = node
     if (anchor) anchors[anchor] = node
     if (node.type === Type.ALIAS) {
       const src = anchors[node.rawValue]

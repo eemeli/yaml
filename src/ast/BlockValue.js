@@ -12,6 +12,7 @@ export default class BlockValue extends Node {
     super(type, props)
     this.blockIndent = null
     this.chomping = Chomp.CLIP
+    this.header = null
   }
 
   get strValue () {
@@ -92,6 +93,7 @@ export default class BlockValue extends Node {
           break
         default:
           this.blockIndent = Number(bi) || null
+          this.header = new Range(start, offset)
           return offset
       }
       offset += 1

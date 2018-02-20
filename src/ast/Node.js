@@ -161,6 +161,19 @@ export default class Node {
     return comments.length > 0 ? comments.join('\n') : null
   }
 
+  get errorComments () {
+    if (!this.context) return []
+    const { src } = this.context
+    return this.props.filter(({ start }) => {
+      if (src[start] !== Char.COMMENT) return false
+      if (this.header && start === this.header.end) return true
+      if (this.valueRange) {
+        const { end } = this.valueRange
+        return start === end && !Node.atBlank(src, end - 1)
+      }
+    })
+  }
+
   get hasComment () {
     if (this.context) {
       const { src } = this.context
