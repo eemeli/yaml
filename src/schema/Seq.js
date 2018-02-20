@@ -1,5 +1,4 @@
-import { Type } from 'raw-yaml'
-
+import { Type } from '../ast/Node'
 import { YAMLSyntaxError } from '../errors'
 import Collection, { toJSON } from './Collection'
 import Pair from './Pair'

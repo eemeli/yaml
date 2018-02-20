@@ -1,4 +1,4 @@
-import { Type } from 'raw-yaml'
+import { Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import { DefaultTagPrefixes, DefaultTags } from './Tags'
 import { toJSON } from './schema/Collection'

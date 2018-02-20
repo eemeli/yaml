@@ -1,4 +1,4 @@
-import { Type } from 'raw-yaml'
+import { Type } from '../src/ast/Node'
 import resolve from '../src/index'
 
 const spec = {

@@ -40,7 +40,8 @@
   },
   "jest": {
     "testPathIgnorePatterns": [
-      "__tests__/common"
+      "__tests__/common",
+      "__tests__/ast/common"
     ]
   },
   "devDependencies": {
@@ -53,7 +54,5 @@
     "babel-plugin-trace": "^1.1.0",
     "jest": "^22.3.0"
   },
-  "dependencies": {
-    "raw-yaml": "^0.2.5"
-  }
+  "dependencies": {}
 }

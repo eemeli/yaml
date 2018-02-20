@@ -1,4 +1,4 @@
-import { Type } from 'raw-yaml'
+import { Type } from '../ast/Node'
 
 export const strOptions = {
   defaultType: Type.PLAIN,

@@ -1,4 +1,4 @@
-import parse from 'raw-yaml'
+import parse from './ast/index'
 import Document from './Document'
 import Tags from './Tags'
 

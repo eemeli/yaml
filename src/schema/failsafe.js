@@ -1,4 +1,4 @@
-import { Type } from 'raw-yaml'
+import { Type } from '../ast/Node'
 import Map from './Map'
 import Seq from './Seq'
 import { str } from './_string'

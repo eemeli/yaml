@@ -1,4 +1,4 @@
-import { Type } from 'raw-yaml'
+import { Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import availableSchema from './schema'
 import Pair from './schema/Pair'
