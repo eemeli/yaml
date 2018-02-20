@@ -15,13 +15,19 @@ export default class QuoteSingle extends Node {
     return offset + 1
   }
 
-  /** @throws {SyntaxError} on missing closing quote */
+  /**
+   * @throws {SyntaxError} on missing closing quote and on document boundary
+   * indicators
+   */
   get strValue () {
     if (!this.valueRange || !this.context) return null
     const { start, end } = this.valueRange
     const { src } = this.context
     if (src[end - 1] !== "'") throw new SyntaxError('Missing closing \'quote')
-    return src.slice(start + 1, end - 1)
+    const raw = src.slice(start + 1, end - 1)
+    if (/\n(?:---|\.\.\.)(?:[\n\t ]|$)/.test(raw)) throw new SyntaxError(
+      'Document boundary indicators are not allowed within string values')
+    return raw
       .replace(/''/g, "'")
       .replace(/[ \t]*\n[ \t]*/g, '\n')
       .replace(/\n+/g, nl => nl.length === 1 ? ' ' : '\n')

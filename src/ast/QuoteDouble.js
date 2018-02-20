@@ -19,7 +19,10 @@ export default class QuoteDouble extends Node {
     return offset + 1
   }
 
-  /** @throws {SyntaxError} on invalid \ escape and missing closing quote */
+  /**
+   * @throws {SyntaxError} on invalid \ escape, missing closing quote, and on
+   * document boundary indicators
+   */
   get strValue () {
     if (!this.valueRange || !this.context) return null
     const { start, end } = this.valueRange
@@ -31,6 +34,8 @@ export default class QuoteDouble extends Node {
     for (let i = start + 1; i < end - 1; ++i) {
       let ch = src[i]
       if (ch === '\n') {
+        if (Node.atDocumentBoundary(src, i + 1)) throw new SyntaxError(
+          'Document boundary indicators are not allowed within string values')
         // fold single newline into space, multiple newlines to just one
         let nlCount = 1
         ch = src[i + 1]
