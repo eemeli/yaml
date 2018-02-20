@@ -144,6 +144,8 @@ export default class Document {
     const { anchor } = node
     if (anchor) anchors[anchor] = node
     if (node.type === Type.ALIAS) {
+      if (hasAnchor || hasTag) errors.push(new YAMLSyntaxError(node,
+        'An alias node must not specify any properties'))
       const src = anchors[node.rawValue]
       if (src) return node.resolved = src.resolved
       errors.push(new YAMLReferenceError(node, `Aliased anchor not found: ${node.rawValue}`))

@@ -39,8 +39,6 @@ const skipErrors = [
   'HU3P',
   'QB6E',
   'RXY3',
-  'SR86',
-  'SU74',
   'SY6V',
   'ZCZ6',
   'ZL4Z',
