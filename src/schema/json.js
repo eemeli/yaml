@@ -1,4 +1,5 @@
 import { map, seq } from './failsafe'
+import { resolve as resolveStr } from './_string'
 
 const schema = [
   map,
@@ -6,7 +7,7 @@ const schema = [
   {
     class: String,
     tag: 'tag:yaml.org,2002:str',
-    resolve: (doc, node) => node.strValue || ''
+    resolve: resolveStr
   },
   {
     class: null,

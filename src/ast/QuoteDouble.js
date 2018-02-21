@@ -1,11 +1,14 @@
 import Node from './Node'
 import Range from './Range'
 
-const parseCharCode = (src, offset, length) => {
+const parseCharCode = (src, offset, length, errors) => {
   const cc = src.substr(offset, length)
   const ok = cc.length === length && /^[0-9a-fA-F]+$/.test(cc)
   const code = ok ? parseInt(cc, 16) : NaN
-  if (isNaN(code)) throw new SyntaxError(`Invalid escape sequence ${src.substr(offset - 2, length + 2)}`)
+  if (isNaN(code)) {
+    errors.push(new SyntaxError(`Invalid escape sequence ${src.substr(offset - 2, length + 2)}`))
+    return src.substr(offset - 2, length + 2)
+  }
   return String.fromCodePoint(code)
 }
 
@@ -25,17 +28,18 @@ export default class QuoteDouble extends Node {
    */
   get strValue () {
     if (!this.valueRange || !this.context) return null
+    const errors = []
     const { start, end } = this.valueRange
     const { src } = this.context
-    if (src[end - 1] !== '"') throw new SyntaxError('Missing closing "quote')
+    if (src[end - 1] !== '"') errors.push(new SyntaxError('Missing closing "quote'))
     // Using String#replace is too painful with escaped newlines preceded by
     // escaped backslashes; also, this should be faster.
     let str = ''
     for (let i = start + 1; i < end - 1; ++i) {
       let ch = src[i]
       if (ch === '\n') {
-        if (Node.atDocumentBoundary(src, i + 1)) throw new SyntaxError(
-          'Document boundary indicators are not allowed within string values')
+        if (Node.atDocumentBoundary(src, i + 1)) errors.push(new SyntaxError(
+          'Document boundary indicators are not allowed within string values'))
         // fold single newline into space, multiple newlines to just one
         let nlCount = 1
         ch = src[i + 1]
@@ -66,14 +70,16 @@ export default class QuoteDouble extends Node {
           case '/':  str += '/';       break
           case '\\': str += '\\';      break
           case '\t': str += '\t';      break
-          case 'x':  str += parseCharCode(src, i + 1, 2);  i += 2;  break
-          case 'u':  str += parseCharCode(src, i + 1, 4);  i += 4;  break
-          case 'U':  str += parseCharCode(src, i + 1, 8);  i += 8;  break
+          case 'x':  str += parseCharCode(src, i + 1, 2, errors);  i += 2;  break
+          case 'u':  str += parseCharCode(src, i + 1, 4, errors);  i += 4;  break
+          case 'U':  str += parseCharCode(src, i + 1, 8, errors);  i += 8;  break
           case '\n':
             // skip escaped newlines, but still trim the following line
             while (src[i + 1] === ' ' || src[i + 1] === '\t') i += 1
             break
-          default: throw new SyntaxError(`Invalid escape sequence ${src.substr(i - 1, 2)}`)
+          default:
+            errors.push(new SyntaxError(`Invalid escape sequence ${src.substr(i - 1, 2)}`))
+            str += '\\' + src[i]
         }
       } else if (ch === ' ' || ch === '\t') {
         // trim trailing whitespace
@@ -88,7 +94,7 @@ export default class QuoteDouble extends Node {
         str += ch
       }
     }
-    return str
+    return errors.length > 0 ? { errors, str } : str
   }
 
   /**

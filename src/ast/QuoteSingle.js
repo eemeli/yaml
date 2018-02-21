@@ -21,16 +21,18 @@ export default class QuoteSingle extends Node {
    */
   get strValue () {
     if (!this.valueRange || !this.context) return null
+    const errors = []
     const { start, end } = this.valueRange
     const { src } = this.context
-    if (src[end - 1] !== "'") throw new SyntaxError('Missing closing \'quote')
+    if (src[end - 1] !== "'") errors.push(new SyntaxError('Missing closing \'quote'))
     const raw = src.slice(start + 1, end - 1)
-    if (/\n(?:---|\.\.\.)(?:[\n\t ]|$)/.test(raw)) throw new SyntaxError(
-      'Document boundary indicators are not allowed within string values')
-    return raw
+    if (/\n(?:---|\.\.\.)(?:[\n\t ]|$)/.test(raw)) errors.push(new SyntaxError(
+      'Document boundary indicators are not allowed within string values'))
+    const str = raw
       .replace(/''/g, "'")
       .replace(/[ \t]*\n[ \t]*/g, '\n')
       .replace(/\n+/g, nl => nl.length === 1 ? ' ' : '\n')
+    return errors.length > 0 ? { errors, str } : str
   }
 
   /**

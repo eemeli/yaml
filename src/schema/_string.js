@@ -1,4 +1,5 @@
 import { Type } from '../ast/Node'
+import { YAMLSyntaxError } from '../errors'
 
 export const strOptions = {
   defaultType: Type.PLAIN,
@@ -7,6 +8,19 @@ export const strOptions = {
     jsonEncoding: false,
     minMultiLineLength: 40
   }
+}
+
+export const resolve = (doc, node) => {
+  // on error, will return { str: string, errors: Error[] }
+  const res = node.strValue
+  if (!res) return ''
+  if (typeof res === 'string') return res
+  res.errors.forEach((error) => {
+    if (error instanceof SyntaxError) error = new YAMLSyntaxError(node, error.message)
+    else error.source = node
+    doc.errors.push(error)
+  })
+  return res.str
 }
 
 function doubleQuotedString (value, indent, oneLine) {
@@ -152,7 +166,7 @@ function plainString (value, indent, implicitKey, inFlow, tags) {
 export const str = {
   class: String,
   tag: 'tag:yaml.org,2002:str',
-  resolve: (doc, node) => node.strValue || '',
+  resolve,
   options: strOptions,
   stringify: (value, { implicitKey, indent, inFlow, tags, type } = {}) => {
     const { dropCR, defaultType } = strOptions

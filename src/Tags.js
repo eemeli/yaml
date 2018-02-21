@@ -2,6 +2,7 @@ import { Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import availableSchema from './schema'
 import Pair from './schema/Pair'
+import { resolve as resolveStr } from './schema/_string'
 
 export const DefaultTagPrefixes = {
   '!': '!',
@@ -58,7 +59,7 @@ export default class Tags {
     const generic = tags.find(({ test }) => !test)
     try {
       if (generic) return node.resolved = generic.resolve(doc, node)
-      const str = node.strValue
+      const str = resolveStr(doc, node)
       if (typeof str === 'string' && tags.length > 0) {
         return node.resolved = this.resolveScalar(str, tags)
       }

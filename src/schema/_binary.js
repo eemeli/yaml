@@ -1,4 +1,5 @@
 import { YAMLReferenceError } from '../errors'
+import { resolve as resolveStr } from './_string'
 
 export const binary = {
   class: Uint8Array,  // Buffer inherits from Uint8Array
@@ -13,9 +14,10 @@ export const binary = {
    */
   resolve: (doc, node) => {
     if (typeof Buffer === 'function') {
-      return Buffer.from(node.strValue, 'base64')
+      const str = resolveStr(doc, node)
+      return Buffer.from(str, 'base64')
     } else if (typeof atob === 'function') {
-      const str = atob(node.strValue)
+      const str = atob(resolveStr(doc, node))
       const buffer = new Uint8Array(str.length)
       for (let i = 0; i < str.length; ++i) buffer[i] = str.charCodeAt(i)
       return buffer

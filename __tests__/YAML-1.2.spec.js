@@ -700,7 +700,7 @@ block:\t|
 `Bad escapes:
   "\\c
   \\xq-"`,
-      tgt: [ { 'Bad escapes': null } ],
+      tgt: [ { 'Bad escapes': '\\c \\xq-' } ],
       errors: [ [
         'Invalid escape sequence \\c'
         // ERROR: q and - are invalid hex digits.
