@@ -32,10 +32,15 @@ export default class Document {
     this.version = version
   }
 
-  constructor (tags, { directives = [], contents = [] } = {}, { merge } = {}) {
+  constructor (tags, { directives = [], contents = [], error } = {}, { merge } = {}) {
     this.anchors = []
     this.directives = directives
     this.errors = []
+    if (error) {
+      if (error instanceof SyntaxError) error = new YAMLSyntaxError(this, error.message)
+      else error.source = this
+      this.errors.push(error)
+    }
     this.options = { merge: merge !== false }
     this.rawContents = contents
     this.tagPrefixes = {}

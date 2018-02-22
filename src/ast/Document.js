@@ -20,6 +20,7 @@ export default class Document extends Node {
   parseDirectives (start) {
     const { src } = this.context
     this.directives = []
+    let hasDirectives = false
     let offset = start
     while (!Document.atDocumentBoundary(src, offset, Char.DIRECTIVES_END)) {
       offset = Document.startCommentOrEndBlankLine(src, offset)
@@ -37,13 +38,17 @@ export default class Document extends Node {
           const directive = new Directive()
           offset = directive.parse({ parent: this, src }, offset)
           this.directives.push(directive)
+          hasDirectives = true
           trace: 'directive', { valueRange: directive.valueRange, comment: directive.comment }, JSON.stringify(directive.rawValue)
         } break
         default:
+          if (hasDirectives) this.error = new SyntaxError('Missing directives-end indicator line')
           return offset
       }
     }
-    return src[offset] ? offset + 3 : offset
+    if (src[offset]) return offset + 3
+    if (hasDirectives) this.error = new SyntaxError('Missing directives-end indicator line')
+    return offset
   }
 
   parseContents (start) {

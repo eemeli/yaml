@@ -891,6 +891,7 @@ Chomping: |
       src:
 `%YAML 1.2
 %YAML 1.1
+---
 foo`,
       tgt: [ 'foo' ],
       errors: [ [
@@ -916,6 +917,7 @@ foo`,
       src:
 `%TAG ! !foo
 %TAG ! !foo
+---
 bar`,
       tgt: [ 'bar' ],
       errors: [ [ 'The TAG directive must only be given at most once per handle in the same document.' ] ],

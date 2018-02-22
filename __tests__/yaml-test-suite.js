@@ -22,7 +22,6 @@ const skipErrors = [
   '3HFZ',
   '5U3A',
   '9KBC',
-  'B63P',
   'ZCZ6',
   'ZL4Z',
 ]
