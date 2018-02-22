@@ -23,6 +23,8 @@ export default class YAMLSeq extends Collection {
           break
         case Type.SEQ_ITEM:
           this.items.push(doc.resolveNode(item.node))
+          if (item.hasProps) doc.errors.push(new YAMLSyntaxError(item,
+            'Sequence items cannot have tags or anchors before the - indicator'))
           break
         default:
           doc.errors.push(new YAMLSyntaxError(item,

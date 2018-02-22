@@ -111,8 +111,8 @@ export default class ParseContext {
       }
       ch = src[offset]
     }
-    // '- &a : b' has an anchor on an empty PLAIN node
-    if (lineHasProps && Node.atCollectionItem(src, offset)) offset -= 1
+    // '- &a : b' has an anchor on an empty node
+    if (lineHasProps && ch === ':' && Node.atBlank(src, offset + 1)) offset -= 1
     const type = ParseContext.parseType(src, offset, inFlow)
     trace: 'props', type, { props, offset }
     return { props, type, valueStart: offset }

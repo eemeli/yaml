@@ -210,6 +210,16 @@ export default class Node {
     return false
   }
 
+  get hasProps () {
+    if (this.context) {
+      const { src } = this.context
+      for (let i = 0; i < this.props.length; ++i) {
+        if (src[this.props[i].start] !== Char.COMMENT) return true
+      }
+    }
+    return false
+  }
+
   get jsonLike () {
     const jsonLikeTypes = [
       Type.FLOW_MAP,
