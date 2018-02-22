@@ -57,6 +57,11 @@ export default class Tags {
   resolveNode (doc, node, tagName) {
     const tags = this.schema.filter(({ tag }) => tag === tagName)
     const generic = tags.find(({ test }) => !test)
+    if (node.error) {
+      if (node.error instanceof SyntaxError) node.error = new YAMLSyntaxError(node, node.error.message)
+      else node.error.source = node
+      doc.errors.push(node.error)
+    }
     try {
       if (generic) return node.resolved = generic.resolve(doc, node)
       const str = resolveStr(doc, node)

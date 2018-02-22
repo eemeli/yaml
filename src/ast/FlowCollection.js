@@ -26,7 +26,7 @@ export default class FlowCollection extends Node {
     trace: 'flow-start', context.pretty, { start }
     this.context = context
     const { parseNode, src } = context
-    let { lineStart } = context
+    let { indent, lineStart } = context
     let ch = src[start] // { or [
     this.items = [ch]
     let offset = Node.endOfWhiteSpace(src, start + 1)
@@ -37,6 +37,7 @@ export default class FlowCollection extends Node {
         case '\n': {
           lineStart = offset + 1
           offset = Node.endOfIndent(src, lineStart)
+          if (offset - lineStart <= indent) this.error = new SyntaxError('Insufficient indentation in flow collection')
         } break
         case ',': {
           this.items.push(ch)
