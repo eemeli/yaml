@@ -1,5 +1,5 @@
 import Node, { Type } from '../../src/ast/Node'
-import parse from '../../src/ast/index'
+import parse from '../../src/ast/parse'
 import { pretty } from './common'
 
 describe('folded block with chomp: keep', () => {
