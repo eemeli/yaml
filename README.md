@@ -51,7 +51,7 @@ The [AST level] of the library has been released separately, and is fully functi
 #### Parsing
 - Support for all YAML node types, including alias nodes and multi-document streams
 - Complete support for the Fallback, JSON, and Core [Schemas], as well as an "extended" schema that covers all of the YAML 1.1 scalar [types] except for `!!yaml`.
-- Support for `<<` merge keys (default-enabled, disable with `merge: false` option)
+- Support for `<<` merge keys (default-disabled, enable with `merge: true` option)
 - Complete match between the parsed `in.yaml`, `in.json`, and `out.yaml` files across all of the [yaml-test-suite] test cases (note: A few of the tests are not in agreement with the spec, so this requires the use of a [custom branch] until the relevant [pull requests] and [issues] are resolved)
 - Comments are parsed and included up to the [AST level] of the API
 - "Native" `Map` and `Seq` collections have `toJSON()` methods for bare JavaScript `Object` and `Array` output

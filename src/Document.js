@@ -40,7 +40,7 @@ export default class Document {
       if (!error.source) error.source = this
       this.errors.push(error)
     }
-    this.options = { merge: merge !== false }
+    this.options = { merge }
     this.rawContents = contents
     this.tagPrefixes = {}
     this.tags = tags

@@ -289,7 +289,7 @@ describe('merge <<', () => {
   label: center/big`
 
   test('example', () => {
-    const doc = resolve(src)[0].toJSON()
+    const doc = resolve(src, { merge: true })[0].toJSON()
     expect(doc).toHaveLength(8)
     for (let i = 4; i < doc.length; ++i) {
       expect(doc[i]).toMatchObject({ x: 1, y: 2, r: 10, label: 'center/big' })
@@ -297,7 +297,7 @@ describe('merge <<', () => {
   })
 
   test('disabled merge', () => {
-    const doc = resolve(src, { merge: false })[0].toJSON()
+    const doc = resolve(src)[0].toJSON()
     expect(doc).toHaveLength(8)
     for (let i = 5; i < doc.length; ++i) {
       expect(doc[i]).toHaveProperty('<<')
