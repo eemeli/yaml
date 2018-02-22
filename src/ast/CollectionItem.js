@@ -1,3 +1,4 @@
+import { YAMLSyntaxError } from '../errors'
 import Node, { Type } from './Node'
 import Range from './Range'
 
@@ -17,6 +18,8 @@ export default class CollectionItem extends Node {
     trace: 'item-start', context.pretty, { start }
     const { parseNode, src } = context
     let { atLineStart, lineStart } = context
+    if (!atLineStart && this.type === Type.SEQ_ITEM) this.error = new YAMLSyntaxError(this,
+      'Sequence items are not allowed on the same line with map keys')
     const indent = atLineStart ? start - lineStart : context.indent
     let offset = Node.endOfWhiteSpace(src, start + 1)
     let ch = src[offset]

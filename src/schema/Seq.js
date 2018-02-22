@@ -22,6 +22,7 @@ export default class YAMLSeq extends Collection {
           this.addComment(item.comment)
           break
         case Type.SEQ_ITEM:
+          if (item.error) doc.errors.push(item.error)
           this.items.push(doc.resolveNode(item.node))
           if (item.hasProps) doc.errors.push(new YAMLSyntaxError(item,
             'Sequence items cannot have tags or anchors before the - indicator'))

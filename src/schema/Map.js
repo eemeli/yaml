@@ -48,11 +48,13 @@ export default class YAMLMap extends Collection {
           break
         case Type.MAP_KEY:
           if (key !== undefined) this.items.push(new Pair(key))
+          if (item.error) doc.errors.push(item.error)
           key = doc.resolveNode(item.node)
           keyStart = null
           break
         case Type.MAP_VALUE:
           if (key === undefined) key = null
+          if (item.error) doc.errors.push(item.error)
           this.items.push(new Pair(key, doc.resolveNode(item.node)))
           Collection.checkKeyLength(doc, map, i, key, keyStart)
           key = undefined
