@@ -1,3 +1,4 @@
+import { YAMLSyntaxError } from '../errors'
 import Comment from './Comment'
 import Directive from './Directive'
 import Node, { Char, Type } from './Node'
@@ -42,12 +43,12 @@ export default class Document extends Node {
           trace: 'directive', { valueRange: directive.valueRange, comment: directive.comment }, JSON.stringify(directive.rawValue)
         } break
         default:
-          if (hasDirectives) this.error = new SyntaxError('Missing directives-end indicator line')
+          if (hasDirectives) this.error = new YAMLSyntaxError(this, 'Missing directives-end indicator line')
           return offset
       }
     }
     if (src[offset]) return offset + 3
-    if (hasDirectives) this.error = new SyntaxError('Missing directives-end indicator line')
+    if (hasDirectives) this.error = new YAMLSyntaxError(this, 'Missing directives-end indicator line')
     return offset
   }
 
@@ -103,7 +104,7 @@ export default class Document extends Node {
           case undefined:
             break
           default:
-            this.error = new SyntaxError('Document end marker line should not have a non-comment suffix')
+            this.error = new YAMLSyntaxError(this, 'Document end marker line should not have a non-comment suffix')
         }
       }
     }

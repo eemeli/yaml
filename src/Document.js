@@ -37,8 +37,7 @@ export default class Document {
     this.directives = directives
     this.errors = []
     if (error) {
-      if (error instanceof SyntaxError) error = new YAMLSyntaxError(this, error.message)
-      else error.source = this
+      if (!error.source) error.source = this
       this.errors.push(error)
     }
     this.options = { merge: merge !== false }
@@ -161,8 +160,7 @@ export default class Document {
     if (node.type === Type.PLAIN) try {
       return node.resolved = tags.resolveScalar(node.strValue || '')
     } catch (error) {
-      if (error instanceof SyntaxError) error = new YAMLSyntaxError(node, error.message)
-      else error.source = node
+      if (!error.source) error.source = node
       errors.push(error)
       return null
     }

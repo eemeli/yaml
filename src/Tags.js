@@ -1,5 +1,5 @@
 import { Type } from './ast/Node'
-import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
+import { YAMLReferenceError, YAMLWarning } from './errors'
 import availableSchema from './schema'
 import Pair from './schema/Pair'
 import { resolve as resolveStr } from './schema/_string'
@@ -57,11 +57,7 @@ export default class Tags {
   resolveNode (doc, node, tagName) {
     const tags = this.schema.filter(({ tag }) => tag === tagName)
     const generic = tags.find(({ test }) => !test)
-    if (node.error) {
-      if (node.error instanceof SyntaxError) node.error = new YAMLSyntaxError(node, node.error.message)
-      else node.error.source = node
-      doc.errors.push(node.error)
-    }
+    if (node.error) doc.errors.push(node.error)
     try {
       if (generic) return node.resolved = generic.resolve(doc, node)
       const str = resolveStr(doc, node)
@@ -69,8 +65,7 @@ export default class Tags {
         return node.resolved = this.resolveScalar(str, tags)
       }
     } catch (error) {
-      if (error instanceof SyntaxError) error = new YAMLSyntaxError(node, error.message)
-      else error.source = node
+      if (!error.source) error.source = node
       doc.errors.push(error)
       node.resolved = null
     }

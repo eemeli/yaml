@@ -1,3 +1,4 @@
+import { YAMLSyntaxError } from '../errors'
 import Node from './Node'
 import Range from './Range'
 
@@ -16,30 +17,30 @@ export default class QuoteSingle extends Node {
   }
 
   /**
-   * @throws {SyntaxError} on missing closing quote and on document boundary
-   * indicators
+   * @returns {string | { str: string, errors: YAMLSyntaxError[] }}
    */
   get strValue () {
     if (!this.valueRange || !this.context) return null
     const errors = []
     const { start, end } = this.valueRange
     const { indent, src } = this.context
-    if (src[end - 1] !== "'") errors.push(new SyntaxError('Missing closing \'quote'))
+    if (src[end - 1] !== "'") errors.push(new YAMLSyntaxError(this, 'Missing closing \'quote'))
     let str = ''
     for (let i = start + 1; i < end - 1; ++i) {
       let ch = src[i]
       if (ch === '\n') {
-        if (Node.atDocumentBoundary(src, i + 1)) errors.push(new SyntaxError(
+        if (Node.atDocumentBoundary(src, i + 1)) errors.push(new YAMLSyntaxError(this,
           'Document boundary indicators are not allowed within string values'))
         const { fold, offset, error } = Node.foldNewline(src, i, indent)
         str += fold
         i = offset
-        if (error) errors.push(new SyntaxError(
+        if (error) errors.push(new YAMLSyntaxError(this,
           'Multi-line single-quoted string needs to be sufficiently indented'))
       } else if (ch === "'") {
         str += ch
         i += 1
-        if (src[i] !== "'") errors.push(new SyntaxError('Unescaped single quote? This should not happen.'))
+        if (src[i] !== "'") errors.push(new YAMLSyntaxError(this,
+          'Unescaped single quote? This should not happen.'))
       } else if (ch === ' ' || ch === '\t') {
         // trim trailing whitespace
         const wsStart = i

@@ -1,5 +1,4 @@
 import { Type } from '../ast/Node'
-import { YAMLSyntaxError } from '../errors'
 
 export const strOptions = {
   defaultType: Type.PLAIN,
@@ -16,8 +15,7 @@ export const resolve = (doc, node) => {
   if (!res) return ''
   if (typeof res === 'string') return res
   res.errors.forEach((error) => {
-    if (error instanceof SyntaxError) error = new YAMLSyntaxError(node, error.message)
-    else error.source = node
+    if (!error.source) error.source = node
     doc.errors.push(error)
   })
   return res.str

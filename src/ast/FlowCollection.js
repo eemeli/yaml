@@ -1,3 +1,4 @@
+import { YAMLSyntaxError } from '../errors'
 import Comment from './Comment'
 import Node, { Type } from './Node'
 import Range from './Range'
@@ -37,7 +38,7 @@ export default class FlowCollection extends Node {
         case '\n': {
           lineStart = offset + 1
           offset = Node.endOfIndent(src, lineStart)
-          if (offset - lineStart <= indent) this.error = new SyntaxError('Insufficient indentation in flow collection')
+          if (offset - lineStart <= indent) this.error = new YAMLSyntaxError(this, 'Insufficient indentation in flow collection')
         } break
         case ',': {
           this.items.push(ch)

@@ -1,3 +1,4 @@
+import { YAMLSyntaxError } from '../errors'
 import Alias from './Alias'
 import BlockValue from './BlockValue'
 import Collection from './Collection'
@@ -158,7 +159,7 @@ export default class ParseContext {
         node = new QuoteSingle(type, props)
         break
       default:
-        node.error = new Error(`Unknown node type: ${JSON.stringify(type)}`)
+        node.error = new YAMLSyntaxError(node, `Unknown node type: ${JSON.stringify(type)}`)
         node.range = new Range(start, start + 1)
         return node
     }
@@ -167,6 +168,7 @@ export default class ParseContext {
     if (nodeEnd <= start) {
       node.error = new Error(`Node#parse consumed no characters`)
       node.error.parseEnd = nodeEnd
+      node.error.source = node
       nodeEnd = start + 1
     }
     node.range = new Range(start, nodeEnd)
