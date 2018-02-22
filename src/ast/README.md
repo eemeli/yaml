@@ -1,4 +1,4 @@
-# raw-yaml
+# YAML AST Parser
 ### Read anything as YAML
 
 A maximally liberal [YAML 1.2] parser:
@@ -18,12 +18,12 @@ A maximally liberal [YAML 1.2] parser:
 
 To install:
 ```
-npm install raw-yaml
+npm install yaml@next
 ```
 
 To use:
 ```js
-import parse from 'raw-yaml'
+import parse from 'yaml/dist/ast/parse'
 
 const str = `
 sequence: [ one, two, ]
@@ -56,19 +56,19 @@ The public API of the library is a single function which returns an array of par
 
 If a node has its `value` set, that will be used when re-stringifying. Care should be taken when modifying the AST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren't broken. In other words, this is an engineering tool and you may hurt yourself. If you're looking to generate a brand new YAML document, you should probably not be using this library directly.
 
-If using the module in a CommonJS environment, the default-exported function is available at `require('raw-yaml').default`.
+If using the module in a CommonJS environment, the default-exported function is available at `require('yaml/dist/ast/parse').default`.
 
-For more usage examples and AST trees, take a look through the [`__tests__`](https://github.com/eemeli/raw-yaml/tree/master/__tests__) directory.
+For more usage examples and AST trees, take a look through the [`__tests__/ast`](https://github.com/eemeli/yaml/tree/master/__tests__/ast) directory.
 
 
 ## AST Structure
 
-For an example, here's what the first few lines of this file look like when parsed by raw-yaml (simplified for clarity):
+For an example, here's what the first few lines of this file look like when parsed as yaml (simplified for clarity):
 
 ```js
 [ {
   directives: [
-    { type: 'COMMENT', comment: ' raw-yaml' },
+    { type: 'COMMENT', comment: ' YAML AST Parser' },
     { type: 'COMMENT', comment: '## Read anything as YAML' }
   ],
   contents: [
@@ -124,8 +124,8 @@ class Alias extends Node {
 class Scalar extends Node {
   type: 'PLAIN' | 'QUOTE_DOUBLE' | 'QUOTE_SINGLE' |
     'BLOCK_FOLDED' | 'BLOCK_LITERAL'
-  +strValue: ?string    // unescaped string value; may throw for
-                        //   QUOTE_DOUBLE on bad escape sequences
+  +strValue: ?string |  // unescaped string value
+    { str: string, errors: YAMLSyntaxError[] }
 }
 
 class Comment extends Node {
