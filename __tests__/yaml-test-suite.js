@@ -18,10 +18,6 @@ const matchJson = (stream, json) => {
   }
 }
 
-const skipErrors = [
-  '9KBC',
-]
-
 testDirs.forEach(dir => {
   const root = path.resolve(__dirname, 'yaml-test-suite', dir)
   const name = fs.readFileSync(path.resolve(root, '==='), 'utf8')
@@ -35,12 +31,6 @@ testDirs.forEach(dir => {
     const stream = resolve(yaml)
     matchJson(stream, json)
     if (error) {
-      if (skipErrors.includes(dir)) return
-      if (stream[0].errors.length === 0) {
-        log: dir, name,
-          '\nIN\n' + yaml,
-          '\nJSON\n' + JSON.stringify(stream[0], null, '  ')
-      }
       expect(stream[0].errors).not.toHaveLength(0)
     } else {
       const errors = stream
