@@ -96,7 +96,15 @@ export default class Document extends Node {
           this.contents.push(comment)
           trace: 'document-suffix-comment', comment.comment
         }
-        if (src[offset] === '\n') offset += 1
+        switch (src[offset]) {
+          case '\n':
+            offset += 1
+            break
+          case undefined:
+            break
+          default:
+            this.error = new SyntaxError('Document end marker line should not have a non-comment suffix')
+        }
       }
     }
     return offset

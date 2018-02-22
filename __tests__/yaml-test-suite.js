@@ -19,7 +19,6 @@ const matchJson = (stream, json) => {
 }
 
 const skipErrors = [
-  '3HFZ',
   '5U3A',
   '9KBC',
   'ZCZ6',
