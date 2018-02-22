@@ -52,7 +52,7 @@ The [AST level] of the library has been released separately, and is fully functi
 - Support for all YAML node types, including alias nodes and multi-document streams
 - Complete support for the Fallback, JSON, and Core [Schemas], as well as an "extended" schema that covers all of the YAML 1.1 scalar [types] except for `!!yaml`.
 - Support for `<<` merge keys (default-disabled, enable with `merge: true` option)
-- Complete match between the parsed `in.yaml`, `in.json`, and `out.yaml` files across all of the [yaml-test-suite] test cases (note: A few of the tests are not in agreement with the spec, so this requires the use of a [custom branch] until the relevant [pull requests] and [issues] are resolved)
+- Complete match between the parsed `in.yaml`, `in.json`, `out.yaml`, and `error` files across all of the [yaml-test-suite] test cases (note: A few of the tests are not in agreement with the spec, so this requires the use of a [custom branch] until the relevant [pull requests] and [issues] are resolved)
 - Comments are parsed and included up to the [AST level] of the API
 - "Native" `Map` and `Seq` collections have `toJSON()` methods for bare JavaScript `Object` and `Array` output
 - Any string input should be accepted, and produce some output. Errors (if any) are not thrown, but included in the document's `errors` array
@@ -63,7 +63,7 @@ The [AST level] of the library has been released separately, and is fully functi
 [custom branch]: https://github.com/eemeli/yaml-test-suite/tree/fixed-data
 [pull requests]: https://github.com/yaml/yaml-test-suite/pulls/eemeli
 [issues]: https://github.com/yaml/yaml-test-suite/issues/created_by/eemeli
-[AST level]: https://www.npmjs.com/package/raw-yaml
+[AST level]: src/ast/README.md
 
 #### Stringifying
 - `Document#toString()` produces idempotent YAML from all non-error spec examples and test suite cases
@@ -77,6 +77,5 @@ The [AST level] of the library has been released separately, and is fully functi
 - Collections need to retain tag and comment data
 - Item add/remove should keep tags and comments in place
 - Explicit tags are not included in the stringified output
-- Not all parser errors are reported
 - API needs finalising
 - Better documentation
