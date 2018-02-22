@@ -127,6 +127,36 @@ export default class Node {
       : Node.endOfWhiteSpace(src, offset)
   }
 
+  // fold single newline into space, multiple newlines to N - 1 newlines
+  // presumes src[offset] === '\n'
+  static foldNewline (src, offset, indent) {
+    let inCount = 0
+    let error = false
+    let fold = ''
+    let ch = src[offset + 1]
+    while (ch === ' ' || ch === '\t' || ch === '\n') {
+      switch (ch) {
+        case '\n':
+          inCount = 0
+          offset += 1
+          fold += '\n'
+          break
+        case '\t':
+          if (inCount <= indent) error = true
+          offset = Node.endOfWhiteSpace(src, offset + 2) - 1
+          break
+        case ' ':
+          inCount += 1
+          offset += 1
+          break
+      }
+      ch = src[offset + 1]
+    }
+    if (!fold) fold = ' '
+    if (ch && inCount <= indent) error = true
+    return { fold, offset, error }
+  }
+
   constructor (type, props, context) {
     this.context = context || null
     this.error = null

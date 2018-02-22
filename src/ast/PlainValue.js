@@ -28,18 +28,9 @@ export default class PlainValue extends Node {
     for (let i = start; i < end; ++i) {
       let ch = src[i]
       if (ch === '\n') {
-        // fold single newline into space, multiple newlines to N - 1 newlines
-        let nlCount = 1
-        ch = src[i + 1]
-        while (ch === ' ' || ch === '\t' || ch === '\n') {
-          if (ch === '\n') {
-            ++nlCount
-            str += '\n'
-          }
-          i += 1
-          ch = src[i + 1]
-        }
-        if (nlCount === 1) str += ' '
+        const { fold, offset } = Node.foldNewline(src, i, -1)
+        str += fold
+        i = offset
       } else if (ch === ' ' || ch === '\t') {
         // trim trailing whitespace
         const wsStart = i

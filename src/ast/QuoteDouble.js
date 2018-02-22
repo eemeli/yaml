@@ -30,7 +30,7 @@ export default class QuoteDouble extends Node {
     if (!this.valueRange || !this.context) return null
     const errors = []
     const { start, end } = this.valueRange
-    const { src } = this.context
+    const { indent, src } = this.context
     if (src[end - 1] !== '"') errors.push(new SyntaxError('Missing closing "quote'))
     // Using String#replace is too painful with escaped newlines preceded by
     // escaped backslashes; also, this should be faster.
@@ -40,15 +40,11 @@ export default class QuoteDouble extends Node {
       if (ch === '\n') {
         if (Node.atDocumentBoundary(src, i + 1)) errors.push(new SyntaxError(
           'Document boundary indicators are not allowed within string values'))
-        // fold single newline into space, multiple newlines to just one
-        let nlCount = 1
-        ch = src[i + 1]
-        while (ch === ' ' || ch === '\t' || ch === '\n') {
-          if (ch === '\n') ++nlCount
-          i += 1
-          ch = src[i + 1]
-        }
-        str += nlCount > 1 ? '\n' : ' '
+        const { fold, offset, error } = Node.foldNewline(src, i, indent)
+        str += fold
+        i = offset
+        if (error) errors.push(new SyntaxError(
+          'Multi-line double-quoted string needs to be sufficiently indented'))
       } else if (ch === '\\') {
         i += 1
         switch (src[i]) {

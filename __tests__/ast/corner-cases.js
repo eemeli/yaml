@@ -16,10 +16,18 @@ describe('folded block with chomp: keep', () => {
   })
 })
 
-test('multiple linebreaks in plain scalar', () => {
-  const src = `trimmed\n\n\n\nlines\n`
-  const doc = parse(src)[0]
-  expect(doc.contents[0].strValue).toBe('trimmed\n\n\nlines')
+describe('multiple linebreaks in scalars', () => {
+  test('plain', () => {
+    const src = `trimmed\n\n\n\nlines\n`
+    const doc = parse(src)[0]
+    expect(doc.contents[0].strValue).toBe('trimmed\n\n\nlines')
+  })
+
+  test('single-quoted', () => {
+    const src = `'trimmed\n\n\n\nlines'\n`
+    const doc = parse(src)[0]
+    expect(doc.contents[0].strValue).toBe('trimmed\n\n\nlines')
+  })
 })
 
 test('no null document for document-end marker', () => {
@@ -43,4 +51,15 @@ test('seq with anchor as explicit key', () => {
   const doc = parse(src)[0]
   expect(doc.contents).toHaveLength(1)
   expect(doc.contents[0].items[0].node.rawValue).toBe('- a')
+})
+
+test('unindented single-quoted string', () => {
+  const src = `key: 'two\nlines'\n`
+  const doc = parse(src)[0]
+  const { node } = doc.contents[0].items[1]
+  expect(node.error).toBeNull()
+  expect(node.strValue).toMatchObject({
+    str: 'two lines',
+    errors: [new SyntaxError('Multi-line single-quoted string needs to be sufficiently indented')]
+  })
 })

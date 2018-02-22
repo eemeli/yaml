@@ -346,10 +346,10 @@ tie-fighter: '|\\-*-/|'`,
   spans many lines.
 
 quoted: "So does this
-  quoted scalar.\n"`,
+  quoted scalar.\\n"`,
       tgt: [ { contents: [ { items: [
         'plain', { type: Type.MAP_VALUE, node: 'This unquoted scalar spans many lines.' },
-        'quoted', { type: Type.MAP_VALUE, node: 'So does this quoted scalar. ' }
+        'quoted', { type: Type.MAP_VALUE, node: 'So does this quoted scalar.\n' }
       ] } ] } ]
     },
   },

@@ -23,15 +23,36 @@ export default class QuoteSingle extends Node {
     if (!this.valueRange || !this.context) return null
     const errors = []
     const { start, end } = this.valueRange
-    const { src } = this.context
+    const { indent, src } = this.context
     if (src[end - 1] !== "'") errors.push(new SyntaxError('Missing closing \'quote'))
-    const raw = src.slice(start + 1, end - 1)
-    if (/\n(?:---|\.\.\.)(?:[\n\t ]|$)/.test(raw)) errors.push(new SyntaxError(
-      'Document boundary indicators are not allowed within string values'))
-    const str = raw
-      .replace(/''/g, "'")
-      .replace(/[ \t]*\n[ \t]*/g, '\n')
-      .replace(/\n+/g, nl => nl.length === 1 ? ' ' : '\n')
+    let str = ''
+    for (let i = start + 1; i < end - 1; ++i) {
+      let ch = src[i]
+      if (ch === '\n') {
+        if (Node.atDocumentBoundary(src, i + 1)) errors.push(new SyntaxError(
+          'Document boundary indicators are not allowed within string values'))
+        const { fold, offset, error } = Node.foldNewline(src, i, indent)
+        str += fold
+        i = offset
+        if (error) errors.push(new SyntaxError(
+          'Multi-line single-quoted string needs to be sufficiently indented'))
+      } else if (ch === "'") {
+        str += ch
+        i += 1
+        if (src[i] !== "'") errors.push(new SyntaxError('Unescaped single quote? This should not happen.'))
+      } else if (ch === ' ' || ch === '\t') {
+        // trim trailing whitespace
+        const wsStart = i
+        let next = src[i + 1]
+        while (next === ' ' || next === '\t') {
+          i += 1
+          next = src[i + 1]
+        }
+        if (next !== '\n') str += i > wsStart ? src.slice(wsStart, i + 1) : ch
+      } else {
+        str += ch
+      }
+    }
     return errors.length > 0 ? { errors, str } : str
   }
 

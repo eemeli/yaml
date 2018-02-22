@@ -298,10 +298,10 @@ tie-fighter: '|\\-*-/|'`,
   spans many lines.
 
 quoted: "So does this
-  quoted scalar.\n"`,
+  quoted scalar.\\n"`,
       tgt: [ {
         plain: 'This unquoted scalar spans many lines.',
-        quoted: 'So does this quoted scalar. ' } ]
+        quoted: 'So does this quoted scalar.\n' } ]
     },
   },
 
