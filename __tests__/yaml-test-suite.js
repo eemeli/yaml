@@ -20,8 +20,6 @@ const matchJson = (stream, json) => {
 
 const skipErrors = [
   '9KBC',
-  'ZCZ6',
-  'ZL4Z',
 ]
 
 testDirs.forEach(dir => {

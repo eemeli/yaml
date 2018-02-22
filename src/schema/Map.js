@@ -55,6 +55,9 @@ export default class YAMLMap extends Collection {
         case Type.MAP_VALUE:
           if (key === undefined) key = null
           if (item.error) doc.errors.push(item.error)
+          if (!item.context.atLineStart && item.node && item.node.type === Type.MAP && !item.node.context.atLineStart) {
+            doc.errors.push(new YAMLSyntaxError(item.node, 'Nested mappings are not allowed in compact mappings'))
+          }
           this.items.push(new Pair(key, doc.resolveNode(item.node)))
           Collection.checkKeyLength(doc, map, i, key, keyStart)
           key = undefined
