@@ -1,7 +1,9 @@
 import { toJSON } from './Collection'
+import Node from './Node'
 
-export default class Scalar {
+export default class Scalar extends Node {
   constructor (value) {
+    super()
     this.value = value
   }
 

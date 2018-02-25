@@ -1,4 +1,5 @@
 import { YAMLSyntaxError } from '../errors'
+import Node from './Node'
 
 export const toJSON = (value) => Array.isArray(value) ? (
   value.map(toJSON)
@@ -13,7 +14,7 @@ export class Comment {
   }
 }
 
-export default class Collection {
+export default class Collection extends Node {
   static checkKeyLength (doc, node, itemIdx, key, keyStart) {
     if (typeof keyStart !== 'number') return
     const item = node.items[itemIdx]
@@ -34,6 +35,7 @@ export default class Collection {
   }
 
   constructor (doc) {
+    super()
     this.comments = [] // TODO: include collection & item comments
     this.doc = doc
     this.items = []
