@@ -97,7 +97,7 @@ export default class YAMLSeq extends Collection {
   toString (indent, inFlow) {
     const { tags } = this.doc
     const options = { implicitKey: false, indent: indent + '  ', inFlow, type: null }
-    const items = this.items.map(node => tags.stringify(node, options))
+    const items = this.items.map(item => tags.stringify(item, options))
     if (inFlow || items.length === 0) {
       return `[ ${items.join(', ')} ]`
     } else {

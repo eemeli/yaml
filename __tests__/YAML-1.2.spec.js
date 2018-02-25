@@ -392,7 +392,7 @@ application specific tag: !something |
       ] ],
       special: (src) => {
         const doc = resolve(src, { schema: 'extended' })[0]
-        const data = doc.contents.items[1].value
+        const data = doc.contents.items[1].value.value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)
       }

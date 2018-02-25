@@ -14,21 +14,25 @@ export default class YAMLMap extends Collection {
       this.resolveBlockMapItems(doc, node)
     }
     for (let i = 0; i < this.items.length; ++i) {
-      const { key } = this.items[i]
+      const { key: iKey } = this.items[i]
       for (let j = i + 1; j < this.items.length; ++j) {
-        if (this.items[j].key === key) {
+        const { key: jKey } = this.items[j]
+        if (iKey === jKey || (iKey && jKey && iKey.hasOwnProperty('value') && iKey.value === jKey.value)) {
           doc.errors.push(new YAMLSyntaxError(node,
-            `Map keys must be unique; "${key}" is repeated`))
+            `Map keys must be unique; "${iKey}" is repeated`))
           break
         }
       }
-      if (doc.options.merge && key === '<<') {
+      if (doc.options.merge && iKey.value === '<<') {
         const src = this.items[i].value
         const srcItems = src instanceof YAMLSeq ? (
           src.items.reduce((acc, { items }) => acc.concat(items), [])
         ) : src.items
         const toAdd = srcItems.reduce((toAdd, pair) => {
-          const exists = this.items.some(({ key }) => key === pair.key) || toAdd.some(({ key }) => key === pair.key)
+          const exists = (
+            this.items.some(({ key }) => key.value === pair.key.value) ||
+            toAdd.some(({ key }) => key.value === pair.key.value)
+          )
           return exists ? toAdd : toAdd.concat(pair)
         }, [])
         Array.prototype.splice.apply(this.items, [i, 1, ...toAdd])

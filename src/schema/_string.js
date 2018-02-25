@@ -158,7 +158,7 @@ function plainString (value, indent, implicitKey, inFlow, tags) {
   // Need to verify that output will be parsed as a string
   const str = value.replace(/\n+/g, `$&\n${indent}`)
   const res = tags.resolveScalar(str)
-  return typeof res === 'string' ? str : doubleQuotedString(value, indent, implicitKey)
+  return typeof res.value === 'string' ? str : doubleQuotedString(value, indent, implicitKey)
 }
 
 export const str = {
@@ -166,7 +166,7 @@ export const str = {
   tag: 'tag:yaml.org,2002:str',
   resolve,
   options: strOptions,
-  stringify: (value, { implicitKey, indent, inFlow, tags, type } = {}) => {
+  stringify: ({ value }, { implicitKey, indent, inFlow, tags, type } = {}) => {
     const { dropCR, defaultType } = strOptions
     if (typeof value !== 'string') value = String(value)
     if (dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')

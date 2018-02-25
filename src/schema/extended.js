@@ -14,7 +14,7 @@ export default failsafe.concat([
     test: /^(?:~|null)?$/i,
     resolve: () => null,
     options: nullOptions,
-    stringify: (value) => nullOptions.nullStr
+    stringify: () => nullOptions.nullStr
   },
   {
     class: Boolean,
@@ -22,7 +22,7 @@ export default failsafe.concat([
     test: /^(?:y|yes|true|on)$/i,
     resolve: () => true,
     options: boolOptions,
-    stringify: (value) => value ? boolOptions.trueStr : boolOptions.falseStr
+    stringify: ({ value }) => value ? boolOptions.trueStr : boolOptions.falseStr
   },
   {
     class: Boolean,
@@ -30,7 +30,7 @@ export default failsafe.concat([
     test: /^(?:n|no|false|off)$/i,
     resolve: () => false,
     options: boolOptions,
-    stringify: (value) => value ? boolOptions.trueStr : boolOptions.falseStr
+    stringify: ({ value }) => value ? boolOptions.trueStr : boolOptions.falseStr
   },
   {
     class: Number,
@@ -38,7 +38,7 @@ export default failsafe.concat([
     format: 'bin',
     test: /^0b([0-1_]+)$/,
     resolve: (str, bin) => parseInt(bin.replace(/_/g, ''), 2),
-    stringify: (value) => '0b' + value.toString(2)
+    stringify: ({ value }) => '0b' + value.toString(2)
   },
   {
     class: Number,
@@ -46,7 +46,7 @@ export default failsafe.concat([
     format: 'oct',
     test: /^[-+]?0([0-7_]+)$/,
     resolve: (str, oct) => parseInt(oct.replace(/_/g, ''), 8),
-    stringify: (value) => (value < 0 ? '-0' : '0') + value.toString(8)
+    stringify: ({ value }) => (value < 0 ? '-0' : '0') + value.toString(8)
   },
   {
     class: Number,
@@ -61,7 +61,7 @@ export default failsafe.concat([
     format: 'hex',
     test: /^0x([0-9a-fA-F_]+)$/,
     resolve: (str, hex) => parseInt(hex.replace(/_/g, ''), 16),
-    stringify: (value) => (value < 0 ? '-0x' : '0x') + value.toString(16)
+    stringify: ({ value }) => (value < 0 ? '-0x' : '0x') + value.toString(16)
   },
   {
     class: Number,

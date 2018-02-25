@@ -28,7 +28,7 @@ export const binary = {
     }
   },
   options: { lineWidth: 76 },
-  stringify: (value) => {
+  stringify: ({ value }) => {
     let str
     if (typeof Buffer === 'function') {
       str = value instanceof Buffer ? (

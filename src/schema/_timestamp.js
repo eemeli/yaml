@@ -6,7 +6,7 @@ const parseSexagesimal = (sign, parts) => {
 }
 
 // hhhh:mm:ss.sss
-const stringifySexagesimal = (value) => {
+const stringifySexagesimal = ({ value }) => {
   if (!isNan(value) || !isFinite(value)) return stringifyNumber(value)
   let sign = ''
   if (value < 0) {
@@ -68,7 +68,7 @@ export const timestamp = {
     }
     return new Date(date)
   },
-  stringify: (value) => value.toISOString()
+  stringify: ({ value }) => value.toISOString()
 }
 
 export default [

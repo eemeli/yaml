@@ -153,8 +153,8 @@ description:
  The binary value above is a tiny arrow encoded as a gif image.`
 
     const doc = resolve(src, { schema: 'extended' })[0]
-    const canonical = doc.contents.items[0].value
-    const generic = doc.contents.items[1].value
+    const canonical = doc.contents.items[0].value.value
+    const generic = doc.contents.items[1].value.value
     expect(canonical).toBeInstanceOf(Uint8Array)
     expect(generic).toBeInstanceOf(Uint8Array)
     expect(canonical).toHaveLength(185)

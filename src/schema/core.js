@@ -1,6 +1,6 @@
 import failsafe from './failsafe'
 
-export const stringifyNumber = (value) => (
+export const stringifyNumber = ({ value }) => (
   isFinite(value) ? JSON.stringify(value)
   : isNaN(value) ? '.nan'
   : value < 0 ? '-.inf'
@@ -16,7 +16,7 @@ export default failsafe.concat([
     test: /^(?:~|null)?$/i,
     resolve: () => null,
     options: nullOptions,
-    stringify: (value) => nullOptions.nullStr
+    stringify: () => nullOptions.nullStr
   },
   {
     class: Boolean,
@@ -30,7 +30,7 @@ export default failsafe.concat([
     format: 'oct',
     test: /^0o([0-7]+)$/,
     resolve: (str, oct) => parseInt(oct, 8),
-    stringify: (value) => '0o' + value.toString(8)
+    stringify: ({ value }) => '0o' + value.toString(8)
   },
   {
     class: Number,
@@ -45,7 +45,7 @@ export default failsafe.concat([
     format: 'hex',
     test: /^0x([0-9a-fA-F]+)$/,
     resolve: (str, hex) => parseInt(hex, 16),
-    stringify: (value) => '0x' + value.toString(16)
+    stringify: ({ value }) => '0x' + value.toString(16)
   },
   {
     class: Number,

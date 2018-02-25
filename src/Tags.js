@@ -1,7 +1,9 @@
 import { Type } from './ast/Node'
 import { YAMLReferenceError, YAMLWarning } from './errors'
 import availableSchema from './schema'
+import Collection from './schema/Collection'
 import Pair from './schema/Pair'
+import Scalar from './schema/Scalar'
 import { resolve as resolveStr } from './schema/_string'
 
 export const DefaultTagPrefixes = {
@@ -47,10 +49,11 @@ export default class Tags {
       const { test, resolve } = tags[i]
       if (test) {
         const match = str.match(test)
-        if (match) return resolve.apply(null, match)
+        if (match) return new Scalar(resolve.apply(null, match))
       }
     }
-    return this.schema.scalarFallback ? this.schema.scalarFallback(str) : str
+    if (this.schema.scalarFallback) str = this.schema.scalarFallback(str)
+    return new Scalar(str)
   }
 
   // sets node.resolved on success
@@ -59,7 +62,11 @@ export default class Tags {
     const generic = tags.find(({ test }) => !test)
     if (node.error) doc.errors.push(node.error)
     try {
-      if (generic) return node.resolved = generic.resolve(doc, node)
+      if (generic) {
+        let res = generic.resolve(doc, node)
+        if (!(res instanceof Collection)) res = new Scalar(res)
+        return node.resolved = res
+      }
       const str = resolveStr(doc, node)
       if (typeof str === 'string' && tags.length > 0) {
         return node.resolved = this.resolveScalar(str, tags)
@@ -92,34 +99,34 @@ export default class Tags {
     return null
   }
 
-  getStringifier (value, tag, format) {
+  stringify (item, options) {
+    if (item == null || typeof item !== 'object') item = new Scalar(item)
+    options.tags = this
     let match
-    if (tag) {
-      match = this.schema.filter(t => t.tag === tag && (!format || t.format === format))
-      if (match.length === 0) throw new Error(`Tag not available: ${tag}${format ? ', format ' + format : ''}`)
-    } else if (value == null) {
+    if (item.tag) {
+      match = this.schema.filter(({ format, tag }) => tag === item.tag && (!item.format || format === item.format))
+      if (match.length === 0) throw new Error(
+        `Tag not available: ${item.tag}${item.format ? ', format ' + item.format : ''}`)
+    } else if (item.value === null) {
       match = this.schema.filter(t => t.class === null && !t.format)
-      if (match.length === 0) match = this.schema.filter(t => t.class === String && !t.format)
-    } else if (value instanceof Pair) {
-      return (value, options) => value.toString(this, options)
+      if (match.length === 0) throw new Error('Schema is missing a null stringifier')
+    } else if (item instanceof Pair) {
+      return item.toString(this, options) // FIXME
     } else {
-      let obj
-      switch (typeof value) {
-        case 'boolean': obj = new Boolean; break
-        case 'number':  obj = new Number; break
-        case 'string':  obj = new String; break
-        default:        obj = value
+      let obj = item
+      if (item.hasOwnProperty('value')) {
+        switch (typeof item.value) {
+          case 'boolean': obj = new Boolean; break
+          case 'number':  obj = new Number; break
+          case 'string':  obj = new String; break
+          default:        obj = item.value
+        }
       }
       match = this.schema.filter(t => t.class && (obj instanceof t.class) && !t.format)
       if (match.length === 0) throw new Error(`Tag not resolved for ${obj && obj.constructor ? obj.constructor.name : typeof obj}`)
-      // TODO: Handle bare arrays and objects
+      // TODO: Handle bare arrays and objects?
     }
-    return match[0].stringify || Tags.defaultStringifier
-  }
-
-  stringify (value, options, tag, format) {
-    const stringifier = this.getStringifier(value, tag, format)
-    options.tags = this
-    return stringifier(value, options)
+    const stringifier = match[0].stringify || Tags.defaultStringifier
+    return stringifier(item, options)
   }
 }
