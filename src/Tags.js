@@ -2,6 +2,7 @@ import { Type } from './ast/Node'
 import { YAMLReferenceError, YAMLWarning } from './errors'
 import availableSchema from './schema'
 import Collection from './schema/Collection'
+import { addFlowComment } from './schema/Node'
 import Pair from './schema/Pair'
 import Scalar from './schema/Scalar'
 import { resolve as resolveStr } from './schema/_string'
@@ -126,7 +127,8 @@ export default class Tags {
       if (match.length === 0) throw new Error(`Tag not resolved for ${obj && obj.constructor ? obj.constructor.name : typeof obj}`)
       // TODO: Handle bare arrays and objects?
     }
-    const stringifier = match[0].stringify || Tags.defaultStringifier
-    return stringifier(item, options)
+    const { strIncludesComment, stringify = Tags.defaultStringifier } = match[0]
+    const str = stringify(item, options)
+    return strIncludesComment ? str : addFlowComment(str, options.indent || '', item.comment)
   }
 }

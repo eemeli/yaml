@@ -1,4 +1,5 @@
 import { Type } from '../ast/Node'
+import { addFlowComment } from './Node'
 
 export const strOptions = {
   defaultType: Type.PLAIN,
@@ -21,10 +22,10 @@ export const resolve = (doc, node) => {
   return res.str
 }
 
-function doubleQuotedString (value, indent, oneLine) {
+function doubleQuotedString (value, indent, oneLine, comment) {
   const { jsonEncoding, minMultiLineLength } = strOptions.doubleQuoted
   const json = JSON.stringify(value)
-  if (jsonEncoding) return json
+  if (jsonEncoding) return addFlowComment(json, indent, comment)
   let str = ''
   let start = 0
   for (let i = 0, ch = json[i]; ch; ch = json[++i]) {
@@ -76,23 +77,24 @@ function doubleQuotedString (value, indent, oneLine) {
         i += 1
     }
   }
-  return start ? str + json.slice(start) : json
+  str = start ? str + json.slice(start) : json
+  return addFlowComment(str, indent, comment)
 }
 
-function singleQuotedString (value, indent, oneLine) {
+function singleQuotedString (value, indent, oneLine, comment) {
   if (oneLine) {
-    if (/\n/.test(value)) return doubleQuotedString(value, indent, true)
+    if (/\n/.test(value)) return doubleQuotedString(value, indent, true, comment)
   } else {
     // single quoted string can't have leading or trailing whitespace around newline
-    if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, indent, false)
+    if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, indent, false, comment)
   }
   value = value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`)
-  return `'${value}'`
+  return addFlowComment(`'${value}'`, indent, comment)
 }
 
-function blockString (value, indent, literal) {
+function blockString (value, indent, literal, comment) {
   // block can't end in whitespace unless the last line is non-empty
-  if (/\n[\t ]+$/.test(value)) return doubleQuotedString(value, indent, false)
+  if (/\n[\t ]+$/.test(value)) return doubleQuotedString(value, indent, false, comment)
   const indentSize = indent ? '2' : '1'  // root is at -1
   let header = literal ? '|' : '>'
   if (!value) return header + '\n'
@@ -122,6 +124,7 @@ function blockString (value, indent, literal) {
     })
   if (wsEnd) wsEnd = wsEnd.replace(/\n+(?!\n|$)/g, `$&${indent}`)
   if (wsStart) wsStart = wsStart.replace(/\n+/g, `$&${indent}`)
+  if (comment) header += ' #' + comment.replace(/ ?[\r\n]+/g, ' ')
   if (!value) return `${header}${indentSize}\n${indent}${wsEnd}`
   if (literal) {
     value = value.replace(/\n+/g, `$&${indent}`)
@@ -135,12 +138,12 @@ function blockString (value, indent, literal) {
   return `${header}\n${indent}${wsStart}${value}${wsEnd}`
 }
 
-function plainString (value, indent, implicitKey, inFlow, tags) {
+function plainString (value, indent, implicitKey, inFlow, comment, tags) {
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
   ) {
-    return doubleQuotedString(value, indent, implicitKey)
+    return doubleQuotedString(value, indent, implicitKey, comment)
   }
   if (!value || /^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t ]$/.test(value)) {
     // not allowed:
@@ -150,15 +153,17 @@ function plainString (value, indent, implicitKey, inFlow, tags) {
     // - '#' not preceded by a non-space char
     // - end with ' '
     return implicitKey || inFlow ? (
-      doubleQuotedString(value, indent, implicitKey)
+      doubleQuotedString(value, indent, implicitKey, comment)
     ) : (
-      blockString(value, indent, false)
+      blockString(value, indent, false, comment)
     )
   }
   // Need to verify that output will be parsed as a string
   const str = value.replace(/\n+/g, `$&\n${indent}`)
-  const res = tags.resolveScalar(str)
-  return typeof res.value === 'string' ? str : doubleQuotedString(value, indent, implicitKey)
+  if (typeof tags.resolveScalar(str).value !== 'string') {
+    return doubleQuotedString(value, indent, implicitKey, comment)
+  }
+  return addFlowComment(str, indent, comment)
 }
 
 export const str = {
@@ -166,17 +171,18 @@ export const str = {
   tag: 'tag:yaml.org,2002:str',
   resolve,
   options: strOptions,
-  stringify: ({ value }, { implicitKey, indent, inFlow, tags, type } = {}) => {
+  strIncludesComment: true,
+  stringify: ({ comment, value }, { implicitKey, indent, inFlow, tags, type } = {}) => {
     const { dropCR, defaultType } = strOptions
     if (typeof value !== 'string') value = String(value)
     if (dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')
     const _stringify = (_type) => {
       switch (_type) {
-        case Type.BLOCK_FOLDED: return blockString(value, indent, false)
-        case Type.BLOCK_LITERAL: return blockString(value, indent, true)
-        case Type.QUOTE_DOUBLE: return doubleQuotedString(value, indent, implicitKey)
-        case Type.QUOTE_SINGLE: return singleQuotedString(value, indent, implicitKey)
-        case Type.PLAIN: return plainString(value, indent, implicitKey, inFlow, tags)
+        case Type.BLOCK_FOLDED: return blockString(value, indent, false, comment)
+        case Type.BLOCK_LITERAL: return blockString(value, indent, true, comment)
+        case Type.QUOTE_DOUBLE: return doubleQuotedString(value, indent, implicitKey, comment)
+        case Type.QUOTE_SINGLE: return singleQuotedString(value, indent, implicitKey, comment)
+        case Type.PLAIN: return plainString(value, indent, implicitKey, inFlow, comment, tags)
         default: return null
       }
     }
