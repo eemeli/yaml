@@ -12,6 +12,7 @@ export default class YAMLSeq extends Collection {
     } else {
       this.resolveBlockSeqItems(doc, node)
     }
+    this.resolveComments()
   }
 
   resolveBlockSeqItems (doc, seq) {

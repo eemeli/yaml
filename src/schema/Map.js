@@ -13,6 +13,7 @@ export default class YAMLMap extends Collection {
     } else {
       this.resolveBlockMapItems(doc, node)
     }
+    this.resolveComments()
     for (let i = 0; i < this.items.length; ++i) {
       const { key: iKey } = this.items[i]
       for (let j = i + 1; j < this.items.length; ++j) {

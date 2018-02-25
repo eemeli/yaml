@@ -7,13 +7,6 @@ export const toJSON = (value) => Array.isArray(value) ? (
    value.toJSON()
  ) : value
 
-export class Comment {
-  constructor (comment, before) {
-    this.before = before
-    this.comment = comment
-  }
-}
-
 export default class Collection extends Node {
   static checkKeyLength (doc, node, itemIdx, key, keyStart) {
     if (typeof keyStart !== 'number') return
@@ -36,13 +29,27 @@ export default class Collection extends Node {
 
   constructor (doc) {
     super()
-    this.comments = [] // TODO: include collection & item comments
+    this._comments = []
     this.doc = doc
     this.items = []
   }
 
   addComment (comment) {
-    this.comments.push(new Comment(comment, this.items.length))
+    this._comments.push({ comment, before: this.items.length })
+  }
+
+  resolveComments () {
+    this._comments.forEach(({ comment, before }) => {
+      const item = this.items[before]
+      if (!item) {
+        if (this.comment) this.comment += '\n' + comment
+        else this.comment = comment
+      } else {
+        if (item.commentBefore) item.commentBefore += '\n' + comment
+        else item.commentBefore = comment
+      }
+    })
+    delete this._comments
   }
 
   // overridden in implementations
