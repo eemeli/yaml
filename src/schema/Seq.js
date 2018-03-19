@@ -97,12 +97,12 @@ export default class YAMLSeq extends Collection {
 
   toString (indent, inFlow) {
     const { tags } = this.doc
-    const options = { implicitKey: false, indent: indent + '  ', inFlow, type: null }
+    const options = { implicitKey: false, indent: indent + (inFlow ? '    ' : '  '), inFlow, type: null }
     const items = this.items.map(item => tags.stringify(item, options))
-    let str = (inFlow || items.length === 0) ? (
-      `[ ${items.join(', ')} ]`
-    ) : (
-      items.map(item => `- ${item}`).join(`\n${indent}`)
+    let str = (
+      items.length === 0 ? '[]'
+      : inFlow ? `[\n  ${indent}${items.join(`,\n  ${indent}`)}\n${indent}]`
+      : items.map(item => `- ${item}`).join(`\n${indent}`)
     )
     if (this.comment) str += '\n' + this.comment.replace(/^/gm, `${indent}#`)
     return str
