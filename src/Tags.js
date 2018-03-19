@@ -66,18 +66,23 @@ export default class Tags {
       if (generic) {
         let res = generic.resolve(doc, node)
         if (!(res instanceof Collection)) res = new Scalar(res)
-        return node.resolved = res
-      }
-      const str = resolveStr(doc, node)
-      if (typeof str === 'string' && tags.length > 0) {
-        return node.resolved = this.resolveScalar(str, tags)
+        node.resolved = res
+      } else {
+        const str = resolveStr(doc, node)
+        if (typeof str === 'string' && tags.length > 0) {
+          node.resolved = this.resolveScalar(str, tags)
+        }
       }
     } catch (error) {
       if (!error.source) error.source = node
       doc.errors.push(error)
       node.resolved = null
     }
-    return null
+    if (!node.resolved) return null
+    if (node.hasComment) node.resolved.comment = node.comment
+    if (node.hasProps) node.resolved.anchor = node.anchor
+    if (tagName) node.resolved.tag = tagName
+    return node.resolved
   }
 
   resolve (doc, node, tagName) {

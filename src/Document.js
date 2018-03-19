@@ -145,8 +145,7 @@ export default class Document {
           break
       }
     })
-    const { anchor } = node
-    if (anchor) anchors[anchor] = node
+    if (hasAnchor) anchors[node.anchor] = node
     if (node.type === Type.ALIAS) {
       if (hasAnchor || hasTag) errors.push(new YAMLSyntaxError(node,
         'An alias node must not specify any properties'))
