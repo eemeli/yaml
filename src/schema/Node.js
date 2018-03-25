@@ -1,8 +1,8 @@
-export const addFlowComment = (str, indent, comment) => {
-  if (!comment) return str
-  const cc = comment.replace(/\n/g, `\n${indent}#`)
-  return str.indexOf('\n') === -1 ? `${str} #${cc}` : `#${cc}\n${indent}${str}`
-}
+export const addComment = (str, indent, comment) => (
+  !comment ? str
+    : comment.indexOf('\n') === -1 ? `${str} #${comment}`
+    : `${str}\n` + comment.replace(/^/gm, `${indent || ''}#`)
+)
 
 export default class Node {
   anchor = null

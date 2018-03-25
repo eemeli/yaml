@@ -2,6 +2,7 @@ import { Char, Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import { DefaultTagPrefixes, DefaultTags } from './Tags'
 import { toJSON } from './schema/Collection'
+import { addComment } from './schema/Node'
 
 export default class Document {
   parseTagDirective (directive) {
@@ -173,10 +174,14 @@ export default class Document {
 
   toString () {
     if (Array.isArray(this.contents)) {
-      return this.contents.map(c => (
-        this.tags.stringify(c, { indent: '' })
-      )).join('\n---\n') + '\n'
+      return this.contents.map((c) => {
+        let comment = c && c.comment
+        const str = this.tags.stringify(c, { indent: '' }, () => { comment = null })
+        return addComment(str, '', comment)
+      }).join('\n---\n') + '\n'
     }
-    return this.tags.stringify(this.contents, { indent: '' }) + '\n'
+    let comment = this.contents && this.contents.comment
+    const str = this.tags.stringify(this.contents, { indent: '' }, () => { comment = null })
+    return addComment(str, '', comment) + '\n'
   }
 }

@@ -142,16 +142,13 @@ export default class YAMLMap extends Collection {
     }, {})
   }
 
-  toString (indent, inFlow) {
-    const { tags } = this.doc
-    const options = { indent: indent + (inFlow ? '  ' : ''), inFlow, type: null }
-    const items = this.items.map(pair => pair.toString(tags, options))
-    let str = (
-      items.length === 0 ? '{}'
-      : inFlow ? `{\n  ${indent}${items.join(`,\n  ${indent}`)}\n${indent}}`
-      : items.join(`\n${indent}`)
-    )
-    if (this.comment) str += '\n' + this.comment.replace(/^/gm, `${indent}#`)
-    return str
+  toString (indent, inFlow, onComment) {
+    return super.toString({
+      blockItem: item => item,
+      flowChars: { start: '{', end: '}' },
+      indent,
+      inFlow,
+      itemIndent: indent + (inFlow ? '  ' : '')
+    }, onComment)
   }
 }

@@ -1,5 +1,5 @@
 import { YAMLSyntaxError } from '../errors'
-import Node from './Node'
+import Node, { addComment } from './Node'
 
 export const toJSON = (value) => Array.isArray(value) ? (
   value.map(toJSON)
@@ -8,6 +8,8 @@ export const toJSON = (value) => Array.isArray(value) ? (
  ) : value
 
 export default class Collection extends Node {
+  static maxFlowStringSingleLineLength = 60
+
   static checkKeyLength (doc, node, itemIdx, key, keyStart) {
     if (typeof keyStart !== 'number') return
     const item = node.items[itemIdx]
@@ -55,5 +57,42 @@ export default class Collection extends Node {
   // overridden in implementations
   toJSON () {
     return null
+  }
+
+  toString (options, onComment) {
+    const { tags } = this.doc
+    const { blockItem, flowChars, indent, inFlow, itemIndent } = options
+    const opt = { indent: itemIndent, inFlow, type: null }
+    let hasItemWithComment = false
+    let hasItemWithNewLine = false
+    const items = this.items.map((item, i) => {
+      let comment = item && item.comment
+      if (comment) hasItemWithComment = true
+      let str = tags.stringify(item, opt, () => { comment = null })
+      if (!hasItemWithNewLine && str.indexOf('\n') !== -1) hasItemWithNewLine = true
+      if (inFlow && i < this.items.length - 1) str += ','
+      return addComment(str, opt.indent, comment)
+    })
+    let str;
+    if (items.length === 0) {
+      str = flowChars.start + flowChars.end
+    } else if (inFlow) {
+      const { start, end } = flowChars
+      if (hasItemWithComment || hasItemWithNewLine || (
+        items.reduce((sum, item) => sum + item.length + 2, 2) > Collection.maxFlowStringSingleLineLength
+      )) {
+        str = `${start}\n  ${indent}${items.join(`\n  ${indent}`)}\n${indent}${end}`
+      } else {
+        str = `${start} ${items.join(', ')} ${end}`
+      }
+    } else {
+      str = items.map(blockItem).join(`\n${indent}`)
+    }
+    if (this.comment) {
+      if (!hasItemWithNewLine && str.indexOf('\n') === -1) str = addComment(str, indent, this.comment)
+      else str += '\n' + this.comment.replace(/^/gm, `${indent}#`)
+      if (onComment) onComment()
+    }
+    return str
   }
 }

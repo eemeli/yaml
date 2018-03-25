@@ -2,7 +2,6 @@ import { Type } from './ast/Node'
 import { YAMLReferenceError, YAMLWarning } from './errors'
 import availableSchema from './schema'
 import Collection from './schema/Collection'
-import { addFlowComment } from './schema/Node'
 import Pair from './schema/Pair'
 import Scalar from './schema/Scalar'
 import { resolve as resolveStr } from './schema/_string'
@@ -105,19 +104,19 @@ export default class Tags {
     return null
   }
 
-  stringify (item, options) {
+  stringify (item, options, onComment) {
     if (item == null || typeof item !== 'object') item = new Scalar(item)
     options.tags = this
     let match
-    if (item.tag) {
+    if (item instanceof Pair) {
+      return item.toString(this, options, onComment)
+    } else if (item.tag) {
       match = this.schema.filter(({ format, tag }) => tag === item.tag && (!item.format || format === item.format))
       if (match.length === 0) throw new Error(
         `Tag not available: ${item.tag}${item.format ? ', format ' + item.format : ''}`)
     } else if (item.value === null) {
       match = this.schema.filter(t => t.class === null && !t.format)
       if (match.length === 0) throw new Error('Schema is missing a null stringifier')
-    } else if (item instanceof Pair) {
-      return item.toString(this, options) // FIXME
     } else {
       let obj = item
       if (item.hasOwnProperty('value')) {
@@ -132,8 +131,7 @@ export default class Tags {
       if (match.length === 0) throw new Error(`Tag not resolved for ${obj && obj.constructor ? obj.constructor.name : typeof obj}`)
       // TODO: Handle bare arrays and objects?
     }
-    const { strIncludesComment, stringify = Tags.defaultStringifier } = match[0]
-    const str = stringify(item, options)
-    return strIncludesComment ? str : addFlowComment(str, options.indent || '', item.comment)
+    const stringify = match[0].stringify || Tags.defaultStringifier
+    return stringify(item, options, onComment)
   }
 }
