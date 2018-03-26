@@ -173,6 +173,11 @@ export default class Document {
   }
 
   toString () {
+    let { contents } = this
+    if (Array.isArray(contents)) {
+      if (contents.length <= 1) contents = contents[0] || null
+      else throw new Error('Document with multiple content nodes cannot be stringified')
+    }
     const head = this.directives
       .filter(({ comment }) => comment)
       .map(({ comment }) => comment.replace(/^/gm, '#'))
@@ -187,15 +192,8 @@ export default class Document {
       hasDirectives = true
     })
     if (head.length > 0) head.push(hasDirectives ? '---\n' : '')
-    if (Array.isArray(this.contents)) {
-      return head.join('\n') + this.contents.map((c) => {
-        let comment = c && c.comment
-        const body = this.tags.stringify(c, { indent: '' }, () => { comment = null })
-        return addComment(body, '', comment)
-      }).join('\n...\n') + '\n'
-    }
-    let comment = this.contents && this.contents.comment
-    const body = this.tags.stringify(this.contents, { indent: '' }, () => { comment = null })
+    let comment = contents && contents.comment
+    const body = this.tags.stringify(contents, { indent: '' }, () => { comment = null })
     return head.join('\n') + addComment(body, '', comment) + '\n'
   }
 }
