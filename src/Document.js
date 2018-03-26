@@ -173,15 +173,29 @@ export default class Document {
   }
 
   toString () {
+    const head = this.directives
+      .filter(({ comment }) => comment)
+      .map(({ comment }) => comment.replace(/^/gm, '#'))
+    let hasDirectives = false
+    if (this.version) {
+      head.push('%YAML 1.2')
+      hasDirectives = true
+    }
+    Object.keys(this.tagPrefixes).forEach((handle) => {
+      const prefix = this.tagPrefixes[handle]
+      head.push(`%TAG ${handle} ${prefix}`)
+      hasDirectives = true
+    })
+    if (head.length > 0) head.push(hasDirectives ? '---\n' : '')
     if (Array.isArray(this.contents)) {
-      return this.contents.map((c) => {
+      return head.join('\n') + this.contents.map((c) => {
         let comment = c && c.comment
-        const str = this.tags.stringify(c, { indent: '' }, () => { comment = null })
-        return addComment(str, '', comment)
-      }).join('\n---\n') + '\n'
+        const body = this.tags.stringify(c, { indent: '' }, () => { comment = null })
+        return addComment(body, '', comment)
+      }).join('\n...\n') + '\n'
     }
     let comment = this.contents && this.contents.comment
-    const str = this.tags.stringify(this.contents, { indent: '' }, () => { comment = null })
-    return addComment(str, '', comment) + '\n'
+    const body = this.tags.stringify(this.contents, { indent: '' }, () => { comment = null })
+    return head.join('\n') + addComment(body, '', comment) + '\n'
   }
 }

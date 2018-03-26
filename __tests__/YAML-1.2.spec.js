@@ -1785,7 +1785,7 @@ for (const section in spec) {
         })
         if (special) special(src)
         if (!errors) {
-          const src2 = documents.map(doc => String(doc)).join('\n---\n')
+          const src2 = documents.map(doc => String(doc)).join('\n...\n')
           const documents2 = resolve(src2)
           const json2 = documents2.map(doc => doc.toJSON())
           trace: name,
