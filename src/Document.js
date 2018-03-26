@@ -46,8 +46,9 @@ export default class Document {
     this.tagPrefixes = {}
     this.tags = tags
     this.version = null
+    const directiveComments = []
     directives.forEach((directive) => {
-      const { name } = directive
+      const { comment, name } = directive
       switch (name) {
         case 'TAG':
           this.parseTagDirective(directive)
@@ -60,22 +61,37 @@ export default class Document {
             `YAML 1.2 only supports TAG and YAML directives, and not ${name}`
           ))
       }
+      if (comment) directiveComments.push(comment)
     })
-    const contentNodes = contents
-      .filter(node => node.valueRange && !node.valueRange.isEmpty)
-      .map(node => this.resolveNode(node))
+    this.commentBefore = directiveComments.join('\n') || null
+    const comments = { before: [], after: [] }
+    const contentNodes = []
+    contents.forEach((node) => {
+      if (node.valueRange && !node.valueRange.isEmpty) {
+        contentNodes.push(this.resolveNode(node))
+      } else if (node.comment) {
+        const cc = contentNodes.length === 0 ? comments.before : comments.after
+        cc.push(node.comment)
+      }
+    })
     switch (contentNodes.length) {
       case 0:
         this.contents = null
+        comments.after = comments.before
         break
       case 1:
         this.contents = contentNodes[0]
+        if (this.contents) this.contents.commentBefore = comments.before.join('\n') || null
+        else comments.after = comments.before.concat(comments.after)
         break
       default:
         this.errors.push(new YAMLSyntaxError(null,
           'Document is not valid YAML (bad indentation?)'))
         this.contents = contentNodes
+        if (this.contents[0]) this.contents[0].commentBefore = comments.before.join('\n') || null
+        else comments.after = comments.before.concat(comments.after)
     }
+    this.comment = comments.after.join('\n') || null
   }
 
   resolveTagName (node) {
@@ -178,22 +194,32 @@ export default class Document {
       if (contents.length <= 1) contents = contents[0] || null
       else throw new Error('Document with multiple content nodes cannot be stringified')
     }
-    const head = this.directives
+    const lines = this.directives
       .filter(({ comment }) => comment)
       .map(({ comment }) => comment.replace(/^/gm, '#'))
     let hasDirectives = false
     if (this.version) {
-      head.push('%YAML 1.2')
+      lines.push('%YAML 1.2')
       hasDirectives = true
     }
     Object.keys(this.tagPrefixes).forEach((handle) => {
       const prefix = this.tagPrefixes[handle]
-      head.push(`%TAG ${handle} ${prefix}`)
+      lines.push(`%TAG ${handle} ${prefix}`)
       hasDirectives = true
     })
-    if (head.length > 0) head.push(hasDirectives ? '---\n' : '')
-    let comment = contents && contents.comment
-    const body = this.tags.stringify(contents, { indent: '' }, () => { comment = null })
-    return head.join('\n') + addComment(body, '', comment) + '\n'
+    if (hasDirectives) lines.push('---')
+    if (contents) {
+      if (contents.commentBefore) lines.push(contents.commentBefore.replace(/^/gm, '#'))
+      const options = {
+        // top-level block scalars need to be indented if followed by a comment
+        forceBlockIndent: !!this.comment,
+        indent: ''
+      }
+      let comment = contents.comment
+      const body = this.tags.stringify(contents, options, () => { comment = null })
+      lines.push(addComment(body, '', comment))
+    }
+    if (this.comment) lines.push(this.comment.replace(/^/gm, '#'))
+    return lines.join('\n') + '\n'
   }
 }

@@ -1,6 +1,31 @@
 import resolve from '../src/index'
 import { Type } from '../src/ast/Node'
 
+describe('parse comments', () => {
+  describe('body', () => {
+    test('directives', () => {
+      const src = '#comment\n%YAML 1.2 #comment\n---\nstring\n'
+      const doc = resolve(src)[0]
+      expect(doc.commentBefore).toBe('comment\ncomment')
+      expect(String(doc)).toBe('#comment\n#comment\n%YAML 1.2\n---\nstring\n')
+    })
+
+    test('body start comments', () => {
+      const src = '---\n#comment\n#comment\nstring\n'
+      const doc = resolve(src)[0]
+      expect(doc.contents.commentBefore).toBe('comment\ncomment')
+      expect(String(doc)).toBe('#comment\n#comment\nstring\n')
+    })
+
+    test('body end comments', () => {
+      const src = '\nstring\n#comment\n#comment\n'
+      const doc = resolve(src)[0]
+      expect(doc.comment).toBe('comment\ncomment')
+      expect(String(doc)).toBe('string\n#comment\n#comment\n')
+    })
+  })
+})
+
 describe('stringify comments', () => {
   describe('single-line comments', () => {
     test('plain', () => {

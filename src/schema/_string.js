@@ -90,9 +90,10 @@ function singleQuotedString (value, indent, oneLine) {
   return `'${value}'`
 }
 
-function blockString (value, indent, literal, comment, onComment) {
+function blockString (value, indent, literal, forceBlockIndent, comment, onComment) {
   // block can't end in whitespace unless the last line is non-empty
   if (/\n[\t ]+$/.test(value)) return doubleQuotedString(value, indent, false)
+  if (forceBlockIndent && !indent) indent = ' '
   const indentSize = indent ? '2' : '1'  // root is at -1
   let header = literal ? '|' : '>'
   if (!value) return header + '\n'
@@ -139,7 +140,7 @@ function blockString (value, indent, literal, comment, onComment) {
   return `${header}\n${indent}${wsStart}${value}${wsEnd}`
 }
 
-function plainString (value, indent, implicitKey, inFlow, tags, comment, onComment) {
+function plainString (value, indent, implicitKey, inFlow, forceBlockIndent, tags, comment, onComment) {
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
@@ -156,7 +157,7 @@ function plainString (value, indent, implicitKey, inFlow, tags, comment, onComme
     return implicitKey || inFlow ? (
       doubleQuotedString(value, indent, implicitKey)
     ) : (
-      blockString(value, indent, false, comment, onComment)
+      blockString(value, indent, false, forceBlockIndent, comment, onComment)
     )
   }
   // Need to verify that output will be parsed as a string
@@ -177,17 +178,17 @@ export const str = {
   tag: 'tag:yaml.org,2002:str',
   resolve,
   options: strOptions,
-  stringify: ({ comment, value }, { implicitKey, indent, inFlow, tags, type } = {}, onComment) => {
+  stringify: ({ comment, value }, { forceBlockIndent, implicitKey, indent, inFlow, tags, type } = {}, onComment) => {
     const { dropCR, defaultType } = strOptions
     if (typeof value !== 'string') value = String(value)
     if (dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')
     const _stringify = (_type) => {
       switch (_type) {
-        case Type.BLOCK_FOLDED: return blockString(value, indent, false, comment, onComment)
-        case Type.BLOCK_LITERAL: return blockString(value, indent, true, comment, onComment)
+        case Type.BLOCK_FOLDED: return blockString(value, indent, false, forceBlockIndent, comment, onComment)
+        case Type.BLOCK_LITERAL: return blockString(value, indent, true, forceBlockIndent, comment, onComment)
         case Type.QUOTE_DOUBLE: return doubleQuotedString(value, indent, implicitKey, comment)
         case Type.QUOTE_SINGLE: return singleQuotedString(value, indent, implicitKey, comment)
-        case Type.PLAIN: return plainString(value, indent, implicitKey, inFlow, tags, comment, onComment)
+        case Type.PLAIN: return plainString(value, indent, implicitKey, inFlow, forceBlockIndent, tags, comment, onComment)
         default: return null
       }
     }
