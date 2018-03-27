@@ -78,7 +78,6 @@ export default class Tags {
       node.resolved = null
     }
     if (!node.resolved) return null
-    if (node.hasComment) node.resolved.comment = node.comment
     if (node.hasProps) node.resolved.anchor = node.anchor
     if (tagName) node.resolved.tag = tagName
     return node.resolved

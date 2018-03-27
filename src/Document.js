@@ -144,11 +144,19 @@ export default class Document {
     const { anchors, errors, tags } = this
     let hasAnchor = false
     let hasTag = false
-    node.props.forEach(({ start, end }) => {
+    const comments = { before: [], after: [] }
+    node.props.forEach(({ start, end }, i) => {
       switch (node.context.src[start]) {
         case Char.COMMENT:
           if (!node.commentHasRequiredWhitespace(start)) errors.push(new YAMLSyntaxError(node,
             'Comments must be separated from other tokens by white space characters'))
+          const c = node.getPropValue(i, Char.COMMENT, true)
+          const { header, valueRange } = node
+          if (valueRange && (start > valueRange.start || (header && start > header.start))) {
+            comments.after.push(c)
+          } else {
+            comments.before.push(c)
+          }
           break
         case Char.ANCHOR:
           if (hasAnchor) errors.push(new YAMLSyntaxError(node,
@@ -163,25 +171,41 @@ export default class Document {
       }
     })
     if (hasAnchor) anchors[node.anchor] = node
+    let res
     if (node.type === Type.ALIAS) {
       if (hasAnchor || hasTag) errors.push(new YAMLSyntaxError(node,
         'An alias node must not specify any properties'))
       const src = anchors[node.rawValue]
-      if (src) return node.resolved = src.resolved
-      errors.push(new YAMLReferenceError(node, `Aliased anchor not found: ${node.rawValue}`))
-      return null
+      if (!src) {
+        errors.push(new YAMLReferenceError(node, `Aliased anchor not found: ${node.rawValue}`))
+        return null
+      }
+      res = src.resolved
+    } else {
+      const tagName = this.resolveTagName(node)
+      if (tagName) {
+        res = tags.resolve(this, node, tagName)
+      } else {
+        if (node.type !== Type.PLAIN) {
+          errors.push(new YAMLSyntaxError(node, `Failed to resolve ${node.type} node here`))
+          return null
+        }
+        try {
+          res = tags.resolveScalar(node.strValue || '')
+        } catch (error) {
+          if (!error.source) error.source = node
+          errors.push(error)
+          return null
+        }
+      }
     }
-    const tagName = this.resolveTagName(node)
-    if (tagName) return node.resolved = tags.resolve(this, node, tagName)
-    if (node.type === Type.PLAIN) try {
-      return node.resolved = tags.resolveScalar(node.strValue || '')
-    } catch (error) {
-      if (!error.source) error.source = node
-      errors.push(error)
-      return null
+    if (res) {
+      const cb = comments.before.join('\n')
+      if (cb) res.commentBefore = res.commentBefore ? `${res.commentBefore}\n${cb}` : cb
+      const ca = comments.after.join('\n')
+      if (ca) res.comment = res.comment ? `${res.comment}\n${ca}` : ca
     }
-    errors.push(new YAMLSyntaxError(node, `Failed to resolve ${node.type} node here`))
-    return null
+    return node.resolved = res
   }
 
   toJSON () {

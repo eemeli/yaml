@@ -24,6 +24,35 @@ describe('parse comments', () => {
       expect(String(doc)).toBe('string\n#comment\n#comment\n')
     })
   })
+
+  describe('top-level scalar comments', () => {
+    test('plain', () => {
+      const src = '#c0\nvalue #c1\n#c2'
+      const doc = resolve(src)[0]
+      expect(doc.commentBefore).toBe('c0')
+      expect(doc.contents.comment).toBe('c1')
+      expect(doc.comment).toBe('c2')
+      expect(doc.contents.value).toBe('value')
+    })
+
+    test('"quoted"', () => {
+      const src = '#c0\n"value" #c1\n#c2'
+      const doc = resolve(src)[0]
+      expect(doc.commentBefore).toBe('c0')
+      expect(doc.contents.comment).toBe('c1')
+      expect(doc.comment).toBe('c2')
+      expect(doc.contents.value).toBe('value')
+    })
+
+    test('block', () => {
+      const src = '#c0\n>- #c1\n value\n#c2\n'
+      const doc = resolve(src)[0]
+      expect(doc.commentBefore).toBe('c0')
+      expect(doc.contents.comment).toBe('c1')
+      expect(doc.comment).toBe('c2')
+      expect(doc.contents.value).toBe('value')
+    })
+  })
 })
 
 describe('stringify comments', () => {
