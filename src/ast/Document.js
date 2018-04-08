@@ -23,7 +23,7 @@ export default class Document extends Node {
     this.directives = []
     let hasDirectives = false
     let offset = start
-    while (!Document.atDocumentBoundary(src, offset, Char.DIRECTIVES_END)) {
+    while (!Node.atDocumentBoundary(src, offset, Char.DIRECTIVES_END)) {
       offset = Document.startCommentOrEndBlankLine(src, offset)
       switch (src[offset]) {
         case '\n':
@@ -43,24 +43,34 @@ export default class Document extends Node {
           trace: 'directive', { valueRange: directive.valueRange, comment: directive.comment }, JSON.stringify(directive.rawValue)
         } break
         default:
-          if (hasDirectives) this.error = new YAMLSyntaxError(this, 'Missing directives-end indicator line')
+          if (hasDirectives) {
+            this.error = new YAMLSyntaxError(this, 'Missing directives-end indicator line')
+          } else if (this.directives.length > 0) {
+            this.contents = this.directives
+            this.directives = []
+          }
           return offset
       }
     }
     if (src[offset]) return offset + 3
-    if (hasDirectives) this.error = new YAMLSyntaxError(this, 'Missing directives-end indicator line')
+    if (hasDirectives) {
+      this.error = new YAMLSyntaxError(this, 'Missing directives-end indicator line')
+    } else if (this.directives.length > 0) {
+      this.contents = this.directives
+      this.directives = []
+    }
     return offset
   }
 
   parseContents (start) {
     const { parseNode, src } = this.context
-    this.contents = []
+    if (!this.contents) this.contents = []
     let lineStart = start
     while (src[lineStart - 1] === '-') lineStart -= 1
     let offset = Node.endOfWhiteSpace(src, start)
     let atLineStart = lineStart === start
     this.valueRange = new Range(offset)
-    while (!Document.atDocumentBoundary(src, offset, Char.DOCUMENT_END)) {
+    while (!Node.atDocumentBoundary(src, offset, Char.DOCUMENT_END)) {
       switch (src[offset]) {
         case '\n':
           offset += 1

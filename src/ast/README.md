@@ -67,11 +67,9 @@ For an example, here's what the first few lines of this file look like when pars
 
 ```js
 [ {
-  directives: [
-    { type: 'COMMENT', comment: ' YAML AST Parser' },
-    { type: 'COMMENT', comment: '## Read anything as YAML' }
-  ],
   contents: [
+    { type: 'COMMENT', comment: ' YAML AST Parser' },
+    { type: 'COMMENT', comment: '## Read anything as YAML' },
     { type: 'MAP', items: [
       { type: 'PLAIN', strValue: 'A maximally liberal YAML 1.2...' },
       { type: 'MAP_VALUE', node: { type: 'SEQ', items: [

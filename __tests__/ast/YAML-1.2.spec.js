@@ -700,7 +700,7 @@ mapping: { sky: blue, sea: green }`,
     'Example 5.5. Comment Indicator': {
       src:
 `# Comment only.`,
-      tgt: [{ directives: [{ comment: ' Comment only.' }]}]
+      tgt: [ { contents: [ { comment: ' Comment only.' } ] } ]
     },
 
     'Example 5.6. Node Property Indicators': {
@@ -777,15 +777,15 @@ block:\t|
   void main() {
   \tprintf("Hello, world!\\n");
   }`,
-      tgt: [{
-        directives: [{ comment: ' Tabs and spaces' }],
-        contents: [{ items: [
+      tgt: [ { contents: [
+        { comment: ' Tabs and spaces' },
+        { items: [
           'quoted',
           { type: Type.MAP_VALUE, node: 'Quoted \t' },
           'block',
           { type: Type.MAP_VALUE, node: 'void main() {\n\tprintf("Hello, world!\\n");\n}\n' }
-        ]}]
-      }]
+        ] }
+      ] } ]
     },
   },
 
@@ -831,12 +831,10 @@ Not indented:
   Also by two,    # are neither
   \tStill by two   # content nor
     ]             # indentation.`,
-      tgt: [{
-        directives: [
-          { comment: ' Leading comment line spaces are' },
-          { comment: ' neither content nor indentation.' }
-        ],
-        contents: [{ items: [
+      tgt: [ { contents: [
+        { comment: ' Leading comment line spaces are' },
+        { comment: ' neither content nor indentation.' },
+        { items: [
           'Not indented',
           { type: Type.MAP_VALUE, node: { items: [
             'By one space',
@@ -850,8 +848,8 @@ Not indented:
               ']'
             ], comment: ' indentation.' } }
           ] } }
-        ]}]
-      }]
+        ] }
+      ] } ]
     },
 
     'Example 6.2. Indentation Indicators': {
@@ -984,7 +982,7 @@ Chomping: |
       src:
 `  # Comment
    \n\n`,
-      tgt: [{ directives: [{ comment: ' Comment' }] }]
+      tgt: [ { contents: [ { comment: ' Comment' } ] } ]
     },
 
     'Example 6.11. Multi-Line Comments': {
@@ -1105,12 +1103,19 @@ bar`,
 !foo "bar"`,
       tgt: [
         {
-          directives: [{ comment: ' Private' }],
-          contents: [{ tag: { handle: '!', suffix: 'foo' }, strValue: 'bar' }]
+          contents: [
+            { comment: ' Private' },
+            { tag: { handle: '!', suffix: 'foo' }, strValue: 'bar' }
+          ]
         },
         {
-          directives: [{ comment: ' Global' }, { name: 'TAG', parameters: ['!', 'tag:example.com,2000:app/'] }],
-          contents: [{ tag: { handle: '!', suffix: 'foo' }, strValue: 'bar' }]
+          directives: [
+            { comment: ' Global' },
+            { name: 'TAG', parameters: ['!', 'tag:example.com,2000:app/'] }
+          ],
+          contents: [
+            { tag: { handle: '!', suffix: 'foo' }, strValue: 'bar' }
+          ]
         }
       ]
     },
@@ -1252,14 +1257,14 @@ bar`,
 - "12"
 - 12
 - ! 12`,
-      tgt: [{
-        directives: [{ comment: ' Assuming conventional resolution:' }],
-        contents: [{ items: [
+      tgt: [ { contents: [
+        { comment: ' Assuming conventional resolution:' },
+        { items: [
           { type: Type.SEQ_ITEM, node: '12' },
           { type: Type.SEQ_ITEM, node: '12' },
           { type: Type.SEQ_ITEM, node: { tag: { handle: '!', suffix: '' }, strValue: '12' } }
-        ] }]
-      }]
+        ] }
+      ] } ]
     },
 
     'Example 6.29. Node Anchors': {
@@ -1396,9 +1401,9 @@ to a line feed, or \t\\
   "Up, up and away!",
   -123,
   http://example.com/foo#bar ]`,
-      tgt: [ {
-        directives: [ { comment: ' Outside flow collection:' } ],
-        contents: [ { items: [
+      tgt: [ { contents: [
+        { comment: ' Outside flow collection:' },
+        { items: [
           { type: Type.SEQ_ITEM, node: '::vector' },
           { type: Type.SEQ_ITEM, node: ': - ()' },
           { type: Type.SEQ_ITEM, node: 'Up, up, and away!' },
@@ -1702,9 +1707,10 @@ keep: |+
 
  # Trail
   # comments.`,
-      tgt: [ {
-        directives: [ { comment: ' Strip' }, { comment: ' Comments:' } ],
-        contents: [ { items: [
+      tgt: [ { contents: [
+        { comment: ' Strip' },
+        { comment: ' Comments:' },
+        { items: [
           'strip',
           { type: Type.MAP_VALUE, node: '# text' },
           { comment: ' Clip' },
@@ -1717,8 +1723,8 @@ keep: |+
           { type: Type.MAP_VALUE, node: '# text\n\n' },
           { comment: ' Trail' },
           { comment: ' comments.' }
-        ] } ]
-      } ]
+        ] }
+      ] } ]
     },
 
     'Example 8.6. Empty Scalar Chomping': {
@@ -1981,8 +1987,7 @@ mapping: !!map
 # lines
 Document`,
       tgt: [{
-        directives: [{ comment: ' Comment' }, { comment: ' lines' }],
-        contents: ['Document']
+        contents: [{ comment: ' Comment' }, { comment: ' lines' }, 'Document']
       }]
     },
 
@@ -2010,7 +2015,7 @@ document
       tgt: [{
         contents: ['Bare document']
       }, {
-        directives: [{ comment: ' No document' }]
+        contents: [{ comment: ' No document' }]
       }, {
         contents: ['%!PS-Adobe-2.0 # Not the first line\n']
       }]

@@ -29,7 +29,7 @@ describe('parse comments', () => {
     test('plain', () => {
       const src = '#c0\nvalue #c1\n#c2'
       const doc = resolve(src)[0]
-      expect(doc.commentBefore).toBe('c0')
+      expect(doc.contents.commentBefore).toBe('c0')
       expect(doc.contents.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
       expect(doc.contents.value).toBe('value')
@@ -38,7 +38,7 @@ describe('parse comments', () => {
     test('"quoted"', () => {
       const src = '#c0\n"value" #c1\n#c2'
       const doc = resolve(src)[0]
-      expect(doc.commentBefore).toBe('c0')
+      expect(doc.contents.commentBefore).toBe('c0')
       expect(doc.contents.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
       expect(doc.contents.value).toBe('value')
@@ -47,7 +47,7 @@ describe('parse comments', () => {
     test('block', () => {
       const src = '#c0\n>- #c1\n value\n#c2\n'
       const doc = resolve(src)[0]
-      expect(doc.commentBefore).toBe('c0')
+      expect(doc.contents.commentBefore).toBe('c0')
       expect(doc.contents.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
       expect(doc.contents.value).toBe('value')
@@ -56,11 +56,12 @@ describe('parse comments', () => {
 
   describe('seq entry comments', () => {
     test('plain', () => {
-      const src = '- value 1\n#c0\n\n- value 2\n\n#c1'
+      const src = '#c0\n- value 1\n#c1\n\n- value 2\n\n#c2'
       const doc = resolve(src)[0]
       expect(doc.contents.items).toHaveLength(2)
-      expect(doc.contents.items[1].commentBefore).toBe('c0')
-      expect(doc.contents.comment).toBe('c1')
+      expect(doc.contents.commentBefore).toBe('c0')
+      expect(doc.contents.items[1].commentBefore).toBe('c1')
+      expect(doc.contents.comment).toBe('c2')
     })
 
     test('multiline', () => {
@@ -74,11 +75,12 @@ describe('parse comments', () => {
 
   describe('map entry comments', () => {
     test('plain', () => {
-      const src = 'key1: value 1\n#c0\n\nkey2: value 2\n\n#c1'
+      const src = '#c0\nkey1: value 1\n#c1\n\nkey2: value 2\n\n#c2'
       const doc = resolve(src)[0]
       expect(doc.contents.items).toHaveLength(2)
-      expect(doc.contents.items[1].commentBefore).toBe('c0')
-      expect(doc.contents.comment).toBe('c1')
+      expect(doc.contents.commentBefore).toBe('c0')
+      expect(doc.contents.items[1].commentBefore).toBe('c1')
+      expect(doc.contents.comment).toBe('c2')
     })
 
     test('multiline', () => {
