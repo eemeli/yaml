@@ -4,6 +4,8 @@ import { DefaultTagPrefixes, DefaultTags } from './Tags'
 import Collection, { toJSON } from './schema/Collection'
 import { addComment } from './schema/Node'
 
+const isCollectionItem = (node) => node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
+
 export default class Document {
   parseTagDirective (directive) {
     const [handle, prefix] = directive.parameters
@@ -83,10 +85,13 @@ export default class Document {
         this.contents = contentNodes[0]
         if (this.contents) {
           const cb = comments.before.join('\n') || null
-          if (this.contents instanceof Collection && this.contents.items[0]) {
-            this.contents.items[0].commentBefore = cb
-          } else {
-            this.contents.commentBefore = cb
+          if (cb) {
+            const cbNode = this.contents instanceof Collection && this.contents.items[0]
+              ? this.contents.items[0]
+              : this.contents
+            cbNode.commentBefore = cbNode.commentBefore
+              ? `${cb}\n${cbNode.commentBefore}`
+              : cb
           }
         } else {
           comments.after = comments.before.concat(comments.after)
@@ -153,12 +158,15 @@ export default class Document {
     let hasAnchor = false
     let hasTag = false
     const comments = { before: [], after: [] }
-    node.props.forEach(({ start, end }, i) => {
+    const props = isCollectionItem(node.context.parent)
+      ? node.context.parent.props.concat(node.props)
+      : node.props
+    props.forEach(({ start, end }, i) => {
       switch (node.context.src[start]) {
         case Char.COMMENT:
           if (!node.commentHasRequiredWhitespace(start)) errors.push(new YAMLSyntaxError(node,
             'Comments must be separated from other tokens by white space characters'))
-          const c = node.getPropValue(i, Char.COMMENT, true)
+          const c = node.context.src.slice(start + 1, end)
           const { header, valueRange } = node
           if (valueRange && (start > valueRange.start || (header && start > header.start))) {
             comments.after.push(c)

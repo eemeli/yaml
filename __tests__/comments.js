@@ -106,8 +106,7 @@ describe('parse comments', () => {
       const doc = resolve(src)[0]
       expect(doc.contents.items).toHaveLength(1)
       expect(doc.contents.items[0].items).toHaveLength(3)
-      expect(doc.contents.items[0].commentBefore).toBe('c0')
-      // expect(doc.contents.items[0].items[0].commentBefore).toBe('c1')
+      expect(doc.contents.items[0].commentBefore).toBe('c0\nc1')
       expect(doc.contents.items[0].items[1].commentBefore).toBe('c2')
       expect(doc.contents.items[0].items[1].value.comment).toBe('c3')
       expect(doc.contents.items[0].items[2].commentBefore).toBe('c4')
@@ -124,19 +123,18 @@ k1: #c1
 #c2
   - v2
   #c3
-k2: - v3 #c4
+k2:
+  - v3 #c4
 #c5\n`
       const doc = resolve(src)[0]
       expect(doc.contents.items).toHaveLength(2)
       expect(doc.contents.items[0].value.items).toHaveLength(2)
       expect(doc.contents.items[0].commentBefore).toBe('c0')
-      // expect(doc.contents.items[0].value.items[0].commentBefore).toBe('c1')
+      expect(doc.contents.items[0].value.commentBefore).toBe('c1')
       expect(doc.contents.items[0].value.items[1].commentBefore).toBe('c2')
       expect(doc.contents.items[0].value.comment).toBe('c3')
       expect(doc.contents.items[1].value.items[0].comment).toBe('c4')
       expect(doc.contents.items[1].value.comment).toBe('c5')
-      // console.log(doc.rawContents[1].items[1].props[0])
-      // console.log(doc.contents.items[0].value)
     })
   })
 })
