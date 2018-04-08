@@ -1,7 +1,7 @@
 import { Char, Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import { DefaultTagPrefixes, DefaultTags } from './Tags'
-import { toJSON } from './schema/Collection'
+import Collection, { toJSON } from './schema/Collection'
 import { addComment } from './schema/Node'
 
 export default class Document {
@@ -81,8 +81,16 @@ export default class Document {
         break
       case 1:
         this.contents = contentNodes[0]
-        if (this.contents) this.contents.commentBefore = comments.before.join('\n') || null
-        else comments.after = comments.before.concat(comments.after)
+        if (this.contents) {
+          const cb = comments.before.join('\n') || null
+          if (this.contents instanceof Collection && this.contents.items[0]) {
+            this.contents.items[0].commentBefore = cb
+          } else {
+            this.contents.commentBefore = cb
+          }
+        } else {
+          comments.after = comments.before.concat(comments.after)
+        }
         break
       default:
         this.errors.push(new YAMLSyntaxError(null,

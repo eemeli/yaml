@@ -59,7 +59,7 @@ describe('parse comments', () => {
       const src = '#c0\n- value 1\n#c1\n\n- value 2\n\n#c2'
       const doc = resolve(src)[0]
       expect(doc.contents.items).toHaveLength(2)
-      expect(doc.contents.commentBefore).toBe('c0')
+      expect(doc.contents.items[0].commentBefore).toBe('c0')
       expect(doc.contents.items[1].commentBefore).toBe('c1')
       expect(doc.contents.comment).toBe('c2')
     })
@@ -78,7 +78,7 @@ describe('parse comments', () => {
       const src = '#c0\nkey1: value 1\n#c1\n\nkey2: value 2\n\n#c2'
       const doc = resolve(src)[0]
       expect(doc.contents.items).toHaveLength(2)
-      expect(doc.contents.commentBefore).toBe('c0')
+      expect(doc.contents.items[0].commentBefore).toBe('c0')
       expect(doc.contents.items[1].commentBefore).toBe('c1')
       expect(doc.contents.comment).toBe('c2')
     })
