@@ -65,28 +65,38 @@ export default class Collection extends Node {
     const opt = { indent: itemIndent, inFlow, type: null }
     let hasItemWithComment = false
     let hasItemWithNewLine = false
-    const items = this.items.map((item, i) => {
+    const nodes = this.items.reduce((nodes, item, i) => {
+      const commentBefore = item && item.commentBefore
+      if (commentBefore) {
+        hasItemWithComment = true
+        commentBefore.match(/^.*$/gm).forEach(line => {
+          nodes.push({ type: 'comment', str: `#${line}`})
+        })
+      }
       let comment = item && item.comment
       if (comment) hasItemWithComment = true
       let str = tags.stringify(item, opt, () => { comment = null })
       if (!hasItemWithNewLine && str.indexOf('\n') !== -1) hasItemWithNewLine = true
       if (inFlow && i < this.items.length - 1) str += ','
-      return addComment(str, opt.indent, comment)
-    })
+      str = addComment(str, opt.indent, comment)
+      nodes.push({ type: 'item', str })
+      return nodes
+    }, [])
     let str;
-    if (items.length === 0) {
+    if (nodes.length === 0) {
       str = flowChars.start + flowChars.end
     } else if (inFlow) {
       const { start, end } = flowChars
+      const strings = nodes.map(({ str }) => str)
       if (hasItemWithComment || hasItemWithNewLine || (
-        items.reduce((sum, item) => sum + item.length + 2, 2) > Collection.maxFlowStringSingleLineLength
+        strings.reduce((sum, str) => sum + str.length + 2, 2) > Collection.maxFlowStringSingleLineLength
       )) {
-        str = `${start}\n  ${indent}${items.join(`\n  ${indent}`)}\n${indent}${end}`
+        str = `${start}\n  ${indent}${strings.join(`\n  ${indent}`)}\n${indent}${end}`
       } else {
-        str = `${start} ${items.join(', ')} ${end}`
+        str = `${start} ${strings.join(' ')} ${end}`
       }
     } else {
-      str = items.map(blockItem).join(`\n${indent}`)
+      str = nodes.map(blockItem).join(`\n${indent}`)
     }
     if (this.comment) {
       if (!hasItemWithNewLine && str.indexOf('\n') === -1) str = addComment(str, indent, this.comment)

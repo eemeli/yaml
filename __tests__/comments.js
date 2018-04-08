@@ -53,6 +53,42 @@ describe('parse comments', () => {
       expect(doc.contents.value).toBe('value')
     })
   })
+
+  describe('seq entry comments', () => {
+    test('plain', () => {
+      const src = '- value 1\n#c0\n\n- value 2\n\n#c1'
+      const doc = resolve(src)[0]
+      expect(doc.contents.items).toHaveLength(2)
+      expect(doc.contents.items[1].commentBefore).toBe('c0')
+      expect(doc.contents.comment).toBe('c1')
+    })
+
+    test('multiline', () => {
+      const src = '- value 1\n#c0\n#c1\n\n#c2\n- value 2\n\n#c3\n#c4'
+      const doc = resolve(src)[0]
+      expect(doc.contents.items).toHaveLength(2)
+      expect(doc.contents.items[1].commentBefore).toBe('c0\nc1\nc2')
+      expect(doc.contents.comment).toBe('c3\nc4')
+    })
+  })
+
+  describe('map entry comments', () => {
+    test('plain', () => {
+      const src = 'key1: value 1\n#c0\n\nkey2: value 2\n\n#c1'
+      const doc = resolve(src)[0]
+      expect(doc.contents.items).toHaveLength(2)
+      expect(doc.contents.items[1].commentBefore).toBe('c0')
+      expect(doc.contents.comment).toBe('c1')
+    })
+
+    test('multiline', () => {
+      const src = 'key1: value 1\n#c0\n#c1\n\n#c2\nkey2: value 2\n\n#c3\n#c4'
+      const doc = resolve(src)[0]
+      expect(doc.contents.items).toHaveLength(2)
+      expect(doc.contents.items[1].commentBefore).toBe('c0\nc1\nc2')
+      expect(doc.contents.comment).toBe('c3\nc4')
+    })
+  })
 })
 
 describe('stringify comments', () => {
@@ -108,6 +144,68 @@ describe('stringify comments', () => {
       const doc = resolve(src)[0]
       doc.directives.push({ type: Type.COMMENT, comment: 'comment' })
       expect(String(doc)).toBe('#comment\nstring\n')
+    })
+  })
+
+  describe('seq entry comments', () => {
+    test('plain', () => {
+      const src = '- value 1\n- value 2\n'
+      const doc = resolve(src)[0]
+      doc.contents.items[0].commentBefore = 'c0'
+      doc.contents.items[1].commentBefore = 'c1'
+      doc.contents.comment = 'c2'
+      expect(String(doc)).toBe('#c0\n- value 1\n#c1\n- value 2\n#c2\n')
+    })
+
+    test('multiline', () => {
+      const src = '- value 1\n- value 2\n'
+      const doc = resolve(src)[0]
+      doc.contents.items[0].commentBefore = 'c0\nc1'
+      doc.contents.items[1].commentBefore = '\nc2\n\nc3'
+      doc.contents.comment = 'c4\nc5'
+      expect(String(doc)).toBe(
+`#c0
+#c1
+- value 1
+#
+#c2
+#
+#c3
+- value 2
+#c4
+#c5
+`)
+    })
+  })
+
+  describe('map entry comments', () => {
+    test('plain', () => {
+      const src = 'key1: value 1\nkey2: value 2\n'
+      const doc = resolve(src)[0]
+      doc.contents.items[0].commentBefore = 'c0'
+      doc.contents.items[1].commentBefore = 'c1'
+      doc.contents.comment = 'c2'
+      expect(String(doc)).toBe('#c0\nkey1: value 1\n#c1\nkey2: value 2\n#c2\n')
+    })
+
+    test('multiline', () => {
+      const src = 'key1: value 1\nkey2: value 2\n'
+      const doc = resolve(src)[0]
+      doc.contents.items[0].commentBefore = 'c0\nc1'
+      doc.contents.items[1].commentBefore = '\nc2\n\nc3'
+      doc.contents.comment = 'c4\nc5'
+      expect(String(doc)).toBe(
+`#c0
+#c1
+key1: value 1
+#
+#c2
+#
+#c3
+key2: value 2
+#c4
+#c5
+`)
     })
   })
 })
