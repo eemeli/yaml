@@ -4,18 +4,18 @@ import Collection, { toJSON } from './Collection'
 import Pair from './Pair'
 
 export default class YAMLSeq extends Collection {
-  constructor (doc, node) {
-    super(doc)
-    node.resolved = this
-    if (node.type === Type.FLOW_SEQ) {
-      this.resolveFlowSeqItems(doc, node)
+  parse (ast) {
+    ast.resolved = this
+    if (ast.type === Type.FLOW_SEQ) {
+      this.resolveFlowSeqItems(ast)
     } else {
-      this.resolveBlockSeqItems(doc, node)
+      this.resolveBlockSeqItems(ast)
     }
     this.resolveComments()
+    return this
   }
 
-  resolveBlockSeqItems (doc, seq) {
+  resolveBlockSeqItems (seq) {
     for (let i = 0; i < seq.items.length; ++i) {
       const item = seq.items[i]
       switch (item.type) {
@@ -23,19 +23,19 @@ export default class YAMLSeq extends Collection {
           this.addComment(item.comment)
           break
         case Type.SEQ_ITEM:
-          if (item.error) doc.errors.push(item.error)
-          this.items.push(doc.resolveNode(item.node))
-          if (item.hasProps) doc.errors.push(new YAMLSyntaxError(item,
+          if (item.error) this.doc.errors.push(item.error)
+          this.items.push(this.doc.resolveNode(item.node))
+          if (item.hasProps) this.doc.errors.push(new YAMLSyntaxError(item,
             'Sequence items cannot have tags or anchors before the - indicator'))
           break
         default:
-          doc.errors.push(new YAMLSyntaxError(item,
+          this.doc.errors.push(new YAMLSyntaxError(item,
             `Unexpected ${item.type} node in sequence`))
       }
     }
   }
 
-  resolveFlowSeqItems (doc, seq) {
+  resolveFlowSeqItems (seq) {
     let explicitKey = false
     let key = undefined
     let keyStart = null
@@ -57,9 +57,9 @@ export default class YAMLSeq extends Collection {
         } else if (next !== '[' && item === ':' && key === undefined) {
           if (next === ',') {
             key = this.items.pop()
-            if (key instanceof Pair) doc.errors.push(new YAMLSyntaxError(item,
+            if (key instanceof Pair) this.doc.errors.push(new YAMLSyntaxError(item,
               'Chaining flow sequence pairs is invalid (e.g. [ a : b : c ])'))
-            if (!explicitKey) Collection.checkKeyLength(doc, seq, i, key, keyStart)
+            if (!explicitKey) Collection.checkKeyLength(this.doc, seq, i, key, keyStart)
           } else {
             key = null
           }
@@ -67,15 +67,15 @@ export default class YAMLSeq extends Collection {
           explicitKey = false // TODO: add error for non-explicit multiline plain key
           next = null
         } else if (next === '[' || item !== ']' || i < seq.items.length - 1) {
-          doc.errors.push(new YAMLSyntaxError(seq,
+          this.doc.errors.push(new YAMLSyntaxError(seq,
             `Flow sequence contains an unexpected ${item}`))
         }
       } else if (item.type === Type.COMMENT) {
         this.addComment(item.comment)
       } else {
-        if (next) doc.errors.push(new YAMLSyntaxError(item,
+        if (next) this.doc.errors.push(new YAMLSyntaxError(item,
           `Expected a ${next} here in flow sequence`))
-        const value = doc.resolveNode(item)
+        const value = this.doc.resolveNode(item)
         if (key === undefined) {
           this.items.push(value)
         } else {
@@ -86,7 +86,7 @@ export default class YAMLSeq extends Collection {
         next = ','
       }
     }
-    if (seq.items[seq.items.length - 1] !== ']') doc.errors.push(new YAMLSyntaxError(seq,
+    if (seq.items[seq.items.length - 1] !== ']') this.doc.errors.push(new YAMLSyntaxError(seq,
       'Expected flow sequence to end with ]'))
     if (key !== undefined) this.items.push(new Pair(key))
   }

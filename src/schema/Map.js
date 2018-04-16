@@ -5,13 +5,12 @@ import Pair from './Pair'
 import YAMLSeq from './Seq'
 
 export default class YAMLMap extends Collection {
-  constructor (doc, node) {
-    super(doc)
-    node.resolved = this
-    if (node.type === Type.FLOW_MAP) {
-      this.resolveFlowMapItems(doc, node)
+  parse (ast) {
+    ast.resolved = this
+    if (ast.type === Type.FLOW_MAP) {
+      this.resolveFlowMapItems(ast)
     } else {
-      this.resolveBlockMapItems(doc, node)
+      this.resolveBlockMapItems(ast)
     }
     this.resolveComments()
     for (let i = 0; i < this.items.length; ++i) {
@@ -19,12 +18,12 @@ export default class YAMLMap extends Collection {
       for (let j = i + 1; j < this.items.length; ++j) {
         const { key: jKey } = this.items[j]
         if (iKey === jKey || (iKey && jKey && iKey.hasOwnProperty('value') && iKey.value === jKey.value)) {
-          doc.errors.push(new YAMLSyntaxError(node,
+          this.doc.errors.push(new YAMLSyntaxError(ast,
             `Map keys must be unique; "${iKey}" is repeated`))
           break
         }
       }
-      if (doc.options.merge && iKey.value === '<<') {
+      if (this.doc.options.merge && iKey.value === '<<') {
         const src = this.items[i].value
         const srcItems = src instanceof YAMLSeq ? (
           src.items.reduce((acc, { items }) => acc.concat(items), [])
@@ -40,9 +39,10 @@ export default class YAMLMap extends Collection {
         i += toAdd.length - 1
       }
     }
+    return this
   }
 
-  resolveBlockMapItems (doc, map) {
+  resolveBlockMapItems (map) {
     let key = undefined
     let keyStart = null
     for (let i = 0; i < map.items.length; ++i) {
@@ -53,41 +53,41 @@ export default class YAMLMap extends Collection {
           break
         case Type.MAP_KEY:
           if (key !== undefined) this.items.push(new Pair(key))
-          if (item.error) doc.errors.push(item.error)
-          key = doc.resolveNode(item.node)
+          if (item.error) this.doc.errors.push(item.error)
+          key = this.doc.resolveNode(item.node)
           keyStart = null
           break
         case Type.MAP_VALUE:
           if (key === undefined) key = null
-          if (item.error) doc.errors.push(item.error)
+          if (item.error) this.doc.errors.push(item.error)
           if (!item.context.atLineStart && item.node && item.node.type === Type.MAP && !item.node.context.atLineStart) {
-            doc.errors.push(new YAMLSyntaxError(item.node, 'Nested mappings are not allowed in compact mappings'))
+            this.doc.errors.push(new YAMLSyntaxError(item.node, 'Nested mappings are not allowed in compact mappings'))
           }
-          this.items.push(new Pair(key, doc.resolveNode(item.node)))
-          Collection.checkKeyLength(doc, map, i, key, keyStart)
+          this.items.push(new Pair(key, this.doc.resolveNode(item.node)))
+          Collection.checkKeyLength(this.doc, map, i, key, keyStart)
           key = undefined
           keyStart = null
           break
         default:
           if (key !== undefined) this.items.push(new Pair(key))
-          key = doc.resolveNode(item)
+          key = this.doc.resolveNode(item)
           keyStart = item.range.start
-          if (map.items[i + 1].type !== Type.MAP_VALUE) doc.errors.push(new YAMLSyntaxError(node,
+          if (map.items[i + 1].type !== Type.MAP_VALUE) this.doc.errors.push(new YAMLSyntaxError(node,
             'Implicit map keys need to be followed by map values'))
-          if (item.valueRangeContainsNewline) doc.errors.push(new YAMLSyntaxError(node,
+          if (item.valueRangeContainsNewline) this.doc.errors.push(new YAMLSyntaxError(node,
             'Implicit map keys need to be on a single line'))
       }
     }
     if (key !== undefined) this.items.push(new Pair(key))
   }
 
-  resolveFlowMapItems (doc, map) {
+  resolveFlowMapItems (map) {
     let key = undefined
     let keyStart = null
     let explicitKey = false
     let next = '{'
     for (let i = 0; i < map.items.length; ++i) {
-      Collection.checkKeyLength(doc, map, i, key, keyStart)
+      Collection.checkKeyLength(this.doc, map, i, key, keyStart)
       const item = map.items[i]
       if (typeof item === 'string') {
         if (item === '?' && key === undefined && !explicitKey) {
@@ -118,17 +118,17 @@ export default class YAMLMap extends Collection {
           next = ':'
           continue
         }
-        doc.errors.push(new YAMLSyntaxError(map, `Flow map contains an unexpected ${item}`))
+        this.doc.errors.push(new YAMLSyntaxError(map, `Flow map contains an unexpected ${item}`))
       } else if (item.type === Type.COMMENT) {
         this.addComment(item.comment)
       } else if (key === undefined) {
-        if (next === ',') doc.errors.push(new YAMLSyntaxError(item, 'Separator , missing in flow map'))
-        key = doc.resolveNode(item)
+        if (next === ',') this.doc.errors.push(new YAMLSyntaxError(item, 'Separator , missing in flow map'))
+        key = this.doc.resolveNode(item)
         keyStart = explicitKey ? null : item.range.start
         // TODO: add error for non-explicit multiline plain key
       } else {
-        if (next !== ',') doc.errors.push(new YAMLSyntaxError(item, 'Indicator : missing in flow map entry'))
-        this.items.push(new Pair(key, doc.resolveNode(item)))
+        if (next !== ',') this.doc.errors.push(new YAMLSyntaxError(item, 'Indicator : missing in flow map entry'))
+        this.items.push(new Pair(key, this.doc.resolveNode(item)))
         key = undefined
       }
     }
