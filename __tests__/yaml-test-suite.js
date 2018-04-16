@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 import { YAMLWarning } from '../src/errors'
-import resolve from '../src/index'
+import YAML from '../src/index'
 
 const testDirs = fs.readdirSync(path.resolve(__dirname, 'yaml-test-suite'))
   .filter(dir => ['.git', 'meta', 'name', 'tags'].indexOf(dir) === -1)
@@ -28,7 +28,7 @@ testDirs.forEach(dir => {
   try { outYaml = fs.readFileSync(path.resolve(root, 'out.yaml'), 'utf8') } catch (e) {}
   if (!error && !json && !outYaml) return
   test(`${dir}: ${name}`, () => {
-    const stream = resolve(yaml)
+    const stream = YAML.parseStream(yaml)
     matchJson(stream, json)
     if (error) {
       expect(stream[0].errors).not.toHaveLength(0)
@@ -38,7 +38,7 @@ testDirs.forEach(dir => {
         .filter(docErrors => docErrors.length > 0)
       expect(errors).toHaveLength(0)
       const src2 = stream.map(doc => String(doc).replace(/\n$/, '')).join('\n---\n') + '\n'
-      const stream2 = resolve(src2)
+      const stream2 = YAML.parseStream(src2)
       trace: name,
         '\nIN\n' + yaml,
         '\nJSON\n' + JSON.stringify(stream[0], null, '  '),
@@ -47,7 +47,7 @@ testDirs.forEach(dir => {
         '\nRE-JSON\n' + JSON.stringify(stream2[0], null, '  ')
       matchJson(stream2, json)
       if (outYaml) {
-        const expStream = resolve(outYaml)
+        const expStream = YAML.parseStream(outYaml)
         const resJson = stream.map(doc => doc.toJSON())
         const expJson = expStream.map(doc => doc.toJSON())
         expect(resJson).toMatchObject(expJson)

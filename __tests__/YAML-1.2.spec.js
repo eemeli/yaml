@@ -1,5 +1,5 @@
 import { Type } from '../src/ast/Node'
-import resolve from '../src/index'
+import YAML from '../src/index'
 
 const spec = {
   '2.1. Collections': {
@@ -357,8 +357,7 @@ date: 2002-12-14`,
         spaced: '2001-12-14 21:59:43.10 -5',
         date: '2002-12-14' } ],
       special: (src) => {
-        const doc = resolve(src, { schema: 'extended' })[0]
-        const { canonical, iso8601, spaced, date } = doc.toJSON()
+        const { canonical, iso8601, spaced, date } = YAML.parse(src, { schema: 'extended' })
         expect(canonical).toBe(new Date('2001-12-15T02:59:43.1Z').toJSON())
         expect(iso8601).toBe(new Date('2001-12-14t21:59:43.10-05:00').toJSON())
         expect(spaced).toBe(new Date('2001-12-14 21:59:43.10 -5').toJSON())
@@ -391,7 +390,7 @@ application specific tag: !something |
         'The tag !something is unavailable, falling back to tag:yaml.org,2002:str'
       ] ],
       special: (src) => {
-        const doc = resolve(src, { schema: 'extended' })[0]
+        const doc = YAML.parseStream(src, { schema: 'extended' })[0]
         const data = doc.contents.items[1].value.value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)
@@ -620,9 +619,8 @@ alias: *anchor`,
           tag: '!local',
           resolve: (doc, node) => 'local:' + node.strValue
         }
-        const doc = resolve(src, { tags: [tag] })[0]
-        expect(doc.toJSON()).toMatchObject({ anchored: 'local:value', alias: 'local:value' })
-        expect(doc.errors).toHaveLength(0)
+        const res = YAML.parse(src, { tags: [tag] })
+        expect(res).toMatchObject({ anchored: 'local:value', alias: 'local:value' })
       }
     },
 
@@ -653,7 +651,7 @@ double: "text"`,
 --- text`,
       tgt: [ 'text' ],
       special: (src) => {
-        const doc = resolve(src)[0]
+        const doc = YAML.parseStream(src)[0]
         expect(doc.version).toBe('1.2')
       }
     },
@@ -882,7 +880,7 @@ Chomping: |
       tgt: [ 'foo' ],
       errors: [ [ 'Document will be parsed as YAML 1.2 rather than YAML 1.3' ] ],
       special: (src) => {
-        const doc = resolve(src)[0]
+        const doc = YAML.parseStream(src)[0]
         expect(doc.version).toBe('1.3')
       }
     },
@@ -898,7 +896,7 @@ foo`,
         'The YAML directive must only be given at most once per document.',
         'Document will be parsed as YAML 1.2 rather than YAML 1.1' ] ],
       special: (src) => {
-        const doc = resolve(src)[0]
+        const doc = YAML.parseStream(src)[0]
         expect(doc.version).toBe('1.1')
       }
     },
@@ -922,7 +920,7 @@ bar`,
       tgt: [ 'bar' ],
       errors: [ [ 'The TAG directive must only be given at most once per handle in the same document.' ] ],
       special: (src) => {
-        const doc = resolve(src)[0]
+        const doc = YAML.parseStream(src)[0]
         expect(doc.tagPrefixes).toMatchObject({ '!': '!foo' })
       }
     },
@@ -949,9 +947,8 @@ bar`,
           tag: 'tag:example.com,2000:app/foo',
           resolve: (doc, node) => 'global'
         } ]
-        const documents = resolve(src, { tags })
-        expect(documents.map(doc => doc.toJSON())).toMatchObject(['private', 'global'])
-        documents.forEach(doc => expect(doc.errors).toHaveLength(0))
+        const res = YAML.parse(src, { docArray: true, tags })
+        expect(res).toMatchObject(['private', 'global'])
       }
     },
 
@@ -967,9 +964,8 @@ bar`,
           tag: 'tag:example.com,2000:app/int',
           resolve: (doc, node) => 'interval'
         }
-        const doc = resolve(src, { tags: [tag] })[0]
-        expect(doc.toJSON()).toBe('interval')
-        expect(doc.errors).toHaveLength(0)
+        const res = YAML.parse(src, { tags: [tag] })
+        expect(res).toBe('interval')
       }
     },
 
@@ -985,9 +981,8 @@ bar`,
           tag: 'tag:example.com,2000:app/foo',
           resolve: (doc, node) => 'foo' + node.strValue
         }
-        const doc = resolve(src, { tags: [tag] })[0]
-        expect(doc.toJSON()).toBe('foobar')
-        expect(doc.errors).toHaveLength(0)
+        const res = YAML.parse(src, { tags: [tag] })
+        expect(res).toBe('foobar')
       }
     },
 
@@ -1009,10 +1004,8 @@ bar`,
           tag: '!my-light',
           resolve: (doc, node) => 'light:' + node.strValue
         }
-        const documents = resolve(src, { tags: [tag] })
-        const tgt = ['light:fluorescent', 'light:green']
-        expect(documents.map(doc => doc.toJSON())).toMatchObject(tgt)
-        documents.forEach(doc => expect(doc.errors).toHaveLength(0))
+        const res = YAML.parse(src, { docArray: true, tags: [tag] })
+        expect(res).toMatchObject(['light:fluorescent', 'light:green'])
       }
     },
 
@@ -1028,9 +1021,8 @@ bar`,
           tag: 'tag:example.com,2000:app/foo',
           resolve: (doc, node) => 'foo' + node.strValue
         }
-        const doc = resolve(src, { tags: [tag] })[0]
-        expect(doc.toJSON()).toMatchObject(['foobar'])
-        expect(doc.errors).toHaveLength(0)
+        const res = YAML.parse(src, { tags: [tag] })
+        expect(res).toMatchObject(['foobar'])
       }
     },
 
@@ -1055,9 +1047,8 @@ bar`,
           tag: '!bar',
           resolve: (doc, node) => 'bar' + node.strValue
         }
-        const doc = resolve(src, { tags: [tag] })[0]
-        expect(doc.toJSON()).toMatchObject({ foo: 'barbaz' })
-        expect(doc.errors).toHaveLength(0)
+        const res = YAML.parse(src, { tags: [tag] })
+        expect(res).toMatchObject({ foo: 'barbaz' })
       }
     },
 
@@ -1091,9 +1082,8 @@ bar`,
           tag: 'tag:example.com,2000:app/tag%21',
           resolve: (doc, node) => 'tag!' + node.strValue
         } ]
-        const doc = resolve(src, { tags })[0]
-        expect(doc.toJSON()).toMatchObject(['local:foo', 'bar', 'tag!baz'])
-        expect(doc.errors).toHaveLength(0)
+        const res = YAML.parse(src, { tags })
+        expect(res).toMatchObject(['local:foo', 'bar', 'tag!baz'])
       }
     },
 
@@ -1668,9 +1658,8 @@ folded:
       errors: [ [ 'The tag !foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = { tag: '!foo', resolve: (doc, node) => 'foo' + node.strValue }
-        const doc = resolve(src, { tags: [tag] })[0]
-        expect(doc.toJSON()).toMatchObject({  literal: 'value\n', folded: 'foovalue\n' })
-        expect(doc.errors).toHaveLength(0)
+        const res = YAML.parse(src, { tags: [tag] })
+        expect(res).toMatchObject({  literal: 'value\n', folded: 'foovalue\n' })
       }
     },
 
@@ -1705,7 +1694,7 @@ Document`,
 Document
 ... # Suffix`,
       tgt: [ 'Document' ],
-      special: (src) => expect(resolve(src)[0].version).toBe('1.2')
+      special: (src) => expect(YAML.parseStream(src)[0].version).toBe('1.2')
     },
 
     'Example 9.3. Bare Documents': {
@@ -1746,7 +1735,7 @@ document
 # Empty
 ...`,
       tgt: [ '%!PS-Adobe-2.0\n', null ],
-      special: (src) => resolve(src).forEach(doc => expect(doc.version).toBe('1.2'))
+      special: (src) => YAML.parseStream(src).forEach(doc => expect(doc.version).toBe('1.2'))
     },
   },
 
@@ -1762,7 +1751,7 @@ document
 matches %: 20`,
       tgt: [ 'Document', null, { 'matches %': 20 } ],
       special: (src) => {
-        const versions = resolve(src).map(doc => doc.version)
+        const versions = YAML.parseStream(src).map(doc => doc.version)
         expect(versions).toMatchObject([null, null, '1.2'])
       }
     }
@@ -1774,7 +1763,7 @@ for (const section in spec) {
     for (const name in spec[section]) {
       test(name, () => {
         const { src, tgt, errors, special } = spec[section][name]
-        const documents = resolve(src)
+        const documents = YAML.parseStream(src)
         const json = documents.map(doc => doc.toJSON())
         const docErrors = documents.map(doc => doc.errors.map(err => err.message))
         trace: name, '\n' + JSON.stringify(json, null, '  '), { errors: docErrors }
@@ -1786,7 +1775,7 @@ for (const section in spec) {
         if (special) special(src)
         if (!errors) {
           const src2 = documents.map(doc => String(doc)).join('\n...\n')
-          const documents2 = resolve(src2)
+          const documents2 = YAML.parseStream(src2)
           const json2 = documents2.map(doc => doc.toJSON())
           trace: name,
             '\nIN\n' + src,

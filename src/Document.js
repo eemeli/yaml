@@ -1,62 +1,42 @@
 import { Char, Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
-import { DefaultTagPrefixes, DefaultTags } from './Tags'
+import Tags, { DefaultTagPrefixes, DefaultTags } from './Tags'
 import Collection, { toJSON } from './schema/Collection'
 import { addComment } from './schema/Node'
 
 const isCollectionItem = (node) => node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
 export default class Document {
-  parseTagDirective (directive) {
-    const [handle, prefix] = directive.parameters
-    if (handle && prefix) {
-      if (this.tagPrefixes[handle]) this.errors.push(new YAMLSyntaxError(directive,
-        'The TAG directive must only be given at most once per handle in the same document.'
-      ))
-      this.tagPrefixes[handle] = prefix
-    } else {
-      this.errors.push(new YAMLSyntaxError(directive,
-        'Insufficient parameters given for TAG directive'
-      ))
-    }
-  }
-
-  parseYamlDirective (directive) {
-    const [version] = directive.parameters
-    if (this.version) this.errors.push(new YAMLSyntaxError(directive,
-      'The YAML directive must only be given at most once per document.'
-    ))
-    if (!version) this.errors.push(new YAMLSyntaxError(directive,
-      'Insufficient parameters given for YAML directive'
-    ))
-    else if (version !== '1.2') this.errors.push(new YAMLWarning(directive,
-      `Document will be parsed as YAML 1.2 rather than YAML ${version}`
-    ))
-    this.version = version
-  }
-
-  constructor (tags, { directives = [], contents = [], error } = {}, { merge } = {}) {
+  constructor (tags, options = {}) {
     this.anchors = []
-    this.directives = directives
+    this.commentBefore = null
+    this.comment = null
+    this.contents = null
+    this.directives = []
     this.errors = []
+    this.options = options.merge ? { merge: options.merge } : {}
+    this.rawContents = null
+    this.tagPrefixes = {}
+    this.tags = tags || new Tags(options)
+    this.version = null
+  }
+
+  parse ({ directives = [], contents = [], error }) {
+    this.directives = directives
     if (error) {
       if (!error.source) error.source = this
       this.errors.push(error)
     }
-    this.options = { merge }
     this.rawContents = contents
-    this.tagPrefixes = {}
-    this.tags = tags
-    this.version = null
     const directiveComments = []
     directives.forEach((directive) => {
       const { comment, name } = directive
       switch (name) {
         case 'TAG':
-          this.parseTagDirective(directive)
+          this.resolveTagDirective(directive)
           break
         case 'YAML':
-          this.parseYamlDirective(directive)
+          this.resolveYamlDirective(directive)
           break
         default:
           if (name) this.errors.push(new YAMLWarning(directive,
@@ -105,6 +85,35 @@ export default class Document {
         else comments.after = comments.before.concat(comments.after)
     }
     this.comment = comments.after.join('\n') || null
+    return this
+  }
+
+  resolveTagDirective (directive) {
+    const [handle, prefix] = directive.parameters
+    if (handle && prefix) {
+      if (this.tagPrefixes[handle]) this.errors.push(new YAMLSyntaxError(directive,
+        'The TAG directive must only be given at most once per handle in the same document.'
+      ))
+      this.tagPrefixes[handle] = prefix
+    } else {
+      this.errors.push(new YAMLSyntaxError(directive,
+        'Insufficient parameters given for TAG directive'
+      ))
+    }
+  }
+
+  resolveYamlDirective (directive) {
+    const [version] = directive.parameters
+    if (this.version) this.errors.push(new YAMLSyntaxError(directive,
+      'The YAML directive must only be given at most once per document.'
+    ))
+    if (!version) this.errors.push(new YAMLSyntaxError(directive,
+      'Insufficient parameters given for YAML directive'
+    ))
+    else if (version !== '1.2') this.errors.push(new YAMLWarning(directive,
+      `Document will be parsed as YAML 1.2 rather than YAML ${version}`
+    ))
+    this.version = version
   }
 
   resolveTagName (node) {
