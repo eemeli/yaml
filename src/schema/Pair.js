@@ -1,5 +1,5 @@
+import addComment from '../addComment'
 import Collection, { toJSON } from './Collection'
-import { addComment } from './Node'
 import Scalar from './Scalar'
 
 export default class Pair {

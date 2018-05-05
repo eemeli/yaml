@@ -1,5 +1,6 @@
+import addComment from '../addComment'
 import { YAMLSyntaxError } from '../errors'
-import Node, { addComment } from './Node'
+import Node from './Node'
 
 export const toJSON = (value) => Array.isArray(value) ? (
   value.map(toJSON)

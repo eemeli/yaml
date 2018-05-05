@@ -1,8 +1,8 @@
+import addComment from './addComment'
 import { Char, Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import Tags, { DefaultTagPrefixes, DefaultTags } from './Tags'
 import Collection, { toJSON } from './schema/Collection'
-import { addComment } from './schema/Node'
 
 const isCollectionItem = (node) => node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
