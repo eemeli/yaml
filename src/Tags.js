@@ -83,7 +83,7 @@ export default class Tags {
     return node.resolved
   }
 
-  resolve (doc, node, tagName) {
+  resolveNodeWithFallback (doc, node, tagName) {
     const res = this.resolveNode(doc, node, tagName)
     if (node.hasOwnProperty('resolved')) return res
     const fallback = (

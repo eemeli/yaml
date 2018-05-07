@@ -209,7 +209,7 @@ export default class Document {
     } else {
       const tagName = this.resolveTagName(node)
       if (tagName) {
-        res = tags.resolve(this, node, tagName)
+        res = tags.resolveNodeWithFallback(this, node, tagName)
       } else {
         if (node.type !== Type.PLAIN) {
           errors.push(new YAMLSyntaxError(node, `Failed to resolve ${node.type} node here`))
