@@ -1,6 +1,7 @@
 import addComment from './addComment'
 import { Char, Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
+import resolveValue from './resolveValue'
 import Tags, { DefaultTagPrefixes, DefaultTags } from './Tags'
 import Collection, { toJSON } from './schema/Collection'
 
@@ -231,6 +232,10 @@ export default class Document {
       if (ca) res.comment = res.comment ? `${res.comment}\n${ca}` : ca
     }
     return node.resolved = res
+  }
+
+  setContents (value, wrapScalars) {
+    this.contents = resolveValue(this, value, wrapScalars)
   }
 
   toJSON () {

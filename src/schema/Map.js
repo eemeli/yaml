@@ -142,7 +142,7 @@ export default class YAMLMap extends Collection {
     }, {})
   }
 
-  toString (indent, inFlow, onComment) {
+  toString (indent = '', inFlow = false, onComment) {
     return super.toString({
       blockItem: ({ str }) => str,
       flowChars: { start: '{', end: '}' },
