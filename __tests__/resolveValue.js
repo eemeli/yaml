@@ -9,34 +9,34 @@ let doc
 beforeEach(() => { doc = new YAML.Document() })
 
 describe('scalars', () => {
-  describe('wrapScalars true', () => {
+  describe('doc#resolveValue(value) - wrapScalars true', () => {
     test('boolean', () => {
-      const s = resolveValue(doc, false, true)
+      const s = doc.resolveValue(false)
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(false)
     })
     test('null', () => {
-      const s = resolveValue(doc, null, true)
+      const s = doc.resolveValue(null)
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(null)
     })
     test('undefined', () => {
-      const s = resolveValue(doc, undefined, true)
+      const s = doc.resolveValue(undefined)
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(null)
     })
     test('number', () => {
-      const s = resolveValue(doc, 3, true)
+      const s = doc.resolveValue(3)
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(3)
     })
     test('string', () => {
-      const s = resolveValue(doc, 'test', true)
+      const s = doc.resolveValue('test')
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe('test')
     })
   })
-  describe('wrapScalars false', () => {
+  describe('resolveValue(doc, value) - wrapScalars false', () => {
     test('boolean', () => {
       const s = resolveValue(doc, false)
       expect(s).toBe(false)
@@ -47,7 +47,7 @@ describe('scalars', () => {
       expect(s.value).toBe(null)
     })
     test('undefined', () => {
-      const s = resolveValue(doc)
+      const s = resolveValue(doc, )
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(null)
     })
@@ -64,7 +64,7 @@ describe('scalars', () => {
 
 describe('arrays', () => {
   test('[]', () => {
-    const s = resolveValue(doc, [])
+    const s = doc.resolveValue([])
     expect(s).toBeInstanceOf(Seq)
     expect(s.items).toHaveLength(0)
   })
@@ -75,7 +75,7 @@ describe('arrays', () => {
   })
   describe('[3, ["four", 5]]', () => {
     const array = [3, ['four', 5]]
-    test('wrapScalars false', () => {
+    test('resolveValue(doc, value) - wrapScalars false', () => {
       const s = resolveValue(doc, array)
       expect(s).toBeInstanceOf(Seq)
       expect(s.items).toHaveLength(2)
@@ -83,8 +83,8 @@ describe('arrays', () => {
       expect(s.items[1]).toBeInstanceOf(Seq)
       expect(s.items[1].items).toMatchObject(['four', 5])
     })
-    test('wrapScalars true', () => {
-      const s = resolveValue(doc, array, true)
+    test('doc#resolveValue(value) - wrapScalars true', () => {
+      const s = doc.resolveValue(array)
       expect(s).toBeInstanceOf(Seq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0].value).toBe(3)
@@ -102,7 +102,7 @@ describe('arrays', () => {
 
 describe('objects', () => {
   test('{}', () => {
-    const s = resolveValue(doc, {})
+    const s = doc.resolveValue({})
     expect(s).toBeInstanceOf(Map)
     expect(s.items).toHaveLength(0)
   })
@@ -115,7 +115,7 @@ describe('objects', () => {
   })
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {
     const object = { x: 3, y: [4], z: { w: "five", v: 6 } }
-    test('wrapScalars false', () => {
+    test('resolveValue(doc, value) - wrapScalars false', () => {
       const s = resolveValue(doc, object)
       expect(s).toBeInstanceOf(Map)
       expect(s.items).toHaveLength(3)
@@ -128,8 +128,8 @@ describe('objects', () => {
         ] } }
       ])
     })
-    test('wrapScalars true', () => {
-      const s = resolveValue(doc, object, true)
+    test('doc#resolveValue(value) - wrapScalars true', () => {
+      const s = doc.resolveValue(object)
       expect(s).toBeInstanceOf(Map)
       expect(s.items).toHaveLength(3)
       expect(s.items).toMatchObject([

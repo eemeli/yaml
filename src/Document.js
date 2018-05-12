@@ -235,6 +235,10 @@ export default class Document {
     return node.resolved = res
   }
 
+  resolveValue (value) {
+    return resolveValue(this, value, true)
+  }
+
   toJSON () {
     return toJSON(this.contents)
   }

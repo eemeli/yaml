@@ -1,6 +1,5 @@
 import { Type } from './ast/Node'
 import { YAMLReferenceError, YAMLWarning } from './errors'
-import resolveValue from './resolveValue'
 import availableSchema from './schema'
 import Collection from './schema/Collection'
 import Pair from './schema/Pair'
@@ -105,7 +104,7 @@ export default class Tags {
 
   stringify (doc, item, options, onComment) {
     if (!(item instanceof Scalar || item instanceof Collection || item instanceof Pair)) {
-      item = resolveValue(doc, item, true)
+      item = doc.resolveValue(item, true)
     }
     options.tags = this
     let match
