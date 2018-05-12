@@ -1,5 +1,6 @@
 import { Type } from './ast/Node'
 import { YAMLReferenceError, YAMLWarning } from './errors'
+import resolveValue from './resolveValue'
 import availableSchema from './schema'
 import Collection from './schema/Collection'
 import Pair from './schema/Pair'
@@ -102,12 +103,14 @@ export default class Tags {
     return null
   }
 
-  stringify (item, options, onComment) {
-    if (item == null || typeof item !== 'object') item = new Scalar(item)
+  stringify (doc, item, options, onComment) {
+    if (!(item instanceof Scalar || item instanceof Collection || item instanceof Pair)) {
+      item = resolveValue(doc, item, true)
+    }
     options.tags = this
     let match
     if (item instanceof Pair) {
-      return item.toString(this, options, onComment)
+      return item.toString(doc, options, onComment)
     } else if (item.tag) {
       match = this.schema.filter(({ format, tag }) => tag === item.tag && (!item.format || format === item.format))
       if (match.length === 0) throw new Error(

@@ -76,7 +76,7 @@ export default class Collection extends Node {
       }
       let comment = item && item.comment
       if (comment) hasItemWithComment = true
-      let str = tags.stringify(item, opt, () => { comment = null })
+      let str = tags.stringify(this.doc, item, opt, () => { comment = null })
       if (!hasItemWithNewLine && str.indexOf('\n') !== -1) hasItemWithNewLine = true
       if (inFlow && i < this.items.length - 1) str += ','
       str = addComment(str, opt.indent, comment)

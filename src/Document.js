@@ -235,20 +235,12 @@ export default class Document {
     return node.resolved = res
   }
 
-  setContents (value, wrapScalars) {
-    this.contents = resolveValue(this, value, wrapScalars)
-  }
-
   toJSON () {
     return toJSON(this.contents)
   }
 
   toString () {
-    let { contents } = this
-    if (Array.isArray(contents)) {
-      if (contents.length <= 1) contents = contents[0] || null
-      else throw new Error('Document with multiple content nodes cannot be stringified')
-    }
+    if (this.errors.length > 0) throw new Error('Document with errors cannot be stringified')
     const lines = this.directives
       .filter(({ comment }) => comment)
       .map(({ comment }) => comment.replace(/^/gm, '#'))
@@ -263,6 +255,7 @@ export default class Document {
       hasDirectives = true
     })
     if (hasDirectives) lines.push('---')
+    const { contents } = this
     if (contents) {
       if (contents.commentBefore) lines.push(contents.commentBefore.replace(/^/gm, '#'))
       const options = {
@@ -271,7 +264,7 @@ export default class Document {
         indent: ''
       }
       let comment = contents.comment
-      const body = this.tags.stringify(contents, options, () => { comment = null })
+      const body = this.tags.stringify(this, contents, options, () => { comment = null })
       lines.push(addComment(body, '', comment))
     }
     if (this.comment) lines.push(this.comment.replace(/^/gm, '#'))

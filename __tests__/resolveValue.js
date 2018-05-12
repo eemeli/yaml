@@ -71,23 +71,17 @@ describe('arrays', () => {
   test('[true]', () => {
     const s = resolveValue(doc, [true])
     expect(s).toBeInstanceOf(Seq)
-    expect(s.items).toHaveLength(1)
-    expect(s.items[0]).toBe(true)
+    expect(s.items).toMatchObject([true])
   })
   describe('[3, ["four", 5]]', () => {
     const array = [3, ['four', 5]]
-    const res = '- 3\n- - four\n  - 5\n'
     test('wrapScalars false', () => {
       const s = resolveValue(doc, array)
       expect(s).toBeInstanceOf(Seq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0]).toBe(3)
       expect(s.items[1]).toBeInstanceOf(Seq)
-      expect(s.items[1].items).toHaveLength(2)
-      expect(s.items[1].items[0]).toBe('four')
-      expect(s.items[1].items[1]).toBe(5)
-      doc.setContents(array)
-      expect(String(doc)).toBe(res)
+      expect(s.items[1].items).toMatchObject(['four', 5])
     })
     test('wrapScalars true', () => {
       const s = resolveValue(doc, array, true)
@@ -98,8 +92,10 @@ describe('arrays', () => {
       expect(s.items[1].items).toHaveLength(2)
       expect(s.items[1].items[0].value).toBe('four')
       expect(s.items[1].items[1].value).toBe(5)
-      doc.setContents(array, true)
-      expect(String(doc)).toBe(res)
+    })
+    test('set contents', () => {
+      doc.contents = array
+      expect(String(doc)).toBe('- 3\n- - four\n  - 5\n')
     })
   })
 })
@@ -119,12 +115,6 @@ describe('objects', () => {
   })
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {
     const object = { x: 3, y: [4], z: { w: "five", v: 6 } }
-    const res = `x: 3
-y:
-  - 4
-z:
-  w: five
-  v: 6\n`
     test('wrapScalars false', () => {
       const s = resolveValue(doc, object)
       expect(s).toBeInstanceOf(Map)
@@ -137,8 +127,6 @@ z:
           { key: 'v', value: 6 }
         ] } }
       ])
-      doc.setContents(object)
-      expect(String(doc)).toBe(res)
     })
     test('wrapScalars true', () => {
       const s = resolveValue(doc, object, true)
@@ -152,7 +140,15 @@ z:
           { key: { value: 'v' }, value: { value: 6 } }
         ] } }
       ])
-      doc.setContents(object, true)
+    })
+    test('set contents', () => {
+      const res = `x: 3
+y:
+  - 4
+z:
+  w: five
+  v: 6\n`
+      doc.contents = object
       expect(String(doc)).toBe(res)
     })
   })

@@ -31,8 +31,8 @@ export default class Pair {
     return pair
   }
 
-  toString (tags, options, onComment) {
-    if (!tags) return JSON.stringify(this)
+  toString (doc, options, onComment) {
+    if (!doc) return JSON.stringify(this)
     const { key, value } = this
     const { indent } = options
     const explicitKey = !key || key.comment || key instanceof Collection
@@ -41,10 +41,10 @@ export default class Pair {
       indent: options.indent + '  '
     })
     let keyComment = key && key.comment
-    let keyStr = tags.stringify(key, opt, () => { keyComment = null })
+    let keyStr = doc.tags.stringify(doc, key, opt, () => { keyComment = null })
     if (keyComment) keyStr = addComment(keyStr, opt.indent, keyComment)
     opt.implicitKey = false
-    const valueStr = tags.stringify(value, opt, onComment)
+    const valueStr = doc.tags.stringify(doc, value, opt, onComment)
     if (explicitKey) {
       return `? ${keyStr}\n${indent}: ${valueStr}`
     } else if (value instanceof Collection) {
