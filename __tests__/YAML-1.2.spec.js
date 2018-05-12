@@ -385,7 +385,7 @@ application specific tag: !something |
         picture: 'R0lGODlhDAAMAIQAAP//9/X\n17unp5WZmZgAAAOfn515eXv\nPz7Y6OjuDg4J+fn5OTk6enp\n56enmleECcgggoBADs=\n',
         'application specific tag': 'The semantics of the tag\nabove may be different for\ndifferent documents.\n'
       } ],
-      errors: [ [
+      warnings: [ [
         'The tag tag:yaml.org,2002:binary is unavailable, falling back to tag:yaml.org,2002:str',
         'The tag !something is unavailable, falling back to tag:yaml.org,2002:str'
       ] ],
@@ -419,7 +419,7 @@ application specific tag: !something |
         { start: { x: 73, y: 129 },
           color: 16772795,
           text: 'Pretty vector drawing.' } ] ],
-      errors: [ [
+      warnings: [ [
         'The tag tag:clarkevans.com,2002:shape is unavailable, falling back to tag:yaml.org,2002:seq',
         'The tag tag:clarkevans.com,2002:circle is unavailable, falling back to tag:yaml.org,2002:map',
         'The tag tag:clarkevans.com,2002:line is unavailable, falling back to tag:yaml.org,2002:map',
@@ -441,7 +441,7 @@ application specific tag: !something |
         'Sammy Sosa': null,
         'Ken Griff': null
       } ],
-      errors: [ [
+      warnings: [ [
         'The tag tag:yaml.org,2002:set is unavailable, falling back to tag:yaml.org,2002:map'
       ] ]
     },
@@ -459,7 +459,7 @@ application specific tag: !something |
         { 'Mark McGwire': 65 },
         { 'Sammy Sosa': 63 },
         { 'Ken Griffy': 58 } ] ],
-      errors: [ [
+      warnings: [ [
         'The tag tag:yaml.org,2002:omap is unavailable, falling back to tag:yaml.org,2002:seq'
       ] ]
     },
@@ -528,7 +528,7 @@ comments:
         tax: 251.42,
         total: 4443.52,
         comments: 'Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.' } ],
-      errors: [ [
+      warnings: [ [
         'The tag tag:clarkevans.com,2002:invoice is unavailable, falling back to tag:yaml.org,2002:map'
       ] ]
     },
@@ -613,7 +613,7 @@ mapping: { sky: blue, sea: green }`,
 `anchored: !local &anchor value
 alias: *anchor`,
       tgt: [ { anchored: 'value', alias: 'value' } ],
-      errors: [ [ 'The tag !local is unavailable, falling back to tag:yaml.org,2002:str' ] ],
+      warnings: [ [ 'The tag !local is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: '!local',
@@ -866,7 +866,7 @@ Chomping: |
 # with a warning.
 --- "foo"`,
       tgt: [ 'foo' ],
-      errors: [ [ 'YAML 1.2 only supports TAG and YAML directives, and not FOO' ] ]
+      warnings: [ [ 'YAML 1.2 only supports TAG and YAML directives, and not FOO' ] ]
     },
 
   },
@@ -878,7 +878,7 @@ Chomping: |
 ---
 "foo"`,
       tgt: [ 'foo' ],
-      errors: [ [ 'Document will be parsed as YAML 1.2 rather than YAML 1.3' ] ],
+      warnings: [ [ 'Document will be parsed as YAML 1.2 rather than YAML 1.3' ] ],
       special: (src) => {
         const doc = YAML.parseStream(src)[0]
         expect(doc.version).toBe('1.3')
@@ -892,9 +892,8 @@ Chomping: |
 ---
 foo`,
       tgt: [ 'foo' ],
-      errors: [ [
-        'The YAML directive must only be given at most once per document.',
-        'Document will be parsed as YAML 1.2 rather than YAML 1.1' ] ],
+      errors: [ [ 'The YAML directive must only be given at most once per document.' ] ],
+      warnings: [ [ 'Document will be parsed as YAML 1.2 rather than YAML 1.1' ] ],
       special: (src) => {
         const doc = YAML.parseStream(src)[0]
         expect(doc.version).toBe('1.1')
@@ -935,7 +934,7 @@ bar`,
 ---
 !foo "bar"`,
       tgt: [ 'bar', 'bar' ],
-      errors: [
+      warnings: [
         [ 'The tag !foo is unavailable, falling back to tag:yaml.org,2002:str' ],
         [ 'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str' ]
       ],
@@ -958,7 +957,7 @@ bar`,
 ---
 !!int 1 - 3 # Interval, not integer`,
       tgt: [ '1 - 3' ],
-      errors: [ [ 'The tag tag:example.com,2000:app/int is unavailable, falling back to tag:yaml.org,2002:str' ] ],
+      warnings: [ [ 'The tag tag:example.com,2000:app/int is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: 'tag:example.com,2000:app/int',
@@ -975,7 +974,7 @@ bar`,
 ---
 !e!foo "bar"`,
       tgt: [ 'bar' ],
-      errors: [ [ 'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
+      warnings: [ [ 'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
@@ -996,7 +995,7 @@ bar`,
 --- # Color here
 !m!light green`,
       tgt: [ 'fluorescent', 'green' ],
-      errors: [
+      warnings: [
         [ 'The tag !my-light is unavailable, falling back to tag:yaml.org,2002:str' ],
         [ 'The tag !my-light is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
@@ -1015,7 +1014,7 @@ bar`,
 ---
 - !e!foo "bar"`,
       tgt: [ [ 'bar' ] ],
-      errors: [ [ 'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
+      warnings: [ [ 'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
@@ -1041,7 +1040,7 @@ bar`,
 `!<tag:yaml.org,2002:str> foo :
   !<!bar> baz`,
       tgt: [ { foo: 'baz' } ],
-      errors: [ [ 'The tag !bar is unavailable, falling back to tag:yaml.org,2002:str' ] ],
+      warnings: [ [ 'The tag !bar is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = {
           tag: '!bar',
@@ -1057,10 +1056,8 @@ bar`,
 `- !<!> foo
 - !<$:?> bar`,
       tgt: [ [ 'foo', 'bar' ] ],
-      errors: [ [
-        'Verbatim tags aren\'t resolved, so ! is invalid.',
-        'The tag $:? is unavailable, falling back to tag:yaml.org,2002:str'
-      ]]
+      errors: [ [ 'Verbatim tags aren\'t resolved, so ! is invalid.' ] ],
+      warnings: [ [ 'The tag $:? is unavailable, falling back to tag:yaml.org,2002:str' ] ]
     },
 
     'Example 6.26. Tag Shorthands': {
@@ -1071,7 +1068,7 @@ bar`,
 - !!str bar
 - !e!tag%21 baz`,
       tgt: [ [ 'foo', 'bar', 'baz' ] ],
-      errors: [ [
+      warnings: [ [
         'The tag !local is unavailable, falling back to tag:yaml.org,2002:str',
         'The tag tag:example.com,2000:app/tag%21 is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
@@ -1655,7 +1652,7 @@ folded:
   >1
  value`,
       tgt: [ { literal: 'value\n', folded: 'value\n' } ],
-      errors: [ [ 'The tag !foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
+      warnings: [ [ 'The tag !foo is unavailable, falling back to tag:yaml.org,2002:str' ] ],
       special: (src) => {
         const tag = { tag: '!foo', resolve: (doc, node) => 'foo' + node.strValue }
         const res = YAML.parse(src, { tags: [tag] })
@@ -1762,7 +1759,7 @@ for (const section in spec) {
   describe(section, () => {
     for (const name in spec[section]) {
       test(name, () => {
-        const { src, tgt, errors, special } = spec[section][name]
+        const { src, tgt, errors, special, warnings } = spec[section][name]
         const documents = YAML.parseStream(src)
         const json = documents.map(doc => doc.toJSON())
         const docErrors = documents.map(doc => doc.errors.map(err => err.message))
@@ -1771,6 +1768,8 @@ for (const section in spec) {
         documents.forEach((doc, i) => {
           if (!errors || !errors[i]) expect(doc.errors).toHaveLength(0)
           else errors[i].forEach((err, j) => expect(doc.errors[j].message).toBe(err))
+          if (!warnings || !warnings[i]) expect(doc.warnings).toHaveLength(0)
+          else warnings[i].forEach((err, j) => expect(doc.warnings[j].message).toBe(err))
         })
         if (special) special(src)
         if (!errors) {

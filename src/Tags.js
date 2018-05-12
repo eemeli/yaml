@@ -92,8 +92,7 @@ export default class Tags {
       : DefaultTags.STR
     )
     if (fallback) {
-      const err =
-      doc.errors.push(new YAMLWarning(node,
+      doc.warnings.push(new YAMLWarning(node,
         `The tag ${tagName} is unavailable, falling back to ${fallback}`))
       return this.resolveNode(doc, node, fallback)
     } else {

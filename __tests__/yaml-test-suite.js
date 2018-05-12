@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 
-import { YAMLWarning } from '../src/errors'
 import YAML from '../src/index'
 
 const testDirs = fs.readdirSync(path.resolve(__dirname, 'yaml-test-suite'))
@@ -30,12 +29,12 @@ testDirs.forEach(dir => {
   test(`${dir}: ${name}`, () => {
     const stream = YAML.parseStream(yaml)
     matchJson(stream, json)
+    const errors = stream
+      .map(doc => doc.errors)
+      .filter(docErrors => docErrors.length > 0)
     if (error) {
-      expect(stream[0].errors).not.toHaveLength(0)
+      expect(errors).not.toHaveLength(0)
     } else {
-      const errors = stream
-        .map(doc => doc.errors.filter(err => !(err instanceof YAMLWarning)))
-        .filter(docErrors => docErrors.length > 0)
       expect(errors).toHaveLength(0)
       const src2 = stream.map(doc => String(doc).replace(/\n$/, '')).join('\n---\n') + '\n'
       const stream2 = YAML.parseStream(src2)

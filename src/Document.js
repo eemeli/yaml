@@ -20,6 +20,7 @@ export default class Document {
     this.tagPrefixes = {}
     this.tags = tags || new Tags(options)
     this.version = null
+    this.warnings = []
   }
 
   parse ({ directives = [], contents = [], error }) {
@@ -40,7 +41,7 @@ export default class Document {
           this.resolveYamlDirective(directive)
           break
         default:
-          if (name) this.errors.push(new YAMLWarning(directive,
+          if (name) this.warnings.push(new YAMLWarning(directive,
             `YAML 1.2 only supports TAG and YAML directives, and not ${name}`
           ))
       }
@@ -111,7 +112,7 @@ export default class Document {
     if (!version) this.errors.push(new YAMLSyntaxError(directive,
       'Insufficient parameters given for YAML directive'
     ))
-    else if (version !== '1.2') this.errors.push(new YAMLWarning(directive,
+    else if (version !== '1.2') this.warnings.push(new YAMLWarning(directive,
       `Document will be parsed as YAML 1.2 rather than YAML ${version}`
     ))
     this.version = version
