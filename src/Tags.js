@@ -6,10 +6,10 @@ import Pair from './schema/Pair'
 import Scalar from './schema/Scalar'
 import { resolve as resolveStr } from './schema/_string'
 
-export const DefaultTagPrefixes = {
-  '!': '!',
-  '!!': 'tag:yaml.org,2002:'
-}
+export const DefaultTagPrefixes = [
+  { handle: '!', prefix: '!' },
+  { handle: '!!', prefix: 'tag:yaml.org,2002:' }
+]
 
 export const DefaultTags = {
   MAP: 'tag:yaml.org,2002:map',
@@ -94,7 +94,9 @@ export default class Tags {
     if (fallback) {
       doc.warnings.push(new YAMLWarning(node,
         `The tag ${tagName} is unavailable, falling back to ${fallback}`))
-      return this.resolveNode(doc, node, fallback)
+      const res = this.resolveNode(doc, node, fallback)
+      res.origTag = tagName
+      return res
     } else {
       doc.errors.push(new YAMLReferenceError(node,
         `The tag ${tagName} is unavailable`))

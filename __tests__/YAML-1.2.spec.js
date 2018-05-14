@@ -920,7 +920,7 @@ bar`,
       errors: [ [ 'The TAG directive must only be given at most once per handle in the same document.' ] ],
       special: (src) => {
         const doc = YAML.parseStream(src)[0]
-        expect(doc.tagPrefixes).toMatchObject({ '!': '!foo' })
+        expect(doc.tagPrefixes).toMatchObject([{ handle: '!', prefix: '!foo' }])
       }
     },
 

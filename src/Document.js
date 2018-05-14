@@ -1,4 +1,5 @@
 import addComment from './addComment'
+import listTagNames from './listTagNames'
 import { Char, Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import resolveValue from './resolveValue'
@@ -17,7 +18,7 @@ export default class Document {
     this.errors = []
     this.options = options.merge ? { merge: options.merge } : {}
     this.rawContents = null
-    this.tagPrefixes = {}
+    this.tagPrefixes = []
     this.tags = tags || new Tags(options)
     this.version = null
     this.warnings = []
@@ -93,10 +94,13 @@ export default class Document {
   resolveTagDirective (directive) {
     const [handle, prefix] = directive.parameters
     if (handle && prefix) {
-      if (this.tagPrefixes[handle]) this.errors.push(new YAMLSyntaxError(directive,
-        'The TAG directive must only be given at most once per handle in the same document.'
-      ))
-      this.tagPrefixes[handle] = prefix
+      if (this.tagPrefixes.every(p => p.handle !== handle)) {
+        this.tagPrefixes.push({ handle, prefix })
+      } else {
+        this.errors.push(new YAMLSyntaxError(directive,
+          'The TAG directive must only be given at most once per handle in the same document.'
+        ))
+      }
     } else {
       this.errors.push(new YAMLSyntaxError(directive,
         'Insufficient parameters given for TAG directive'
@@ -131,9 +135,9 @@ export default class Document {
       } else if (handle === '!' && !suffix) {
         nonSpecific = true
       } else {
-        const prefix = this.tagPrefixes[handle] || DefaultTagPrefixes[handle]
+        const prefix = this.tagPrefixes.find(p => p.handle === handle) || DefaultTagPrefixes.find(p => p.handle === handle)
         if (prefix) {
-          if (suffix) return prefix + suffix
+          if (suffix) return prefix.prefix + suffix
           this.errors.push(new YAMLSyntaxError(node,
             `The ${handle} tag has no suffix.`
           ))
@@ -239,6 +243,12 @@ export default class Document {
     return resolveValue(this, value, true)
   }
 
+  listNonDefaultTags () {
+    const { prefix } = DefaultTagPrefixes.find(p => p.handle === '!!')
+    return listTagNames(this.contents)
+      .filter(t => t.indexOf(prefix) !== 0)
+  }
+
   toJSON () {
     return toJSON(this.contents)
   }
@@ -253,22 +263,26 @@ export default class Document {
       lines.push('%YAML 1.2')
       hasDirectives = true
     }
-    Object.keys(this.tagPrefixes).forEach((handle) => {
-      const prefix = this.tagPrefixes[handle]
-      lines.push(`%TAG ${handle} ${prefix}`)
-      hasDirectives = true
-    })
+    const tagNames = this.listNonDefaultTags()
+    if (tagNames.length > 0) {
+      tagNames.forEach(t => {
+        const p = this.tagPrefixes.find(p => t.indexOf(p.prefix) === 0)
+        if (p) {
+          lines.push(`%TAG ${p.handle} ${p.prefix}`)
+          hasDirectives = true
+        }
+      })
+    }
     if (hasDirectives) lines.push('---')
-    const { contents } = this
-    if (contents) {
-      if (contents.commentBefore) lines.push(contents.commentBefore.replace(/^/gm, '#'))
+    if (this.contents) {
+      if (this.contents.commentBefore) lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
       const options = {
         // top-level block scalars need to be indented if followed by a comment
         forceBlockIndent: !!this.comment,
         indent: ''
       }
-      let comment = contents.comment
-      const body = this.tags.stringify(this, contents, options, () => { comment = null })
+      let comment = this.contents.comment
+      const body = this.tags.stringify(this, this.contents, options, () => { comment = null })
       lines.push(addComment(body, '', comment))
     }
     if (this.comment) lines.push(this.comment.replace(/^/gm, '#'))
