@@ -12,7 +12,7 @@ npm install yaml@next
 ```
 
 ```js
-import { resolve } from 'yaml'
+import YAML from 'yaml'
 
 const yaml =
 `YAML:
@@ -23,9 +23,7 @@ yaml:
   - https://www.npmjs.com/package/yaml
 `
 
-const doc = resolve(yaml)[0]
-
-doc.toJSON()
+YAML.parse(yaml)
 /*
  *  { YAML:
  *    [ 'A human-readable data serialization language',
@@ -35,7 +33,8 @@ doc.toJSON()
  *      'https://www.npmjs.com/package/yaml' ] }
 */
 
-doc.toString() === yaml
+const docStream = YAML.parseStream(yaml)
+docStream[0].toString() === yaml
 ```
 
 
@@ -71,14 +70,11 @@ The reason why this project exists is to have a tool that's capable of properly 
 
 #### Stringifying
 - `Document#toString()` produces idempotent YAML from all non-error spec examples and test suite cases
+- Non-default tags are explicitly included in the output
 - `AST#toString()` works completely, but is clumsy to use
 
 
 ### Still Needs Work
-
 - Long lines should be wrapped
-- Collections need to retain tag data
-- Item add/remove should keep tags in place
-- Explicit tags are not included in the stringified output
 - API needs finalising
 - Better documentation
