@@ -1,6 +1,7 @@
 import YAML from '../src/index'
+import Scalar from '../src/schema/Scalar'
 
-describe('json', () => {
+describe('json schema', () => {
   test('!!bool', () => {
     const src =
 `"canonical": true
@@ -70,7 +71,7 @@ describe('json', () => {
   })
 })
 
-describe('core', () => {
+describe('core schema', () => {
   test('!!bool', () => {
     const src =
 `canonical: true
@@ -132,7 +133,7 @@ english: null
   })
 })
 
-describe('extended', () => {
+describe('extended schema', () => {
   test('!!binary', () => {
     const src =
 `canonical: !!binary "\\
@@ -293,5 +294,64 @@ describe('merge <<', () => {
     for (let i = 5; i < res.length; ++i) {
       expect(res[i]).toHaveProperty('<<')
     }
+  })
+})
+
+describe('custom tags', () => {
+  const src =
+`%TAG !e! tag:example.com,2000:test/
+---
+!e!x
+- !y 2
+- !e!z 3
+- !<tag:example.com,2000:other/w> 4
+- '5'`
+
+  test('parse', () => {
+    const doc = YAML.parseStream(src)[0]
+    expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
+    expect(doc.contents.origTag).toBe('tag:example.com,2000:test/x')
+    const { items } = doc.contents
+    expect(items).toHaveLength(4)
+    items.forEach(item => expect(item.tag).toBe('tag:yaml.org,2002:str'))
+    expect(items[0].origTag).toBe('!y')
+    expect(items[1].origTag).toBe('tag:example.com,2000:test/z')
+    expect(items[2].origTag).toBe('tag:example.com,2000:other/w')
+  })
+
+  test('stringify', () => {
+    const doc = YAML.parseStream(src)[0]
+    expect(String(doc)).toBe(
+`%TAG !e! tag:example.com,2000:test/
+---
+!e!x
+- !y "2"
+- !e!z "3"
+- !<tag:example.com,2000:other/w> "4"
+- "5"\n`
+    )
+  })
+
+  test('modify', () => {
+    const doc = YAML.parseStream(src)[0]
+    doc.setTagPrefix('!f!', 'tag:example.com,2000:other/')
+    doc.contents.commentBefore = 'c'
+    doc.contents.items[3].comment = 'cc'
+    const s = new Scalar(6)
+    s.tag = 'tag:yaml.org,2002:str'
+    s.origTag = '!g'
+    doc.contents.items.splice(1, 1, s, '7')
+    expect(String(doc)).toBe(
+`%TAG !e! tag:example.com,2000:test/
+%TAG !f! tag:example.com,2000:other/
+---
+#c
+!e!x
+- !y "2"
+- !g "6"
+- "7"
+- !f!w "4"
+- "5" #cc\n`
+    )
   })
 })

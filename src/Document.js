@@ -249,6 +249,17 @@ export default class Document {
       .filter(t => t.indexOf(prefix) !== 0)
   }
 
+  setTagPrefix (handle, prefix) {
+    if (handle[0] !== '!' || handle[handle.length - 1] !== '!') throw new Error('Handle must start and end with !')
+    if (prefix) {
+      const prev = this.tagPrefixes.find(p => p.handle === handle)
+      if (prev) prev.prefix = prefix
+      else this.tagPrefixes.push({ handle, prefix })
+    } else {
+      this.tagPrefixes = this.tagPrefixes.filter(p => p.handle !== handle)
+    }
+  }
+
   toJSON () {
     return toJSON(this.contents)
   }
@@ -264,15 +275,12 @@ export default class Document {
       hasDirectives = true
     }
     const tagNames = this.listNonDefaultTags()
-    if (tagNames.length > 0) {
-      tagNames.forEach(t => {
-        const p = this.tagPrefixes.find(p => t.indexOf(p.prefix) === 0)
-        if (p) {
-          lines.push(`%TAG ${p.handle} ${p.prefix}`)
-          hasDirectives = true
-        }
-      })
-    }
+    this.tagPrefixes.forEach(({ handle, prefix }) => {
+      if (tagNames.some(t => t.indexOf(prefix) === 0)) {
+        lines.push(`%TAG ${handle} ${prefix}`)
+        hasDirectives = true
+      }
+    })
     if (hasDirectives) lines.push('---')
     if (this.contents) {
       if (this.contents.commentBefore) lines.push(this.contents.commentBefore.replace(/^/gm, '#'))

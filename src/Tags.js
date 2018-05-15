@@ -6,9 +6,11 @@ import Pair from './schema/Pair'
 import Scalar from './schema/Scalar'
 import { resolve as resolveStr } from './schema/_string'
 
+const defaultPrefix = 'tag:yaml.org,2002:'
+
 export const DefaultTagPrefixes = [
   { handle: '!', prefix: '!' },
-  { handle: '!!', prefix: 'tag:yaml.org,2002:' }
+  { handle: '!!', prefix: defaultPrefix }
 ]
 
 export const DefaultTags = {
@@ -131,9 +133,21 @@ export default class Tags {
       }
       match = this.schema.filter(t => t.class && (obj instanceof t.class) && !t.format)
       if (match.length === 0) throw new Error(`Tag not resolved for ${obj && obj.constructor ? obj.constructor.name : typeof obj}`)
-      // TODO: Handle bare arrays and objects?
     }
     const stringify = match[0].stringify || Tags.defaultStringifier
-    return stringify(item, options, onComment)
+    const str = stringify(item, options, onComment)
+    const tag = item.origTag || item.tag
+    if (tag && tag.indexOf(defaultPrefix) !== 0) {
+      const p = doc.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
+      const tagProp = p
+        ? p.handle + tag.substr(p.prefix.length)
+        : tag[0] === '!' ? tag : `!<${tag}>`
+      if (item instanceof Collection && !options.inFlow && item.items.length > 0) {
+        return `${tagProp}\n${options.indent}${str}`
+      } else {
+        return `${tagProp} ${str}`
+      }
+    }
+    return str
   }
 }
