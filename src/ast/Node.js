@@ -37,10 +37,10 @@ export default class Node {
 
   // ^(---|...)
   static atDocumentBoundary (src, offset, sep) {
-    const prev = src[offset - 1]
-    if (prev && prev !== '\n') return false
     const ch0 = src[offset]
     if (!ch0) return true
+    const prev = src[offset - 1]
+    if (prev && prev !== '\n') return false
     if (sep) {
       if (ch0 !== sep) return false
     } else {
