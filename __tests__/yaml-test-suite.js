@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 import YAML from '../src/index'
+import { strOptions } from '../src/schema/_string'
 
 const testDirs = fs.readdirSync(path.resolve(__dirname, 'yaml-test-suite'))
   .filter(dir => ['.git', 'meta', 'name', 'tags'].indexOf(dir) === -1)
@@ -16,6 +17,20 @@ const matchJson = (stream, json) => {
     expect(received).toMatchObject(expected)
   }
 }
+
+let origFoldOptions
+
+beforeAll(() => {
+  origFoldOptions = strOptions.fold
+  strOptions.fold = {
+    lineWidth: 20,
+    minContentWidth: 0
+  }
+})
+
+afterAll(() => {
+  strOptions.fold = origFoldOptions
+})
 
 testDirs.forEach(dir => {
   const root = path.resolve(__dirname, 'yaml-test-suite', dir)

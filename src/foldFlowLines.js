@@ -57,10 +57,10 @@ export default function foldFlowLines (text, {
       end = i + endStep
       split = undefined
     } else {
-      if (ch === ' ' && prev && prev !== ' ' && prev !== '\n') {
+      if (ch === ' ' && prev && prev !== ' ' && prev !== '\n' && prev !== '\t') {
         // space surrounded by non-space can be replaced with newline + indent
         const next = text[i + 1]
-        if (next && next !== ' ' && next !== '\n') split = i
+        if (next && next !== ' ' && next !== '\n' && next !== '\t') split = i
       }
       if (i >= end) {
         if (split) {

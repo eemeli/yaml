@@ -1,5 +1,6 @@
 import { Type } from '../src/ast/Node'
 import YAML from '../src/index'
+import { strOptions } from '../src/schema/_string'
 
 const spec = {
   '2.1. Collections': {
@@ -1754,6 +1755,20 @@ matches %: 20`,
     }
   }
 }
+
+let origFoldOptions
+
+beforeAll(() => {
+  origFoldOptions = strOptions.fold
+  strOptions.fold = {
+    lineWidth: 20,
+    minContentWidth: 0
+  }
+})
+
+afterAll(() => {
+  strOptions.fold = origFoldOptions
+})
 
 for (const section in spec) {
   describe(section, () => {

@@ -101,9 +101,14 @@ describe('double-quoted', () => {
     options.lineWidth = 9
     expect(fold(src2, options)).toBe('"abc  de\\\nf  ghi  \\\njkl  mno  \\\npqr  stu  \\\nvwx  yz\n"')
   })
+
+  test('terminal whitespace', () => {
+    const src2 = '" \t \t \t \t \tnext \t"'
+    expect(fold(src2, options)).toBe('" \t \t \t \t \t\\\nnext \t"')
+  })
 })
 
-describe('block folds', () => {
+describe('end-to-end', () => {
   let origFoldOptions
 
   beforeAll(() => {
@@ -118,7 +123,7 @@ describe('block folds', () => {
     strOptions.fold = origFoldOptions
   })
 
-  test('more-indented', () => {
+  test('more-indented folded block', () => {
     const src = `> # comment with an excessive length that won't get folded
 Text on a line that
 should get folded
@@ -144,6 +149,18 @@ folded but is not.
 
 Unfolded paragraph.\n`
     )
+    expect(String(doc)).toBe(src)
+  })
+
+  test('plain string', () => {
+    const src =
+`- plain value with
+  enough length to
+  fold twice
+- plain with comment # that won't get folded\n`
+    const doc = YAML.parseStream(src)[0]
+    expect(doc.contents.items[0].value).toBe('plain value with enough length to fold twice')
+    expect(doc.contents.items[1].value).toBe('plain with comment')
     expect(String(doc)).toBe(src)
   })
 })

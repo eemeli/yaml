@@ -1,3 +1,4 @@
+import { addCommentBefore } from '../addComment'
 import { Type } from '../ast/Node'
 import foldFlowLines from '../foldFlowLines'
 
@@ -81,7 +82,9 @@ function doubleQuotedString (value, indent, oneLine) {
         i += 1
     }
   }
-  return start ? str + json.slice(start) : json
+  str = start ? str + json.slice(start) : json
+  const foldOptions = Object.assign({}, strOptions.fold, { indent, mode: 'quoted' })
+  return oneLine ? str : foldFlowLines(str, foldOptions)
 }
 
 function singleQuotedString (value, indent, oneLine) {
@@ -91,8 +94,9 @@ function singleQuotedString (value, indent, oneLine) {
     // single quoted string can't have leading or trailing whitespace around newline
     if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, indent, false)
   }
-  value = value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`)
-  return `'${value}'`
+  value = "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'"
+  const foldOptions = Object.assign({}, strOptions.fold, { indent })
+  return oneLine ? value : foldFlowLines(value, foldOptions)
 }
 
 function blockString (value, indent, literal, forceBlockIndent, comment, onComment) {
@@ -172,12 +176,13 @@ function plainString (value, indent, implicitKey, inFlow, forceBlockIndent, tags
   if (typeof tags.resolveScalar(str).value !== 'string') {
     return doubleQuotedString(value, indent, implicitKey)
   }
-  if (comment && !inFlow && (str.indexOf('\n') !== -1 || comment.indexOf('\n') !== -1)) {
+  const foldOptions = Object.assign({}, strOptions.fold, { indent })
+  const body = implicitKey ? str : foldFlowLines(str, foldOptions)
+  if (comment && !inFlow && (body.indexOf('\n') !== -1 || comment.indexOf('\n') !== -1)) {
     if (onComment) onComment()
-    const cc = comment.replace(/[\s\S]^/gm, `$&${indent}#`)
-    return `#${cc}\n${indent}${str}`
+    return addCommentBefore(body, indent, comment)
   }
-  return str
+  return body
 }
 
 export const str = {

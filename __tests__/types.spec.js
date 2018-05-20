@@ -1,5 +1,20 @@
 import YAML from '../src/index'
 import Scalar from '../src/schema/Scalar'
+import { strOptions } from '../src/schema/_string'
+
+let origFoldOptions
+
+beforeAll(() => {
+  origFoldOptions = strOptions.fold
+  strOptions.fold = {
+    lineWidth: 20,
+    minContentWidth: 0
+  }
+})
+
+afterAll(() => {
+  strOptions.fold = origFoldOptions
+})
 
 describe('json schema', () => {
   test('!!bool', () => {
