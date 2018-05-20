@@ -1,4 +1,5 @@
 import { Type } from '../ast/Node'
+import foldFlowLines from '../foldFlowLines'
 
 export const strOptions = {
   defaultType: Type.PLAIN,
@@ -6,6 +7,10 @@ export const strOptions = {
   doubleQuoted: {
     jsonEncoding: false,
     minMultiLineLength: 40
+  },
+  fold: {
+    lineWidth: 80,
+    minContentWidth: 20
   }
 }
 
@@ -130,14 +135,16 @@ function blockString (value, indent, literal, forceBlockIndent, comment, onComme
   if (!value) return `${header}${indentSize}\n${indent}${wsEnd}`
   if (literal) {
     value = value.replace(/\n+/g, `$&${indent}`)
-  } else {
-    value = value
-      .replace(/\n+/g, '\n$&')
-      .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
-      //         ^ ind.line  ^ empty     ^ capture next empty lines only at end of indent
-      .replace(/\n+/g, `$&${indent}`)
+    return `${header}\n${indent}${wsStart}${value}${wsEnd}`
   }
-  return `${header}\n${indent}${wsStart}${value}${wsEnd}`
+  value = value
+    .replace(/\n+/g, '\n$&')
+    .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
+    //         ^ ind.line  ^ empty     ^ capture next empty lines only at end of indent
+    .replace(/\n+/g, `$&${indent}`)
+  const foldOptions = Object.assign({}, strOptions.fold, { indent, mode: 'block' })
+  const body = foldFlowLines(`${wsStart}${value}${wsEnd}`, foldOptions)
+  return `${header}\n${indent}${body}`
 }
 
 function plainString (value, indent, implicitKey, inFlow, forceBlockIndent, tags, comment, onComment) {
