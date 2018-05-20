@@ -1,6 +1,6 @@
 import { addCommentBefore } from '../addComment'
 import { Type } from '../ast/Node'
-import foldFlowLines from '../foldFlowLines'
+import foldFlowLines, { FOLD_BLOCK, FOLD_FLOW, FOLD_QUOTED } from '../foldFlowLines'
 
 export const strOptions = {
   defaultType: Type.PLAIN,
@@ -83,8 +83,7 @@ function doubleQuotedString (value, indent, oneLine) {
     }
   }
   str = start ? str + json.slice(start) : json
-  const foldOptions = Object.assign({}, strOptions.fold, { indent, mode: 'quoted' })
-  return oneLine ? str : foldFlowLines(str, foldOptions)
+  return oneLine ? str : foldFlowLines(str, indent, FOLD_QUOTED, strOptions.fold)
 }
 
 function singleQuotedString (value, indent, oneLine) {
@@ -95,8 +94,7 @@ function singleQuotedString (value, indent, oneLine) {
     if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, indent, false)
   }
   value = "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'"
-  const foldOptions = Object.assign({}, strOptions.fold, { indent })
-  return oneLine ? value : foldFlowLines(value, foldOptions)
+  return oneLine ? value : foldFlowLines(value, indent, FOLD_FLOW, strOptions.fold)
 }
 
 function blockString (value, indent, literal, forceBlockIndent, comment, onComment) {
@@ -146,8 +144,7 @@ function blockString (value, indent, literal, forceBlockIndent, comment, onComme
     .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
     //         ^ ind.line  ^ empty     ^ capture next empty lines only at end of indent
     .replace(/\n+/g, `$&${indent}`)
-  const foldOptions = Object.assign({}, strOptions.fold, { indent, mode: 'block' })
-  const body = foldFlowLines(`${wsStart}${value}${wsEnd}`, foldOptions)
+  const body = foldFlowLines(`${wsStart}${value}${wsEnd}`, indent, FOLD_BLOCK, strOptions.fold)
   return `${header}\n${indent}${body}`
 }
 
@@ -176,8 +173,7 @@ function plainString (value, indent, implicitKey, inFlow, forceBlockIndent, tags
   if (typeof tags.resolveScalar(str).value !== 'string') {
     return doubleQuotedString(value, indent, implicitKey)
   }
-  const foldOptions = Object.assign({}, strOptions.fold, { indent })
-  const body = implicitKey ? str : foldFlowLines(str, foldOptions)
+  const body = implicitKey ? str : foldFlowLines(str, indent, FOLD_FLOW, strOptions.fold)
   if (comment && !inFlow && (body.indexOf('\n') !== -1 || comment.indexOf('\n') !== -1)) {
     if (onComment) onComment()
     return addCommentBefore(body, indent, comment)

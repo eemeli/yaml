@@ -1,29 +1,31 @@
+export const FOLD_FLOW = 'flow'
+export const FOLD_BLOCK = 'block'
+export const FOLD_QUOTED = 'quoted'
+
 /**
  * Tries to keep input at up to `lineWidth` characters, splitting only on spaces
  * not followed by newlines or spaces unless `mode` is `'quoted'`. Lines are
  * terminated with `\n` and started with `indent`.
  *
  * @param {string} text
+ * @param {string} indent
+ * @param {string} [mode='flow'] `'block'` prevents more-indented lines
+ *   from being folded; `'quoted'` allows for `\` escapes, including escaped
+ *   newlines
  * @param {Object} options
- * @param {string} [options.indent='']
  * @param {number} [options.indentAtStart] Accounts for leading contents on
  *   the first line, defaulting to `indent.length`
  * @param {number} [options.lineWidth=80]
  * @param {number} [options.minContentWidth=20] Allow highly indented lines to
  *   stretch the line width
- * @param {boolean} [options.mode='flow'] `'block'` prevents more-indented lines
- *   from being folded; `'quoted'` allows for `\` escapes, including escaped
- *   newlines
  * @param {function} options.onFold Called once if the text is folded
  * @param {function} options.onFold Called once if any line of text exceeds
  *   lineWidth characters
  */
-export default function foldFlowLines (text, {
-  indent = '',
+export default function foldFlowLines (text, indent, mode, {
   indentAtStart,
   lineWidth = 80,
   minContentWidth = 20,
-  mode = 'flow',
   onFold,
   onOverflow
 }) {
@@ -37,7 +39,7 @@ export default function foldFlowLines (text, {
   let prev = undefined
   let overflow = false
   for (let i = 0, ch = text[0]; ch; ch = text[i += 1]) {
-    if (mode === 'quoted' && ch === '\\') {
+    if (mode === FOLD_QUOTED && ch === '\\') {
       switch (text[i + 1]) {
         case 'x': ch = text[i += 4]; break
         case 'u': ch = text[i += 6]; break
@@ -46,7 +48,7 @@ export default function foldFlowLines (text, {
       }
     }
     if (ch === '\n') {
-      if (mode === 'block') {
+      if (mode === FOLD_BLOCK) {
         // more-indented lines in blocks can't be folded
         let next = text[i + 1]
         while (next === ' ' || next === '\t') {
@@ -67,7 +69,7 @@ export default function foldFlowLines (text, {
           folds.push(split)
           end = split + endStep
           split = undefined
-        } else if (mode === 'quoted') {
+        } else if (mode === FOLD_QUOTED) {
           // white-space collected at end may stretch past lineWidth
           while (prev === ' ' || prev === '\t') {
             prev = ch
@@ -93,7 +95,7 @@ export default function foldFlowLines (text, {
   for (let i = 0; i < folds.length; ++i) {
     const fold = folds[i]
     const end = folds[i + 1] || text.length
-    if (mode === 'quoted' && escapedFolds[fold]) res += `${text[fold]}\\`
+    if (mode === FOLD_QUOTED && escapedFolds[fold]) res += `${text[fold]}\\`
     res += `\n${indent}${text.slice(fold + 1, end)}`
   }
   return res
