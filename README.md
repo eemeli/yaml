@@ -70,11 +70,13 @@ The reason why this project exists is to have a tool that's capable of properly 
 
 #### Stringifying
 - `Document#toString()` produces idempotent YAML from all non-error spec examples and test suite cases
-- Non-default tags are explicitly included in the output
+- Comments and non-default tags are explicitly included in the output
+- String output is folded when possible to fit to a max width of 80 characters (customisable)
 - `AST#toString()` works completely, but is clumsy to use
 
 
 ### Still Needs Work
-- Long lines should be wrapped
+- Alias nodes are resolved too early, and can't be created
+- Need to consider handling stream input
 - API needs finalising
 - Better documentation
