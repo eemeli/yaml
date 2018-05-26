@@ -7,9 +7,9 @@ import { strOptions } from '../src/schema/_string'
 const testDirs = fs.readdirSync(path.resolve(__dirname, 'yaml-test-suite'))
   .filter(dir => ['.git', 'meta', 'name', 'tags'].indexOf(dir) === -1)
 
-const matchJson = (stream, json) => {
+const matchJson = (docs, json) => {
   if (!json) return
-  const received = stream[0] ? stream[0].toJSON() : null
+  const received = docs[0] ? docs[0].toJSON() : null
   const expected = JSON.parse(json)
   if (!received || typeof received !== 'object') {
     expect(received).toBe(expected)
@@ -42,28 +42,28 @@ testDirs.forEach(dir => {
   try { outYaml = fs.readFileSync(path.resolve(root, 'out.yaml'), 'utf8') } catch (e) {}
   if (!error && !json && !outYaml) return
   test(`${dir}: ${name}`, () => {
-    const stream = YAML.parseStream(yaml)
-    matchJson(stream, json)
-    const errors = stream
+    const docs = YAML.parseDocuments(yaml)
+    matchJson(docs, json)
+    const errors = docs
       .map(doc => doc.errors)
       .filter(docErrors => docErrors.length > 0)
     if (error) {
       expect(errors).not.toHaveLength(0)
     } else {
       expect(errors).toHaveLength(0)
-      const src2 = stream.map(doc => String(doc).replace(/\n$/, '')).join('\n---\n') + '\n'
-      const stream2 = YAML.parseStream(src2)
+      const src2 = docs.map(doc => String(doc).replace(/\n$/, '')).join('\n---\n') + '\n'
+      const docs2 = YAML.parseDocuments(src2)
       trace: name,
         '\nIN\n' + yaml,
-        '\nJSON\n' + JSON.stringify(stream[0], null, '  '),
+        '\nJSON\n' + JSON.stringify(docs[0], null, '  '),
         '\n\nOUT\n' + src2,
         '\nOUT-JSON\n' + JSON.stringify(src2),
-        '\nRE-JSON\n' + JSON.stringify(stream2[0], null, '  ')
-      matchJson(stream2, json)
+        '\nRE-JSON\n' + JSON.stringify(docs2[0], null, '  ')
+      matchJson(docs2, json)
       if (outYaml) {
-        const expStream = YAML.parseStream(outYaml)
-        const resJson = stream.map(doc => doc.toJSON())
-        const expJson = expStream.map(doc => doc.toJSON())
+        const expDocs = YAML.parseDocuments(outYaml)
+        const resJson = docs.map(doc => doc.toJSON())
+        const expJson = expDocs.map(doc => doc.toJSON())
         expect(resJson).toMatchObject(expJson)
       }
     }

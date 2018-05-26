@@ -136,7 +136,7 @@ folded but is not.
   Text that is prevented from folding due to being more-indented.
 
 Unfolded paragraph.\n`
-    const doc = YAML.parseStream(src)[0]
+    const doc = YAML.parseDocuments(src)[0]
     expect(doc.contents.value).toBe(
 `Text on a line that should get folded with a line width of 20 characters.
 
@@ -157,7 +157,7 @@ Unfolded paragraph.\n`
   enough length to
   fold twice
 - plain with comment # that won't get folded\n`
-    const doc = YAML.parseStream(src)[0]
+    const doc = YAML.parseDocuments(src)[0]
     expect(doc.contents.items[0].value).toBe('plain value with enough length to fold twice')
     expect(doc.contents.items[1].value).toBe('plain with comment')
     expect(String(doc)).toBe(src)

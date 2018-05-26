@@ -32,8 +32,8 @@ describe('multiple linebreaks in scalars', () => {
 
 test('no null document for document-end marker', () => {
   const src = '---\nx\n...\n'
-  const stream = parse(src)
-  expect(stream).toHaveLength(1)
+  const docs = parse(src)
+  expect(docs).toHaveLength(1)
 })
 
 test('explicit key after empty value', () => {

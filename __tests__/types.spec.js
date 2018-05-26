@@ -24,7 +24,7 @@ describe('json schema', () => {
 "logical": True
 "option": TruE`
 
-    const doc = YAML.parseStream(src, { schema: 'json' })[0]
+    const doc = YAML.parseDocuments(src, { schema: 'json' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: true,
       answer: false,
@@ -41,7 +41,7 @@ describe('json schema', () => {
 "negative infinity": -.inf
 "not a number": .NaN`
 
-    const doc = YAML.parseStream(src, { schema: 'json' })[0]
+    const doc = YAML.parseDocuments(src, { schema: 'json' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: 685230.15,
       fixed: 685230.15,
@@ -58,7 +58,7 @@ describe('json schema', () => {
 "octal": 0o2472256
 "hexadecimal": 0x0A74AE`
 
-    const doc = YAML.parseStream(src, { schema: 'json' })[0]
+    const doc = YAML.parseDocuments(src, { schema: 'json' })[0]
     expect(doc.toJSON()).toMatchObject({
       canonical: 685230,
       decimal: -685230,
@@ -75,7 +75,7 @@ describe('json schema', () => {
 "english": null
 ~: 'null key'`
 
-    const doc = YAML.parseStream(src, { schema: 'json' })[0]
+    const doc = YAML.parseDocuments(src, { schema: 'json' })[0]
     expect(doc.toJSON()).toMatchObject({
       empty: null,
       canonical: null,
@@ -164,7 +164,7 @@ generic: !!binary |
 description:
  The binary value above is a tiny arrow encoded as a gif image.`
 
-    const doc = YAML.parseStream(src, { schema: 'extended' })[0]
+    const doc = YAML.parseDocuments(src, { schema: 'extended' })[0]
     const canonical = doc.contents.items[0].value.value
     const generic = doc.contents.items[1].value.value
     expect(canonical).toBeInstanceOf(Uint8Array)
@@ -323,7 +323,7 @@ describe('custom tags', () => {
 - '5'`
 
   test('parse', () => {
-    const doc = YAML.parseStream(src)[0]
+    const doc = YAML.parseDocuments(src)[0]
     expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
     expect(doc.contents.origTag).toBe('tag:example.com,2000:test/x')
     const { items } = doc.contents
@@ -335,7 +335,7 @@ describe('custom tags', () => {
   })
 
   test('stringify', () => {
-    const doc = YAML.parseStream(src)[0]
+    const doc = YAML.parseDocuments(src)[0]
     expect(String(doc)).toBe(
 `%TAG !e! tag:example.com,2000:test/
 ---
@@ -348,7 +348,7 @@ describe('custom tags', () => {
   })
 
   test('modify', () => {
-    const doc = YAML.parseStream(src)[0]
+    const doc = YAML.parseDocuments(src)[0]
     doc.setTagPrefix('!f!', 'tag:example.com,2000:other/')
     doc.contents.commentBefore = 'c'
     doc.contents.items[3].comment = 'cc'

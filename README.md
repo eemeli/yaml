@@ -33,8 +33,8 @@ YAML.parse(yaml)
  *      'https://www.npmjs.com/package/yaml' ] }
 */
 
-const docStream = YAML.parseStream(yaml)
-docStream[0].toString() === yaml
+const docs = YAML.parseDocuments(yaml)
+docs[0].toString() === yaml
 ```
 
 
@@ -49,7 +49,7 @@ The reason why this project exists is to have a tool that's capable of properly 
 - Support for all YAML node types, including alias nodes and multi-document streams
 - Complete support for the Fallback, JSON, and Core [Schemas], as well as an "extended" schema that covers all of the YAML 1.1 scalar [types] except for `!!yaml`.
 - `YAML.parse` converts string input to native JavaScript values
-- Comments are parsed and included in the outputs of `YAML.parseAST` ([lower-level AST] of the input) and `YAML.parseStream` (array of `Document` objects with `Map`/`Seq`/`Scalar` contents). These functions should never throw, but include arrays of `errors` and `warnings`.
+- Comments are parsed and included in the outputs of `YAML.parseAST` ([lower-level AST] of the input) and `YAML.parseDocuments` (array of `Document` objects with `Map`/`Seq`/`Scalar` contents). These functions should never throw, but include arrays of `errors` and `warnings`.
 - Support for `<<` merge keys (default-disabled, enable with `merge: true` option)
 - Complete match between the parsed `in.yaml`, `in.json`, `out.yaml`, and `error` files across all of the [yaml-test-suite] test cases (note: A few of the tests are not in agreement with the spec, so this requires the use of a [custom branch] until the relevant [pull requests] and [issues] are resolved)
 - "Native" `Map` and `Seq` collections have `toJSON()` methods for bare JavaScript `Object` and `Array` output
@@ -78,5 +78,4 @@ The reason why this project exists is to have a tool that's capable of properly 
 ### Still Needs Work
 - Alias nodes are resolved too early, and can't be created
 - Need to consider handling stream input
-- API needs finalising
 - Better documentation

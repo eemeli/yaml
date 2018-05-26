@@ -391,7 +391,7 @@ application specific tag: !something |
         'The tag !something is unavailable, falling back to tag:yaml.org,2002:str'
       ] ],
       special: (src) => {
-        const doc = YAML.parseStream(src, { schema: 'extended' })[0]
+        const doc = YAML.parseDocuments(src, { schema: 'extended' })[0]
         const data = doc.contents.items[1].value.value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)
@@ -652,7 +652,7 @@ double: "text"`,
 --- text`,
       tgt: [ 'text' ],
       special: (src) => {
-        const doc = YAML.parseStream(src)[0]
+        const doc = YAML.parseDocuments(src)[0]
         expect(doc.version).toBe('1.2')
       }
     },
@@ -881,7 +881,7 @@ Chomping: |
       tgt: [ 'foo' ],
       warnings: [ [ 'Document will be parsed as YAML 1.2 rather than YAML 1.3' ] ],
       special: (src) => {
-        const doc = YAML.parseStream(src)[0]
+        const doc = YAML.parseDocuments(src)[0]
         expect(doc.version).toBe('1.3')
       }
     },
@@ -896,7 +896,7 @@ foo`,
       errors: [ [ 'The YAML directive must only be given at most once per document.' ] ],
       warnings: [ [ 'Document will be parsed as YAML 1.2 rather than YAML 1.1' ] ],
       special: (src) => {
-        const doc = YAML.parseStream(src)[0]
+        const doc = YAML.parseDocuments(src)[0]
         expect(doc.version).toBe('1.1')
       }
     },
@@ -920,7 +920,7 @@ bar`,
       tgt: [ 'bar' ],
       errors: [ [ 'The TAG directive must only be given at most once per handle in the same document.' ] ],
       special: (src) => {
-        const doc = YAML.parseStream(src)[0]
+        const doc = YAML.parseDocuments(src)[0]
         expect(doc.tagPrefixes).toMatchObject([{ handle: '!', prefix: '!foo' }])
       }
     },
@@ -1692,7 +1692,7 @@ Document`,
 Document
 ... # Suffix`,
       tgt: [ 'Document' ],
-      special: (src) => expect(YAML.parseStream(src)[0].version).toBe('1.2')
+      special: (src) => expect(YAML.parseDocuments(src)[0].version).toBe('1.2')
     },
 
     'Example 9.3. Bare Documents': {
@@ -1733,7 +1733,7 @@ document
 # Empty
 ...`,
       tgt: [ '%!PS-Adobe-2.0\n', null ],
-      special: (src) => YAML.parseStream(src).forEach(doc => expect(doc.version).toBe('1.2'))
+      special: (src) => YAML.parseDocuments(src).forEach(doc => expect(doc.version).toBe('1.2'))
     },
   },
 
@@ -1749,7 +1749,7 @@ document
 matches %: 20`,
       tgt: [ 'Document', null, { 'matches %': 20 } ],
       special: (src) => {
-        const versions = YAML.parseStream(src).map(doc => doc.version)
+        const versions = YAML.parseDocuments(src).map(doc => doc.version)
         expect(versions).toMatchObject([null, null, '1.2'])
       }
     }
@@ -1775,7 +1775,7 @@ for (const section in spec) {
     for (const name in spec[section]) {
       test(name, () => {
         const { src, tgt, errors, special, warnings } = spec[section][name]
-        const documents = YAML.parseStream(src)
+        const documents = YAML.parseDocuments(src)
         const json = documents.map(doc => doc.toJSON())
         const docErrors = documents.map(doc => doc.errors.map(err => err.message))
         trace: name, '\n' + JSON.stringify(json, null, '  '), { errors: docErrors }
@@ -1789,7 +1789,7 @@ for (const section in spec) {
         if (special) special(src)
         if (!errors) {
           const src2 = documents.map(doc => String(doc)).join('\n...\n')
-          const documents2 = YAML.parseStream(src2)
+          const documents2 = YAML.parseDocuments(src2)
           const json2 = documents2.map(doc => doc.toJSON())
           trace: name,
             '\nIN\n' + src,
