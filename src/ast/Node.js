@@ -29,14 +29,14 @@ export const Char = {
 
 /** Root class of all nodes */
 export default class Node {
-  static addStringTerminator (src, offset, str) {
+  static addStringTerminator(src, offset, str) {
     if (str[str.length - 1] === '\n') return str
     const next = Node.endOfWhiteSpace(src, offset)
     return next >= src.length || src[next] === '\n' ? str + '\n' : str
   }
 
   // ^(---|...)
-  static atDocumentBoundary (src, offset, sep) {
+  static atDocumentBoundary(src, offset, sep) {
     const ch0 = src[offset]
     if (!ch0) return true
     const prev = src[offset - 1]
@@ -53,32 +53,32 @@ export default class Node {
     return !ch3 || ch3 === '\n' || ch3 === '\t' || ch3 === ' '
   }
 
-  static endOfIdentifier (src, offset) {
+  static endOfIdentifier(src, offset) {
     let ch = src[offset]
-    const isVerbatim = (ch === '<')
+    const isVerbatim = ch === '<'
     const notOk = isVerbatim
       ? ['\n', '\t', ' ', '>']
       : ['\n', '\t', ' ', '[', ']', '{', '}', ',']
-    while (ch && notOk.indexOf(ch) === -1) ch = src[offset += 1]
+    while (ch && notOk.indexOf(ch) === -1) ch = src[(offset += 1)]
     if (isVerbatim && ch === '>') offset += 1
     return offset
   }
 
-  static endOfIndent (src, offset) {
+  static endOfIndent(src, offset) {
     let ch = src[offset]
-    while (ch === ' ') ch = src[offset += 1]
+    while (ch === ' ') ch = src[(offset += 1)]
     return offset
   }
 
-  static endOfLine (src, offset) {
+  static endOfLine(src, offset) {
     let ch = src[offset]
-    while (ch && ch !== '\n') ch = src[offset += 1]
+    while (ch && ch !== '\n') ch = src[(offset += 1)]
     return offset
   }
 
-  static endOfWhiteSpace (src, offset) {
+  static endOfWhiteSpace(src, offset) {
     let ch = src[offset]
-    while (ch === '\t' || ch === ' ') ch = src[offset += 1]
+    while (ch === '\t' || ch === ' ') ch = src[(offset += 1)]
     return offset
   }
 
@@ -91,7 +91,7 @@ export default class Node {
    * @param {number} lineStart
    * @returns {?number}
    */
-  static endOfBlockIndent (src, indent, lineStart) {
+  static endOfBlockIndent(src, indent, lineStart) {
     const inEnd = Node.endOfIndent(src, lineStart)
     if (inEnd > lineStart + indent) {
       return inEnd
@@ -103,33 +103,37 @@ export default class Node {
     return null
   }
 
-  static atBlank (src, offset) {
+  static atBlank(src, offset) {
     const ch = src[offset]
     return ch === '\n' || ch === '\t' || ch === ' '
   }
 
-  static atCollectionItem (src, offset) {
+  static atCollectionItem(src, offset) {
     const ch = src[offset]
-    return (ch === '?' || ch === ':' || ch === '-') && Node.atBlank(src, offset + 1)
+    return (
+      (ch === '?' || ch === ':' || ch === '-') && Node.atBlank(src, offset + 1)
+    )
   }
 
-  static nextNodeIsIndented (ch, indentDiff, indicatorAsIndent) {
+  static nextNodeIsIndented(ch, indentDiff, indicatorAsIndent) {
     if (!ch || indentDiff < 0) return false
     if (indentDiff > 0) return true
-    return indicatorAsIndent && (ch === '-')
+    return indicatorAsIndent && ch === '-'
   }
 
   // should be at line or string end, or at next non-whitespace char
-  static normalizeOffset (src, offset) {
+  static normalizeOffset(src, offset) {
     const ch = src[offset]
-    return !ch ? offset
-      : ch !== '\n' && src[offset - 1] === '\n' ? offset - 1
-      : Node.endOfWhiteSpace(src, offset)
+    return !ch
+      ? offset
+      : ch !== '\n' && src[offset - 1] === '\n'
+        ? offset - 1
+        : Node.endOfWhiteSpace(src, offset)
   }
 
   // fold single newline into space, multiple newlines to N - 1 newlines
   // presumes src[offset] === '\n'
-  static foldNewline (src, offset, indent) {
+  static foldNewline(src, offset, indent) {
     let inCount = 0
     let error = false
     let fold = ''
@@ -157,7 +161,7 @@ export default class Node {
     return { fold, offset, error }
   }
 
-  constructor (type, props, context) {
+  constructor(type, props, context) {
     this.context = context || null
     this.error = null
     this.range = null
@@ -167,14 +171,16 @@ export default class Node {
     this.value = null
   }
 
-  getPropValue (idx, key, skipKey) {
+  getPropValue(idx, key, skipKey) {
     if (!this.context) return null
     const { src } = this.context
     const prop = this.props[idx]
-    return prop && (src[prop.start] === key) ? src.slice(prop.start + (skipKey ? 1 : 0), prop.end) : null
+    return prop && src[prop.start] === key
+      ? src.slice(prop.start + (skipKey ? 1 : 0), prop.end)
+      : null
   }
 
-  get anchor () {
+  get anchor() {
     for (let i = 0; i < this.props.length; ++i) {
       const anchor = this.getPropValue(i, Char.ANCHOR, true)
       if (anchor != null) return anchor
@@ -182,7 +188,7 @@ export default class Node {
     return null
   }
 
-  get comment () {
+  get comment() {
     const comments = []
     for (let i = 0; i < this.props.length; ++i) {
       const comment = this.getPropValue(i, Char.COMMENT, true)
@@ -191,7 +197,7 @@ export default class Node {
     return comments.length > 0 ? comments.join('\n') : null
   }
 
-  commentHasRequiredWhitespace (start) {
+  commentHasRequiredWhitespace(start) {
     const { src } = this.context
     if (this.header && start === this.header.end) return false
     if (this.valueRange) {
@@ -200,7 +206,7 @@ export default class Node {
     }
   }
 
-  get hasComment () {
+  get hasComment() {
     if (this.context) {
       const { src } = this.context
       for (let i = 0; i < this.props.length; ++i) {
@@ -210,7 +216,7 @@ export default class Node {
     return false
   }
 
-  get hasProps () {
+  get hasProps() {
     if (this.context) {
       const { src } = this.context
       for (let i = 0; i < this.props.length; ++i) {
@@ -220,7 +226,7 @@ export default class Node {
     return false
   }
 
-  get jsonLike () {
+  get jsonLike() {
     const jsonLikeTypes = [
       Type.FLOW_MAP,
       Type.FLOW_SEQ,
@@ -230,13 +236,13 @@ export default class Node {
     return jsonLikeTypes.indexOf(this.type) !== -1
   }
 
-  get rawValue () {
+  get rawValue() {
     if (!this.valueRange || !this.context) return null
     const { start, end } = this.valueRange
     return this.context.src.slice(start, end)
   }
 
-  get tag () {
+  get tag() {
     for (let i = 0; i < this.props.length; ++i) {
       const tag = this.getPropValue(i, Char.TAG, false)
       if (tag != null) {
@@ -251,7 +257,7 @@ export default class Node {
     return null
   }
 
-  get valueRangeContainsNewline () {
+  get valueRangeContainsNewline() {
     if (!this.valueRange || !this.context) return false
     const { start, end } = this.valueRange
     const { src } = this.context
@@ -261,20 +267,27 @@ export default class Node {
     return false
   }
 
-  parseComment (start) {
+  parseComment(start) {
     const { src } = this.context
     if (src[start] === Char.COMMENT) {
       const end = Node.endOfLine(src, start + 1)
       const commentRange = new Range(start, end)
       this.props.push(commentRange)
-      trace: commentRange, JSON.stringify(this.getPropValue(this.props.length - 1, Char.COMMENT, true))
+      trace: commentRange,
+        JSON.stringify(
+          this.getPropValue(this.props.length - 1, Char.COMMENT, true)
+        )
       return end
     }
     return start
   }
 
-  toString () {
-    const { context: { src }, range, value } = this
+  toString() {
+    const {
+      context: { src },
+      range,
+      value
+    } = this
     if (value != null) return value
     const str = src.slice(range.start, range.end)
     return Node.addStringTerminator(src, range.end, str)

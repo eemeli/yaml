@@ -24,7 +24,7 @@ const stringifySexagesimal = ({ value }) => {
       parts.unshift(value) // hours
     }
   }
-  return sign + parts.map(n => n < 10 ? '0' + String(n) : String(n)).join(':')
+  return sign + parts.map(n => (n < 10 ? '0' + String(n) : String(n))).join(':')
 }
 
 export const intTime = {
@@ -32,7 +32,8 @@ export const intTime = {
   tag: 'tag:yaml.org,2002:int',
   format: 'time',
   test: /^([-+]?)([0-9][0-9_]*(?::[0-5]?[0-9])+)$/,
-  resolve: (str, sign, parts) => parseSexagesimal(sign, parts.replace(/_/g, '')),
+  resolve: (str, sign, parts) =>
+    parseSexagesimal(sign, parts.replace(/_/g, '')),
   stringify: stringifySexagesimal
 }
 
@@ -41,7 +42,8 @@ export const floatTime = {
   tag: 'tag:yaml.org,2002:float',
   format: 'time',
   test: /^([-+]?)([0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*)$/,
-  resolve: (str, sign, parts) => parseSexagesimal(sign, parts.replace(/_/g, '')),
+  resolve: (str, sign, parts) =>
+    parseSexagesimal(sign, parts.replace(/_/g, '')),
   stringify: stringifySexagesimal
 }
 
@@ -51,16 +53,26 @@ export const timestamp = {
   // If the time zone is omitted, the timestamp is assumed to be specified in UTC. The time part
   // may be omitted altogether, resulting in a date format. In such a case, the time part is
   // assumed to be 00:00:00Z (start of day, UTC).
-  test: RegExp('^(?:' +
+  test: RegExp(
+    '^(?:' +
     '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})' + // YYYY-Mm-Dd
     '(?:(?:t|T|[ \\t]+)' + // t | T | whitespace
-      '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2}(\\.[0-9]+)?)' + // Hh:Mm:Ss(.ss)?
-      '(?:[ \\t]*(Z|[-+][012]?[0-9](?::[0-9]{2})?))?' + // Z | +5 | -03:30
-    ')?' +
-  ')$'),
+    '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2}(\\.[0-9]+)?)' + // Hh:Mm:Ss(.ss)?
+    '(?:[ \\t]*(Z|[-+][012]?[0-9](?::[0-9]{2})?))?' + // Z | +5 | -03:30
+      ')?' +
+      ')$'
+  ),
   resolve: (str, year, month, day, hour, minute, second, millisec, tz) => {
     if (millisec) millisec = (millisec + '00').substr(1, 3)
-    let date = Date.UTC(year, month - 1, day, hour || 0, minute || 0, second || 0, millisec || 0)
+    let date = Date.UTC(
+      year,
+      month - 1,
+      day,
+      hour || 0,
+      minute || 0,
+      second || 0,
+      millisec || 0
+    )
     if (tz && tz !== 'Z') {
       let d = parseSexagesimal(tz[0], tz.slice(1))
       if (Math.abs(d) < 30) d *= 60
@@ -71,9 +83,4 @@ export const timestamp = {
   stringify: ({ value }) => value.toISOString()
 }
 
-export default [
-  intTime,
-  floatTime,
-  timestamp
-]
-
+export default [intTime, floatTime, timestamp]

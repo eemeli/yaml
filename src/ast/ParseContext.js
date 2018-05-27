@@ -20,7 +20,7 @@ import Range from './Range'
  * @param {string} src - Source of the YAML document
  */
 export default class ParseContext {
-  static parseType (src, offset, inFlow) {
+  static parseType(src, offset, inFlow) {
     switch (src[offset]) {
       case '*':
         return Type.ALIAS
@@ -33,11 +33,17 @@ export default class ParseContext {
       case '[':
         return Type.FLOW_SEQ
       case '?':
-        return !inFlow && Node.atBlank(src, offset + 1) ? Type.MAP_KEY : Type.PLAIN
+        return !inFlow && Node.atBlank(src, offset + 1)
+          ? Type.MAP_KEY
+          : Type.PLAIN
       case ':':
-        return !inFlow && Node.atBlank(src, offset + 1) ? Type.MAP_VALUE : Type.PLAIN
+        return !inFlow && Node.atBlank(src, offset + 1)
+          ? Type.MAP_VALUE
+          : Type.PLAIN
       case '-':
-        return !inFlow && Node.atBlank(src, offset + 1) ? Type.SEQ_ITEM : Type.PLAIN
+        return !inFlow && Node.atBlank(src, offset + 1)
+          ? Type.SEQ_ITEM
+          : Type.PLAIN
       case '"':
         return Type.QUOTE_DOUBLE
       case "'":
@@ -47,9 +53,14 @@ export default class ParseContext {
     }
   }
 
-  constructor (orig = {}, { atLineStart, inCollection, inFlow, indent, lineStart, parent } = {}) {
-    this.atLineStart = atLineStart != null ? atLineStart : orig.lineStart || false
-    this.inCollection = inCollection != null ? inCollection : orig.inCollection || false
+  constructor(
+    orig = {},
+    { atLineStart, inCollection, inFlow, indent, lineStart, parent } = {}
+  ) {
+    this.atLineStart =
+      atLineStart != null ? atLineStart : orig.lineStart || false
+    this.inCollection =
+      inCollection != null ? inCollection : orig.inCollection || false
     this.inFlow = inFlow != null ? inFlow : orig.inFlow || false
     this.indent = indent != null ? indent : orig.indent
     this.lineStart = lineStart != null ? lineStart : orig.lineStart
@@ -58,7 +69,7 @@ export default class ParseContext {
   }
 
   // for logging
-  get pretty () {
+  get pretty() {
     const obj = {
       start: `${this.lineStart} + ${this.indent}`,
       in: [],
@@ -70,7 +81,7 @@ export default class ParseContext {
     return obj
   }
 
-  nodeStartsCollection (node) {
+  nodeStartsCollection(node) {
     const { inCollection, inFlow, src } = this
     if (inCollection || inFlow) return false
     if (node instanceof CollectionItem) return true
@@ -83,19 +94,28 @@ export default class ParseContext {
 
   // Anchor and tag are before type, which determines the node implementation
   // class; hence this intermediate step.
-  parseProps (offset) {
+  parseProps(offset) {
     const { inFlow, parent, src } = this
     const props = []
     let lineHasProps = false
     offset = Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
-    while (ch === Char.ANCHOR || ch === Char.COMMENT || ch === Char.TAG || ch === '\n') {
+    while (
+      ch === Char.ANCHOR ||
+      ch === Char.COMMENT ||
+      ch === Char.TAG ||
+      ch === '\n'
+    ) {
       if (ch === '\n') {
         const lineStart = offset + 1
         const inEnd = Node.endOfIndent(src, lineStart)
         const indentDiff = inEnd - (lineStart + this.indent)
-        const noIndicatorAsIndent = parent.type === Type.SEQ_ITEM && parent.context.atLineStart
-        if (!Node.nextNodeIsIndented(src[inEnd], indentDiff, !noIndicatorAsIndent)) break
+        const noIndicatorAsIndent =
+          parent.type === Type.SEQ_ITEM && parent.context.atLineStart
+        if (
+          !Node.nextNodeIsIndented(src[inEnd], indentDiff, !noIndicatorAsIndent)
+        )
+          break
         this.atLineStart = true
         this.lineStart = lineStart
         lineHasProps = false
@@ -159,7 +179,10 @@ export default class ParseContext {
         node = new QuoteSingle(type, props)
         break
       default:
-        node.error = new YAMLSyntaxError(node, `Unknown node type: ${JSON.stringify(type)}`)
+        node.error = new YAMLSyntaxError(
+          node,
+          `Unknown node type: ${JSON.stringify(type)}`
+        )
         node.range = new Range(start, start + 1)
         return node
     }
@@ -178,7 +201,9 @@ export default class ParseContext {
       const collection = new Collection(node)
       offset = collection.parse(context, offset)
       collection.range = new Range(start, offset)
-      trace: collection.type, collection.range, JSON.stringify(collection.rawValue)
+      trace: collection.type,
+        collection.range,
+        JSON.stringify(collection.rawValue)
       return collection
     }
     return node

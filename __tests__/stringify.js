@@ -48,19 +48,21 @@ test('array', () => {
   const array = [3, ['four', 5]]
   const str = YAML.stringify(array)
   expect(str).toBe(
-`- 3
+    `- 3
 - - four
-  - 5\n`)
+  - 5\n`
+  )
 })
 
 test('object', () => {
-  const object = { x: 3, y: [4], z: { w: "five", v: 6 } }
+  const object = { x: 3, y: [4], z: { w: 'five', v: 6 } }
   const str = YAML.stringify(object)
   expect(str).toBe(
-`x: 3
+    `x: 3
 y:
   - 4
 z:
   w: five
-  v: 6\n`)
+  v: 6\n`
+  )
 })

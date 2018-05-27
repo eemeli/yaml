@@ -3,7 +3,7 @@ import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class CollectionItem extends Node {
-  constructor (type, props) {
+  constructor(type, props) {
     super(type, props)
     this.node = null
   }
@@ -13,13 +13,16 @@ export default class CollectionItem extends Node {
    * @param {number} start - Index of first character
    * @returns {number} - Index of the character after this
    */
-  parse (context, start) {
+  parse(context, start) {
     this.context = context
     trace: 'item-start', context.pretty, { start }
     const { parseNode, src } = context
     let { atLineStart, lineStart } = context
-    if (!atLineStart && this.type === Type.SEQ_ITEM) this.error = new YAMLSyntaxError(this,
-      'Sequence items are not allowed on the same line with map keys')
+    if (!atLineStart && this.type === Type.SEQ_ITEM)
+      this.error = new YAMLSyntaxError(
+        this,
+        'Sequence items are not allowed on the same line with map keys'
+      )
     const indent = atLineStart ? start - lineStart : context.indent
     let offset = Node.endOfWhiteSpace(src, start + 1)
     let ch = src[offset]
@@ -36,9 +39,22 @@ export default class CollectionItem extends Node {
       }
       ch = src[offset]
     }
-    trace: 'item-parse?', { indentDiff: offset - (lineStart + indent), ch: ch && JSON.stringify(ch) }
-    if (Node.nextNodeIsIndented(ch, offset - (lineStart + indent), this.type !== Type.SEQ_ITEM)) {
-      this.node = parseNode({ atLineStart, inCollection: false, indent, lineStart, parent: this }, offset)
+    trace: 'item-parse?',
+      {
+        indentDiff: offset - (lineStart + indent),
+        ch: ch && JSON.stringify(ch)
+      }
+    if (
+      Node.nextNodeIsIndented(
+        ch,
+        offset - (lineStart + indent),
+        this.type !== Type.SEQ_ITEM
+      )
+    ) {
+      this.node = parseNode(
+        { atLineStart, inCollection: false, indent, lineStart, parent: this },
+        offset
+      )
       if (this.node) offset = this.node.range.end
     } else if (lineStart > start + 1) {
       offset = lineStart - 1
@@ -49,14 +65,17 @@ export default class CollectionItem extends Node {
     return offset
   }
 
-  toString () {
-    const { context: { src }, node, range, value } = this
+  toString() {
+    const {
+      context: { src },
+      node,
+      range,
+      value
+    } = this
     if (value != null) return value
-    const str = node ? (
-      src.slice(range.start, node.range.start) + String(node)
-    ) : (
-      src.slice(range.start, range.end)
-    )
+    const str = node
+      ? src.slice(range.start, node.range.start) + String(node)
+      : src.slice(range.start, range.end)
     return Node.addStringTerminator(src, range.end, str)
   }
 }

@@ -2,9 +2,9 @@ import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class Directive extends Node {
-  static endOfDirective (src, offset) {
+  static endOfDirective(src, offset) {
     let ch = src[offset]
-    while (ch && ch !== '\n' && ch !== '#') ch = src[offset += 1]
+    while (ch && ch !== '\n' && ch !== '#') ch = src[(offset += 1)]
     // last char can't be whitespace
     ch = src[offset - 1]
     while (ch === ' ' || ch === '\t') {
@@ -14,35 +14,36 @@ export default class Directive extends Node {
     return offset
   }
 
-  constructor () {
+  constructor() {
     super(Type.DIRECTIVE)
     this.name = null
   }
 
-  get parameters () {
+  get parameters() {
     const raw = this.rawValue
     return raw ? raw.trim().split(/[ \t]+/) : []
   }
 
-  parseName (start) {
+  parseName(start) {
     const { src } = this.context
     let offset = start
     let ch = src[offset]
-    while (ch && (ch !== '\n' && ch !== '\t' && ch !== ' ')) ch = src[offset += 1]
+    while (ch && (ch !== '\n' && ch !== '\t' && ch !== ' '))
+      ch = src[(offset += 1)]
     this.name = src.slice(start, offset)
     return offset
   }
 
-  parseParameters (start) {
+  parseParameters(start) {
     const { src } = this.context
     let offset = start
     let ch = src[offset]
-    while (ch && ch !== '\n' && ch !== '#') ch = src[offset += 1]
+    while (ch && ch !== '\n' && ch !== '#') ch = src[(offset += 1)]
     this.valueRange = new Range(start, offset)
     return offset
   }
 
-  parse (context, start) {
+  parse(context, start) {
     this.context = context
     const { src } = context
     let offset = this.parseName(start + 1)

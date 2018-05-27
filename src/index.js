@@ -8,8 +8,10 @@ const defaultOptions = {
   tags: null
 }
 
-function parseDocuments (src, options) {
-  const o = options ? Object.assign({}, defaultOptions, options): defaultOptions
+function parseDocuments(src, options) {
+  const o = options
+    ? Object.assign({}, defaultOptions, options)
+    : defaultOptions
   const tags = new Tags(o)
   return parseAST(src).map(astDoc => {
     const doc = new Document(tags, o)
@@ -17,20 +19,26 @@ function parseDocuments (src, options) {
   })
 }
 
-function parse (src, options) {
+function parse(src, options) {
   const docs = parseDocuments(src, options)
   docs.forEach(doc => {
     doc.warnings.forEach(warning => console.warn(warning))
-    doc.errors.forEach(error => { throw error })
+    doc.errors.forEach(error => {
+      throw error
+    })
   })
   if (docs.length > 1) {
-    throw new Error('Source contains multiple documents; please use YAML.parseDocuments()')
+    throw new Error(
+      'Source contains multiple documents; please use YAML.parseDocuments()'
+    )
   }
   return docs[0] && docs[0].toJSON()
 }
 
-function stringify (value, options) {
-  const o = options ? Object.assign({}, defaultOptions, options): defaultOptions
+function stringify(value, options) {
+  const o = options
+    ? Object.assign({}, defaultOptions, options)
+    : defaultOptions
   const doc = new Document(null, o)
   doc.contents = value
   return String(doc)

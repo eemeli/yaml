@@ -3,35 +3,39 @@ import Collection, { toJSON } from './Collection'
 import Scalar from './Scalar'
 
 export default class Pair {
-  constructor (key, value = null) {
+  constructor(key, value = null) {
     this.key = key
     this.value = value
   }
 
-  get comment () {
+  get comment() {
     return this.value && this.value.comment
   }
 
-  set comment (comment) {
+  set comment(comment) {
     if (this.value == null) this.value = new Scalar(null)
     this.value.comment = comment
   }
 
-  get stringKey () {
+  get stringKey() {
     const key = toJSON(this.key)
     if (key === null) return ''
-    if (typeof key === 'object') try { return JSON.stringify(key) }
-    catch (e) { /* should not happen, but let's ignore in any case */ }
+    if (typeof key === 'object')
+      try {
+        return JSON.stringify(key)
+      } catch (e) {
+        /* should not happen, but let's ignore in any case */
+      }
     return String(key)
   }
 
-  toJSON () {
+  toJSON() {
     const pair = {}
     pair[this.stringKey] = toJSON(this.value)
     return pair
   }
 
-  toString (doc, options, onComment) {
+  toString(doc, options, onComment) {
     if (!doc) return JSON.stringify(this)
     const { key, value } = this
     const { indent } = options
@@ -41,7 +45,9 @@ export default class Pair {
       indent: options.indent + '  '
     })
     let keyComment = key && key.comment
-    let keyStr = doc.tags.stringify(doc, key, opt, () => { keyComment = null })
+    let keyStr = doc.tags.stringify(doc, key, opt, () => {
+      keyComment = null
+    })
     if (keyComment) keyStr = addComment(keyStr, opt.indent, keyComment)
     opt.implicitKey = false
     const valueStr = doc.tags.stringify(doc, value, opt, onComment)
@@ -54,4 +60,3 @@ export default class Pair {
     }
   }
 }
-

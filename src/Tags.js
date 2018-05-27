@@ -19,22 +19,24 @@ export const DefaultTags = {
   STR: 'tag:yaml.org,2002:str'
 }
 
-const isMap = ({ type }) => (type === Type.FLOW_MAP || type === Type.MAP)
+const isMap = ({ type }) => type === Type.FLOW_MAP || type === Type.MAP
 
-const isSeq = ({ type }) => (type === Type.FLOW_SEQ || type === Type.SEQ)
+const isSeq = ({ type }) => type === Type.FLOW_SEQ || type === Type.SEQ
 
 export default class Tags {
-  static defaultStringifier (value) {
+  static defaultStringifier(value) {
     return JSON.stringify(value)
   }
 
-  constructor ({ schema, tags }) {
+  constructor({ schema, tags }) {
     this.schema = Array.isArray(schema) ? schema : availableSchema[schema]
     if (!this.schema) {
       const keys = Object.keys(availableSchema)
         .map(key => JSON.stringify(key))
         .join(', ')
-      throw new Error(`Unknown schema; use ${keys}, or { tag, test, resolve }[]`)
+      throw new Error(
+        `Unknown schema; use ${keys}, or { tag, test, resolve }[]`
+      )
     }
     if (Array.isArray(tags)) {
       this.schema = this.schema.concat(tags)
@@ -44,7 +46,7 @@ export default class Tags {
   }
 
   // falls back to string on no match
-  resolveScalar (str, tags) {
+  resolveScalar(str, tags) {
     if (!tags) tags = this.schema
     for (let i = 0; i < tags.length; ++i) {
       const { test, resolve } = tags[i]
@@ -58,7 +60,7 @@ export default class Tags {
   }
 
   // sets node.resolved on success
-  resolveNode (doc, node, tagName) {
+  resolveNode(doc, node, tagName) {
     const tags = this.schema.filter(({ tag }) => tag === tagName)
     const generic = tags.find(({ test }) => !test)
     if (node.error) doc.errors.push(node.error)
@@ -84,29 +86,40 @@ export default class Tags {
     return node.resolved
   }
 
-  resolveNodeWithFallback (doc, node, tagName) {
+  resolveNodeWithFallback(doc, node, tagName) {
     const res = this.resolveNode(doc, node, tagName)
     if (node.hasOwnProperty('resolved')) return res
-    const fallback = (
-      isMap(node) ? DefaultTags.MAP
-      : isSeq(node) ? DefaultTags.SEQ
-      : DefaultTags.STR
-    )
+    const fallback = isMap(node)
+      ? DefaultTags.MAP
+      : isSeq(node)
+        ? DefaultTags.SEQ
+        : DefaultTags.STR
     if (fallback) {
-      doc.warnings.push(new YAMLWarning(node,
-        `The tag ${tagName} is unavailable, falling back to ${fallback}`))
+      doc.warnings.push(
+        new YAMLWarning(
+          node,
+          `The tag ${tagName} is unavailable, falling back to ${fallback}`
+        )
+      )
       const res = this.resolveNode(doc, node, fallback)
       res.origTag = tagName
       return res
     } else {
-      doc.errors.push(new YAMLReferenceError(node,
-        `The tag ${tagName} is unavailable`))
+      doc.errors.push(
+        new YAMLReferenceError(node, `The tag ${tagName} is unavailable`)
+      )
     }
     return null
   }
 
-  stringify (doc, item, options, onComment) {
-    if (!(item instanceof Scalar || item instanceof Collection || item instanceof Pair)) {
+  stringify(doc, item, options, onComment) {
+    if (
+      !(
+        item instanceof Scalar ||
+        item instanceof Collection ||
+        item instanceof Pair
+      )
+    ) {
       item = doc.resolveValue(item, true)
     }
     options.tags = this
@@ -114,24 +127,46 @@ export default class Tags {
     if (item instanceof Pair) {
       return item.toString(doc, options, onComment)
     } else if (item.tag) {
-      match = this.schema.filter(({ format, tag }) => tag === item.tag && (!item.format || format === item.format))
-      if (match.length === 0) throw new Error(
-        `Tag not available: ${item.tag}${item.format ? ', format ' + item.format : ''}`)
+      match = this.schema.filter(
+        ({ format, tag }) =>
+          tag === item.tag && (!item.format || format === item.format)
+      )
+      if (match.length === 0)
+        throw new Error(
+          `Tag not available: ${item.tag}${
+            item.format ? ', format ' + item.format : ''
+          }`
+        )
     } else if (item.value === null) {
       match = this.schema.filter(t => t.class === null && !t.format)
-      if (match.length === 0) throw new Error('Schema is missing a null stringifier')
+      if (match.length === 0)
+        throw new Error('Schema is missing a null stringifier')
     } else {
       let obj = item
       if (item.hasOwnProperty('value')) {
         switch (typeof item.value) {
-          case 'boolean': obj = new Boolean; break
-          case 'number':  obj = new Number; break
-          case 'string':  obj = new String; break
-          default:        obj = item.value
+          case 'boolean':
+            obj = new Boolean()
+            break
+          case 'number':
+            obj = new Number()
+            break
+          case 'string':
+            obj = new String()
+            break
+          default:
+            obj = item.value
         }
       }
-      match = this.schema.filter(t => t.class && (obj instanceof t.class) && !t.format)
-      if (match.length === 0) throw new Error(`Tag not resolved for ${obj && obj.constructor ? obj.constructor.name : typeof obj}`)
+      match = this.schema.filter(
+        t => t.class && obj instanceof t.class && !t.format
+      )
+      if (match.length === 0)
+        throw new Error(
+          `Tag not resolved for ${
+            obj && obj.constructor ? obj.constructor.name : typeof obj
+          }`
+        )
     }
     const stringify = match[0].stringify || Tags.defaultStringifier
     const str = stringify(item, options, onComment)
@@ -140,8 +175,14 @@ export default class Tags {
       const p = doc.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
       const tagProp = p
         ? p.handle + tag.substr(p.prefix.length)
-        : tag[0] === '!' ? tag : `!<${tag}>`
-      if (item instanceof Collection && !options.inFlow && item.items.length > 0) {
+        : tag[0] === '!'
+          ? tag
+          : `!<${tag}>`
+      if (
+        item instanceof Collection &&
+        !options.inFlow &&
+        item.items.length > 0
+      ) {
         return `${tagProp}\n${options.indent}${str}`
       } else {
         return `${tagProp} ${str}`

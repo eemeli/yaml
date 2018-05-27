@@ -18,4 +18,4 @@ const visit = (node, tags) => {
   return tags
 }
 
-export default (node) => Object.keys(visit(node, {}))
+export default node => Object.keys(visit(node, {}))

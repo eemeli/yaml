@@ -31,17 +31,17 @@ const schema = [
     class: Number,
     tag: 'tag:yaml.org,2002:int',
     test: /^-?(?:0|[1-9][0-9]*)$/,
-    resolve: (str) => parseInt(str, 10)
+    resolve: str => parseInt(str, 10)
   },
   {
     class: Number,
     tag: 'tag:yaml.org,2002:float',
     test: /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][-+]?[0-9]+)?$/,
-    resolve: (str) => parseFloat(str)
+    resolve: str => parseFloat(str)
   }
 ]
 
-schema.scalarFallback = (str) => {
+schema.scalarFallback = str => {
   throw new SyntaxError(`Unresolved plain scalar ${JSON.stringify(str)}`)
 }
 

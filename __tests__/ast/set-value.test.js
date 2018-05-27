@@ -1,36 +1,33 @@
 import Node, { Type } from '../../src/ast/Node'
 import parse from '../../src/ast/parse'
 import { pretty, testSpec } from './common'
-import CollectionItem from '../../src/ast/CollectionItem';
+import CollectionItem from '../../src/ast/CollectionItem'
 
 test('set value in collection', () => {
- const src = // spec 2.1
-`- Mark McGwire
+  const src = `- Mark McGwire
 - Sammy Sosa
 - Ken Griffey
-`
+` // spec 2.1
   const ast = parse(src)
   ast[0].contents[0].items[1].node.value = 'TEST\n'
   expect(String(ast)).toBe(src.replace(/Sammy Sosa/, 'TEST'))
 })
 
 test('replace entire contents', () => {
- const src = // spec 2.1
-`- Mark McGwire
+  const src = `- Mark McGwire
 - Sammy Sosa
 - Ken Griffey
-`
+` // spec 2.1
   const ast = parse(src)
   ast[0].contents[0].value = 'TEST: true\n'
   expect(String(ast)).toBe('TEST: true\n')
 })
 
 test('remove map key/value pair', () => {
-  const src = // spec 2.2
-`hr:  65    # Home runs
+  const src = `hr:  65    # Home runs
 avg: 0.278 # Batting average
 rbi: 147   # Runs Batted In
-`
+` // spec 2.2
   const ast = parse(src)
   ast[0].contents[0].items[2].value = ''
   ast[0].contents[0].items[3].value = ''
@@ -38,8 +35,7 @@ rbi: 147   # Runs Batted In
 })
 
 test('add entry to seq', () => {
-  const src = // spec 2.3
-`american:
+  const src = `american:
   - Boston Red Sox
   - Detroit Tigers
   - New York Yankees
@@ -47,7 +43,7 @@ national:
   - New York Mets
   - Chicago Cubs
   - Atlanta Braves
-`
+` // spec 2.3
   const ast = parse(src)
   const seq = ast[0].contents[0].items[3].node
   const item = new CollectionItem(Type.SEQ_ITEM)

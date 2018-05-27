@@ -6,7 +6,9 @@ import Scalar from '../src/schema/Scalar'
 import Seq from '../src/schema/Seq'
 
 let doc
-beforeEach(() => { doc = new YAML.Document() })
+beforeEach(() => {
+  doc = new YAML.Document()
+})
 
 describe('scalars', () => {
   describe('doc#resolveValue(value) - wrapScalars true', () => {
@@ -47,7 +49,7 @@ describe('scalars', () => {
       expect(s.value).toBe(null)
     })
     test('undefined', () => {
-      const s = resolveValue(doc, )
+      const s = resolveValue(doc)
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(null)
     })
@@ -114,18 +116,20 @@ describe('objects', () => {
     expect(s.items[0]).toMatchObject({ key: 'x', value: true })
   })
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {
-    const object = { x: 3, y: [4], z: { w: "five", v: 6 } }
+    const object = { x: 3, y: [4], z: { w: 'five', v: 6 } }
     test('resolveValue(doc, value) - wrapScalars false', () => {
       const s = resolveValue(doc, object)
       expect(s).toBeInstanceOf(Map)
       expect(s.items).toHaveLength(3)
       expect(s.items).toMatchObject([
         { key: 'x', value: 3 },
-        { key: 'y', value: { items: [ 4 ] } },
-        { key: 'z', value: { items: [
-          { key: 'w', value: 'five' },
-          { key: 'v', value: 6 }
-        ] } }
+        { key: 'y', value: { items: [4] } },
+        {
+          key: 'z',
+          value: {
+            items: [{ key: 'w', value: 'five' }, { key: 'v', value: 6 }]
+          }
+        }
       ])
     })
     test('doc#resolveValue(value) - wrapScalars true', () => {
@@ -134,11 +138,16 @@ describe('objects', () => {
       expect(s.items).toHaveLength(3)
       expect(s.items).toMatchObject([
         { key: { value: 'x' }, value: { value: 3 } },
-        { key: { value: 'y' }, value: { items: [ { value: 4 } ] } },
-        { key: { value: 'z' }, value: { items: [
-          { key: { value: 'w' }, value: { value: 'five' } },
-          { key: { value: 'v' }, value: { value: 6 } }
-        ] } }
+        { key: { value: 'y' }, value: { items: [{ value: 4 }] } },
+        {
+          key: { value: 'z' },
+          value: {
+            items: [
+              { key: { value: 'w' }, value: { value: 'five' } },
+              { key: { value: 'v' }, value: { value: 6 } }
+            ]
+          }
+        }
       ])
     })
     test('set contents', () => {

@@ -1,5 +1,5 @@
 export class YAMLReferenceError extends ReferenceError {
-  constructor (source, message) {
+  constructor(source, message) {
     super()
     this.name = 'YAMLReferenceError'
     this.message = message
@@ -8,7 +8,7 @@ export class YAMLReferenceError extends ReferenceError {
 }
 
 export class YAMLSyntaxError extends SyntaxError {
-  constructor (source, message) {
+  constructor(source, message) {
     super()
     this.name = 'YAMLSyntaxError'
     this.message = message
@@ -17,7 +17,7 @@ export class YAMLSyntaxError extends SyntaxError {
 }
 
 export class YAMLWarning extends Error {
-  constructor (source, message) {
+  constructor(source, message) {
     super()
     this.name = 'YAMLWarning'
     this.message = message

@@ -8,14 +8,14 @@ export const Chomp = {
 }
 
 export default class BlockValue extends Node {
-  constructor (type, props) {
+  constructor(type, props) {
     super(type, props)
     this.blockIndent = null
     this.chomping = Chomp.CLIP
     this.header = null
   }
 
-  get strValue () {
+  get strValue() {
     if (!this.valueRange || !this.context) return null
     let { start, end } = this.valueRange
     const { indent, src } = this.context
@@ -41,7 +41,7 @@ export default class BlockValue extends Node {
       }
     }
     const bi = indent + this.blockIndent
-    const folded = (this.type === Type.BLOCK_FOLDED)
+    const folded = this.type === Type.BLOCK_FOLDED
     let str = ''
     let sep = ''
     let prevMoreIndented = false
@@ -74,7 +74,7 @@ export default class BlockValue extends Node {
     return this.chomping === Chomp.STRIP ? str : str + '\n'
   }
 
-  parseBlockHeader (start) {
+  parseBlockHeader(start) {
     const { src } = this.context
     let offset = start + 1
     let bi = ''
@@ -87,8 +87,16 @@ export default class BlockValue extends Node {
         case '+':
           this.chomping = Chomp.KEEP
           break
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
           bi += ch
           break
         default:
@@ -100,7 +108,7 @@ export default class BlockValue extends Node {
     }
   }
 
-  parseBlockValue (start) {
+  parseBlockValue(start) {
     const { indent, inFlow, src } = this.context
     let offset = start
     let bi = this.blockIndent ? indent + this.blockIndent - 1 : indent
@@ -152,7 +160,7 @@ export default class BlockValue extends Node {
    * @param {number} start - Index of first character
    * @returns {number} - Index of the character after this block
    */
-  parse (context, start) {
+  parse(context, start) {
     this.context = context
     trace: 'block-start', context.pretty, { start }
     const { src } = context
@@ -160,7 +168,13 @@ export default class BlockValue extends Node {
     offset = Node.endOfWhiteSpace(src, offset)
     offset = this.parseComment(offset)
     offset = this.parseBlockValue(offset)
-    trace: this.type, { style: this.blockStyle, valueRange: this.valueRange, comment: this.comment }, JSON.stringify(this.rawValue)
+    trace: this.type,
+      {
+        style: this.blockStyle,
+        valueRange: this.valueRange,
+        comment: this.comment
+      },
+      JSON.stringify(this.rawValue)
     return offset
   }
 }

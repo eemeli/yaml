@@ -2,16 +2,17 @@ import addComment from '../addComment'
 import { YAMLSyntaxError } from '../errors'
 import Node from './Node'
 
-export const toJSON = (value) => Array.isArray(value) ? (
-  value.map(toJSON)
- ) : value && typeof value === 'object' && ('toJSON' in value) ? (
-   value.toJSON()
- ) : value
+export const toJSON = value =>
+  Array.isArray(value)
+    ? value.map(toJSON)
+    : value && typeof value === 'object' && 'toJSON' in value
+      ? value.toJSON()
+      : value
 
 export default class Collection extends Node {
   static maxFlowStringSingleLineLength = 60
 
-  static checkKeyLength (doc, node, itemIdx, key, keyStart) {
+  static checkKeyLength(doc, node, itemIdx, key, keyStart) {
     if (typeof keyStart !== 'number') return
     const item = node.items[itemIdx]
     let keyEnd = item && item.range && item.range.start
@@ -25,23 +26,23 @@ export default class Collection extends Node {
       }
     }
     if (keyEnd > keyStart + 1024) {
-      const k = String(key).substr(0,8) + '...' + String(key).substr(-8)
+      const k = String(key).substr(0, 8) + '...' + String(key).substr(-8)
       doc.errors.push(new YAMLSyntaxError(node, `The "${k}" key is too long`))
     }
   }
 
-  constructor (doc) {
+  constructor(doc) {
     super()
     this._comments = []
     this.doc = doc
     this.items = []
   }
 
-  addComment (comment) {
+  addComment(comment) {
     this._comments.push({ comment, before: this.items.length })
   }
 
-  resolveComments () {
+  resolveComments() {
     this._comments.forEach(({ comment, before }) => {
       const item = this.items[before]
       if (!item) {
@@ -56,11 +57,11 @@ export default class Collection extends Node {
   }
 
   // overridden in implementations
-  toJSON () {
+  toJSON() {
     return null
   }
 
-  toString (options, onComment) {
+  toString(options, onComment) {
     const { tags } = this.doc
     const { blockItem, flowChars, indent, inFlow, itemIndent } = options
     const opt = { indent: itemIndent, inFlow, type: null }
@@ -71,28 +72,36 @@ export default class Collection extends Node {
       if (commentBefore) {
         hasItemWithComment = true
         commentBefore.match(/^.*$/gm).forEach(line => {
-          nodes.push({ type: 'comment', str: `#${line}`})
+          nodes.push({ type: 'comment', str: `#${line}` })
         })
       }
       let comment = item && item.comment
       if (comment) hasItemWithComment = true
-      let str = tags.stringify(this.doc, item, opt, () => { comment = null })
-      if (!hasItemWithNewLine && str.indexOf('\n') !== -1) hasItemWithNewLine = true
+      let str = tags.stringify(this.doc, item, opt, () => {
+        comment = null
+      })
+      if (!hasItemWithNewLine && str.indexOf('\n') !== -1)
+        hasItemWithNewLine = true
       if (inFlow && i < this.items.length - 1) str += ','
       str = addComment(str, opt.indent, comment)
       nodes.push({ type: 'item', str })
       return nodes
     }, [])
-    let str;
+    let str
     if (nodes.length === 0) {
       str = flowChars.start + flowChars.end
     } else if (inFlow) {
       const { start, end } = flowChars
       const strings = nodes.map(({ str }) => str)
-      if (hasItemWithComment || hasItemWithNewLine || (
-        strings.reduce((sum, str) => sum + str.length + 2, 2) > Collection.maxFlowStringSingleLineLength
-      )) {
-        str = `${start}\n  ${indent}${strings.join(`\n  ${indent}`)}\n${indent}${end}`
+      if (
+        hasItemWithComment ||
+        hasItemWithNewLine ||
+        strings.reduce((sum, str) => sum + str.length + 2, 2) >
+          Collection.maxFlowStringSingleLineLength
+      ) {
+        str = `${start}\n  ${indent}${strings.join(
+          `\n  ${indent}`
+        )}\n${indent}${end}`
       } else {
         str = `${start} ${strings.join(' ')} ${end}`
       }
@@ -100,7 +109,8 @@ export default class Collection extends Node {
       str = nodes.map(blockItem).join(`\n${indent}`)
     }
     if (this.comment) {
-      if (!hasItemWithNewLine && str.indexOf('\n') === -1) str = addComment(str, indent, this.comment)
+      if (!hasItemWithNewLine && str.indexOf('\n') === -1)
+        str = addComment(str, indent, this.comment)
       else str += '\n' + this.comment.replace(/^/gm, `${indent}#`)
       if (onComment) onComment()
     }

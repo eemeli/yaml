@@ -7,18 +7,16 @@ export const map = {
   class: Map,
   tag: 'tag:yaml.org,2002:map',
   resolve: (doc, node) => new Map(doc).parse(node),
-  stringify: (value, { indent, inFlow }, onComment) => value.toString(indent, inFlow, onComment)
+  stringify: (value, { indent, inFlow }, onComment) =>
+    value.toString(indent, inFlow, onComment)
 }
 
 export const seq = {
   class: Seq,
   tag: 'tag:yaml.org,2002:seq',
   resolve: (doc, node) => new Seq(doc).parse(node),
-  stringify: (value, { indent, inFlow }, onComment) => value.toString(indent, inFlow, onComment)
+  stringify: (value, { indent, inFlow }, onComment) =>
+    value.toString(indent, inFlow, onComment)
 }
 
-export default [
-  map,
-  seq,
-  str
-]
+export default [map, seq, str]

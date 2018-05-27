@@ -1,11 +1,13 @@
 import failsafe from './failsafe'
 
-export const stringifyNumber = ({ value }) => (
-  isFinite(value) ? JSON.stringify(value)
-  : isNaN(value) ? '.nan'
-  : value < 0 ? '-.inf'
-  : '.inf'
-)
+export const stringifyNumber = ({ value }) =>
+  isFinite(value)
+    ? JSON.stringify(value)
+    : isNaN(value)
+      ? '.nan'
+      : value < 0
+        ? '-.inf'
+        : '.inf'
 
 export const nullOptions = { nullStr: 'null' }
 
@@ -22,7 +24,7 @@ export default failsafe.concat([
     class: Boolean,
     tag: 'tag:yaml.org,2002:bool',
     test: /^(?:true|false)$/i,
-    resolve: (str) => (str[0] === 't' || str[0] === 'T')
+    resolve: str => str[0] === 't' || str[0] === 'T'
   },
   {
     class: Number,
@@ -36,7 +38,7 @@ export default failsafe.concat([
     class: Number,
     tag: 'tag:yaml.org,2002:int',
     test: /^[-+]?[0-9]+$/,
-    resolve: (str) => parseInt(str, 10),
+    resolve: str => parseInt(str, 10),
     stringify: stringifyNumber
   },
   {
@@ -51,16 +53,19 @@ export default failsafe.concat([
     class: Number,
     tag: 'tag:yaml.org,2002:float',
     test: /^(?:[-+]?\.inf|(\.nan))$/i,
-    resolve: (str, nan) => nan ? NaN : (
-      str[0] === '-' ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY
-    ),
+    resolve: (str, nan) =>
+      nan
+        ? NaN
+        : str[0] === '-'
+          ? Number.NEGATIVE_INFINITY
+          : Number.POSITIVE_INFINITY,
     stringify: stringifyNumber
   },
   {
     class: Number,
     tag: 'tag:yaml.org,2002:float',
     test: /^[-+]?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][-+]?[0-9]+)?$/,
-    resolve: (str) => parseFloat(str),
+    resolve: str => parseFloat(str),
     stringify: stringifyNumber
   }
 ])

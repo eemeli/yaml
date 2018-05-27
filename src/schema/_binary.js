@@ -2,7 +2,7 @@ import { YAMLReferenceError } from '../errors'
 import { resolve as resolveStr } from './_string'
 
 export const binary = {
-  class: Uint8Array,  // Buffer inherits from Uint8Array
+  class: Uint8Array, // Buffer inherits from Uint8Array
   tag: 'tag:yaml.org,2002:binary',
   /**
    * Returns a Buffer in node and an Uint8Array in browsers
@@ -22,8 +22,12 @@ export const binary = {
       for (let i = 0; i < str.length; ++i) buffer[i] = str.charCodeAt(i)
       return buffer
     } else {
-      doc.errors.push(new YAMLReferenceError(node,
-        'This environment does not support reading binary tags; either Buffer or atob is required'))
+      doc.errors.push(
+        new YAMLReferenceError(
+          node,
+          'This environment does not support reading binary tags; either Buffer or atob is required'
+        )
+      )
       return null
     }
   },
@@ -31,17 +35,18 @@ export const binary = {
   stringify: ({ value }) => {
     let str
     if (typeof Buffer === 'function') {
-      str = value instanceof Buffer ? (
-        value.toString('base64')
-      ) : (
-        Buffer.from(value.buffer).toString('base64')
-      )
+      str =
+        value instanceof Buffer
+          ? value.toString('base64')
+          : Buffer.from(value.buffer).toString('base64')
     } else if (typeof btoa === 'function') {
       let s = ''
       for (let i = 0; i < value.length; ++i) s += String.fromCharCode(buf[i])
       str = btoa(s)
     } else {
-      throw new Error('This environment does not support writing binary tags; either Buffer or btoa is required')
+      throw new Error(
+        'This environment does not support writing binary tags; either Buffer or btoa is required'
+      )
     }
     const { lineWidth } = binary.options
     const n = Math.ceil(str.length / lineWidth)
@@ -53,6 +58,4 @@ export const binary = {
   }
 }
 
-export default [
-  binary
-]
+export default [binary]

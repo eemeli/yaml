@@ -2,7 +2,7 @@ import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class Comment extends Node {
-  constructor () {
+  constructor() {
     super(Type.COMMENT)
   }
 
@@ -13,7 +13,7 @@ export default class Comment extends Node {
    * @param {number} start - Index of first character
    * @returns {number} - Index of the character after this scalar
    */
-  parse (context, start) {
+  parse(context, start) {
     this.context = context
     const { src } = context
     let offset = this.parseComment(start)
@@ -22,4 +22,3 @@ export default class Comment extends Node {
     return offset
   }
 }
-

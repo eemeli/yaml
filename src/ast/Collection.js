@@ -4,7 +4,7 @@ import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class Collection extends Node {
-  constructor (firstItem) {
+  constructor(firstItem) {
     super(firstItem.type === Type.SEQ_ITEM ? Type.SEQ : Type.MAP)
     this.items = [firstItem]
     for (let i = firstItem.props.length - 1; i >= 0; --i) {
@@ -24,7 +24,7 @@ export default class Collection extends Node {
    * @param {number} start - Index of first character
    * @returns {number} - Index of the character after this
    */
-  parse (context, start) {
+  parse(context, start) {
     trace: 'collection-start', context.pretty, { start }
     this.context = context
     const { parseNode, src } = context
@@ -66,7 +66,8 @@ export default class Collection extends Node {
         break
       }
       if (offset !== lineStart + indent && (atLineStart || ch !== ':')) {
-        trace: 'end:unindent', { offset, lineStart, indent, ch: JSON.stringify(ch) }
+        trace: 'end:unindent',
+          { offset, lineStart, indent, ch: JSON.stringify(ch) }
         if (lineStart > start) offset = lineStart
         break
       }
@@ -78,13 +79,17 @@ export default class Collection extends Node {
           typeswitch = !next || next === '\n' || next === '\t' || next === ' '
         }
         if (typeswitch) {
-          trace: 'end:typeswitch', { offset, lineStart, indent, ch: JSON.stringify(ch) }
+          trace: 'end:typeswitch',
+            { offset, lineStart, indent, ch: JSON.stringify(ch) }
           if (lineStart > start) offset = lineStart
           break
         }
       }
       trace: 'item-start', this.items.length, { ch: JSON.stringify(ch) }
-      const node = parseNode({ atLineStart, inCollection: true, indent, lineStart, parent: this }, offset)
+      const node = parseNode(
+        { atLineStart, inCollection: true, indent, lineStart, parent: this },
+        offset
+      )
       if (!node) return offset // at next document start
       this.items.push(node)
       this.valueRange.end = node.valueRange.end
@@ -97,8 +102,13 @@ export default class Collection extends Node {
     return offset
   }
 
-  toString () {
-    const { context: { src }, items, range, value } = this
+  toString() {
+    const {
+      context: { src },
+      items,
+      range,
+      value
+    } = this
     if (value != null) return value
     let str = src.slice(range.start, items[0].range.start) + String(items[0])
     for (let i = 1; i < items.length; ++i) {

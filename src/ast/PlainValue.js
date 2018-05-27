@@ -2,13 +2,21 @@ import Node from './Node'
 import Range from './Range'
 
 export default class PlainValue extends Node {
-  static endOfLine (src, start, inFlow) {
+  static endOfLine(src, start, inFlow) {
     let ch = src[start]
     let offset = start
     while (ch && ch !== '\n') {
-      if (inFlow && (ch === '[' || ch === ']' || ch === '{' || ch === '}' || ch === ',')) break
+      if (
+        inFlow &&
+        (ch === '[' || ch === ']' || ch === '{' || ch === '}' || ch === ',')
+      )
+        break
       const next = src[offset + 1]
-      if (ch === ':' && (next === '\n' || next === '\t' || next === ' ' || next === ',')) break
+      if (
+        ch === ':' &&
+        (next === '\n' || next === '\t' || next === ' ' || next === ',')
+      )
+        break
       if ((ch === ' ' || ch === '\t') && next === '#') break
       offset += 1
       ch = next
@@ -16,14 +24,16 @@ export default class PlainValue extends Node {
     return offset
   }
 
-  get strValue () {
+  get strValue() {
     if (!this.valueRange || !this.context) return null
     let { start, end } = this.valueRange
     const { src } = this.context
     let ch = src[end - 1]
-    while (start < end && (ch === '\n' || ch === '\t' || ch === ' ')) ch = src[--end - 1]
+    while (start < end && (ch === '\n' || ch === '\t' || ch === ' '))
+      ch = src[--end - 1]
     ch = src[start]
-    while (start < end && (ch === '\n' || ch === '\t' || ch === ' ')) ch = src[++start]
+    while (start < end && (ch === '\n' || ch === '\t' || ch === ' '))
+      ch = src[++start]
     let str = ''
     for (let i = start; i < end; ++i) {
       let ch = src[i]
@@ -47,7 +57,7 @@ export default class PlainValue extends Node {
     return str
   }
 
-  parseBlockValue (start) {
+  parseBlockValue(start) {
     const { indent, inFlow, src } = this.context
     let offset = start
     for (let ch = src[offset]; ch === '\n'; ch = src[offset]) {
@@ -87,7 +97,7 @@ export default class PlainValue extends Node {
    * @param {number} start - Index of first character
    * @returns {number} - Index of the character after this scalar, may be `\n`
    */
-  parse (context, start) {
+  parse(context, start) {
     this.context = context
     trace: 'plain-start', context.pretty, { start }
     const { inFlow, src } = context
@@ -99,11 +109,15 @@ export default class PlainValue extends Node {
     this.valueRange = new Range(start, offset)
     offset = Node.endOfWhiteSpace(src, offset)
     offset = this.parseComment(offset)
-    trace: 'first line', { valueRange: this.valueRange, comment: this.comment }, JSON.stringify(this.rawValue)
+    trace: 'first line',
+      { valueRange: this.valueRange, comment: this.comment },
+      JSON.stringify(this.rawValue)
     if (!this.hasComment || this.valueRange.isEmpty) {
       offset = this.parseBlockValue(offset)
     }
-    trace: this.type, { offset, valueRange: this.valueRange }, JSON.stringify(this.rawValue)
+    trace: this.type,
+      { offset, valueRange: this.valueRange },
+      JSON.stringify(this.rawValue)
     return offset
   }
 }

@@ -10,7 +10,7 @@ describe('folded block with chomp: keep', () => {
   })
 
   test('nl + nl + sp + nl', () => {
-    const src = ">+\nab\n\n \n"
+    const src = '>+\nab\n\n \n'
     const doc = parse(src)[0]
     expect(doc.contents[0].strValue).toBe('ab\n\n \n')
   })
@@ -40,10 +40,7 @@ test('explicit key after empty value', () => {
   const src = 'one:\n? two\n'
   const doc = parse(src)[0]
   const raw = doc.contents[0].items.map(it => it.rawValue)
-  expect(raw).toMatchObject([
-    'one', ':',
-    '? two'
-  ])
+  expect(raw).toMatchObject(['one', ':', '? two'])
 })
 
 test('seq with anchor as explicit key', () => {
@@ -60,6 +57,10 @@ test('unindented single-quoted string', () => {
   expect(node.error).toBeNull()
   expect(node.strValue).toMatchObject({
     str: 'two lines',
-    errors: [new SyntaxError('Multi-line single-quoted string needs to be sufficiently indented')]
+    errors: [
+      new SyntaxError(
+        'Multi-line single-quoted string needs to be sufficiently indented'
+      )
+    ]
   })
 })

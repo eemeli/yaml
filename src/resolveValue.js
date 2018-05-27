@@ -3,7 +3,7 @@ import Pair from './schema/Pair'
 import Scalar from './schema/Scalar'
 import Seq from './schema/Seq'
 
-export default function resolveValue (doc, value, wrapScalars) {
+export default function resolveValue(doc, value, wrapScalars) {
   if (value == null) return new Scalar(null)
   if (typeof value !== 'object') return wrapScalars ? new Scalar(value) : value
   if (Array.isArray(value)) {
@@ -20,4 +20,3 @@ export default function resolveValue (doc, value, wrapScalars) {
     return map
   }
 }
-

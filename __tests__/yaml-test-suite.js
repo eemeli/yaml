@@ -4,7 +4,8 @@ import path from 'path'
 import YAML from '../src/index'
 import { strOptions } from '../src/schema/_string'
 
-const testDirs = fs.readdirSync(path.resolve(__dirname, 'yaml-test-suite'))
+const testDirs = fs
+  .readdirSync(path.resolve(__dirname, 'yaml-test-suite'))
   .filter(dir => ['.git', 'meta', 'name', 'tags'].indexOf(dir) === -1)
 
 const matchJson = (docs, json) => {
@@ -37,9 +38,16 @@ testDirs.forEach(dir => {
   const name = fs.readFileSync(path.resolve(root, '==='), 'utf8')
   const yaml = fs.readFileSync(path.resolve(root, 'in.yaml'), 'utf8')
   let json, error, outYaml
-  try { json = fs.readFileSync(path.resolve(root, 'in.json'), 'utf8') } catch (e) {}
-  try { fs.readFileSync(path.resolve(root, 'error'), 'utf8'); error = true } catch (e) {}
-  try { outYaml = fs.readFileSync(path.resolve(root, 'out.yaml'), 'utf8') } catch (e) {}
+  try {
+    json = fs.readFileSync(path.resolve(root, 'in.json'), 'utf8')
+  } catch (e) {}
+  try {
+    fs.readFileSync(path.resolve(root, 'error'), 'utf8')
+    error = true
+  } catch (e) {}
+  try {
+    outYaml = fs.readFileSync(path.resolve(root, 'out.yaml'), 'utf8')
+  } catch (e) {}
   if (!error && !json && !outYaml) return
   test(`${dir}: ${name}`, () => {
     const docs = YAML.parseDocuments(yaml)
@@ -51,7 +59,8 @@ testDirs.forEach(dir => {
       expect(errors).not.toHaveLength(0)
     } else {
       expect(errors).toHaveLength(0)
-      const src2 = docs.map(doc => String(doc).replace(/\n$/, '')).join('\n---\n') + '\n'
+      const src2 =
+        docs.map(doc => String(doc).replace(/\n$/, '')).join('\n---\n') + '\n'
       const docs2 = YAML.parseDocuments(src2)
       trace: name,
         '\nIN\n' + yaml,

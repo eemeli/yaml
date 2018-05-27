@@ -94,8 +94,7 @@ describe('parse comments', () => {
 
   describe('map-in-seq comments', () => {
     test('plain', () => {
-      const src =
-`#c0
+      const src = `#c0
 - #c1
   k1: v1
   #c2
@@ -116,8 +115,7 @@ describe('parse comments', () => {
 
   describe('seq-in-map comments', () => {
     test('plain', () => {
-      const src =
-`#c0
+      const src = `#c0
 k1: #c1
   - v1
 #c2
@@ -212,7 +210,7 @@ describe('stringify comments', () => {
       doc.contents.items[1].commentBefore = '\nc2\n\nc3'
       doc.contents.comment = 'c4\nc5'
       expect(String(doc)).toBe(
-`#c0
+        `#c0
 #c1
 - value 1
 #
@@ -222,7 +220,8 @@ describe('stringify comments', () => {
 - value 2
 #c4
 #c5
-`)
+`
+      )
     })
   })
 
@@ -243,7 +242,7 @@ describe('stringify comments', () => {
       doc.contents.items[1].commentBefore = '\nc2\n\nc3'
       doc.contents.comment = 'c4\nc5'
       expect(String(doc)).toBe(
-`#c0
+        `#c0
 #c1
 key1: value 1
 #
@@ -253,7 +252,8 @@ key1: value 1
 key2: value 2
 #c4
 #c5
-`)
+`
+      )
     })
   })
 })

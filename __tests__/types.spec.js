@@ -18,8 +18,7 @@ afterAll(() => {
 
 describe('json schema', () => {
   test('!!bool', () => {
-    const src =
-`"canonical": true
+    const src = `"canonical": true
 "answer": false
 "logical": True
 "option": TruE`
@@ -35,8 +34,7 @@ describe('json schema', () => {
   })
 
   test('!!float', () => {
-    const src =
-`"canonical": 6.8523015e+5
+    const src = `"canonical": 6.8523015e+5
 "fixed": 685230.15
 "negative infinity": -.inf
 "not a number": .NaN`
@@ -52,8 +50,7 @@ describe('json schema', () => {
   })
 
   test('!!int', () => {
-    const src =
-`"canonical": 685230
+    const src = `"canonical": 685230
 "decimal": -685230
 "octal": 0o2472256
 "hexadecimal": 0x0A74AE`
@@ -69,8 +66,7 @@ describe('json schema', () => {
   })
 
   test('!!null', () => {
-    const src =
-`"empty":
+    const src = `"empty":
 "canonical": ~
 "english": null
 ~: 'null key'`
@@ -88,8 +84,7 @@ describe('json schema', () => {
 
 describe('core schema', () => {
   test('!!bool', () => {
-    const src =
-`canonical: true
+    const src = `canonical: true
 answer: FALSE
 logical: True
 option: TruE`
@@ -103,8 +98,7 @@ option: TruE`
   })
 
   test('!!float', () => {
-    const src =
-`canonical: 6.8523015e+5
+    const src = `canonical: 6.8523015e+5
 fixed: 685230.15
 negative infinity: -.inf
 not a number: .NaN`
@@ -118,8 +112,7 @@ not a number: .NaN`
   })
 
   test('!!int', () => {
-    const src =
-`canonical: 685230
+    const src = `canonical: 685230
 decimal: +685230
 octal: 0o2472256
 hexadecimal: 0x0A74AE`
@@ -133,8 +126,7 @@ hexadecimal: 0x0A74AE`
   })
 
   test('!!null', () => {
-    const src =
-`empty:
+    const src = `empty:
 canonical: ~
 english: null
 ~: null key`
@@ -150,8 +142,7 @@ english: null
 
 describe('extended schema', () => {
   test('!!binary', () => {
-    const src =
-`canonical: !!binary "\\
+    const src = `canonical: !!binary "\\
  R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5\\
  OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+\\
  +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC\\
@@ -173,15 +164,16 @@ description:
     expect(generic).toHaveLength(185)
     let canonicalStr = ''
     let genericStr = ''
-    for (let i = 0; i < canonical.length; ++i) canonicalStr += String.fromCharCode(canonical[i])
-    for (let i = 0; i < generic.length; ++i) genericStr += String.fromCharCode(generic[i])
+    for (let i = 0; i < canonical.length; ++i)
+      canonicalStr += String.fromCharCode(canonical[i])
+    for (let i = 0; i < generic.length; ++i)
+      genericStr += String.fromCharCode(generic[i])
     expect(canonicalStr).toBe(genericStr)
-    expect(canonicalStr.substr(0,5)).toBe('GIF89')
+    expect(canonicalStr.substr(0, 5)).toBe('GIF89')
   })
 
   test('!!bool', () => {
-    const src =
-`canonical: y
+    const src = `canonical: y
 answer: NO
 logical: True
 option: on`
@@ -195,8 +187,7 @@ option: on`
   })
 
   test('!!float', () => {
-    const src =
-`canonical: 6.8523015e+5
+    const src = `canonical: 6.8523015e+5
 exponential: 685.230_15e+03
 fixed: 685_230.15
 sexagesimal: 190:20:30.15
@@ -214,8 +205,7 @@ not a number: .NaN`
   })
 
   test('!!int', () => {
-    const src =
-`canonical: 685230
+    const src = `canonical: 685230
 decimal: +685_230
 octal: 02472256
 hexadecimal: 0x_0A_74_AE
@@ -233,8 +223,7 @@ sexagesimal: 190:20:30`
   })
 
   test('!!null', () => {
-    const src =
-`empty:
+    const src = `empty:
 canonical: ~
 english: null
 ~: null key`
@@ -248,8 +237,7 @@ english: null
   })
 
   test('!!timestamp', () => {
-    const src =
-`canonical:       2001-12-15T02:59:43.1Z
+    const src = `canonical:       2001-12-15T02:59:43.1Z
 valid iso8601:    2001-12-14t21:59:43.10-05:00
 space separated:  2001-12-14 21:59:43.10 -5
 no time zone (Z): 2001-12-15 2:59:43.10
@@ -263,7 +251,6 @@ date (00:00:00Z): 2002-12-14`
       'date (00:00:00Z)': '2002-12-14T00:00:00.000Z'
     })
   })
-
 })
 
 describe('merge <<', () => {
@@ -313,8 +300,7 @@ describe('merge <<', () => {
 })
 
 describe('custom tags', () => {
-  const src =
-`%TAG !e! tag:example.com,2000:test/
+  const src = `%TAG !e! tag:example.com,2000:test/
 ---
 !e!x
 - !y 2
@@ -337,7 +323,7 @@ describe('custom tags', () => {
   test('stringify', () => {
     const doc = YAML.parseDocuments(src)[0]
     expect(String(doc)).toBe(
-`%TAG !e! tag:example.com,2000:test/
+      `%TAG !e! tag:example.com,2000:test/
 ---
 !e!x
 - !y "2"
@@ -357,7 +343,7 @@ describe('custom tags', () => {
     s.origTag = '!g'
     doc.contents.items.splice(1, 1, s, '7')
     expect(String(doc)).toBe(
-`%TAG !e! tag:example.com,2000:test/
+      `%TAG !e! tag:example.com,2000:test/
 %TAG !f! tag:example.com,2000:other/
 ---
 #c
