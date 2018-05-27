@@ -37,6 +37,5 @@ export default {
     }
   },
   parse,
-  parseAST,
   parseDocuments
 }
