@@ -1,0 +1,3 @@
+/dist/
+/package*.json
+/__tests__/yaml-test-suite/
