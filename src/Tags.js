@@ -28,11 +28,10 @@ export default class Tags {
     return JSON.stringify(value)
   }
 
-  constructor ({ schema, tags } = {}) {
-    this.schema = Array.isArray(schema) ? schema : availableSchema[schema || '']
+  constructor ({ schema, tags }) {
+    this.schema = Array.isArray(schema) ? schema : availableSchema[schema]
     if (!this.schema) {
       const keys = Object.keys(availableSchema)
-        .filter(key => key)
         .map(key => JSON.stringify(key))
         .join(', ')
       throw new Error(`Unknown schema; use ${keys}, or { tag, test, resolve }[]`)

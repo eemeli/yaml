@@ -4,7 +4,6 @@ import failsafe from './failsafe'
 import json from './json'
 
 export default {
-  '': core,
   core,
   extended,
   failsafe,

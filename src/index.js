@@ -2,16 +2,22 @@ import parseAST from './ast/parse'
 import Document from './Document'
 import Tags from './Tags'
 
-const parseDocuments = (src, options = {}) => {
-  const ast = parseAST(src)
-  const tags = new Tags(options)
-  return ast.map(astDoc => {
-    const doc = new Document(tags, options)
+const defaultOptions = {
+  merge: false,
+  schema: 'core',
+  tags: null
+}
+
+function parseDocuments (src, options) {
+  const o = options ? Object.assign({}, defaultOptions, options): defaultOptions
+  const tags = new Tags(o)
+  return parseAST(src).map(astDoc => {
+    const doc = new Document(tags, o)
     return doc.parse(astDoc)
   })
 }
 
-const parse = (src, options = {}) => {
+function parse (src, options) {
   const docs = parseDocuments(src, options)
   docs.forEach(doc => {
     doc.warnings.forEach(warning => console.warn(warning))
@@ -24,7 +30,12 @@ const parse = (src, options = {}) => {
 }
 
 export default {
-  Document,
+  defaultOptions,
+  Document: class extends Document {
+    constructor(tags, options) {
+      super(tags, Object.assign({}, defaultOptions, options))
+    }
+  },
   parse,
   parseAST,
   parseDocuments

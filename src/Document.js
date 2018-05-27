@@ -9,14 +9,14 @@ import Collection, { toJSON } from './schema/Collection'
 const isCollectionItem = (node) => node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
 export default class Document {
-  constructor (tags, options = {}) {
+  constructor (tags, options) {
     this.anchors = []
     this.commentBefore = null
     this.comment = null
     this.contents = null
     this.directives = []
     this.errors = []
-    this.options = options.merge ? { merge: options.merge } : {}
+    this.options = options && options.merge ? { merge: true } : {}
     this.rawContents = null
     this.tagPrefixes = []
     this.tags = tags || new Tags(options)
