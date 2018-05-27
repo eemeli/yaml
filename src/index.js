@@ -29,6 +29,13 @@ function parse (src, options) {
   return docs[0] && docs[0].toJSON()
 }
 
+function stringify (value, options) {
+  const o = options ? Object.assign({}, defaultOptions, options): defaultOptions
+  const doc = new Document(null, o)
+  doc.contents = value
+  return String(doc)
+}
+
 export default {
   defaultOptions,
   Document: class extends Document {
@@ -37,5 +44,6 @@ export default {
     }
   },
   parse,
-  parseDocuments
+  parseDocuments,
+  stringify
 }

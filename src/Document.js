@@ -292,6 +292,8 @@ export default class Document {
       let comment = this.contents.comment
       const body = this.tags.stringify(this, this.contents, options, () => { comment = null })
       lines.push(addComment(body, '', comment))
+    } else if (this.contents !== undefined) {
+      lines.push(this.tags.stringify(this, this.contents, { indent: '' }))
     }
     if (this.comment) lines.push(this.comment.replace(/^/gm, '#'))
     return lines.join('\n') + '\n'
