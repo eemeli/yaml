@@ -947,8 +947,8 @@ bar`,
           tag: 'tag:example.com,2000:app/foo',
           resolve: (doc, node) => 'global'
         } ]
-        const res = YAML.parse(src, { docArray: true, tags })
-        expect(res).toMatchObject(['private', 'global'])
+        const docs = YAML.parseDocuments(src, { tags })
+        expect(docs.map(d => d.toJSON())).toMatchObject(['private', 'global'])
       }
     },
 
@@ -1004,8 +1004,8 @@ bar`,
           tag: '!my-light',
           resolve: (doc, node) => 'light:' + node.strValue
         }
-        const res = YAML.parse(src, { docArray: true, tags: [tag] })
-        expect(res).toMatchObject(['light:fluorescent', 'light:green'])
+        const docs = YAML.parseDocuments(src, { tags: [tag] })
+        expect(docs.map(d => d.toJSON())).toMatchObject(['light:fluorescent', 'light:green'])
       }
     },
 
