@@ -28,7 +28,8 @@ export default class Tags {
     return JSON.stringify(value)
   }
 
-  constructor({ schema, tags }) {
+  constructor({ merge, schema, tags }) {
+    this.merge = !!merge
     this.schema = Array.isArray(schema) ? schema : availableSchema[schema]
     if (!this.schema) {
       const keys = Object.keys(availableSchema)

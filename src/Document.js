@@ -10,28 +10,23 @@ const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
 export default class Document {
-  constructor(tags, options) {
-    this.anchors = []
+  constructor(tags) {
+    this.anchors = {}
     this.commentBefore = null
     this.comment = null
     this.contents = null
-    this.directives = []
     this.errors = []
-    this.options = options && options.merge ? { merge: true } : {}
-    this.rawContents = null
     this.tagPrefixes = []
-    this.tags = tags || new Tags(options)
+    this.tags = tags instanceof Tags ? tags : new Tags(tags)
     this.version = null
     this.warnings = []
   }
 
   parse({ directives = [], contents = [], error }) {
-    this.directives = directives
     if (error) {
       if (!error.source) error.source = this
       this.errors.push(error)
     }
-    this.rawContents = contents
     const directiveComments = []
     directives.forEach(directive => {
       const { comment, name } = directive

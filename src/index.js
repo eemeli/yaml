@@ -9,14 +9,11 @@ const defaultOptions = {
 }
 
 function parseDocuments(src, options) {
-  const o = options
+  const resolvedOptions = options
     ? Object.assign({}, defaultOptions, options)
     : defaultOptions
-  const tags = new Tags(o)
-  return parseAST(src).map(astDoc => {
-    const doc = new Document(tags, o)
-    return doc.parse(astDoc)
-  })
+  const tags = new Tags(resolvedOptions)
+  return parseAST(src).map(astDoc => new Document(tags).parse(astDoc))
 }
 
 function parse(src, options) {
@@ -36,10 +33,10 @@ function parse(src, options) {
 }
 
 function stringify(value, options) {
-  const o = options
+  const resolvedOptions = options
     ? Object.assign({}, defaultOptions, options)
     : defaultOptions
-  const doc = new Document(null, o)
+  const doc = new Document(resolvedOptions)
   doc.contents = value
   return String(doc)
 }
@@ -47,8 +44,12 @@ function stringify(value, options) {
 export default {
   defaultOptions,
   Document: class extends Document {
-    constructor(tags, options) {
-      super(tags, Object.assign({}, defaultOptions, options))
+    constructor(tags) {
+      if (tags instanceof Tags) {
+        super(tags)
+      } else {
+        super(Object.assign({}, defaultOptions, tags))
+      }
     }
   },
   parse,
