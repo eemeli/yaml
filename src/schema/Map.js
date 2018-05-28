@@ -92,17 +92,18 @@ export default class YAMLMap extends Collection {
           if (key !== undefined) this.items.push(new Pair(key))
           key = this.doc.resolveNode(item)
           keyStart = item.range.start
-          if (map.items[i + 1].type !== Type.MAP_VALUE)
+          const nextItem = map.items[i + 1]
+          if (!nextItem || nextItem.type !== Type.MAP_VALUE)
             this.doc.errors.push(
               new YAMLSyntaxError(
-                node,
+                item.node,
                 'Implicit map keys need to be followed by map values'
               )
             )
           if (item.valueRangeContainsNewline)
             this.doc.errors.push(
               new YAMLSyntaxError(
-                node,
+                item.node,
                 'Implicit map keys need to be on a single line'
               )
             )
