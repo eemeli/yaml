@@ -1,5 +1,5 @@
 import { Type } from '../ast/Node'
-import { YAMLSyntaxError } from '../errors'
+import { YAMLSemanticError } from '../errors'
 import Collection, { toJSON } from './Collection'
 import Pair from './Pair'
 
@@ -27,7 +27,7 @@ export default class YAMLSeq extends Collection {
           this.items.push(this.doc.resolveNode(item.node))
           if (item.hasProps)
             this.doc.errors.push(
-              new YAMLSyntaxError(
+              new YAMLSemanticError(
                 item,
                 'Sequence items cannot have tags or anchors before the - indicator'
               )
@@ -35,7 +35,7 @@ export default class YAMLSeq extends Collection {
           break
         default:
           this.doc.errors.push(
-            new YAMLSyntaxError(
+            new YAMLSemanticError(
               item,
               `Unexpected ${item.type} node in sequence`
             )
@@ -68,7 +68,7 @@ export default class YAMLSeq extends Collection {
             key = this.items.pop()
             if (key instanceof Pair)
               this.doc.errors.push(
-                new YAMLSyntaxError(
+                new YAMLSemanticError(
                   item,
                   'Chaining flow sequence pairs is invalid (e.g. [ a : b : c ])'
                 )
@@ -83,7 +83,7 @@ export default class YAMLSeq extends Collection {
           next = null
         } else if (next === '[' || item !== ']' || i < seq.items.length - 1) {
           this.doc.errors.push(
-            new YAMLSyntaxError(
+            new YAMLSemanticError(
               seq,
               `Flow sequence contains an unexpected ${item}`
             )
@@ -94,7 +94,7 @@ export default class YAMLSeq extends Collection {
       } else {
         if (next)
           this.doc.errors.push(
-            new YAMLSyntaxError(
+            new YAMLSemanticError(
               item,
               `Expected a ${next} here in flow sequence`
             )
@@ -112,7 +112,7 @@ export default class YAMLSeq extends Collection {
     }
     if (seq.items[seq.items.length - 1] !== ']')
       this.doc.errors.push(
-        new YAMLSyntaxError(seq, 'Expected flow sequence to end with ]')
+        new YAMLSemanticError(seq, 'Expected flow sequence to end with ]')
       )
     if (key !== undefined) this.items.push(new Pair(key))
   }

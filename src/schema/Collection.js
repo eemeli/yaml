@@ -1,5 +1,5 @@
 import addComment from '../addComment'
-import { YAMLSyntaxError } from '../errors'
+import { YAMLSemanticError } from '../errors'
 import Node from './Node'
 
 export const toJSON = value =>
@@ -27,7 +27,7 @@ export default class Collection extends Node {
     }
     if (keyEnd > keyStart + 1024) {
       const k = String(key).substr(0, 8) + '...' + String(key).substr(-8)
-      doc.errors.push(new YAMLSyntaxError(node, `The "${k}" key is too long`))
+      doc.errors.push(new YAMLSemanticError(node, `The "${k}" key is too long`))
     }
   }
 

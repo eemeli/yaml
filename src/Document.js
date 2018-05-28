@@ -1,7 +1,7 @@
 import addComment from './addComment'
 import listTagNames from './listTagNames'
 import { Char, Type } from './ast/Node'
-import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
+import { YAMLReferenceError, YAMLSemanticError, YAMLWarning } from './errors'
 import resolveValue from './resolveValue'
 import Schema, { DefaultTagPrefixes, DefaultTags } from './schema'
 import Collection, { toJSON } from './schema/Collection'
@@ -55,7 +55,7 @@ export default class Document {
       if (node.valueRange && !node.valueRange.isEmpty) {
         if (contentNodes.length === 1) {
           this.errors.push(
-            new YAMLSyntaxError(
+            new YAMLSemanticError(
               node,
               'Document is not valid YAML (bad indentation?)'
             )
@@ -106,7 +106,7 @@ export default class Document {
         this.tagPrefixes.push({ handle, prefix })
       } else {
         this.errors.push(
-          new YAMLSyntaxError(
+          new YAMLSemanticError(
             directive,
             'The TAG directive must only be given at most once per handle in the same document.'
           )
@@ -114,7 +114,7 @@ export default class Document {
       }
     } else {
       this.errors.push(
-        new YAMLSyntaxError(
+        new YAMLSemanticError(
           directive,
           'Insufficient parameters given for TAG directive'
         )
@@ -126,14 +126,14 @@ export default class Document {
     const [version] = directive.parameters
     if (this.version)
       this.errors.push(
-        new YAMLSyntaxError(
+        new YAMLSemanticError(
           directive,
           'The YAML directive must only be given at most once per document.'
         )
       )
     if (!version)
       this.errors.push(
-        new YAMLSyntaxError(
+        new YAMLSemanticError(
           directive,
           'Insufficient parameters given for YAML directive'
         )
@@ -156,7 +156,7 @@ export default class Document {
       if (verbatim) {
         if (verbatim !== '!' && verbatim !== '!!') return verbatim
         this.errors.push(
-          new YAMLSyntaxError(
+          new YAMLSemanticError(
             node,
             `Verbatim tags aren't resolved, so ${verbatim} is invalid.`
           )
@@ -170,11 +170,11 @@ export default class Document {
         if (prefix) {
           if (suffix) return prefix.prefix + suffix
           this.errors.push(
-            new YAMLSyntaxError(node, `The ${handle} tag has no suffix.`)
+            new YAMLSemanticError(node, `The ${handle} tag has no suffix.`)
           )
         } else {
           this.errors.push(
-            new YAMLSyntaxError(
+            new YAMLSemanticError(
               node,
               `The ${handle} tag handle is non-default and was not declared.`
             )
@@ -215,7 +215,7 @@ export default class Document {
         case Char.COMMENT:
           if (!node.commentHasRequiredWhitespace(start))
             errors.push(
-              new YAMLSyntaxError(
+              new YAMLSemanticError(
                 node,
                 'Comments must be separated from other tokens by white space characters'
               )
@@ -234,14 +234,14 @@ export default class Document {
         case Char.ANCHOR:
           if (hasAnchor)
             errors.push(
-              new YAMLSyntaxError(node, 'A node can have at most one anchor')
+              new YAMLSemanticError(node, 'A node can have at most one anchor')
             )
           hasAnchor = true
           break
         case Char.TAG:
           if (hasTag)
             errors.push(
-              new YAMLSyntaxError(node, 'A node can have at most one tag')
+              new YAMLSemanticError(node, 'A node can have at most one tag')
             )
           hasTag = true
           break
@@ -252,7 +252,7 @@ export default class Document {
     if (node.type === Type.ALIAS) {
       if (hasAnchor || hasTag)
         errors.push(
-          new YAMLSyntaxError(
+          new YAMLSemanticError(
             node,
             'An alias node must not specify any properties'
           )
@@ -275,7 +275,7 @@ export default class Document {
       } else {
         if (node.type !== Type.PLAIN) {
           errors.push(
-            new YAMLSyntaxError(
+            new YAMLSemanticError(
               node,
               `Failed to resolve ${node.type} node here`
             )

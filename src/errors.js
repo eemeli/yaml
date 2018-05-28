@@ -7,6 +7,15 @@ export class YAMLReferenceError extends ReferenceError {
   }
 }
 
+export class YAMLSemanticError extends SyntaxError {
+  constructor(source, message) {
+    super()
+    this.name = 'YAMLSemanticError'
+    this.message = message
+    this.source = source
+  }
+}
+
 export class YAMLSyntaxError extends SyntaxError {
   constructor(source, message) {
     super()

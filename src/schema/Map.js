@@ -1,5 +1,5 @@
 import { Type } from '../ast/Node'
-import { YAMLSyntaxError } from '../errors'
+import { YAMLSemanticError } from '../errors'
 import Collection, { toJSON } from './Collection'
 import Pair from './Pair'
 import YAMLSeq from './Seq'
@@ -25,7 +25,7 @@ export default class YAMLMap extends Collection {
             iKey.value === jKey.value)
         ) {
           this.doc.errors.push(
-            new YAMLSyntaxError(
+            new YAMLSemanticError(
               ast,
               `Map keys must be unique; "${iKey}" is repeated`
             )
@@ -77,7 +77,7 @@ export default class YAMLMap extends Collection {
             !item.node.context.atLineStart
           ) {
             this.doc.errors.push(
-              new YAMLSyntaxError(
+              new YAMLSemanticError(
                 item.node,
                 'Nested mappings are not allowed in compact mappings'
               )
@@ -95,14 +95,14 @@ export default class YAMLMap extends Collection {
           const nextItem = map.items[i + 1]
           if (!nextItem || nextItem.type !== Type.MAP_VALUE)
             this.doc.errors.push(
-              new YAMLSyntaxError(
+              new YAMLSemanticError(
                 item.node,
                 'Implicit map keys need to be followed by map values'
               )
             )
           if (item.valueRangeContainsNewline)
             this.doc.errors.push(
-              new YAMLSyntaxError(
+              new YAMLSemanticError(
                 item.node,
                 'Implicit map keys need to be on a single line'
               )
@@ -150,14 +150,14 @@ export default class YAMLMap extends Collection {
           continue
         }
         this.doc.errors.push(
-          new YAMLSyntaxError(map, `Flow map contains an unexpected ${item}`)
+          new YAMLSemanticError(map, `Flow map contains an unexpected ${item}`)
         )
       } else if (item.type === Type.COMMENT) {
         this.addComment(item.comment)
       } else if (key === undefined) {
         if (next === ',')
           this.doc.errors.push(
-            new YAMLSyntaxError(item, 'Separator , missing in flow map')
+            new YAMLSemanticError(item, 'Separator , missing in flow map')
           )
         key = this.doc.resolveNode(item)
         keyStart = explicitKey ? null : item.range.start
@@ -165,7 +165,7 @@ export default class YAMLMap extends Collection {
       } else {
         if (next !== ',')
           this.doc.errors.push(
-            new YAMLSyntaxError(item, 'Indicator : missing in flow map entry')
+            new YAMLSemanticError(item, 'Indicator : missing in flow map entry')
           )
         this.items.push(new Pair(key, this.doc.resolveNode(item)))
         key = undefined
