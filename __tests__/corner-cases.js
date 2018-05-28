@@ -13,3 +13,11 @@ aliases:
     ]
   })
 })
+
+test('eemeli/yaml#3', () => {
+  const src = '{ ? : 123 }'
+  const doc = YAML.parseDocuments(src)[0]
+  expect(doc.errors).toHaveLength(0)
+  expect(doc.contents.items[0].key).toBeNull()
+  expect(doc.contents.items[0].value.value).toBe(123)
+})

@@ -168,6 +168,7 @@ export default class YAMLMap extends Collection {
           )
         this.items.push(new Pair(key, this.doc.resolveNode(item)))
         key = undefined
+        explicitKey = false
       }
     }
     if (key !== undefined) this.items.push(new Pair(key))
