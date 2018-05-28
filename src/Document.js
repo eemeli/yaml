@@ -53,6 +53,14 @@ export default class Document {
     const contentNodes = []
     contents.forEach(node => {
       if (node.valueRange && !node.valueRange.isEmpty) {
+        if (contentNodes.length === 1) {
+          this.errors.push(
+            new YAMLSyntaxError(
+              node,
+              'Document is not valid YAML (bad indentation?)'
+            )
+          )
+        }
         contentNodes.push(this.resolveNode(node))
       } else if (node.comment) {
         const cc = contentNodes.length === 0 ? comments.before : comments.after
@@ -82,12 +90,6 @@ export default class Document {
         }
         break
       default:
-        this.errors.push(
-          new YAMLSyntaxError(
-            null,
-            'Document is not valid YAML (bad indentation?)'
-          )
-        )
         this.contents = contentNodes
         if (this.contents[0])
           this.contents[0].commentBefore = comments.before.join('\n') || null
