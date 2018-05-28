@@ -82,6 +82,12 @@ export default class Node {
     return offset
   }
 
+  static startOfLine(src, offset) {
+    let ch = src[offset - 1]
+    while (ch && ch !== '\n') ch = src[(offset -= 1)]
+    return offset + 1
+  }
+
   /**
    * End of indentation, or null if the line's indent level is not more
    * than `indent`

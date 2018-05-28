@@ -64,3 +64,27 @@ test('unindented single-quoted string', () => {
     ]
   })
 })
+
+describe('seq unindent to non-empty indent', () => {
+  test('after map', () => {
+    //  const src = `
+    //  - a:|    - b|  - c|`
+    const src = `
+  - a:
+    - b
+  - c\n`
+    const doc = parse(src)[0]
+    expect(doc.contents).toHaveLength(1)
+    expect(doc.contents[0].items).toHaveLength(2)
+  })
+
+  test('after seq', () => {
+    const src = `
+  -
+    - a
+  - b\n`
+    const doc = parse(src)[0]
+    expect(doc.contents).toHaveLength(1)
+    expect(doc.contents[0].items).toHaveLength(2)
+  })
+})

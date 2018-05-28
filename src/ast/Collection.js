@@ -28,7 +28,9 @@ export default class Collection extends Node {
     trace: 'collection-start', context.pretty, { start }
     this.context = context
     const { parseNode, src } = context
-    let { lineStart } = context
+    // It's easier to recalculate lineStart here rather than tracking down the
+    // last context from which to read it -- eemeli/yaml#2
+    let lineStart = Node.startOfLine(src, start)
     const firstItem = this.items[0]
     this.valueRange = Range.copy(firstItem.valueRange)
     const indent = firstItem.range.start - firstItem.context.lineStart
