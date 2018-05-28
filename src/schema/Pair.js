@@ -45,12 +45,12 @@ export default class Pair {
       indent: options.indent + '  '
     })
     let keyComment = key && key.comment
-    let keyStr = doc.tags.stringify(doc, key, opt, () => {
+    let keyStr = doc.schema.stringify(doc, key, opt, () => {
       keyComment = null
     })
     if (keyComment) keyStr = addComment(keyStr, opt.indent, keyComment)
     opt.implicitKey = false
-    const valueStr = doc.tags.stringify(doc, value, opt, onComment)
+    const valueStr = doc.schema.stringify(doc, value, opt, onComment)
     if (explicitKey) {
       return `? ${keyStr}\n${indent}: ${valueStr}`
     } else if (value instanceof Collection) {

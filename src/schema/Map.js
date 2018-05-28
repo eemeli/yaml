@@ -33,7 +33,7 @@ export default class YAMLMap extends Collection {
           break
         }
       }
-      if (this.doc.tags.merge && iKey.value === '<<') {
+      if (this.doc.schema.merge && iKey.value === '<<') {
         const src = this.items[i].value
         const srcItems =
           src instanceof YAMLSeq

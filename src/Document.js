@@ -17,7 +17,7 @@ export default class Document {
     this.contents = null
     this.errors = []
     this.tagPrefixes = []
-    this.tags = schema instanceof Schema ? schema : new Schema(schema)
+    this.schema = schema instanceof Schema ? schema : new Schema(schema)
     this.version = null
     this.warnings = []
   }
@@ -201,7 +201,7 @@ export default class Document {
 
   resolveNode(node) {
     if (!node) return null
-    const { anchors, errors, tags } = this
+    const { anchors, errors, schema } = this
     let hasAnchor = false
     let hasTag = false
     const comments = { before: [], after: [] }
@@ -269,7 +269,7 @@ export default class Document {
     } else {
       const tagName = this.resolveTagName(node)
       if (tagName) {
-        res = tags.resolveNodeWithFallback(this, node, tagName)
+        res = schema.resolveNodeWithFallback(this, node, tagName)
       } else {
         if (node.type !== Type.PLAIN) {
           errors.push(
@@ -281,7 +281,7 @@ export default class Document {
           return null
         }
         try {
-          res = tags.resolveScalar(node.strValue || '')
+          res = schema.resolveScalar(node.strValue || '')
         } catch (error) {
           if (!error.source) error.source = node
           errors.push(error)
@@ -353,12 +353,12 @@ export default class Document {
         indent: ''
       }
       let comment = this.contents.comment
-      const body = this.tags.stringify(this, this.contents, options, () => {
+      const body = this.schema.stringify(this, this.contents, options, () => {
         comment = null
       })
       lines.push(addComment(body, '', comment))
     } else if (this.contents !== undefined) {
-      lines.push(this.tags.stringify(this, this.contents, { indent: '' }))
+      lines.push(this.schema.stringify(this, this.contents, { indent: '' }))
     }
     if (this.comment) lines.push(this.comment.replace(/^/gm, '#'))
     return lines.join('\n') + '\n'
