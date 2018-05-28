@@ -186,10 +186,11 @@ describe('stringify comments', () => {
 
   describe('document comments', () => {
     test('directive', () => {
-      const src = 'string'
+      const src = '#c0\n---\nstring'
       const doc = YAML.parseDocuments(src)[0]
-      doc.directives.push({ type: Type.COMMENT, comment: 'comment' })
-      expect(String(doc)).toBe('#comment\nstring\n')
+      expect(doc.commentBefore).toBe('c0')
+      doc.commentBefore += '\nc1'
+      expect(String(doc)).toBe('#c0\n#c1\nstring\n')
     })
   })
 

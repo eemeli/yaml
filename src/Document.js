@@ -334,9 +334,8 @@ export default class Document {
   toString() {
     if (this.errors.length > 0)
       throw new Error('Document with errors cannot be stringified')
-    const lines = this.directives
-      .filter(({ comment }) => comment)
-      .map(({ comment }) => comment.replace(/^/gm, '#'))
+    const lines = []
+    if (this.commentBefore) lines.push(this.commentBefore.replace(/^/gm, '#'))
     let hasDirectives = false
     if (this.version) {
       lines.push('%YAML 1.2')
