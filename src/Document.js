@@ -3,21 +3,21 @@ import listTagNames from './listTagNames'
 import { Char, Type } from './ast/Node'
 import { YAMLReferenceError, YAMLSyntaxError, YAMLWarning } from './errors'
 import resolveValue from './resolveValue'
-import Tags, { DefaultTagPrefixes, DefaultTags } from './Tags'
+import Schema, { DefaultTagPrefixes, DefaultTags } from './schema'
 import Collection, { toJSON } from './schema/Collection'
 
 const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
 export default class Document {
-  constructor(tags) {
+  constructor(schema) {
     this.anchors = {}
     this.commentBefore = null
     this.comment = null
     this.contents = null
     this.errors = []
     this.tagPrefixes = []
-    this.tags = tags instanceof Tags ? tags : new Tags(tags)
+    this.tags = schema instanceof Schema ? schema : new Schema(schema)
     this.version = null
     this.warnings = []
   }

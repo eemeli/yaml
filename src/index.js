@@ -1,6 +1,6 @@
 import parseAST from './ast/parse'
 import Document from './Document'
-import Tags from './Tags'
+import Schema from './schema'
 
 const defaultOptions = {
   merge: false,
@@ -12,8 +12,8 @@ function parseDocuments(src, options) {
   const resolvedOptions = options
     ? Object.assign({}, defaultOptions, options)
     : defaultOptions
-  const tags = new Tags(resolvedOptions)
-  return parseAST(src).map(astDoc => new Document(tags).parse(astDoc))
+  const schema = new Schema(resolvedOptions)
+  return parseAST(src).map(astDoc => new Document(schema).parse(astDoc))
 }
 
 function parse(src, options) {
@@ -44,11 +44,11 @@ function stringify(value, options) {
 export default {
   defaultOptions,
   Document: class extends Document {
-    constructor(tags) {
-      if (tags instanceof Tags) {
-        super(tags)
+    constructor(schema) {
+      if (schema instanceof Schema) {
+        super(schema)
       } else {
-        super(Object.assign({}, defaultOptions, tags))
+        super(Object.assign({}, defaultOptions, schema))
       }
     }
   },
