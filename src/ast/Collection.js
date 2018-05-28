@@ -37,7 +37,7 @@ export default class Collection extends Node {
     let offset = start
     offset = Node.normalizeOffset(src, offset)
     let ch = src[offset]
-    let atLineStart = false
+    let atLineStart = Node.endOfWhiteSpace(src, lineStart) === offset
     trace: 'items-start', { offset, indent, lineStart, ch: JSON.stringify(ch) }
     while (ch) {
       while (ch === '\n' || ch === '#') {

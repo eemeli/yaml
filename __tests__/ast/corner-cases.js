@@ -76,6 +76,7 @@ describe('seq unindent to non-empty indent', () => {
     const doc = parse(src)[0]
     expect(doc.contents).toHaveLength(1)
     expect(doc.contents[0].items).toHaveLength(2)
+    expect(doc.contents[0].items[1].error).toBeNull()
   })
 
   test('after seq', () => {
@@ -86,5 +87,6 @@ describe('seq unindent to non-empty indent', () => {
     const doc = parse(src)[0]
     expect(doc.contents).toHaveLength(1)
     expect(doc.contents[0].items).toHaveLength(2)
+    expect(doc.contents[0].items[1].error).toBeNull()
   })
 })
