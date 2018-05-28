@@ -201,7 +201,7 @@
       <script src="javascripts/all.js"></script>
   </head>
 
-  <body class="index" data-languages="[&quot;javascript&quot;]">
+  <body class="index" data-languages="[]">
     <a href="#" id="nav-button">
       <span>
         NAV
@@ -210,31 +210,36 @@
     </a>
     <div class="toc-wrapper">
       <img src="images/logo.png" class="logo" alt="Logo" />
-        <div class="lang-selector">
-              <a href="#" data-language-name="javascript">javascript</a>
-        </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
         </div>
         <ul class="search-results"></ul>
       <div id="toc" class="toc-list-h1">
           <li>
-            <a href="#introduction" class="toc-h1 toc-link" data-title="introduction">Introduction</a>
+            <a href="#yaml" class="toc-h1 toc-link" data-title="yaml">YAML</a>
           </li>
           <li>
-            <a href="#authentication" class="toc-h1 toc-link" data-title="authentication">Authentication</a>
-          </li>
-          <li>
-            <a href="#kittens" class="toc-h1 toc-link" data-title="kittens">Kittens</a>
+            <a href="#pure-javascript" class="toc-h1 toc-link" data-title="pure-javascript">Pure JavaScript</a>
               <ul class="toc-list-h2">
                   <li>
-                    <a href="#get-all-kittens" class="toc-h2 toc-link" data-title="get-all-kittens">Get All Kittens</a>
+                    <a href="#yaml-parse" class="toc-h2 toc-link" data-title="yaml-parse">YAML.parse</a>
                   </li>
                   <li>
-                    <a href="#get-a-specific-kitten" class="toc-h2 toc-link" data-title="get-a-specific-kitten">Get a Specific Kitten</a>
+                    <a href="#yaml-stringify" class="toc-h2 toc-link" data-title="yaml-stringify">YAML.stringify</a>
                   </li>
                   <li>
-                    <a href="#delete-a-specific-kitten" class="toc-h2 toc-link" data-title="delete-a-specific-kitten">Delete a Specific Kitten</a>
+                    <a href="#yaml-defaultoptions" class="toc-h2 toc-link" data-title="yaml-defaultoptions">YAML.defaultOptions</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#yaml-objects" class="toc-h1 toc-link" data-title="yaml-objects">YAML Objects</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#yaml-parsedocuments" class="toc-h2 toc-link" data-title="yaml-parsedocuments">YAML.parseDocuments</a>
+                  </li>
+                  <li>
+                    <a href="#yaml-document" class="toc-h2 toc-link" data-title="yaml-document">YAML.Document</a>
                   </li>
               </ul>
           </li>
@@ -250,183 +255,296 @@
     <div class="page-wrapper">
       <div class="dark-box"></div>
       <div class="content">
-        <h1 id='introduction'>Introduction</h1>
-<p>Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.</p>
-
-<p>We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
-
-<p>This example API documentation page was created with <a href="https://github.com/lord/slate">Slate</a>. Feel free to edit it and use it as a base for your own API&#39;s documentation.</p>
-<h1 id='authentication'>Authentication</h1>
+        <h1 id='yaml'>YAML</h1>
 <blockquote>
-<p>To authorize, use this code:</p>
+<p>To install:</p>
 </blockquote>
-<pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-</code></pre><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">kittn</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-</code></pre><pre class="highlight shell tab-shell"><code><span class="c"># With shell, you can just pass the correct header with each request</span>
-curl <span class="s2">"api_endpoint_here"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">kittn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kittn'</span><span class="p">)</span>
-
-<span class="kd">let</span> <span class="nx">api</span> <span class="o">=</span> <span class="nx">kittn</span><span class="p">.</span><span class="nx">authorize</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
+<pre class="highlight sh tab-shell"><code>npm install yaml
+<span class="c"># or</span>
+yarn add yaml
 </code></pre>
 <blockquote>
-<p>Make sure to replace <code>meowmeowmeow</code> with your API key.</p>
+<p>To use:</p>
 </blockquote>
-
-<p>Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our <a href="http://example.com/developers">developer portal</a>.</p>
-
-<p>Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:</p>
-
-<p><code>Authorization: meowmeowmeow</code></p>
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-<h1 id='kittens'>Kittens</h1><h2 id='get-all-kittens'>Get All Kittens</h2><pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">get</span>
-</code></pre><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">kittn</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-</code></pre><pre class="highlight shell tab-shell"><code>curl <span class="s2">"http://example.com/api/kittens"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">kittn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kittn'</span><span class="p">)</span>
-
-<span class="kd">let</span> <span class="nx">api</span> <span class="o">=</span> <span class="nx">kittn</span><span class="p">.</span><span class="nx">authorize</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="kd">let</span> <span class="nx">kittens</span> <span class="o">=</span> <span class="nx">api</span><span class="p">.</span><span class="nx">kittens</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
+<span class="c1">// or</span>
+<span class="kr">const</span> <span class="nx">YAML</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'yaml'</span><span class="p">).</span><span class="k">default</span>
 </code></pre>
-<blockquote>
-<p>The above command returns JSON structured like this:</p>
-</blockquote>
-<pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Fluffums"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"calico"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Max"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unknown"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre>
-<p>This endpoint retrieves all kittens.</p>
-<h3 id='http-request'>HTTP Request</h3>
-<p><code>GET http://example.com/api/kittens</code></p>
-<h3 id='query-parameters'>Query Parameters</h3>
+<p><code>yaml</code> is a JavaScript parser and stringifier for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. It supports almost all aspects of the 1.2 version of the spec for both parsing and stringifying data, as well as a few of the most common extensions.</p>
+
+<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies, and is usable in both browser and node environments.</p>
+
+<p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#pure-javascript">Pure JavaScript</a>, <a href="#yaml-objects">YAML Objects</a>, and the AST level. The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library, and the third is the closest to YAML source, making it fast, raw, and crude.</p>
+<h1 id='pure-javascript'>Pure JavaScript</h1><pre class="highlight yaml tab-yaml"><code><span class="c1"># file.yml</span>
+<span class="na">YAML</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">A human-readable data serialization language</span>
+  <span class="pi">-</span> <span class="s">https://en.wikipedia.org/wiki/YAML</span>
+<span class="na">yaml</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">A complete JavaScript implementation</span>
+  <span class="pi">-</span> <span class="s">https://www.npmjs.com/package/yaml</span>
+</code></pre>
+<p>At its simplest, you can use <code>YAML.parse(str)</code> and <code>YAML.stringify(value)</code> just as you&#39;d use <code>JSON.parse(str)</code> and <code>JSON.stringify(value)</code>. If that&#39;s enough for you, everything else in these docs is really just implementation details.</p>
+<h2 id='yaml-parse'>YAML.parse</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">fs</span> <span class="nx">from</span> <span class="s1">'fs'</span>
+<span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'3.14159'</span><span class="p">)</span>
+<span class="c1">// 3.14159</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'[ true, false, maybe, null ]\n'</span><span class="p">)</span>
+<span class="c1">// [ true, false, 'maybe', null ]</span>
+
+<span class="kr">const</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="s1">'./file.yml'</span><span class="p">,</span> <span class="s1">'utf8'</span><span class="p">)</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+<span class="c1">// { YAML:</span>
+<span class="c1">//   [ 'A human-readable data serialization language',</span>
+<span class="c1">//     'https://en.wikipedia.org/wiki/YAML' ],</span>
+<span class="c1">//   yaml:</span>
+<span class="c1">//   [ 'A complete JavaScript implementation',</span>
+<span class="c1">//     'https://www.npmjs.com/package/yaml' ] }</span>
+</code></pre><h4 id='yaml-parse-str-options-any'><code>YAML.parse(str, options = {}): any</code></h4>
+<p><code>str</code> should be a string with YAML formatting, while <code>options</code> is an optional configuration object with the same shape as <a href="#yaml-defaultoptions"><code>YAML.defaultOptions</code></a>.</p>
+
+<p>The returned value will match the type of the root value of the parsed YAML document, so Maps become objects, Sequences arrays, and scalars result in nulls, booleans, numbers and strings.</p>
+
+<p><code>YAML.parse</code> may throw on error, and it may log warnings using <code>console.warn</code>. It only supports input consisting of a single YAML document; for multi-document support you should use <code>YAML.parseDocuments</code>.</p>
+<h2 id='yaml-stringify'>YAML.stringify</h2><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="mf">3.14159</span><span class="p">)</span>
+<span class="c1">// '3.14159\n'</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">([</span><span class="kc">true</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="s1">'maybe'</span><span class="p">,</span> <span class="kc">null</span><span class="p">])</span>
+<span class="c1">// `- true</span>
+<span class="c1">// - false</span>
+<span class="c1">// - maybe</span>
+<span class="c1">// - null</span>
+<span class="c1">// `</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="na">number</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">plain</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">block</span><span class="p">:</span> <span class="s1">'two\nlines\n'</span> <span class="p">})</span>
+<span class="c1">// `number: 3</span>
+<span class="c1">// plain: string</span>
+<span class="c1">// block: &gt;</span>
+<span class="c1">//   two</span>
+<span class="c1">//</span>
+<span class="c1">//   lines</span>
+<span class="c1">// `</span>
+</code></pre><h4 id='yaml-stringify-value-options-string'><code>YAML.stringify(value, options = {}): string</code></h4>
+<p><code>value</code> can be of any type, while <code>options</code> is an optional configuration object with the same shape as <a href="#yaml-defaultoptions"><code>YAML.defaultOptions</code></a>.</p>
+
+<p>The returned string will always include <code>\n</code> as the last character, as is expected of YAML documents.</p>
+
+<p>As strings in particular may be represented in a number of different styles, the simplest option for the value in question will always be chosen, depending mostly on the presence of escaped or control characters and leading &amp; trailing whitespace.</p>
+<h2 id='yaml-defaultoptions'>YAML.defaultOptions</h2>
+<p>These values set the default options used by <code>YAML</code> methods, and may be set overridden by <code>options</code> arguments.</p>
+<pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">merge</span> <span class="o">=</span> <span class="kc">true</span>
+
+<span class="kr">const</span> <span class="nx">mergeResult</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s2">`
+source: &amp;base { a: 1, b: 2 }
+target:
+  &lt;&lt;: *base
+  b: base
+`</span><span class="p">)</span>
+
+<span class="nx">mergeResult</span><span class="p">.</span><span class="nx">target</span>
+<span class="c1">// { a: 1, b: 'base' }</span>
+</code></pre>
 <table><thead>
 <tr>
-<th>Parameter</th>
+<th>Option</th>
 <th>Default</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>include_cats</td>
+<td>merge</td>
 <td>false</td>
-<td>If set to true, the result will also include cats.</td>
+<td>Enable support for <code>&lt;&lt;</code> merge keys</td>
 </tr>
 <tr>
-<td>available</td>
-<td>true</td>
-<td>If set to false, the result will include kittens that have already been adopted.</td>
+<td>schema</td>
+<td>&#39;core&#39;</td>
+<td>The schema to use, one of <code>&#39;core&#39;</code>, <code>&#39;extended&#39;</code>, <code>&#39;failsafe&#39;</code> or <code>&#39;json&#39;</code></td>
+</tr>
+<tr>
+<td>tags</td>
+<td>null</td>
+<td>Array of additional tags to include in the schema</td>
 </tr>
 </tbody></table>
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
+<p><strong>Merge</strong> keys are a <a href="http://yaml.org/type/merge.html">YAML 1.1 feature</a> that is not officially a part of the 1.2 spec. To use a merge key, assign an alias node or an array of alias nodes as the value of a <code>&lt;&lt;</code> key in a mapping.</p>
+<pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'3'</span><span class="p">)</span> <span class="c1">// 3</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'3'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'failsafe'</span> <span class="p">})</span> <span class="c1">// '3'</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">)</span> <span class="c1">// 'No'</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'json'</span> <span class="p">})</span> <span class="c1">// SyntaxError: Unresolved plain scalar "No"</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'extended'</span> <span class="p">})</span> <span class="c1">// false</span>
+</code></pre>
+<p>Aside from defining the language structure, the YAML 1.2 spec defines a number of different <strong>schemas</strong> that may be used. The default is the <a href="http://yaml.org/spec/1.2/spec.html#id2804923">core schema</a>, which is the most common one. The <a href="http://yaml.org/spec/1.2/spec.html#id2803231">JSON schema</a> is effectively the minimum schema required to parse JSON; both it and the core schema are supersets of the minimal <a href="http://yaml.org/spec/1.2/spec.html#id2802346">failsafe schema</a>.</p>
+
+<p>The <strong>extended</strong> schema matches the more liberal <a href="http://yaml.org/type/">YAML 1.1 types</a>, including binary data and timestamps as distinct tags as well as accepting greater variance in scalar values (with e.g. <code>&#39;No&#39;</code> being parsed as <code>false</code> rather than a string value). The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/dist/schema/_timestamp'</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'!!timestamp 2001-12-15 2:59:43'</span><span class="p">)</span>
+<span class="c1">// { [YAMLWarning: The tag tag:yaml.org,2002:timestamp is unavailable, falling back to tag:yaml.org,2002:str] }</span>
+<span class="c1">// '2001-12-15 2:59:43'</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'2001-12-15 2:59:43'</span><span class="p">,</span> <span class="p">{</span> <span class="na">tags</span><span class="p">:</span> <span class="p">[</span><span class="nx">timestamp</span><span class="p">]</span> <span class="p">})</span>
+<span class="c1">// '2001-12-15T02:59:43.000Z'</span>
+</code></pre>
+<p>The easiest way to extend a schema is by defining the additional <strong>tags</strong> that you wish to support. For further customisation, <code>schema</code> may also be set to a completely custom array of types, or <code>tags</code> may be a function that&#39;ll then be passed the named schema as an argument, and may add to or otherwise modify it as necessary.</p>
+
+<aside class="notice">
+A YAML schema is a combination of a set of tags and a mechanism for resolving non-specific tags.
 </aside>
-<h2 id='get-a-specific-kitten'>Get a Specific Kitten</h2><pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
+<h1 id='yaml-objects'>YAML Objects</h1><h2 id='yaml-parsedocuments'>YAML.parseDocuments</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">fs</span> <span class="nx">from</span> <span class="s1">'fs'</span>
+<span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
 
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">kittn</span>
+<span class="kr">const</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="s1">'./file.yml'</span><span class="p">,</span> <span class="s1">'utf8'</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">docs</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocuments</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+<span class="nx">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">contents</span>
+<span class="c1">// YAMLMap {</span>
+<span class="c1">//   anchor: null,</span>
+<span class="c1">//   comment: null,</span>
+<span class="c1">//   commentBefore: null,</span>
+<span class="c1">//   tag: 'tag:yaml.org,2002:map',</span>
+<span class="c1">//   doc: Document { ... },</span>
+<span class="c1">//   items:</span>
+<span class="c1">//    [ Pair {</span>
+<span class="c1">//        key: Scalar { ..., value: 'YAML' },</span>
+<span class="c1">//        value: YAMLSeq { ...,</span>
+<span class="c1">//          items:</span>
+<span class="c1">//            [ Scalar { ..., value: 'A human-readable data serialization language' },</span>
+<span class="c1">//              Scalar { ..., value: 'https://en.wikipedia.org/wiki/YAML' } ] } },</span>
+<span class="c1">//      Pair {</span>
+<span class="c1">//        key: Scalar { ..., value: 'yaml' },</span>
+<span class="c1">//        value: YAMLSeq { ...,</span>
+<span class="c1">//          items:</span>
+<span class="c1">//            [ Scalar { ..., value: 'A complete JavaScript implementation' },</span>
+<span class="c1">//              Scalar { ..., value: 'https://www.npmjs.com/package/yaml' } ] } } ] }</span>
+</code></pre><h4 id='yaml-parsedocuments-str-options-yaml-document'><code>YAML.parseDocuments(str, options = {}): YAML.Document[]</code></h4>
+<p>When parsing YAML, the input string <code>str</code> is considered as a stream of documents separated from each other by <code>...</code> document end marker lines. <code>YAML.parseDocuments</code> (used internally by <code>YAML.parse</code>) will return an array of <code>Document</code> objects that allow these documents to be parsed and manipulated with more control.</p>
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre><pre class="highlight shell tab-shell"><code>curl <span class="s2">"http://example.com/api/kittens/2"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">kittn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kittn'</span><span class="p">)</span>
+<p>This function should never throw; errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays. In particular, if <code>errors</code> is not empty it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
 
-<span class="kd">let</span> <span class="nx">api</span> <span class="o">=</span> <span class="nx">kittn</span><span class="p">.</span><span class="nx">authorize</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="kd">let</span> <span class="nx">max</span> <span class="o">=</span> <span class="nx">api</span><span class="p">.</span><span class="nx">kittens</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre>
-<blockquote>
-<p>The above command returns JSON structured like this:</p>
-</blockquote>
-<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Max"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unknown"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-<p>This endpoint retrieves a specific kitten.</p>
+<p>The returned documents&#39; <code>contents</code> will always consist of <code>Scalar</code>, <code>Map</code>, <code>Seq</code> or <code>null</code> values.</p>
+<h2 id='yaml-document'>YAML.Document</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
+<span class="c1">// Document {</span>
+<span class="c1">//   anchors: {},</span>
+<span class="c1">//   commentBefore: null,</span>
+<span class="c1">//   comment: null,</span>
+<span class="c1">//   contents: null,</span>
+<span class="c1">//   errors: [],</span>
+<span class="c1">//   tagPrefixes: [],</span>
+<span class="c1">//   schema:</span>
+<span class="c1">//    Tags {</span>
+<span class="c1">//      merge: false,</span>
+<span class="c1">//      schema:</span>
+<span class="c1">//       [ ...,</span>
+<span class="c1">//         { class: [Function: Boolean],</span>
+<span class="c1">//           tag: 'tag:yaml.org,2002:bool',</span>
+<span class="c1">//           test: /^(?:true|false)$/i,</span>
+<span class="c1">//           resolve: [Function: resolve] },</span>
+<span class="c1">//         ... ] },</span>
+<span class="c1">//   version: null,</span>
+<span class="c1">//   warnings: [] }</span>
 
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-<h3 id='http-request-2'>HTTP Request</h3>
-<p><code>GET http://example.com/kittens/&lt;ID&gt;</code></p>
-<h3 id='url-parameters'>URL Parameters</h3>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">version</span> <span class="o">=</span> <span class="kc">true</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span> <span class="o">=</span> <span class="s1">' A commented document'</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'some'</span><span class="p">,</span> <span class="s1">'values'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}]</span>
+
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// # A commented document</span>
+<span class="c1">// %YAML 1.2</span>
+<span class="c1">// ---</span>
+<span class="c1">// - some</span>
+<span class="c1">// - values</span>
+<span class="c1">// - balloons: 99</span>
+</code></pre><h4 id='new-yaml-document-options'><code>new YAML.Document(options = {})</code></h4><h4 id='new-yaml-document-schema'><code>new YAML.Document(schema)</code></h4>
+<p>A YAML Document will need to include a schema definition. Its constructor may thefore be called with a ready <code>schema</code>, or the <code>options</code> (see <a href="#yaml-defaultoptions"><code>YAML.defaultOptions</code></a>) required for its construction.</p>
+
 <table><thead>
 <tr>
-<th>Parameter</th>
+<th>Member</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>ID</td>
-<td>The ID of the kitten to retrieve</td>
+<td>commentBefore</td>
+<td><code>string?</code></td>
+<td>A comment at the very beginning of the document.</td>
+</tr>
+<tr>
+<td>comment</td>
+<td><code>string?</code></td>
+<td>A comment at the end of the document.</td>
+</tr>
+<tr>
+<td>contents</td>
+<td><code>any</code></td>
+<td>The document contents.</td>
+</tr>
+<tr>
+<td>errors</td>
+<td><code>Error[]</code></td>
+<td>Errors encountered during parsing.</td>
+</tr>
+<tr>
+<td>tagPrefixes</td>
+<td><code>Prefix[]</code></td>
+<td>Array of prefixes; each will have a string <code>handle</code> that starts and ends with <code>!</code> and a string <code>prefix</code> that the handle will be replaced by.</td>
+</tr>
+<tr>
+<td>schema</td>
+<td><code>Schema</code></td>
+<td>The schema used with the document.</td>
+</tr>
+<tr>
+<td>version</td>
+<td><code>string?</code></td>
+<td>The parsed version of the source document; if true-ish, stringified output will include a <code>%YAML 1.2</code> directive.</td>
+</tr>
+<tr>
+<td>warnings</td>
+<td><code>Error[]</code></td>
+<td>Warnings encountered during parsing.</td>
 </tr>
 </tbody></table>
-<h2 id='delete-a-specific-kitten'>Delete a Specific Kitten</h2><pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
 
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">kittn</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre><pre class="highlight shell tab-shell"><code>curl <span class="s2">"http://example.com/api/kittens/2"</span>
-  -X DELETE
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">kittn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kittn'</span><span class="p">)</span>
-
-<span class="kd">let</span> <span class="nx">api</span> <span class="o">=</span> <span class="nx">kittn</span><span class="p">.</span><span class="nx">authorize</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="kd">let</span> <span class="nx">max</span> <span class="o">=</span> <span class="nx">api</span><span class="p">.</span><span class="nx">kittens</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre>
-<blockquote>
-<p>The above command returns JSON structured like this:</p>
-</blockquote>
-<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"deleted"</span><span class="p">:</span><span class="w"> </span><span class="s2">":("</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-<p>This endpoint deletes a specific kitten.</p>
-<h3 id='http-request-3'>HTTP Request</h3>
-<p><code>DELETE http://example.com/kittens/&lt;ID&gt;</code></p>
-<h3 id='url-parameters-2'>URL Parameters</h3>
 <table><thead>
 <tr>
-<th>Parameter</th>
+<th>Method</th>
+<th>Return type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>ID</td>
-<td>The ID of the kitten to delete</td>
+<td>parse(ast)</td>
+<td><code>Document</code></td>
+<td>Parse an AST into this document</td>
+</tr>
+<tr>
+<td>resolveValue(value)</td>
+<td><code>Node</code></td>
+<td>Turn objects into <code>Map</code>, arrays to <code>Seq</code>, and wrap plain values in <code>Scalar</code>.</td>
+</tr>
+<tr>
+<td>listNonDefaultTags()</td>
+<td><code>string[]</code></td>
+<td>List the tags used in the document that are not in the default <code>tag:yaml.org,2002:</code> namespace.</td>
+</tr>
+<tr>
+<td>setTagPrefix(handle, prefix)</td>
+<td><code>undefined</code></td>
+<td>Set <code>handle</code> as a shorthand string for the <code>prefix</code> tag namespace.</td>
+</tr>
+<tr>
+<td>toJSON()</td>
+<td><code>any</code></td>
+<td>A plain JavaScript representation of the document <code>contents</code>.</td>
+</tr>
+<tr>
+<td>toString()</td>
+<td><code>string</code></td>
+<td>A YAML representation of the document.</td>
 </tr>
 </tbody></table>
 <h1 id='errors'>Errors</h1>
@@ -490,9 +608,6 @@ This error section is stored in a separate file in <code>includes/_errors.md</co
 
       </div>
       <div class="dark-box">
-          <div class="lang-selector">
-                <a href="#" data-language-name="javascript">javascript</a>
-          </div>
       </div>
     </div>
   </body>
