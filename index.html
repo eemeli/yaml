@@ -216,35 +216,35 @@
         <ul class="search-results"></ul>
       <div id="toc" class="toc-list-h1">
           <li>
-            <a href="#yaml" class="toc-h1 toc-link" data-title="yaml">YAML</a>
+            <a href="#yaml" class="toc-h1 toc-link" data-title="YAML">YAML</a>
           </li>
           <li>
-            <a href="#pure-javascript" class="toc-h1 toc-link" data-title="pure-javascript">Pure JavaScript</a>
+            <a href="#pure-javascript" class="toc-h1 toc-link" data-title="Pure JavaScript">Pure JavaScript</a>
               <ul class="toc-list-h2">
                   <li>
-                    <a href="#yaml-parse" class="toc-h2 toc-link" data-title="yaml-parse">YAML.parse</a>
+                    <a href="#yaml-parse" class="toc-h2 toc-link" data-title="YAML.parse">YAML.parse</a>
                   </li>
                   <li>
-                    <a href="#yaml-stringify" class="toc-h2 toc-link" data-title="yaml-stringify">YAML.stringify</a>
+                    <a href="#yaml-stringify" class="toc-h2 toc-link" data-title="YAML.stringify">YAML.stringify</a>
                   </li>
                   <li>
-                    <a href="#yaml-defaultoptions" class="toc-h2 toc-link" data-title="yaml-defaultoptions">YAML.defaultOptions</a>
+                    <a href="#yaml-defaultoptions" class="toc-h2 toc-link" data-title="YAML.defaultOptions">YAML.defaultOptions</a>
                   </li>
               </ul>
           </li>
           <li>
-            <a href="#yaml-objects" class="toc-h1 toc-link" data-title="yaml-objects">YAML Objects</a>
+            <a href="#yaml-objects" class="toc-h1 toc-link" data-title="YAML Objects">YAML Objects</a>
               <ul class="toc-list-h2">
                   <li>
-                    <a href="#yaml-parsedocuments" class="toc-h2 toc-link" data-title="yaml-parsedocuments">YAML.parseDocuments</a>
+                    <a href="#yaml-parsedocuments" class="toc-h2 toc-link" data-title="YAML.parseDocuments">YAML.parseDocuments</a>
                   </li>
                   <li>
-                    <a href="#yaml-document" class="toc-h2 toc-link" data-title="yaml-document">YAML.Document</a>
+                    <a href="#yaml-document" class="toc-h2 toc-link" data-title="YAML.Document">YAML.Document</a>
                   </li>
               </ul>
           </li>
           <li>
-            <a href="#errors" class="toc-h1 toc-link" data-title="errors">Errors</a>
+            <a href="#errors" class="toc-h1 toc-link" data-title="Errors">Errors</a>
           </li>
       </div>
         <ul class="toc-footer">
@@ -434,7 +434,7 @@ A YAML schema is a combination of a set of tags and a mechanism for resolving no
 <span class="c1">//   errors: [],</span>
 <span class="c1">//   tagPrefixes: [],</span>
 <span class="c1">//   schema:</span>
-<span class="c1">//    Tags {</span>
+<span class="c1">//    Schema {</span>
 <span class="c1">//      merge: false,</span>
 <span class="c1">//      schema:</span>
 <span class="c1">//       [ ...,</span>
@@ -488,14 +488,14 @@ A YAML schema is a combination of a set of tags and a mechanism for resolving no
 <td>Errors encountered during parsing.</td>
 </tr>
 <tr>
-<td>tagPrefixes</td>
-<td><code>Prefix[]</code></td>
-<td>Array of prefixes; each will have a string <code>handle</code> that starts and ends with <code>!</code> and a string <code>prefix</code> that the handle will be replaced by.</td>
-</tr>
-<tr>
 <td>schema</td>
 <td><code>Schema</code></td>
 <td>The schema used with the document.</td>
+</tr>
+<tr>
+<td>tagPrefixes</td>
+<td><code>Prefix[]</code></td>
+<td>Array of prefixes; each will have a string <code>handle</code> that starts and ends with <code>!</code> and a string <code>prefix</code> that the handle will be replaced by.</td>
 </tr>
 <tr>
 <td>version</td>
@@ -508,6 +508,8 @@ A YAML schema is a combination of a set of tags and a mechanism for resolving no
 <td>Warnings encountered during parsing.</td>
 </tr>
 </tbody></table>
+
+<p>The Document members are all modifiable, though it&#39;s unlikely that you&#39;ll have reason to change <code>errors</code>, <code>schema</code> or <code>warnings</code>. In particular you may be interested in both reading and writing <strong><code>contents</code></strong>. Although <code>YAML.parseDocuments()</code> will leave it with <code>Map</code>, <code>Seq</code>, <code>Scalar</code> or <code>null</code> contents, it can be set to anything.</p>
 
 <table><thead>
 <tr>
@@ -547,6 +549,16 @@ A YAML schema is a combination of a set of tags and a mechanism for resolving no
 <td>A YAML representation of the document.</td>
 </tr>
 </tbody></table>
+
+<p><strong><code>parse(ast)</code></strong> is mostly an internal method, modifying the document according to the contents of the parsed <code>ast</code>. Calling this multiple times on a Document is not recommended.</p>
+
+<p>To attach comments or other metadata to a value, use <strong><code>resolveValue(value)</code></strong> to wrap it in container object and then set the returned value as the Document <code>contents</code>, or deeper within the contents.</p>
+
+<p>To define a tag prefix to use when stringifying, use <strong><code>setTagPrefix(handle, prefix)</code></strong> rather than setting a value directly in <code>tagPrefixes</code>. This will guarantee that the <code>handle</code> is valid (by throwing an error), and will overwrite any previous definition for the <code>handle</code>. Use an empty <code>prefix</code> value to remove a prefix.</p>
+
+<p>For a plain JavaScript representation of the document, <strong><code>toJSON()</code></strong> is your friend. Do note that it will call <code>toJSON()</code> methods recursively on the contents, so e.g. <code>Date</code> objects will also be stringified.</p>
+
+<p>Conversely, to stringify a document as YAML, use <strong><code>toString()</code></strong>. This will also be called by <code>String(doc)</code>. This method will throw if the <code>errors</code> array is not empty.</p>
 <h1 id='errors'>Errors</h1>
 <aside class="notice">
 This error section is stored in a separate file in <code>includes/_errors.md</code>. Slate allows you to optionally separate out your docs into many files...just save them to the <code>includes</code> folder and add them to the top of your <code>index.md</code>'s frontmatter. Files are included in the order listed.
