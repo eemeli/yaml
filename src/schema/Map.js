@@ -141,11 +141,15 @@ export default class YAMLMap extends Collection {
             this.items.push(new Pair(key))
             key = undefined
             keyStart = null
+            if (item === ',') {
+              next = ':'
+              continue
+            }
           }
         }
         if (item === '}') {
           if (i === map.items.length - 1) continue
-        } else if (item === next || (next === ':' && item === ',')) {
+        } else if (item === next) {
           next = ':'
           continue
         }

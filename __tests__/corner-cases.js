@@ -29,3 +29,18 @@ test('eemeli/yaml#6', () => {
   expect(doc.errors).toHaveLength(1)
   expect(doc.errors[0]).toBeInstanceOf(YAMLSemanticError)
 })
+
+describe('eemeli/yaml#7', () => {
+  test('map', () => {
+    const src = '{ , }\n---\n{ 123,,, }\n'
+    const docs = YAML.parseDocuments(src)
+    expect(docs[0].errors).toHaveLength(1)
+    expect(docs[1].errors).toHaveLength(2)
+  })
+  test('seq', () => {
+    const src = '[ , ]\n---\n[ 123,,, ]\n'
+    const docs = YAML.parseDocuments(src)
+    expect(docs[0].errors).toHaveLength(1)
+    expect(docs[1].errors).toHaveLength(2)
+  })
+})
