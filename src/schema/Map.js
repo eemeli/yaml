@@ -96,14 +96,14 @@ export default class YAMLMap extends Collection {
           if (!nextItem || nextItem.type !== Type.MAP_VALUE)
             this.doc.errors.push(
               new YAMLSemanticError(
-                item.node,
+                item,
                 'Implicit map keys need to be followed by map values'
               )
             )
           if (item.valueRangeContainsNewline)
             this.doc.errors.push(
               new YAMLSemanticError(
-                item.node,
+                item,
                 'Implicit map keys need to be on a single line'
               )
             )

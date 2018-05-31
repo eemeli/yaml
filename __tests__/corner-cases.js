@@ -1,3 +1,4 @@
+import Node from '../src/ast/Node'
 import { YAMLSemanticError } from '../src/errors'
 import YAML from '../src/index'
 
@@ -28,6 +29,7 @@ test('eemeli/yaml#6', () => {
   const doc = YAML.parseDocuments(src)[0]
   expect(doc.errors).toHaveLength(1)
   expect(doc.errors[0]).toBeInstanceOf(YAMLSemanticError)
+  expect(doc.errors[0].source).toBeInstanceOf(Node)
 })
 
 describe('eemeli/yaml#7', () => {
