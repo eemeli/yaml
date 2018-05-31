@@ -178,7 +178,7 @@ export default class YAMLMap extends Collection {
     }
     if (map.items[map.items.length - 1] !== '}')
       this.doc.errors.push(
-        new YAMLSemanticError(map, 'Expected flow map to end with ]')
+        new YAMLSemanticError(map, 'Expected flow map to end with }')
       )
     if (key !== undefined) this.items.push(new Pair(key))
   }
