@@ -44,3 +44,10 @@ describe('eemeli/yaml#7', () => {
     expect(docs[1].errors).toHaveLength(2)
   })
 })
+
+test('eemeli/yaml#8', () => {
+  const src = '{'
+  const doc = YAML.parseDocuments(src)[0]
+  expect(doc.errors).toHaveLength(1)
+  expect(doc.errors[0]).toBeInstanceOf(YAMLSemanticError)
+})
