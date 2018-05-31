@@ -53,3 +53,31 @@ test('eemeli/yaml#8', () => {
   expect(doc.errors).toHaveLength(1)
   expect(doc.errors[0]).toBeInstanceOf(YAMLSemanticError)
 })
+
+describe('eemeli/yaml#10', () => {
+  test('reported', () => {
+    const src = `
+aliases:
+  - restore_cache:
+      - v1-yarn-cache
+  - save_cache:
+      paths:
+        - ~/.cache/yarn
+  - &restore_deps_cache
+    keys:
+      - v1-deps-cache-{{ checksum "yarn.lock" }}\n`
+    const docs = YAML.parseDocuments(src)
+    expect(docs).toHaveLength(1)
+    expect(docs[0].errors).toHaveLength(0)
+  })
+  test('minimal', () => {
+    const src = `
+  - a
+  - b:
+    - c
+  - d`
+    const docs = YAML.parseDocuments(src)
+    expect(docs[0].errors).toHaveLength(0)
+    expect(docs[0].toJSON()).toMatchObject(['a', { b: ['c'] }, 'd'])
+  })
+})
