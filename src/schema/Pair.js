@@ -8,6 +8,14 @@ export default class Pair {
     this.value = value
   }
 
+  get commentBefore() {
+    return this.key && this.key.commentBefore
+  }
+
+  set commentBefore(cb) {
+    return this.key && this.key.commentBefore
+  }
+
   get comment() {
     return this.value && this.value.comment
   }
@@ -51,12 +59,18 @@ export default class Pair {
     if (keyComment) keyStr = addComment(keyStr, opt.indent, keyComment)
     opt.implicitKey = false
     const valueStr = doc.schema.stringify(doc, value, opt, onComment)
+    const vcb =
+      value && value.commentBefore
+        ? ` #${value.commentBefore.replace(/\n+(?!\n|$)/g, `$&${opt.indent}#`)}`
+        : ''
     if (explicitKey) {
-      return `? ${keyStr}\n${indent}: ${valueStr}`
+      return `? ${keyStr}\n${indent}:${
+        vcb ? `${vcb}\n${opt.indent}` : ' '
+      }${valueStr}`
     } else if (value instanceof Collection) {
-      return `${keyStr}:\n${opt.indent}${valueStr}`
+      return `${keyStr}:${vcb}\n${opt.indent}${valueStr}`
     } else {
-      return `${keyStr}: ${valueStr}`
+      return `${keyStr}:${vcb ? `${vcb}\n${opt.indent}` : ' '}${valueStr}`
     }
   }
 }

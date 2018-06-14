@@ -194,14 +194,23 @@ describe('stringify comments', () => {
     })
   })
 
-  describe('seq entry comments', () => {
+  describe('seq comments', () => {
     test('plain', () => {
       const src = '- value 1\n- value 2\n'
       const doc = YAML.parseDocuments(src)[0]
-      doc.contents.items[0].commentBefore = 'c0'
-      doc.contents.items[1].commentBefore = 'c1'
-      doc.contents.comment = 'c2'
-      expect(String(doc)).toBe('#c0\n- value 1\n#c1\n- value 2\n#c2\n')
+      doc.contents.commentBefore = 'c0'
+      doc.contents.items[0].commentBefore = 'c1'
+      doc.contents.items[1].commentBefore = 'c2'
+      doc.contents.comment = 'c3'
+      expect(String(doc)).toBe(
+        `#c0
+#c1
+- value 1
+#c2
+- value 2
+#c3
+`
+      )
     })
 
     test('multiline', () => {
@@ -222,6 +231,28 @@ describe('stringify comments', () => {
 #c4
 #c5
 `
+      )
+    })
+
+    test.only('seq-in-map', () => {
+      const src = 'map:\n  - value 1\n  - value 2\n'
+      const doc = YAML.parseDocuments(src)[0]
+      doc.contents.items[0].key.commentBefore = 'c0'
+      doc.contents.items[0].key.comment = 'c1'
+      const seq = doc.contents.items[0].value
+      seq.commentBefore = 'c2'
+      seq.items[0].commentBefore = 'c3'
+      seq.items[1].commentBefore = 'c4'
+      seq.comment = 'c5'
+      expect(String(doc)).toBe(
+        `#c0
+? map #c1
+: #c2
+  #c3
+  - value 1
+  #c4
+  - value 2
+  #c5\n`
       )
     })
   })
