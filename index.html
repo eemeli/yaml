@@ -241,6 +241,9 @@
                   <li>
                     <a href="#yaml-document" class="toc-h2 toc-link" data-title="YAML.Document">YAML.Document</a>
                   </li>
+                  <li>
+                    <a href="#comments" class="toc-h2 toc-link" data-title="Comments">Comments</a>
+                  </li>
               </ul>
           </li>
           <li>
@@ -559,6 +562,36 @@ A YAML schema is a combination of a set of tags and a mechanism for resolving no
 <p>For a plain JavaScript representation of the document, <strong><code>toJSON()</code></strong> is your friend. Do note that it will call <code>toJSON()</code> methods recursively on the contents, so e.g. <code>Date</code> objects will also be stringified.</p>
 
 <p>Conversely, to stringify a document as YAML, use <strong><code>toString()</code></strong>. This will also be called by <code>String(doc)</code>. This method will throw if the <code>errors</code> array is not empty.</p>
+<h2 id='comments'>Comments</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocuments</span><span class="p">(</span><span class="s2">`
+# This is YAML.
+---
+it has:
+  - an array
+  - of values
+`</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="c1">// { 'it has': [ 'an array', 'of values' ] }</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span>
+<span class="c1">// ' This is YAML.'</span>
+
+<span class="kr">const</span> <span class="nx">seq</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span>
+<span class="nx">seq</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">comment</span> <span class="o">=</span> <span class="s1">' item comment'</span>
+<span class="nx">seq</span><span class="p">.</span><span class="nx">comment</span> <span class="o">=</span> <span class="s1">' collection end comment'</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
+<span class="c1">// # This is YAML.</span>
+<span class="c1">// it has:</span>
+<span class="c1">//   - an array # item comment</span>
+<span class="c1">//   - of values</span>
+<span class="c1">//   # collection end comment</span>
+</code></pre>
+<p>A primary differentiator between this and other YAML libraries is the ability to programmatically handle comments, which according to <a href="http://yaml.org/spec/1.2/spec.html#id2767100">the spec</a> &quot;must not have any effect on the serialization tree or representation graph. In particular, comments are not associated with a particular node.&quot;</p>
+
+<p>This library does allow comments to be handled programmatically, and does attach them to particular nodes. Each <code>Scalar</code>, <code>Map</code>, <code>Seq</code> and the <code>Document</code> itself has <code>comment</code> and <code>commentBefore</code> members that may be set to a stringifiable value. The string contents of comments are not processed by the library, except for merging adjacent comment lines together and prefixing each line with the <code>#</code> comment indicator.</p>
+
+<p><strong>Note</strong>: Due to implementation details, the library&#39;s comment handling is not completely stable. In particular, when reading and writing a YAML file, comments may move around a bit due to getting associated with a different node than intended.</p>
 <h1 id='errors'>Errors</h1>
 <aside class="notice">
 This error section is stored in a separate file in <code>includes/_errors.md</code>. Slate allows you to optionally separate out your docs into many files...just save them to the <code>includes</code> folder and add them to the top of your <code>index.md</code>'s frontmatter. Files are included in the order listed.
