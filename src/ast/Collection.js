@@ -104,7 +104,7 @@ export default class Collection extends Node {
         let ls = offset - 1
         let prev = src[ls]
         while (prev === ' ' || prev === '\t') prev = src[--ls]
-        if (prev === '\n') lineStart = ls
+        if (prev === '\n') lineStart = ls + 1
       }
       trace: 'item-end', node.type, { offset, ch: JSON.stringify(ch) }
     }

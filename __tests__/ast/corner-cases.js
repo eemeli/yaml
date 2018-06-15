@@ -1,6 +1,4 @@
-import Node, { Type } from '../../src/ast/Node'
 import parse from '../../src/ast/parse'
-import { pretty } from './common'
 
 describe('folded block with chomp: keep', () => {
   test('nl + nl', () => {
@@ -89,4 +87,16 @@ describe('seq unindent to non-empty indent', () => {
     expect(doc.contents[0].items).toHaveLength(2)
     expect(doc.contents[0].items[1].error).toBeNull()
   })
+})
+
+test('eemeli/yaml#10', () => {
+  const src = `
+  a:
+    - b
+  c: d
+`
+  const doc = parse(src)[0]
+  expect(doc.contents).toHaveLength(1)
+  expect(doc.contents[0].items).toHaveLength(4)
+  expect(doc.contents[0].items[1].error).toBeNull()
 })

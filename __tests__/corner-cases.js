@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import Node from '../src/ast/Node'
 import { YAMLSemanticError } from '../src/errors'
 import YAML from '../src/index'
@@ -70,6 +72,107 @@ aliases:
     expect(docs).toHaveLength(1)
     expect(docs[0].errors).toHaveLength(0)
   })
+
+  test('complete file', () => {
+    const src = fs.readFileSync(
+      path.resolve(__dirname, './artifacts/prettier-circleci-config.yml'),
+      'utf8'
+    )
+    const cfg = YAML.parse(src)
+    expect(cfg).toMatchObject({
+      aliases: [
+        { restore_cache: { keys: ['v1-yarn-cache'] } },
+        { save_cache: { key: 'v1-yarn-cache', paths: ['~/.cache/yarn'] } },
+        {
+          restore_cache: { keys: ['v1-deps-cache-{{ checksum "yarn.lock" }}'] }
+        },
+        {
+          save_cache: {
+            key: 'v1-yarn-deps-{{ checksum "yarn.lock" }}',
+            paths: ['node_modules']
+          }
+        },
+        {
+          docker: [{ image: 'circleci/node:9' }],
+          working_directory: '~/prettier'
+        }
+      ],
+      jobs: {
+        build_prod: {
+          '<<': {
+            docker: [{ image: 'circleci/node:9' }],
+            working_directory: '~/prettier'
+          },
+          environment: { NODE_ENV: 'production' },
+          steps: [
+            { attach_workspace: { at: '~/prettier' } },
+            { run: 'yarn build' },
+            { persist_to_workspace: { paths: ['dist'], root: '.' } },
+            { store_artifacts: { path: '~/prettier/dist' } }
+          ]
+        },
+        checkout_code: {
+          '<<': {
+            docker: [{ image: 'circleci/node:9' }],
+            working_directory: '~/prettier'
+          },
+          steps: [
+            'checkout',
+            { restore_cache: { keys: ['v1-yarn-cache'] } },
+            {
+              restore_cache: {
+                keys: ['v1-deps-cache-{{ checksum "yarn.lock" }}']
+              }
+            },
+            { run: 'yarn install' },
+            { run: 'yarn check-deps' },
+            {
+              save_cache: {
+                key: 'v1-yarn-deps-{{ checksum "yarn.lock" }}',
+                paths: ['node_modules']
+              }
+            },
+            { save_cache: { key: 'v1-yarn-cache', paths: ['~/.cache/yarn'] } },
+            { persist_to_workspace: { paths: ['.'], root: '.' } }
+          ]
+        },
+        test_prod_node4: {
+          '<<': {
+            docker: [{ image: 'circleci/node:9' }],
+            working_directory: '~/prettier'
+          },
+          docker: [{ image: 'circleci/node:4' }],
+          steps: [
+            { attach_workspace: { at: '~/prettier' } },
+            { run: 'yarn test:dist' }
+          ]
+        },
+        test_prod_node9: {
+          '<<': {
+            docker: [{ image: 'circleci/node:9' }],
+            working_directory: '~/prettier'
+          },
+          steps: [
+            { attach_workspace: { at: '~/prettier' } },
+            { run: 'yarn test:dist' }
+          ]
+        }
+      },
+      version: 2,
+      workflows: {
+        prod: {
+          jobs: [
+            'checkout_code',
+            { build_prod: { requires: ['checkout_code'] } },
+            { test_prod_node4: { requires: ['build_prod'] } },
+            { test_prod_node9: { requires: ['build_prod'] } }
+          ]
+        },
+        version: 2
+      }
+    })
+  })
+
   test('minimal', () => {
     const src = `
   - a
