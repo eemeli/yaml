@@ -1,3 +1,5 @@
+// Published as 'yaml/parse-ast'
+
 import Document from './Document'
 import ParseContext from './ParseContext'
 

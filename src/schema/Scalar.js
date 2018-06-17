@@ -1,3 +1,5 @@
+// Published as 'yaml/scalar'
+
 import { toJSON } from './Collection'
 import Node from './Node'
 

@@ -1,3 +1,5 @@
+// Published as 'yaml/seq'
+
 import { Type } from '../ast/Node'
 import { YAMLSemanticError } from '../errors'
 import Collection, { toJSON } from './Collection'

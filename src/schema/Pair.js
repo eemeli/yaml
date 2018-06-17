@@ -1,3 +1,5 @@
+// Published as 'yaml/pair'
+
 import addComment from '../addComment'
 import Collection, { toJSON } from './Collection'
 import Scalar from './Scalar'

@@ -1,3 +1,5 @@
+// Published as 'yaml/types/binary'
+
 import { YAMLReferenceError } from '../errors'
 import { resolve as resolveStr } from './_string'
 

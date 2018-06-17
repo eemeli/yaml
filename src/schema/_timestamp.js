@@ -1,3 +1,5 @@
+// Published as 'yaml/types/timestamp'
+
 import { stringifyNumber } from './core'
 
 const parseSexagesimal = (sign, parts) => {

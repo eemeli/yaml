@@ -33,6 +33,7 @@ export default class Collection extends Node {
 
   constructor(doc) {
     super()
+    if (!doc) throw new Error('Document not defined for new collection')
     this._comments = []
     this.doc = doc
     this.items = []
