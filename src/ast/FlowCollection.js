@@ -1,4 +1,4 @@
-import { YAMLSyntaxError } from '../errors'
+import { YAMLSemanticError } from '../errors'
 import Comment from './Comment'
 import Node, { Type } from './Node'
 import Range from './Range'
@@ -40,7 +40,7 @@ export default class FlowCollection extends Node {
             lineStart = offset + 1
             offset = Node.endOfIndent(src, lineStart)
             if (offset - lineStart <= indent)
-              this.error = new YAMLSyntaxError(
+              this.error = new YAMLSemanticError(
                 this,
                 'Insufficient indentation in flow collection'
               )

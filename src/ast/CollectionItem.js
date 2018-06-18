@@ -1,4 +1,4 @@
-import { YAMLSyntaxError } from '../errors'
+import { YAMLSemanticError } from '../errors'
 import Node, { Type } from './Node'
 import Range from './Range'
 
@@ -19,7 +19,7 @@ export default class CollectionItem extends Node {
     const { parseNode, src } = context
     let { atLineStart, lineStart } = context
     if (!atLineStart && this.type === Type.SEQ_ITEM)
-      this.error = new YAMLSyntaxError(
+      this.error = new YAMLSemanticError(
         this,
         'Sequence items are not allowed on the same line with map keys'
       )

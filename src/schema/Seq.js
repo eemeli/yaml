@@ -1,7 +1,7 @@
 // Published as 'yaml/seq'
 
 import { Type } from '../ast/Node'
-import { YAMLSemanticError } from '../errors'
+import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Collection, { toJSON } from './Collection'
 import Pair from './Pair'
 
@@ -37,7 +37,7 @@ export default class YAMLSeq extends Collection {
           break
         default:
           this.doc.errors.push(
-            new YAMLSemanticError(
+            new YAMLSyntaxError(
               item,
               `Unexpected ${item.type} node in sequence`
             )
@@ -85,7 +85,7 @@ export default class YAMLSeq extends Collection {
           next = null
         } else if (next === '[' || item !== ']' || i < seq.items.length - 1) {
           this.doc.errors.push(
-            new YAMLSemanticError(
+            new YAMLSyntaxError(
               seq,
               `Flow sequence contains an unexpected ${item}`
             )

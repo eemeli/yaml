@@ -1,7 +1,12 @@
 import addComment from './addComment'
 import listTagNames from './listTagNames'
 import { Char, Type } from './ast/Node'
-import { YAMLReferenceError, YAMLSemanticError, YAMLWarning } from './errors'
+import {
+  YAMLReferenceError,
+  YAMLSemanticError,
+  YAMLSyntaxError,
+  YAMLWarning
+} from './errors'
 import resolveValue from './resolveValue'
 import Schema, { DefaultTagPrefixes, DefaultTags } from './schema'
 import Collection, { toJSON } from './schema/Collection'
@@ -42,7 +47,7 @@ export default class Document {
             this.warnings.push(
               new YAMLWarning(
                 directive,
-                `YAML 1.2 only supports TAG and YAML directives, and not ${name}`
+                `YAML 1.2 only supports %TAG and %YAML directives, and not %${name}`
               )
             )
       }
@@ -55,7 +60,7 @@ export default class Document {
       if (node.valueRange && !node.valueRange.isEmpty) {
         if (contentNodes.length === 1) {
           this.errors.push(
-            new YAMLSemanticError(
+            new YAMLSyntaxError(
               node,
               'Document is not valid YAML (bad indentation?)'
             )
@@ -108,7 +113,7 @@ export default class Document {
         this.errors.push(
           new YAMLSemanticError(
             directive,
-            'The TAG directive must only be given at most once per handle in the same document.'
+            'The %TAG directive must only be given at most once per handle in the same document.'
           )
         )
       }
@@ -116,7 +121,7 @@ export default class Document {
       this.errors.push(
         new YAMLSemanticError(
           directive,
-          'Insufficient parameters given for TAG directive'
+          'Insufficient parameters given for %TAG directive'
         )
       )
     }
@@ -128,14 +133,14 @@ export default class Document {
       this.errors.push(
         new YAMLSemanticError(
           directive,
-          'The YAML directive must only be given at most once per document.'
+          'The %YAML directive must only be given at most once per document.'
         )
       )
     if (!version)
       this.errors.push(
         new YAMLSemanticError(
           directive,
-          'Insufficient parameters given for YAML directive'
+          'Insufficient parameters given for %YAML directive'
         )
       )
     else if (version !== '1.2')
@@ -275,7 +280,7 @@ export default class Document {
       } else {
         if (node.type !== Type.PLAIN) {
           errors.push(
-            new YAMLSemanticError(
+            new YAMLSyntaxError(
               node,
               `Failed to resolve ${node.type} node here`
             )

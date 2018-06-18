@@ -1,7 +1,7 @@
 // Published as 'yaml/map'
 
 import { Type } from '../ast/Node'
-import { YAMLSemanticError } from '../errors'
+import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Collection, { toJSON } from './Collection'
 import Pair from './Pair'
 import YAMLSeq from './Seq'
@@ -156,7 +156,7 @@ export default class YAMLMap extends Collection {
           continue
         }
         this.doc.errors.push(
-          new YAMLSemanticError(map, `Flow map contains an unexpected ${item}`)
+          new YAMLSyntaxError(map, `Flow map contains an unexpected ${item}`)
         )
       } else if (item.type === Type.COMMENT) {
         this.addComment(item.comment)

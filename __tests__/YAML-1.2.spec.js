@@ -923,7 +923,7 @@ Chomping: |
 --- "foo"`,
       tgt: ['foo'],
       warnings: [
-        ['YAML 1.2 only supports TAG and YAML directives, and not FOO']
+        ['YAML 1.2 only supports %TAG and %YAML directives, and not %FOO']
       ]
     }
   },
@@ -948,7 +948,7 @@ Chomping: |
 foo`,
       tgt: ['foo'],
       errors: [
-        ['The YAML directive must only be given at most once per document.']
+        ['The %YAML directive must only be given at most once per document.']
       ],
       warnings: [['Document will be parsed as YAML 1.2 rather than YAML 1.1']],
       special: src => {
@@ -973,7 +973,7 @@ bar`,
       tgt: ['bar'],
       errors: [
         [
-          'The TAG directive must only be given at most once per handle in the same document.'
+          'The %TAG directive must only be given at most once per handle in the same document.'
         ]
       ],
       special: src => {

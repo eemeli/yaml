@@ -1,4 +1,4 @@
-import { YAMLSyntaxError } from '../errors'
+import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Node from './Node'
 import Range from './Range'
 
@@ -30,7 +30,7 @@ export default class QuoteDouble extends Node {
       if (ch === '\n') {
         if (Node.atDocumentBoundary(src, i + 1))
           errors.push(
-            new YAMLSyntaxError(
+            new YAMLSemanticError(
               this,
               'Document boundary indicators are not allowed within string values'
             )
@@ -40,7 +40,7 @@ export default class QuoteDouble extends Node {
         i = offset
         if (error)
           errors.push(
-            new YAMLSyntaxError(
+            new YAMLSemanticError(
               this,
               'Multi-line double-quoted string needs to be sufficiently indented'
             )
