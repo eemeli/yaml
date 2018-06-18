@@ -13,7 +13,9 @@
   ],
   "homepage": "https://eemeli.org/yaml/",
   "files": [
-    "dist/"
+    "dist/",
+    "types/",
+    "*.js"
   ],
   "scripts": {
     "build": "babel src/ --out-dir dist/",
