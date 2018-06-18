@@ -11,7 +11,7 @@
     "parser",
     "stringifier"
   ],
-  "homepage": "https://github.com/eemeli/yaml#readme",
+  "homepage": "https://eemeli.org/yaml/",
   "files": [
     "dist/"
   ],
