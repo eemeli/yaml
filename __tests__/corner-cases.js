@@ -30,7 +30,7 @@ test('eemeli/yaml#6', () => {
   const src = 'abc: 123\ndef'
   const doc = YAML.parseDocuments(src)[0]
   expect(doc.errors).toHaveLength(1)
-  expect(doc.errors[0]).toBeInstanceOf(YAMLSemanticError)
+  expect(doc.errors[0].name).toBe('YAMLSemanticError')
   expect(doc.errors[0].source).toBeInstanceOf(Node)
 })
 
@@ -53,7 +53,7 @@ test('eemeli/yaml#8', () => {
   const src = '{'
   const doc = YAML.parseDocuments(src)[0]
   expect(doc.errors).toHaveLength(1)
-  expect(doc.errors[0]).toBeInstanceOf(YAMLSemanticError)
+  expect(doc.errors[0].name).toBe('YAMLSemanticError')
 })
 
 describe('eemeli/yaml#10', () => {
