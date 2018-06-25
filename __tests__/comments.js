@@ -234,7 +234,7 @@ describe('stringify comments', () => {
       )
     })
 
-    test.only('seq-in-map', () => {
+    test('seq-in-map', () => {
       const src = 'map:\n  - value 1\n  - value 2\n'
       const doc = YAML.parseDocuments(src)[0]
       doc.contents.items[0].key.commentBefore = 'c0'

@@ -15,7 +15,8 @@ export default class Pair {
   }
 
   set commentBefore(cb) {
-    return this.key && this.key.commentBefore
+    if (this.key == null) this.key = new Scalar(null)
+    this.key.commentBefore = cb
   }
 
   get comment() {

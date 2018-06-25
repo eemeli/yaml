@@ -96,9 +96,11 @@ export default class Document {
         break
       default:
         this.contents = contentNodes
-        if (this.contents[0])
+        if (this.contents[0]) {
           this.contents[0].commentBefore = comments.before.join('\n') || null
-        else comments.after = comments.before.concat(comments.after)
+        } else {
+          comments.after = comments.before.concat(comments.after)
+        }
     }
     this.comment = comments.after.join('\n') || null
     return this
@@ -298,10 +300,11 @@ export default class Document {
     }
     if (res) {
       const cb = comments.before.join('\n')
-      if (cb)
+      if (cb) {
         res.commentBefore = res.commentBefore
           ? `${res.commentBefore}\n${cb}`
           : cb
+      }
       const ca = comments.after.join('\n')
       if (ca) res.comment = res.comment ? `${res.comment}\n${ca}` : ca
     }

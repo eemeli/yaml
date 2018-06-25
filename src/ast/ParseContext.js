@@ -58,7 +58,7 @@ export default class ParseContext {
     { atLineStart, inCollection, inFlow, indent, lineStart, parent } = {}
   ) {
     this.atLineStart =
-      atLineStart != null ? atLineStart : orig.lineStart || false
+      atLineStart != null ? atLineStart : orig.atLineStart || false
     this.inCollection =
       inCollection != null ? inCollection : orig.inCollection || false
     this.inFlow = inFlow != null ? inFlow : orig.inFlow || false
