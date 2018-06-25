@@ -289,3 +289,19 @@ key2: value 2
     })
   })
 })
+
+describe('eemeli/yaml#17', () => {
+  test('reported', () => {
+    const src = `test1:
+  foo: #123
+    bar: 1\n`
+    const doc = YAML.parseDocuments(src)[0]
+    expect(String(doc)).toBe(src)
+  })
+
+  test('minimal', () => {
+    const src = `foo: #123\n  bar: baz\n`
+    const doc = YAML.parseDocuments(src)[0]
+    expect(String(doc)).toBe(src)
+  })
+})

@@ -32,6 +32,9 @@ export default class Collection extends Node {
     // last context from which to read it -- eemeli/yaml#2
     let lineStart = Node.startOfLine(src, start)
     const firstItem = this.items[0]
+    // First-item context needs to be correct for later comment handling
+    // -- eemeli/yaml#17
+    firstItem.context.parent = this
     this.valueRange = Range.copy(firstItem.valueRange)
     const indent = firstItem.range.start - firstItem.context.lineStart
     let offset = start

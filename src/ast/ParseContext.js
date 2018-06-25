@@ -199,7 +199,7 @@ export default class ParseContext {
     if (context.nodeStartsCollection(node)) {
       trace: 'collection-start'
       const collection = new Collection(node)
-      offset = collection.parse(context, offset)
+      offset = collection.parse(new ParseContext(context), offset)
       collection.range = new Range(start, offset)
       trace: collection.type,
         collection.range,
