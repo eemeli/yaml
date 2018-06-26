@@ -1,12 +1,12 @@
-import { Type } from '../ast/Node'
 import Map from './Map'
 import Seq from './Seq'
 import { str } from './_string'
+import parseMap from './parseMap'
 
 export const map = {
   class: Map,
   tag: 'tag:yaml.org,2002:map',
-  resolve: (doc, node) => new Map(doc).parse(node),
+  resolve: (doc, node) => parseMap(doc, new Map(), node),
   stringify: (value, ctx, onComment) => value.toString(ctx, onComment)
 }
 
