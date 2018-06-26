@@ -252,6 +252,9 @@
                     <a href="#collections" class="toc-h2 toc-link" data-title="Collections">Collections</a>
                   </li>
                   <li>
+                    <a href="#yaml-createnode" class="toc-h2 toc-link" data-title="YAML.createNode">YAML.createNode</a>
+                  </li>
+                  <li>
                     <a href="#comments" class="toc-h2 toc-link" data-title="Comments">Comments</a>
                   </li>
               </ul>
@@ -286,7 +289,7 @@
           </li>
       </div>
         <ul class="toc-footer">
-            <li><a href='https://github.com/eemeli/yaml/releases'>Version 1.0.0-rc.2</a></li>
+            <li><a href='https://github.com/eemeli/yaml/releases'>Version 1.0.0-rc.3</a></li>
             <li><a href='https://github.com/eemeli/yaml'>github.com/eemeli/yaml</a></li>
             <li><a href='https://www.npmjs.com/package/yaml'>npm i yaml@next</a></li>
         </ul>
@@ -475,7 +478,6 @@ target:
 <span class="c1">//   comment: null,</span>
 <span class="c1">//   commentBefore: null,</span>
 <span class="c1">//   tag: 'tag:yaml.org,2002:map',</span>
-<span class="c1">//   doc: Document { ... },</span>
 <span class="c1">//   items:</span>
 <span class="c1">//    [ Pair {</span>
 <span class="c1">//        key: Scalar { ..., value: 'YAML' },</span>
@@ -594,11 +596,6 @@ target:
 <td>Parse an AST into this document</td>
 </tr>
 <tr>
-<td>resolveValue(value)</td>
-<td><code>Node</code></td>
-<td>Turn objects into <code>Map</code>, arrays to <code>Seq</code>, and wrap plain values in <code>Scalar</code>.</td>
-</tr>
-<tr>
 <td>listNonDefaultTags()</td>
 <td><code>string[]</code></td>
 <td>List the tags used in the document that are not in the default <code>tag:yaml.org,2002:</code> namespace.</td>
@@ -622,8 +619,6 @@ target:
 
 <p><strong><code>parse(ast)</code></strong> is mostly an internal method, modifying the document according to the contents of the parsed <code>ast</code>. Calling this multiple times on a Document is not recommended.</p>
 
-<p>To attach comments or other metadata to a value, use <strong><code>resolveValue(value)</code></strong> to wrap it in container object and then set the returned value as the Document <code>contents</code>, or deeper within the contents.</p>
-
 <p>To define a tag prefix to use when stringifying, use <strong><code>setTagPrefix(handle, prefix)</code></strong> rather than setting a value directly in <code>tagPrefixes</code>. This will guarantee that the <code>handle</code> is valid (by throwing an error), and will overwrite any previous definition for the <code>handle</code>. Use an empty <code>prefix</code> value to remove a prefix.</p>
 
 <p>For a plain JavaScript representation of the document, <strong><code>toJSON()</code></strong> is your friend. Do note that it will call <code>toJSON()</code> methods recursively on the contents, so e.g. <code>Date</code> objects will also be stringified.</p>
@@ -634,7 +629,7 @@ target:
 <span class="kr">import</span> <span class="nx">Seq</span> <span class="nx">from</span> <span class="s1">'yaml/seq'</span>
 
 <span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Seq</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Seq</span><span class="p">()</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span> <span class="o">=</span> <span class="p">[</span>
   <span class="s1">'some values'</span><span class="p">,</span>
   <span class="mi">42</span><span class="p">,</span>
@@ -648,12 +643,36 @@ target:
 <span class="c1">// - "3": a string</span>
 <span class="c1">//   including: objects</span>
 <span class="c1">// - 1: a number</span>
-</code></pre>
+</code></pre><h4 id='new-map-new-seq-new-pair-key-value'><code>new Map(), new Seq(), new Pair(key, value)</code></h4>
 <p>Within a YAML document, two forms of collections are supported: sequential <code>Seq</code> collections and key-value <code>Map</code> collections. The JavaScript representations of these collections both have an <code>items</code> array, which may (<code>Seq</code>) or must (<code>Map</code>) consist of <code>Pair</code> objects that contain a <code>key</code> and a <code>value</code> of any type, including <code>null</code>. The <code>items</code> array of a <code>Seq</code> object may contain values of any type.</p>
 
-<p>To construct a <code>Seq</code> or <code>Map</code>, use <code>Document#resolveValue()</code> with array or object input, or create the collections directly by importing the classes from <code>yaml/seq</code> and <code>yaml/map</code>. Do note that <code>new Seq</code> and <code>new Map</code> require a <code>YAML.Document</code> parameter, as the YAML stringification will depend on the document-specific schema.</p>
+<p>To construct a <code>Seq</code> or <code>Map</code>, use <code>YAML.createNode()</code> with array or object input, or create the collections directly by importing the classes from <code>yaml/seq</code> and <code>yaml/map</code>.</p>
 
 <p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created by importing the class from <code>yaml/pair</code> and using its <code>new Pair(key, value)</code> constructor. Note in particular that this is required to create non-<code>string</code> keys.</p>
+<h2 id='yaml-createnode'>YAML.createNode</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">seq</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">createNode</span><span class="p">([</span><span class="s1">'some'</span><span class="p">,</span> <span class="s1">'values'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}])</span>
+<span class="c1">// YAMLSeq {</span>
+<span class="c1">//   anchor: null,</span>
+<span class="c1">//   comment: null,</span>
+<span class="c1">//   commentBefore: null,</span>
+<span class="c1">//   tag: null,</span>
+<span class="c1">//   items:</span>
+<span class="c1">//    [ Scalar { ..., value: 'some' },</span>
+<span class="c1">//      Scalar { ..., value: 'values' },</span>
+<span class="c1">//      YAMLMap { ..., items: [ Pair {</span>
+<span class="c1">//        key: Scalar { ..., value: 'balloons' },</span>
+<span class="c1">//        value: Scalar { ..., value: 99 } } ] } ] }</span>
+
+<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="nx">seq</span>
+<span class="nx">seq</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">comment</span> <span class="o">=</span> <span class="s1">' A commented item'</span>
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// - some # A commented item</span>
+<span class="c1">// - values</span>
+<span class="c1">// - balloons: 99</span>
+</code></pre><h4 id='yaml-createnode-value-wrapscalars-true-map-seq-scalar-string-number-boolean-null'><code>YAML.createNode(value, wrapScalars = true): Map | Seq | Scalar | string | number | boolean | null</code></h4>
+<p><code>YAML.createNode</code> recursively turns objects into <code>Map</code> and arrays to <code>Seq</code> collections. If <code>wrapScalars</code> is undefined or <code>true</code>, it also wraps plain values in <code>Scalar</code> objects. Its primary use is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output.</p>
+
+<p>To stringify the output of <code>YAML.createNode</code> as YAML, you&#39;ll need to assign it to the <code>contents</code> of a Document (or somewhere within said contents), as the document&#39;s schema is required for YAML string output.</p>
 <h2 id='comments'>Comments</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocuments</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---
@@ -715,7 +734,7 @@ mapping: { sky: blue, sea: green }
 
 <p>The public API of the library is a single function which returns an array of parsed AST documents. The array and its contained nodes override the default <code>toString</code> method, each returning a YAML string representation of its contents.</p>
 
-<p>If a node has its <code>value</code> set, that will be used when re-stringifying. Care should be taken when modifying the AST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren&#39;t broken. In other words, this is an engineering tool and you may hurt yourself. If you&#39;re looking to generate a brand new YAML document, you should probably not be using this library directly.</p>
+<p>If a node has its <code>value</code> set, that will be used when re-stringifying. Care should be taken when modifying the AST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren&#39;t broken. In other words, this is an engineering tool and you may hurt yourself. If you&#39;re looking to generate a brand new YAML document, you should probably not be using this API directly.</p>
 
 <p>For more usage examples and AST trees, have a look through the <a href="https://github.com/eemeli/yaml/tree/master/__tests__/ast">extensive test suite</a> included in the project&#39;s repository.</p>
 
@@ -752,7 +771,7 @@ mapping: { sky: blue, sea: green }
 <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">value</span>
 <span class="c1">// 'bad YAML'</span>
 </code></pre>
-<p>While the YAML spec considers e.g. block collections within a flow collection to be an error, this error will not be detected by the AST parser. For complete validation, you will need to parse the AST into a <code>YAML.Document</code>. If the document contains errors, they will be included in the document&#39;s <code>errors</code> array, and each error will will contain a <code>source</code> reference to the AST node where it was encountered. Do note that even if an error is encountered, the document contents might still be available.</p>
+<p>While the YAML spec considers e.g. block collections within a flow collection to be an error, this error will not be detected by the AST parser. For complete validation, you will need to parse the AST into a <code>YAML.Document</code>. If the document contains errors, they will be included in the document&#39;s <code>errors</code> array, and each error will will contain a <code>source</code> reference to the AST node where it was encountered. Do note that even if an error is encountered, the document contents might still be available. In such a case, the error will be a <a href="#yamlsemanticerror"><code>YAMLSemanticError</code></a> rather than a <a href="#yamlsyntaxerror"><code>YAMLSyntaxError</code></a>.</p>
 <h2 id='ast-nodes'>AST Nodes</h2>
 <blockquote>
 <p>This section uses Flow-ish notation, so <code>+</code> as a prefix indicates a read-only getter property.</p>
@@ -782,7 +801,8 @@ mapping: { sky: blue, sea: green }
     <span class="s1">'DIRECTIVE'</span> <span class="o">|</span> <span class="s1">'DOCUMENT'</span> <span class="o">|</span> <span class="s1">'FLOW_MAP'</span> <span class="o">|</span> <span class="s1">'FLOW_SEQ'</span> <span class="o">|</span>
     <span class="s1">'MAP'</span> <span class="o">|</span> <span class="s1">'MAP_KEY'</span> <span class="o">|</span> <span class="s1">'MAP_VALUE'</span> <span class="o">|</span> <span class="s1">'PLAIN'</span> <span class="o">|</span>
     <span class="s1">'QUOTE_DOUBLE'</span> <span class="o">|</span> <span class="s1">'QUOTE_SINGLE'</span> <span class="o">|</span> <span class="s1">'SEQ'</span> <span class="o">|</span> <span class="s1">'SEQ_ITEM'</span><span class="p">,</span>
-  <span class="nx">value</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span>        <span class="c1">// if non-null, overrides source value</span>
+  <span class="nx">value</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span>        <span class="c1">// if set to a non-null value, overrides</span>
+                        <span class="c1">//   source value when stringified</span>
   <span class="o">+</span><span class="nx">anchor</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>     <span class="c1">// anchor, if set</span>
   <span class="o">+</span><span class="nx">comment</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>    <span class="c1">// newline-delimited comment(s), if any</span>
   <span class="o">+</span><span class="nx">rawValue</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>   <span class="c1">// an unprocessed slice of context.src</span>
@@ -818,7 +838,7 @@ mapping: { sky: blue, sea: green }
   <span class="o">+</span><span class="nx">tag</span><span class="p">:</span> <span class="kc">null</span>
 <span class="p">}</span>
 </code></pre>
-<p>While <code>Alias</code> nodes are not technically scalars, they are parsed as such at this level.</p>
+<p>While <code>Alias</code> and <code>Comment</code> nodes are not technically scalars, they are parsed as such at this level.</p>
 
 <p>Due to parsing differences, each scalar type is implemented using its own class.</p>
 
