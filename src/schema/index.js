@@ -123,7 +123,7 @@ export default class Schema {
     return null
   }
 
-  stringify(doc, item, options, onComment) {
+  stringify(item, ctx, onComment) {
     if (
       !(
         item instanceof Scalar ||
@@ -131,12 +131,12 @@ export default class Schema {
         item instanceof Pair
       )
     ) {
-      item = doc.resolveValue(item, true)
+      item = ctx.doc.resolveValue(item, true)
     }
-    options.tags = this
+    ctx.tags = this
     let match
     if (item instanceof Pair) {
-      return item.toString(doc, options, onComment)
+      return item.toString(ctx, onComment)
     } else if (item.tag) {
       match = this.schema.filter(
         ({ format, tag }) =>
@@ -180,21 +180,17 @@ export default class Schema {
         )
     }
     const stringify = match[0].stringify || Schema.defaultStringifier
-    const str = stringify(item, options, onComment)
+    const str = stringify(item, ctx, onComment)
     const tag = item.origTag || item.tag
     if (tag && tag.indexOf(defaultPrefix) !== 0) {
-      const p = doc.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
+      const p = ctx.doc.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
       const tagProp = p
         ? p.handle + tag.substr(p.prefix.length)
         : tag[0] === '!'
           ? tag
           : `!<${tag}>`
-      if (
-        item instanceof Collection &&
-        !options.inFlow &&
-        item.items.length > 0
-      ) {
-        return `${tagProp}\n${options.indent}${str}`
+      if (item instanceof Collection && !ctx.inFlow && item.items.length > 0) {
+        return `${tagProp}\n${ctx.indent}${str}`
       } else {
         return `${tagProp} ${str}`
       }

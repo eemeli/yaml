@@ -46,34 +46,34 @@ export default class Pair {
     return pair
   }
 
-  toString(doc, options, onComment) {
-    if (!doc) return JSON.stringify(this)
+  toString(ctx, onComment) {
+    if (!ctx || !ctx.doc) return JSON.stringify(this)
     const { key, value } = this
-    const { indent } = options
     const explicitKey = !key || key.comment || key instanceof Collection
-    const opt = Object.assign({}, options, {
+    const { doc, indent } = ctx
+    ctx = Object.assign({}, ctx, {
       implicitKey: !explicitKey,
-      indent: options.indent + '  '
+      indent: indent + '  '
     })
     let keyComment = key && key.comment
-    let keyStr = doc.schema.stringify(doc, key, opt, () => {
+    let keyStr = doc.schema.stringify(key, ctx, () => {
       keyComment = null
     })
-    if (keyComment) keyStr = addComment(keyStr, opt.indent, keyComment)
-    opt.implicitKey = false
-    const valueStr = doc.schema.stringify(doc, value, opt, onComment)
+    if (keyComment) keyStr = addComment(keyStr, ctx.indent, keyComment)
+    ctx.implicitKey = false
+    const valueStr = doc.schema.stringify(value, ctx, onComment)
     const vcb =
       value && value.commentBefore
-        ? ` #${value.commentBefore.replace(/\n+(?!\n|$)/g, `$&${opt.indent}#`)}`
+        ? ` #${value.commentBefore.replace(/\n+(?!\n|$)/g, `$&${ctx.indent}#`)}`
         : ''
     if (explicitKey) {
       return `? ${keyStr}\n${indent}:${
-        vcb ? `${vcb}\n${opt.indent}` : ' '
+        vcb ? `${vcb}\n${ctx.indent}` : ' '
       }${valueStr}`
     } else if (value instanceof Collection) {
-      return `${keyStr}:${vcb}\n${opt.indent}${valueStr}`
+      return `${keyStr}:${vcb}\n${ctx.indent}${valueStr}`
     } else {
-      return `${keyStr}:${vcb ? `${vcb}\n${opt.indent}` : ' '}${valueStr}`
+      return `${keyStr}:${vcb ? `${vcb}\n${ctx.indent}` : ' '}${valueStr}`
     }
   }
 }

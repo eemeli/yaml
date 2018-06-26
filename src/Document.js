@@ -354,21 +354,22 @@ export default class Document {
       }
     })
     if (hasDirectives) lines.push('---')
+    const ctx = {
+      doc: this,
+      indent: ''
+    }
     if (this.contents) {
       if (this.contents.commentBefore)
         lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
-      const options = {
-        // top-level block scalars need to be indented if followed by a comment
-        forceBlockIndent: !!this.comment,
-        indent: ''
-      }
+      // top-level block scalars need to be indented if followed by a comment
+      ctx.forceBlockIndent = !!this.comment
       let comment = this.contents.comment
-      const body = this.schema.stringify(this, this.contents, options, () => {
+      const body = this.schema.stringify(this.contents, ctx, () => {
         comment = null
       })
       lines.push(addComment(body, '', comment))
     } else if (this.contents !== undefined) {
-      lines.push(this.schema.stringify(this, this.contents, { indent: '' }))
+      lines.push(this.schema.stringify(this.contents, ctx))
     }
     if (this.comment) lines.push(this.comment.replace(/^/gm, '#'))
     return lines.join('\n') + '\n'
