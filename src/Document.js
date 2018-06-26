@@ -7,7 +7,6 @@ import {
   YAMLSyntaxError,
   YAMLWarning
 } from './errors'
-import resolveValue from './resolveValue'
 import Schema, { DefaultTagPrefixes, DefaultTags } from './schema'
 import Collection, { toJSON } from './schema/Collection'
 
@@ -309,10 +308,6 @@ export default class Document {
       if (ca) res.comment = res.comment ? `${res.comment}\n${ca}` : ca
     }
     return (node.resolved = res)
-  }
-
-  resolveValue(value) {
-    return resolveValue(this, value, true)
   }
 
   listNonDefaultTags() {

@@ -5,88 +5,84 @@ import Pair from '../src/schema/Pair'
 import Scalar from '../src/schema/Scalar'
 import Seq from '../src/schema/Seq'
 
-let doc
-beforeEach(() => {
-  doc = new YAML.Document()
-})
-
 describe('scalars', () => {
-  describe('doc#resolveValue(value) - wrapScalars true', () => {
+  describe('resolveValue(value, false)', () => {
     test('boolean', () => {
-      const s = doc.resolveValue(false)
-      expect(s).toBeInstanceOf(Scalar)
-      expect(s.value).toBe(false)
-    })
-    test('null', () => {
-      const s = doc.resolveValue(null)
-      expect(s).toBeInstanceOf(Scalar)
-      expect(s.value).toBe(null)
-    })
-    test('undefined', () => {
-      const s = doc.resolveValue(undefined)
-      expect(s).toBeInstanceOf(Scalar)
-      expect(s.value).toBe(null)
-    })
-    test('number', () => {
-      const s = doc.resolveValue(3)
-      expect(s).toBeInstanceOf(Scalar)
-      expect(s.value).toBe(3)
-    })
-    test('string', () => {
-      const s = doc.resolveValue('test')
-      expect(s).toBeInstanceOf(Scalar)
-      expect(s.value).toBe('test')
-    })
-  })
-  describe('resolveValue(doc, value) - wrapScalars false', () => {
-    test('boolean', () => {
-      const s = resolveValue(doc, false)
+      const s = resolveValue(false, false)
       expect(s).toBe(false)
     })
     test('null', () => {
-      const s = resolveValue(doc, null)
+      const s = resolveValue(null, false)
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(null)
     })
     test('undefined', () => {
-      const s = resolveValue(doc)
+      const s = resolveValue(undefined, false)
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(null)
     })
     test('number', () => {
-      const s = resolveValue(doc, 3)
+      const s = resolveValue(3, false)
       expect(s).toBe(3)
     })
     test('string', () => {
-      const s = resolveValue(doc, 'test')
+      const s = resolveValue('test', false)
       expect(s).toBe('test')
     })
   })
 })
 
+describe('resolveValue(value, true)', () => {
+  test('boolean', () => {
+    const s = resolveValue(false, true)
+    expect(s).toBeInstanceOf(Scalar)
+    expect(s.value).toBe(false)
+  })
+  test('null', () => {
+    const s = resolveValue(null, true)
+    expect(s).toBeInstanceOf(Scalar)
+    expect(s.value).toBe(null)
+  })
+  test('undefined', () => {
+    const s = resolveValue(undefined, true)
+    expect(s).toBeInstanceOf(Scalar)
+    expect(s.value).toBe(null)
+  })
+  test('number', () => {
+    const s = resolveValue(3, true)
+    expect(s).toBeInstanceOf(Scalar)
+    expect(s.value).toBe(3)
+  })
+  test('string', () => {
+    const s = resolveValue('test', true)
+    expect(s).toBeInstanceOf(Scalar)
+    expect(s.value).toBe('test')
+  })
+})
+
 describe('arrays', () => {
-  test('[]', () => {
-    const s = doc.resolveValue([])
+  test('resolveValue([])', () => {
+    const s = resolveValue([])
     expect(s).toBeInstanceOf(Seq)
     expect(s.items).toHaveLength(0)
   })
-  test('[true]', () => {
-    const s = resolveValue(doc, [true])
+  test('resolveValue([true], false)', () => {
+    const s = resolveValue([true], false)
     expect(s).toBeInstanceOf(Seq)
     expect(s.items).toMatchObject([true])
   })
   describe('[3, ["four", 5]]', () => {
     const array = [3, ['four', 5]]
-    test('resolveValue(doc, value) - wrapScalars false', () => {
-      const s = resolveValue(doc, array)
+    test('resolveValue(value, false)', () => {
+      const s = resolveValue(array, false)
       expect(s).toBeInstanceOf(Seq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0]).toBe(3)
       expect(s.items[1]).toBeInstanceOf(Seq)
       expect(s.items[1].items).toMatchObject(['four', 5])
     })
-    test('doc#resolveValue(value) - wrapScalars true', () => {
-      const s = doc.resolveValue(array)
+    test('resolveValue(value, true)', () => {
+      const s = resolveValue(array, true)
       expect(s).toBeInstanceOf(Seq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0].value).toBe(3)
@@ -95,21 +91,27 @@ describe('arrays', () => {
       expect(s.items[1].items[0].value).toBe('four')
       expect(s.items[1].items[1].value).toBe(5)
     })
-    test('set contents', () => {
+    test('set doc contents', () => {
+      const res = '- 3\n- - four\n  - 5\n'
+      const doc = new YAML.Document()
       doc.contents = array
-      expect(String(doc)).toBe('- 3\n- - four\n  - 5\n')
+      expect(String(doc)).toBe(res)
+      doc.contents = resolveValue(array, false)
+      expect(String(doc)).toBe(res)
+      doc.contents = resolveValue(array, true)
+      expect(String(doc)).toBe(res)
     })
   })
 })
 
 describe('objects', () => {
-  test('{}', () => {
-    const s = doc.resolveValue({})
+  test('resolveValue({})', () => {
+    const s = resolveValue({})
     expect(s).toBeInstanceOf(Map)
     expect(s.items).toHaveLength(0)
   })
-  test('{ x: true }', () => {
-    const s = resolveValue(doc, { x: true })
+  test('resolveValue({ x: true }, false)', () => {
+    const s = resolveValue({ x: true }, false)
     expect(s).toBeInstanceOf(Map)
     expect(s.items).toHaveLength(1)
     expect(s.items[0]).toBeInstanceOf(Pair)
@@ -117,8 +119,8 @@ describe('objects', () => {
   })
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {
     const object = { x: 3, y: [4], z: { w: 'five', v: 6 } }
-    test('resolveValue(doc, value) - wrapScalars false', () => {
-      const s = resolveValue(doc, object)
+    test('resolveValue(value, false)', () => {
+      const s = resolveValue(object, false)
       expect(s).toBeInstanceOf(Map)
       expect(s.items).toHaveLength(3)
       expect(s.items).toMatchObject([
@@ -132,8 +134,8 @@ describe('objects', () => {
         }
       ])
     })
-    test('doc#resolveValue(value) - wrapScalars true', () => {
-      const s = doc.resolveValue(object)
+    test('resolveValue(value, true)', () => {
+      const s = resolveValue(object, true)
       expect(s).toBeInstanceOf(Map)
       expect(s.items).toHaveLength(3)
       expect(s.items).toMatchObject([
@@ -150,14 +152,19 @@ describe('objects', () => {
         }
       ])
     })
-    test('set contents', () => {
+    test('set doc contents', () => {
       const res = `x: 3
 y:
   - 4
 z:
   w: five
   v: 6\n`
+      const doc = new YAML.Document()
       doc.contents = object
+      expect(String(doc)).toBe(res)
+      doc.contents = resolveValue(object, false)
+      expect(String(doc)).toBe(res)
+      doc.contents = resolveValue(object, true)
       expect(String(doc)).toBe(res)
     })
   })
