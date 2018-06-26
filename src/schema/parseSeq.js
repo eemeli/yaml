@@ -2,15 +2,17 @@ import { Type } from '../ast/Node'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Pair from './Pair'
 import { checkKeyLength, resolveComments } from './parseUtils'
+import Seq from './Seq'
 
-export default function parseSeq(doc, seq, ast) {
-  ast.resolved = seq
+export default function parseSeq(doc, ast) {
   const { comments, items } =
     ast.type === Type.FLOW_SEQ
       ? resolveFlowSeqItems(doc, ast)
       : resolveBlockSeqItems(doc, ast)
+  const seq = new Seq()
   seq.items = items
   resolveComments(seq, comments)
+  ast.resolved = seq
   return seq
 }
 

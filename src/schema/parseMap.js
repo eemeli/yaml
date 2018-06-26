@@ -1,21 +1,22 @@
 import { Type } from '../ast/Node'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
+import Map from './Map'
 import Pair from './Pair'
 import { checkKeyLength, resolveComments } from './parseUtils'
 import YAMLSeq from './Seq'
 
-export default function parseMap(doc, map, ast) {
-  ast.resolved = map
+export default function parseMap(doc, ast) {
   const { comments, items } =
     ast.type === Type.FLOW_MAP
       ? resolveFlowMapItems(doc, ast)
       : resolveBlockMapItems(doc, ast)
+  const map = new Map()
   map.items = items
   resolveComments(map, comments)
-  for (let i = 0; i < map.items.length; ++i) {
-    const { key: iKey } = map.items[i]
-    for (let j = i + 1; j < map.items.length; ++j) {
-      const { key: jKey } = map.items[j]
+  for (let i = 0; i < items.length; ++i) {
+    const { key: iKey } = items[i]
+    for (let j = i + 1; j < items.length; ++j) {
+      const { key: jKey } = items[j]
       if (
         iKey === jKey ||
         (iKey &&
@@ -33,21 +34,22 @@ export default function parseMap(doc, map, ast) {
       }
     }
     if (doc.schema.merge && iKey.value === '<<') {
-      const src = map.items[i].value
+      const src = items[i].value
       const srcItems =
         src instanceof YAMLSeq
           ? src.items.reduce((acc, { items }) => acc.concat(items), [])
           : src.items
       const toAdd = srcItems.reduce((toAdd, pair) => {
         const exists =
-          map.items.some(({ key }) => key.value === pair.key.value) ||
+          items.some(({ key }) => key.value === pair.key.value) ||
           toAdd.some(({ key }) => key.value === pair.key.value)
         return exists ? toAdd : toAdd.concat(pair)
       }, [])
-      Array.prototype.splice.apply(map.items, [i, 1, ...toAdd])
+      Array.prototype.splice.apply(items, [i, 1, ...toAdd])
       i += toAdd.length - 1
     }
   }
+  ast.resolved = map
   return map
 }
 
