@@ -62,10 +62,12 @@ export default class Collection extends Node {
     return null
   }
 
-  toString(options, onComment) {
-    const { schema } = this.doc
-    const { blockItem, flowChars, indent, inFlow, itemIndent } = options
-    const ctx = { doc: this.doc, indent: itemIndent, inFlow, type: null }
+  toString(
+    { blockItem, doc, flowChars, indent, inFlow, itemIndent },
+    onComment
+  ) {
+    if (!doc) return JSON.stringify(this)
+    const ctx = { doc, indent: itemIndent, inFlow, type: null }
     let hasItemWithComment = false
     let hasItemWithNewLine = false
     const nodes = this.items.reduce((nodes, item, i) => {
@@ -78,7 +80,7 @@ export default class Collection extends Node {
       }
       let comment = item && item.comment
       if (comment) hasItemWithComment = true
-      let str = schema.stringify(item, ctx, () => {
+      let str = doc.schema.stringify(item, ctx, () => {
         comment = null
       })
       if (!hasItemWithNewLine && str.indexOf('\n') !== -1)
