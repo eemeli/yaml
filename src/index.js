@@ -1,4 +1,5 @@
 import parseAST from './ast/parse'
+import createNode from './createNode'
 import Document from './Document'
 import Schema from './schema'
 
@@ -42,6 +43,7 @@ function stringify(value, options) {
 }
 
 export default {
+  createNode,
   defaultOptions,
   Document: class extends Document {
     constructor(schema) {
