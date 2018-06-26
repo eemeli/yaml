@@ -1,6 +1,6 @@
 {
   "name": "yaml",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "main": "dist/index.js",
   "license": "ISC",
   "author": "Eemeli Aro <eemeli@gmail.com>",
