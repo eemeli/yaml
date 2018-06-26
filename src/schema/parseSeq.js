@@ -1,31 +1,31 @@
-// Published as 'yaml/seq'
-
 import { Type } from '../ast/Node'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
-import Collection from './Collection'
 import Pair from './Pair'
+import { checkKeyLength, resolveComments } from './parseUtils'
 
 export default function parseSeq(doc, seq, ast) {
   ast.resolved = seq
-  if (ast.type === Type.FLOW_SEQ) {
-    resolveFlowSeqItems(doc, seq, ast)
-  } else {
-    resolveBlockSeqItems(doc, seq, ast)
-  }
-  seq.resolveComments()
+  const { comments, items } =
+    ast.type === Type.FLOW_SEQ
+      ? resolveFlowSeqItems(doc, ast)
+      : resolveBlockSeqItems(doc, ast)
+  seq.items = items
+  resolveComments(seq, comments)
   return seq
 }
 
-function resolveBlockSeqItems(doc, seq, ast) {
+function resolveBlockSeqItems(doc, ast) {
+  const comments = []
+  const items = []
   for (let i = 0; i < ast.items.length; ++i) {
     const item = ast.items[i]
     switch (item.type) {
       case Type.COMMENT:
-        seq.addComment(item.comment)
+        comments.push({ comment: item.comment, before: items.length })
         break
       case Type.SEQ_ITEM:
         if (item.error) doc.errors.push(item.error)
-        seq.items.push(doc.resolveNode(item.node))
+        items.push(doc.resolveNode(item.node))
         if (item.hasProps)
           doc.errors.push(
             new YAMLSemanticError(
@@ -40,9 +40,12 @@ function resolveBlockSeqItems(doc, seq, ast) {
         )
     }
   }
+  return { comments, items }
 }
 
-function resolveFlowSeqItems(doc, seq, ast) {
+function resolveFlowSeqItems(doc, ast) {
+  const comments = []
+  const items = []
   let explicitKey = false
   let key = undefined
   let keyStart = null
@@ -52,7 +55,7 @@ function resolveFlowSeqItems(doc, seq, ast) {
     if (typeof item === 'string') {
       if (item !== ':' && (explicitKey || key !== undefined)) {
         if (explicitKey && key === undefined) key = null
-        seq.items.push(new Pair(key))
+        items.push(new Pair(key))
         explicitKey = false
         key = undefined
         keyStart = null
@@ -63,7 +66,7 @@ function resolveFlowSeqItems(doc, seq, ast) {
         explicitKey = true
       } else if (next !== '[' && item === ':' && key === undefined) {
         if (next === ',') {
-          key = seq.items.pop()
+          key = items.pop()
           if (key instanceof Pair)
             doc.errors.push(
               new YAMLSemanticError(
@@ -71,8 +74,7 @@ function resolveFlowSeqItems(doc, seq, ast) {
                 'Chaining flow sequence pairs is invalid (e.g. [ a : b : c ])'
               )
             )
-          if (!explicitKey)
-            Collection.checkKeyLength(doc, ast, i, key, keyStart)
+          if (!explicitKey) checkKeyLength(doc.errors, ast, i, key, keyStart)
         } else {
           key = null
         }
@@ -88,7 +90,7 @@ function resolveFlowSeqItems(doc, seq, ast) {
         )
       }
     } else if (item.type === Type.COMMENT) {
-      seq.addComment(item.comment)
+      comments.push({ comment: item.comment, before: items.length })
     } else {
       if (next)
         doc.errors.push(
@@ -99,9 +101,9 @@ function resolveFlowSeqItems(doc, seq, ast) {
         )
       const value = doc.resolveNode(item)
       if (key === undefined) {
-        seq.items.push(value)
+        items.push(value)
       } else {
-        seq.items.push(new Pair(key, value))
+        items.push(new Pair(key, value))
         key = undefined
       }
       keyStart = item.range.start
@@ -112,5 +114,6 @@ function resolveFlowSeqItems(doc, seq, ast) {
     doc.errors.push(
       new YAMLSemanticError(ast, 'Expected flow sequence to end with ]')
     )
-  if (key !== undefined) seq.items.push(new Pair(key))
+  if (key !== undefined) items.push(new Pair(key))
+  return { comments, items }
 }

@@ -1,17 +1,17 @@
 import { Type } from '../ast/Node'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
-import Collection from './Collection'
 import Pair from './Pair'
+import { checkKeyLength, resolveComments } from './parseUtils'
 import YAMLSeq from './Seq'
 
 export default function parseMap(doc, map, ast) {
   ast.resolved = map
-  if (ast.type === Type.FLOW_MAP) {
-    resolveFlowMapItems(doc, map, ast)
-  } else {
-    resolveBlockMapItems(doc, map, ast)
-  }
-  map.resolveComments()
+  const { comments, items } =
+    ast.type === Type.FLOW_MAP
+      ? resolveFlowMapItems(doc, ast)
+      : resolveBlockMapItems(doc, ast)
+  map.items = items
+  resolveComments(map, comments)
   for (let i = 0; i < map.items.length; ++i) {
     const { key: iKey } = map.items[i]
     for (let j = i + 1; j < map.items.length; ++j) {
@@ -51,17 +51,19 @@ export default function parseMap(doc, map, ast) {
   return map
 }
 
-function resolveBlockMapItems(doc, map, ast) {
+function resolveBlockMapItems(doc, ast) {
+  const comments = []
+  const items = []
   let key = undefined
   let keyStart = null
   for (let i = 0; i < ast.items.length; ++i) {
     const item = ast.items[i]
     switch (item.type) {
       case Type.COMMENT:
-        map.addComment(item.comment)
+        comments.push({ comment: item.comment, before: items.length })
         break
       case Type.MAP_KEY:
-        if (key !== undefined) map.items.push(new Pair(key))
+        if (key !== undefined) items.push(new Pair(key))
         if (item.error) doc.errors.push(item.error)
         key = doc.resolveNode(item.node)
         keyStart = null
@@ -82,13 +84,13 @@ function resolveBlockMapItems(doc, map, ast) {
             )
           )
         }
-        map.items.push(new Pair(key, doc.resolveNode(item.node)))
-        Collection.checkKeyLength(doc, ast, i, key, keyStart)
+        items.push(new Pair(key, doc.resolveNode(item.node)))
+        checkKeyLength(doc.errors, ast, i, key, keyStart)
         key = undefined
         keyStart = null
         break
       default:
-        if (key !== undefined) map.items.push(new Pair(key))
+        if (key !== undefined) items.push(new Pair(key))
         key = doc.resolveNode(item)
         keyStart = item.range.start
         const nextItem = ast.items[i + 1]
@@ -108,16 +110,19 @@ function resolveBlockMapItems(doc, map, ast) {
           )
     }
   }
-  if (key !== undefined) map.items.push(new Pair(key))
+  if (key !== undefined) items.push(new Pair(key))
+  return { comments, items }
 }
 
-function resolveFlowMapItems(doc, map, ast) {
+function resolveFlowMapItems(doc, ast) {
+  const comments = []
+  const items = []
   let key = undefined
   let keyStart = null
   let explicitKey = false
   let next = '{'
   for (let i = 0; i < ast.items.length; ++i) {
-    Collection.checkKeyLength(doc, ast, i, key, keyStart)
+    checkKeyLength(doc.errors, ast, i, key, keyStart)
     const item = ast.items[i]
     if (typeof item === 'string') {
       if (item === '?' && key === undefined && !explicitKey) {
@@ -137,7 +142,7 @@ function resolveFlowMapItems(doc, map, ast) {
           explicitKey = false
         }
         if (key !== undefined) {
-          map.items.push(new Pair(key))
+          items.push(new Pair(key))
           key = undefined
           keyStart = null
           if (item === ',') {
@@ -156,7 +161,7 @@ function resolveFlowMapItems(doc, map, ast) {
         new YAMLSyntaxError(ast, `Flow map contains an unexpected ${item}`)
       )
     } else if (item.type === Type.COMMENT) {
-      map.addComment(item.comment)
+      comments.push({ comment: item.comment, before: items.length })
     } else if (key === undefined) {
       if (next === ',')
         doc.errors.push(
@@ -170,7 +175,7 @@ function resolveFlowMapItems(doc, map, ast) {
         doc.errors.push(
           new YAMLSemanticError(item, 'Indicator : missing in flow map entry')
         )
-      map.items.push(new Pair(key, doc.resolveNode(item)))
+      items.push(new Pair(key, doc.resolveNode(item)))
       key = undefined
       explicitKey = false
     }
@@ -179,5 +184,6 @@ function resolveFlowMapItems(doc, map, ast) {
     doc.errors.push(
       new YAMLSemanticError(ast, 'Expected flow map to end with }')
     )
-  if (key !== undefined) map.items.push(new Pair(key))
+  if (key !== undefined) items.push(new Pair(key))
+  return { comments, items }
 }
