@@ -1,6 +1,6 @@
 import { Type } from '../ast/Node'
+import createNode from '../createNode'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
-import resolveValue from '../resolveValue'
 import Collection from './Collection'
 import core from './core'
 import extended from './extended'
@@ -132,7 +132,7 @@ export default class Schema {
         item instanceof Pair
       )
     ) {
-      item = resolveValue(item, true)
+      item = createNode(item, true)
     }
     ctx.tags = this
     let match
