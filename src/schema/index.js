@@ -6,6 +6,7 @@ import core from './core'
 import extended from './extended'
 import failsafe from './failsafe'
 import json from './json'
+import Node from './Node'
 import Pair from './Pair'
 import Scalar from './Scalar'
 import { resolve as resolveStr } from './_string'
@@ -124,15 +125,7 @@ export default class Schema {
   }
 
   stringify(item, ctx, onComment) {
-    if (
-      !(
-        item instanceof Scalar ||
-        item instanceof Collection ||
-        item instanceof Pair
-      )
-    ) {
-      item = createNode(item, true)
-    }
+    if (!(item instanceof Node)) item = createNode(item, true)
     ctx.tags = this
     let match
     if (item instanceof Pair) {

@@ -2,10 +2,12 @@
 
 import addComment from '../addComment'
 import Collection, { toJSON } from './Collection'
+import Node from './Node'
 import Scalar from './Scalar'
 
-export default class Pair {
+export default class Pair extends Node {
   constructor(key, value = null) {
+    super()
     this.key = key
     this.value = value
   }
@@ -49,13 +51,13 @@ export default class Pair {
   toString(ctx, onComment) {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
     const { key, value } = this
-    const explicitKey = !key || key.comment || key instanceof Collection
+    let keyComment = key instanceof Node && key.comment
+    const explicitKey = !key || keyComment || key instanceof Collection
     const { doc, indent } = ctx
     ctx = Object.assign({}, ctx, {
       implicitKey: !explicitKey,
       indent: indent + '  '
     })
-    let keyComment = key && key.comment
     let keyStr = doc.schema.stringify(key, ctx, () => {
       keyComment = null
     })
