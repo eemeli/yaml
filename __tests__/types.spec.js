@@ -1,5 +1,6 @@
 import YAML from '../src/index'
 import Scalar from '../src/schema/Scalar'
+import Seq from '../src/schema/Seq'
 import { strOptions } from '../src/schema/_string'
 
 let origFoldOptions
@@ -310,14 +311,14 @@ describe('custom tags', () => {
 
   test('parse', () => {
     const doc = YAML.parseDocuments(src)[0]
-    expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
-    expect(doc.contents.origTag).toBe('tag:example.com,2000:test/x')
+    expect(doc.contents).toBeInstanceOf(Seq)
+    expect(doc.contents.tag).toBe('tag:example.com,2000:test/x')
     const { items } = doc.contents
     expect(items).toHaveLength(4)
-    items.forEach(item => expect(item.tag).toBe('tag:yaml.org,2002:str'))
-    expect(items[0].origTag).toBe('!y')
-    expect(items[1].origTag).toBe('tag:example.com,2000:test/z')
-    expect(items[2].origTag).toBe('tag:example.com,2000:other/w')
+    items.forEach(item => expect(typeof item.value).toBe('string'))
+    expect(items[0].tag).toBe('!y')
+    expect(items[1].tag).toBe('tag:example.com,2000:test/z')
+    expect(items[2].tag).toBe('tag:example.com,2000:other/w')
   })
 
   test('stringify', () => {
@@ -339,8 +340,7 @@ describe('custom tags', () => {
     doc.contents.commentBefore = 'c'
     doc.contents.items[3].comment = 'cc'
     const s = new Scalar(6)
-    s.tag = 'tag:yaml.org,2002:str'
-    s.origTag = '!g'
+    s.tag = '!g'
     doc.contents.items.splice(1, 1, s, '7')
     expect(String(doc)).toBe(
       `%TAG !e! tag:example.com,2000:test/
@@ -349,7 +349,7 @@ describe('custom tags', () => {
 #c
 !e!x
 - !y "2"
-- !g "6"
+- !g 6
 - "7"
 - !f!w "4"
 - "5" #cc\n`

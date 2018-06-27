@@ -114,7 +114,7 @@ export default class Schema {
         )
       )
       const res = this.resolveNode(doc, node, fallback)
-      res.origTag = tagName
+      res.tag = tagName
       return res
     } else {
       doc.errors.push(
@@ -124,27 +124,18 @@ export default class Schema {
     return null
   }
 
-  stringify(item, ctx, onComment) {
-    if (!(item instanceof Node)) item = createNode(item, true)
-    ctx.tags = this
+  getStringifier(item) {
     let match
-    if (item instanceof Pair) {
-      return item.toString(ctx, onComment)
-    } else if (item.tag) {
-      match = this.schema.filter(
+    if (item.tag) {
+      match = this.schema.find(
         ({ format, tag }) =>
           tag === item.tag && (!item.format || format === item.format)
       )
-      if (match.length === 0)
-        throw new Error(
-          `Tag not available: ${item.tag}${
-            item.format ? ', format ' + item.format : ''
-          }`
-        )
-    } else if (item.value === null) {
-      match = this.schema.filter(t => t.class === null && !t.format)
-      if (match.length === 0)
-        throw new Error('Schema is missing a null stringifier')
+      if (match) return match.stringify || Schema.defaultStringifier
+    }
+    if (item.value === null) {
+      match = this.schema.find(t => t.class === null && !t.format)
+      if (!match) throw new Error('Schema is missing a null stringifier')
     } else {
       let obj = item
       if (item.hasOwnProperty('value')) {
@@ -162,19 +153,24 @@ export default class Schema {
             obj = item.value
         }
       }
-      match = this.schema.filter(
+      match = this.schema.find(
         t => t.class && obj instanceof t.class && !t.format
       )
-      if (match.length === 0)
-        throw new Error(
-          `Tag not resolved for ${
-            obj && obj.constructor ? obj.constructor.name : typeof obj
-          }`
-        )
+      if (!match) {
+        const name = obj && obj.constructor ? obj.constructor.name : typeof obj
+        throw new Error(`Tag not resolved for ${name}`)
+      }
     }
-    const stringify = match[0].stringify || Schema.defaultStringifier
+    return match.stringify || Schema.defaultStringifier
+  }
+
+  stringify(item, ctx, onComment) {
+    if (!(item instanceof Node)) item = createNode(item, true)
+    ctx.tags = this
+    if (item instanceof Pair) return item.toString(ctx, onComment)
+    const stringify = this.getStringifier(item)
     const str = stringify(item, ctx, onComment)
-    const tag = item.origTag || item.tag
+    const { tag } = item
     if (tag && tag.indexOf(defaultPrefix) !== 0) {
       const p = ctx.doc.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
       const tagProp = p

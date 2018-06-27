@@ -4,7 +4,7 @@ import Scalar from './schema/Scalar'
 
 const visit = (node, tags) => {
   if (node && typeof node === 'object') {
-    const tag = node.origTag || node.tag
+    const { tag } = node
     if (node instanceof Collection) {
       if (tag) tags[tag] = true
       node.items.forEach(n => visit(n, tags))
