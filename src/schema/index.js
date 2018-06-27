@@ -93,7 +93,6 @@ export default class Schema {
       node.resolved = null
     }
     if (!node.resolved) return null
-    if (node.hasProps) node.resolved.anchor = node.anchor
     if (tagName) node.resolved.tag = tagName
     return node.resolved
   }
