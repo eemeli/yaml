@@ -66,3 +66,11 @@ z:
   v: 6\n`
   )
 })
+
+test('Map with non-Pair item', () => {
+  const doc = new YAML.Document()
+  doc.contents = YAML.createNode({ x: 3, y: 4 })
+  expect(String(doc)).toBe('x: 3\ny: 4\n')
+  doc.contents.items.push('TEST')
+  expect(() => String(doc)).toThrow(/^Map items must all be pairs.*TEST/)
+})

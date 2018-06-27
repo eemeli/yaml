@@ -1,6 +1,7 @@
 // Published as 'yaml/map'
 
 import Collection, { toJSON } from './Collection'
+import Pair from './Pair'
 
 export default class YAMLMap extends Collection {
   toJSON() {
@@ -11,6 +12,12 @@ export default class YAMLMap extends Collection {
   }
 
   toString({ doc, indent = '', inFlow = false } = {}, onComment) {
+    this.items.forEach(item => {
+      if (!(item instanceof Pair))
+        throw new Error(
+          `Map items must all be pairs; found ${JSON.stringify(item)} instead`
+        )
+    })
     return super.toString(
       {
         blockItem: ({ str }) => str,
