@@ -298,6 +298,7 @@ export default class Document {
       }
     }
     if (res) {
+      res.range = [node.range.start, node.range.end]
       const cb = comments.before.join('\n')
       if (cb) {
         res.commentBefore = res.commentBefore

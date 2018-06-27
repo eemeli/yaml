@@ -33,6 +33,7 @@ describe('parse comments', () => {
       expect(doc.contents.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
       expect(doc.contents.value).toBe('value')
+      expect(doc.contents.range).toMatchObject([4, 14])
     })
 
     test('"quoted"', () => {
@@ -42,6 +43,7 @@ describe('parse comments', () => {
       expect(doc.contents.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
       expect(doc.contents.value).toBe('value')
+      expect(doc.contents.range).toMatchObject([4, 16])
     })
 
     test('block', () => {
@@ -51,6 +53,7 @@ describe('parse comments', () => {
       expect(doc.contents.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
       expect(doc.contents.value).toBe('value')
+      expect(doc.contents.range).toMatchObject([4, 18])
     })
   })
 
@@ -61,7 +64,9 @@ describe('parse comments', () => {
       expect(doc.contents.items).toHaveLength(2)
       expect(doc.contents.items[0].commentBefore).toBe('c0')
       expect(doc.contents.items[1].commentBefore).toBe('c1')
+      expect(doc.contents.items[0].range).toMatchObject([6, 14])
       expect(doc.contents.comment).toBe('c2')
+      expect(doc.contents.range).toMatchObject([4, 33])
     })
 
     test('multiline', () => {
