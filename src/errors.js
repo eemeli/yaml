@@ -1,4 +1,4 @@
-import Node from './ast/Node'
+import Node from './cst/Node'
 
 export class YAMLReferenceError extends ReferenceError {
   constructor(source, message) {

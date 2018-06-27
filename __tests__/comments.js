@@ -1,5 +1,5 @@
 import YAML from '../src/index'
-import { Type } from '../src/ast/Node'
+import { Type } from '../src/cst/Node'
 
 describe('parse comments', () => {
   describe('body', () => {

@@ -1,15 +1,15 @@
-import { Type } from '../ast/Node'
+import { Type } from '../cst/Node'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Map from './Map'
 import Pair from './Pair'
 import { checkKeyLength, resolveComments } from './parseUtils'
 import YAMLSeq from './Seq'
 
-export default function parseMap(doc, ast) {
+export default function parseMap(doc, cst) {
   const { comments, items } =
-    ast.type === Type.FLOW_MAP
-      ? resolveFlowMapItems(doc, ast)
-      : resolveBlockMapItems(doc, ast)
+    cst.type === Type.FLOW_MAP
+      ? resolveFlowMapItems(doc, cst)
+      : resolveBlockMapItems(doc, cst)
   const map = new Map()
   map.items = items
   resolveComments(map, comments)
@@ -26,7 +26,7 @@ export default function parseMap(doc, ast) {
       ) {
         doc.errors.push(
           new YAMLSemanticError(
-            ast,
+            cst,
             `Map keys must be unique; "${iKey}" is repeated`
           )
         )
@@ -49,17 +49,17 @@ export default function parseMap(doc, ast) {
       i += toAdd.length - 1
     }
   }
-  ast.resolved = map
+  cst.resolved = map
   return map
 }
 
-function resolveBlockMapItems(doc, ast) {
+function resolveBlockMapItems(doc, cst) {
   const comments = []
   const items = []
   let key = undefined
   let keyStart = null
-  for (let i = 0; i < ast.items.length; ++i) {
-    const item = ast.items[i]
+  for (let i = 0; i < cst.items.length; ++i) {
+    const item = cst.items[i]
     switch (item.type) {
       case Type.COMMENT:
         comments.push({ comment: item.comment, before: items.length })
@@ -87,7 +87,7 @@ function resolveBlockMapItems(doc, ast) {
           )
         }
         items.push(new Pair(key, doc.resolveNode(item.node)))
-        checkKeyLength(doc.errors, ast, i, key, keyStart)
+        checkKeyLength(doc.errors, cst, i, key, keyStart)
         key = undefined
         keyStart = null
         break
@@ -95,7 +95,7 @@ function resolveBlockMapItems(doc, ast) {
         if (key !== undefined) items.push(new Pair(key))
         key = doc.resolveNode(item)
         keyStart = item.range.start
-        const nextItem = ast.items[i + 1]
+        const nextItem = cst.items[i + 1]
         if (!nextItem || nextItem.type !== Type.MAP_VALUE)
           doc.errors.push(
             new YAMLSemanticError(
@@ -116,16 +116,16 @@ function resolveBlockMapItems(doc, ast) {
   return { comments, items }
 }
 
-function resolveFlowMapItems(doc, ast) {
+function resolveFlowMapItems(doc, cst) {
   const comments = []
   const items = []
   let key = undefined
   let keyStart = null
   let explicitKey = false
   let next = '{'
-  for (let i = 0; i < ast.items.length; ++i) {
-    checkKeyLength(doc.errors, ast, i, key, keyStart)
-    const item = ast.items[i]
+  for (let i = 0; i < cst.items.length; ++i) {
+    checkKeyLength(doc.errors, cst, i, key, keyStart)
+    const item = cst.items[i]
     if (typeof item === 'string') {
       if (item === '?' && key === undefined && !explicitKey) {
         explicitKey = true
@@ -154,13 +154,13 @@ function resolveFlowMapItems(doc, ast) {
         }
       }
       if (item === '}') {
-        if (i === ast.items.length - 1) continue
+        if (i === cst.items.length - 1) continue
       } else if (item === next) {
         next = ':'
         continue
       }
       doc.errors.push(
-        new YAMLSyntaxError(ast, `Flow map contains an unexpected ${item}`)
+        new YAMLSyntaxError(cst, `Flow map contains an unexpected ${item}`)
       )
     } else if (item.type === Type.COMMENT) {
       comments.push({ comment: item.comment, before: items.length })
@@ -182,9 +182,9 @@ function resolveFlowMapItems(doc, ast) {
       explicitKey = false
     }
   }
-  if (ast.items[ast.items.length - 1] !== '}')
+  if (cst.items[cst.items.length - 1] !== '}')
     doc.errors.push(
-      new YAMLSemanticError(ast, 'Expected flow map to end with }')
+      new YAMLSemanticError(cst, 'Expected flow map to end with }')
     )
   if (key !== undefined) items.push(new Pair(key))
   return { comments, items }

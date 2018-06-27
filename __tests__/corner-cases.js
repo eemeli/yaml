@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import Node from '../src/ast/Node'
+import Node from '../src/cst/Node'
 import { YAMLSemanticError } from '../src/errors'
 import YAML from '../src/index'
 

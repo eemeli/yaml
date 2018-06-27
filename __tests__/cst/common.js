@@ -1,4 +1,4 @@
-import Node from '../../src/ast/Node'
+import Node from '../../src/cst/Node'
 
 export const pretty = node => {
   if (!node || typeof node !== 'object') return node

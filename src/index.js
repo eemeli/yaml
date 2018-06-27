@@ -1,4 +1,4 @@
-import parseAST from './ast/parse'
+import parseCST from './cst/parse'
 import createNode from './createNode'
 import Document from './Document'
 import Schema from './schema'
@@ -14,7 +14,7 @@ function parseDocuments(src, options) {
     ? Object.assign({}, defaultOptions, options)
     : defaultOptions
   const schema = new Schema(resolvedOptions)
-  return parseAST(src).map(astDoc => new Document(schema).parse(astDoc))
+  return parseCST(src).map(astDoc => new Document(schema).parse(astDoc))
 }
 
 function parse(src, options) {

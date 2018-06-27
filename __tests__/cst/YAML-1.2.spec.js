@@ -1,5 +1,5 @@
-import Node, { Type } from '../../src/ast/Node'
-import parse from '../../src/ast/parse'
+import Node, { Type } from '../../src/cst/Node'
+import parse from '../../src/cst/parse'
 import { pretty, testSpec } from './common'
 
 const spec = {

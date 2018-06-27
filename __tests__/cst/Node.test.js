@@ -1,5 +1,5 @@
-import Node, { Type } from '../../src/ast/Node'
-import Range from '../../src/ast/Range'
+import Node, { Type } from '../../src/cst/Node'
+import Range from '../../src/cst/Range'
 
 describe('internals', () => {
   test('constructor', () => {

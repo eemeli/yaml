@@ -1,4 +1,4 @@
-import parse from '../../src/ast/parse'
+import parse from '../../src/cst/parse'
 
 describe('folded block with chomp: keep', () => {
   test('nl + nl', () => {

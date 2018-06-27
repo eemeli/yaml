@@ -1,5 +1,5 @@
 import { addCommentBefore } from '../addComment'
-import { Type } from '../ast/Node'
+import { Type } from '../cst/Node'
 import foldFlowLines, {
   FOLD_BLOCK,
   FOLD_FLOW,

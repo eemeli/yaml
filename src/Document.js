@@ -1,6 +1,6 @@
 import addComment from './addComment'
 import listTagNames from './listTagNames'
-import { Char, Type } from './ast/Node'
+import { Char, Type } from './cst/Node'
 import {
   YAMLReferenceError,
   YAMLSemanticError,

@@ -1,26 +1,26 @@
-import { Type } from '../ast/Node'
+import { Type } from '../cst/Node'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Pair from './Pair'
 import { checkKeyLength, resolveComments } from './parseUtils'
 import Seq from './Seq'
 
-export default function parseSeq(doc, ast) {
+export default function parseSeq(doc, cst) {
   const { comments, items } =
-    ast.type === Type.FLOW_SEQ
-      ? resolveFlowSeqItems(doc, ast)
-      : resolveBlockSeqItems(doc, ast)
+    cst.type === Type.FLOW_SEQ
+      ? resolveFlowSeqItems(doc, cst)
+      : resolveBlockSeqItems(doc, cst)
   const seq = new Seq()
   seq.items = items
   resolveComments(seq, comments)
-  ast.resolved = seq
+  cst.resolved = seq
   return seq
 }
 
-function resolveBlockSeqItems(doc, ast) {
+function resolveBlockSeqItems(doc, cst) {
   const comments = []
   const items = []
-  for (let i = 0; i < ast.items.length; ++i) {
-    const item = ast.items[i]
+  for (let i = 0; i < cst.items.length; ++i) {
+    const item = cst.items[i]
     switch (item.type) {
       case Type.COMMENT:
         comments.push({ comment: item.comment, before: items.length })
@@ -45,15 +45,15 @@ function resolveBlockSeqItems(doc, ast) {
   return { comments, items }
 }
 
-function resolveFlowSeqItems(doc, ast) {
+function resolveFlowSeqItems(doc, cst) {
   const comments = []
   const items = []
   let explicitKey = false
   let key = undefined
   let keyStart = null
   let next = '['
-  for (let i = 0; i < ast.items.length; ++i) {
-    const item = ast.items[i]
+  for (let i = 0; i < cst.items.length; ++i) {
+    const item = cst.items[i]
     if (typeof item === 'string') {
       if (item !== ':' && (explicitKey || key !== undefined)) {
         if (explicitKey && key === undefined) key = null
@@ -76,17 +76,17 @@ function resolveFlowSeqItems(doc, ast) {
                 'Chaining flow sequence pairs is invalid (e.g. [ a : b : c ])'
               )
             )
-          if (!explicitKey) checkKeyLength(doc.errors, ast, i, key, keyStart)
+          if (!explicitKey) checkKeyLength(doc.errors, cst, i, key, keyStart)
         } else {
           key = null
         }
         keyStart = null
         explicitKey = false // TODO: add error for non-explicit multiline plain key
         next = null
-      } else if (next === '[' || item !== ']' || i < ast.items.length - 1) {
+      } else if (next === '[' || item !== ']' || i < cst.items.length - 1) {
         doc.errors.push(
           new YAMLSyntaxError(
-            ast,
+            cst,
             `Flow sequence contains an unexpected ${item}`
           )
         )
@@ -112,9 +112,9 @@ function resolveFlowSeqItems(doc, ast) {
       next = ','
     }
   }
-  if (ast.items[ast.items.length - 1] !== ']')
+  if (cst.items[cst.items.length - 1] !== ']')
     doc.errors.push(
-      new YAMLSemanticError(ast, 'Expected flow sequence to end with ]')
+      new YAMLSemanticError(cst, 'Expected flow sequence to end with ]')
     )
   if (key !== undefined) items.push(new Pair(key))
   return { comments, items }

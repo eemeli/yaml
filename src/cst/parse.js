@@ -1,4 +1,4 @@
-// Published as 'yaml/parse-ast'
+// Published as 'yaml/parse-cst'
 
 import Document from './Document'
 import ParseContext from './ParseContext'

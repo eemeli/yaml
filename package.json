@@ -47,7 +47,7 @@
   "jest": {
     "testPathIgnorePatterns": [
       "__tests__/common",
-      "__tests__/ast/common"
+      "__tests__/cst/common"
     ]
   },
   "prettier": {

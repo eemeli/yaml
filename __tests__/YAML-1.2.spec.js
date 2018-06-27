@@ -1,4 +1,4 @@
-import { Type } from '../src/ast/Node'
+import { Type } from '../src/cst/Node'
 import YAML from '../src/index'
 import { strOptions } from '../src/schema/_string'
 

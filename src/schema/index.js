@@ -1,4 +1,4 @@
-import { Type } from '../ast/Node'
+import { Type } from '../cst/Node'
 import createNode from '../createNode'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import Collection from './Collection'
