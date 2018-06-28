@@ -1,7 +1,8 @@
 // Published as 'yaml/pair'
 
 import addComment from '../addComment'
-import Collection, { toJSON } from './Collection'
+import toJSON from '../toJSON'
+import Collection from './Collection'
 import Node from './Node'
 import Scalar from './Scalar'
 

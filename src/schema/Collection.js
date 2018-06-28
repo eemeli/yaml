@@ -1,13 +1,6 @@
 import addComment from '../addComment'
 import Node from './Node'
 
-export const toJSON = value =>
-  Array.isArray(value)
-    ? value.map(toJSON)
-    : value && typeof value === 'object' && 'toJSON' in value
-      ? value.toJSON()
-      : value
-
 export default class Collection extends Node {
   static maxFlowStringSingleLineLength = 60
 

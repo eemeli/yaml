@@ -1,6 +1,7 @@
 // Published as 'yaml/seq'
 
-import Collection, { toJSON } from './Collection'
+import toJSON from '../toJSON'
+import Collection from './Collection'
 
 export default class YAMLSeq extends Collection {
   toJSON() {

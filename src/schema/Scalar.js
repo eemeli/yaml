@@ -1,6 +1,6 @@
 // Published as 'yaml/scalar'
 
-import { toJSON } from './Collection'
+import toJSON from '../toJSON'
 import Node from './Node'
 
 export default class Scalar extends Node {

@@ -1,6 +1,7 @@
 // Published as 'yaml/map'
 
-import Collection, { toJSON } from './Collection'
+import toJSON from '../toJSON'
+import Collection from './Collection'
 import Pair from './Pair'
 
 export default class YAMLMap extends Collection {

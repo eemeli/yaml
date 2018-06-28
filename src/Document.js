@@ -8,7 +8,8 @@ import {
   YAMLWarning
 } from './errors'
 import Schema, { DefaultTagPrefixes, DefaultTags } from './schema'
-import Collection, { toJSON } from './schema/Collection'
+import Collection from './schema/Collection'
+import toJSON from './toJSON'
 
 const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
