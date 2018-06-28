@@ -11,12 +11,9 @@ export default class Collection extends Node {
     return null
   }
 
-  toString(
-    { blockItem, doc, flowChars, indent, inFlow, itemIndent },
-    onComment
-  ) {
-    if (!doc) return JSON.stringify(this)
-    const ctx = { doc, indent: itemIndent, inFlow, type: null }
+  toString(ctx, { blockItem, flowChars, itemIndent }, onComment) {
+    const { doc, indent, inFlow } = ctx
+    ctx = Object.assign({}, ctx, { indent: itemIndent, type: null })
     let hasItemWithComment = false
     let hasItemWithNewLine = false
     const nodes = this.items.reduce((nodes, item, i) => {
@@ -35,7 +32,7 @@ export default class Collection extends Node {
       if (!hasItemWithNewLine && str.indexOf('\n') !== -1)
         hasItemWithNewLine = true
       if (inFlow && i < this.items.length - 1) str += ','
-      str = addComment(str, ctx.indent, comment)
+      str = addComment(str, itemIndent, comment)
       nodes.push({ type: 'item', str })
       return nodes
     }, [])

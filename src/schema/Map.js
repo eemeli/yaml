@@ -12,21 +12,22 @@ export default class YAMLMap extends Collection {
     }, {})
   }
 
-  toString({ doc, indent = '', inFlow = false } = {}, onComment) {
+  toString(ctx, onComment) {
+    if (!ctx) return JSON.stringify(this)
     this.items.forEach(item => {
       if (!(item instanceof Pair))
         throw new Error(
           `Map items must all be pairs; found ${JSON.stringify(item)} instead`
         )
     })
+    let itemIndent = ctx.indent || ''
+    if (ctx.inFlow) itemIndent += '  '
     return super.toString(
+      ctx,
       {
         blockItem: ({ str }) => str,
-        doc,
         flowChars: { start: '{', end: '}' },
-        indent,
-        inFlow,
-        itemIndent: indent + (inFlow ? '  ' : '')
+        itemIndent
       },
       onComment
     )

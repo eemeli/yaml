@@ -8,15 +8,15 @@ export default class YAMLSeq extends Collection {
     return this.items.map(toJSON)
   }
 
-  toString({ doc, indent = '', inFlow = false } = {}, onComment) {
+  toString(ctx, onComment) {
+    if (!ctx) return JSON.stringify(this)
+    const itemIndent = (ctx.indent || '') + (ctx.inFlow ? '    ' : '  ')
     return super.toString(
+      ctx,
       {
         blockItem: ({ type, str }) => (type === 'comment' ? str : `- ${str}`),
-        doc,
         flowChars: { start: '[', end: ']' },
-        indent,
-        inFlow,
-        itemIndent: indent + (inFlow ? '    ' : '  ')
+        itemIndent
       },
       onComment
     )
