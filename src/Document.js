@@ -1,5 +1,5 @@
 import addComment from './addComment'
-import listTagNames from './listTagNames'
+import Anchors from './Anchors'
 import { Char, Type } from './cst/Node'
 import {
   YAMLReferenceError,
@@ -7,7 +7,9 @@ import {
   YAMLSyntaxError,
   YAMLWarning
 } from './errors'
+import listTagNames from './listTagNames'
 import Schema, { DefaultTagPrefixes, DefaultTags } from './schema'
+import Alias from './schema/Alias'
 import Collection from './schema/Collection'
 import toJSON from './toJSON'
 
@@ -16,7 +18,7 @@ const isCollectionItem = node =>
 
 export default class Document {
   constructor(schema) {
-    this.anchors = {}
+    this.anchors = new Anchors()
     this.commentBefore = null
     this.comment = null
     this.contents = null
@@ -53,6 +55,7 @@ export default class Document {
       }
       if (comment) directiveComments.push(comment)
     })
+    this.anchors._cstAliases = []
     this.commentBefore = directiveComments.join('\n') || null
     const comments = { before: [], after: [] }
     const contentNodes = []
@@ -103,6 +106,7 @@ export default class Document {
         }
     }
     this.comment = comments.after.join('\n') || null
+    this.anchors.resolveNodes()
     return this
   }
 
@@ -254,7 +258,17 @@ export default class Document {
           break
       }
     })
-    if (hasAnchor) anchors[node.anchor] = node
+    if (hasAnchor) {
+      const name = node.anchor
+      const prev = anchors.getNode(name)
+      // At this point, aliases for any preceding node with the same anchor
+      // name have already been resolved, so it may safely be renamed.
+      if (prev) anchors.map[anchors.newName(name)] = prev
+      // During parsing, we need to store the CST node in anchors.map as
+      // anchors need to be available during resolution to allow for
+      // circular references.
+      anchors.map[name] = node
+    }
     let res
     if (node.type === Type.ALIAS) {
       if (hasAnchor || hasTag)
@@ -264,17 +278,17 @@ export default class Document {
             'An alias node must not specify any properties'
           )
         )
-      const src = anchors[node.rawValue]
+      const name = node.rawValue
+      const src = anchors.getNode(name)
       if (!src) {
         errors.push(
-          new YAMLReferenceError(
-            node,
-            `Aliased anchor not found: ${node.rawValue}`
-          )
+          new YAMLReferenceError(node, `Aliased anchor not found: ${name}`)
         )
         return null
       }
-      res = src.resolved
+      // Lazy resolution for circular references
+      res = new Alias(src)
+      anchors._cstAliases.push(res)
     } else {
       const tagName = this.resolveTagName(node)
       if (tagName) {
@@ -352,6 +366,7 @@ export default class Document {
     })
     if (hasDirectives) lines.push('---')
     const ctx = {
+      anchors: {},
       doc: this,
       indent: ''
     }

@@ -1,6 +1,7 @@
 import { Type } from '../cst/Node'
 import createNode from '../createNode'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
+import Alias from './Alias'
 import Collection from './Collection'
 import core from './core'
 import extended from './extended'
@@ -125,6 +126,7 @@ export default class Schema {
   }
 
   getStringifier(item) {
+    if (item instanceof Alias) return Alias.stringify
     let match
     if (item.tag) {
       match = this.schema.find(
@@ -164,26 +166,39 @@ export default class Schema {
     return match.stringify || Schema.defaultStringifier
   }
 
+  stringifyProps(node, { anchors, doc }) {
+    const props = []
+    const anchor = doc.anchors.getName(node)
+    if (anchor) {
+      anchors[anchor] = node
+      props.push(`&${anchor}`)
+    }
+    const { tag } = node
+    // FIXME: should read prefix-skip from schema
+    if (tag && tag.indexOf(defaultPrefix) !== 0) {
+      const p = doc.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
+      props.push(
+        p
+          ? p.handle + tag.substr(p.prefix.length)
+          : tag[0] === '!'
+            ? tag
+            : `!<${tag}>`
+      )
+    }
+    return props.join(' ')
+  }
+
   stringify(item, ctx, onComment) {
     if (!(item instanceof Node)) item = createNode(item, true)
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment)
     const stringify = this.getStringifier(item)
     const str = stringify(item, ctx, onComment)
-    const { tag } = item
-    if (tag && tag.indexOf(defaultPrefix) !== 0) {
-      const p = ctx.doc.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
-      const tagProp = p
-        ? p.handle + tag.substr(p.prefix.length)
-        : tag[0] === '!'
-          ? tag
-          : `!<${tag}>`
-      if (item instanceof Collection && !ctx.inFlow && item.items.length > 0) {
-        return `${tagProp}\n${ctx.indent}${str}`
-      } else {
-        return `${tagProp} ${str}`
-      }
-    }
-    return str
+    const props = this.stringifyProps(item, ctx)
+    return props
+      ? item instanceof Collection && !ctx.inFlow && item.items.length > 0
+        ? `${props}\n${ctx.indent}${str}`
+        : `${props} ${str}`
+      : str
   }
 }

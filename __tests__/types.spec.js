@@ -283,7 +283,7 @@ describe('merge <<', () => {
   x: 1
   label: center/big`
 
-  test('example', () => {
+  test.skip('example', () => {
     const res = YAML.parse(src, { merge: true })
     expect(res).toHaveLength(8)
     for (let i = 4; i < res.length; ++i) {
