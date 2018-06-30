@@ -1,9 +1,10 @@
 import { Type } from '../cst/Node'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Map from './Map'
+import Merge, { MERGE_KEY } from './Merge'
 import Pair from './Pair'
 import { checkKeyLength, resolveComments } from './parseUtils'
-import YAMLSeq from './Seq'
+import Alias from './Alias'
 
 export default function parseMap(doc, cst) {
   const { comments, items } =
@@ -33,20 +34,21 @@ export default function parseMap(doc, cst) {
         break
       }
     }
-    if (doc.schema.merge && iKey.value === '<<') {
-      const src = items[i].value
-      const srcItems =
-        src instanceof YAMLSeq
-          ? src.items.reduce((acc, { items }) => acc.concat(items), [])
-          : src.items
-      const toAdd = srcItems.reduce((toAdd, pair) => {
-        const exists =
-          items.some(({ key }) => key.value === pair.key.value) ||
-          toAdd.some(({ key }) => key.value === pair.key.value)
-        return exists ? toAdd : toAdd.concat(pair)
-      }, [])
-      Array.prototype.splice.apply(items, [i, 1, ...toAdd])
-      i += toAdd.length - 1
+    if (doc.schema.merge && iKey.value === MERGE_KEY) {
+      items[i] = new Merge(items[i])
+      const sources = items[i].value.items
+      let error = null
+      sources.some(node => {
+        if (node instanceof Alias) {
+          // During parsing, alias sources are CST nodes; to account for
+          // circular references their resolved values can't be used here.
+          const { type } = node.source
+          if (type === Type.MAP || type === Type.FLOW_MAP) return false
+          return (error = 'Merge nodes aliases can only point to maps')
+        }
+        return (error = 'Merge nodes can only have Alias nodes as values')
+      })
+      if (error) doc.errors.push(new YAMLSemanticError(cst, error))
     }
   }
   cst.resolved = map
