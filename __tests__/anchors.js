@@ -130,14 +130,12 @@ describe('merge <<', () => {
     })
   })
 
-  test('new Merge', () => {
+  test('doc.anchors.createMergePair', () => {
     const doc = YAML.parseDocuments('[{ a: A }, { b: B }]')[0]
     const {
       items: [a, b]
     } = doc.contents
-    const merge = new Merge()
-    const alias = doc.anchors.createAlias(a)
-    merge.value.items.push(alias)
+    const merge = doc.anchors.createMergePair(a)
     b.items.push(merge)
     expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
     expect(String(doc)).toBe('- &a1\n  a: A\n- b: B\n  <<: *a1\n')

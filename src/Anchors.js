@@ -1,5 +1,6 @@
 import Alias from './schema/Alias'
 import Map from './schema/Map'
+import Merge from './schema/Merge'
 import Scalar from './schema/Scalar'
 import Seq from './schema/Seq'
 
@@ -13,6 +14,19 @@ export default class Anchors {
   createAlias(node, name) {
     this.setAnchor(node, name)
     return new Alias(node)
+  }
+
+  createMergePair(...sources) {
+    const merge = new Merge()
+    merge.value.items = sources.map(s => {
+      if (s instanceof Alias) {
+        if (s.source instanceof Map) return s
+      } else if (s instanceof Map) {
+        return this.createAlias(s)
+      }
+      throw new Error('Merge sources must be Map nodes or their Aliases')
+    })
+    return merge
   }
 
   getName(node) {
