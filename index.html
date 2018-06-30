@@ -6,6 +6,7 @@
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>YAML</title>
+    <link href="images/favicon.ico" rel="icon" type="image/ico" />
 
     <style>
       .highlight table td { padding: 5px; }
@@ -255,6 +256,9 @@
                     <a href="#ast-nodes" class="toc-h2 toc-link" data-title="AST Nodes">AST Nodes</a>
                   </li>
                   <li>
+                    <a href="#anchors-and-alias-nodes" class="toc-h2 toc-link" data-title="Anchors and Alias Nodes">Anchors and Alias Nodes</a>
+                  </li>
+                  <li>
                     <a href="#comments" class="toc-h2 toc-link" data-title="Comments">Comments</a>
                   </li>
               </ul>
@@ -289,7 +293,7 @@
           </li>
       </div>
         <ul class="toc-footer">
-            <li><a href='https://github.com/eemeli/yaml/releases'>Version 1.0.0-rc.4 (changelog)</a></li>
+            <li><a href='https://github.com/eemeli/yaml/releases'>Version 1.0.0-rc.5 (changelog)</a></li>
             <li><a href='https://github.com/eemeli/yaml'>github.com/eemeli/yaml</a></li>
             <li><a href='https://www.npmjs.com/package/yaml'>npm i yaml@next</a></li>
         </ul>
@@ -552,6 +556,11 @@ target:
 </tr>
 </thead><tbody>
 <tr>
+<td>anchors</td>
+<td><a href="#anchors"><code>Anchors</code></a></td>
+<td>Anchors associated with the document&#39;s nodes; also provides alias &amp; merge node creators.</td>
+</tr>
+<tr>
 <td>commentBefore</td>
 <td><code>string?</code></td>
 <td>A comment at the very beginning of the document.</td>
@@ -717,6 +726,111 @@ target:
 <p>To construct a <code>Seq</code> or <code>Map</code>, use <a href="#yaml-createnode"><code>YAML.createNode()</code></a> with array or object input, or create the collections directly by importing the classes from <code>yaml/seq</code> and <code>yaml/map</code>.</p>
 
 <p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created by importing the class from <code>yaml/pair</code> and using its <code>new Pair(key, value)</code> constructor. Note in particular that this is required to create non-<code>string</code> keys.</p>
+<h2 id='anchors-and-alias-nodes'>Anchors and Alias Nodes</h2><pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Alias</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">source</span><span class="p">:</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">Map</span> <span class="o">|</span> <span class="nx">Seq</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">Merge</span> <span class="kr">extends</span> <span class="nx">Pair</span> <span class="p">{</span>
+  <span class="nl">key</span><span class="p">:</span> <span class="nx">Scalar</span><span class="p">(</span><span class="s1">'&lt;&lt;'</span><span class="p">),</span>      <span class="c1">// defined by the type specification</span>
+  <span class="nx">value</span><span class="p">:</span> <span class="nx">Seq</span><span class="o">&lt;</span><span class="nx">Alias</span><span class="p">(</span><span class="nx">Map</span><span class="p">)</span><span class="o">&gt;</span>  <span class="c1">// stringified as *A if length = 1</span>
+<span class="p">}</span>
+</code></pre>
+<p><code>Alias</code> nodes provide a way to include a single node in multiple places in a document; the <code>source</code> of an alias node must be a preceding node in the document. Circular references are supported at the AST level, but cannot be JSON-ified.</p>
+
+<p><code>Merge</code> nodes are not a core YAML 1.2 feature, but are defined as a <a href="http://yaml.org/type/merge.html">YAML 1.1 type</a>. They are only valid directly within a <code>Map#items</code> array and must contain one or more <code>Alias</code> nodes that themselves refer to <code>Map</code> nodes. When the surrounding map is resolved as a plain JS object, the key-value pairs of the aliased maps will be included in the object. Earlier <code>Alias</code> nodes override later ones, as do values set in the object directly.</p>
+
+<h3 id="anchors" style="clear:both">Anchors</h3>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="s1">'[{ a: A }, { b: B }, { c: C }]'</span>
+<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocuments</span><span class="p">(</span><span class="nx">src</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">anchors</span><span class="p">,</span> <span class="nx">contents</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">doc</span>
+<span class="kr">const</span> <span class="p">[</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">]</span> <span class="o">=</span> <span class="nx">contents</span><span class="p">.</span><span class="nx">items</span>
+<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">)</span> <span class="c1">// 'a1'</span>
+<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">)</span> <span class="c1">// 'a2'</span>
+<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">'a1'</span><span class="p">)</span> <span class="c1">// 'a1'</span>
+<span class="nx">anchors</span><span class="p">.</span><span class="nx">getName</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="c1">// undefined</span>
+<span class="nx">anchors</span><span class="p">.</span><span class="nx">getNode</span><span class="p">(</span><span class="s1">'a2'</span><span class="p">)</span> <span class="c1">// { value: 'B', range: [ 16, 18 ] }</span>
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// - a: A</span>
+<span class="c1">// - b: &amp;a2 B</span>
+
+<span class="kr">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="s1">'AA'</span><span class="p">)</span>
+<span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="c1">// [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]</span>
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// - &amp;AA</span>
+<span class="c1">//   a: A</span>
+<span class="c1">// - b: &amp;a2 B</span>
+<span class="c1">// - *AA</span>
+
+<span class="kr">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createMergePair</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
+<span class="nx">b</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">merge</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="c1">// [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]</span>
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// - &amp;AA</span>
+<span class="c1">//   a: A</span>
+<span class="c1">// - b: &amp;a2 B</span>
+<span class="c1">//   &lt;&lt;: *AA</span>
+<span class="c1">// - *AA</span>
+
+<span class="c1">// This creates a circular reference</span>
+<span class="nx">merge</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span> <span class="c1">// [RangeError: Maximum call stack size exceeded]</span>
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// - &amp;AA</span>
+<span class="c1">//   a: A</span>
+<span class="c1">// - &amp;a3</span>
+<span class="c1">//   b: &amp;a2 B</span>
+<span class="c1">//   &lt;&lt;:</span>
+<span class="c1">//     - *AA</span>
+<span class="c1">//     - *a3</span>
+<span class="c1">// - *AA</span>
+</code></pre><h4 id='yaml-document-anchors'><code>YAML.Document#anchors</code></h4>
+<table><thead>
+<tr>
+<th>Method</th>
+<th>Return type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>createAlias(node: Node, name?: string)</td>
+<td><code>Alias</code></td>
+<td>Create a new <code>Alias</code> node, adding the required anchor for <code>node</code>. If <code>name</code> is empty, a new anchor name will be generated.</td>
+</tr>
+<tr>
+<td>createMergePair(...Node)</td>
+<td><code>Merge</code></td>
+<td>Create a new <code>Merge</code> node with the given source nodes. Non-<code>Alias</code> sources will be automatically wrapped.</td>
+</tr>
+<tr>
+<td>getName(node: Node)</td>
+<td><code>string?</code></td>
+<td>The anchor name associated with <code>node</code>, if set.</td>
+</tr>
+<tr>
+<td>getNode(name: string)</td>
+<td><code>Node?</code></td>
+<td>The node associated with the anchor <code>name</code>, if set.</td>
+</tr>
+<tr>
+<td>newName(prefix: string)</td>
+<td><code>string</code></td>
+<td>Find an available anchor name with the given <code>prefix</code> and a numerical suffix.</td>
+</tr>
+<tr>
+<td>setAnchor(node: Node, name?: string)</td>
+<td><code>string?</code></td>
+<td>Associate an anchor with <code>node</code>. If <code>name</code> is empty, a new name will be generated.</td>
+</tr>
+</tbody></table>
+
+<p>The constructors for <code>Alias</code> and <code>Merge</code> are not directly exported by the library, as they depend on the document&#39;s anchors; instead you&#39;ll need to use <strong><code>createAlias(node, name)</code></strong> and <strong><code>createMergePair(...sources)</code></strong>. You should make sure to only add alias and merge nodes to the document after the nodes to which they refer, or the document&#39;s YAML stringification will fail.</p>
+
+<p>It is valid to have an anchor associated with a node even if it has no aliases. <code>yaml</code> will not allow you to associate the same name with more than one node, even though this is allowed by the YAML spec (all but the last instance will have numerical suffixes added). To add or reassign an anchor, use <strong><code>setAnchor(node, name)</code></strong>. The second parameter is optional, and if left out either the pre-existing anchor name of the node will be used, or a new one generated. To remove an anchor, use <code>setAnchor(null, name)</code>. The function will return the new anchor&#39;s name, or <code>null</code> if both of its arguments are <code>null</code>.</p>
+
+<p>While the <code>merge</code> option needs to be true to parse <code>Merge</code> nodes as such, this is not required during stringification.</p>
 <h2 id='comments'>Comments</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocuments</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---
