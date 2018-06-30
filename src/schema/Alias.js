@@ -2,13 +2,13 @@ import toJSON from '../toJSON'
 import Node from './Node'
 
 export default class Alias extends Node {
-  static stringify({ source }, { anchors, doc, implicitKey }) {
+  static stringify({ range, source }, { anchors, doc, implicitKey }) {
     const anchor = Object.keys(anchors).find(a => anchors[a] === source)
     if (anchor) return `*${anchor}${implicitKey ? ' ' : ''}`
     const msg = doc.anchors.getName(source)
       ? 'Alias node must be after source node'
       : 'Source node not found for alias node'
-    throw new Error(`${msg}: ${JSON.stringify(source)}`)
+    throw new Error(`${msg} [${range}]`)
   }
 
   constructor(source) {

@@ -166,6 +166,7 @@ export default class Schema {
     return match.stringify || Schema.defaultStringifier
   }
 
+  // needs to be called before stringifier to allow for circular anchor refs
   stringifyProps(node, { anchors, doc }) {
     const props = []
     const anchor = doc.anchors.getName(node)
@@ -193,8 +194,8 @@ export default class Schema {
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment)
     const stringify = this.getStringifier(item)
-    const str = stringify(item, ctx, onComment)
     const props = this.stringifyProps(item, ctx)
+    const str = stringify(item, ctx, onComment)
     return props
       ? item instanceof Collection && !ctx.inFlow && item.items.length > 0
         ? `${props}\n${ctx.indent}${str}`
