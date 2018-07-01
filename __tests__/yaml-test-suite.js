@@ -10,8 +10,14 @@ const testDirs = fs
 
 const matchJson = (docs, json) => {
   if (!json) return
-  const received = docs[0] ? docs[0].toJSON() : null
-  const expected = JSON.parse(json)
+  const received = docs[0] ? docs.map(doc => doc.toJSON()) : null
+  const expected =
+    docs.length > 1
+      ? json
+          .replace(/\n$/, '')
+          .split('\n')
+          .map(line => JSON.parse(line))
+      : [JSON.parse(json)]
   if (!received || typeof received !== 'object') {
     expect(received).toBe(expected)
   } else {
