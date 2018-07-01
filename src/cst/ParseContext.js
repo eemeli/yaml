@@ -198,6 +198,16 @@ export default class ParseContext {
     trace: node.type, node.range, JSON.stringify(node.rawValue)
     if (context.nodeStartsCollection(node)) {
       trace: 'collection-start'
+      if (
+        !node.error &&
+        !context.atLineStart &&
+        context.parent.type === Type.DOCUMENT
+      ) {
+        node.error = new YAMLSyntaxError(
+          node,
+          'Block collection must not have preceding content here (e.g. directives-end indicator)'
+        )
+      }
       const collection = new Collection(node)
       offset = collection.parse(new ParseContext(context), offset)
       collection.range = new Range(start, offset)

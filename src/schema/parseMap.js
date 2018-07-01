@@ -97,6 +97,7 @@ function resolveBlockMapItems(doc, cst) {
         if (key !== undefined) items.push(new Pair(key))
         key = doc.resolveNode(item)
         keyStart = item.range.start
+        if (item.error) doc.errors.push(item.error)
         const nextItem = cst.items[i + 1]
         if (!nextItem || nextItem.type !== Type.MAP_VALUE)
           doc.errors.push(

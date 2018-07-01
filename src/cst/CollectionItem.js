@@ -21,7 +21,7 @@ export default class CollectionItem extends Node {
     if (!atLineStart && this.type === Type.SEQ_ITEM)
       this.error = new YAMLSemanticError(
         this,
-        'Sequence items are not allowed on the same line with map keys'
+        'Sequence items must not have preceding content on the same line'
       )
     const indent = atLineStart ? start - lineStart : context.indent
     let offset = Node.endOfWhiteSpace(src, start + 1)

@@ -37,6 +37,7 @@ function resolveBlockSeqItems(doc, cst) {
           )
         break
       default:
+        if (item.error) doc.errors.push(item.error)
         doc.errors.push(
           new YAMLSyntaxError(item, `Unexpected ${item.type} node in sequence`)
         )
