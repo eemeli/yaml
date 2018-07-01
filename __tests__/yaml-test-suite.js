@@ -66,7 +66,7 @@ testDirs.forEach(dir => {
     } else {
       expect(errors).toHaveLength(0)
       const src2 =
-        docs.map(doc => String(doc).replace(/\n$/, '')).join('\n---\n') + '\n'
+        docs.map(doc => String(doc).replace(/\n$/, '')).join('\n...\n') + '\n'
       const docs2 = YAML.parseDocuments(src2)
       trace: name,
         '\nIN\n' + yaml,
