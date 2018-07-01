@@ -14,6 +14,20 @@ describe('folded block with chomp: keep', () => {
   })
 })
 
+describe('folded block with indent indicator + leading empty lines + leading whitespace', () => {
+  test('one blank line', () => {
+    const src = '>1\n\n line\n'
+    const doc = parse(src)[0]
+    expect(doc.contents[0].strValue).toBe('\n line\n')
+  })
+
+  test('two blank lines', () => {
+    const src = '>1\n\n\n line\n'
+    const doc = parse(src)[0]
+    expect(doc.contents[0].strValue).toBe('\n\n line\n')
+  })
+})
+
 describe('multiple linebreaks in scalars', () => {
   test('plain', () => {
     const src = `trimmed\n\n\n\nlines\n`

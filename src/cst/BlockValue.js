@@ -42,6 +42,7 @@ export default class BlockValue extends Node {
     }
     const bi = indent + this.blockIndent
     const folded = this.type === Type.BLOCK_FOLDED
+    let atStart = true
     let str = ''
     let sep = ''
     let prevMoreIndented = false
@@ -56,11 +57,11 @@ export default class BlockValue extends Node {
         else sep = '\n'
       } else {
         const lineEnd = Node.endOfLine(src, i)
-        let line = src.slice(i, lineEnd)
+        const line = src.slice(i, lineEnd)
         i = lineEnd
         if (folded && (ch === ' ' || ch === '\t') && i < keepStart) {
           if (sep === ' ') sep = '\n'
-          else if (!prevMoreIndented && sep === '\n') sep = '\n\n'
+          else if (!prevMoreIndented && !atStart && sep === '\n') sep = '\n\n'
           str += sep + line //+ ((lineEnd < end && src[lineEnd]) || '')
           sep = (lineEnd < end && src[lineEnd]) || ''
           prevMoreIndented = true
@@ -69,6 +70,7 @@ export default class BlockValue extends Node {
           sep = folded && i < keepStart ? ' ' : '\n'
           prevMoreIndented = false
         }
+        if (atStart && line !== '') atStart = false
       }
     }
     return this.chomping === Chomp.STRIP ? str : str + '\n'

@@ -15,4 +15,8 @@ export default class Range {
   get length() {
     return this.isEmpty ? 0 : this.end - this.start
   }
+
+  apply(src) {
+    return this.isEmpty ? '' : src.slice(this.start, this.end)
+  }
 }
