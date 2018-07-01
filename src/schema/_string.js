@@ -139,8 +139,11 @@ function blockString(
   comment,
   onComment
 ) {
-  // block can't end in whitespace unless the last line is non-empty
-  if (/\n[\t ]+$/.test(value)) return doubleQuotedString(value, indent, false)
+  // Block can't end in whitespace unless the last line is non-empty
+  // Strings consisting of only whitespace are best rendered explicitly
+  if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
+    return doubleQuotedString(value, indent, false)
+  }
   if (forceBlockIndent && !indent) indent = ' '
   const indentSize = indent ? '2' : '1' // root is at -1
   let header = literal ? '|' : '>'
