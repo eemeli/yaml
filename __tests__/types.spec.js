@@ -141,7 +141,7 @@ english: null
   })
 })
 
-describe('extended schema', () => {
+describe('YAML 1.1 schema', () => {
   test('!!binary', () => {
     const src = `canonical: !!binary "\\
  R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5\\
@@ -156,7 +156,7 @@ generic: !!binary |
 description:
  The binary value above is a tiny arrow encoded as a gif image.`
 
-    const doc = YAML.parseDocuments(src, { schema: 'extended' })[0]
+    const doc = YAML.parseDocuments(src, { schema: 'yaml-1.1' })[0]
     const canonical = doc.contents.items[0].value.value
     const generic = doc.contents.items[1].value.value
     expect(canonical).toBeInstanceOf(Uint8Array)
@@ -179,7 +179,7 @@ answer: NO
 logical: True
 option: on`
 
-    expect(YAML.parse(src, { schema: 'extended' })).toMatchObject({
+    expect(YAML.parse(src, { schema: 'yaml-1.1' })).toMatchObject({
       canonical: true,
       answer: false,
       logical: true,
@@ -195,7 +195,7 @@ sexagesimal: 190:20:30.15
 negative infinity: -.inf
 not a number: .NaN`
 
-    expect(YAML.parse(src, { schema: 'extended' })).toMatchObject({
+    expect(YAML.parse(src, { schema: 'yaml-1.1' })).toMatchObject({
       canonical: 685230.15,
       exponential: 685230.15,
       fixed: 685230.15,
@@ -213,7 +213,7 @@ hexadecimal: 0x_0A_74_AE
 binary: 0b1010_0111_0100_1010_1110
 sexagesimal: 190:20:30`
 
-    expect(YAML.parse(src, { schema: 'extended' })).toMatchObject({
+    expect(YAML.parse(src, { schema: 'yaml-1.1' })).toMatchObject({
       canonical: 685230,
       decimal: 685230,
       octal: 685230,
@@ -229,7 +229,7 @@ canonical: ~
 english: null
 ~: null key`
 
-    expect(YAML.parse(src, { schema: 'extended' })).toMatchObject({
+    expect(YAML.parse(src, { schema: 'yaml-1.1' })).toMatchObject({
       empty: null,
       canonical: null,
       english: null,
@@ -244,7 +244,7 @@ space separated:  2001-12-14 21:59:43.10 -5
 no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
-    expect(YAML.parse(src, { schema: 'extended' })).toMatchObject({
+    expect(YAML.parse(src, { schema: 'yaml-1.1' })).toMatchObject({
       canonical: '2001-12-15T02:59:43.100Z',
       'valid iso8601': '2001-12-15T02:59:43.100Z',
       'space separated': '2001-12-15T02:59:43.100Z',

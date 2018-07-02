@@ -4,19 +4,19 @@ import { YAMLReferenceError, YAMLWarning } from '../errors'
 import Alias from './Alias'
 import Collection from './Collection'
 import core from './core'
-import extended from './extended'
 import failsafe from './failsafe'
 import json from './json'
 import Node from './Node'
 import Pair from './Pair'
 import Scalar from './Scalar'
 import { resolve as resolveStr } from './_string'
+import yaml11 from './yaml-1.1'
 
 export const availableSchema = {
   core,
-  extended,
   failsafe,
-  json
+  json,
+  'yaml-1.1': yaml11
 }
 
 const defaultPrefix = 'tag:yaml.org,2002:'

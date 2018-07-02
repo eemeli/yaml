@@ -1,4 +1,3 @@
-import { Type } from '../src/cst/Node'
 import YAML from '../src/index'
 import { strOptions } from '../src/schema/_string'
 
@@ -373,7 +372,7 @@ date: 2002-12-14`,
       ],
       special: src => {
         const { canonical, iso8601, spaced, date } = YAML.parse(src, {
-          schema: 'extended'
+          schema: 'yaml-1.1'
         })
         expect(canonical).toBe(new Date('2001-12-15T02:59:43.1Z').toJSON())
         expect(iso8601).toBe(new Date('2001-12-14t21:59:43.10-05:00').toJSON())
@@ -412,7 +411,7 @@ application specific tag: !something |
         ]
       ],
       special: src => {
-        const doc = YAML.parseDocuments(src, { schema: 'extended' })[0]
+        const doc = YAML.parseDocuments(src, { schema: 'yaml-1.1' })[0]
         const data = doc.contents.items[1].value.value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)
