@@ -55,14 +55,14 @@
     "singleQuote": true
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.46",
-    "@babel/core": "^7.0.0-beta.46",
-    "@babel/preset-env": "^7.0.0-beta.46",
-    "@babel/preset-stage-3": "^7.0.0-beta.46",
+    "@babel/cli": "^7.0.0-beta.51",
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "@babel/preset-stage-3": "^7.0.0-beta.51",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^22.4.3",
+    "babel-jest": "^23.2.0",
     "babel-plugin-trace": "^1.1.0",
-    "jest": "^22.4.3",
+    "jest": "^23.2.0",
     "prettier": "1.12.1"
   },
   "dependencies": {},
