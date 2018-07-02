@@ -43,7 +43,7 @@ export default class Schema {
 
   constructor({ merge, schema, tags }) {
     this.merge = !!merge
-    this.schema = Array.isArray(schema) ? schema : availableSchema[schema]
+    this.schema = availableSchema[schema]
     if (!this.schema) {
       const keys = Object.keys(availableSchema)
         .map(key => JSON.stringify(key))
@@ -57,6 +57,7 @@ export default class Schema {
     } else if (typeof tags === 'function') {
       this.schema = tags(this.schema.slice())
     }
+    this.version = schema === 'yaml-1.1' ? '1.1' : '1.2'
   }
 
   // falls back to string on no match

@@ -17,16 +17,33 @@ const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
 export default class Document {
-  constructor(schema) {
+  static defaults = {
+    '1.1': { schema: 'yaml-1.1', merge: true },
+    '1.2': { schema: 'core', merge: false }
+  }
+
+  constructor(options) {
     this.anchors = new Anchors()
     this.commentBefore = null
     this.comment = null
     this.contents = null
     this.errors = []
+    this.options = options
+    this.schema = null
     this.tagPrefixes = []
-    this.schema = schema instanceof Schema ? schema : new Schema(schema)
     this.version = null
     this.warnings = []
+  }
+
+  setSchema() {
+    if (this.schema) return
+    const version =
+      this.version == '1.1' || this.version == '1.2'
+        ? String(this.version)
+        : this.options.version
+    this.schema = new Schema(
+      Object.assign({}, Document.defaults[version], this.options)
+    )
   }
 
   parse({ directives = [], contents = [], error }) {
@@ -55,6 +72,7 @@ export default class Document {
       }
       if (comment) directiveComments.push(comment)
     })
+    this.setSchema()
     this.anchors._cstAliases = []
     this.commentBefore = directiveComments.join('\n') || null
     const comments = { before: [], after: [] }
@@ -134,29 +152,23 @@ export default class Document {
   }
 
   resolveYamlDirective(directive) {
-    const [version] = directive.parameters
-    if (this.version)
-      this.errors.push(
-        new YAMLSemanticError(
-          directive,
-          'The %YAML directive must only be given at most once per document.'
-        )
-      )
-    if (!version)
-      this.errors.push(
-        new YAMLSemanticError(
-          directive,
-          'Insufficient parameters given for %YAML directive'
-        )
-      )
-    else if (version !== '1.2')
-      this.warnings.push(
-        new YAMLWarning(
-          directive,
-          `Document will be parsed as YAML 1.2 rather than YAML ${version}`
-        )
-      )
-    this.version = version
+    let [version] = directive.parameters
+    if (this.version) {
+      const msg =
+        'The %YAML directive must only be given at most once per document.'
+      this.errors.push(new YAMLSemanticError(directive, msg))
+    }
+    if (!version) {
+      const msg = 'Insufficient parameters given for %YAML directive'
+      this.errors.push(new YAMLSemanticError(directive, msg))
+    } else {
+      if (version !== '1.1' && version !== '1.2') {
+        const v0 = this.version || this.options.version
+        const msg = `Document will be parsed as YAML ${v0} rather than YAML ${version}`
+        this.warnings.push(new YAMLWarning(directive, msg))
+      }
+      this.version = version
+    }
   }
 
   resolveTagName(node) {
@@ -360,11 +372,12 @@ export default class Document {
   toString() {
     if (this.errors.length > 0)
       throw new Error('Document with errors cannot be stringified')
+    this.setSchema()
     const lines = []
     if (this.commentBefore) lines.push(this.commentBefore.replace(/^/gm, '#'))
     let hasDirectives = false
     if (this.version) {
-      lines.push('%YAML 1.2')
+      lines.push(`%YAML ${this.schema.version}`)
       hasDirectives = true
     }
     const tagNames = this.listNonDefaultTags()

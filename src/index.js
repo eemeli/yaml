@@ -1,20 +1,16 @@
 import parseCST from './cst/parse'
 import createNode from './createNode'
 import Document from './Document'
-import Schema from './schema'
 
 const defaultOptions = {
-  merge: false,
-  schema: 'core',
-  tags: null
+  tags: null,
+  version: '1.2'
 }
 
 function parseDocuments(src, options) {
-  const resolvedOptions = options
-    ? Object.assign({}, defaultOptions, options)
-    : defaultOptions
-  const schema = new Schema(resolvedOptions)
-  return parseCST(src).map(astDoc => new Document(schema).parse(astDoc))
+  return parseCST(src).map(astDoc =>
+    new Document(Object.assign({}, defaultOptions, options)).parse(astDoc)
+  )
 }
 
 function parse(src, options) {
@@ -34,10 +30,7 @@ function parse(src, options) {
 }
 
 function stringify(value, options) {
-  const resolvedOptions = options
-    ? Object.assign({}, defaultOptions, options)
-    : defaultOptions
-  const doc = new Document(resolvedOptions)
+  const doc = new Document(Object.assign({}, defaultOptions, options))
   doc.contents = value
   return String(doc)
 }
@@ -46,12 +39,8 @@ export default {
   createNode,
   defaultOptions,
   Document: class extends Document {
-    constructor(schema) {
-      if (schema instanceof Schema) {
-        super(schema)
-      } else {
-        super(Object.assign({}, defaultOptions, schema))
-      }
+    constructor(options) {
+      super(Object.assign({}, defaultOptions, options))
     }
   },
   parse,

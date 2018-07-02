@@ -949,7 +949,6 @@ foo`,
       errors: [
         ['The %YAML directive must only be given at most once per document.']
       ],
-      warnings: [['Document will be parsed as YAML 1.2 rather than YAML 1.1']],
       special: src => {
         const doc = YAML.parseDocuments(src)[0]
         expect(doc.version).toBe('1.1')
