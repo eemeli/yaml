@@ -18,6 +18,7 @@ const isCollectionItem = node =>
 
 export default class Document {
   static defaults = {
+    '1.0': { schema: 'yaml-1.1', merge: true },
     '1.1': { schema: 'yaml-1.1', merge: true },
     '1.2': { schema: 'core', merge: false }
   }
@@ -37,13 +38,9 @@ export default class Document {
 
   setSchema() {
     if (this.schema) return
-    const version =
-      this.version == '1.1' || this.version == '1.2'
-        ? String(this.version)
-        : this.options.version
-    this.schema = new Schema(
-      Object.assign({}, Document.defaults[version], this.options)
-    )
+    const defaults =
+      Document.defaults[this.version] || Document.defaults[this.options.version]
+    this.schema = new Schema(Object.assign({}, defaults, this.options))
   }
 
   parse({ directives = [], contents = [], error }) {
@@ -59,6 +56,7 @@ export default class Document {
           this.resolveTagDirective(directive)
           break
         case 'YAML':
+        case 'YAML:1.0':
           this.resolveYamlDirective(directive)
           break
         default:
@@ -153,6 +151,7 @@ export default class Document {
 
   resolveYamlDirective(directive) {
     let [version] = directive.parameters
+    if (directive.name === 'YAML:1.0') version = '1.0'
     if (this.version) {
       const msg =
         'The %YAML directive must only be given at most once per document.'
@@ -162,7 +161,7 @@ export default class Document {
       const msg = 'Insufficient parameters given for %YAML directive'
       this.errors.push(new YAMLSemanticError(directive, msg))
     } else {
-      if (version !== '1.1' && version !== '1.2') {
+      if (!Document.defaults[version]) {
         const v0 = this.version || this.options.version
         const msg = `Document will be parsed as YAML ${v0} rather than YAML ${version}`
         this.warnings.push(new YAMLWarning(directive, msg))
@@ -377,7 +376,12 @@ export default class Document {
     if (this.commentBefore) lines.push(this.commentBefore.replace(/^/gm, '#'))
     let hasDirectives = false
     if (this.version) {
-      lines.push(`%YAML ${this.schema.version}`)
+      let vd = '%YAML 1.2'
+      if (this.schema.name === 'yaml-1.1') {
+        if (this.version === '1.0') vd = '%YAML:1.0'
+        else if (this.version === '1.1') vd = '%YAML 1.1'
+      }
+      lines.push(vd)
       hasDirectives = true
     }
     const tagNames = this.listNonDefaultTags()

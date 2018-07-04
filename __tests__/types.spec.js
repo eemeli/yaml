@@ -318,4 +318,25 @@ describe('custom tags', () => {
 - "5" #cc\n`
     )
   })
+
+  test('YAML 1.0', () => {
+    const src = `%YAML:1.0
+---
+empty:
+octal: 02472256
+~: ~`
+
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.version).toBe('1.0')
+    expect(doc.toJSON()).toMatchObject({
+      empty: null,
+      octal: 685230,
+      '': null
+    })
+    expect(String(doc)).toBe(`%YAML:1.0
+---
+empty: null
+octal: 685230
+null: null\n`)
+  })
 })
