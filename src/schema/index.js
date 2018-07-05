@@ -131,9 +131,9 @@ export default class Schema {
     let match
     if (item.tag) {
       match = this.schema.find(
-        ({ format, tag }) =>
-          tag === item.tag && (!item.format || format === item.format)
+        ({ format, tag }) => tag === item.tag && format === item.format
       )
+      if (!match) match = this.schema.find(({ tag }) => tag === item.tag)
       if (match) return match.stringify || Schema.defaultStringifier
     }
     if (item.value === null) {
