@@ -324,6 +324,7 @@ describe('custom tags', () => {
 ---
 empty:
 octal: 02472256
+number: !int '123'
 ~: ~`
 
     const doc = YAML.parseDocuments(src)[0]
@@ -331,12 +332,14 @@ octal: 02472256
     expect(doc.toJSON()).toMatchObject({
       empty: null,
       octal: 685230,
+      number: 123,
       '': null
     })
     expect(String(doc)).toBe(`%YAML:1.0
 ---
 empty: null
 octal: 685230
+number: 123
 null: null\n`)
   })
 })

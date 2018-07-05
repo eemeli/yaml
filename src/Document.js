@@ -8,7 +8,7 @@ import {
   YAMLWarning
 } from './errors'
 import listTagNames from './listTagNames'
-import Schema, { DefaultTagPrefixes, DefaultTags } from './schema'
+import Schema, { defaultPrefix, DefaultTags } from './schema'
 import Alias from './schema/Alias'
 import Collection from './schema/Collection'
 import toJSON from './toJSON'
@@ -18,9 +18,30 @@ const isCollectionItem = node =>
 
 export default class Document {
   static defaults = {
-    '1.0': { schema: 'yaml-1.1', merge: true },
-    '1.1': { schema: 'yaml-1.1', merge: true },
-    '1.2': { schema: 'core', merge: false }
+    '1.0': {
+      schema: 'yaml-1.1',
+      merge: true,
+      tagPrefixes: [
+        { handle: '!', prefix: defaultPrefix },
+        { handle: '!!', prefix: '!' }
+      ]
+    },
+    '1.1': {
+      schema: 'yaml-1.1',
+      merge: true,
+      tagPrefixes: [
+        { handle: '!', prefix: '!' },
+        { handle: '!!', prefix: defaultPrefix }
+      ]
+    },
+    '1.2': {
+      schema: 'core',
+      merge: false,
+      tagPrefixes: [
+        { handle: '!', prefix: '!' },
+        { handle: '!!', prefix: defaultPrefix }
+      ]
+    }
   }
 
   constructor(options) {
@@ -36,11 +57,19 @@ export default class Document {
     this.warnings = []
   }
 
+  getDefaults() {
+    return (
+      Document.defaults[this.version] ||
+      Document.defaults[this.options.version] ||
+      {}
+    )
+  }
+
   setSchema() {
-    if (this.schema) return
-    const defaults =
-      Document.defaults[this.version] || Document.defaults[this.options.version]
-    this.schema = new Schema(Object.assign({}, defaults, this.options))
+    if (!this.schema)
+      this.schema = new Schema(
+        Object.assign({}, this.getDefaults(), this.options)
+      )
   }
 
   parse({ directives = [], contents = [], error }) {
@@ -186,9 +215,11 @@ export default class Document {
       } else if (handle === '!' && !suffix) {
         nonSpecific = true
       } else {
-        const prefix =
-          this.tagPrefixes.find(p => p.handle === handle) ||
-          DefaultTagPrefixes.find(p => p.handle === handle)
+        let prefix = this.tagPrefixes.find(p => p.handle === handle)
+        if (!prefix) {
+          const dtp = this.getDefaults().tagPrefixes
+          if (dtp) prefix = dtp.find(p => p.handle === handle)
+        }
         if (prefix) {
           if (suffix) return prefix.prefix + suffix
           this.errors.push(
@@ -346,8 +377,9 @@ export default class Document {
   }
 
   listNonDefaultTags() {
-    const { prefix } = DefaultTagPrefixes.find(p => p.handle === '!!')
-    return listTagNames(this.contents).filter(t => t.indexOf(prefix) !== 0)
+    return listTagNames(this.contents).filter(
+      t => t.indexOf(defaultPrefix) !== 0
+    )
   }
 
   setTagPrefix(handle, prefix) {

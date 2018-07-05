@@ -19,12 +19,7 @@ export const availableSchema = {
   'yaml-1.1': yaml11
 }
 
-const defaultPrefix = 'tag:yaml.org,2002:'
-
-export const DefaultTagPrefixes = [
-  { handle: '!', prefix: '!' },
-  { handle: '!!', prefix: defaultPrefix }
-]
+export const defaultPrefix = 'tag:yaml.org,2002:'
 
 export const DefaultTags = {
   MAP: 'tag:yaml.org,2002:map',
