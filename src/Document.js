@@ -23,7 +23,7 @@ export default class Document {
       merge: true,
       tagPrefixes: [
         { handle: '!', prefix: defaultPrefix },
-        { handle: '!!', prefix: '!' }
+        { handle: '!!', prefix: 'tag:private.yaml.org,2002:' }
       ]
     },
     '1.1': {
@@ -221,7 +221,22 @@ export default class Document {
           if (dtp) prefix = dtp.find(p => p.handle === handle)
         }
         if (prefix) {
-          if (suffix) return prefix.prefix + suffix
+          if (suffix) {
+            if (
+              handle === '!' &&
+              (this.version || this.options.version) === '1.0'
+            ) {
+              if (suffix[0] === '^') return suffix
+              if (/[:/]/.test(suffix)) {
+                // word/foo -> tag:word.yaml.org,2002:foo
+                const vocab = suffix.match(/^([a-z0-9-]+)\/(.*)/i)
+                return vocab
+                  ? `tag:${vocab[1]}.yaml.org,2002:${vocab[2]}`
+                  : `tag:${suffix}`
+              }
+            }
+            return prefix.prefix + suffix
+          }
           this.errors.push(
             new YAMLSemanticError(node, `The ${handle} tag has no suffix.`)
           )
@@ -391,6 +406,19 @@ export default class Document {
       else this.tagPrefixes.push({ handle, prefix })
     } else {
       this.tagPrefixes = this.tagPrefixes.filter(p => p.handle !== handle)
+    }
+  }
+
+  stringifyTag(tag) {
+    if ((this.version || this.options.version) === '1.0') {
+      const priv = tag.match(/^tag:private\.yaml\.org,2002:([^:/]+)$/)
+      if (priv) return '!' + priv[1]
+      const vocab = tag.match(/^tag:([a-zA-Z0-9-]+)\.yaml\.org,2002:(.*)/)
+      return vocab ? `!${vocab[1]}/${vocab[2]}` : `!${tag.replace(/^tag:/, '')}`
+    } else {
+      const p = this.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
+      if (p) return p.handle + tag.substr(p.prefix.length)
+      return tag[0] === '!' ? tag : `!<${tag}>`
     }
   }
 

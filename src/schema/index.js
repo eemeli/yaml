@@ -173,14 +173,7 @@ export default class Schema {
     const { tag } = node
     // FIXME: should read prefix-skip from schema
     if (tag && tag.indexOf(defaultPrefix) !== 0) {
-      const p = doc.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
-      props.push(
-        p
-          ? p.handle + tag.substr(p.prefix.length)
-          : tag[0] === '!'
-            ? tag
-            : `!<${tag}>`
-      )
+      props.push(doc.stringifyTag(tag))
     }
     return props.join(' ')
   }

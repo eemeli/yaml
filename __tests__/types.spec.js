@@ -319,27 +319,57 @@ describe('custom tags', () => {
     )
   })
 
-  test('YAML 1.0', () => {
+  test('YAML 1.0 explicit tags', () => {
     const src = `%YAML:1.0
 ---
-empty:
-octal: 02472256
+date: 2001-01-23
 number: !int '123'
-~: ~`
+string: !str 123
+pool: !!ball { number: 8 }
+perl: !perl/Text::Tabs {}`
 
     const doc = YAML.parseDocuments(src)[0]
     expect(doc.version).toBe('1.0')
     expect(doc.toJSON()).toMatchObject({
-      empty: null,
-      octal: 685230,
+      date: '2001-01-23T00:00:00.000Z',
       number: 123,
-      '': null
+      string: '123',
+      pool: { number: 8 },
+      perl: {}
     })
     expect(String(doc)).toBe(`%YAML:1.0
 ---
-empty: null
-octal: 685230
+date: 2001-01-23T00:00:00.000Z
 number: 123
-null: null\n`)
+string: \"123\"
+pool:
+  !ball
+  number: 8
+perl:
+  !perl/Text::Tabs {}\n`)
+  })
+
+  test('YAML 1.0 tag prefixing', () => {
+    const src = `%YAML:1.0
+---
+invoice: !domain.tld,2002/^invoice
+  customers: !seq
+    - !^customer
+      given : Chris
+      family : Dumars`
+
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.version).toBe('1.0')
+    expect(doc.toJSON()).toMatchObject({
+      invoice: { customers: [{ family: 'Dumars', given: 'Chris' }] }
+    })
+    expect(String(doc)).toBe(`%YAML:1.0
+---
+invoice:
+  !domain.tld,2002/^invoice
+  customers:
+    - !^customer
+      given: Chris
+      family: Dumars\n`)
   })
 })
