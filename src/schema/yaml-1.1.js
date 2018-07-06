@@ -38,7 +38,7 @@ export default failsafe.concat(
     {
       class: Number,
       tag: 'tag:yaml.org,2002:int',
-      format: 'bin',
+      format: 'BIN',
       test: /^0b([0-1_]+)$/,
       resolve: (str, bin) => parseInt(bin.replace(/_/g, ''), 2),
       stringify: ({ value }) => '0b' + value.toString(2)
@@ -46,7 +46,7 @@ export default failsafe.concat(
     {
       class: Number,
       tag: 'tag:yaml.org,2002:int',
-      format: 'oct',
+      format: 'OCT',
       test: /^[-+]?0([0-7_]+)$/,
       resolve: (str, oct) => parseInt(oct.replace(/_/g, ''), 8),
       stringify: ({ value }) => (value < 0 ? '-0' : '0') + value.toString(8)
@@ -61,7 +61,7 @@ export default failsafe.concat(
     {
       class: Number,
       tag: 'tag:yaml.org,2002:int',
-      format: 'hex',
+      format: 'HEX',
       test: /^0x([0-9a-fA-F_]+)$/,
       resolve: (str, hex) => parseInt(hex.replace(/_/g, ''), 16),
       stringify: ({ value }) => (value < 0 ? '-0x' : '0x') + value.toString(16)

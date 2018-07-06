@@ -29,7 +29,7 @@ export default failsafe.concat([
   {
     class: Number,
     tag: 'tag:yaml.org,2002:int',
-    format: 'oct',
+    format: 'OCT',
     test: /^0o([0-7]+)$/,
     resolve: (str, oct) => parseInt(oct, 8),
     stringify: ({ value }) => '0o' + value.toString(8)
@@ -44,7 +44,7 @@ export default failsafe.concat([
   {
     class: Number,
     tag: 'tag:yaml.org,2002:int',
-    format: 'hex',
+    format: 'HEX',
     test: /^0x([0-9a-fA-F]+)$/,
     resolve: (str, hex) => parseInt(hex, 16),
     stringify: ({ value }) => '0x' + value.toString(16)

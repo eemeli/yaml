@@ -88,14 +88,16 @@ describe('core schema', () => {
     const src = `canonical: true
 answer: FALSE
 logical: True
-option: TruE`
+option: TruE\n`
 
-    expect(YAML.parse(src)).toMatchObject({
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.toJSON()).toMatchObject({
       canonical: true,
       answer: false,
       logical: true,
       option: true
     })
+    expect(String(doc)).toBe(src.toLowerCase())
   })
 
   test('!!float', () => {
@@ -104,12 +106,17 @@ fixed: 685230.15
 negative infinity: -.inf
 not a number: .NaN`
 
-    expect(YAML.parse(src)).toMatchObject({
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.toJSON()).toMatchObject({
       canonical: 685230.15,
       fixed: 685230.15,
       'negative infinity': Number.NEGATIVE_INFINITY,
       'not a number': NaN
     })
+    expect(String(doc)).toBe(`canonical: 685230.15
+fixed: 685230.15
+negative infinity: -.inf
+not a number: .nan\n`)
   })
 
   test('!!int', () => {
@@ -118,12 +125,17 @@ decimal: +685230
 octal: 0o2472256
 hexadecimal: 0x0A74AE`
 
-    expect(YAML.parse(src)).toMatchObject({
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.toJSON()).toMatchObject({
       canonical: 685230,
       decimal: 685230,
       octal: 685230,
       hexadecimal: 685230
     })
+    expect(String(doc)).toBe(`canonical: 685230
+decimal: 685230
+octal: 0o2472256
+hexadecimal: 0xa74ae\n`)
   })
 
   test('!!null', () => {
@@ -132,12 +144,17 @@ canonical: ~
 english: null
 ~: null key`
 
-    expect(YAML.parse(src)).toMatchObject({
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.toJSON()).toMatchObject({
       empty: null,
       canonical: null,
       english: null,
       '': 'null key'
     })
+    expect(String(doc)).toBe(`empty: null
+canonical: null
+english: null
+null: null key\n`)
   })
 })
 
@@ -180,12 +197,17 @@ answer: NO
 logical: True
 option: on`
 
-    expect(YAML.parse(src, { version: '1.1' })).toMatchObject({
+    const doc = YAML.parseDocuments(src, { version: '1.1' })[0]
+    expect(doc.toJSON()).toMatchObject({
       canonical: true,
       answer: false,
       logical: true,
       option: true
     })
+    expect(String(doc)).toBe(`canonical: true
+answer: false
+logical: true
+option: true\n`)
   })
 
   test('!!float', () => {
@@ -198,7 +220,8 @@ sexagesimal: 190:20:30.15
 negative infinity: -.inf
 not a number: .NaN`
 
-    expect(YAML.parse(src)).toMatchObject({
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.toJSON()).toMatchObject({
       canonical: 685230.15,
       exponential: 685230.15,
       fixed: 685230.15,
@@ -206,6 +229,14 @@ not a number: .NaN`
       'negative infinity': Number.NEGATIVE_INFINITY,
       'not a number': NaN
     })
+    expect(String(doc)).toBe(`%YAML 1.1
+---
+canonical: 685230.15
+exponential: 685230.15
+fixed: 685230.15
+sexagesimal: 190:20:30.15
+negative infinity: -.inf
+not a number: .nan\n`)
   })
 
   test('!!int', () => {
@@ -218,7 +249,8 @@ hexadecimal: 0x_0A_74_AE
 binary: 0b1010_0111_0100_1010_1110
 sexagesimal: 190:20:30`
 
-    expect(YAML.parse(src)).toMatchObject({
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.toJSON()).toMatchObject({
       canonical: 685230,
       decimal: 685230,
       octal: 685230,
@@ -226,6 +258,14 @@ sexagesimal: 190:20:30`
       binary: 685230,
       sexagesimal: 685230
     })
+    expect(String(doc)).toBe(`%YAML 1.1
+---
+canonical: 685230
+decimal: 685230
+octal: 02472256
+hexadecimal: 0xa74ae
+binary: 0b10100111010010101110
+sexagesimal: 190:20:30\n`)
   })
 
   test('!!null', () => {
@@ -236,12 +276,19 @@ canonical: ~
 english: null
 ~: null key`
 
-    expect(YAML.parse(src)).toMatchObject({
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.toJSON()).toMatchObject({
       empty: null,
       canonical: null,
       english: null,
       '': 'null key'
     })
+    expect(String(doc)).toBe(`%YAML 1.1
+---
+empty: null
+canonical: null
+english: null
+null: null key\n`)
   })
 
   test('!!timestamp', () => {
@@ -253,13 +300,21 @@ space separated:  2001-12-14 21:59:43.10 -5
 no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
-    expect(YAML.parse(src)).toMatchObject({
+    const doc = YAML.parseDocuments(src)[0]
+    expect(doc.toJSON()).toMatchObject({
       canonical: '2001-12-15T02:59:43.100Z',
       'valid iso8601': '2001-12-15T02:59:43.100Z',
       'space separated': '2001-12-15T02:59:43.100Z',
       'no time zone (Z)': '2001-12-15T02:59:43.100Z',
       'date (00:00:00Z)': '2002-12-14T00:00:00.000Z'
     })
+    expect(String(doc)).toBe(`%YAML 1.1
+---
+canonical: 2001-12-15T02:59:43.100Z
+valid iso8601: 2001-12-15T02:59:43.100Z
+space separated: 2001-12-15T02:59:43.100Z
+no time zone (Z): 2001-12-15T02:59:43.100Z
+date (00:00:00Z): 2002-12-14T00:00:00.000Z\n`)
   })
 })
 

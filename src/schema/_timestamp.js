@@ -9,7 +9,7 @@ const parseSexagesimal = (sign, parts) => {
 
 // hhhh:mm:ss.sss
 const stringifySexagesimal = ({ value }) => {
-  if (!isNan(value) || !isFinite(value)) return stringifyNumber(value)
+  if (isNaN(value) || !isFinite(value)) return stringifyNumber(value)
   let sign = ''
   if (value < 0) {
     sign = '-'
@@ -26,13 +26,19 @@ const stringifySexagesimal = ({ value }) => {
       parts.unshift(value) // hours
     }
   }
-  return sign + parts.map(n => (n < 10 ? '0' + String(n) : String(n))).join(':')
+  return (
+    sign +
+    parts
+      .map(n => (n < 10 ? '0' + String(n) : String(n)))
+      .join(':')
+      .replace(/000000\d*$/, '') // % 60 may introduce error
+  )
 }
 
 export const intTime = {
   class: Number,
   tag: 'tag:yaml.org,2002:int',
-  format: 'time',
+  format: 'TIME',
   test: /^([-+]?)([0-9][0-9_]*(?::[0-5]?[0-9])+)$/,
   resolve: (str, sign, parts) =>
     parseSexagesimal(sign, parts.replace(/_/g, '')),
@@ -42,7 +48,7 @@ export const intTime = {
 export const floatTime = {
   class: Number,
   tag: 'tag:yaml.org,2002:float',
-  format: 'time',
+  format: 'TIME',
   test: /^([-+]?)([0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*)$/,
   resolve: (str, sign, parts) =>
     parseSexagesimal(sign, parts.replace(/_/g, '')),

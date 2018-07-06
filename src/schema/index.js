@@ -59,10 +59,14 @@ export default class Schema {
   resolveScalar(str, tags) {
     if (!tags) tags = this.schema
     for (let i = 0; i < tags.length; ++i) {
-      const { test, resolve } = tags[i]
+      const { format, test, resolve } = tags[i]
       if (test) {
         const match = str.match(test)
-        if (match) return new Scalar(resolve.apply(null, match))
+        if (match) {
+          const res = new Scalar(resolve.apply(null, match))
+          if (format) res.format = format
+          return res
+        }
       }
     }
     if (this.schema.scalarFallback) str = this.schema.scalarFallback(str)
@@ -152,8 +156,13 @@ export default class Schema {
         }
       }
       match = this.schema.find(
-        t => t.class && obj instanceof t.class && !t.format
+        t => t.class && obj instanceof t.class && t.format === item.format
       )
+      if (!match) {
+        match = this.schema.find(
+          t => t.class && obj instanceof t.class && !t.format
+        )
+      }
       if (!match) {
         const name = obj && obj.constructor ? obj.constructor.name : typeof obj
         throw new Error(`Tag not resolved for ${name}`)
