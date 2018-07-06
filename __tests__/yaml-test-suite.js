@@ -56,7 +56,7 @@ testDirs.forEach(dir => {
   } catch (e) {}
   if (!error && !json && !outYaml) return
   test(`${dir}: ${name}`, () => {
-    const docs = YAML.parseDocuments(yaml)
+    const docs = YAML.parseAllDocuments(yaml)
     matchJson(docs, json)
     const errors = docs
       .map(doc => doc.errors)
@@ -67,7 +67,7 @@ testDirs.forEach(dir => {
       expect(errors).toHaveLength(0)
       const src2 =
         docs.map(doc => String(doc).replace(/\n$/, '')).join('\n...\n') + '\n'
-      const docs2 = YAML.parseDocuments(src2)
+      const docs2 = YAML.parseAllDocuments(src2)
       trace: name,
         '\nIN\n' + yaml,
         '\nJSON\n' + JSON.stringify(docs[0], null, '  '),
@@ -76,7 +76,7 @@ testDirs.forEach(dir => {
         '\nRE-JSON\n' + JSON.stringify(docs2[0], null, '  ')
       matchJson(docs2, json)
       if (outYaml) {
-        const expDocs = YAML.parseDocuments(outYaml)
+        const expDocs = YAML.parseAllDocuments(outYaml)
         const resJson = docs.map(doc => doc.toJSON())
         const expJson = expDocs.map(doc => doc.toJSON())
         expect(resJson).toMatchObject(expJson)

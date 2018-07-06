@@ -4,7 +4,7 @@ import Merge from '../src/schema/Merge'
 
 test('basic', () => {
   const src = `- &a 1\n- *a\n`
-  const doc = YAML.parseDocuments(src)[0]
+  const doc = YAML.parseDocument(src)
   expect(doc.errors).toHaveLength(0)
   const { items } = doc.contents
   expect(items).toMatchObject([{ value: 1 }, { source: { value: 1 } }])
@@ -14,7 +14,7 @@ test('basic', () => {
 
 test('re-defined anchor', () => {
   const src = '- &a 1\n- &a 2\n- *a\n'
-  const doc = YAML.parseDocuments(src)[0]
+  const doc = YAML.parseDocument(src)
   expect(doc.errors).toHaveLength(0)
   const { items } = doc.contents
   expect(items).toMatchObject([
@@ -28,7 +28,7 @@ test('re-defined anchor', () => {
 
 test('circular reference', () => {
   const src = '&a [ 1, *a ]\n'
-  const doc = YAML.parseDocuments(src)[0]
+  const doc = YAML.parseDocument(src)
   const message =
     'Alias node contains a circular reference, which cannot be resolved as JSON'
   expect(doc.errors).toHaveLength(0)
@@ -42,7 +42,7 @@ test('circular reference', () => {
 
 describe('create', () => {
   test('doc.anchors.setAnchor', () => {
-    const doc = YAML.parseDocuments('[{ a: A }, { b: B }]')[0]
+    const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
     const {
       items: [a, b]
     } = doc.contents
@@ -56,7 +56,7 @@ describe('create', () => {
   })
 
   test('doc.anchors.createAlias', () => {
-    const doc = YAML.parseDocuments('[{ a: A }, { b: B }]')[0]
+    const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
     const {
       items: [a, b]
     } = doc.contents
@@ -112,8 +112,8 @@ describe('merge <<', () => {
     }
   })
 
-  test('YAML.parseDocuments', () => {
-    const doc = YAML.parseDocuments(src, { merge: true })[0]
+  test('YAML.parseAllDocuments', () => {
+    const doc = YAML.parseDocument(src, { merge: true })
     expect(doc.contents.items).toHaveLength(8)
     expect(Object.keys(doc.anchors.map)).toMatchObject([
       'CENTER',
@@ -131,7 +131,7 @@ describe('merge <<', () => {
   })
 
   test('doc.anchors.createMergePair', () => {
-    const doc = YAML.parseDocuments('[{ a: A }, { b: B }]')[0]
+    const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
     const {
       items: [a, b]
     } = doc.contents
@@ -158,7 +158,7 @@ describe('merge <<', () => {
 
     test('circular reference', () => {
       const src = '&A { <<: *A, B: b }\n'
-      const doc = YAML.parseDocuments(src, { merge: true })[0]
+      const doc = YAML.parseDocument(src, { merge: true })
       expect(doc.errors).toHaveLength(0)
       const message =
         'Alias node contains a circular reference, which cannot be resolved as JSON'
@@ -170,7 +170,7 @@ describe('merge <<', () => {
 
   describe('stringify', () => {
     test('example', () => {
-      const doc = YAML.parseDocuments(src, { merge: true })[0]
+      const doc = YAML.parseDocument(src, { merge: true })
       expect(YAML.parse(String(doc), { merge: true })).toMatchObject([
         { x: 1, y: 2 },
         { x: 0, y: 2 },

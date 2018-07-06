@@ -1,6 +1,6 @@
 import parseCST from './cst/parse'
 import createNode from './createNode'
-import Document from './Document'
+import YAMLDocument from './Document'
 
 const defaultOptions = {
   keepNodeTypes: true,
@@ -8,30 +8,35 @@ const defaultOptions = {
   version: '1.2'
 }
 
-function parseDocuments(src, options) {
-  return parseCST(src).map(astDoc =>
-    new Document(Object.assign({}, defaultOptions, options)).parse(astDoc)
-  )
+class Document extends YAMLDocument {
+  constructor(options) {
+    super(Object.assign({}, defaultOptions, options))
+  }
+}
+
+function parseAllDocuments(src, options) {
+  return parseCST(src).map(cstDoc => new Document(options).parse(cstDoc))
+}
+
+function parseDocument(src, options) {
+  const cst = parseCST(src)
+  if (cst.length > 1) {
+    throw new Error(
+      'Source contains multiple documents; please use YAML.parseAllDocuments()'
+    )
+  }
+  return new Document(options).parse(cst[0])
 }
 
 function parse(src, options) {
-  const docs = parseDocuments(src, options)
-  docs.forEach(doc => {
-    doc.warnings.forEach(warning => console.warn(warning))
-    doc.errors.forEach(error => {
-      throw error
-    })
-  })
-  if (docs.length > 1) {
-    throw new Error(
-      'Source contains multiple documents; please use YAML.parseDocuments()'
-    )
-  }
-  return docs[0] && docs[0].toJSON()
+  const doc = parseDocument(src, options)
+  doc.warnings.forEach(warning => console.warn(warning))
+  if (doc.errors.length > 0) throw doc.errors[0]
+  return doc.toJSON()
 }
 
 function stringify(value, options) {
-  const doc = new Document(Object.assign({}, defaultOptions, options))
+  const doc = new Document(options)
   doc.contents = value
   return String(doc)
 }
@@ -39,12 +44,9 @@ function stringify(value, options) {
 export default {
   createNode,
   defaultOptions,
-  Document: class extends Document {
-    constructor(options) {
-      super(Object.assign({}, defaultOptions, options))
-    }
-  },
+  Document,
   parse,
-  parseDocuments,
+  parseAllDocuments,
+  parseDocument,
   stringify
 }

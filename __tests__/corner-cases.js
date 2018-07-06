@@ -20,7 +20,7 @@ aliases:
 
 test('eemeli/yaml#3', () => {
   const src = '{ ? : 123 }'
-  const doc = YAML.parseDocuments(src)[0]
+  const doc = YAML.parseDocument(src)
   expect(doc.errors).toHaveLength(0)
   expect(doc.contents.items[0].key).toBeNull()
   expect(doc.contents.items[0].value.value).toBe(123)
@@ -28,7 +28,7 @@ test('eemeli/yaml#3', () => {
 
 test('eemeli/yaml#6', () => {
   const src = 'abc: 123\ndef'
-  const doc = YAML.parseDocuments(src)[0]
+  const doc = YAML.parseDocument(src)
   expect(doc.errors).toHaveLength(1)
   expect(doc.errors[0].name).toBe('YAMLSemanticError')
   expect(doc.errors[0].source).toBeInstanceOf(Node)
@@ -37,13 +37,13 @@ test('eemeli/yaml#6', () => {
 describe('eemeli/yaml#7', () => {
   test('map', () => {
     const src = '{ , }\n---\n{ 123,,, }\n'
-    const docs = YAML.parseDocuments(src)
+    const docs = YAML.parseAllDocuments(src)
     expect(docs[0].errors).toHaveLength(1)
     expect(docs[1].errors).toHaveLength(2)
   })
   test('seq', () => {
     const src = '[ , ]\n---\n[ 123,,, ]\n'
-    const docs = YAML.parseDocuments(src)
+    const docs = YAML.parseAllDocuments(src)
     expect(docs[0].errors).toHaveLength(1)
     expect(docs[1].errors).toHaveLength(2)
   })
@@ -51,7 +51,7 @@ describe('eemeli/yaml#7', () => {
 
 test('eemeli/yaml#8', () => {
   const src = '{'
-  const doc = YAML.parseDocuments(src)[0]
+  const doc = YAML.parseDocument(src)
   expect(doc.errors).toHaveLength(1)
   expect(doc.errors[0].name).toBe('YAMLSemanticError')
 })
@@ -68,7 +68,7 @@ aliases:
   - &restore_deps_cache
     keys:
       - v1-deps-cache-{{ checksum "yarn.lock" }}\n`
-    const docs = YAML.parseDocuments(src)
+    const docs = YAML.parseAllDocuments(src)
     expect(docs).toHaveLength(1)
     expect(docs[0].errors).toHaveLength(0)
   })
@@ -179,7 +179,7 @@ aliases:
   - b:
     - c
   - d`
-    const docs = YAML.parseDocuments(src)
+    const docs = YAML.parseAllDocuments(src)
     expect(docs[0].errors).toHaveLength(0)
     expect(docs[0].toJSON()).toMatchObject(['a', { b: ['c'] }, 'd'])
   })
