@@ -125,7 +125,20 @@ export default class ParseContext {
         props.push(new Range(offset, end))
         offset = end
       } else {
-        const end = Node.endOfIdentifier(src, offset + 1)
+        let end = Node.endOfIdentifier(src, offset + 1)
+        if (
+          ch === Char.TAG &&
+          src[end] === ',' &&
+          /^[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+,\d\d\d\d(-\d\d){0,2}\/\S/.test(
+            src.slice(offset + 1, end + 13)
+          )
+        ) {
+          // Let's presume we're dealing with a YAML 1.0 domain tag here, rather
+          // than an empty but 'foo.bar' private-tagged node in a flow collection
+          // followed without whitespace by a plain string starting with a year
+          // or date divided by something.
+          end = Node.endOfIdentifier(src, end + 5)
+        }
         props.push(new Range(offset, end))
         lineHasProps = true
         offset = Node.endOfWhiteSpace(src, end)
