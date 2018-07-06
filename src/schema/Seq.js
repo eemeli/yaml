@@ -10,13 +10,12 @@ export default class YAMLSeq extends Collection {
 
   toString(ctx, onComment) {
     if (!ctx) return JSON.stringify(this)
-    const itemIndent = (ctx.indent || '') + (ctx.inFlow ? '    ' : '  ')
     return super.toString(
       ctx,
       {
         blockItem: ({ type, str }) => (type === 'comment' ? str : `- ${str}`),
         flowChars: { start: '[', end: ']' },
-        itemIndent
+        itemIndent: (ctx.indent || '') + '  '
       },
       onComment
     )

@@ -46,14 +46,12 @@ export default class YAMLMap extends Collection {
           `Map items must all be pairs; found ${JSON.stringify(item)} instead`
         )
     })
-    let itemIndent = ctx.indent || ''
-    if (ctx.inFlow) itemIndent += '  '
     return super.toString(
       ctx,
       {
         blockItem: ({ str }) => str,
         flowChars: { start: '{', end: '}' },
-        itemIndent
+        itemIndent: ctx.indent || ''
       },
       onComment
     )

@@ -27,7 +27,7 @@ test('re-defined anchor', () => {
 })
 
 test('circular reference', () => {
-  const src = '&a [1, *a]\n'
+  const src = '&a [ 1, *a ]\n'
   const doc = YAML.parseDocuments(src)[0]
   const message =
     'Alias node contains a circular reference, which cannot be resolved as JSON'
@@ -37,7 +37,7 @@ test('circular reference', () => {
   expect(items).toHaveLength(2)
   expect(items[1].source).toBe(doc.contents)
   expect(() => doc.toJSON()).toThrow(message)
-  expect(String(doc)).toBe('&a\n- 1\n- *a\n')
+  expect(String(doc)).toBe(src)
 })
 
 describe('create', () => {
@@ -52,7 +52,7 @@ describe('create', () => {
     expect(doc.anchors.setAnchor(null, 'a1')).toBe('a1')
     expect(doc.anchors.getName(a)).toBe('AA')
     expect(doc.anchors.getNode('a2').value).toBe('B')
-    expect(String(doc)).toBe('- &AA\n  a: A\n- b: &a2 B\n')
+    expect(String(doc)).toBe('[ &AA { a: A }, { b: &a2 B } ]\n')
   })
 
   test('doc.anchors.createAlias', () => {
@@ -63,7 +63,7 @@ describe('create', () => {
     const alias = doc.anchors.createAlias(a, 'AA')
     doc.contents.items.push(alias)
     expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
-    expect(String(doc)).toMatch('- &AA\n  a: A\n- b: B\n- *AA\n')
+    expect(String(doc)).toMatch('[ &AA { a: A }, { b: B }, *AA ]\n')
   })
 })
 
@@ -138,7 +138,7 @@ describe('merge <<', () => {
     const merge = doc.anchors.createMergePair(a)
     b.items.push(merge)
     expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
-    expect(String(doc)).toBe('- &a1\n  a: A\n- b: B\n  <<: *a1\n')
+    expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
   })
 
   describe('parse errors', () => {
@@ -157,14 +157,14 @@ describe('merge <<', () => {
     })
 
     test('circular reference', () => {
-      const src = '&A { <<: *A, B: b }'
+      const src = '&A { <<: *A, B: b }\n'
       const doc = YAML.parseDocuments(src, { merge: true })[0]
       expect(doc.errors).toHaveLength(0)
       const message =
         'Alias node contains a circular reference, which cannot be resolved as JSON'
       expect(doc.warnings).toMatchObject([{ message }])
       expect(() => doc.toJSON()).toThrow(message)
-      expect(String(doc)).toBe('&A\n<<: *A\nB: b\n')
+      expect(String(doc)).toBe(src)
     })
   })
 

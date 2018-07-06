@@ -343,8 +343,7 @@ date: 2001-01-23T00:00:00.000Z
 number: 123
 string: \"123\"
 pool:
-  !ball
-  number: 8
+  !ball { number: 8 }
 perl:
   !perl/Text::Tabs {}\n`)
   })

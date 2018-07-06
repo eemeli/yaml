@@ -186,7 +186,7 @@ export default class Schema {
     const props = this.stringifyProps(item, ctx)
     const str = stringify(item, ctx, onComment)
     return props
-      ? item instanceof Collection && !ctx.inFlow && item.items.length > 0
+      ? item instanceof Collection && str[0] !== '{' && str[0] !== '['
         ? `${props}\n${ctx.indent}${str}`
         : `${props} ${str}`
       : str

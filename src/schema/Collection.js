@@ -12,8 +12,11 @@ export default class Collection extends Node {
   }
 
   toString(ctx, { blockItem, flowChars, itemIndent }, onComment) {
-    const { doc, indent, inFlow } = ctx
-    ctx = Object.assign({}, ctx, { indent: itemIndent, type: null })
+    const { doc, indent } = ctx
+    const inFlow =
+      (this.type && this.type.substr(0, 4) === 'FLOW') || ctx.inFlow
+    if (inFlow) itemIndent += '  '
+    ctx = Object.assign({}, ctx, { indent: itemIndent, inFlow, type: null })
     let hasItemWithComment = false
     let hasItemWithNewLine = false
     const nodes = this.items.reduce((nodes, item, i) => {
