@@ -293,7 +293,7 @@ describe('custom tags', () => {
 - !y "2"
 - !e!z "3"
 - !<tag:example.com,2000:other/w> "4"
-- "5"\n`
+- '5'\n`
     )
   })
 
@@ -315,7 +315,7 @@ describe('custom tags', () => {
 - !g 6
 - "7"
 - !f!w "4"
-- "5" #cc\n`
+- '5' #cc\n`
     )
   })
 

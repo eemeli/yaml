@@ -254,8 +254,8 @@ export const str = {
   resolve,
   options: strOptions,
   stringify: (
-    { comment, value },
-    { forceBlockIndent, implicitKey, indent, inFlow, tags, type } = {},
+    { comment, type, value },
+    { forceBlockIndent, implicitKey, indent, inFlow, tags } = {},
     onComment
   ) => {
     const { dropCR, defaultType } = strOptions
@@ -307,7 +307,7 @@ export const str = {
       // force double quotes on control characters
       type = Type.QUOTE_DOUBLE
     } else if (
-      inFlow &&
+      (implicitKey || inFlow) &&
       (type === Type.BLOCK_FOLDED || type === Type.BLOCK_LITERAL)
     ) {
       // should not happen; blocks are not valid inside flow containers
