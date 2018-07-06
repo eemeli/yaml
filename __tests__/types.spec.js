@@ -95,9 +95,12 @@ option: TruE\n`
       canonical: true,
       answer: false,
       logical: true,
-      option: true
+      option: 'TruE'
     })
-    expect(String(doc)).toBe(src.toLowerCase())
+    expect(String(doc)).toBe(`canonical: true
+answer: false
+logical: true
+option: TruE\n`)
   })
 
   test('!!float', () => {

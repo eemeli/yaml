@@ -15,7 +15,7 @@ export default failsafe.concat([
   {
     class: null,
     tag: 'tag:yaml.org,2002:null',
-    test: /^(?:~|null)?$/i,
+    test: /^(?:~|[Nn]ull|NULL)?$/,
     resolve: () => null,
     options: nullOptions,
     stringify: () => nullOptions.nullStr
@@ -23,7 +23,7 @@ export default failsafe.concat([
   {
     class: Boolean,
     tag: 'tag:yaml.org,2002:bool',
-    test: /^(?:true|false)$/i,
+    test: /^(?:[Tt]rue|TRUE|[Ff]alse|FALSE)$/,
     resolve: str => str[0] === 't' || str[0] === 'T'
   },
   {

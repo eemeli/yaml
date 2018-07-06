@@ -12,7 +12,7 @@ export default failsafe.concat(
     {
       class: null,
       tag: 'tag:yaml.org,2002:null',
-      test: /^(?:~|null)?$/i,
+      test: /^(?:~|[Nn]ull|NULL)?$/,
       resolve: () => null,
       options: nullOptions,
       stringify: () => nullOptions.nullStr
@@ -20,7 +20,7 @@ export default failsafe.concat(
     {
       class: Boolean,
       tag: 'tag:yaml.org,2002:bool',
-      test: /^(?:y|yes|true|on)$/i,
+      test: /^(?:Y|y|[Yy]es|YES|[Tt]rue|TRUE|[Oo]n|ON)$/,
       resolve: () => true,
       options: boolOptions,
       stringify: ({ value }) =>
@@ -29,7 +29,7 @@ export default failsafe.concat(
     {
       class: Boolean,
       tag: 'tag:yaml.org,2002:bool',
-      test: /^(?:n|no|false|off)$/i,
+      test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
       resolve: () => false,
       options: boolOptions,
       stringify: ({ value }) =>
