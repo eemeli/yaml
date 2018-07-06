@@ -3,6 +3,7 @@ import createNode from './createNode'
 import Document from './Document'
 
 const defaultOptions = {
+  keepNodeTypes: true,
   tags: null,
   version: '1.2'
 }
