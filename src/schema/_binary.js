@@ -1,7 +1,8 @@
 // Published as 'yaml/types/binary'
 
 import { YAMLReferenceError } from '../errors'
-import { resolve as resolveStr } from './_string'
+import { Type } from '../cst/Node'
+import { resolve as resolveStr, stringify as stringifyStr } from './_string'
 
 export const binary = {
   class: Uint8Array, // Buffer inherits from Uint8Array
@@ -17,12 +18,12 @@ export const binary = {
    */
   resolve: (doc, node) => {
     if (typeof Buffer === 'function') {
-      const str = resolveStr(doc, node)
-      return Buffer.from(str, 'base64')
+      const src = resolveStr(doc, node)
+      return Buffer.from(src, 'base64')
     } else if (typeof atob === 'function') {
-      const str = atob(resolveStr(doc, node))
-      const buffer = new Uint8Array(str.length)
-      for (let i = 0; i < str.length; ++i) buffer[i] = str.charCodeAt(i)
+      const src = atob(resolveStr(doc, node))
+      const buffer = new Uint8Array(src.length)
+      for (let i = 0; i < src.length; ++i) buffer[i] = src.charCodeAt(i)
       return buffer
     } else {
       doc.errors.push(
@@ -34,30 +35,36 @@ export const binary = {
       return null
     }
   },
-  options: { lineWidth: 76 },
-  stringify: ({ value }) => {
-    let str
+  options: { defaultType: Type.BLOCK_LITERAL, lineWidth: 76 },
+  stringify: ({ comment, type, value }, ctx, onComment) => {
+    let src
     if (typeof Buffer === 'function') {
-      str =
+      src =
         value instanceof Buffer
           ? value.toString('base64')
           : Buffer.from(value.buffer).toString('base64')
     } else if (typeof btoa === 'function') {
       let s = ''
       for (let i = 0; i < value.length; ++i) s += String.fromCharCode(buf[i])
-      str = btoa(s)
+      src = btoa(s)
     } else {
       throw new Error(
         'This environment does not support writing binary tags; either Buffer or btoa is required'
       )
     }
-    const { lineWidth } = binary.options
-    const n = Math.ceil(str.length / lineWidth)
-    const lines = new Array(n)
-    for (let i = 0, o = 0; i < n; ++i, o += lineWidth) {
-      lines[i] = str.substr(o, lineWidth)
+    if (!type) type = binary.options.defaultType
+    if (type === Type.QUOTE_DOUBLE) {
+      value = src
+    } else {
+      const { lineWidth } = binary.options
+      const n = Math.ceil(src.length / lineWidth)
+      const lines = new Array(n)
+      for (let i = 0, o = 0; i < n; ++i, o += lineWidth) {
+        lines[i] = src.substr(o, lineWidth)
+      }
+      value = lines.join(type === Type.BLOCK_LITERAL ? '\n' : ' ')
     }
-    return lines.join('\n')
+    return stringifyStr({ comment, type, value }, ctx, onComment)
   }
 }
 

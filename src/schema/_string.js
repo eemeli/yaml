@@ -248,80 +248,80 @@ function plainString(
   return body
 }
 
+export function stringify(
+  { comment, type, value },
+  { forceBlockIndent, implicitKey, indent, inFlow, tags } = {},
+  onComment
+) {
+  const { dropCR, defaultType } = strOptions
+  if (typeof value !== 'string') value = String(value)
+  if (dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')
+  const _stringify = _type => {
+    switch (_type) {
+      case Type.BLOCK_FOLDED:
+        return blockString(
+          value,
+          indent,
+          false,
+          forceBlockIndent,
+          comment,
+          onComment
+        )
+      case Type.BLOCK_LITERAL:
+        return blockString(
+          value,
+          indent,
+          true,
+          forceBlockIndent,
+          comment,
+          onComment
+        )
+      case Type.QUOTE_DOUBLE:
+        return doubleQuotedString(value, indent, implicitKey, comment)
+      case Type.QUOTE_SINGLE:
+        return singleQuotedString(value, indent, implicitKey, comment)
+      case Type.PLAIN:
+        return plainString(
+          value,
+          indent,
+          implicitKey,
+          inFlow,
+          forceBlockIndent,
+          tags,
+          comment,
+          onComment
+        )
+      default:
+        return null
+    }
+  }
+  if (
+    type !== Type.QUOTE_DOUBLE &&
+    /[\x00-\x08\x0b-\x1f\x7f-\x9f]/.test(value)
+  ) {
+    // force double quotes on control characters
+    type = Type.QUOTE_DOUBLE
+  } else if (
+    (implicitKey || inFlow) &&
+    (type === Type.BLOCK_FOLDED || type === Type.BLOCK_LITERAL)
+  ) {
+    // should not happen; blocks are not valid inside flow containers
+    type = Type.QUOTE_DOUBLE
+  }
+  let res = _stringify(type)
+  if (res === null) {
+    res = _stringify(defaultType)
+    if (res === null)
+      throw new Error(`Unsupported default string type ${defaultType}`)
+  }
+  return res
+}
+
 export const str = {
   class: String,
   default: true,
   tag: 'tag:yaml.org,2002:str',
   resolve,
-  options: strOptions,
-  stringify: (
-    { comment, type, value },
-    { forceBlockIndent, implicitKey, indent, inFlow, tags } = {},
-    onComment
-  ) => {
-    const { dropCR, defaultType } = strOptions
-    if (typeof value !== 'string') value = String(value)
-    if (dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')
-    const _stringify = _type => {
-      switch (_type) {
-        case Type.BLOCK_FOLDED:
-          return blockString(
-            value,
-            indent,
-            false,
-            forceBlockIndent,
-            comment,
-            onComment
-          )
-        case Type.BLOCK_LITERAL:
-          return blockString(
-            value,
-            indent,
-            true,
-            forceBlockIndent,
-            comment,
-            onComment
-          )
-        case Type.QUOTE_DOUBLE:
-          return doubleQuotedString(value, indent, implicitKey, comment)
-        case Type.QUOTE_SINGLE:
-          return singleQuotedString(value, indent, implicitKey, comment)
-        case Type.PLAIN:
-          return plainString(
-            value,
-            indent,
-            implicitKey,
-            inFlow,
-            forceBlockIndent,
-            tags,
-            comment,
-            onComment
-          )
-        default:
-          return null
-      }
-    }
-    if (
-      type !== Type.QUOTE_DOUBLE &&
-      /[\x00-\x08\x0b-\x1f\x7f-\x9f]/.test(value)
-    ) {
-      // force double quotes on control characters
-      type = Type.QUOTE_DOUBLE
-    } else if (
-      (implicitKey || inFlow) &&
-      (type === Type.BLOCK_FOLDED || type === Type.BLOCK_LITERAL)
-    ) {
-      // should not happen; blocks are not valid inside flow containers
-      type = Type.QUOTE_DOUBLE
-    }
-    let res = _stringify(type)
-    if (res === null) {
-      res = _stringify(defaultType)
-      if (res === null)
-        throw new Error(`Unsupported default string type ${defaultType}`)
-    }
-    return res
-  }
+  stringify,
+  options: strOptions
 }
-
-export default [str]
