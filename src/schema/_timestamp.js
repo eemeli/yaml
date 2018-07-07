@@ -88,7 +88,8 @@ export const timestamp = {
     }
     return new Date(date)
   },
-  stringify: ({ value }) => value.toISOString()
+  stringify: ({ value }) =>
+    value.toISOString().replace(/((T00:00)?:00)?\.000Z$/, '')
 }
 
 export default [intTime, floatTime, timestamp]

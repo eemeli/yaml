@@ -320,7 +320,7 @@ canonical: 2001-12-15T02:59:43.100Z
 valid iso8601: 2001-12-15T02:59:43.100Z
 space separated: 2001-12-15T02:59:43.100Z
 no time zone (Z): 2001-12-15T02:59:43.100Z
-date (00:00:00Z): 2002-12-14T00:00:00.000Z\n`)
+date (00:00:00Z): 2002-12-14\n`)
   })
 })
 
@@ -402,7 +402,7 @@ perl: !perl/Text::Tabs {}`
     expect(date.getFullYear()).toBe(2001)
     expect(String(doc)).toBe(`%YAML:1.0
 ---
-date: 2001-01-23T00:00:00.000Z
+date: 2001-01-23
 number: 123
 string: \"123\"
 pool:
