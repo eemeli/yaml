@@ -361,23 +361,24 @@ string: '012345'`,
       src: `canonical: 2001-12-15T02:59:43.1Z
 iso8601: 2001-12-14t21:59:43.10-05:00
 spaced: 2001-12-14 21:59:43.10 -5
-date: 2002-12-14`,
+date: 2001-12-14`,
       tgt: [
         {
           canonical: '2001-12-15T02:59:43.1Z',
           iso8601: '2001-12-14t21:59:43.10-05:00',
           spaced: '2001-12-14 21:59:43.10 -5',
-          date: '2002-12-14'
+          date: '2001-12-14'
         }
       ],
       special: src => {
-        const { canonical, iso8601, spaced, date } = YAML.parse(src, {
-          schema: 'yaml-1.1'
+        const obj = YAML.parse(src, { schema: 'yaml-1.1' })
+        expect(Object.keys(obj)).toHaveLength(4)
+        ;[('canonical', 'iso8601', 'spaced', 'date')].forEach(key => {
+          const date = obj[key]
+          expect(date).toBeInstanceOf(Date)
+          expect(date.getFullYear()).toBe(2001)
+          expect(date.getMonth()).toBe(11)
         })
-        expect(canonical).toBe(new Date('2001-12-15T02:59:43.1Z').toJSON())
-        expect(iso8601).toBe(new Date('2001-12-14t21:59:43.10-05:00').toJSON())
-        expect(spaced).toBe(new Date('2001-12-14 21:59:43.10 -5').toJSON())
-        expect(date).toBe(new Date('2002-12-14').toJSON())
       }
     },
 
@@ -1784,7 +1785,9 @@ document
 ...`,
       tgt: ['%!PS-Adobe-2.0\n', null],
       special: src =>
-        YAML.parseAllDocuments(src).forEach(doc => expect(doc.version).toBe('1.2'))
+        YAML.parseAllDocuments(src).forEach(doc =>
+          expect(doc.version).toBe('1.2')
+        )
     }
   },
 

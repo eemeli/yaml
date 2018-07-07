@@ -4,8 +4,8 @@ import toJSON from '../toJSON'
 import Collection from './Collection'
 
 export default class YAMLSeq extends Collection {
-  toJSON() {
-    return this.items.map(toJSON)
+  toJSON(_, keep) {
+    return this.items.map((v, i) => toJSON(v, String(i), keep))
   }
 
   toString(ctx, onComment) {

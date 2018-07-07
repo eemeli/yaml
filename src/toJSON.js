@@ -1,7 +1,7 @@
-export default function toJSON(value) {
+export default function toJSON(value, arg, keep) {
   return Array.isArray(value)
-    ? value.map(toJSON)
-    : value && typeof value === 'object' && 'toJSON' in value
-      ? value.toJSON()
+    ? value.map((v, i) => toJSON(v, String(i), keep))
+    : value && typeof value.toJSON === 'function'
+      ? value.toJSON(arg, keep)
       : value
 }

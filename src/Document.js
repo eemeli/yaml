@@ -12,6 +12,7 @@ import Schema, { defaultPrefix, DefaultTags } from './schema'
 import Alias from './schema/Alias'
 import Collection from './schema/Collection'
 import toJSON from './toJSON'
+import Scalar from './schema/Scalar'
 
 const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
@@ -423,10 +424,13 @@ export default class Document {
     }
   }
 
-  toJSON() {
+  toJSON(arg) {
     const cr = this.warnings.find(w => /circular reference/.test(w.message))
     if (cr) throw new YAMLSemanticError(cr.source, cr.message)
-    return toJSON(this.contents)
+    const keep =
+      this.options.keepBlobsInJSON &&
+      (typeof arg !== 'string' || !(this.contents instanceof Scalar))
+    return toJSON(this.contents, arg, keep)
   }
 
   toString() {

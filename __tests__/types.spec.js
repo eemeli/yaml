@@ -303,7 +303,10 @@ space separated:  2001-12-14 21:59:43.10 -5
 no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
-    const doc = YAML.parseDocument(src)
+    const doc = YAML.parseDocument(src, { keepBlobsInJSON: false })
+    doc.contents.items.forEach(item => {
+      expect(item.value.value).toBeInstanceOf(Date)
+    })
     expect(doc.toJSON()).toMatchObject({
       canonical: '2001-12-15T02:59:43.100Z',
       'valid iso8601': '2001-12-15T02:59:43.100Z',
@@ -389,12 +392,14 @@ perl: !perl/Text::Tabs {}`
     const doc = YAML.parseDocument(src)
     expect(doc.version).toBe('1.0')
     expect(doc.toJSON()).toMatchObject({
-      date: '2001-01-23T00:00:00.000Z',
       number: 123,
       string: '123',
       pool: { number: 8 },
       perl: {}
     })
+    const date = doc.contents.items[0].value.value
+    expect(date).toBeInstanceOf(Date)
+    expect(date.getFullYear()).toBe(2001)
     expect(String(doc)).toBe(`%YAML:1.0
 ---
 date: 2001-01-23T00:00:00.000Z

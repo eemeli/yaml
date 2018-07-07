@@ -4,6 +4,7 @@ import YAMLDocument from './Document'
 
 const defaultOptions = {
   keepNodeTypes: true,
+  keepBlobsInJSON: true,
   tags: null,
   version: '1.2'
 }
