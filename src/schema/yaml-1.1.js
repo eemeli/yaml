@@ -11,6 +11,7 @@ export default failsafe.concat(
   [
     {
       class: null,
+      default: true,
       tag: 'tag:yaml.org,2002:null',
       test: /^(?:~|[Nn]ull|NULL)?$/,
       resolve: () => null,
@@ -19,6 +20,7 @@ export default failsafe.concat(
     },
     {
       class: Boolean,
+      default: true,
       tag: 'tag:yaml.org,2002:bool',
       test: /^(?:Y|y|[Yy]es|YES|[Tt]rue|TRUE|[Oo]n|ON)$/,
       resolve: () => true,
@@ -28,6 +30,7 @@ export default failsafe.concat(
     },
     {
       class: Boolean,
+      default: true,
       tag: 'tag:yaml.org,2002:bool',
       test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
       resolve: () => false,
@@ -37,6 +40,7 @@ export default failsafe.concat(
     },
     {
       class: Number,
+      default: true,
       tag: 'tag:yaml.org,2002:int',
       format: 'BIN',
       test: /^0b([0-1_]+)$/,
@@ -45,6 +49,7 @@ export default failsafe.concat(
     },
     {
       class: Number,
+      default: true,
       tag: 'tag:yaml.org,2002:int',
       format: 'OCT',
       test: /^[-+]?0([0-7_]+)$/,
@@ -53,6 +58,7 @@ export default failsafe.concat(
     },
     {
       class: Number,
+      default: true,
       tag: 'tag:yaml.org,2002:int',
       test: /^[-+]?[0-9][0-9_]*$/,
       resolve: str => parseInt(str.replace(/_/g, ''), 10),
@@ -60,6 +66,7 @@ export default failsafe.concat(
     },
     {
       class: Number,
+      default: true,
       tag: 'tag:yaml.org,2002:int',
       format: 'HEX',
       test: /^0x([0-9a-fA-F_]+)$/,
@@ -68,6 +75,7 @@ export default failsafe.concat(
     },
     {
       class: Number,
+      default: true,
       tag: 'tag:yaml.org,2002:float',
       test: /^(?:[-+]?\.inf|(\.nan))$/i,
       resolve: (str, nan) =>
@@ -80,6 +88,7 @@ export default failsafe.concat(
     },
     {
       class: Number,
+      default: true,
       tag: 'tag:yaml.org,2002:float',
       test: /^[-+]?([0-9][0-9_]*)?\.[0-9_]*([eE][-+]?[0-9]+)?$/,
       resolve: str => parseFloat(str.replace(/_/g, '')),

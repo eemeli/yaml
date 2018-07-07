@@ -2,6 +2,8 @@ import toJSON from '../toJSON'
 import Node from './Node'
 
 export default class Alias extends Node {
+  static default = true
+
   static stringify({ range, source }, { anchors, doc, implicitKey }) {
     const anchor = Object.keys(anchors).find(a => anchors[a] === source)
     if (anchor) return `*${anchor}${implicitKey ? ' ' : ''}`

@@ -14,6 +14,7 @@ export const nullOptions = { nullStr: 'null' }
 export default failsafe.concat([
   {
     class: null,
+    default: true,
     tag: 'tag:yaml.org,2002:null',
     test: /^(?:~|[Nn]ull|NULL)?$/,
     resolve: () => null,
@@ -22,12 +23,14 @@ export default failsafe.concat([
   },
   {
     class: Boolean,
+    default: true,
     tag: 'tag:yaml.org,2002:bool',
     test: /^(?:[Tt]rue|TRUE|[Ff]alse|FALSE)$/,
     resolve: str => str[0] === 't' || str[0] === 'T'
   },
   {
     class: Number,
+    default: true,
     tag: 'tag:yaml.org,2002:int',
     format: 'OCT',
     test: /^0o([0-7]+)$/,
@@ -36,6 +39,7 @@ export default failsafe.concat([
   },
   {
     class: Number,
+    default: true,
     tag: 'tag:yaml.org,2002:int',
     test: /^[-+]?[0-9]+$/,
     resolve: str => parseInt(str, 10),
@@ -43,6 +47,7 @@ export default failsafe.concat([
   },
   {
     class: Number,
+    default: true,
     tag: 'tag:yaml.org,2002:int',
     format: 'HEX',
     test: /^0x([0-9a-fA-F]+)$/,
@@ -51,6 +56,7 @@ export default failsafe.concat([
   },
   {
     class: Number,
+    default: true,
     tag: 'tag:yaml.org,2002:float',
     test: /^(?:[-+]?\.inf|(\.nan))$/i,
     resolve: (str, nan) =>
@@ -63,6 +69,7 @@ export default failsafe.concat([
   },
   {
     class: Number,
+    default: true,
     tag: 'tag:yaml.org,2002:float',
     test: /^[-+]?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][-+]?[0-9]+)?$/,
     resolve: str => parseFloat(str),

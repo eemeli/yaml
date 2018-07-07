@@ -6,6 +6,7 @@ import parseSeq from './parseSeq'
 
 export const map = {
   class: Map,
+  default: true,
   tag: 'tag:yaml.org,2002:map',
   resolve: parseMap,
   stringify: (value, ctx, onComment) => value.toString(ctx, onComment)
@@ -13,6 +14,7 @@ export const map = {
 
 export const seq = {
   class: Seq,
+  default: true,
   tag: 'tag:yaml.org,2002:seq',
   resolve: parseSeq,
   stringify: (value, ctx, onComment) => value.toString(ctx, onComment)

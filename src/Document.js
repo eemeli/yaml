@@ -418,7 +418,11 @@ export default class Document {
       const vocab = tag.match(/^tag:([a-zA-Z0-9-]+)\.yaml\.org,2002:(.*)/)
       return vocab ? `!${vocab[1]}/${vocab[2]}` : `!${tag.replace(/^tag:/, '')}`
     } else {
-      const p = this.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
+      let p = this.tagPrefixes.find(p => tag.indexOf(p.prefix) === 0)
+      if (!p) {
+        const dtp = this.getDefaults().tagPrefixes
+        p = dtp && dtp.find(p => tag.indexOf(p.prefix) === 0)
+      }
       if (p) return p.handle + tag.substr(p.prefix.length)
       return tag[0] === '!' ? tag : `!<${tag}>`
     }

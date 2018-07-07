@@ -5,6 +5,7 @@ import { resolve as resolveStr } from './_string'
 
 export const binary = {
   class: Uint8Array, // Buffer inherits from Uint8Array
+  default: false,
   tag: 'tag:yaml.org,2002:binary',
   /**
    * Returns a Buffer in node and an Uint8Array in browsers

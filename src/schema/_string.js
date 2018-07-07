@@ -250,6 +250,7 @@ function plainString(
 
 export const str = {
   class: String,
+  default: true,
   tag: 'tag:yaml.org,2002:str',
   resolve,
   options: strOptions,

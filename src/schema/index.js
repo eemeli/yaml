@@ -125,19 +125,19 @@ export default class Schema {
     return null
   }
 
-  getStringifier(item) {
-    if (item instanceof Alias) return Alias.stringify
-    let match
+  getTagObject(item) {
+    if (item instanceof Alias) return Alias
     if (item.tag) {
-      match = this.schema.find(
+      let match = this.schema.find(
         ({ format, tag }) => tag === item.tag && format === item.format
       )
       if (!match) match = this.schema.find(({ tag }) => tag === item.tag)
-      if (match) return match.stringify || Schema.defaultStringifier
+      if (match) return match
     }
     if (item.value === null) {
-      match = this.schema.find(t => t.class === null && !t.format)
-      if (!match) throw new Error('Schema is missing a null stringifier')
+      const match = this.schema.find(t => t.class === null && !t.format)
+      if (!match) throw new Error('Tag not resolved for null value')
+      return match
     } else {
       let obj = item
       if (item.hasOwnProperty('value')) {
@@ -155,7 +155,7 @@ export default class Schema {
             obj = item.value
         }
       }
-      match = this.schema.find(
+      let match = this.schema.find(
         t => t.class && obj instanceof t.class && t.format === item.format
       )
       if (!match) {
@@ -165,24 +165,24 @@ export default class Schema {
       }
       if (!match) {
         const name = obj && obj.constructor ? obj.constructor.name : typeof obj
-        throw new Error(`Tag not resolved for ${name}`)
+        throw new Error(`Tag not resolved for ${name} value`)
       }
+      return match
     }
-    return match.stringify || Schema.defaultStringifier
   }
 
   // needs to be called before stringifier to allow for circular anchor refs
-  stringifyProps(node, { anchors, doc }) {
+  stringifyProps(node, tagObj, { anchors, doc }) {
     const props = []
     const anchor = doc.anchors.getName(node)
     if (anchor) {
       anchors[anchor] = node
       props.push(`&${anchor}`)
     }
-    const { tag } = node
-    // FIXME: should read prefix-skip from schema
-    if (tag && tag.indexOf(defaultPrefix) !== 0) {
-      props.push(doc.stringifyTag(tag))
+    if (node.tag && node.tag !== tagObj.tag) {
+      props.push(doc.stringifyTag(node.tag))
+    } else if (!tagObj.default) {
+      props.push(doc.stringifyTag(tagObj.tag))
     }
     return props.join(' ')
   }
@@ -191,8 +191,9 @@ export default class Schema {
     if (!(item instanceof Node)) item = createNode(item, true)
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment)
-    const stringify = this.getStringifier(item)
-    const props = this.stringifyProps(item, ctx)
+    const tagObj = this.getTagObject(item)
+    const props = this.stringifyProps(item, tagObj, ctx)
+    const stringify = tagObj.stringify || Schema.defaultStringifier
     const str = stringify(item, ctx, onComment)
     return props
       ? item instanceof Collection && str[0] !== '{' && str[0] !== '['
