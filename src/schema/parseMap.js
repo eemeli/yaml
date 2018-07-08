@@ -7,6 +7,11 @@ import { checkKeyLength, resolveComments } from './parseUtils'
 import Alias from './Alias'
 
 export default function parseMap(doc, cst) {
+  if (cst.type !== Type.MAP && cst.type !== Type.FLOW_MAP) {
+    const msg = `A ${cst.type} node cannot be resolved as a mapping`
+    doc.errors.push(new YAMLSyntaxError(cst, msg))
+    return null
+  }
   const { comments, items } =
     cst.type === Type.FLOW_MAP
       ? resolveFlowMapItems(doc, cst)
@@ -25,12 +30,8 @@ export default function parseMap(doc, cst) {
           iKey.hasOwnProperty('value') &&
           iKey.value === jKey.value)
       ) {
-        doc.errors.push(
-          new YAMLSemanticError(
-            cst,
-            `Map keys must be unique; "${iKey}" is repeated`
-          )
-        )
+        const msg = `Map keys must be unique; "${iKey}" is repeated`
+        doc.errors.push(new YAMLSemanticError(cst, msg))
         break
       }
     }
@@ -81,12 +82,8 @@ function resolveBlockMapItems(doc, cst) {
           item.node.type === Type.MAP &&
           !item.node.context.atLineStart
         ) {
-          doc.errors.push(
-            new YAMLSemanticError(
-              item.node,
-              'Nested mappings are not allowed in compact mappings'
-            )
-          )
+          const msg = 'Nested mappings are not allowed in compact mappings'
+          doc.errors.push(new YAMLSemanticError(item.node, msg))
         }
         items.push(new Pair(key, doc.resolveNode(item.node)))
         checkKeyLength(doc.errors, cst, i, key, keyStart)
@@ -99,20 +96,14 @@ function resolveBlockMapItems(doc, cst) {
         keyStart = item.range.start
         if (item.error) doc.errors.push(item.error)
         const nextItem = cst.items[i + 1]
-        if (!nextItem || nextItem.type !== Type.MAP_VALUE)
-          doc.errors.push(
-            new YAMLSemanticError(
-              item,
-              'Implicit map keys need to be followed by map values'
-            )
-          )
-        if (item.valueRangeContainsNewline)
-          doc.errors.push(
-            new YAMLSemanticError(
-              item,
-              'Implicit map keys need to be on a single line'
-            )
-          )
+        if (!nextItem || nextItem.type !== Type.MAP_VALUE) {
+          const msg = 'Implicit map keys need to be followed by map values'
+          doc.errors.push(new YAMLSemanticError(item, msg))
+        }
+        if (item.valueRangeContainsNewline) {
+          const msg = 'Implicit map keys need to be on a single line'
+          doc.errors.push(new YAMLSemanticError(item, msg))
+        }
     }
   }
   if (key !== undefined) items.push(new Pair(key))

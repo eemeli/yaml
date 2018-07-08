@@ -5,6 +5,11 @@ import { checkKeyLength, resolveComments } from './parseUtils'
 import Seq from './Seq'
 
 export default function parseSeq(doc, cst) {
+  if (cst.type !== Type.SEQ && cst.type !== Type.FLOW_SEQ) {
+    const msg = `A ${cst.type} node cannot be resolved as a sequence`
+    doc.errors.push(new YAMLSyntaxError(cst, msg))
+    return null
+  }
   const { comments, items } =
     cst.type === Type.FLOW_SEQ
       ? resolveFlowSeqItems(doc, cst)
@@ -28,13 +33,11 @@ function resolveBlockSeqItems(doc, cst) {
       case Type.SEQ_ITEM:
         if (item.error) doc.errors.push(item.error)
         items.push(doc.resolveNode(item.node))
-        if (item.hasProps)
-          doc.errors.push(
-            new YAMLSemanticError(
-              item,
-              'Sequence items cannot have tags or anchors before the - indicator'
-            )
-          )
+        if (item.hasProps) {
+          const msg =
+            'Sequence items cannot have tags or anchors before the - indicator'
+          doc.errors.push(new YAMLSemanticError(item, msg))
+        }
         break
       default:
         if (item.error) doc.errors.push(item.error)
@@ -70,13 +73,11 @@ function resolveFlowSeqItems(doc, cst) {
       } else if (next !== '[' && item === ':' && key === undefined) {
         if (next === ',') {
           key = items.pop()
-          if (key instanceof Pair)
-            doc.errors.push(
-              new YAMLSemanticError(
-                item,
-                'Chaining flow sequence pairs is invalid (e.g. [ a : b : c ])'
-              )
-            )
+          if (key instanceof Pair) {
+            const msg =
+              'Chaining flow sequence pairs is invalid (e.g. [ a : b : c ])'
+            doc.errors.push(new YAMLSemanticError(item, msg))
+          }
           if (!explicitKey) checkKeyLength(doc.errors, cst, i, key, keyStart)
         } else {
           key = null
@@ -85,23 +86,16 @@ function resolveFlowSeqItems(doc, cst) {
         explicitKey = false // TODO: add error for non-explicit multiline plain key
         next = null
       } else if (next === '[' || item !== ']' || i < cst.items.length - 1) {
-        doc.errors.push(
-          new YAMLSyntaxError(
-            cst,
-            `Flow sequence contains an unexpected ${item}`
-          )
-        )
+        const msg = `Flow sequence contains an unexpected ${item}`
+        doc.errors.push(new YAMLSyntaxError(cst, msg))
       }
     } else if (item.type === Type.COMMENT) {
       comments.push({ comment: item.comment, before: items.length })
     } else {
-      if (next)
-        doc.errors.push(
-          new YAMLSemanticError(
-            item,
-            `Expected a ${next} here in flow sequence`
-          )
-        )
+      if (next) {
+        const msg = `Expected a ${next} here in flow sequence`
+        doc.errors.push(new YAMLSemanticError(item, msg))
+      }
       const value = doc.resolveNode(item)
       if (key === undefined) {
         items.push(value)
