@@ -73,7 +73,7 @@ export default class Document {
       )
   }
 
-  parse({ directives = [], contents = [], error }) {
+  parse({ directives = [], contents = [], error, valueRange }) {
     if (error) {
       if (!error.source) error.source = this
       this.errors.push(error)
@@ -97,6 +97,7 @@ export default class Document {
       }
       if (comment) directiveComments.push(comment)
     })
+    this.range = valueRange ? [valueRange.start, valueRange.end] : null
     this.setSchema()
     this.anchors._cstAliases = []
     this.commentBefore = directiveComments.join('\n') || null
