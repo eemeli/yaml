@@ -1,0 +1,126 @@
+import parseCST from './cst/parse'
+import Document from './Document'
+
+// test harness for yaml-test-suite event tests
+export default function testEvents(src, options) {
+  const opt = Object.assign(
+    { keepCstNodes: true, keepNodeTypes: true, version: '1.2' },
+    options
+  )
+  const docs = parseCST(src).map(cstDoc => new Document(opt).parse(cstDoc))
+  const events = ['+STR']
+  try {
+    for (let i = 0; i < docs.length; ++i) {
+      const doc = docs[i]
+      let root = doc.contents
+      if (Array.isArray(root)) root = root[0]
+      const [rootStart, rootEnd] = doc.range || [0, 0]
+      let e = doc.errors[0] && doc.errors[0].source
+      if (e && e.type === 'SEQ_ITEM') e = e.node
+      if (e && (e.type === 'DOCUMENT' || e.range.start < rootStart))
+        throw new Error()
+      let docStart = '+DOC'
+      const pre = src.slice(0, rootStart)
+      const explicitDoc = /---\s*$/.test(pre)
+      if (explicitDoc) docStart += ' ---'
+      else if (!doc.contents) continue
+      events.push(docStart)
+      addEvents(events, doc, e, root)
+      if (doc.contents && doc.contents.length > 1) throw new Error()
+      let docEnd = '-DOC'
+      if (rootEnd) {
+        const post = src.slice(rootEnd)
+        if (/^(\s*(#.*)?\n)*\.\.\./.test(post)) docEnd += ' ...'
+      }
+      events.push(docEnd)
+    }
+  } catch (e) {
+    if (e.message) console.error(e.message)
+    return events.join('\n') + '\n'
+  }
+  events.push('-STR')
+  return events.join('\n') + '\n'
+}
+
+function addEvents(events, doc, e, node) {
+  if (!node) return events.push('=VAL :')
+  if (e && node.cstNode === e) throw new Error()
+  let props = ''
+  let anchor = doc.anchors.getName(node)
+  if (anchor) {
+    if (/1$/.test(anchor)) {
+      const alt = anchor.replace(/1$/, '')
+      if (doc.anchors.getNode(alt)) anchor = alt
+    }
+    props = ` &${anchor}`
+  }
+  if (node.cstNode && node.cstNode.tag) {
+    const { handle, suffix } = node.cstNode.tag
+    props += handle === '!' && !suffix ? ' <!>' : ` <${node.tag}>`
+  }
+  let scalar = null
+  switch (node.type) {
+    case 'ALIAS':
+      let alias = doc.anchors.getName(node.source)
+      if (/1$/.test(alias)) {
+        const alt = alias.replace(/1$/, '')
+        if (doc.anchors.getNode(alt)) alias = alt
+      }
+      events.push(`=ALI${props} *${alias}`)
+      break
+    case 'BLOCK_FOLDED':
+      scalar = '>'
+      break
+    case 'BLOCK_LITERAL':
+      scalar = '|'
+      break
+    case 'PLAIN':
+      scalar = ':'
+      break
+    case 'QUOTE_DOUBLE':
+      scalar = '"'
+      break
+    case 'QUOTE_SINGLE':
+      scalar = "'"
+      break
+    case 'PAIR':
+      events.push(`+MAP${props}`)
+      addEvents(events, doc, e, node.key)
+      addEvents(events, doc, e, node.value)
+      events.push('-MAP')
+      break
+    case 'FLOW_SEQ':
+    case 'SEQ':
+      events.push(`+SEQ${props}`)
+      node.items.forEach(item => {
+        addEvents(events, doc, e, item)
+      })
+      events.push('-SEQ')
+      break
+    case 'FLOW_MAP':
+    case 'MAP':
+      events.push(`+MAP${props}`)
+      node.items.forEach(({ key, value }) => {
+        addEvents(events, doc, e, key)
+        addEvents(events, doc, e, value)
+      })
+      events.push('-MAP')
+      break
+    default:
+      throw new Error(`Unexpected node type ${node.type}`)
+  }
+  if (scalar) {
+    const value = node.cstNode.strValue
+      .replace(/\\/g, '\\\\')
+      .replace(/\0/g, '\\0')
+      .replace(/\x07/g, '\\a')
+      .replace(/\x08/g, '\\b')
+      .replace(/\t/g, '\\t')
+      .replace(/\n/g, '\\n')
+      .replace(/\v/g, '\\v')
+      .replace(/\f/g, '\\f')
+      .replace(/\r/g, '\\r')
+      .replace(/\x1b/g, '\\e')
+    events.push(`=VAL${props} ${scalar}${value}`)
+  }
+}
