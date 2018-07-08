@@ -1145,7 +1145,7 @@ bar`,
       warnings: [
         [
           'The tag !local is unavailable, falling back to tag:yaml.org,2002:str',
-          'The tag tag:example.com,2000:app/tag%21 is unavailable, falling back to tag:yaml.org,2002:str'
+          'The tag tag:example.com,2000:app/tag! is unavailable, falling back to tag:yaml.org,2002:str'
         ]
       ],
       special: src => {
@@ -1155,7 +1155,7 @@ bar`,
             resolve: (doc, node) => 'local:' + node.strValue
           },
           {
-            tag: 'tag:example.com,2000:app/tag%21',
+            tag: 'tag:example.com,2000:app/tag!',
             resolve: (doc, node) => 'tag!' + node.strValue
           }
         ]

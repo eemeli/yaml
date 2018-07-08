@@ -218,7 +218,7 @@ export default class Document {
                   : `tag:${suffix}`
               }
             }
-            return prefix.prefix + suffix
+            return prefix.prefix + decodeURIComponent(suffix)
           }
           this.errors.push(
             new YAMLSemanticError(node, `The ${handle} tag has no suffix.`)
@@ -389,8 +389,20 @@ export default class Document {
         const dtp = this.getDefaults().tagPrefixes
         p = dtp && dtp.find(p => tag.indexOf(p.prefix) === 0)
       }
-      if (p) return p.handle + tag.substr(p.prefix.length)
-      return tag[0] === '!' ? tag : `!<${tag}>`
+      if (!p) return tag[0] === '!' ? tag : `!<${tag}>`
+      const suffix = tag.substr(p.prefix.length).replace(
+        /[!,\[]{}]/g,
+        ch =>
+          ({
+            '!': '%21',
+            ',': '%2C',
+            '[': '%5B',
+            ']': '%5D',
+            '{': '%7B',
+            '}': '%7D'
+          }[ch])
+      )
+      return p.handle + suffix
     }
   }
 
