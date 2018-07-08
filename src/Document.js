@@ -345,6 +345,7 @@ export default class Document {
     }
     if (res) {
       res.range = [node.range.start, node.range.end]
+      if (this.options.keepCstNodes) res.cstNode = node
       if (this.options.keepNodeTypes) res.type = node.type
       const cb = comments.before.join('\n')
       if (cb) {
