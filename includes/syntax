@@ -1,0 +1,114 @@
+<h1 id='syntax-and-schema'>Syntax and Schema</h1>
+<p>A YAML schema is a combination of a set of tags and a mechanism for resolving non-specific tags, i.e. values that do not have an explicit tag such as <code>!!int</code>. The default schema is the <code>&#39;core&#39;</code> schema, which is the recommended one for YAML 1.2. For YAML 1.0 and YAML 1.1 documents the default is <code>&#39;yaml-1.1&#39;</code>.</p>
+<h2 id='tags'>Tags</h2><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'"42"'</span><span class="p">)</span>
+<span class="c1">// '42'</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'!!int "42"'</span><span class="p">)</span>
+<span class="c1">// 42</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s2">`
+%TAG ! tag:example.com,2018:app/
+---
+!foo 42
+`</span><span class="p">)</span>
+<span class="c1">// YAMLWarning:</span>
+<span class="c1">//   The tag tag:example.com,2018:app/foo is unavailable,</span>
+<span class="c1">//   falling back to tag:yaml.org,2002:str</span>
+<span class="c1">// '42'</span>
+</code></pre>
+<p>The default prefix for YAML tags is <code>tag:yaml.org,2002:</code>, for which the shorthand <code>!!</code> is used when stringified. Shorthands for other prefixes may also be defined by document-specific directives, e.g. <code>!e!</code> or just <code>!</code> for <code>tag:example.com,2018:app/</code>, but this is not required to use a tag with a different prefix.</p>
+
+<p>During parsing, unresolved tags should not result in errors (though they will be noted as <code>warnings</code>), with the tagged value being parsed according to the data type that it would have under automatic tag resolution rules. This should not result in any data loss, allowing such tags to be handled by the calling app.</p>
+
+<p>In order to have <code>yaml</code> provide you with automatic parsing and stringification of non-standard data types, it will need to be configured with a suitable tag object. For more information, see <a href="#custom-tags">Custom Tags</a>.</p>
+
+<p>The YAML 1.0 tag specification is <a href="#changes-from-yaml-1-0-to-1-1">slightly different</a> from that used in later versions, and implements prefixing shorthands rather differently.</p>
+<h2 id='version-differences'>Version Differences</h2>
+<p>This library&#39;s parser is based on the 1.2 version of the <a href="http://yaml.org/spec/1.2/spec.html">YAML spec</a>, which is mostly backwards-compatible with <a href="http://yaml.org/spec/1.1/">YAML 1.1</a> as well as <a href="http://yaml.org/spec/1.0/">YAML 1.0</a>. Some specific relaxations have been added for backwards compatibility, but if you encounter an issue please <a href="https://github.com/eemeli/yaml/issues">report it</a>.</p>
+<h3 id='changes-from-yaml-1-1-to-1-2'>Changes from YAML 1.1 to 1.2</h3><pre class="highlight yaml tab-yaml"><code><span class="nt">%YAML</span> <span class="m">1.1</span>
+<span class="nn">---</span>
+<span class="na">true</span><span class="pi">:</span> <span class="s">Yes</span>
+<span class="na">octal</span><span class="pi">:</span> <span class="s">014</span>
+<span class="na">sexagesimal</span><span class="pi">:</span> <span class="s">3:25:45</span>
+<span class="na">picture</span><span class="pi">:</span> <span class="kt">!!binary</span> <span class="pi">|</span>
+ <span class="no">R0lGODlhDAAMAIQAAP//9/X</span>
+ <span class="no">17unp5WZmZgAAAOfn515eXv</span>
+ <span class="no">Pz7Y6OjuDg4J+fn5OTk6enp</span>
+ <span class="no">56enmleECcgggoBADs=</span>
+</code></pre><pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">true</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nx">octal</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+  <span class="nx">sexagesimal</span><span class="p">:</span> <span class="mi">12345</span><span class="p">,</span>
+  <span class="nx">picture</span><span class="p">:</span>
+   <span class="nx">Buffer</span> <span class="p">[</span><span class="nx">Uint8Array</span><span class="p">]</span> <span class="p">[</span>
+     <span class="mi">71</span><span class="p">,</span> <span class="mi">73</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">132</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+     <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">247</span><span class="p">,</span> <span class="mi">245</span><span class="p">,</span> <span class="mi">245</span><span class="p">,</span> <span class="mi">238</span><span class="p">,</span> <span class="mi">233</span><span class="p">,</span> <span class="mi">233</span><span class="p">,</span> <span class="mi">229</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span>
+     <span class="mi">102</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">231</span><span class="p">,</span> <span class="mi">231</span><span class="p">,</span> <span class="mi">231</span><span class="p">,</span> <span class="mi">94</span><span class="p">,</span> <span class="mi">94</span><span class="p">,</span> <span class="mi">94</span><span class="p">,</span> <span class="mi">243</span><span class="p">,</span>
+     <span class="mi">243</span><span class="p">,</span> <span class="mi">237</span><span class="p">,</span> <span class="mi">142</span><span class="p">,</span> <span class="mi">142</span><span class="p">,</span> <span class="mi">142</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">159</span><span class="p">,</span> <span class="mi">159</span><span class="p">,</span>
+     <span class="mi">159</span><span class="p">,</span> <span class="mi">147</span><span class="p">,</span> <span class="mi">147</span><span class="p">,</span> <span class="mi">147</span><span class="p">,</span> <span class="mi">167</span><span class="p">,</span> <span class="mi">167</span><span class="p">,</span> <span class="mi">167</span><span class="p">,</span> <span class="mi">158</span><span class="p">,</span> <span class="mi">158</span><span class="p">,</span> <span class="mi">158</span><span class="p">,</span>
+     <span class="mi">105</span><span class="p">,</span> <span class="mi">94</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">59</span> <span class="p">]</span> <span class="p">}</span>
+</code></pre>
+<p>The most significant difference between YAML 1.1 and YAML 1.2 is the introduction of the core data schema as the recommended default, replacing the YAML 1.1 type library:</p>
+
+<ul>
+<li>Only <code>true</code> and <code>false</code> strings are parsed (case-insensitively) as booleans; <code>y</code>, <code>yes</code>, <code>on</code>, and their negative counterparts are parsed as strings.</li>
+<li>Underlines <code>_</code> cannot be used within numerical values.</li>
+<li>Octal values need a <code>0o</code> prefix; e.g. <code>010</code> is now parsed with the value 10 rather than 8.</li>
+<li>The binary and sexagesimal integer formats have been dropped.</li>
+<li>The <code>!!timestamp</code> and <code>!!binary</code> types have been dropped.</li>
+<li>The merge <code>&lt;&lt;</code> and value <code>=</code> special mapping keys have been removed.</li>
+</ul>
+
+<p>The other major change has been to make sure that YAML 1.2 is a valid superset of JSON. Additionally there are some minor differences between the parsing rules:</p>
+
+<ul>
+<li>The next-line <code>\x85</code>, line-separator <code>\u2028</code> and paragraph-separator <code>\u2029</code> characters are no longer considered line-break characters. Within scalar values, this means that next-line characters will not be included in the white-space normalisation. Using any of these outside scalar values is likely to result in errors during parsing. For a relatively robust solution, try replacing <code>\x85</code> and <code>\u2028</code> with <code>\n</code> and <code>\u2029</code> with <code>\n\n</code>.</li>
+<li>Tag shorthands can no longer include any of the characters <code>,[]{}</code>, but can include <code>#</code>. To work around this, either fix your tag names or use verbatim tags.</li>
+<li>Anchors can no longer include any of the characters <code>,[]{}</code>.</li>
+<li>Inside double-quoted strings <code>\/</code> is now a valid escape for the <code>/</code> character.</li>
+<li>Quoted content can include practically all Unicode characters</li>
+</ul>
+<h3 id='changes-from-yaml-1-0-to-1-1'>Changes from YAML 1.0 to 1.1</h3><pre class="highlight plaintext"><code>%YAML:1.0
+---
+date: 2001-01-23
+number: !int '123'
+string: !str 123
+pool: !!ball { number: 8 }
+invoice: !domain.tld,2002/^invoice
+  customers: !seq
+    - !^customer
+      given : Chris
+      family : Dumars
+</code></pre><pre class="highlight javascript"><code><span class="c1">// YAMLWarning:</span>
+<span class="c1">//   The tag tag:private.yaml.org,2002:ball is unavailable,</span>
+<span class="c1">//   falling back to tag:yaml.org,2002:map</span>
+<span class="c1">// YAMLWarning:</span>
+<span class="c1">//   The tag tag:domain.tld,2002/^invoice is unavailable,</span>
+<span class="c1">//   falling back to tag:yaml.org,2002:map</span>
+<span class="c1">// YAMLWarning:</span>
+<span class="c1">//   The tag ^customer is unavailable,</span>
+<span class="c1">//   falling back to tag:yaml.org,2002:map</span>
+<span class="p">{</span> <span class="nl">date</span><span class="p">:</span> <span class="s1">'2001-01-23T00:00:00.000Z'</span><span class="p">,</span>
+  <span class="nx">number</span><span class="p">:</span> <span class="mi">123</span><span class="p">,</span>
+  <span class="nx">string</span><span class="p">:</span> <span class="s1">'123'</span><span class="p">,</span>
+  <span class="nx">pool</span><span class="p">:</span> <span class="p">{</span> <span class="nl">number</span><span class="p">:</span> <span class="mi">8</span> <span class="p">},</span>
+  <span class="nx">invoice</span><span class="p">:</span> <span class="p">{</span> <span class="nl">customers</span><span class="p">:</span> <span class="p">[</span> <span class="p">{</span> <span class="na">given</span><span class="p">:</span> <span class="s1">'Chris'</span><span class="p">,</span> <span class="na">family</span><span class="p">:</span> <span class="s1">'Dumars'</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span>
+</code></pre>
+<p>The most significant difference between these versions is the complete refactoring of the tag syntax:</p>
+
+<ul>
+<li>The <code>%TAG</code> directive has been added, along with the <code>!foo!</code> tag prefix shorthand notation.</li>
+<li>The <code>^</code> character no longer enables tag prefixing.</li>
+<li>The private vs. default scoping of <code>!</code> and <code>!!</code> tag prefixes has been switched around; <code>!!str</code> is now a default tag while <code>!bar</code> is an application-specific tag.</li>
+<li>Verbatim <code>!&lt;baz&gt;</code> tag notation has been added.</li>
+<li>The formal <code>tag:domain,date/path</code> format for tag names has been dropped as a requirement.</li>
+</ul>
+
+<p>Additionally, the formal description of the language describing the document structure has been completely refactored between these versions, but the described intent has not changed. Other changes include:</p>
+
+<ul>
+<li>A <code>\</code> escape has been added for the tab character, in addition to the pre-existing <code>\t</code></li>
+<li>The <code>\^</code> escape has been removed</li>
+<li>Directives now use a blank space <code>&#39; &#39;</code> rather than <code>:</code> as the separator between the name and its parameter/value.</li>
+</ul>
+
+<p><code>yaml</code> supports parsing and stringifying YAML 1.0 tags, but does not expand tags using the <code>^</code> notation. If this is something you&#39;d find useful, please file a <a href="https://github.com/eemeli/yaml/issues">GitHub issue</a> about it.</p>

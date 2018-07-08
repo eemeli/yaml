@@ -1,0 +1,34 @@
+<h1 id='errors'>Errors</h1>
+<p>All errors and warnings produced by the <code>yaml</code> parser functions contain the following fields:</p>
+
+<table><thead>
+<tr>
+<th>Member</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>name</td>
+<td><code>string</code></td>
+<td>One of <code>YAMLReferenceError</code>, <code>YAMLSemanticError</code>, <code>YAMLSyntaxError</code>, or <code>YAMLWarning</code></td>
+</tr>
+<tr>
+<td>message</td>
+<td><code>string</code></td>
+<td>A human-readable description of the error</td>
+</tr>
+<tr>
+<td>source</td>
+<td><code>CST Node</code></td>
+<td>The CST node at which this error or warning was encountered</td>
+</tr>
+</tbody></table>
+<h2 id='yamlreferenceerror'>YAMLReferenceError</h2>
+<p>An error resolving a tag or an anchor that is referred to in the source. It is likely that the contents of the <code>source</code> node have not been completely parsed into the document. Not used by the CST parser.</p>
+<h2 id='yamlsemanticerror'>YAMLSemanticError</h2>
+<p>An error related to the metadata of the document, or an error with limitations imposed by the YAML spec. The data contents of the document should be valid, but the metadata may be broken.</p>
+<h2 id='yamlsyntaxerror'>YAMLSyntaxError</h2>
+<p>A serious parsing error; the document contents will not be complete, and the CST is likely to be rather broken.</p>
+<h2 id='yamlwarning'>YAMLWarning</h2>
+<p>Not an error, but a spec-mandated warning about unsupported directives or a fallback resolution being used for a node with an unavailable tag. Not used by the CST parser.</p>

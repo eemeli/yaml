@@ -1,0 +1,193 @@
+<h1 id='cst-parser'>CST Parser</h1>
+<p>For ease of implementation and to provide better error handling and reporting, the lowest level of the library&#39;s parser turns any input string into a <a href="https://en.wikipedia.org/wiki/Concrete_syntax_tree"><strong>Concrete Syntax Tree</strong></a> of nodes as if the input were YAML. This level of the API has not been designed to be particularly user-friendly for external users, but it is fast, robust, and not dependent on the rest of the library.</p>
+<h2 id='parsecst'>parseCST</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">parseCST</span> <span class="nx">from</span> <span class="s1">'yaml/parse-cst'</span>
+
+<span class="kr">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">parseCST</span><span class="p">(</span><span class="s2">`
+sequence: [ one, two, ]
+mapping: { sky: blue, sea: green }
+---
+-
+  "flow in block"
+- &gt;
+ Block scalar
+- !!map # Block collection
+  foo : bar
+`</span><span class="p">)</span>
+
+<span class="nx">cst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>            <span class="c1">// first document, containing a map with two keys</span>
+  <span class="p">.</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1">// document contents (as opposed to directives)</span>
+  <span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="nx">node</span>  <span class="c1">// the last item, a flow map</span>
+  <span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>       <span class="c1">// the fourth token, parsed as a plain value</span>
+  <span class="p">.</span><span class="nx">strValue</span>       <span class="c1">// 'blue'</span>
+
+<span class="nx">cst</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>            <span class="c1">// second document, containing a sequence</span>
+  <span class="p">.</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1">// document contents (as opposed to directives)</span>
+  <span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">node</span>  <span class="c1">// the second item, a block value</span>
+  <span class="p">.</span><span class="nx">strValue</span>       <span class="c1">// 'Block scalar\n'</span>
+</code></pre><h4 id='parsecst-string-cstdocument'><code>parseCST(string): CSTDocument[]</code></h4>
+<p>The CST parser will not produce a CST that is necessarily valid YAML, and in particular its representation of collections of items is expected to undergo further processing and validation. The parser should never throw errors, but may include them as a value of the relevant node. On the other hand, if you feed it garbage, you&#39;ll likely get a garbage CST as well.</p>
+
+<p>The public API of the library is a single function which returns an array of parsed CST documents. The array and its contained nodes override the default <code>toString</code> method, each returning a YAML string representation of its contents.</p>
+
+<p>If a node has its <code>value</code> set, that will be used when re-stringifying. Care should be taken when modifying the CST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren&#39;t broken. In other words, this is an engineering tool and you may hurt yourself. If you&#39;re looking to generate a brand new YAML document, you should probably not be using this API directly.</p>
+
+<p>For more usage examples and CST trees, have a look through the <a href="https://github.com/eemeli/yaml/tree/master/__tests__/cst">extensive test suite</a> included in the project&#39;s repository.</p>
+
+<h3 style="clear:both">Error detection</h3>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
+<span class="kr">import</span> <span class="nx">parseCST</span> <span class="nx">from</span> <span class="s1">'yaml/parse-cst'</span>
+
+<span class="kr">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">parseCST</span><span class="p">(</span><span class="s1">'this: is: bad YAML'</span><span class="p">)</span>
+
+<span class="nx">cst</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1">// Note: Simplified for clarity</span>
+<span class="c1">// { type: 'MAP',</span>
+<span class="c1">//   items: [</span>
+<span class="c1">//     { type: 'PLAIN', strValue: 'this' },</span>
+<span class="c1">//     { type: 'MAP_VALUE',</span>
+<span class="c1">//       node: {</span>
+<span class="c1">//         type: 'MAP',</span>
+<span class="c1">//         items: [</span>
+<span class="c1">//           { type: 'PLAIN', strValue: 'is' },</span>
+<span class="c1">//           { type: 'MAP_VALUE',</span>
+<span class="c1">//             node: { type: 'PLAIN', strValue: 'bad YAML' } } ] } } ] }</span>
+
+<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">cst</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">errors</span>
+<span class="c1">// [ {</span>
+<span class="c1">//   name: 'YAMLSemanticError',</span>
+<span class="c1">//   message: 'Nested mappings are not allowed in compact mappings',</span>
+<span class="c1">//   source: {</span>
+<span class="c1">//     type: 'MAP',</span>
+<span class="c1">//     range: { start: 6, end: 18 },</span>
+<span class="c1">//     ...,</span>
+<span class="c1">//     rawValue: 'is: bad YAML' } } ]</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">value</span>
+<span class="c1">// 'bad YAML'</span>
+</code></pre>
+<p>While the YAML spec considers e.g. block collections within a flow collection to be an error, this error will not be detected by the CST parser. For complete validation, you will need to parse the CST into a <code>YAML.Document</code>. If the document contains errors, they will be included in the document&#39;s <code>errors</code> array, and each error will will contain a <code>source</code> reference to the CST node where it was encountered. Do note that even if an error is encountered, the document contents might still be available. In such a case, the error will be a <a href="#yamlsemanticerror"><code>YAMLSemanticError</code></a> rather than a <a href="#yamlsyntaxerror"><code>YAMLSyntaxError</code></a>.</p>
+<h2 id='cst-nodes'>CST Nodes</h2>
+<blockquote>
+<p>Node type definitions use Flow-ish notation, so <code>+</code> as a prefix indicates a read-only getter property.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Range</span> <span class="p">{</span>
+  <span class="nl">start</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>        <span class="c1">// offset of first character</span>
+  <span class="nx">end</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>          <span class="c1">// offset after last character</span>
+  <span class="o">+</span><span class="nx">isEmpty</span><span class="p">:</span> <span class="kr">boolean</span>     <span class="c1">// true if end is not greater than start</span>
+<span class="p">}</span>
+</code></pre>
+<p><strong>Note</strong>: The <code>Node</code>, <code>Scalar</code> and other values referred to in this section are the CST representations of said objects, and are not the same as those used in preceding parts.</p>
+
+<p>Actual values in the CST nodes are stored as <code>start</code>, <code>end</code> indices of the input string. This allows for memory consumption to be minimised by making string generation really lazy.</p>
+
+<h3 style="clear:both">Node</h3>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">context</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">atLineStart</span><span class="p">:</span> <span class="kr">boolean</span><span class="p">,</span> <span class="c1">// is this node the first one on this line</span>
+    <span class="nx">indent</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>     <span class="c1">// current level of indentation (may be -1)</span>
+    <span class="nx">src</span><span class="p">:</span> <span class="nx">string</span>         <span class="c1">// the full original source</span>
+  <span class="p">},</span>
+  <span class="nx">error</span><span class="p">:</span> <span class="p">?</span><span class="nb">Error</span><span class="p">,</span>        <span class="c1">// if not null, indicates a parser failure</span>
+  <span class="nx">props</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Range</span><span class="o">&gt;</span><span class="p">,</span>  <span class="c1">// anchors, tags and comments</span>
+  <span class="nx">range</span><span class="p">:</span> <span class="nx">Range</span><span class="p">,</span>         <span class="c1">// span of context.src parsed into this node</span>
+  <span class="nx">type</span><span class="p">:</span>                 <span class="c1">// specific node type</span>
+    <span class="s1">'ALIAS'</span> <span class="o">|</span> <span class="s1">'BLOCK_FOLDED'</span> <span class="o">|</span> <span class="s1">'BLOCK_LITERAL'</span> <span class="o">|</span> <span class="s1">'COMMENT'</span> <span class="o">|</span>
+    <span class="s1">'DIRECTIVE'</span> <span class="o">|</span> <span class="s1">'DOCUMENT'</span> <span class="o">|</span> <span class="s1">'FLOW_MAP'</span> <span class="o">|</span> <span class="s1">'FLOW_SEQ'</span> <span class="o">|</span>
+    <span class="s1">'MAP'</span> <span class="o">|</span> <span class="s1">'MAP_KEY'</span> <span class="o">|</span> <span class="s1">'MAP_VALUE'</span> <span class="o">|</span> <span class="s1">'PLAIN'</span> <span class="o">|</span>
+    <span class="s1">'QUOTE_DOUBLE'</span> <span class="o">|</span> <span class="s1">'QUOTE_SINGLE'</span> <span class="o">|</span> <span class="s1">'SEQ'</span> <span class="o">|</span> <span class="s1">'SEQ_ITEM'</span><span class="p">,</span>
+  <span class="nx">value</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span>        <span class="c1">// if set to a non-null value, overrides</span>
+                        <span class="c1">//   source value when stringified</span>
+  <span class="o">+</span><span class="nx">anchor</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>     <span class="c1">// anchor, if set</span>
+  <span class="o">+</span><span class="nx">comment</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>    <span class="c1">// newline-delimited comment(s), if any</span>
+  <span class="o">+</span><span class="nx">rawValue</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>   <span class="c1">// an unprocessed slice of context.src</span>
+                        <span class="c1">//   determining this node's value</span>
+  <span class="o">+</span><span class="nx">tag</span><span class="p">:</span>                 <span class="c1">// this node's tag, if set</span>
+    <span class="kc">null</span> <span class="o">|</span> <span class="p">{</span> <span class="na">verbatim</span><span class="p">:</span> <span class="nx">string</span> <span class="p">}</span> <span class="o">|</span> <span class="p">{</span> <span class="na">handle</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="na">suffix</span><span class="p">:</span> <span class="nx">string</span> <span class="p">},</span>
+  <span class="nx">toString</span><span class="p">():</span> <span class="nx">string</span>    <span class="c1">// a YAML string representation of this node</span>
+<span class="p">}</span>
+
+<span class="nx">type</span> <span class="nx">ContentNode</span> <span class="o">=</span>
+  <span class="nx">Comment</span> <span class="o">|</span> <span class="nx">Alias</span> <span class="o">|</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">Map</span> <span class="o">|</span> <span class="nx">Seq</span> <span class="o">|</span> <span class="nx">FlowCollection</span>
+</code></pre>
+<p>Each node in the CST extends a common ancestor <code>Node</code>. Additional undocumented properties are available, but are likely only useful during parsing.</p>
+
+<h3 style="clear:both">Scalars</h3>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Alias</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="c1">// rawValue will contain the anchor without the * prefix</span>
+  <span class="nl">type</span><span class="p">:</span> <span class="s1">'ALIAS'</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">Scalar</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">type</span><span class="p">:</span> <span class="s1">'PLAIN'</span> <span class="o">|</span> <span class="s1">'QUOTE_DOUBLE'</span> <span class="o">|</span> <span class="s1">'QUOTE_SINGLE'</span> <span class="o">|</span>
+    <span class="s1">'BLOCK_FOLDED'</span> <span class="o">|</span> <span class="s1">'BLOCK_LITERAL'</span>
+  <span class="o">+</span><span class="nx">strValue</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span> <span class="o">|</span>  <span class="c1">// unescaped string value</span>
+    <span class="p">{</span> <span class="na">str</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="na">errors</span><span class="p">:</span> <span class="nx">YAMLSyntaxError</span><span class="p">[]</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">Comment</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">type</span><span class="p">:</span> <span class="s1">'COMMENT'</span><span class="p">,</span>      <span class="c1">// PLAIN nodes may also be comment-only</span>
+  <span class="o">+</span><span class="nx">anchor</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="o">+</span><span class="nx">comment</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+  <span class="o">+</span><span class="nx">rawValue</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="o">+</span><span class="nx">tag</span><span class="p">:</span> <span class="kc">null</span>
+<span class="p">}</span>
+</code></pre>
+<p>While <code>Alias</code> and <code>Comment</code> nodes are not technically scalars, they are parsed as such at this level.</p>
+
+<p>Due to parsing differences, each scalar type is implemented using its own class.</p>
+
+<h3 style="clear:both">Collections</h3>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">MapItem</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">node</span><span class="p">:</span> <span class="nx">ContentNode</span> <span class="o">|</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="nx">type</span><span class="p">:</span> <span class="s1">'MAP_KEY'</span> <span class="o">|</span> <span class="s1">'MAP_VALUE'</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">Map</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="c1">// implicit keys are not wrapped</span>
+  <span class="nl">items</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Comment</span> <span class="o">|</span> <span class="nx">Alias</span> <span class="o">|</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">MapItem</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">type</span><span class="p">:</span> <span class="s1">'MAP'</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">SeqItem</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">node</span><span class="p">:</span> <span class="nx">ContentNode</span> <span class="o">|</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="nx">type</span><span class="p">:</span> <span class="s1">'SEQ_ITEM'</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">Seq</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">items</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Comment</span> <span class="o">|</span> <span class="nx">SeqItem</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">type</span><span class="p">:</span> <span class="s1">'SEQ'</span>
+<span class="p">}</span>
+
+<span class="nx">type</span> <span class="nx">FlowChar</span> <span class="o">=</span> <span class="s1">'{'</span> <span class="o">|</span> <span class="s1">'}'</span> <span class="o">|</span> <span class="s1">'['</span> <span class="o">|</span> <span class="s1">']'</span> <span class="o">|</span> <span class="s1">','</span> <span class="o">|</span> <span class="s1">'?'</span> <span class="o">|</span> <span class="s1">':'</span>
+
+<span class="kr">class</span> <span class="nx">FlowCollection</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">items</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">FlowChar</span> <span class="o">|</span> <span class="nx">Comment</span> <span class="o">|</span> <span class="nx">Alias</span> <span class="o">|</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">FlowCollection</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">type</span><span class="p">:</span> <span class="s1">'FLOW_MAP'</span> <span class="o">|</span> <span class="s1">'FLOW_SEQ'</span>
+<span class="p">}</span>
+</code></pre>
+<p>Block and flow collections are parsed rather differently, due to their representation differences.</p>
+
+<p>An <code>Alias</code> or <code>Scalar</code> item directly within a <code>Map</code> should be treated as an implicit map key.</p>
+
+<p>In actual code, <code>MapItem</code> and <code>SeqItem</code> are implemented as <code>CollectionItem</code>, and correspondingly <code>Map</code> and <code>Seq</code> as <code>Collection</code>.</p>
+
+<h3 style="clear:both">Document Structure</h3>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Directive</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>  <span class="c1">// should only be 'TAG' or 'YAML'</span>
+  <span class="nx">type</span><span class="p">:</span> <span class="s1">'DIRECTIVE'</span><span class="p">,</span>
+  <span class="o">+</span><span class="nx">anchor</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="o">+</span><span class="nx">parameters</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">string</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="o">+</span><span class="nx">tag</span><span class="p">:</span> <span class="kc">null</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">CSTDocument</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nl">directives</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Comment</span> <span class="o">|</span> <span class="nx">Directive</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">contents</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">ContentNode</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">type</span><span class="p">:</span> <span class="s1">'DOCUMENT'</span><span class="p">,</span>
+  <span class="o">+</span><span class="nx">anchor</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="o">+</span><span class="nx">comment</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="o">+</span><span class="nx">tag</span><span class="p">:</span> <span class="kc">null</span>
+<span class="p">}</span>
+</code></pre>
+<p>The CST tree of a valid YAML document should have a single non-<code>Comment</code> <code>ContentNode</code> in its <code>contents</code> array. Multiple values indicates that the input is malformed in a way that made it impossible to determine the proper structure of the document.</p>
