@@ -18,6 +18,7 @@ export default class Merge extends Pair {
     } else {
       super(new Scalar(MERGE_KEY), new Seq())
     }
+    this.type = 'MERGE_PAIR'
   }
 
   toString(ctx, onComment) {

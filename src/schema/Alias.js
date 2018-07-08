@@ -1,3 +1,4 @@
+import { Type } from '../cst/Node'
 import toJSON from '../toJSON'
 import Node from './Node'
 
@@ -16,6 +17,7 @@ export default class Alias extends Node {
   constructor(source) {
     super()
     this.source = source
+    this.type = Type.ALIAS
   }
 
   set tag(t) {

@@ -11,6 +11,7 @@ export default class Pair extends Node {
     super()
     this.key = key
     this.value = value
+    this.type = 'PAIR'
   }
 
   get commentBefore() {
