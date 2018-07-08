@@ -1,6 +1,7 @@
 import parseCST from './cst/parse'
 import createNode from './createNode'
 import YAMLDocument from './Document'
+import { YAMLSemanticError } from './errors'
 
 const defaultOptions = {
   keepNodeTypes: true,
@@ -21,12 +22,13 @@ function parseAllDocuments(src, options) {
 
 function parseDocument(src, options) {
   const cst = parseCST(src)
+  const doc = new Document(options).parse(cst[0])
   if (cst.length > 1) {
-    throw new Error(
+    const errMsg =
       'Source contains multiple documents; please use YAML.parseAllDocuments()'
-    )
+    doc.errors.unshift(new YAMLSemanticError(cst[1], errMsg))
   }
-  return new Document(options).parse(cst[0])
+  return doc
 }
 
 function parse(src, options) {
