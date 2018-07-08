@@ -90,13 +90,10 @@ export default class Document {
           this.resolveYamlDirective(directive)
           break
         default:
-          if (name)
-            this.warnings.push(
-              new YAMLWarning(
-                directive,
-                `YAML 1.2 only supports %TAG and %YAML directives, and not %${name}`
-              )
-            )
+          if (name) {
+            const msg = `YAML only supports %TAG and %YAML directives, and not %${name}`
+            this.warnings.push(new YAMLWarning(directive, msg))
+          }
       }
       if (comment) directiveComments.push(comment)
     })
@@ -108,12 +105,8 @@ export default class Document {
     contents.forEach(node => {
       if (node.valueRange && !node.valueRange.isEmpty) {
         if (contentNodes.length === 1) {
-          this.errors.push(
-            new YAMLSyntaxError(
-              node,
-              'Document is not valid YAML (bad indentation?)'
-            )
-          )
+          const msg = 'Document is not valid YAML (bad indentation?)'
+          this.errors.push(new YAMLSyntaxError(node, msg))
         }
         contentNodes.push(this.resolveNode(node))
       } else if (node.comment) {
@@ -162,20 +155,13 @@ export default class Document {
       if (this.tagPrefixes.every(p => p.handle !== handle)) {
         this.tagPrefixes.push({ handle, prefix })
       } else {
-        this.errors.push(
-          new YAMLSemanticError(
-            directive,
-            'The %TAG directive must only be given at most once per handle in the same document.'
-          )
-        )
+        const msg =
+          'The %TAG directive must only be given at most once per handle in the same document.'
+        this.errors.push(new YAMLSemanticError(directive, msg))
       }
     } else {
-      this.errors.push(
-        new YAMLSemanticError(
-          directive,
-          'Insufficient parameters given for %TAG directive'
-        )
-      )
+      const msg = 'Insufficient parameters given for %TAG directive'
+      this.errors.push(new YAMLSemanticError(directive, msg))
     }
   }
 
@@ -207,12 +193,8 @@ export default class Document {
       const { handle, suffix, verbatim } = tag
       if (verbatim) {
         if (verbatim !== '!' && verbatim !== '!!') return verbatim
-        this.errors.push(
-          new YAMLSemanticError(
-            node,
-            `Verbatim tags aren't resolved, so ${verbatim} is invalid.`
-          )
-        )
+        const msg = `Verbatim tags aren't resolved, so ${verbatim} is invalid.`
+        this.errors.push(new YAMLSemanticError(node, msg))
       } else if (handle === '!' && !suffix) {
         nonSpecific = true
       } else {
@@ -242,12 +224,8 @@ export default class Document {
             new YAMLSemanticError(node, `The ${handle} tag has no suffix.`)
           )
         } else {
-          this.errors.push(
-            new YAMLSemanticError(
-              node,
-              `The ${handle} tag handle is non-default and was not declared.`
-            )
-          )
+          const msg = `The ${handle} tag handle is non-default and was not declared.`
+          this.errors.push(new YAMLSemanticError(node, msg))
         }
       }
     }
@@ -282,13 +260,11 @@ export default class Document {
     props.forEach(({ start, end }, i) => {
       switch (node.context.src[start]) {
         case Char.COMMENT:
-          if (!node.commentHasRequiredWhitespace(start))
-            errors.push(
-              new YAMLSemanticError(
-                node,
-                'Comments must be separated from other tokens by white space characters'
-              )
-            )
+          if (!node.commentHasRequiredWhitespace(start)) {
+            const msg =
+              'Comments must be separated from other tokens by white space characters'
+            errors.push(new YAMLSemanticError(node, msg))
+          }
           const c = node.context.src.slice(start + 1, end)
           const { header, valueRange } = node
           if (
@@ -301,17 +277,17 @@ export default class Document {
           }
           break
         case Char.ANCHOR:
-          if (hasAnchor)
-            errors.push(
-              new YAMLSemanticError(node, 'A node can have at most one anchor')
-            )
+          if (hasAnchor) {
+            const msg = 'A node can have at most one anchor'
+            errors.push(new YAMLSemanticError(node, msg))
+          }
           hasAnchor = true
           break
         case Char.TAG:
-          if (hasTag)
-            errors.push(
-              new YAMLSemanticError(node, 'A node can have at most one tag')
-            )
+          if (hasTag) {
+            const msg = 'A node can have at most one tag'
+            errors.push(new YAMLSemanticError(node, msg))
+          }
           hasTag = true
           break
       }
@@ -329,31 +305,24 @@ export default class Document {
     }
     let res
     if (node.type === Type.ALIAS) {
-      if (hasAnchor || hasTag)
-        errors.push(
-          new YAMLSemanticError(
-            node,
-            'An alias node must not specify any properties'
-          )
-        )
+      if (hasAnchor || hasTag) {
+        const msg = 'An alias node must not specify any properties'
+        errors.push(new YAMLSemanticError(node, msg))
+      }
       const name = node.rawValue
       const src = anchors.getNode(name)
       if (!src) {
-        errors.push(
-          new YAMLReferenceError(node, `Aliased anchor not found: ${name}`)
-        )
+        const msg = `Aliased anchor not found: ${name}`
+        errors.push(new YAMLReferenceError(node, msg))
         return null
       }
       // Lazy resolution for circular references
       res = new Alias(src)
       anchors._cstAliases.push(res)
       if (!src.resolved) {
-        this.warnings.push(
-          new YAMLWarning(
-            node,
-            'Alias node contains a circular reference, which cannot be resolved as JSON'
-          )
-        )
+        const msg =
+          'Alias node contains a circular reference, which cannot be resolved as JSON'
+        this.warnings.push(new YAMLWarning(node, msg))
       }
     } else {
       const tagName = this.resolveTagName(node)
@@ -361,12 +330,8 @@ export default class Document {
         res = schema.resolveNodeWithFallback(this, node, tagName)
       } else {
         if (node.type !== Type.PLAIN) {
-          errors.push(
-            new YAMLSyntaxError(
-              node,
-              `Failed to resolve ${node.type} node here`
-            )
-          )
+          const msg = `Failed to resolve ${node.type} node here`
+          errors.push(new YAMLSyntaxError(node, msg))
           return null
         }
         try {

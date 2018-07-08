@@ -922,9 +922,7 @@ Chomping: |
 # with a warning.
 --- "foo"`,
       tgt: ['foo'],
-      warnings: [
-        ['YAML 1.2 only supports %TAG and %YAML directives, and not %FOO']
-      ]
+      warnings: [['YAML only supports %TAG and %YAML directives, and not %FOO']]
     }
   },
   '6.8.1. “YAML” Directives': {
