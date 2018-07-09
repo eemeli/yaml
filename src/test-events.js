@@ -49,8 +49,8 @@ function addEvents(events, doc, e, node) {
   let props = ''
   let anchor = doc.anchors.getName(node)
   if (anchor) {
-    if (/1$/.test(anchor)) {
-      const alt = anchor.replace(/1$/, '')
+    if (/\d$/.test(anchor)) {
+      const alt = anchor.replace(/\d$/, '')
       if (doc.anchors.getNode(alt)) anchor = alt
     }
     props = ` &${anchor}`
@@ -63,8 +63,8 @@ function addEvents(events, doc, e, node) {
   switch (node.type) {
     case 'ALIAS':
       let alias = doc.anchors.getName(node.source)
-      if (/1$/.test(alias)) {
-        const alt = alias.replace(/1$/, '')
+      if (/\d$/.test(alias)) {
+        const alt = alias.replace(/\d$/, '')
         if (doc.anchors.getNode(alt)) alias = alt
       }
       events.push(`=ALI${props} *${alias}`)

@@ -7,7 +7,7 @@ import testEvents from '../src/test-events'
 
 const testDirs = fs
   .readdirSync(path.resolve(__dirname, 'yaml-test-suite'))
-  .filter(dir => ['.git', 'meta', 'name', 'tags'].indexOf(dir) === -1)
+  .filter(dir => /^[A-Z0-9]{4}$/.test(dir))
 
 const matchJson = (docs, json) => {
   if (!json) return
