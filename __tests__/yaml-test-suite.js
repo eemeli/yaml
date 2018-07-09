@@ -62,7 +62,12 @@ testDirs.forEach(dir => {
 
   describe(`${dir}: ${name}`, () => {
     const docs = YAML.parseAllDocuments(yaml)
-    if (events) test('test.event', () => expect(testEvents(yaml)).toBe(events))
+    if (events) {
+      test('test.event', () => {
+        const actual = testEvents(yaml).events.join('\n') + '\n'
+        expect(actual).toBe(events)
+      })
+    }
     if (json) test('in.json', () => matchJson(docs, json))
     test('errors', () => {
       const errors = docs

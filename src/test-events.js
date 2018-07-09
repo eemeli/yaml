@@ -8,6 +8,8 @@ export default function testEvents(src, options) {
     options
   )
   const docs = parseCST(src).map(cstDoc => new Document(opt).parse(cstDoc))
+  const errDoc = docs.find(doc => doc.errors.length > 0)
+  const error = errDoc ? errDoc.errors[0].message : null
   const events = ['+STR']
   try {
     for (let i = 0; i < docs.length; ++i) {
@@ -35,11 +37,10 @@ export default function testEvents(src, options) {
       events.push(docEnd)
     }
   } catch (e) {
-    if (e.message) console.error(e.message)
-    return events.join('\n') + '\n'
+    return { events, error: error || e }
   }
   events.push('-STR')
-  return events.join('\n') + '\n'
+  return { events, error }
 }
 
 function addEvents(events, doc, e, node) {
