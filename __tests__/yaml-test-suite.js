@@ -64,8 +64,9 @@ testDirs.forEach(dir => {
     const docs = YAML.parseAllDocuments(yaml)
     if (events) {
       test('test.event', () => {
-        const actual = testEvents(yaml).events.join('\n') + '\n'
-        expect(actual).toBe(events)
+        const res = testEvents(yaml)
+        expect(res.events.join('\n') + '\n').toBe(events)
+        expect(res.error).toBeNull()
       })
     }
     if (json) test('in.json', () => matchJson(docs, json))
