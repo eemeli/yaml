@@ -50,6 +50,7 @@ export default {
   Document,
   parse,
   parseAllDocuments,
+  parseCST,
   parseDocument,
   stringify
 }
