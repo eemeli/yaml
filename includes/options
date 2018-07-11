@@ -1,12 +1,16 @@
 <h1 id='options'>Options</h1><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span>
-<span class="c1">// { keepBlobsInJSON: true, keepNodeTypes: true, version: '1.2' }</span>
+<span class="c1">// { keepBlobsInJSON: true,</span>
+<span class="c1">//   keepNodeTypes: true,</span>
+<span class="c1">//   version: '1.2' }</span>
 
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">.</span><span class="nx">defaults</span>
 <span class="c1">// { '1.0': { merge: true, schema: 'yaml-1.1' },</span>
 <span class="c1">//   '1.1': { merge: true, schema: 'yaml-1.1' },</span>
 <span class="c1">//   '1.2': { merge: false, schema: 'core' } }</span>
 </code></pre><h4 id='yaml-defaultoptions'><code>YAML.defaultOptions</code></h4><h4 id='yaml-document-defaults'><code>YAML.Document.defaults</code></h4>
-<p><code>yaml</code> defines options in three places: as an argument of parse, create and stringify calls, in the values of <code>YAML.defaultOptions</code>, and in the version-dependent <code>YAML.Document.defaults</code> object. Values set in <code>YAML.defaultOptions</code> override version-dependent defaults, and argument options override both. The <code>version</code> option value (<code>&#39;1.2&#39;</code> by default) may be overridden by any document-specific <code>%YAML</code> directive.</p>
+<p><code>yaml</code> defines options in three places: as an argument of parse, create and stringify calls, in the values of <code>YAML.defaultOptions</code>, and in the version-dependent <code>YAML.Document.defaults</code> object. Values set in <code>YAML.defaultOptions</code> override version-dependent defaults, and argument options override both.</p>
+
+<p>The <code>version</code> option value (<code>&#39;1.2&#39;</code> by default) may be overridden by any document-specific <code>%YAML</code> directive.</p>
 
 <table><thead>
 <tr>
@@ -19,6 +23,11 @@
 <td>keepBlobsInJSON</td>
 <td><code>boolean</code></td>
 <td>Allow non-JSON JavaScript objects to remain in the <code>toJSON</code> output. Relevant with the YAML 1.1 <code>!!timestamp</code> and <code>!!binary</code> tags. By default <code>true</code>.</td>
+</tr>
+<tr>
+<td>keepCstNodes</td>
+<td><code>boolean</code></td>
+<td>Include references in the AST to each node&#39;s corresponding CST node. By default <code>false</code>.</td>
 </tr>
 <tr>
 <td>keepNodeTypes</td>

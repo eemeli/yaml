@@ -24,20 +24,19 @@ mapping: { sky: blue, sea: green }
   <span class="p">.</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1">// document contents (as opposed to directives)</span>
   <span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">node</span>  <span class="c1">// the second item, a block value</span>
   <span class="p">.</span><span class="nx">strValue</span>       <span class="c1">// 'Block scalar\n'</span>
-</code></pre><h4 id='parsecst-string-cstdocument'><code>parseCST(string): CSTDocument[]</code></h4>
+</code></pre><h4 id='parsecst-string-cstdocument'><code>parseCST(string): CSTDocument[]</code></h4><h4 id='yaml-parsecst-string-cstdocument'><code>YAML.parseCST(string): CSTDocument[]</code></h4>
 <p>The CST parser will not produce a CST that is necessarily valid YAML, and in particular its representation of collections of items is expected to undergo further processing and validation. The parser should never throw errors, but may include them as a value of the relevant node. On the other hand, if you feed it garbage, you&#39;ll likely get a garbage CST as well.</p>
 
-<p>The public API of the library is a single function which returns an array of parsed CST documents. The array and its contained nodes override the default <code>toString</code> method, each returning a YAML string representation of its contents.</p>
+<p>The public API of the CST layer is a single function which returns an array of parsed CST documents. The array and its contained nodes override the default <code>toString</code> method, each returning a YAML string representation of its contents. The same function is exported as a part of the default <code>YAML</code> object, as well as seprately at <code>yaml/parse-cst</code>. It has no dependency on the rest of the library, so importing only <code>parseCST</code> should add about 9kB to your gzipped bundle size, when the whole library will add about 27kB.</p>
 
-<p>If a node has its <code>value</code> set, that will be used when re-stringifying. Care should be taken when modifying the CST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren&#39;t broken. In other words, this is an engineering tool and you may hurt yourself. If you&#39;re looking to generate a brand new YAML document, you should probably not be using this API directly.</p>
+<p>Care should be taken when modifying the CST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren&#39;t broken. In other words, this is an engineering tool and you may hurt yourself. If you&#39;re looking to generate a brand new YAML document, see the section on <a href="#creating-documents">Creating Documents</a>.</p>
 
 <p>For more usage examples and CST trees, have a look through the <a href="https://github.com/eemeli/yaml/tree/master/__tests__/cst">extensive test suite</a> included in the project&#39;s repository.</p>
 
 <h3 style="clear:both">Error detection</h3>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
-<span class="kr">import</span> <span class="nx">parseCST</span> <span class="nx">from</span> <span class="s1">'yaml/parse-cst'</span>
 
-<span class="kr">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">parseCST</span><span class="p">(</span><span class="s1">'this: is: bad YAML'</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseCST</span><span class="p">(</span><span class="s1">'this: is: bad YAML'</span><span class="p">)</span>
 
 <span class="nx">cst</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1">// Note: Simplified for clarity</span>
 <span class="c1">// { type: 'MAP',</span>
@@ -111,6 +110,8 @@ mapping: { sky: blue, sea: green }
   <span class="nx">Comment</span> <span class="o">|</span> <span class="nx">Alias</span> <span class="o">|</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">Map</span> <span class="o">|</span> <span class="nx">Seq</span> <span class="o">|</span> <span class="nx">FlowCollection</span>
 </code></pre>
 <p>Each node in the CST extends a common ancestor <code>Node</code>. Additional undocumented properties are available, but are likely only useful during parsing.</p>
+
+<p>If a node has its <code>value</code> set, that will be used when re-stringifying.</p>
 
 <h3 style="clear:both">Scalars</h3>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Alias</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>

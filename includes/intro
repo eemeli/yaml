@@ -2,11 +2,11 @@
 <blockquote>
 <p>To install:</p>
 </blockquote>
-<pre class="highlight sh tab-shell"><code>npm install yaml@next
+<pre class="highlight sh tab-shell"><code>npm install yaml
 <span class="c"># or</span>
-yarn add yaml@next
+yarn add yaml
 </code></pre>
-<p><code>yaml</code> is a JavaScript parser and stringifier for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. It supports all aspects of the 1.2 version of the spec for both parsing and stringifying data, as well as supporting YAML 1.1 data types.</p>
+<p><code>yaml</code> is a JavaScript parser and stringifier for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. It supports both parsing and stringifying data using all versions of YAML, along with all common data schemas. As a particularly distinguishing feature, <code>yaml</code> fully supports reading and writing comments in YAML documents.</p>
 
 <p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies, and is usable in both browser and node environments.</p>
 <h2 id='api-overview'>API Overview</h2>
@@ -54,4 +54,5 @@ yarn add yaml@next
 </code></pre>
 <ul>
 <li><a href="#parsecst"><code>parseCST(str): CSTDocument[]</code></a></li>
+<li><a href="#parsecst"><code>YAML.parseCST(str): CSTDocument[]</code></a></li>
 </ul>
