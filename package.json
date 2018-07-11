@@ -26,8 +26,6 @@
     "docs:deploy": "cd docs/ && ./deploy.sh",
     "docs": "cd docs/ && bundle exec middleman server",
     "preversion": "npm test && npm run build",
-    "version": "git commit -am \"Update version\" && git add -f dist/",
-    "postversion": "git reset --hard HEAD^",
     "prepublishOnly": "npm test && npm run build"
   },
   "babel": {
