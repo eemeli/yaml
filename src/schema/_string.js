@@ -8,7 +8,6 @@ import foldFlowLines, {
 
 export const strOptions = {
   defaultType: Type.PLAIN,
-  dropCR: false,
   doubleQuoted: {
     jsonEncoding: false,
     minMultiLineLength: 40
@@ -253,9 +252,8 @@ export function stringify(
   { forceBlockIndent, implicitKey, indent, inFlow, tags } = {},
   onComment
 ) {
-  const { dropCR, defaultType } = strOptions
+  const { defaultType } = strOptions
   if (typeof value !== 'string') value = String(value)
-  if (dropCR && /\r/.test(value)) value = value.replace(/\r\n?/g, '\n')
   const _stringify = _type => {
     switch (_type) {
       case Type.BLOCK_FOLDED:
