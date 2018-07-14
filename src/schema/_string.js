@@ -30,7 +30,7 @@ export const resolve = (doc, node) => {
   return res.str
 }
 
-function doubleQuotedString(value, indent, oneLine) {
+function doubleQuotedString(value, { implicitKey, indent }) {
   const { jsonEncoding, minMultiLineLength } = strOptions.doubleQuoted
   const json = JSON.stringify(value)
   if (jsonEncoding) return json
@@ -83,7 +83,7 @@ function doubleQuotedString(value, indent, oneLine) {
           break
         case 'n':
           if (
-            oneLine ||
+            implicitKey ||
             json[i + 2] === '"' ||
             json.length < minMultiLineLength
           ) {
@@ -111,39 +111,34 @@ function doubleQuotedString(value, indent, oneLine) {
       }
   }
   str = start ? str + json.slice(start) : json
-  return oneLine
+  return implicitKey
     ? str
     : foldFlowLines(str, indent, FOLD_QUOTED, strOptions.fold)
 }
 
-function singleQuotedString(value, indent, oneLine) {
-  if (oneLine) {
-    if (/\n/.test(value)) return doubleQuotedString(value, indent, true)
+function singleQuotedString(value, ctx) {
+  const { indent, implicitKey } = ctx
+  if (implicitKey) {
+    if (/\n/.test(value)) return doubleQuotedString(value, ctx)
   } else {
     // single quoted string can't have leading or trailing whitespace around newline
-    if (/[ \t]\n|\n[ \t]/.test(value))
-      return doubleQuotedString(value, indent, false)
+    if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, ctx)
   }
-  value = "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'"
-  return oneLine
-    ? value
-    : foldFlowLines(value, indent, FOLD_FLOW, strOptions.fold)
+  const res =
+    "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'"
+  return implicitKey
+    ? res
+    : foldFlowLines(res, indent, FOLD_FLOW, strOptions.fold)
 }
 
-function blockString(
-  value,
-  indent,
-  literal,
-  forceBlockIndent,
-  comment,
-  onComment
-) {
-  // Block can't end in whitespace unless the last line is non-empty
-  // Strings consisting of only whitespace are best rendered explicitly
+function blockString({ comment, type, value }, ctx, onComment) {
+  // 1. Block can't end in whitespace unless the last line is non-empty.
+  // 2. Strings consisting of only whitespace are best rendered explicitly.
   if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
-    return doubleQuotedString(value, indent, false)
+    return doubleQuotedString(value, ctx)
   }
-  if (forceBlockIndent && !indent) indent = ' '
+  const literal = type === Type.BLOCK_LITERAL
+  const indent = ctx.indent || (ctx.forceBlockIndent ? ' ' : '')
   const indentSize = indent ? '2' : '1' // root is at -1
   let header = literal ? '|' : '>'
   if (!value) return header + '\n'
@@ -196,21 +191,14 @@ function blockString(
   return `${header}\n${indent}${body}`
 }
 
-function plainString(
-  value,
-  indent,
-  implicitKey,
-  inFlow,
-  forceBlockIndent,
-  tags,
-  comment,
-  onComment
-) {
+function plainString(item, ctx, onComment) {
+  const { comment, value } = item
+  const { implicitKey, indent, inFlow, tags } = ctx
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
   ) {
-    return doubleQuotedString(value, indent, implicitKey)
+    return doubleQuotedString(value, ctx)
   }
   if (
     !value ||
@@ -225,13 +213,13 @@ function plainString(
     // - '#' not preceded by a non-space char
     // - end with ' '
     return implicitKey || inFlow
-      ? doubleQuotedString(value, indent, implicitKey)
-      : blockString(value, indent, false, forceBlockIndent, comment, onComment)
+      ? doubleQuotedString(value, ctx)
+      : blockString(item, ctx, onComment)
   }
   // Need to verify that output will be parsed as a string
   const str = value.replace(/\n+/g, `$&\n${indent}`)
   if (typeof tags.resolveScalar(str).value !== 'string') {
-    return doubleQuotedString(value, indent, implicitKey)
+    return doubleQuotedString(value, ctx)
   }
   const body = implicitKey
     ? str
@@ -247,48 +235,25 @@ function plainString(
   return body
 }
 
-export function stringify(
-  { comment, type, value },
-  { forceBlockIndent, implicitKey, indent, inFlow, tags } = {},
-  onComment
-) {
+export function stringify(item, ctx, onComment) {
   const { defaultType } = strOptions
-  if (typeof value !== 'string') value = String(value)
+  const { implicitKey, inFlow } = ctx
+  let { type, value } = item
+  if (typeof value !== 'string') {
+    value = String(value)
+    item = Object.assign({}, item, { value })
+  }
   const _stringify = _type => {
     switch (_type) {
       case Type.BLOCK_FOLDED:
-        return blockString(
-          value,
-          indent,
-          false,
-          forceBlockIndent,
-          comment,
-          onComment
-        )
       case Type.BLOCK_LITERAL:
-        return blockString(
-          value,
-          indent,
-          true,
-          forceBlockIndent,
-          comment,
-          onComment
-        )
+        return blockString(item, ctx, onComment)
       case Type.QUOTE_DOUBLE:
-        return doubleQuotedString(value, indent, implicitKey, comment)
+        return doubleQuotedString(value, ctx)
       case Type.QUOTE_SINGLE:
-        return singleQuotedString(value, indent, implicitKey, comment)
+        return singleQuotedString(value, ctx)
       case Type.PLAIN:
-        return plainString(
-          value,
-          indent,
-          implicitKey,
-          inFlow,
-          forceBlockIndent,
-          tags,
-          comment,
-          onComment
-        )
+        return plainString(item, ctx, onComment)
       default:
         return null
     }
