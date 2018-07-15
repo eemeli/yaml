@@ -18,6 +18,19 @@ export const strOptions = {
   }
 }
 
+const lineLengthOverLimit = (str, limit) => {
+  const strLen = str.length
+  if (strLen <= limit) return false
+  for (let i = 0, start = 0; i < strLen; ++i) {
+    if (str[i] === '\n') {
+      if (i - start > limit) return true
+      start = i + 1
+      if (strLen - start <= limit) return false
+    }
+  }
+  return true
+}
+
 export const resolve = (doc, node) => {
   // on error, will return { str: string, errors: Error[] }
   const res = node.strValue
@@ -137,9 +150,14 @@ function blockString({ comment, type, value }, ctx, onComment) {
   if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
     return doubleQuotedString(value, ctx)
   }
-  const literal = type === Type.BLOCK_LITERAL
   const indent = ctx.indent || (ctx.forceBlockIndent ? ' ' : '')
   const indentSize = indent ? '2' : '1' // root is at -1
+  const literal =
+    type === Type.BLOCK_FOLDED
+      ? false
+      : type === Type.BLOCK_LITERAL
+        ? true
+        : !lineLengthOverLimit(value, strOptions.fold.lineWidth - indent.length)
   let header = literal ? '|' : '>'
   if (!value) return header + '\n'
   let wsStart = ''
@@ -192,7 +210,7 @@ function blockString({ comment, type, value }, ctx, onComment) {
 }
 
 function plainString(item, ctx, onComment) {
-  const { comment, value } = item
+  const { comment, type, value } = item
   const { implicitKey, indent, inFlow, tags } = ctx
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
@@ -212,9 +230,20 @@ function plainString(item, ctx, onComment) {
     // - '\n ', ': ' or ' \n' anywhere
     // - '#' not preceded by a non-space char
     // - end with ' '
-    return implicitKey || inFlow
-      ? doubleQuotedString(value, ctx)
+    return implicitKey || inFlow || value.indexOf('\n') === -1
+      ? value.indexOf('"') !== -1 && value.indexOf("'") === -1
+        ? singleQuotedString(value, ctx)
+        : doubleQuotedString(value, ctx)
       : blockString(item, ctx, onComment)
+  }
+  if (
+    !implicitKey &&
+    !inFlow &&
+    type !== Type.PLAIN &&
+    value.indexOf('\n') !== -1
+  ) {
+    // Where allowed & type not set explicitly, prefer block style for multiline strings
+    return blockString(item, ctx, onComment)
   }
   // Need to verify that output will be parsed as a string
   const str = value.replace(/\n+/g, `$&\n${indent}`)

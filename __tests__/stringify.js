@@ -1,4 +1,5 @@
 import YAML from '../src/index'
+import { strOptions } from '../src/schema/_string'
 
 test('undefined', () => {
   expect(YAML.stringify()).toBe('\n')
@@ -33,14 +34,44 @@ describe('number', () => {
 })
 
 describe('string', () => {
+  let origFoldOptions
+  beforeAll(() => {
+    origFoldOptions = strOptions.fold
+    strOptions.fold = {
+      lineWidth: 20,
+      minContentWidth: 0
+    }
+  })
+  afterAll(() => {
+    strOptions.fold = origFoldOptions
+  })
+
   test('plain', () => {
     expect(YAML.stringify('STR')).toBe('STR\n')
   })
-  test('quoted', () => {
-    expect(YAML.stringify('"x"')).toBe('>-\n"x"\n')
+  test('double-quoted', () => {
+    expect(YAML.stringify('"x"')).toBe('\'"x"\'\n')
+  })
+  test('single-quoted', () => {
+    expect(YAML.stringify("'x'")).toBe('"\'x\'"\n')
   })
   test('escaped', () => {
     expect(YAML.stringify('null: \u0000')).toBe('"null: \\0"\n')
+  })
+  test('short multiline', () => {
+    expect(YAML.stringify('blah\nblah\nblah')).toBe('|-\nblah\nblah\nblah\n')
+  })
+  test('long multiline', () => {
+    expect(
+      YAML.stringify(
+        'blah blah\nblah blah blah blah blah blah blah blah blah blah\n'
+      )
+    ).toBe(`>
+blah blah
+
+blah blah blah blah
+blah blah blah blah
+blah blah\n`)
   })
 })
 
