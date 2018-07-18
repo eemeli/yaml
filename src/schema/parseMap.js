@@ -1,4 +1,5 @@
 import { Type } from '../cst/Node'
+import PlainValue from '../cst/PlainValue'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Map from './Map'
 import Merge, { MERGE_KEY } from './Merge'
@@ -85,7 +86,18 @@ function resolveBlockMapItems(doc, cst) {
           const msg = 'Nested mappings are not allowed in compact mappings'
           doc.errors.push(new YAMLSemanticError(item.node, msg))
         }
-        items.push(new Pair(key, doc.resolveNode(item.node)))
+        let valueNode = item.node
+        if (!valueNode && item.props.length > 0) {
+          // Comments on an empty mapping value need to be preserved, so we
+          // need to construct a minimal empty node here to use instead of the
+          // missing `item.node`. -- eemeli/yaml#19
+          valueNode = new PlainValue(Type.PLAIN, [])
+          valueNode.context = { parent: item, src: item.context.src }
+          const pos = item.range.start + 1
+          valueNode.range = { start: pos, end: pos }
+          valueNode.valueRange = { start: pos, end: pos }
+        }
+        items.push(new Pair(key, doc.resolveNode(valueNode)))
         checkKeyLength(doc.errors, cst, i, key, keyStart)
         key = undefined
         keyStart = null
