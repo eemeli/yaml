@@ -114,3 +114,11 @@ test('eemeli/yaml#10', () => {
   expect(doc.contents[0].items).toHaveLength(4)
   expect(doc.contents[0].items[1].error).toBeNull()
 })
+
+test('eemeli/yaml#l19', () => {
+  const src = 'a:\n  # 123'
+  const doc = parse(src)[0]
+  const { items } = doc.contents[0]
+  expect(items).toHaveLength(2)
+  expect(items[1].comment).toBe(' 123')
+})

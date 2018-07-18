@@ -56,7 +56,7 @@ export default class CollectionItem extends Node {
         offset
       )
       if (this.node) offset = this.node.range.end
-    } else if (lineStart > start + 1) {
+    } else if (ch && lineStart > start + 1) {
       offset = lineStart - 1
     }
     const end = this.node ? this.node.valueRange.end : offset
