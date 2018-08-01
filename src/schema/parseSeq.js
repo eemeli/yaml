@@ -58,25 +58,26 @@ function resolveFlowSeqItems(doc, cst) {
   let next = '['
   for (let i = 0; i < cst.items.length; ++i) {
     const item = cst.items[i]
-    if (typeof item === 'string') {
-      if (item !== ':' && (explicitKey || key !== undefined)) {
+    if (typeof item.char === 'string') {
+      const { char } = item
+      if (char !== ':' && (explicitKey || key !== undefined)) {
         if (explicitKey && key === undefined) key = null
         items.push(new Pair(key))
         explicitKey = false
         key = undefined
         keyStart = null
       }
-      if (item === next) {
+      if (char === next) {
         next = null
-      } else if (!next && item === '?') {
+      } else if (!next && char === '?') {
         explicitKey = true
-      } else if (next !== '[' && item === ':' && key === undefined) {
+      } else if (next !== '[' && char === ':' && key === undefined) {
         if (next === ',') {
           key = items.pop()
           if (key instanceof Pair) {
             const msg =
               'Chaining flow sequence pairs is invalid (e.g. [ a : b : c ])'
-            doc.errors.push(new YAMLSemanticError(item, msg))
+            doc.errors.push(new YAMLSemanticError(char, msg))
           }
           if (!explicitKey) checkKeyLength(doc.errors, cst, i, key, keyStart)
         } else {
@@ -85,8 +86,8 @@ function resolveFlowSeqItems(doc, cst) {
         keyStart = null
         explicitKey = false // TODO: add error for non-explicit multiline plain key
         next = null
-      } else if (next === '[' || item !== ']' || i < cst.items.length - 1) {
-        const msg = `Flow sequence contains an unexpected ${item}`
+      } else if (next === '[' || char !== ']' || i < cst.items.length - 1) {
+        const msg = `Flow sequence contains an unexpected ${char}`
         doc.errors.push(new YAMLSyntaxError(cst, msg))
       }
     } else if (item.type === Type.COMMENT) {
@@ -107,7 +108,7 @@ function resolveFlowSeqItems(doc, cst) {
       next = ','
     }
   }
-  if (cst.items[cst.items.length - 1] !== ']')
+  if (cst.items[cst.items.length - 1].char !== ']')
     doc.errors.push(
       new YAMLSemanticError(cst, 'Expected flow sequence to end with ]')
     )
