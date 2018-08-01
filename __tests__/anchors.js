@@ -141,6 +141,16 @@ describe('merge <<', () => {
     expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
   })
 
+  test('merge multiple times', () => {
+    const src =
+      'x:\n  - &a\n    key1: value1\n  - &b\n    key2: value2\nfoo:\n  bar: baz\n  <<: *a\n  <<: *b'
+    const res = YAML.parse(src, { merge: true })
+    expect(res).toEqual({
+      x: [{ key1: 'value1' }, { key2: 'value2' }],
+      foo: { bar: 'baz', key1: 'value1', key2: 'value2' }
+    })
+  })
+
   describe('parse errors', () => {
     test('non-alias merge value', () => {
       const src = '{ <<: A, B: b }'

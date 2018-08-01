@@ -22,20 +22,6 @@ export default function parseMap(doc, cst) {
   resolveComments(map, comments)
   for (let i = 0; i < items.length; ++i) {
     const { key: iKey } = items[i]
-    for (let j = i + 1; j < items.length; ++j) {
-      const { key: jKey } = items[j]
-      if (
-        iKey === jKey ||
-        (iKey &&
-          jKey &&
-          iKey.hasOwnProperty('value') &&
-          iKey.value === jKey.value)
-      ) {
-        const msg = `Map keys must be unique; "${iKey}" is repeated`
-        doc.errors.push(new YAMLSemanticError(cst, msg))
-        break
-      }
-    }
     if (doc.schema.merge && iKey.value === MERGE_KEY) {
       items[i] = new Merge(items[i])
       const sources = items[i].value.items
@@ -51,6 +37,21 @@ export default function parseMap(doc, cst) {
         return (error = 'Merge nodes can only have Alias nodes as values')
       })
       if (error) doc.errors.push(new YAMLSemanticError(cst, error))
+    } else {
+      for (let j = i + 1; j < items.length; ++j) {
+        const { key: jKey } = items[j]
+        if (
+          iKey === jKey ||
+          (iKey &&
+            jKey &&
+            iKey.hasOwnProperty('value') &&
+            iKey.value === jKey.value)
+        ) {
+          const msg = `Map keys must be unique; "${iKey}" is repeated`
+          doc.errors.push(new YAMLSemanticError(cst, msg))
+          break
+        }
+      }
     }
   }
   cst.resolved = map
