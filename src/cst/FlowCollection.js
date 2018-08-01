@@ -28,13 +28,13 @@ export default class FlowCollection extends Node {
     this.context = context
     const { parseNode, src } = context
     let { indent, lineStart } = context
-    let ch = src[start] // { or [
-    this.items = [ch]
+    let char = src[start] // { or [
+    this.items = [{ char, offset: start }]
     let offset = Node.endOfWhiteSpace(src, start + 1)
-    ch = src[offset]
-    while (ch && ch !== ']' && ch !== '}') {
-      trace: 'item-start', this.items.length, ch
-      switch (ch) {
+    char = src[offset]
+    while (char && char !== ']' && char !== '}') {
+      trace: 'item-start', this.items.length, char
+      switch (char) {
         case '\n':
           {
             lineStart = offset + 1
@@ -48,7 +48,7 @@ export default class FlowCollection extends Node {
           break
         case ',':
           {
-            this.items.push(ch)
+            this.items.push({ char, offset })
             offset += 1
           }
           break
@@ -68,9 +68,9 @@ export default class FlowCollection extends Node {
             next === ' ' ||
             next === ',' ||
             // in-flow : after JSON-like key does not need to be followed by whitespace
-            (ch === ':' && this.prevNodeIsJsonLike())
+            (char === ':' && this.prevNodeIsJsonLike())
           ) {
-            this.items.push(ch)
+            this.items.push({ char, offset })
             offset += 1
             break
           }
@@ -98,11 +98,11 @@ export default class FlowCollection extends Node {
         }
       }
       offset = Node.endOfWhiteSpace(src, offset)
-      ch = src[offset]
+      char = src[offset]
     }
     this.valueRange = new Range(start, offset + 1)
-    if (ch) {
-      this.items.push(ch)
+    if (char) {
+      this.items.push({ char, offset })
       offset = Node.endOfWhiteSpace(src, offset + 1)
       offset = this.parseComment(offset)
     }

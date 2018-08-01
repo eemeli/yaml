@@ -133,13 +133,14 @@ function resolveFlowMapItems(doc, cst) {
   for (let i = 0; i < cst.items.length; ++i) {
     checkKeyLength(doc.errors, cst, i, key, keyStart)
     const item = cst.items[i]
-    if (typeof item === 'string') {
-      if (item === '?' && key === undefined && !explicitKey) {
+    if (typeof item.char === 'string') {
+      const { char } = item
+      if (char === '?' && key === undefined && !explicitKey) {
         explicitKey = true
         next = ':'
         continue
       }
-      if (item === ':') {
+      if (char === ':') {
         if (key === undefined) key = null
         if (next === ':') {
           next = ','
@@ -147,27 +148,27 @@ function resolveFlowMapItems(doc, cst) {
         }
       } else {
         if (explicitKey) {
-          if (key === undefined && item !== ',') key = null
+          if (key === undefined && char !== ',') key = null
           explicitKey = false
         }
         if (key !== undefined) {
           items.push(new Pair(key))
           key = undefined
           keyStart = null
-          if (item === ',') {
+          if (char === ',') {
             next = ':'
             continue
           }
         }
       }
-      if (item === '}') {
+      if (char === '}') {
         if (i === cst.items.length - 1) continue
-      } else if (item === next) {
+      } else if (char === next) {
         next = ':'
         continue
       }
       doc.errors.push(
-        new YAMLSyntaxError(cst, `Flow map contains an unexpected ${item}`)
+        new YAMLSyntaxError(cst, `Flow map contains an unexpected ${char}`)
       )
     } else if (item.type === Type.COMMENT) {
       comments.push({ comment: item.comment, before: items.length })
@@ -189,7 +190,7 @@ function resolveFlowMapItems(doc, cst) {
       explicitKey = false
     }
   }
-  if (cst.items[cst.items.length - 1] !== '}')
+  if (cst.items[cst.items.length - 1].char !== '}')
     doc.errors.push(
       new YAMLSemanticError(cst, 'Expected flow map to end with }')
     )
