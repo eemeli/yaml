@@ -7,11 +7,14 @@ import Node from './Node'
 import Scalar from './Scalar'
 
 export default class Pair extends Node {
-  constructor(key, value = null) {
+  constructor(key, value = null, cstNode) {
     super()
     this.key = key
     this.value = value
     this.type = 'PAIR'
+    if (cstNode) {
+      this.cstNode = cstNode
+    }
   }
 
   get commentBefore() {

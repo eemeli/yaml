@@ -56,13 +56,18 @@ function resolveFlowSeqItems(doc, cst) {
   let key = undefined
   let keyStart = null
   let next = '['
+
+  const sliceCstItems = doc.options.keepCstNodes
+    ? createCstItemsSlicer(cst.items)
+    : () => undefined
+
   for (let i = 0; i < cst.items.length; ++i) {
     const item = cst.items[i]
     if (typeof item.char === 'string') {
       const { char } = item
       if (char !== ':' && (explicitKey || key !== undefined)) {
         if (explicitKey && key === undefined) key = null
-        items.push(new Pair(key))
+        items.push(new Pair(key, undefined, sliceCstItems(i)))
         explicitKey = false
         key = undefined
         keyStart = null
@@ -99,9 +104,10 @@ function resolveFlowSeqItems(doc, cst) {
       }
       const value = doc.resolveNode(item)
       if (key === undefined) {
+        sliceCstItems(i)
         items.push(value)
       } else {
-        items.push(new Pair(key, value))
+        items.push(new Pair(key, value, sliceCstItems(i)))
         key = undefined
       }
       keyStart = item.range.start
@@ -112,6 +118,20 @@ function resolveFlowSeqItems(doc, cst) {
     doc.errors.push(
       new YAMLSemanticError(cst, 'Expected flow sequence to end with ]')
     )
-  if (key !== undefined) items.push(new Pair(key))
+  if (key !== undefined) items.push(new Pair(key, undefined, sliceCstItems()))
   return { comments, items }
+}
+
+function createCstItemsSlicer(array, start = 0) {
+  let index = start
+  return (endItemIndex = array.length - 1) =>
+    array
+      .slice(index, (index = endItemIndex + 1))
+      .filter(
+        item =>
+          item.char !== ',' &&
+          item.char !== '[' &&
+          item.char !== ']' &&
+          item.type !== Type.COMMENT
+      )
 }
