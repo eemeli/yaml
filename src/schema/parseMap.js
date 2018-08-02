@@ -63,6 +63,11 @@ function resolveBlockMapItems(doc, cst) {
   const items = []
   let key = undefined
   let keyStart = null
+
+  const sliceCstItems = doc.options.keepCstNodes
+    ? createCstItemsSlicer(cst.items)
+    : () => undefined
+
   for (let i = 0; i < cst.items.length; ++i) {
     const item = cst.items[i]
     switch (item.type) {
@@ -70,7 +75,8 @@ function resolveBlockMapItems(doc, cst) {
         comments.push({ comment: item.comment, before: items.length })
         break
       case Type.MAP_KEY:
-        if (key !== undefined) items.push(new Pair(key))
+        if (key !== undefined)
+          items.push(new Pair(key, undefined, sliceCstItems(i)))
         if (item.error) doc.errors.push(item.error)
         key = doc.resolveNode(item.node)
         keyStart = null
@@ -98,13 +104,14 @@ function resolveBlockMapItems(doc, cst) {
           valueNode.range = { start: pos, end: pos }
           valueNode.valueRange = { start: pos, end: pos }
         }
-        items.push(new Pair(key, doc.resolveNode(valueNode)))
+        items.push(new Pair(key, doc.resolveNode(valueNode), sliceCstItems(i)))
         checkKeyLength(doc.errors, cst, i, key, keyStart)
         key = undefined
         keyStart = null
         break
       default:
-        if (key !== undefined) items.push(new Pair(key))
+        if (key !== undefined)
+          items.push(new Pair(key, undefined, sliceCstItems(i)))
         key = doc.resolveNode(item)
         keyStart = item.range.start
         if (item.error) doc.errors.push(item.error)
@@ -119,7 +126,7 @@ function resolveBlockMapItems(doc, cst) {
         }
     }
   }
-  if (key !== undefined) items.push(new Pair(key))
+  if (key !== undefined) items.push(new Pair(key, undefined, sliceCstItems()))
   return { comments, items }
 }
 
@@ -130,6 +137,11 @@ function resolveFlowMapItems(doc, cst) {
   let keyStart = null
   let explicitKey = false
   let next = '{'
+
+  const sliceCstItems = doc.options.keepCstNodes
+    ? createCstItemsSlicer(cst.items)
+    : () => undefined
+
   for (let i = 0; i < cst.items.length; ++i) {
     checkKeyLength(doc.errors, cst, i, key, keyStart)
     const item = cst.items[i]
@@ -151,7 +163,7 @@ function resolveFlowMapItems(doc, cst) {
           explicitKey = false
         }
         if (key !== undefined) {
-          items.push(new Pair(key))
+          items.push(new Pair(key, undefined, sliceCstItems(i)))
           key = undefined
           keyStart = null
           if (item === ',') {
@@ -184,7 +196,7 @@ function resolveFlowMapItems(doc, cst) {
         doc.errors.push(
           new YAMLSemanticError(item, 'Indicator : missing in flow map entry')
         )
-      items.push(new Pair(key, doc.resolveNode(item)))
+      items.push(new Pair(key, doc.resolveNode(item), sliceCstItems(i)))
       key = undefined
       explicitKey = false
     }
@@ -193,6 +205,20 @@ function resolveFlowMapItems(doc, cst) {
     doc.errors.push(
       new YAMLSemanticError(cst, 'Expected flow map to end with }')
     )
-  if (key !== undefined) items.push(new Pair(key))
+  if (key !== undefined) items.push(new Pair(key, undefined, sliceCstItems()))
   return { comments, items }
+}
+
+function createCstItemsSlicer(array, start = 0) {
+  let index = start
+  return (endItemIndex = array.length - 1) =>
+    array
+      .slice(index, (index = endItemIndex + 1))
+      .filter(
+        item =>
+          item.char !== ',' &&
+          item.char !== '{' &&
+          item.char !== '}' &&
+          item.type !== Type.COMMENT
+      )
 }
