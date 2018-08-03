@@ -56,6 +56,7 @@ export default class Document {
     this.tagPrefixes = []
     this.version = null
     this.warnings = []
+    this.type = 'DOCUMENT'
   }
 
   getDefaults() {
