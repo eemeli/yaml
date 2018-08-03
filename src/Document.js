@@ -75,6 +75,7 @@ export default class Document {
 
   parse(node) {
     if (this.options.keepCstNodes) this.cstNode = node
+    if (this.options.keepNodeTypes) this.type = "DOCUMENT"
     const { directives = [], contents = [], error, valueRange } = node
     if (error) {
       if (!error.source) error.source = this
