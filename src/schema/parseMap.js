@@ -22,7 +22,7 @@ export default function parseMap(doc, cst) {
   resolveComments(map, comments)
   for (let i = 0; i < items.length; ++i) {
     const { key: iKey } = items[i]
-    if (doc.schema.merge && iKey.value === MERGE_KEY) {
+    if (doc.schema.merge && iKey && iKey.value === MERGE_KEY) {
       items[i] = new Merge(items[i])
       const sources = items[i].value.items
       let error = null
