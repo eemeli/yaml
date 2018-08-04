@@ -151,6 +151,11 @@ describe('merge <<', () => {
     })
   })
 
+  test('do not throw error when key is null', () => {
+    const src = ': 123'
+    expect(() => YAML.parse(src, { merge: true })).not.toThrow()
+  })
+
   describe('parse errors', () => {
     test('non-alias merge value', () => {
       const src = '{ <<: A, B: b }'
