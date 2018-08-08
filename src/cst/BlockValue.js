@@ -19,7 +19,7 @@ export default class BlockValue extends Node {
     if (!this.valueRange || !this.context) return null
     let { start, end } = this.valueRange
     const { indent, src } = this.context
-    if (this.valueRange.isEmpty) return ''
+    if (this.valueRange.isEmpty()) return ''
     let lastNewLine = null
     let ch = src[end - 1]
     while (ch === '\n' || ch === '\t' || ch === ' ') {
