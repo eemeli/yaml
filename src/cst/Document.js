@@ -107,9 +107,8 @@ export default class Document extends Node {
             parent: this
           }
           const node = parseNode(context, iEnd)
-          if (!node) return iEnd // at next document start
+          if (!node) return (this.valueRange.end = iEnd) // at next document start
           this.contents.push(node)
-          this.valueRange.end = node.valueRange.end
           offset = node.range.end
           atLineStart = false
           trace: 'content-node',
@@ -119,6 +118,7 @@ export default class Document extends Node {
       }
       offset = Document.startCommentOrEndBlankLine(src, offset)
     }
+    this.valueRange.end = offset
     if (src[offset]) {
       offset += 3
       if (src[offset]) {
