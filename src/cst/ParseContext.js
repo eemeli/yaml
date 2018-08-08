@@ -66,6 +66,13 @@ export default class ParseContext {
     this.lineStart = lineStart != null ? lineStart : orig.lineStart
     this.parent = parent != null ? parent : orig.parent || {}
     this.src = orig.src
+    this.events = Object.assign(
+      {
+        onDocumentContentsEnd: () => {},
+        onDocumentDirectivesEnd: () => {}
+      },
+      orig.events
+    )
   }
 
   // for logging

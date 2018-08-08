@@ -3,9 +3,9 @@
 import Document from './Document'
 import ParseContext from './ParseContext'
 
-export default function parse(src) {
+export default function parse(src, events) {
   if (src.indexOf('\r') !== -1) src = src.replace(/\r\n?/g, '\n')
-  const context = new ParseContext({ src })
+  const context = new ParseContext({ src, events })
   const documents = []
   let offset = 0
   while (offset < src.length) {
