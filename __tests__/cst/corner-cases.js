@@ -122,3 +122,15 @@ test('eemeli/yaml#l19', () => {
   expect(items).toHaveLength(2)
   expect(items[1].comment).toBe(' 123')
 })
+
+test('eemeli/yaml#20', () => {
+  const src = 'a:\r\n  123\r\nb:\r\n  456\r\n'
+  const docStream = parse(src)
+  const a = docStream[0].contents[0].items[1].node
+  expect(a.strValue).toBe('123')
+  expect(docStream.setOrigRanges()).toBe(true)
+  expect(a.valueRange.applyOrig(src)).toBe('123')
+  const b = docStream[0].contents[0].items[3].node
+  expect(b.strValue).toBe('456')
+  expect(b.valueRange.applyOrig(src)).toBe('456')
+})

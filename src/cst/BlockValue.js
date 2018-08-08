@@ -179,4 +179,9 @@ export default class BlockValue extends Node {
       JSON.stringify(this.rawValue)
     return offset
   }
+
+  setOrigRanges(cr, offset) {
+    offset = super.setOrigRanges(cr, offset)
+    return this.header ? this.header.setOrigRange(cr, offset) : offset
+  }
 }

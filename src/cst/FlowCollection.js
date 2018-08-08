@@ -110,6 +110,14 @@ export default class FlowCollection extends Node {
     return offset
   }
 
+  setOrigRanges(cr, offset) {
+    offset = super.setOrigRanges(cr, offset)
+    this.items.forEach(node => {
+      offset = node.setOrigRanges(cr, offset)
+    })
+    return offset
+  }
+
   toString() {
     const {
       context: { src },

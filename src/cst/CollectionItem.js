@@ -65,6 +65,11 @@ export default class CollectionItem extends Node {
     return offset
   }
 
+  setOrigRanges(cr, offset) {
+    offset = super.setOrigRanges(cr, offset)
+    return this.node ? this.node.setOrigRanges(cr, offset) : offset
+  }
+
   toString() {
     const {
       context: { src },
