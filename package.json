@@ -30,12 +30,19 @@
   },
   "babel": {
     "presets": [
-      "@babel/env",
-      "@babel/stage-3"
+      [
+        "@babel/env",
+        {
+          "targets": {
+            "node": "6"
+          }
+        }
+      ]
     ],
     "plugins": [
+      "@babel/plugin-proposal-class-properties",
       [
-        "trace",
+        "babel-plugin-trace",
         {
           "strip": true
         }
@@ -53,15 +60,15 @@
     "singleQuote": true
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.52",
-    "@babel/core": "^7.0.0-beta.52",
-    "@babel/preset-env": "^7.0.0-beta.52",
-    "@babel/preset-stage-3": "^7.0.0-beta.52",
+    "@babel/cli": "^7.0.0-rc.1",
+    "@babel/core": "^7.0.0-rc.1",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
+    "@babel/preset-env": "^7.0.0-rc.1",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^23.2.0",
+    "babel-jest": "^23.4.2",
     "babel-plugin-trace": "^1.1.0",
-    "jest": "^23.3.0",
-    "prettier": "^1.13.7"
+    "jest": "^23.5.0",
+    "prettier": "^1.14.2"
   },
   "dependencies": {},
   "engines": {
