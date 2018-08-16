@@ -197,3 +197,10 @@ describe('eemeli/yaml#l19', () => {
     expect(String(doc)).toBe('- a: null # 123\n')
   })
 })
+
+test('eemeli/yaml#32', () => {
+  expect(YAML.parse('[ ? ]')).toEqual([{ '': null }])
+  expect(YAML.parse('[? 123]')).toEqual([{ 123: null }])
+  expect(YAML.parse('[ 123, ? ]')).toEqual([123, { '': null }])
+  expect(YAML.parse('[ 123, ? 456 ]')).toEqual([123, { 456: null }])
+})
