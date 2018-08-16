@@ -24,7 +24,7 @@ export default function parse(src) {
     for (let i = 1; i < cr.length; ++i) cr[i] -= i
     let crOffset = 0
     for (let i = 0; i < documents.length; ++i) {
-      documents[i].setOrigRanges(cr, crOffset)
+      crOffset = documents[i].setOrigRanges(cr, crOffset)
     }
     cr.splice(0, cr.length)
     return true
