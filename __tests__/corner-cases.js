@@ -197,3 +197,7 @@ describe('eemeli/yaml#l19', () => {
     expect(String(doc)).toBe('- a: null # 123\n')
   })
 })
+
+test('eemeli/yaml#34', () => {
+  expect(YAML.parse('|')).toEqual('')
+})
