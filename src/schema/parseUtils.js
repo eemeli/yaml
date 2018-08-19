@@ -1,7 +1,7 @@
 import { YAMLSemanticError } from '../errors'
 
 export function checkKeyLength(errors, node, itemIdx, key, keyStart) {
-  if (typeof keyStart !== 'number') return
+  if (!key || typeof keyStart !== 'number') return
   const item = node.items[itemIdx]
   let keyEnd = item && item.range && item.range.start
   if (!keyEnd) {
