@@ -55,7 +55,7 @@ test('return value', () => {
     range: null,
     type: 'DOCUMENT',
     value: null,
-    valueRange: { end: 11, start: 0 }
+    valueRange: { end: 12, start: 0 }
   })
 })
 
@@ -85,7 +85,7 @@ describe('setOrigRanges()', () => {
     const src = '- foo\n- bar\n'
     const cst = parse(src)
     expect(cst.setOrigRanges()).toBe(false)
-    expect(cst[0].valueRange).toMatchObject({ start: 0, end: 11 })
+    expect(cst[0].valueRange).toMatchObject({ start: 0, end: 12 })
     expect(cst[0].valueRange.origStart).toBeUndefined()
     expect(cst[0].valueRange.origEnd).toBeUndefined()
   })
@@ -149,7 +149,7 @@ describe('setOrigRanges()', () => {
       range: null,
       type: 'DOCUMENT',
       value: null,
-      valueRange: { end: 11, origEnd: 12, origStart: 0, start: 0 }
+      valueRange: { end: 12, origEnd: 14, origStart: 0, start: 0 }
     })
   })
 
@@ -178,7 +178,7 @@ describe('setOrigRanges()', () => {
       range: null,
       type: 'DOCUMENT',
       value: null,
-      valueRange: { end: 3, origEnd: 3, origStart: 0, start: 0 }
+      valueRange: { end: 4, origEnd: 5, origStart: 0, start: 0 }
     })
     expect(cst[1]).toMatchObject({
       contents: [
@@ -197,7 +197,7 @@ describe('setOrigRanges()', () => {
       range: null,
       type: 'DOCUMENT',
       value: null,
-      valueRange: { end: 11, origEnd: 13, origStart: 10, start: 8 }
+      valueRange: { end: 12, origEnd: 15, origStart: 10, start: 8 }
     })
   })
 })
