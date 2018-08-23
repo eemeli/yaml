@@ -101,13 +101,17 @@ export default class Collection extends Node {
       offset = Node.normalizeOffset(src, node.range.end)
       ch = src[offset]
       atLineStart = false
-      // Need to reset lineStart here if preceding node's range has advanced to
-      // check the current line's indentation level -- eemeli/yaml#10
+      // Need to reset lineStart and atLineStart here if preceding node's range
+      // has advanced to check the current line's indentation level
+      // -- eemeli/yaml#10 & eemeli/yaml#38
       if (ch && ch !== '\n' && ch !== '#') {
         let ls = offset - 1
         let prev = src[ls]
         while (prev === ' ' || prev === '\t') prev = src[--ls]
-        if (prev === '\n') lineStart = ls + 1
+        if (prev === '\n') {
+          lineStart = ls + 1
+          atLineStart = true
+        }
       }
       trace: 'item-end', node.type, { offset, ch: JSON.stringify(ch) }
     }

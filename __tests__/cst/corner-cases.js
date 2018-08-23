@@ -115,7 +115,7 @@ test('eemeli/yaml#10', () => {
   expect(doc.contents[0].items[1].error).toBeNull()
 })
 
-test('eemeli/yaml#l19', () => {
+test('eemeli/yaml#19', () => {
   const src = 'a:\n  # 123'
   const doc = parse(src)[0]
   const { items } = doc.contents[0]
@@ -135,4 +135,18 @@ test('eemeli/yaml#20', () => {
   expect(b.strValue).toBe('456')
   const { origStart: b0, origEnd: b1 } = b.valueRange
   expect(src.slice(b0, b1)).toBe('456')
+})
+
+test('eemeli/yaml#38', () => {
+  const src = `
+ -
+ - - a
+ -
+`
+  const doc = parse(src)[0]
+  const { items } = doc.contents[0]
+  expect(items).toHaveLength(3)
+  items.forEach(item => {
+    expect(item.error).toBe(null)
+  })
 })

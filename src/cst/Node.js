@@ -84,6 +84,7 @@ export default class Node {
 
   static startOfLine(src, offset) {
     let ch = src[offset - 1]
+    if (ch === '\n') return offset
     while (ch && ch !== '\n') ch = src[(offset -= 1)]
     return offset + 1
   }

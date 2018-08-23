@@ -212,3 +212,30 @@ test('eemeli/yaml#34', () => {
 test('eemeli/yaml#36', () => {
   expect(() => YAML.parse(`{ x: ${'x'.repeat(1024)} }`)).not.toThrowError()
 })
+
+test('eemeli/yaml#38', () => {
+  const src = `
+  content:
+    arrayOfArray:
+    -
+      - first: John
+        last: Black
+      - first: Brian
+        last: Green
+    -
+      - first: Mark
+        last: Orange
+    -
+      - first: Adam
+        last: Grey
+  `
+  expect(YAML.parse(src)).toEqual({
+    content: {
+      arrayOfArray: [
+        [{ first: 'John', last: 'Black' }, { first: 'Brian', last: 'Green' }],
+        [{ first: 'Mark', last: 'Orange' }],
+        [{ first: 'Adam', last: 'Grey' }]
+      ]
+    }
+  })
+})
