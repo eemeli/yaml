@@ -208,3 +208,7 @@ test('eemeli/yaml#32', () => {
 test('eemeli/yaml#34', () => {
   expect(YAML.parse('|')).toEqual('')
 })
+
+test('eemeli/yaml#36', () => {
+  expect(() => YAML.parse(`{ x: ${'x'.repeat(1024)} }`)).not.toThrowError()
+})
