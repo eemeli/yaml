@@ -5,7 +5,7 @@
   "license": "ISC",
   "author": "Eemeli Aro <eemeli@gmail.com>",
   "repository": "github:eemeli/yaml",
-  "description": "JavaScript parser and stringifier for YAML 1.2",
+  "description": "JavaScript parser and stringifier for YAML",
   "keywords": [
     "YAML",
     "parser",
