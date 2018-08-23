@@ -12,18 +12,6 @@ export default class Range {
     return typeof this.start !== 'number' || !this.end || this.end <= this.start
   }
 
-  apply(src) {
-    return this.isEmpty() ? '' : src.slice(this.start, this.end)
-  }
-
-  applyOrig(src) {
-    return this.isEmpty()
-      ? ''
-      : this.origEnd
-        ? src.slice(this.origStart, this.origEnd)
-        : src.slice(this.start, this.end)
-  }
-
   /**
    * Set `origStart` and `origEnd` to point to the original source range for
    * this node, which may differ due to dropped CR characters.

@@ -129,8 +129,10 @@ test('eemeli/yaml#20', () => {
   const a = docStream[0].contents[0].items[1].node
   expect(a.strValue).toBe('123')
   expect(docStream.setOrigRanges()).toBe(true)
-  expect(a.valueRange.applyOrig(src)).toBe('123')
+  const { origStart: a0, origEnd: a1 } = a.valueRange
+  expect(src.slice(a0, a1)).toBe('123')
   const b = docStream[0].contents[0].items[3].node
   expect(b.strValue).toBe('456')
-  expect(b.valueRange.applyOrig(src)).toBe('456')
+  const { origStart: b0, origEnd: b1 } = b.valueRange
+  expect(src.slice(b0, b1)).toBe('456')
 })
