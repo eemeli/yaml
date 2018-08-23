@@ -6,11 +6,11 @@
 <span class="c"># or</span>
 yarn add yaml
 </code></pre>
-<p><code>yaml</code> is a new definitive library for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. It:</p>
+<p><code>yaml</code> is a new definitive library for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. This library:</p>
 
 <ul>
 <li>Supports all versions of the standard (1.0, 1.1, and 1.2),</li>
-<li>Passes all of the yaml-test-suite tests,</li>
+<li>Passes all of the <a href="https://github.com/yaml/yaml-test-suite">yaml-test-suite</a> tests,</li>
 <li>Can accept any string as input without throwing, parsing as much YAML out of it as it can, and</li>
 <li>Supports parsing, modifying, and writing YAML comments.</li>
 </ul>
