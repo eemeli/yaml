@@ -107,7 +107,7 @@ export default class Document {
     const comments = { before: [], after: [] }
     const contentNodes = []
     contents.forEach(node => {
-      if (node.valueRange && !node.valueRange.isEmpty()) {
+      if (node.valueRange) {
         if (contentNodes.length === 1) {
           const msg = 'Document is not valid YAML (bad indentation?)'
           this.errors.push(new YAMLSyntaxError(node, msg))

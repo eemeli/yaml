@@ -204,3 +204,7 @@ test('eemeli/yaml#32', () => {
   expect(YAML.parse('[ 123, ? ]')).toEqual([123, { '': null }])
   expect(YAML.parse('[ 123, ? 456 ]')).toEqual([123, { 456: null }])
 })
+
+test('eemeli/yaml#34', () => {
+  expect(YAML.parse('|')).toEqual('')
+})
