@@ -6,7 +6,14 @@
 <span class="c"># or</span>
 yarn add yaml
 </code></pre>
-<p><code>yaml</code> is a JavaScript parser and stringifier for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. It supports both parsing and stringifying data using all versions of YAML, along with all common data schemas. As a particularly distinguishing feature, <code>yaml</code> fully supports reading and writing comments in YAML documents.</p>
+<p><code>yaml</code> is a new definitive library for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. It:</p>
+
+<ul>
+<li>Supports all versions of the standard (1.0, 1.1, and 1.2),</li>
+<li>Passes all of the yaml-test-suite tests,</li>
+<li>Can accept any string as input without throwing, parsing as much YAML out of it as it can, and</li>
+<li>Supports parsing, modifying, and writing YAML comments.</li>
+</ul>
 
 <p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies, and is usable in both browser and node environments.</p>
 <h2 id='api-overview'>API Overview</h2>

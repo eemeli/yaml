@@ -323,7 +323,7 @@
           </li>
       </ul>
         <ul class="toc-footer">
-            <li><a href='https://github.com/eemeli/yaml/releases'>Version 1.0.0-rc.7 (changelog)</a></li>
+            <li><a href='https://github.com/eemeli/yaml/releases'>Version 1.0.0-rc.8 (changelog)</a></li>
             <li><a href='https://github.com/eemeli/yaml'>github.com/eemeli/yaml</a></li>
             <li><a href='https://www.npmjs.com/package/yaml'><code>npm install yaml</code></a></li>
         </ul>
@@ -339,7 +339,14 @@
 <span class="c"># or</span>
 yarn add yaml
 </code></pre>
-<p><code>yaml</code> is a JavaScript parser and stringifier for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. It supports both parsing and stringifying data using all versions of YAML, along with all common data schemas. As a particularly distinguishing feature, <code>yaml</code> fully supports reading and writing comments in YAML documents.</p>
+<p><code>yaml</code> is a new definitive library for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. It:</p>
+
+<ul>
+<li>Supports all versions of the standard (1.0, 1.1, and 1.2),</li>
+<li>Passes all of the yaml-test-suite tests,</li>
+<li>Can accept any string as input without throwing, parsing as much YAML out of it as it can, and</li>
+<li>Supports parsing, modifying, and writing YAML comments.</li>
+</ul>
 
 <p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies, and is usable in both browser and node environments.</p>
 <h2 id='api-overview'>API Overview</h2>
@@ -1186,6 +1193,22 @@ mapping: { sky: blue, sea: green }
 <span class="c1">// 'bad YAML'</span>
 </code></pre>
 <p>While the YAML spec considers e.g. block collections within a flow collection to be an error, this error will not be detected by the CST parser. For complete validation, you will need to parse the CST into a <code>YAML.Document</code>. If the document contains errors, they will be included in the document&#39;s <code>errors</code> array, and each error will will contain a <code>source</code> reference to the CST node where it was encountered. Do note that even if an error is encountered, the document contents might still be available. In such a case, the error will be a <a href="#yamlsemanticerror"><code>YAMLSemanticError</code></a> rather than a <a href="#yamlsyntaxerror"><code>YAMLSyntaxError</code></a>.</p>
+
+<h3 style="clear:both">Dealing with CRLF line terminators</h3>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">parseCST</span> <span class="nx">from</span> <span class="s1">'yaml/parse-cst'</span>
+
+<span class="kr">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="s1">'- foo\r\n- bar\r\n'</span>
+<span class="kr">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">parseCST</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
+<span class="nx">cst</span><span class="p">.</span><span class="nx">setOrigRanges</span><span class="p">()</span> <span class="c1">// true</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">range</span><span class="p">,</span> <span class="nx">valueRange</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">cst</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">node</span>
+
+<span class="nx">src</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">range</span><span class="p">.</span><span class="nx">origStart</span><span class="p">,</span> <span class="nx">range</span><span class="p">.</span><span class="nx">origEnd</span><span class="p">)</span>
+<span class="c1">// 'bar\r\n'</span>
+
+<span class="nx">src</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">valueRange</span><span class="p">.</span><span class="nx">origStart</span><span class="p">,</span> <span class="nx">valueRange</span><span class="p">.</span><span class="nx">origEnd</span><span class="p">)</span>
+<span class="c1">// 'bar'</span>
+</code></pre><h4 id='cst-setorigranges-bool'><code>CST#setOrigRanges(): bool</code></h4>
+<p>The array returned by <code>parseCST()</code> will also include a method <code>setOrigRanges</code> to help deal with input that includes <code>\r\n</code> line terminators, which are converted to just <code>\n</code> before parsing into documents. This conversion will obviously change the total length of the string, as well as the offsets of all ranges. If the method returns <code>false</code>, the input did not include <code>\r\n</code> line terminators and no changes were made. However, if the method returns <code>true</code>, each <code>Range</code> object within the CST will have its <code>origStart</code> and <code>origEnd</code> values set appropriately to refer to the original input string.</p>
 <h2 id='cst-nodes'>CST Nodes</h2>
 <blockquote>
 <p>Node type definitions use Flow-ish notation, so <code>+</code> as a prefix indicates a read-only getter property.</p>
@@ -1193,7 +1216,9 @@ mapping: { sky: blue, sea: green }
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Range</span> <span class="p">{</span>
   <span class="nl">start</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>        <span class="c1">// offset of first character</span>
   <span class="nx">end</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>          <span class="c1">// offset after last character</span>
-  <span class="o">+</span><span class="nx">isEmpty</span><span class="p">:</span> <span class="kr">boolean</span>     <span class="c1">// true if end is not greater than start</span>
+  <span class="nx">isEmpty</span><span class="p">():</span> <span class="kr">boolean</span><span class="p">,</span>   <span class="c1">// true if end is not greater than start</span>
+  <span class="nx">origStart</span><span class="p">:</span> <span class="p">?</span><span class="nx">number</span><span class="p">,</span>   <span class="c1">// set by CST#setOrigRanges(), source</span>
+  <span class="nx">origEnd</span><span class="p">:</span> <span class="p">?</span><span class="nx">number</span>      <span class="c1">//   offsets for input with CRLF terminators</span>
 <span class="p">}</span>
 </code></pre>
 <p><strong>Note</strong>: The <code>Node</code>, <code>Scalar</code> and other values referred to in this section are the CST representations of said objects, and are not the same as those used in preceding parts.</p>
