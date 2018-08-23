@@ -61,7 +61,7 @@ function resolveFlowSeqItems(doc, cst) {
     if (typeof item.char === 'string') {
       const { char } = item
       if (char !== ':' && (explicitKey || key !== undefined)) {
-        if (explicitKey && key === undefined) key = null
+        if (explicitKey && key === undefined) key = next ? items.pop() : null
         items.push(new Pair(key))
         explicitKey = false
         key = undefined

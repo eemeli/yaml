@@ -66,7 +66,7 @@ export default class PlainValue extends Node {
       if (end === null || src[end] === '#') break
       offset = PlainValue.endOfLine(src, end, inFlow)
     }
-    if (this.valueRange.isEmpty) this.valueRange.start = start
+    if (this.valueRange.isEmpty()) this.valueRange.start = start
     this.valueRange.end = offset
     trace: this.valueRange, JSON.stringify(this.rawValue)
     return offset
@@ -112,7 +112,7 @@ export default class PlainValue extends Node {
     trace: 'first line',
       { valueRange: this.valueRange, comment: this.comment },
       JSON.stringify(this.rawValue)
-    if (!this.hasComment || this.valueRange.isEmpty) {
+    if (!this.hasComment || this.valueRange.isEmpty()) {
       offset = this.parseBlockValue(offset)
     }
     trace: this.type,

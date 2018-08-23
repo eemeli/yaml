@@ -288,6 +288,21 @@ export default class Node {
     return start
   }
 
+  /**
+   * Populates the `origStart` and `origEnd` values of all ranges for this
+   * node. Extended by child classes to handle descendant nodes.
+   *
+   * @param {number[]} cr - Positions of dropped CR characters
+   * @param {number} offset - Starting index of `cr` from the last call
+   * @returns {number} - The next offset, matching the one found for `origStart`
+   */
+  setOrigRanges(cr, offset) {
+    if (this.range) offset = this.range.setOrigRange(cr, offset)
+    this.valueRange.setOrigRange(cr, offset)
+    this.props.forEach(prop => prop.setOrigRange(cr, offset))
+    return offset
+  }
+
   toString() {
     const {
       context: { src },
