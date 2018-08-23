@@ -205,6 +205,10 @@ test('eemeli/yaml#32', () => {
   expect(YAML.parse('[ 123, ? 456 ]')).toEqual([123, { 456: null }])
 })
 
+test('eemeli/yaml#34', () => {
+  expect(YAML.parse('|')).toEqual('')
+})
+
 test('eemeli/yaml#36', () => {
   expect(() => YAML.parse(`{ x: ${'x'.repeat(1024)} }`)).not.toThrowError()
 })
