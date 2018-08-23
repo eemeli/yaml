@@ -162,6 +162,17 @@ export default class Document extends Node {
     return offset
   }
 
+  setOrigRanges(cr, offset) {
+    offset = super.setOrigRanges(cr, offset)
+    this.directives.forEach(node => {
+      offset = node.setOrigRanges(cr, offset)
+    })
+    this.contents.forEach(node => {
+      offset = node.setOrigRanges(cr, offset)
+    })
+    return offset
+  }
+
   toString() {
     const {
       contents,
