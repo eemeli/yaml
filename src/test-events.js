@@ -32,7 +32,7 @@ export default function testEvents(src, options) {
       let docEnd = '-DOC'
       if (rootEnd) {
         const post = src.slice(rootEnd)
-        if (/^(\s*(#.*)?\n)*\.\.\./.test(post)) docEnd += ' ...'
+        if (/^\.\.\./.test(post)) docEnd += ' ...'
       }
       events.push(docEnd)
     }
