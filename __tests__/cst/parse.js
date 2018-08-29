@@ -200,4 +200,34 @@ describe('setOrigRanges()', () => {
       valueRange: { end: 12, origEnd: 15, origStart: 10, start: 8 }
     })
   })
+
+  test('flow collections', () => {
+    const src = '\r\n{ : }\r\n'
+    const cst = parse(src)
+    expect(() => cst.setOrigRanges()).not.toThrowError()
+    expect(cst[0]).toMatchObject({
+      contents: [
+        {
+          error: null,
+          items: [
+            { char: '{', offset: 1, origOffset: 2 },
+            { char: ':', offset: 3, origOffset: 4 },
+            { char: '}', offset: 5, origOffset: 6 }
+          ],
+          props: [],
+          range: { end: 7, origEnd: 9, origStart: 2, start: 1 },
+          type: 'FLOW_MAP',
+          value: null,
+          valueRange: { end: 6, origEnd: 7, origStart: 2, start: 1 }
+        }
+      ],
+      directives: [],
+      error: null,
+      props: [],
+      range: null,
+      type: 'DOCUMENT',
+      value: null,
+      valueRange: { end: 7, origEnd: 9, origStart: 2, start: 1 }
+    })
+  })
 })

@@ -113,7 +113,19 @@ export default class FlowCollection extends Node {
   setOrigRanges(cr, offset) {
     offset = super.setOrigRanges(cr, offset)
     this.items.forEach(node => {
-      offset = node.setOrigRanges(cr, offset)
+      if (node instanceof Node) {
+        offset = node.setOrigRanges(cr, offset)
+      } else if (cr.length === 0) {
+        node.origOffset = node.offset
+      } else {
+        let i = offset
+        while (i < cr.length) {
+          if (cr[i] > node.offset) break
+          else ++i
+        }
+        node.origOffset = node.offset + i
+        offset = i
+      }
     })
     return offset
   }
