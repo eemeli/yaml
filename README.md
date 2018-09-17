@@ -23,7 +23,7 @@ The API provided by `yaml` has three layers, depending on how deep you need to g
 ```js
 import YAML from 'yaml'
 // or
-const YAML = require('yaml').default
+const YAML = require('yaml')
 ```
 
 ### Pure JavaScript
