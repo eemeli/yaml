@@ -66,16 +66,16 @@
     "singleQuote": true
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-rc.2",
-    "@babel/core": "^7.0.0-rc.2",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-rc.2",
-    "@babel/preset-env": "^7.0.0-rc.2",
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^23.4.2",
+    "babel-jest": "^23.6.0",
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-plugin-trace": "^1.1.0",
-    "jest": "^23.5.0",
-    "prettier": "^1.14.2"
+    "jest": "^23.6.0",
+    "prettier": "^1.14.3"
   },
   "dependencies": {},
   "engines": {
