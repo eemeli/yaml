@@ -22,7 +22,7 @@ yarn add yaml
 <h3>Pure JavaScript</h3>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
 <span class="c1">// or</span>
-<span class="kr">const</span> <span class="nx">YAML</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'yaml'</span><span class="p">).</span><span class="k">default</span>
+<span class="kr">const</span> <span class="nx">YAML</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'yaml'</span><span class="p">)</span>
 </code></pre>
 <ul>
 <li><a href="#yaml-parse"><code>YAML.parse(str, options): value</code></a></li>
