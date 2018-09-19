@@ -310,3 +310,32 @@ describe('eemeli/yaml#17', () => {
     expect(String(doc)).toBe(src)
   })
 })
+
+describe('eemeli/yaml#28', () => {
+  test.skip('reported', () => {
+    const src = `# This comment is ok
+entryA:
+  - foo
+entryB:
+  - bar # bar comment
+# Ending comment\n`
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe(src)
+  })
+
+  test('collection end comment', () => {
+    const src = `a: b #c\n#d\n`
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe(src)
+  })
+
+  test.skip('comment association by indentation', () => {
+    const src = `a:\n  - b #c\n#d\n`
+    const cst = YAML.parseCST(src)
+    const collection = cst[0].contents[0]
+    const comment = collection.items[2]
+    expect(comment).not.toBeUndefined()
+    expect(comment.type).toBe('COMMENT')
+    expect(comment.comment).toBe('d')
+  })
+})

@@ -61,9 +61,7 @@ export default class Collection extends Node {
       str = nodes.map(blockItem).join(`\n${indent}`)
     }
     if (this.comment) {
-      if (!hasItemWithNewLine && str.indexOf('\n') === -1)
-        str = addComment(str, indent, this.comment)
-      else str += '\n' + this.comment.replace(/^/gm, `${indent}#`)
+      str += '\n' + this.comment.replace(/^/gm, `${indent}#`)
       if (onComment) onComment()
     }
     return str
