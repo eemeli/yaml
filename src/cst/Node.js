@@ -134,8 +134,8 @@ export default class Node {
     return !ch
       ? offset
       : ch !== '\n' && src[offset - 1] === '\n'
-        ? offset - 1
-        : Node.endOfWhiteSpace(src, offset)
+      ? offset - 1
+      : Node.endOfWhiteSpace(src, offset)
   }
 
   // fold single newline into space, multiple newlines to N - 1 newlines

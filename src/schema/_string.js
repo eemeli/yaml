@@ -156,8 +156,8 @@ function blockString({ comment, type, value }, ctx, onComment) {
     type === Type.BLOCK_FOLDED
       ? false
       : type === Type.BLOCK_LITERAL
-        ? true
-        : !lineLengthOverLimit(value, strOptions.fold.lineWidth - indent.length)
+      ? true
+      : !lineLengthOverLimit(value, strOptions.fold.lineWidth - indent.length)
   let header = literal ? '|' : '>'
   if (!value) return header + '\n'
   let wsStart = ''

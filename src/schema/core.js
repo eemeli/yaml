@@ -4,10 +4,10 @@ export const stringifyNumber = ({ value }) =>
   isFinite(value)
     ? JSON.stringify(value)
     : isNaN(value)
-      ? '.nan'
-      : value < 0
-        ? '-.inf'
-        : '.inf'
+    ? '.nan'
+    : value < 0
+    ? '-.inf'
+    : '.inf'
 
 export const nullOptions = { nullStr: 'null' }
 
@@ -63,8 +63,8 @@ export default failsafe.concat([
       nan
         ? NaN
         : str[0] === '-'
-          ? Number.NEGATIVE_INFINITY
-          : Number.POSITIVE_INFINITY,
+        ? Number.NEGATIVE_INFINITY
+        : Number.POSITIVE_INFINITY,
     stringify: stringifyNumber
   },
   {

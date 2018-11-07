@@ -105,8 +105,8 @@ export default class Schema {
     const fallback = isMap(node)
       ? DefaultTags.MAP
       : isSeq(node)
-        ? DefaultTags.SEQ
-        : DefaultTags.STR
+      ? DefaultTags.SEQ
+      : DefaultTags.STR
     if (fallback) {
       doc.warnings.push(
         new YAMLWarning(
