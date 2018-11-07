@@ -220,7 +220,7 @@ function plainString(item, ctx, onComment) {
   }
   if (
     !value ||
-    /^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t ]$/.test(
+    /^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t :]$/.test(
       value
     )
   ) {
@@ -229,7 +229,7 @@ function plainString(item, ctx, onComment) {
     // - start with an indicator character (except [?:-]) or /[?-] /
     // - '\n ', ': ' or ' \n' anywhere
     // - '#' not preceded by a non-space char
-    // - end with ' '
+    // - end with ' ' or ':'
     return implicitKey || inFlow || value.indexOf('\n') === -1
       ? value.indexOf('"') !== -1 && value.indexOf("'") === -1
         ? singleQuotedString(value, ctx)

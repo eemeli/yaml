@@ -105,3 +105,11 @@ test('Map with non-Pair item', () => {
   doc.contents.items.push('TEST')
   expect(() => String(doc)).toThrow(/^Map items must all be pairs.*TEST/)
 })
+
+test('eemeli/yaml#43: Quoting colons', () => {
+  const doc = new YAML.Document()
+  doc.contents = YAML.createNode({ key: ':' })
+  const str = String(doc)
+  expect(() => YAML.parse(str)).not.toThrow()
+  expect(str).toBe('key: ":"\n')
+})
