@@ -90,6 +90,11 @@ describe('setOrigRanges()', () => {
     expect(cst[0].valueRange.origEnd).toBeUndefined()
   })
 
+  test('no error on comments', () => {
+    const src = '\r\n# hello'
+    expect(() => parse(src).setOrigRanges()).not.toThrowError()
+  })
+
   test('single document', () => {
     const src = '- foo\r\n- bar\r\n'
     const cst = parse(src)

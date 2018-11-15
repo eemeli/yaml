@@ -299,7 +299,7 @@ export default class Node {
    */
   setOrigRanges(cr, offset) {
     if (this.range) offset = this.range.setOrigRange(cr, offset)
-    this.valueRange.setOrigRange(cr, offset)
+    if (this.valueRange) this.valueRange.setOrigRange(cr, offset)
     this.props.forEach(prop => prop.setOrigRange(cr, offset))
     return offset
   }

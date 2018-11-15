@@ -239,3 +239,18 @@ test('eemeli/yaml#38', () => {
     }
   })
 })
+
+test('fake node should respect setOrigRanges()', () => {
+  const cst = YAML.parseCST('a:\r\n  # 123')
+  expect(cst.setOrigRanges()).toBe(true)
+  const ast = cst.map(doc =>
+    new YAML.Document({ keepCstNodes: true }).parse(doc)
+  )
+  const fakePlain = ast[0].contents.items[0].value.cstNode
+  expect(fakePlain.range).toEqual({
+    start: 2,
+    end: 2,
+    origStart: 2,
+    origEnd: 2
+  })
+})
