@@ -95,8 +95,13 @@ function resolveBlockMapItems(doc, cst) {
           valueNode = new PlainValue(Type.PLAIN, [])
           valueNode.context = { parent: item, src: item.context.src }
           const pos = item.range.start + 1
+          const origPos = item.range.origStart + 1
           valueNode.range = { start: pos, end: pos }
           valueNode.valueRange = { start: pos, end: pos }
+          if (typeof item.range.origStart === 'number') {
+            valueNode.range.origStart = valueNode.range.origEnd = origPos
+            valueNode.valueRange.origStart = valueNode.valueRange.origEnd = origPos
+          }
         }
         items.push(new Pair(key, doc.resolveNode(valueNode)))
         checkKeyLength(doc.errors, cst, i, key, keyStart)
