@@ -159,6 +159,34 @@ canonical: null
 english: null
 null: null key\n`)
   })
+
+  describe('!!map', () => {
+    test('mapAsMap: false', () => {
+      const src = `
+one: 1
+2: two
+{ 3: 4 }: many\n`
+      const doc = YAML.parseDocument(src)
+      expect(doc.toJSON()).toMatchObject({
+        one: 1,
+        '2': 'two',
+        '{"3":4}': 'many'
+      })
+      expect(doc.errors).toHaveLength(0)
+    })
+
+    test('mapAsMap: true', () => {
+      const src = `
+one: 1
+2: two
+{ 3: 4 }: many\n`
+      const doc = YAML.parseDocument(src, { mapAsMap: true })
+      expect(doc.toJSON()).toMatchObject(
+        new Map([['one', 1], [2, 'two'], [new Map([[3, 4]]), 'many']])
+      )
+      expect(doc.errors).toHaveLength(0)
+    })
+  })
 })
 
 describe('YAML 1.1 schema', () => {

@@ -7,6 +7,7 @@ import Pair from './Pair'
 
 export default class YAMLMap extends Collection {
   toJSON(_, opt) {
+    if (opt && opt.mapAsMap) return this.toJSMap(opt)
     return this.items.reduce((map, item) => {
       if (item instanceof Merge) {
         // If the value associated with a merge key is a single mapping node,
@@ -36,6 +37,30 @@ export default class YAMLMap extends Collection {
       }
       return map
     }, {})
+  }
+
+  toJSMap(opt) {
+    const map = new Map()
+    for (const item of this.items) {
+      if (item instanceof Merge) {
+        const { items } = item.value
+        for (let i = items.length - 1; i >= 0; --i) {
+          const { source } = items[i]
+          if (source instanceof YAMLMap) {
+            for (const [key, value] of source.toJSMap(opt)) {
+              if (!map.has(key)) map.set(key, value)
+            }
+          } else {
+            throw new Error('Merge sources must be maps')
+          }
+        }
+      } else {
+        const key = toJSON(item.key, '', opt)
+        const value = toJSON(item.value, key, opt)
+        map.set(key, value)
+      }
+    }
+    return map
   }
 
   toString(ctx, onComment) {
