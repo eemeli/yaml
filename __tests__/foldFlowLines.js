@@ -136,6 +136,24 @@ describe('double-quoted', () => {
       '" \t \t \t \t \t\\\nnext \t"'
     )
   })
+
+  describe('eemeli/yaml#48: Split \\" escape in double-quoted string', () => {
+    test('minimal', () => {
+      const src2 = '"01234567\\""'
+      expect(fold(src2, '', FOLD_QUOTED, options)).toBe('"01234567\\\n\\""')
+      const src3 = '"012345678\\""'
+      expect(fold(src3, '', FOLD_QUOTED, options)).toBe('"012345678\\\n\\""')
+    })
+
+    test('reported', () => {
+      const x =
+        '{"module":"database","props":{"databaseType":"postgresql"},"extra":{},"foo":"bar\'"}'
+      const str = YAML.stringify({ x })
+      const doc = YAML.parseDocument(str)
+      expect(doc.errors).toHaveLength(0)
+      expect(doc.contents.items[0].value.value).toBe(x)
+    })
+  })
 })
 
 describe('end-to-end', () => {
