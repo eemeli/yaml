@@ -4,6 +4,16 @@ import Node, { Type } from './Node'
 import Range from './Range'
 
 export default class Collection extends Node {
+  static nextContentHasIndent(src, offset, indent) {
+    const lineStart = Node.endOfLine(src, offset) + 1
+    offset = Node.endOfWhiteSpace(src, lineStart)
+    const ch = src[offset]
+    if (!ch) return false
+    if (offset >= lineStart + indent) return true
+    if (ch !== '#') return false
+    return Collection.nextContentHasIndent(src, offset, indent)
+  }
+
   constructor(firstItem) {
     super(firstItem.type === Type.SEQ_ITEM ? Type.SEQ : Type.MAP)
     this.items = [firstItem]
@@ -45,6 +55,13 @@ export default class Collection extends Node {
     while (ch) {
       while (ch === '\n' || ch === '#') {
         if (ch === '#') {
+          if (
+            offset < lineStart + indent &&
+            !Collection.nextContentHasIndent(src, offset, indent)
+          ) {
+            trace: 'end:comment-unindent', { offset, lineStart, indent }
+            return offset
+          }
           const comment = new Comment()
           offset = comment.parse({ src }, offset)
           this.items.push(comment)
