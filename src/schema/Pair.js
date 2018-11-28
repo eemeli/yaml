@@ -44,10 +44,10 @@ export default class Pair extends Node {
     return String(key)
   }
 
-  toJSON(_, keep) {
+  toJSON(_, opt) {
     const pair = {}
     const sk = this.stringKey
-    pair[sk] = toJSON(this.value, sk, keep)
+    pair[sk] = toJSON(this.value, sk, opt)
     return pair
   }
 

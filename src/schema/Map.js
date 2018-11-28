@@ -6,7 +6,7 @@ import Merge from './Merge'
 import Pair from './Pair'
 
 export default class YAMLMap extends Collection {
-  toJSON(_, keep) {
+  toJSON(_, opt) {
     return this.items.reduce((map, item) => {
       if (item instanceof Merge) {
         // If the value associated with a merge key is a single mapping node,
@@ -22,7 +22,7 @@ export default class YAMLMap extends Collection {
         for (let i = items.length - 1; i >= 0; --i) {
           const { source } = items[i]
           if (source instanceof YAMLMap) {
-            const obj = source.toJSON('', keep)
+            const obj = source.toJSON('', opt)
             Object.keys(obj).forEach(key => {
               if (!keys.includes(key)) map[key] = obj[key]
             })
@@ -32,7 +32,7 @@ export default class YAMLMap extends Collection {
         }
       } else {
         const { stringKey, value } = item
-        map[stringKey] = toJSON(value, stringKey, keep)
+        map[stringKey] = toJSON(value, stringKey, opt)
       }
       return map
     }, {})
