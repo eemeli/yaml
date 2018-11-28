@@ -24,7 +24,7 @@ export default class Alias extends Node {
     throw new Error('Alias nodes cannot have tags')
   }
 
-  toJSON(arg, keep) {
-    return toJSON(this.source, arg, keep)
+  toJSON(arg, opt) {
+    return toJSON(this.source, arg, opt)
   }
 }
