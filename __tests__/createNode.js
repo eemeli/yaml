@@ -169,3 +169,47 @@ z:
     })
   })
 })
+
+describe('Set', () => {
+  test('createNode(new Set)', () => {
+    const s = createNode(new Set())
+    expect(s).toBeInstanceOf(Seq)
+    expect(s.items).toHaveLength(0)
+  })
+  test('createNode(new Set([true]), false)', () => {
+    const s = createNode(new Set([true]), false)
+    expect(s).toBeInstanceOf(Seq)
+    expect(s.items).toMatchObject([true])
+  })
+  describe('new Set([3, new Set(["four", 5])])', () => {
+    const set = new Set([3, new Set(['four', 5])])
+    test('createNode(value, false)', () => {
+      const s = createNode(set, false)
+      expect(s).toBeInstanceOf(Seq)
+      expect(s.items).toHaveLength(2)
+      expect(s.items[0]).toBe(3)
+      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1].items).toMatchObject(['four', 5])
+    })
+    test('createNode(value, true)', () => {
+      const s = createNode(set, true)
+      expect(s).toBeInstanceOf(Seq)
+      expect(s.items).toHaveLength(2)
+      expect(s.items[0].value).toBe(3)
+      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1].items).toHaveLength(2)
+      expect(s.items[1].items[0].value).toBe('four')
+      expect(s.items[1].items[1].value).toBe(5)
+    })
+    test('set doc contents', () => {
+      const res = '- 3\n- - four\n  - 5\n'
+      const doc = new YAML.Document()
+      doc.contents = set
+      expect(String(doc)).toBe(res)
+      doc.contents = createNode(set, false)
+      expect(String(doc)).toBe(res)
+      doc.contents = createNode(set, true)
+      expect(String(doc)).toBe(res)
+    })
+  })
+})

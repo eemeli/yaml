@@ -10,6 +10,13 @@ export default function createNode(value, wrapScalars = true) {
     const seq = new Seq()
     seq.items = value.map(v => createNode(v, wrapScalars))
     return seq
+  } else if (typeof Symbol !== 'undefined' && value[Symbol.iterator]) {
+    const seq = new Seq()
+    for (const it of value) {
+      const v = createNode(it, wrapScalars)
+      seq.items.push(v)
+    }
+    return seq
   } else {
     const map = new Map()
     map.items = Object.keys(value).map(key => {
