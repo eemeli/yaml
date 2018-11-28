@@ -220,12 +220,12 @@ function plainString(item, ctx, onComment) {
   }
   if (
     !value ||
-    /^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t :]$/.test(
+    /^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-]$|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t :]$/.test(
       value
     )
   ) {
     // not allowed:
-    // - empty string
+    // - empty string, '-' or '?'
     // - start with an indicator character (except [?:-]) or /[?-] /
     // - '\n ', ': ' or ' \n' anywhere
     // - '#' not preceded by a non-space char

@@ -113,3 +113,15 @@ test('eemeli/yaml#43: Quoting colons', () => {
   expect(() => YAML.parse(str)).not.toThrow()
   expect(str).toBe('key: ":"\n')
 })
+
+test('eemeli/yaml#52: Quoting item markers', () => {
+  const doc = new YAML.Document()
+  doc.contents = YAML.createNode({ key: '-' })
+  const str = String(doc)
+  expect(() => YAML.parse(str)).not.toThrow()
+  expect(str).toBe('key: "-"\n')
+  doc.contents = YAML.createNode({ key: '?' })
+  const str2 = String(doc)
+  expect(() => YAML.parse(str2)).not.toThrow()
+  expect(str2).toBe('key: "?"\n')
+})
