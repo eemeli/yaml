@@ -416,7 +416,8 @@ export default class Document {
     const keep =
       this.options.keepBlobsInJSON &&
       (typeof arg !== 'string' || !(this.contents instanceof Scalar))
-    return toJSON(this.contents, arg, { keep })
+    const mapAsMap = keep && !!this.options.mapAsMap
+    return toJSON(this.contents, arg, { keep, mapAsMap })
   }
 
   toString() {

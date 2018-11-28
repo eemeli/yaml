@@ -6,6 +6,7 @@ import { YAMLSemanticError } from './errors'
 const defaultOptions = {
   keepNodeTypes: true,
   keepBlobsInJSON: true,
+  mapAsMap: false,
   tags: null,
   version: '1.2'
 }
