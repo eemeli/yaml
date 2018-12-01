@@ -23,11 +23,20 @@ export function resolveComments(collection, comments) {
   comments.forEach(({ comment, before }) => {
     const item = collection.items[before]
     if (!item) {
-      if (collection.comment) collection.comment += '\n' + comment
-      else collection.comment = comment
+      if (comment === undefined) {
+        collection.spaceAfter = true
+      } else {
+        if (collection.comment) collection.comment += '\n' + comment
+        else collection.comment = comment
+        collection.spaceAfter = false
+      }
     } else {
-      if (item.commentBefore) item.commentBefore += '\n' + comment
-      else item.commentBefore = comment
+      if (comment === undefined) {
+        if (!item.commentBefore) item.spaceBefore = true
+      } else {
+        if (item.commentBefore) item.commentBefore += '\n' + comment
+        else item.commentBefore = comment
+      }
     }
   })
 }

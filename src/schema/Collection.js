@@ -20,15 +20,23 @@ export default class Collection extends Node {
     let hasItemWithComment = false
     let hasItemWithNewLine = false
     const nodes = this.items.reduce((nodes, item, i) => {
-      const commentBefore = item && item.commentBefore
-      if (commentBefore) {
-        hasItemWithComment = true
-        commentBefore.match(/^.*$/gm).forEach(line => {
-          nodes.push({ type: 'comment', str: `#${line}` })
-        })
+      let comment
+      if (item) {
+        if (item.spaceBefore) {
+          hasItemWithComment = true
+          nodes.push({ type: 'comment', str: '' })
+        }
+        if (item.commentBefore) {
+          hasItemWithComment = true
+          item.commentBefore.match(/^.*$/gm).forEach(line => {
+            nodes.push({ type: 'comment', str: `#${line}` })
+          })
+        }
+        if (item.comment) {
+          hasItemWithComment = true
+          comment = item.comment
+        }
       }
-      let comment = item && item.comment
-      if (comment) hasItemWithComment = true
       let str = doc.schema.stringify(item, ctx, () => {
         comment = null
       })
@@ -64,6 +72,7 @@ export default class Collection extends Node {
       str += '\n' + this.comment.replace(/^/gm, `${indent}#`)
       if (onComment) onComment()
     }
+    if (this.spaceAfter) str += '\n'
     return str
   }
 }

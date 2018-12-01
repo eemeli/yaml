@@ -312,6 +312,73 @@ key2: value 2
   })
 })
 
+describe('blank lines', () => {
+  describe('drop leading blank lines', () => {
+    test('content', () => {
+      const src = '\n\nstr\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('str\n')
+    })
+    test('content comment', () => {
+      const src = '\n\n#cc\n\nstr\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('#cc\nstr\n')
+    })
+    test('directive', () => {
+      const src = '\n\n%YAML 1.2\n---\nstr\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('%YAML 1.2\n---\nstr\n')
+    })
+    test.skip('directive comment', () => {
+      const src = '\n\n#cc\n%YAML 1.2\n---\nstr\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('#cc\n%YAML 1.2\n---\nstr\n')
+    })
+  })
+  describe('drop trailing blank lines', () => {
+    test('empty contents', () => {
+      const src = '\n\n\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('null\n')
+    })
+    test('scalar contents', () => {
+      const src = 'str\n\n\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('str\n')
+    })
+    test('seq contents', () => {
+      const src = '- a\n- b\n\n\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('- a\n- b\n')
+    })
+    test.skip('comment contents', () => {
+      const src = '#cc\n\n\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('\n#cc\nnull\n') // FIXME
+    })
+  })
+  test('between directive comment & directive', () => {
+    const src = '#cc\n\n\n%YAML 1.2\n---\nstr\n'
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe('#cc\n\n%YAML 1.2\n---\nstr\n')
+  })
+  test.skip('after leading comment', () => {
+    const src = '#cc\n\n\nstr\n'
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe('#cc\n\nstr\n')
+  })
+  test.skip('between seq items', () => {
+    const src = '- a\n\n- b\n\n\n- c\n'
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe('- a\n\n- b\n\n- c\n')
+  })
+  test.skip('between seq items with leading comments', () => {
+    const src = '#A\n- a\n\n#B\n- b\n\n\n#C\n\n- c\n'
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe('#A\n- a\n\n#B\n- b\n\n#C\n- c\n')
+  })
+})
+
 describe('eemeli/yaml#17', () => {
   test('reported', () => {
     const src = `test1:
@@ -352,7 +419,7 @@ a:
   - b #c
 #d\n`
     const cst = YAML.parseCST(src)
-    const collection = cst[0].contents[0]
+    const collection = cst[0].contents[1]
     expect(collection.items).toHaveLength(3)
     const comment = collection.items[2]
     expect(comment.type).toBe('COMMENT')

@@ -66,6 +66,9 @@ function resolveBlockMapItems(doc, cst) {
   for (let i = 0; i < cst.items.length; ++i) {
     const item = cst.items[i]
     switch (item.type) {
+      case Type.BLANK_LINE:
+        comments.push({ before: items.length })
+        break
       case Type.COMMENT:
         comments.push({ comment: item.comment, before: items.length })
         break
@@ -175,6 +178,8 @@ function resolveFlowMapItems(doc, cst) {
       doc.errors.push(
         new YAMLSyntaxError(cst, `Flow map contains an unexpected ${char}`)
       )
+    } else if (item.type === Type.BLANK_LINE) {
+      comments.push({ before: items.length })
     } else if (item.type === Type.COMMENT) {
       comments.push({ comment: item.comment, before: items.length })
     } else if (key === undefined) {

@@ -53,6 +53,7 @@ export default class Document {
     this.errors = []
     this.options = options
     this.schema = null
+    this.spaceBefore = false
     this.tagPrefixes = []
     this.version = null
     this.warnings = []
@@ -97,6 +98,7 @@ export default class Document {
             const msg = `YAML only supports %TAG and %YAML directives, and not %${name}`
             this.warnings.push(new YAMLWarning(directive, msg))
           }
+          if (directive.type === Type.BLANK_LINE) this.spaceBefore = true
       }
       if (comment) directiveComments.push(comment)
     })
@@ -106,16 +108,24 @@ export default class Document {
     this.commentBefore = directiveComments.join('\n') || null
     const comments = { before: [], after: [] }
     const contentNodes = []
+    let spaceBefore = false
     contents.forEach(node => {
       if (node.valueRange) {
         if (contentNodes.length === 1) {
           const msg = 'Document is not valid YAML (bad indentation?)'
           this.errors.push(new YAMLSyntaxError(node, msg))
         }
-        contentNodes.push(this.resolveNode(node))
+        const res = this.resolveNode(node)
+        if (spaceBefore) {
+          res.spaceBefore = true
+          spaceBefore = false
+        }
+        contentNodes.push(res)
       } else if (node.comment) {
         const cc = contentNodes.length === 0 ? comments.before : comments.after
         cc.push(node.comment)
+      } else if (node.type === Type.BLANK_LINE) {
+        spaceBefore = true
       }
     })
     switch (contentNodes.length) {
@@ -136,6 +146,7 @@ export default class Document {
               ? `${cb}\n${cbNode.commentBefore}`
               : cb
           }
+          if (this.contents.spaceAfter) delete this.contents.spaceAfter
         } else {
           comments.after = comments.before.concat(comments.after)
         }
@@ -425,7 +436,10 @@ export default class Document {
       throw new Error('Document with errors cannot be stringified')
     this.setSchema()
     const lines = []
-    if (this.commentBefore) lines.push(this.commentBefore.replace(/^/gm, '#'))
+    if (this.commentBefore) {
+      lines.push(this.commentBefore.replace(/^/gm, '#'))
+      if (this.spaceBefore) lines.push('')
+    }
     let hasDirectives = false
     if (this.version) {
       let vd = '%YAML 1.2'
@@ -450,6 +464,7 @@ export default class Document {
       indent: ''
     }
     if (this.contents) {
+      if (this.contents.spaceBefore && lines.length > 0) lines.push('')
       if (this.contents.commentBefore)
         lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
       // top-level block scalars need to be indented if followed by a comment
