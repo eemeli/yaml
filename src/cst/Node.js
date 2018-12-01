@@ -2,6 +2,7 @@ import Range from './Range'
 
 export const Type = {
   ALIAS: 'ALIAS',
+  BLANK_LINE: 'BLANK_LINE',
   BLOCK_FOLDED: 'BLOCK_FOLDED',
   BLOCK_LITERAL: 'BLOCK_LITERAL',
   COMMENT: 'COMMENT',

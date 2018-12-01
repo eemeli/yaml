@@ -1,4 +1,4 @@
-import CollectionItem from './CollectionItem'
+import BlankLine from './BlankLine'
 import Comment from './Comment'
 import Node, { Type } from './Node'
 import Range from './Range'
@@ -54,7 +54,17 @@ export default class Collection extends Node {
     trace: 'items-start', { offset, indent, lineStart, ch: JSON.stringify(ch) }
     while (ch) {
       while (ch === '\n' || ch === '#') {
-        if (ch === '#') {
+        if (atLineStart && ch === '\n') {
+          const blankLine = new BlankLine()
+          offset = blankLine.parse({ src }, offset)
+          this.valueRange.end = offset
+          if (offset >= src.length) {
+            ch = null
+            break
+          }
+          this.items.push(blankLine)
+          offset -= 1 // blankLine.parse() consumes terminal newline
+        } else if (ch === '#') {
           if (
             offset < lineStart + indent &&
             !Collection.nextContentHasIndent(src, offset, indent)

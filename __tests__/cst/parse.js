@@ -214,6 +214,14 @@ describe('setOrigRanges()', () => {
       contents: [
         {
           error: null,
+          props: [],
+          range: { end: 1, origEnd: 2, origStart: 1, start: 0 },
+          type: 'BLANK_LINE',
+          value: null,
+          valueRange: null
+        },
+        {
+          error: null,
           items: [
             { char: '{', offset: 1, origOffset: 2 },
             { char: ':', offset: 3, origOffset: 4 },

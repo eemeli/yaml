@@ -35,7 +35,7 @@ export const testSpec = (res, exp) => {
           : res.rawValue
         : typeof res === 'string'
         ? res
-        : res.char
+        : res && res.char
     expect(value).toBe(exp)
   } else if (Array.isArray(exp)) {
     expect(res).toBeInstanceOf(Array)

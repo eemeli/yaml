@@ -1505,6 +1505,7 @@ Not indented:
           contents: [
             { comment: ' Leading comment line spaces are' },
             { comment: ' neither content nor indentation.' },
+            { type: Type.BLANK_LINE },
             {
               items: [
                 'Not indented',
@@ -2945,6 +2946,7 @@ keep: |+
       tgt: [
         {
           contents: [
+            { type: Type.BLANK_LINE },
             { comment: ' Strip' },
             { comment: ' Comments:' },
             {
@@ -2953,10 +2955,12 @@ keep: |+
                 { type: Type.MAP_VALUE, node: '# text' },
                 { comment: ' Clip' },
                 { comment: ' comments:' },
+                { type: Type.BLANK_LINE },
                 'clip',
                 { type: Type.MAP_VALUE, node: '# text\n' },
                 { comment: ' Keep' },
                 { comment: ' comments:' },
+                { type: Type.BLANK_LINE },
                 'keep',
                 { type: Type.MAP_VALUE, node: '# text\n\n' },
                 { comment: ' Trail' },

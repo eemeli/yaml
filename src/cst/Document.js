@@ -1,4 +1,5 @@
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
+import BlankLine from './BlankLine'
 import Comment from './Comment'
 import Directive from './Directive'
 import Node, { Char, Type } from './Node'
@@ -20,19 +21,31 @@ export default class Document extends Node {
   parseDirectives(start) {
     const { src } = this.context
     this.directives = []
+    let atLineStart = true
     let hasDirectives = false
     let offset = start
     while (!Node.atDocumentBoundary(src, offset, Char.DIRECTIVES_END)) {
       offset = Document.startCommentOrEndBlankLine(src, offset)
       switch (src[offset]) {
         case '\n':
-          offset += 1
+          if (atLineStart) {
+            const blankLine = new BlankLine()
+            offset = blankLine.parse({ src }, offset)
+            if (offset < src.length) {
+              this.directives.push(blankLine)
+              trace: 'directive-blankline'
+            }
+          } else {
+            offset += 1
+            atLineStart = true
+          }
           break
         case '#':
           {
             const comment = new Comment()
             offset = comment.parse({ src }, offset)
             this.directives.push(comment)
+            atLineStart = false
             trace: 'directive-comment', comment.comment
           }
           break
@@ -42,6 +55,7 @@ export default class Document extends Node {
             offset = directive.parse({ parent: this, src }, offset)
             this.directives.push(directive)
             hasDirectives = true
+            atLineStart = false
             trace: 'directive',
               { valueRange: directive.valueRange, comment: directive.comment },
               JSON.stringify(directive.rawValue)
@@ -84,9 +98,18 @@ export default class Document extends Node {
     while (!Node.atDocumentBoundary(src, offset, Char.DOCUMENT_END)) {
       switch (src[offset]) {
         case '\n':
-          offset += 1
+          if (atLineStart) {
+            const blankLine = new BlankLine()
+            offset = blankLine.parse({ src }, offset)
+            if (offset < src.length) {
+              this.contents.push(blankLine)
+              trace: 'content-blankline'
+            }
+          } else {
+            offset += 1
+            atLineStart = true
+          }
           lineStart = offset
-          atLineStart = true
           break
         case '#':
           {
@@ -94,6 +117,7 @@ export default class Document extends Node {
             offset = comment.parse({ src }, offset)
             this.contents.push(comment)
             trace: 'content-comment', comment.comment
+            atLineStart = false
           }
           break
         default: {
