@@ -114,7 +114,15 @@ describe('parse comments', () => {
       expect(doc.contents.items[0].items[1].commentBefore).toBe('c2')
       expect(doc.contents.items[0].items[1].value.comment).toBe('c3')
       expect(doc.contents.items[0].items[2].commentBefore).toBe('c4')
-      expect(doc.contents.items[0].comment).toBe('c5')
+      expect(doc.contents.comment).toBe('c5')
+      expect(String(doc)).toBe(`#c0
+#c1
+- k1: v1
+  #c2
+  k2: v2 #c3
+  #c4
+  k3: v3
+#c5\n`)
     })
   })
 
@@ -137,7 +145,16 @@ k2:
       expect(doc.contents.items[0].value.items[1].commentBefore).toBe('c2')
       expect(doc.contents.items[0].value.comment).toBe('c3')
       expect(doc.contents.items[1].value.items[0].comment).toBe('c4')
-      expect(doc.contents.items[1].value.comment).toBe('c5')
+      expect(doc.contents.comment).toBe('c5')
+      expect(String(doc)).toBe(`#c0
+k1: #c1
+  - v1
+  #c2
+  - v2
+  #c3
+k2:
+  - v3 #c4
+#c5\n`)
     })
   })
 })
@@ -312,7 +329,7 @@ describe('eemeli/yaml#17', () => {
 })
 
 describe('eemeli/yaml#28', () => {
-  test.skip('reported', () => {
+  test('reported', () => {
     const src = `# This comment is ok
 entryA:
   - foo
@@ -329,12 +346,15 @@ entryB:
     expect(String(doc)).toBe(src)
   })
 
-  test.skip('comment association by indentation', () => {
-    const src = `a:\n  - b #c\n#d\n`
+  test('comment association by indentation', () => {
+    const src = `
+a:
+  - b #c
+#d\n`
     const cst = YAML.parseCST(src)
     const collection = cst[0].contents[0]
+    expect(collection.items).toHaveLength(3)
     const comment = collection.items[2]
-    expect(comment).not.toBeUndefined()
     expect(comment.type).toBe('COMMENT')
     expect(comment.comment).toBe('d')
   })
