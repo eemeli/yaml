@@ -61,16 +61,16 @@ export default function foldFlowLines(
     if (mode === FOLD_QUOTED && ch === '\\') {
       switch (text[i + 1]) {
         case 'x':
-          ch = text[(i += 4)]
+          i += 3
           break
         case 'u':
-          ch = text[(i += 6)]
+          i += 5
           break
         case 'U':
-          ch = text[(i += 10)]
+          i += 9
           break
         default:
-          ch = text[(i += 2)]
+          i += 1
       }
     }
     if (ch === '\n') {

@@ -154,6 +154,21 @@ describe('double-quoted', () => {
       expect(doc.contents.items[0].value.value).toBe(x)
     })
   })
+
+  describe('eemeli/yaml#57', () => {
+    test('minimal', () => {
+      const str = `"0123\\"\\\\ '"`
+      expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"0123\\"\\\\\n'"`)
+    })
+
+    test('reported', () => {
+      const key2 = `!""""""""""""""""""""""""""""""""""#"\\ '`
+      const str = YAML.stringify([{ key2 }])
+      const doc = YAML.parseDocument(str)
+      expect(doc.errors).toHaveLength(0)
+      expect(doc.contents.items[0].items[0].value.value).toBe(key2)
+    })
+  })
 })
 
 describe('end-to-end', () => {
