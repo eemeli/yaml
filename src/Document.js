@@ -8,7 +8,7 @@ import {
   YAMLWarning
 } from './errors'
 import listTagNames from './listTagNames'
-import Schema, { defaultPrefix, DefaultTags } from './schema'
+import Schema from './schema'
 import Alias from './schema/Alias'
 import Collection from './schema/Collection'
 import toJSON from './toJSON'
@@ -23,7 +23,7 @@ export default class Document {
       schema: 'yaml-1.1',
       merge: true,
       tagPrefixes: [
-        { handle: '!', prefix: defaultPrefix },
+        { handle: '!', prefix: Schema.defaultPrefix },
         { handle: '!!', prefix: 'tag:private.yaml.org,2002:' }
       ]
     },
@@ -32,7 +32,7 @@ export default class Document {
       merge: true,
       tagPrefixes: [
         { handle: '!', prefix: '!' },
-        { handle: '!!', prefix: defaultPrefix }
+        { handle: '!!', prefix: Schema.defaultPrefix }
       ]
     },
     '1.2': {
@@ -40,7 +40,7 @@ export default class Document {
       merge: false,
       tagPrefixes: [
         { handle: '!', prefix: '!' },
-        { handle: '!!', prefix: defaultPrefix }
+        { handle: '!!', prefix: Schema.defaultPrefix }
       ]
     }
   }
@@ -238,15 +238,15 @@ export default class Document {
       case Type.BLOCK_LITERAL:
       case Type.QUOTE_DOUBLE:
       case Type.QUOTE_SINGLE:
-        return DefaultTags.STR
+        return Schema.defaultTags.STR
       case Type.FLOW_MAP:
       case Type.MAP:
-        return DefaultTags.MAP
+        return Schema.defaultTags.MAP
       case Type.FLOW_SEQ:
       case Type.SEQ:
-        return DefaultTags.SEQ
+        return Schema.defaultTags.SEQ
       case Type.PLAIN:
-        return nonSpecific ? DefaultTags.STR : null
+        return nonSpecific ? Schema.defaultTags.STR : null
       default:
         return null
     }
@@ -365,7 +365,7 @@ export default class Document {
 
   listNonDefaultTags() {
     return listTagNames(this.contents).filter(
-      t => t.indexOf(defaultPrefix) !== 0
+      t => t.indexOf(Schema.defaultPrefix) !== 0
     )
   }
 

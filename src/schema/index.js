@@ -12,52 +12,48 @@ import Scalar from './Scalar'
 import { resolve as resolveStr } from './_string'
 import yaml11 from './yaml-1.1'
 
-export const availableSchema = {
-  core,
-  failsafe,
-  json,
-  'yaml-1.1': yaml11
-}
-
-export const defaultPrefix = 'tag:yaml.org,2002:'
-
-export const DefaultTags = {
-  MAP: 'tag:yaml.org,2002:map',
-  SEQ: 'tag:yaml.org,2002:seq',
-  STR: 'tag:yaml.org,2002:str'
-}
-
 const isMap = ({ type }) => type === Type.FLOW_MAP || type === Type.MAP
 
 const isSeq = ({ type }) => type === Type.FLOW_SEQ || type === Type.SEQ
 
 export default class Schema {
-  static defaultStringifier(value) {
+  static defaultPrefix = 'tag:yaml.org,2002:'
+
+  static defaultTags = {
+    MAP: 'tag:yaml.org,2002:map',
+    SEQ: 'tag:yaml.org,2002:seq',
+    STR: 'tag:yaml.org,2002:str'
+  }
+
+  static tags = {
+    core,
+    failsafe,
+    json,
+    'yaml-1.1': yaml11
+  }
+
+  static defaultStringify(value) {
     return JSON.stringify(value)
   }
 
   constructor({ merge, schema, tags }) {
     this.merge = !!merge
     this.name = schema
-    this.schema = availableSchema[schema]
-    if (!this.schema) {
-      const keys = Object.keys(availableSchema)
-        .map(key => JSON.stringify(key))
-        .join(', ')
-      throw new Error(
-        `Unknown schema; use ${keys}, or { tag, test, resolve }[]`
-      )
+    this.tags = Schema.tags[schema]
+    if (!this.tags) {
+      const keys = Object.keys(Schema.tags).map(key => JSON.stringify(key))
+      throw new Error(`Unknown schema; use one of ${keys.join(', ')}`)
     }
     if (Array.isArray(tags)) {
-      this.schema = this.schema.concat(tags)
+      this.tags = this.tags.concat(tags)
     } else if (typeof tags === 'function') {
-      this.schema = tags(this.schema.slice())
+      this.tags = tags(this.tags.slice())
     }
   }
 
   // falls back to string on no match
   resolveScalar(str, tags) {
-    if (!tags) tags = this.schema
+    if (!tags) tags = this.tags
     for (let i = 0; i < tags.length; ++i) {
       const { format, test, resolve } = tags[i]
       if (test) {
@@ -69,13 +65,13 @@ export default class Schema {
         }
       }
     }
-    if (this.schema.scalarFallback) str = this.schema.scalarFallback(str)
+    if (this.tags.scalarFallback) str = this.tags.scalarFallback(str)
     return new Scalar(str)
   }
 
   // sets node.resolved on success
   resolveNode(doc, node, tagName) {
-    const tags = this.schema.filter(({ tag }) => tag === tagName)
+    const tags = this.tags.filter(({ tag }) => tag === tagName)
     const generic = tags.find(({ test }) => !test)
     if (node.error) doc.errors.push(node.error)
     try {
@@ -103,10 +99,10 @@ export default class Schema {
     const res = this.resolveNode(doc, node, tagName)
     if (node.hasOwnProperty('resolved')) return res
     const fallback = isMap(node)
-      ? DefaultTags.MAP
+      ? Schema.defaultTags.MAP
       : isSeq(node)
-      ? DefaultTags.SEQ
-      : DefaultTags.STR
+      ? Schema.defaultTags.SEQ
+      : Schema.defaultTags.STR
     if (fallback) {
       doc.warnings.push(
         new YAMLWarning(
@@ -128,14 +124,14 @@ export default class Schema {
   getTagObject(item) {
     if (item instanceof Alias) return Alias
     if (item.tag) {
-      let match = this.schema.find(
+      let match = this.tags.find(
         ({ format, tag }) => tag === item.tag && format === item.format
       )
-      if (!match) match = this.schema.find(({ tag }) => tag === item.tag)
+      if (!match) match = this.tags.find(({ tag }) => tag === item.tag)
       if (match) return match
     }
     if (item.value === null) {
-      const match = this.schema.find(t => t.class === null && !t.format)
+      const match = this.tags.find(t => t.class === null && !t.format)
       if (!match) throw new Error('Tag not resolved for null value')
       return match
     } else {
@@ -155,11 +151,11 @@ export default class Schema {
             obj = item.value
         }
       }
-      let match = this.schema.find(
+      let match = this.tags.find(
         t => t.class && obj instanceof t.class && t.format === item.format
       )
       if (!match) {
-        match = this.schema.find(
+        match = this.tags.find(
           t => t.class && obj instanceof t.class && !t.format
         )
       }
@@ -193,7 +189,7 @@ export default class Schema {
     if (item instanceof Pair) return item.toString(ctx, onComment)
     const tagObj = this.getTagObject(item)
     const props = this.stringifyProps(item, tagObj, ctx)
-    const stringify = tagObj.stringify || Schema.defaultStringifier
+    const stringify = tagObj.stringify || Schema.defaultStringify
     const str = stringify(item, ctx, onComment)
     return props
       ? item instanceof Collection && str[0] !== '{' && str[0] !== '['
