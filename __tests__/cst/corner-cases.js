@@ -150,3 +150,14 @@ test('eemeli/yaml#38', () => {
     expect(item.error).toBe(null)
   })
 })
+
+test('eemeli/yaml#56', () => {
+  const src = ':,\n'
+  const doc = parse(src)[0]
+  expect(doc.contents).toHaveLength(1)
+  expect(doc.contents[0]).toMatchObject({
+    error: null,
+    strValue: ':,',
+    type: 'PLAIN'
+  })
+})
