@@ -497,6 +497,11 @@ yarn add yaml
 <td>Store the original node type when parsing documents. By default <code>true</code>.</td>
 </tr>
 <tr>
+<td>mapAsMap</td>
+<td><code>boolean</code></td>
+<td>When outputting JS, use Map rather than Object to represent mappings. By default <code>false</code>.</td>
+</tr>
+<tr>
 <td>merge</td>
 <td><code>boolean</code></td>
 <td>Enable support for <code>&lt;&lt;</code> merge keys.</td>
@@ -524,6 +529,9 @@ yarn add yaml
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'json'</span> <span class="p">})</span> <span class="c1">// SyntaxError: Unresolved plain scalar "No"</span>
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'yaml-1.1'</span> <span class="p">})</span> <span class="c1">// false</span>
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">version</span><span class="p">:</span> <span class="s1">'1.1'</span> <span class="p">})</span> <span class="c1">// false</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'{[1, 2]: many}'</span><span class="p">)</span> <span class="c1">// { '[1,2]': 'many' }</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'{[1, 2]: many}'</span><span class="p">,</span> <span class="p">{</span> <span class="na">mapAsMap</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span> <span class="c1">// Map { [ 1, 2 ] =&gt; 'many' }</span>
 </code></pre>
 <p>Aside from defining the language structure, the YAML 1.2 spec defines a number of different <strong>schemas</strong> that may be used. The default is the <a href="http://yaml.org/spec/1.2/spec.html#id2804923"><code>core</code></a> schema, which is the most common one. The <a href="http://yaml.org/spec/1.2/spec.html#id2803231"><code>json</code></a> schema is effectively the minimum schema required to parse JSON; both it and the core schema are supersets of the minimal <a href="http://yaml.org/spec/1.2/spec.html#id2802346"><code>failsafe</code></a> schema.</p>
 
@@ -1081,7 +1089,7 @@ invoice: !domain.tld,2002/^invoice
 <span class="c1">// - values</span>
 <span class="c1">// - balloons: 99</span>
 </code></pre><h4 id='yaml-createnode-value-map-seq-scalar'><code>YAML.createNode(value): Map | Seq | Scalar</code></h4><h4 id='yaml-createnode-value-false-map-seq-string-number-boolean-null'><code>YAML.createNode(value, false): Map | Seq | string | number | boolean | null</code></h4>
-<p><code>YAML.createNode</code> recursively turns objects into <code>Map</code> and arrays to <code>Seq</code> <a href="#collections">collections</a>. If the second <code>wrapScalars</code> argument is undefined or <code>true</code>, it also wraps plain values in <code>Scalar</code> objects. Its primary use is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output.</p>
+<p><code>YAML.createNode</code> recursively turns objects into <a href="#collections">collections</a>. Generic objects as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences. If the second <code>wrapScalars</code> argument is undefined or <code>true</code>, it also wraps plain values in <code>Scalar</code> objects. Its primary use is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output.</p>
 
 <p>To stringify the output of <code>YAML.createNode</code> as YAML, you&#39;ll need to assign it to the <code>contents</code> of a Document (or somewhere within said contents), as the document&#39;s schema is required for YAML string output.</p>
 
@@ -1106,7 +1114,7 @@ invoice: !domain.tld,2002/^invoice
 <span class="c1">//   including: objects</span>
 <span class="c1">// - 1: a number</span>
 </code></pre>
-<p>To construct a <code>Seq</code> or <code>Map</code>, use <a href="#yaml-createnode"><code>YAML.createNode()</code></a> with array or object input, or create the collections directly by importing the classes from <code>yaml/seq</code> and <code>yaml/map</code>.</p>
+<p>To construct a <code>Seq</code> or <code>Map</code>, use <a href="#yaml-createnode"><code>YAML.createNode()</code></a> with array, object or iterable input, or create the collections directly by importing the classes from <code>yaml/seq</code> and <code>yaml/map</code>.</p>
 
 <p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created by importing the class from <code>yaml/pair</code> and using its <code>new Pair(key, value)</code> constructor. Note in particular that this is required to create non-<code>string</code> keys.</p>
 <h2 id='comments'>Comments</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`

@@ -35,6 +35,11 @@
 <td>Store the original node type when parsing documents. By default <code>true</code>.</td>
 </tr>
 <tr>
+<td>mapAsMap</td>
+<td><code>boolean</code></td>
+<td>When outputting JS, use Map rather than Object to represent mappings. By default <code>false</code>.</td>
+</tr>
+<tr>
 <td>merge</td>
 <td><code>boolean</code></td>
 <td>Enable support for <code>&lt;&lt;</code> merge keys.</td>
@@ -62,6 +67,9 @@
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'json'</span> <span class="p">})</span> <span class="c1">// SyntaxError: Unresolved plain scalar "No"</span>
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'yaml-1.1'</span> <span class="p">})</span> <span class="c1">// false</span>
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">version</span><span class="p">:</span> <span class="s1">'1.1'</span> <span class="p">})</span> <span class="c1">// false</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'{[1, 2]: many}'</span><span class="p">)</span> <span class="c1">// { '[1,2]': 'many' }</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'{[1, 2]: many}'</span><span class="p">,</span> <span class="p">{</span> <span class="na">mapAsMap</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span> <span class="c1">// Map { [ 1, 2 ] =&gt; 'many' }</span>
 </code></pre>
 <p>Aside from defining the language structure, the YAML 1.2 spec defines a number of different <strong>schemas</strong> that may be used. The default is the <a href="http://yaml.org/spec/1.2/spec.html#id2804923"><code>core</code></a> schema, which is the most common one. The <a href="http://yaml.org/spec/1.2/spec.html#id2803231"><code>json</code></a> schema is effectively the minimum schema required to parse JSON; both it and the core schema are supersets of the minimal <a href="http://yaml.org/spec/1.2/spec.html#id2802346"><code>failsafe</code></a> schema.</p>
 
