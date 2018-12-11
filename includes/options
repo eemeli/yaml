@@ -153,18 +153,24 @@ target:
 <td>Used to match string values of scalar nodes; captured parts will be passed as arguments of <code>resolve()</code>.</td>
 </tr>
 </tbody></table>
-<h2 id='tag-stringifier-options'>Tag Stringifier Options</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s1">'this is: null'</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="c1">// Pair {</span>
-<span class="c1">//   key: Scalar { value: 'this is', range: [ 0, 7 ], type: 'PLAIN' },</span>
-<span class="c1">//   value: Scalar { value: null, range: [ 9, 13 ], type: 'PLAIN' } }</span>
+<h2 id='tag-stringifier-options'>Tag Stringifier Options</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">nullOptions</span><span class="p">,</span> <span class="nx">strOptions</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/schema'</span>
 
-<span class="kr">const</span> <span class="nx">nullTag</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
-  <span class="p">({</span> <span class="nx">tag</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">tag</span> <span class="o">===</span> <span class="s1">'tag:yaml.org,2002:null'</span>
-<span class="p">)</span>
-<span class="nx">nullTag</span><span class="p">.</span><span class="nx">options</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="s1">'~'</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
+<span class="c1">// this is: null</span>
 
-<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
-<span class="c1">// this is: ~</span>
+<span class="nx">nullOptions</span>
+<span class="c1">// { nullStr: 'null' }</span>
+<span class="nx">nullOptions</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="s1">'~'</span>
+
+<span class="nx">strOptions</span>
+<span class="c1">// { defaultType: 'PLAIN',</span>
+<span class="c1">//   doubleQuoted: { jsonEncoding: false, minMultiLineLength: 40 },</span>
+<span class="c1">//   fold: { lineWidth: 80, minContentWidth: 20 } }</span>
+<span class="nx">strOptions</span><span class="p">.</span><span class="nx">defaultType</span> <span class="o">=</span> <span class="s1">'QUOTE_SINGLE'</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
+<span class="c1">// 'this is': ~</span>
 </code></pre>
-<p>Some of the tags (in particular <code>!!null</code>, <code>!!str</code> and <code>!!binary</code>) support additional customisations for their YAML stringification. To adjust those, modify the <code>options</code> object of the appropriate tag.</p>
+<p>To customise the YAML stringification, the <code>nullOptions</code> and <code>strOptions</code> objects are exported from <code>&#39;yaml/schema&#39;</code>. Note that these values are used by all documents. For example, to disable the automatic line wrapping, set <code>strOptions.fold.lineWidth</code> to <code>0</code>.</p>
+
+<p>The optional <code>!!binary</code> type (available at <code>&#39;yaml/types/binary&#39;</code>) also provides for some configuration via its <code>options</code> object.</p>
