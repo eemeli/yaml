@@ -200,6 +200,12 @@ Unfolded paragraph.\n`
     expect(String(doc)).toBe(src)
   })
 
+  test('eemeli/yaml#55', () => {
+    const str = ' first more-indented line\nnext line\n'
+    const ys = YAML.stringify(str)
+    expect(ys).toBe('>1\n first more-indented line\nnext line\n')
+  })
+
   test('plain string', () => {
     const src = `- plain value with
   enough length to

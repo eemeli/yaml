@@ -2,6 +2,19 @@ export const FOLD_FLOW = 'flow'
 export const FOLD_BLOCK = 'block'
 export const FOLD_QUOTED = 'quoted'
 
+// presumes i+1 is at the start of a line
+// returns index of last newline in more-indented block
+const consumeMoreIndentedLines = (text, i) => {
+  let ch = text[i + 1]
+  while (ch === ' ' || ch === '\t') {
+    do {
+      ch = text[(i += 1)]
+    } while (ch && ch !== '\n')
+    ch = text[i + 1]
+  }
+  return i
+}
+
 /**
  * Tries to keep input at up to `lineWidth` characters, splitting only on spaces
  * not followed by newlines or spaces unless `mode` is `'quoted'`. Lines are
@@ -39,7 +52,12 @@ export default function foldFlowLines(
   let split = undefined
   let prev = undefined
   let overflow = false
-  for (let i = 0, ch = text[0]; ch; ch = text[(i += 1)]) {
+  let i = -1
+  if (mode === FOLD_BLOCK) {
+    i = consumeMoreIndentedLines(text, i)
+    if (i !== -1) end = i + endStep
+  }
+  for (let ch; (ch = text[(i += 1)]); ) {
     if (mode === FOLD_QUOTED && ch === '\\') {
       switch (text[i + 1]) {
         case 'x':
@@ -56,16 +74,7 @@ export default function foldFlowLines(
       }
     }
     if (ch === '\n') {
-      if (mode === FOLD_BLOCK) {
-        // more-indented lines in blocks can't be folded
-        let next = text[i + 1]
-        while (next === ' ' || next === '\t') {
-          do {
-            ch = text[(i += 1)]
-          } while (ch && ch !== '\n')
-          next = text[i + 1]
-        }
-      }
+      if (mode === FOLD_BLOCK) i = consumeMoreIndentedLines(text, i)
       end = i + endStep
       split = undefined
     } else {
