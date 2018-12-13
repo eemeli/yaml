@@ -169,6 +169,22 @@ describe('double-quoted', () => {
       expect(doc.contents.items[0].items[0].value.value).toBe(key2)
     })
   })
+
+  describe('eemeli/yaml#59', () => {
+    test('minimal', () => {
+      const str = `"######\\\\P#"`
+      expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"######\\\\\\\nP#"`)
+    })
+
+    test('reported', () => {
+      const value =
+        '>####################################"##########################\'####\\P#'
+      const str = YAML.stringify({ key: [[value]] })
+      const doc = YAML.parseDocument(str)
+      expect(doc.errors).toHaveLength(0)
+      expect(doc.contents.items[0].value.items[0].items[0].value).toBe(value)
+    })
+  })
 })
 
 describe('end-to-end', () => {

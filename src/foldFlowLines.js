@@ -120,13 +120,8 @@ export default function foldFlowLines(
   for (let i = 0; i < folds.length; ++i) {
     const fold = folds[i]
     const end = folds[i + 1] || text.length
-    if (mode === FOLD_QUOTED && escapedFolds[fold]) {
-      const ch = text[fold]
-      res += ch === '\\' ? `\\\n${indent}${ch}` : `${ch}\\\n${indent}`
-    } else {
-      res += `\n${indent}`
-    }
-    res += text.slice(fold + 1, end)
+    if (mode === FOLD_QUOTED && escapedFolds[fold]) res += `${text[fold]}\\`
+    res += `\n${indent}${text.slice(fold + 1, end)}`
   }
   return res
 }
