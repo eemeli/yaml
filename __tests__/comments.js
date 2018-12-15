@@ -329,7 +329,7 @@ describe('blank lines', () => {
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('%YAML 1.2\n---\nstr\n')
     })
-    test.skip('directive comment', () => {
+    test('directive comment', () => {
       const src = '\n\n#cc\n%YAML 1.2\n---\nstr\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('#cc\n%YAML 1.2\n---\nstr\n')

@@ -98,7 +98,11 @@ export default class Document {
             const msg = `YAML only supports %TAG and %YAML directives, and not %${name}`
             this.warnings.push(new YAMLWarning(directive, msg))
           }
-          if (directive.type === Type.BLANK_LINE) this.spaceBefore = true
+          if (
+            directive.type === Type.BLANK_LINE &&
+            directiveComments.length > 0
+          )
+            this.spaceBefore = true
       }
       if (comment) directiveComments.push(comment)
     })
