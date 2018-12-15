@@ -322,7 +322,7 @@ describe('blank lines', () => {
     test('content comment', () => {
       const src = '\n\n#cc\n\nstr\n'
       const doc = YAML.parseDocument(src)
-      expect(String(doc)).toBe('#cc\nstr\n')
+      expect(String(doc)).toBe('#cc\n\nstr\n')
     })
     test('directive', () => {
       const src = '\n\n%YAML 1.2\n---\nstr\n'
@@ -351,10 +351,10 @@ describe('blank lines', () => {
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('- a\n- b\n')
     })
-    test.skip('comment contents', () => {
+    test('empty/comment contents', () => {
       const src = '#cc\n\n\n'
       const doc = YAML.parseDocument(src)
-      expect(String(doc)).toBe('\n#cc\nnull\n') // FIXME
+      expect(String(doc)).toBe('#cc\nnull\n')
     })
   })
   test('between directive comment & directive', () => {
@@ -362,7 +362,7 @@ describe('blank lines', () => {
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('#cc\n\n%YAML 1.2\n---\nstr\n')
   })
-  test.skip('after leading comment', () => {
+  test('after leading comment', () => {
     const src = '#cc\n\n\nstr\n'
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('#cc\n\nstr\n')

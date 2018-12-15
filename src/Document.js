@@ -126,6 +126,15 @@ export default class Document {
         cc.push(node.comment)
       } else if (node.type === Type.BLANK_LINE) {
         spaceBefore = true
+        if (
+          contentNodes.length === 0 &&
+          comments.before.length > 0 &&
+          !this.commentBefore
+        ) {
+          // space-separated comments at start are parsed as document comments
+          this.commentBefore = comments.before.join('\n')
+          comments.before = []
+        }
       }
     })
     switch (contentNodes.length) {
