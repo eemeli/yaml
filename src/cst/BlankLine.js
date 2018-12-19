@@ -23,6 +23,7 @@ export default class BlankLine extends Node {
       else break
     }
     this.range = new Range(start, offset)
+    trace: this.type, { offset, range: this.range }
     return offset
   }
 }

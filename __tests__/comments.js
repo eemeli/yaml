@@ -367,12 +367,12 @@ describe('blank lines', () => {
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('#cc\n\nstr\n')
   })
-  test.skip('between seq items', () => {
+  test('between seq items', () => {
     const src = '- a\n\n- b\n\n\n- c\n'
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('- a\n\n- b\n\n- c\n')
   })
-  test.skip('between seq items with leading comments', () => {
+  test('between seq items with leading comments', () => {
     const src = '#A\n- a\n\n#B\n- b\n\n\n#C\n\n- c\n'
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('#A\n- a\n\n#B\n- b\n\n#C\n- c\n')

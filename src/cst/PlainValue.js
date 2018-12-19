@@ -63,16 +63,22 @@ export default class PlainValue extends Node {
   parseBlockValue(start) {
     const { indent, inFlow, src } = this.context
     let offset = start
+    let valueEnd = start
     for (let ch = src[offset]; ch === '\n'; ch = src[offset]) {
       if (Node.atDocumentBoundary(src, offset + 1)) break
       const end = Node.endOfBlockIndent(src, indent, offset + 1)
       if (end === null || src[end] === '#') break
-      offset = PlainValue.endOfLine(src, end, inFlow)
+      if (src[end] === '\n') {
+        offset = end
+      } else {
+        valueEnd = PlainValue.endOfLine(src, end, inFlow)
+        offset = valueEnd
+      }
     }
     if (this.valueRange.isEmpty()) this.valueRange.start = start
-    this.valueRange.end = offset
+    this.valueRange.end = valueEnd
     trace: this.valueRange, JSON.stringify(this.rawValue)
-    return offset
+    return valueEnd
   }
 
   /**
@@ -113,7 +119,7 @@ export default class PlainValue extends Node {
     offset = Node.endOfWhiteSpace(src, offset)
     offset = this.parseComment(offset)
     trace: 'first line',
-      { valueRange: this.valueRange, comment: this.comment },
+      { offset, valueRange: this.valueRange, comment: this.comment },
       JSON.stringify(this.rawValue)
     if (!this.hasComment || this.valueRange.isEmpty()) {
       offset = this.parseBlockValue(offset)

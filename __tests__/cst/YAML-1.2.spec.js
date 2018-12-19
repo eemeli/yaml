@@ -232,6 +232,7 @@ Sammy Sosa: {
                 { type: Type.SEQ_ITEM, node: 'Mark McGwire' },
                 { type: Type.SEQ_ITEM, node: 'Sammy Sosa' },
                 { type: Type.SEQ_ITEM, node: 'Ken Griffey' },
+                { type: Type.BLANK_LINE },
                 { comment: ' Team ranking' }
               ]
             }
@@ -630,6 +631,7 @@ quoted: "So does this
                   type: Type.MAP_VALUE,
                   node: 'This unquoted scalar spans many lines.'
                 },
+                { type: Type.BLANK_LINE },
                 'quoted',
                 { type: Type.MAP_VALUE, node: 'So does this quoted scalar.\n' }
               ]
@@ -771,6 +773,7 @@ application specific tag: !something |
                     strValue: '2002-04-28'
                   }
                 },
+                { type: Type.BLANK_LINE },
                 'picture',
                 {
                   type: Type.MAP_VALUE,
