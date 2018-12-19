@@ -201,14 +201,13 @@ export default class ParseContext {
         return node
     }
     let offset = node.parse(context, valueStart)
-    let nodeEnd = this.src[offset] === '\n' ? offset + 1 : offset
-    if (nodeEnd <= start) {
+    node.range = new Range(start, offset)
+    if (offset <= start) {
       node.error = new Error(`Node#parse consumed no characters`)
-      node.error.parseEnd = nodeEnd
+      node.error.parseEnd = offset
       node.error.source = node
-      nodeEnd = start + 1
+      node.range.end = start + 1
     }
-    node.range = new Range(start, nodeEnd)
     trace: node.type, node.range, JSON.stringify(node.rawValue)
     if (context.nodeStartsCollection(node)) {
       trace: 'collection-start'
