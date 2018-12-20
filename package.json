@@ -74,6 +74,7 @@
     "babel-jest": "^23.6.0",
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-plugin-trace": "^1.1.0",
+    "fast-check": "^1.8.2",
     "jest": "^23.6.0",
     "prettier": "^1.15.3"
   },
