@@ -161,3 +161,44 @@ test('eemeli/yaml#56', () => {
     type: 'PLAIN'
   })
 })
+
+describe('collection indicator as last char', () => {
+  test('seq item', () => {
+    const src = '-'
+    const doc = parse(src)[0]
+    expect(doc.contents[0]).toMatchObject({
+      type: 'SEQ',
+      items: [{ type: 'SEQ_ITEM', node: null }]
+    })
+  })
+
+  test('explicit map key', () => {
+    const src = '?'
+    const doc = parse(src)[0]
+    expect(doc.contents[0]).toMatchObject({
+      type: 'MAP',
+      items: [{ type: 'MAP_KEY', node: null }]
+    })
+  })
+
+  test('empty map value', () => {
+    const src = ':'
+    const doc = parse(src)[0]
+    expect(doc.contents[0]).toMatchObject({
+      type: 'MAP',
+      items: [{ type: 'MAP_VALUE', node: null }]
+    })
+  })
+
+  test('indented seq-in-seq', () => {
+    const src = ` -\n - - a\n -`
+    const doc = parse(src)[0]
+    expect(doc.contents[0]).toMatchObject({
+      items: [
+        { error: null },
+        { node: { items: [{ node: { type: 'PLAIN', strValue: 'a' } }] } },
+        { error: null }
+      ]
+    })
+  })
+})
