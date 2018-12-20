@@ -1,4 +1,5 @@
 import BlankLine from './BlankLine'
+import { Chomp } from './BlockValue'
 import Comment from './Comment'
 import Node, { Type } from './Node'
 import Range from './Range'
@@ -59,10 +60,11 @@ export default class Collection extends Node {
     offset = Node.normalizeOffset(src, offset)
     let ch = src[offset]
     let atLineStart = Node.endOfWhiteSpace(src, lineStart) === offset
+    let afterChompKeep = false
     trace: 'items-start', { offset, indent, lineStart, ch: JSON.stringify(ch) }
     while (ch) {
       while (ch === '\n' || ch === '#') {
-        if (atLineStart && ch === '\n') {
+        if (atLineStart && ch === '\n' && !afterChompKeep) {
           const blankLine = new BlankLine()
           offset = blankLine.parse({ src }, offset)
           this.valueRange.end = offset
@@ -136,10 +138,12 @@ export default class Collection extends Node {
       offset = Node.normalizeOffset(src, node.range.end)
       ch = src[offset]
       atLineStart = false
+      afterChompKeep = node.lastChild().chomping === Chomp.KEEP
       // Need to reset lineStart and atLineStart here if preceding node's range
-      // has advanced to check the current line's indentation level
+      // has advanced to check the current line's indentation level, and for
+      // blank lines.
       // -- eemeli/yaml#10 & eemeli/yaml#38
-      if (ch && ch !== '\n' && ch !== '#') {
+      if (ch && ch !== '#') {
         let ls = offset - 1
         let prev = src[ls]
         while (prev === ' ' || prev === '\t') prev = src[--ls]

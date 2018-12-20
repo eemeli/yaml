@@ -419,6 +419,7 @@ rbi:
                     items: [{ type: Type.SEQ_ITEM, node: '2001-07-23' }]
                   }
                 },
+                { type: Type.BLANK_LINE },
                 {
                   type: Type.MAP_KEY,
                   node: {
@@ -783,6 +784,7 @@ application specific tag: !something |
                       'R0lGODlhDAAMAIQAAP//9/X\n17unp5WZmZgAAAOfn515eXv\nPz7Y6OjuDg4J+fn5OTk6enp\n56enmleECcgggoBADs=\n'
                   }
                 },
+                { type: Type.BLANK_LINE },
                 'application specific tag',
                 {
                   type: Type.MAP_VALUE,
@@ -2957,11 +2959,13 @@ keep: |+
               items: [
                 'strip',
                 { type: Type.MAP_VALUE, node: '# text' },
+                { type: Type.BLANK_LINE },
                 { comment: ' Clip' },
                 { comment: ' comments:' },
                 { type: Type.BLANK_LINE },
                 'clip',
                 { type: Type.MAP_VALUE, node: '# text\n' },
+                { type: Type.BLANK_LINE },
                 { comment: ' Keep' },
                 { comment: ' comments:' },
                 { type: Type.BLANK_LINE },
@@ -2989,8 +2993,10 @@ keep: |+\n\n`,
               items: [
                 'strip',
                 { type: Type.MAP_VALUE, node: '' },
+                { type: Type.BLANK_LINE },
                 'clip',
                 { type: Type.MAP_VALUE, node: '' },
+                { type: Type.BLANK_LINE },
                 'keep',
                 { type: Type.MAP_VALUE, node: '\n' }
               ]

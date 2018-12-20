@@ -377,6 +377,20 @@ describe('blank lines', () => {
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('#A\n- a\n\n#B\n- b\n\n#C\n- c\n')
   })
+  describe('after block value', () => {
+    test('in seq', () => {
+      const src = '- |\n a\n\n- >-\n b\n\n- |+\n c\n\n- d\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('- |\n  a\n\n- >-\n  b\n\n- |+\n  c\n\n- d\n')
+    })
+    test('in map', () => {
+      const src = 'A: |\n a\n\nB: >-\n b\n\nC: |+\n c\n\nD: d\n'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(
+        'A: |\n  a\n\nB: >-\n  b\n\nC: |+\n  c\n\nD: d\n'
+      )
+    })
+  })
 })
 
 describe('eemeli/yaml#17', () => {
