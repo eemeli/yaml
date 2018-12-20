@@ -245,6 +245,10 @@ export default class Node {
     return jsonLikeTypes.indexOf(this.type) !== -1
   }
 
+  lastChild() {
+    return this
+  }
+
   get rawValue() {
     if (!this.valueRange || !this.context) return null
     const { start, end } = this.valueRange

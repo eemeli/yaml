@@ -29,6 +29,14 @@ export default class Collection extends Node {
     }
   }
 
+  lastChild() {
+    for (let i = this.items.length - 1; i >= 0; --i) {
+      const it = this.items[i]
+      if (it) return it.lastChild()
+    }
+    return this
+  }
+
   /**
    * @param {ParseContext} context
    * @param {number} start - Index of first character
