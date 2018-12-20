@@ -202,3 +202,11 @@ describe('collection indicator as last char', () => {
     })
   })
 })
+
+test('parse an empty string as an empty document', () => {
+  const doc = parse('')[0]
+  expect(doc).toMatchObject({
+    error: null,
+    contents: []
+  })
+})
