@@ -254,3 +254,8 @@ test('fake node should respect setOrigRanges()', () => {
     origEnd: 2
   })
 })
+
+test('parse an empty string as null', () => {
+  const value = YAML.parse('')
+  expect(value).toBeNull()
+})

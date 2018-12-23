@@ -14,11 +14,11 @@ export default function parse(src) {
   const context = new ParseContext({ src })
   const documents = []
   let offset = 0
-  while (offset < src.length) {
+  do {
     const doc = new Document()
     offset = doc.parse(context, offset)
     documents.push(doc)
-  }
+  } while (offset < src.length)
   documents.setOrigRanges = () => {
     if (cr.length === 0) return false
     for (let i = 1; i < cr.length; ++i) cr[i] -= i

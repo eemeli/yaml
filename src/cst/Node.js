@@ -110,15 +110,16 @@ export default class Node {
     return null
   }
 
-  static atBlank(src, offset) {
+  static atBlank(src, offset, endAsBlank) {
     const ch = src[offset]
-    return ch === '\n' || ch === '\t' || ch === ' '
+    return ch === '\n' || ch === '\t' || ch === ' ' || (endAsBlank && !ch)
   }
 
   static atCollectionItem(src, offset) {
     const ch = src[offset]
     return (
-      (ch === '?' || ch === ':' || ch === '-') && Node.atBlank(src, offset + 1)
+      (ch === '?' || ch === ':' || ch === '-') &&
+      Node.atBlank(src, offset + 1, true)
     )
   }
 

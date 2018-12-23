@@ -33,15 +33,15 @@ export default class ParseContext {
       case '[':
         return Type.FLOW_SEQ
       case '?':
-        return !inFlow && Node.atBlank(src, offset + 1)
+        return !inFlow && Node.atBlank(src, offset + 1, true)
           ? Type.MAP_KEY
           : Type.PLAIN
       case ':':
-        return !inFlow && Node.atBlank(src, offset + 1)
+        return !inFlow && Node.atBlank(src, offset + 1, true)
           ? Type.MAP_VALUE
           : Type.PLAIN
       case '-':
-        return !inFlow && Node.atBlank(src, offset + 1)
+        return !inFlow && Node.atBlank(src, offset + 1, true)
           ? Type.SEQ_ITEM
           : Type.PLAIN
       case '"':
@@ -146,7 +146,8 @@ export default class ParseContext {
       ch = src[offset]
     }
     // '- &a : b' has an anchor on an empty node
-    if (lineHasProps && ch === ':' && Node.atBlank(src, offset + 1)) offset -= 1
+    if (lineHasProps && ch === ':' && Node.atBlank(src, offset + 1, true))
+      offset -= 1
     const type = ParseContext.parseType(src, offset, inFlow)
     trace: 'props', type, { props, offset }
     return { props, type, valueStart: offset }
