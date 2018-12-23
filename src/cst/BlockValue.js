@@ -15,6 +15,10 @@ export default class BlockValue extends Node {
     this.header = null
   }
 
+  get includesTrailingLines() {
+    return this.chomping === Chomp.KEEP
+  }
+
   get strValue() {
     if (!this.valueRange || !this.context) return null
     let { start, end } = this.valueRange

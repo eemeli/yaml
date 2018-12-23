@@ -30,12 +30,8 @@ export default class Collection extends Node {
     }
   }
 
-  lastChild() {
-    for (let i = this.items.length - 1; i >= 0; --i) {
-      const it = this.items[i]
-      if (it) return it.lastChild()
-    }
-    return this
+  get includesTrailingLines() {
+    return this.items.length > 0
   }
 
   /**
@@ -60,11 +56,11 @@ export default class Collection extends Node {
     offset = Node.normalizeOffset(src, offset)
     let ch = src[offset]
     let atLineStart = Node.endOfWhiteSpace(src, lineStart) === offset
-    let afterChompKeep = false
+    let prevIncludesTrailingLines = false
     trace: 'items-start', { offset, indent, lineStart, ch: JSON.stringify(ch) }
     while (ch) {
       while (ch === '\n' || ch === '#') {
-        if (atLineStart && ch === '\n' && !afterChompKeep) {
+        if (atLineStart && ch === '\n' && !prevIncludesTrailingLines) {
           const blankLine = new BlankLine()
           offset = blankLine.parse({ src }, offset)
           this.valueRange.end = offset
@@ -73,6 +69,7 @@ export default class Collection extends Node {
             break
           }
           this.items.push(blankLine)
+          trace: 'collection-blankline', blankLine.range
           offset -= 1 // blankLine.parse() consumes terminal newline
         } else if (ch === '#') {
           if (
@@ -138,7 +135,7 @@ export default class Collection extends Node {
       offset = Node.normalizeOffset(src, node.range.end)
       ch = src[offset]
       atLineStart = false
-      afterChompKeep = node.lastChild().chomping === Chomp.KEEP
+      prevIncludesTrailingLines = node.includesTrailingLines
       // Need to reset lineStart and atLineStart here if preceding node's range
       // has advanced to check the current line's indentation level, and for
       // blank lines.

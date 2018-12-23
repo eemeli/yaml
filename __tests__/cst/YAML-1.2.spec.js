@@ -416,10 +416,12 @@ rbi:
                 {
                   type: Type.MAP_VALUE,
                   node: {
-                    items: [{ type: Type.SEQ_ITEM, node: '2001-07-23' }]
+                    items: [
+                      { type: Type.SEQ_ITEM, node: '2001-07-23' },
+                      { type: Type.BLANK_LINE }
+                    ]
                   }
                 },
-                { type: Type.BLANK_LINE },
                 {
                   type: Type.MAP_KEY,
                   node: {

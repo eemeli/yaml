@@ -33,7 +33,7 @@ export default class Document extends Node {
             offset = blankLine.parse({ src }, offset)
             if (offset < src.length) {
               this.directives.push(blankLine)
-              trace: 'directive-blankline'
+              trace: 'directive-blankline', blankLine.range
             }
           } else {
             offset += 1
@@ -103,7 +103,7 @@ export default class Document extends Node {
             offset = blankLine.parse({ src }, offset)
             if (offset < src.length) {
               this.contents.push(blankLine)
-              trace: 'content-blankline'
+              trace: 'content-blankline', blankLine.range
             }
           } else {
             offset += 1

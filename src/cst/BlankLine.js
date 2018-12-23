@@ -6,6 +6,10 @@ export default class BlankLine extends Node {
     super(Type.BLANK_LINE)
   }
 
+  get includesTrailingLines() {
+    return true
+  }
+
   /**
    * Parses blank lines from the source
    *

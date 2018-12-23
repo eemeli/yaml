@@ -235,6 +235,10 @@ export default class Node {
     return false
   }
 
+  get includesTrailingLines() {
+    return false
+  }
+
   get jsonLike() {
     const jsonLikeTypes = [
       Type.FLOW_MAP,
@@ -243,10 +247,6 @@ export default class Node {
       Type.QUOTE_SINGLE
     ]
     return jsonLikeTypes.indexOf(this.type) !== -1
-  }
-
-  lastChild() {
-    return this
   }
 
   get rawValue() {

@@ -8,8 +8,8 @@ export default class CollectionItem extends Node {
     this.node = null
   }
 
-  lastChild() {
-    return this.node ? this.node.lastChild() : this
+  get includesTrailingLines() {
+    return !!this.node && this.node.includesTrailingLines
   }
 
   /**

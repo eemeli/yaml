@@ -414,9 +414,12 @@ describe('eemeli/yaml#28', () => {
     const src = `# This comment is ok
 entryA:
   - foo
+
 entryB:
   - bar # bar comment
-# Ending comment\n`
+
+# Ending comment
+# Ending comment 2\n`
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe(src)
   })
@@ -438,5 +441,28 @@ a:
     const comment = collection.items[2]
     expect(comment.type).toBe('COMMENT')
     expect(comment.comment).toBe('d')
+  })
+
+  test('blank line after seq in map', () => {
+    const src = `a:
+  - aa
+
+b:
+  - bb
+
+c: cc\n`
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe(src)
+  })
+
+  test('blank line after map in seq', () => {
+    const src = `- a: aa
+
+- b: bb
+  c: cc
+
+- d: dd\n`
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe(src)
   })
 })
