@@ -335,8 +335,9 @@ english: null
 null: null key\n`)
   })
 
-  test('!!timestamp', () => {
-    const src = `%YAML 1.1
+  describe('!!timestamp', () => {
+    test('parse & document', () => {
+      const src = `%YAML 1.1
 ---
 canonical:        2001-12-15T02:59:43.1Z
 valid iso8601:    2001-12-14t21:59:43.10-05:00
@@ -344,24 +345,33 @@ space separated:  2001-12-14 21:59:43.10 -5
 no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
-    const doc = YAML.parseDocument(src, { keepBlobsInJSON: false })
-    doc.contents.items.forEach(item => {
-      expect(item.value.value).toBeInstanceOf(Date)
-    })
-    expect(doc.toJSON()).toMatchObject({
-      canonical: '2001-12-15T02:59:43.100Z',
-      'valid iso8601': '2001-12-15T02:59:43.100Z',
-      'space separated': '2001-12-15T02:59:43.100Z',
-      'no time zone (Z)': '2001-12-15T02:59:43.100Z',
-      'date (00:00:00Z)': '2002-12-14T00:00:00.000Z'
-    })
-    expect(String(doc)).toBe(`%YAML 1.1
+      const doc = YAML.parseDocument(src, { keepBlobsInJSON: false })
+      doc.contents.items.forEach(item => {
+        expect(item.value.value).toBeInstanceOf(Date)
+      })
+      expect(doc.toJSON()).toMatchObject({
+        canonical: '2001-12-15T02:59:43.100Z',
+        'valid iso8601': '2001-12-15T02:59:43.100Z',
+        'space separated': '2001-12-15T02:59:43.100Z',
+        'no time zone (Z)': '2001-12-15T02:59:43.100Z',
+        'date (00:00:00Z)': '2002-12-14T00:00:00.000Z'
+      })
+      expect(String(doc)).toBe(`%YAML 1.1
 ---
 canonical: 2001-12-15T02:59:43.100Z
 valid iso8601: 2001-12-15T02:59:43.100Z
 space separated: 2001-12-15T02:59:43.100Z
 no time zone (Z): 2001-12-15T02:59:43.100Z
 date (00:00:00Z): 2002-12-14\n`)
+    })
+
+    test('stringify', () => {
+      const date = new Date('2018-12-22T08:02:52Z')
+      const str = YAML.stringify(date) // stringified as !!str
+      expect(str).toBe('2018-12-22T08:02:52.000Z\n')
+      const str2 = YAML.stringify(date, { version: '1.1' })
+      expect(str2).toBe('2018-12-22T08:02:52\n')
+    })
   })
 })
 

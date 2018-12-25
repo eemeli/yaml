@@ -124,47 +124,39 @@ export default class Schema {
   getTagObject(item) {
     if (item instanceof Alias) return Alias
     if (item.tag) {
-      let match = this.tags.find(
-        ({ format, tag }) => tag === item.tag && format === item.format
-      )
-      if (!match) match = this.tags.find(({ tag }) => tag === item.tag)
-      if (match) return match
+      const match = this.tags.filter(t => t.tag === item.tag)
+      if (match.length > 0)
+        return match.find(t => t.format === item.format) || match[0]
     }
     if (item.value === null) {
-      const match = this.tags.find(t => t.class === null && !t.format)
-      if (!match) throw new Error('Tag not resolved for null value')
-      return match
-    } else {
-      let obj = item
-      if (item.hasOwnProperty('value')) {
-        switch (typeof item.value) {
-          case 'boolean':
-            obj = new Boolean()
-            break
-          case 'number':
-            obj = new Number()
-            break
-          case 'string':
-            obj = new String()
-            break
-          default:
-            obj = item.value
-        }
-      }
-      let match = this.tags.find(
-        t => t.class && obj instanceof t.class && t.format === item.format
-      )
-      if (!match) {
-        match = this.tags.find(
-          t => t.class && obj instanceof t.class && !t.format
-        )
-      }
-      if (!match) {
-        const name = obj && obj.constructor ? obj.constructor.name : typeof obj
-        throw new Error(`Tag not resolved for ${name} value`)
-      }
-      return match
+      const tagObj = this.tags.find(t => t.class === null && !t.format)
+      if (!tagObj) throw new Error('Tag not resolved for null value')
+      return tagObj
     }
+    let obj = item
+    if (item.hasOwnProperty('value')) {
+      switch (typeof item.value) {
+        case 'boolean':
+          obj = new Boolean()
+          break
+        case 'number':
+          obj = new Number()
+          break
+        case 'string':
+          obj = new String()
+          break
+        default:
+          obj = item.value
+      }
+    }
+    const match = this.tags.filter(t => t.class && obj instanceof t.class)
+    const tagObj =
+      match.find(t => t.format === item.format) || match.find(t => !t.format)
+    if (!tagObj) {
+      const name = obj && obj.constructor ? obj.constructor.name : typeof obj
+      throw new Error(`Tag not resolved for ${name} value`)
+    }
+    return tagObj
   }
 
   // needs to be called before stringifier to allow for circular anchor refs
@@ -184,10 +176,20 @@ export default class Schema {
   }
 
   stringify(item, ctx, onComment) {
-    if (!(item instanceof Node)) item = createNode(item, true)
+    let tagObj
+    if (!(item instanceof Node)) {
+      tagObj = this.tags.find(
+        t => t.class && item instanceof t.class && !t.format
+      )
+      item = tagObj
+        ? tagObj.createNode
+          ? tagObj.createNode(item)
+          : new Scalar(item)
+        : createNode(item, true)
+    }
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment)
-    const tagObj = this.getTagObject(item)
+    if (!tagObj) tagObj = this.getTagObject(item)
     const props = this.stringifyProps(item, tagObj, ctx)
     const stringify = tagObj.stringify || Schema.defaultStringify
     const str = stringify(item, ctx, onComment)
