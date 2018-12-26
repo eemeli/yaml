@@ -145,6 +145,16 @@ export default class FlowCollection extends Node {
       const prefix = src.slice(prevEnd, node.range.start)
       prevEnd = node.range.end
       str += prefix + String(node)
+      if (
+        str[str.length - 1] === '\n' &&
+        src[prevEnd - 1] !== '\n' &&
+        src[prevEnd] === '\n'
+      ) {
+        // Comment range does not include the terminal newline, but its
+        // stringified value does. Without this fix, newlines at comment ends
+        // get duplicated.
+        prevEnd += 1
+      }
     })
     str += src.slice(prevEnd, range.end)
     return Node.addStringTerminator(src, range.end, str)

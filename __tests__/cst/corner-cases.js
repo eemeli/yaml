@@ -210,3 +210,9 @@ test('parse an empty string as an empty document', () => {
     contents: []
   })
 })
+
+test('re-stringify flow seq with comments', () => {
+  const src = '[ #c\n1, #d\n2 ]\n'
+  const doc = parse(src)
+  expect(String(doc)).toBe(src)
+})
