@@ -1,4 +1,5 @@
 import { YAMLSemanticError } from '../errors'
+import BlankLine from './BlankLine'
 import Comment from './Comment'
 import Node, { Type } from './Node'
 import Range from './Range'
@@ -38,6 +39,12 @@ export default class FlowCollection extends Node {
         case '\n':
           {
             lineStart = offset + 1
+            const wsEnd = Node.endOfWhiteSpace(src, lineStart)
+            if (src[wsEnd] === '\n') {
+              const blankLine = new BlankLine()
+              lineStart = blankLine.parse({ src }, lineStart)
+              this.items.push(blankLine)
+            }
             offset = Node.endOfIndent(src, lineStart)
             if (offset - lineStart <= indent)
               this.error = new YAMLSemanticError(

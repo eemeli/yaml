@@ -319,76 +319,116 @@ describe('blank lines', () => {
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('str\n')
     })
+
     test('content comment', () => {
       const src = '\n\n#cc\n\nstr\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('#cc\n\nstr\n')
     })
+
     test('directive', () => {
       const src = '\n\n%YAML 1.2\n---\nstr\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('%YAML 1.2\n---\nstr\n')
     })
+
     test('directive comment', () => {
       const src = '\n\n#cc\n%YAML 1.2\n---\nstr\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('#cc\n%YAML 1.2\n---\nstr\n')
     })
   })
+
   describe('drop trailing blank lines', () => {
     test('empty contents', () => {
       const src = '\n\n\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('null\n')
     })
+
     test('scalar contents', () => {
       const src = 'str\n\n\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('str\n')
     })
+
     test('seq contents', () => {
       const src = '- a\n- b\n\n\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('- a\n- b\n')
     })
+
     test('empty/comment contents', () => {
       const src = '#cc\n\n\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('#cc\nnull\n')
     })
   })
+
   test('between directive comment & directive', () => {
     const src = '#cc\n\n\n%YAML 1.2\n---\nstr\n'
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('#cc\n\n%YAML 1.2\n---\nstr\n')
   })
+
   test('after leading comment', () => {
     const src = '#cc\n\n\nstr\n'
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('#cc\n\nstr\n')
   })
+
   test('between seq items', () => {
     const src = '- a\n\n- b\n\n\n- c\n'
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('- a\n\n- b\n\n- c\n')
   })
+
   test('between seq items with leading comments', () => {
     const src = '#A\n- a\n\n#B\n- b\n\n\n#C\n\n- c\n'
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('#A\n- a\n\n#B\n- b\n\n#C\n- c\n')
   })
+
   describe('after block value', () => {
     test('in seq', () => {
       const src = '- |\n a\n\n- >-\n b\n\n- |+\n c\n\n- d\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('- |\n  a\n\n- >-\n  b\n\n- |+\n  c\n\n- d\n')
     })
+
     test('in map', () => {
       const src = 'A: |\n a\n\nB: >-\n b\n\nC: |+\n c\n\nD: d\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe(
         'A: |\n  a\n\nB: >-\n  b\n\nC: |+\n  c\n\nD: d\n'
       )
+    })
+  })
+
+  describe('flow collections', () => {
+    test('flow seq', () => {
+      const src = '[1,\n\n2,\n3,\n\n4\n\n]'
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).toMatchObject({
+        items: [
+          { value: 1 },
+          { value: 2, spaceBefore: true },
+          { value: 3 },
+          { value: 4, spaceBefore: true }
+        ]
+      })
+      expect(String(doc)).toBe('[\n  1,\n\n  2,\n  3,\n\n  4\n]\n')
+    })
+
+    test('flow map', () => {
+      const src = '{\n\na: 1,\n\nb: 2 }'
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).toMatchObject({
+        items: [
+          { key: { value: 'a' }, value: { value: 1 }, spaceBefore: true },
+          { key: { value: 'b' }, value: { value: 2 }, spaceBefore: true }
+        ]
+      })
     })
   })
 })

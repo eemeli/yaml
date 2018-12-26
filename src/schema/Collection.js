@@ -59,9 +59,11 @@ export default class Collection extends Node {
         strings.reduce((sum, str) => sum + str.length + 2, 2) >
           Collection.maxFlowStringSingleLineLength
       ) {
-        str = `${start}\n  ${indent}${strings.join(
-          `\n  ${indent}`
-        )}\n${indent}${end}`
+        str = start
+        for (const s of strings) {
+          str += s ? `\n  ${indent}${s}` : '\n'
+        }
+        str += `\n${indent}${end}`
       } else {
         str = `${start} ${strings.join(' ')} ${end}`
       }
