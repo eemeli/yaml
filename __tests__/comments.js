@@ -389,6 +389,23 @@ describe('blank lines', () => {
     expect(String(doc)).toBe('#A\n- a\n\n#B\n- b\n\n#C\n- c\n')
   })
 
+  test('before block map values', () => {
+    const src = 'a:\n\n  1\nb:\n\n  #c\n  2\n'
+    const doc = YAML.parseDocument(src)
+    expect(doc.contents).toMatchObject({
+      items: [
+        {
+          key: { value: 'a' },
+          value: { value: 1, spaceBefore: true }
+        },
+        {
+          key: { value: 'b' },
+          value: { value: 2, commentBefore: 'c', spaceBefore: true }
+        }
+      ]
+    })
+  })
+
   describe('after block value', () => {
     test('in seq', () => {
       const src = '- |\n a\n\n- >-\n b\n\n- |+\n c\n\n- d\n'

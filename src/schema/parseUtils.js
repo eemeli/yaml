@@ -33,7 +33,7 @@ export function resolveComments(collection, comments) {
     } else {
       if (afterKey && item.value) item = item.value
       if (comment === undefined) {
-        if (!item.commentBefore) item.spaceBefore = true
+        if (afterKey || !item.commentBefore) item.spaceBefore = true
       } else {
         if (item.commentBefore) item.commentBefore += '\n' + comment
         else item.commentBefore = comment

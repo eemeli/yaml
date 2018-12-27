@@ -67,10 +67,14 @@ function resolveBlockMapItems(doc, cst) {
     const item = cst.items[i]
     switch (item.type) {
       case Type.BLANK_LINE:
-        comments.push({ before: items.length })
+        comments.push({ afterKey: !!key, before: items.length })
         break
       case Type.COMMENT:
-        comments.push({ comment: item.comment, before: items.length })
+        comments.push({
+          afterKey: !!key,
+          before: items.length,
+          comment: item.comment
+        })
         break
       case Type.MAP_KEY:
         if (key !== undefined) items.push(new Pair(key))
@@ -116,10 +120,19 @@ function resolveBlockMapItems(doc, cst) {
         key = doc.resolveNode(item)
         keyStart = item.range.start
         if (item.error) doc.errors.push(item.error)
-        const nextItem = cst.items[i + 1]
-        if (!nextItem || nextItem.type !== Type.MAP_VALUE) {
-          const msg = 'Implicit map keys need to be followed by map values'
-          doc.errors.push(new YAMLSemanticError(item, msg))
+        next: for (let j = i + 1; ; ++j) {
+          const nextItem = cst.items[j]
+          switch (nextItem && nextItem.type) {
+            case Type.BLANK_LINE:
+            case Type.COMMENT:
+              continue next
+            case Type.MAP_VALUE:
+              break next
+            default:
+              const msg = 'Implicit map keys need to be followed by map values'
+              doc.errors.push(new YAMLSemanticError(item, msg))
+              break next
+          }
         }
         if (item.valueRangeContainsNewline) {
           const msg = 'Implicit map keys need to be on a single line'

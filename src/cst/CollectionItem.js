@@ -1,4 +1,5 @@
 import { YAMLSemanticError } from '../errors'
+import BlankLine from './BlankLine'
 import Node, { Type } from './Node'
 import Range from './Range'
 
@@ -38,6 +39,13 @@ export default class CollectionItem extends Node {
       } else {
         atLineStart = true
         lineStart = offset + 1
+        const wsEnd = Node.endOfWhiteSpace(src, lineStart)
+        if (src[wsEnd] === '\n') {
+          const blankLine = new BlankLine()
+          lineStart = blankLine.parse({ src }, lineStart)
+          const items = context.parent.items || context.parent.contents
+          items.push(blankLine)
+        }
         offset = Node.endOfIndent(src, lineStart)
       }
       ch = src[offset]
