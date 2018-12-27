@@ -138,16 +138,27 @@ k2:
   - v3 #c4
 #c5\n`
       const doc = YAML.parseDocument(src)
-      expect(doc.contents.items).toHaveLength(2)
-      expect(doc.contents.items[0].value.items).toHaveLength(2)
-      expect(doc.contents.items[0].commentBefore).toBe('c0')
-      expect(doc.contents.items[0].value.commentBefore).toBe('c1')
-      expect(doc.contents.items[0].value.items[1].commentBefore).toBe('c2')
-      expect(doc.contents.items[0].value.comment).toBe('c3')
-      expect(doc.contents.items[1].value.items[0].comment).toBe('c4')
-      expect(doc.contents.comment).toBe('c5')
+      expect(doc.contents).toMatchObject({
+        items: [
+          {
+            commentBefore: 'c0',
+            key: { value: 'k1' },
+            value: {
+              commentBefore: 'c1',
+              items: [{ value: 'v1' }, { commentBefore: 'c2', value: 'v2' }]
+            },
+            comment: 'c3'
+          },
+          {
+            key: { value: 'k2' },
+            value: { items: [{ value: 'v3', comment: 'c4' }] }
+          }
+        ],
+        comment: 'c5'
+      })
       expect(String(doc)).toBe(`#c0
-k1: #c1
+k1:
+  #c1
   - v1
   #c2
   - v2
@@ -269,7 +280,8 @@ describe('stringify comments', () => {
       expect(String(doc)).toBe(
         `#c0
 ? map #c1
-: #c2
+:
+  #c2
   #c3
   - value 1
   #c4
@@ -404,6 +416,7 @@ describe('blank lines', () => {
         }
       ]
     })
+    expect(String(doc)).toBe(src)
   })
 
   describe('after block value', () => {
@@ -449,7 +462,7 @@ describe('blank lines', () => {
     })
 
     test('flow map value comments & spaces', () => {
-      const src = '{\n  a: #c\n    1,\n  b:\n\n    #d\n    2\n}\n'
+      const src = '{\n  a:\n    #c\n    1,\n  b:\n\n    #d\n    2\n}\n'
       const doc = YAML.parseDocument(src)
       expect(doc.contents).toMatchObject({
         items: [
@@ -463,23 +476,27 @@ describe('blank lines', () => {
           }
         ]
       })
+      expect(String(doc)).toBe(src)
     })
   })
 })
 
-describe('eemeli/yaml#17', () => {
+describe('eemeli/yaml#18', () => {
   test('reported', () => {
     const src = `test1:
   foo: #123
     bar: 1\n`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(src)
+    expect(String(doc)).toBe(`test1:
+  foo:
+    #123
+    bar: 1\n`)
   })
 
   test('minimal', () => {
     const src = `foo: #123\n  bar: baz\n`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(src)
+    expect(String(doc)).toBe(`foo:\n  #123\n  bar: baz\n`)
   })
 })
 

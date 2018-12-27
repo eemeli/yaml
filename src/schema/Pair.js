@@ -67,18 +67,22 @@ export default class Pair extends Node {
     if (keyComment) keyStr = addComment(keyStr, ctx.indent, keyComment)
     ctx.implicitKey = false
     const valueStr = doc.schema.stringify(value, ctx, onComment)
-    const vcb =
-      value && value.commentBefore
-        ? ` #${value.commentBefore.replace(/\n+(?!\n|$)/g, `$&${ctx.indent}#`)}`
-        : ''
+    let vcb = ''
+    if (value) {
+      if (value.spaceBefore) vcb = '\n'
+      if (value.commentBefore) {
+        const cs = value.commentBefore.replace(/^/gm, `${ctx.indent}#`)
+        vcb += `\n${cs}`
+      }
+    }
     if (explicitKey) {
-      return `? ${keyStr}\n${indent}:${
-        vcb ? `${vcb}\n${ctx.indent}` : ' '
-      }${valueStr}`
+      const ws = vcb ? `${vcb}\n${ctx.indent}` : ' '
+      return `? ${keyStr}\n${indent}:${ws}${valueStr}`
     } else if (value instanceof Collection) {
       return `${keyStr}:${vcb}\n${ctx.indent}${valueStr}`
     } else {
-      return `${keyStr}:${vcb ? `${vcb}\n${ctx.indent}` : ' '}${valueStr}`
+      const ws = vcb ? `${vcb}\n${ctx.indent}` : ' '
+      return `${keyStr}:${ws}${valueStr}`
     }
   }
 }
