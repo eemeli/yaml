@@ -259,3 +259,12 @@ test('parse an empty string as null', () => {
   const value = YAML.parse('')
   expect(value).toBeNull()
 })
+
+test('fail on map value indented with tab', () => {
+  const src = 'a:\n\t1\nb:\n\t2\n'
+  const doc = YAML.parseDocument(src)
+  expect(doc.errors).toMatchObject([
+    { name: 'YAMLSemanticError' },
+    { name: 'YAMLSemanticError' }
+  ])
+})
