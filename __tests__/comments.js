@@ -141,10 +141,9 @@ k2:
       expect(doc.contents).toMatchObject({
         items: [
           {
-            commentBefore: 'c0',
-            key: { value: 'k1' },
+            comment: 'c1',
+            key: { commentBefore: 'c0', value: 'k1' },
             value: {
-              commentBefore: 'c1',
               items: [{ value: 'v1' }, { commentBefore: 'c2', value: 'v2' }],
               comment: 'c3'
             }
@@ -157,8 +156,7 @@ k2:
         comment: 'c5'
       })
       expect(String(doc)).toBe(`#c0
-k1:
-  #c1
+k1: #c1
   - v1
   #c2
   - v2
@@ -486,16 +484,13 @@ describe('eemeli/yaml#18', () => {
   foo: #123
     bar: 1\n`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(`test1:
-  foo:
-    #123
-    bar: 1\n`)
+    expect(String(doc)).toBe(src)
   })
 
   test('minimal', () => {
     const src = `foo: #123\n  bar: baz\n`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(`foo:\n  #123\n  bar: baz\n`)
+    expect(String(doc)).toBe(src)
   })
 })
 

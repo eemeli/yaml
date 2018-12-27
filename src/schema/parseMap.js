@@ -1,4 +1,4 @@
-import { Type } from '../cst/Node'
+import { Char, Type } from '../cst/Node'
 import PlainValue from '../cst/PlainValue'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Map from './Map'
@@ -58,6 +58,33 @@ export default function parseMap(doc, cst) {
   return map
 }
 
+const valueHasPairComment = ({ context: { lineStart, node, src }, props }) => {
+  if (props.length === 0) return false
+  const { start } = props[0]
+  if (node && start > node.valueRange.start) return false
+  if (src[start] !== Char.COMMENT) return false
+  for (let i = lineStart; i < start; ++i) if (src[i] === '\n') return false
+  return true
+}
+
+function resolvePairComment(item, pair) {
+  if (!valueHasPairComment(item)) return
+  const comment = item.getPropValue(0, Char.COMMENT, true)
+  let found = false
+  const cb = pair.value.commentBefore
+  if (cb && cb.startsWith(comment)) {
+    pair.value.commentBefore = cb.substr(comment.length + 1)
+    found = true
+  } else {
+    const cc = pair.value.comment
+    if (!item.node && cc && cc.startsWith(comment)) {
+      pair.value.comment = cc.substr(comment.length + 1)
+      found = true
+    }
+  }
+  if (found) pair.comment = comment
+}
+
 function resolveBlockMapItems(doc, cst) {
   const comments = []
   const items = []
@@ -102,15 +129,17 @@ function resolveBlockMapItems(doc, cst) {
           valueNode = new PlainValue(Type.PLAIN, [])
           valueNode.context = { parent: item, src: item.context.src }
           const pos = item.range.start + 1
-          const origPos = item.range.origStart + 1
           valueNode.range = { start: pos, end: pos }
           valueNode.valueRange = { start: pos, end: pos }
           if (typeof item.range.origStart === 'number') {
+            const origPos = item.range.origStart + 1
             valueNode.range.origStart = valueNode.range.origEnd = origPos
             valueNode.valueRange.origStart = valueNode.valueRange.origEnd = origPos
           }
         }
-        items.push(new Pair(key, doc.resolveNode(valueNode)))
+        const pair = new Pair(key, doc.resolveNode(valueNode))
+        resolvePairComment(item, pair)
+        items.push(pair)
         checkKeyLength(doc.errors, cst, i, key, keyStart)
         key = undefined
         keyStart = null
