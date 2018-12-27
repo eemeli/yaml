@@ -430,6 +430,23 @@ describe('blank lines', () => {
         ]
       })
     })
+
+    test('flow map value comments & spaces', () => {
+      const src = '{\n  a: #c\n    1,\n  b:\n\n    #d\n    2\n}\n'
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).toMatchObject({
+        items: [
+          {
+            key: { value: 'a' },
+            value: { value: 1, commentBefore: 'c' }
+          },
+          {
+            key: { value: 'b' },
+            value: { value: 2, commentBefore: 'd', spaceBefore: true }
+          }
+        ]
+      })
+    })
   })
 })
 

@@ -179,9 +179,13 @@ function resolveFlowMapItems(doc, cst) {
         new YAMLSyntaxError(cst, `Flow map contains an unexpected ${char}`)
       )
     } else if (item.type === Type.BLANK_LINE) {
-      comments.push({ before: items.length })
+      comments.push({ afterKey: !!key, before: items.length })
     } else if (item.type === Type.COMMENT) {
-      comments.push({ comment: item.comment, before: items.length })
+      comments.push({
+        afterKey: !!key,
+        before: items.length,
+        comment: item.comment
+      })
     } else if (key === undefined) {
       if (next === ',')
         doc.errors.push(

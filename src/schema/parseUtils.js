@@ -20,8 +20,8 @@ export function checkKeyLength(errors, node, itemIdx, key, keyStart) {
 }
 
 export function resolveComments(collection, comments) {
-  comments.forEach(({ comment, before }) => {
-    const item = collection.items[before]
+  comments.forEach(({ afterKey, before, comment }) => {
+    let item = collection.items[before]
     if (!item) {
       if (comment === undefined) {
         collection.spaceAfter = true
@@ -31,6 +31,7 @@ export function resolveComments(collection, comments) {
         collection.spaceAfter = false
       }
     } else {
+      if (afterKey && item.value) item = item.value
       if (comment === undefined) {
         if (!item.commentBefore) item.spaceBefore = true
       } else {
