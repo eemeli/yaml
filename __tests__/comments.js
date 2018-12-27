@@ -145,9 +145,9 @@ k2:
             key: { value: 'k1' },
             value: {
               commentBefore: 'c1',
-              items: [{ value: 'v1' }, { commentBefore: 'c2', value: 'v2' }]
-            },
-            comment: 'c3'
+              items: [{ value: 'v1' }, { commentBefore: 'c2', value: 'v2' }],
+              comment: 'c3'
+            }
           },
           {
             key: { value: 'k2' },
@@ -272,16 +272,15 @@ describe('stringify comments', () => {
       const doc = YAML.parseDocument(src)
       doc.contents.items[0].key.commentBefore = 'c0'
       doc.contents.items[0].key.comment = 'c1'
+      doc.contents.items[0].comment = 'c2'
       const seq = doc.contents.items[0].value
-      seq.commentBefore = 'c2'
       seq.items[0].commentBefore = 'c3'
       seq.items[1].commentBefore = 'c4'
       seq.comment = 'c5'
       expect(String(doc)).toBe(
         `#c0
 ? map #c1
-:
-  #c2
+: #c2
   #c3
   - value 1
   #c4

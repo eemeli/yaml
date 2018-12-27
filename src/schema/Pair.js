@@ -23,15 +23,6 @@ export default class Pair extends Node {
     this.key.commentBefore = cb
   }
 
-  get comment() {
-    return this.value && this.value.comment
-  }
-
-  set comment(comment) {
-    if (this.value == null) this.value = new Scalar(null)
-    this.value.comment = comment
-  }
-
   get stringKey() {
     const key = toJSON(this.key)
     if (key === null) return ''
@@ -61,12 +52,16 @@ export default class Pair extends Node {
       implicitKey: !explicitKey,
       indent: indent + '  '
     })
-    let keyStr = doc.schema.stringify(key, ctx, () => {
+    let str = doc.schema.stringify(key, ctx, () => {
       keyComment = null
     })
-    if (keyComment) keyStr = addComment(keyStr, ctx.indent, keyComment)
-    ctx.implicitKey = false
-    const valueStr = doc.schema.stringify(value, ctx, onComment)
+    str = addComment(str, ctx.indent, keyComment)
+    str = explicitKey ? `? ${str}\n${indent}:` : `${str}:`
+    if (this.comment) {
+      // expected (but not strictly required) to be a single-line comment
+      str = addComment(str, indent, this.comment)
+      if (onComment) onComment()
+    }
     let vcb = ''
     if (value) {
       if (value.spaceBefore) vcb = '\n'
@@ -75,14 +70,15 @@ export default class Pair extends Node {
         vcb += `\n${cs}`
       }
     }
-    if (explicitKey) {
-      const ws = vcb ? `${vcb}\n${ctx.indent}` : ' '
-      return `? ${keyStr}\n${indent}:${ws}${valueStr}`
-    } else if (value instanceof Collection) {
-      return `${keyStr}:${vcb}\n${ctx.indent}${valueStr}`
-    } else {
-      const ws = vcb ? `${vcb}\n${ctx.indent}` : ' '
-      return `${keyStr}:${ws}${valueStr}`
-    }
+    ctx.implicitKey = false
+    let valueComment = value instanceof Node && value.comment
+    let valueStr = doc.schema.stringify(value, ctx, () => {
+      valueComment = null
+    })
+    const ws =
+      vcb || this.comment || (!explicitKey && value instanceof Collection)
+        ? `${vcb}\n${ctx.indent}`
+        : ' '
+    return addComment(str + ws + valueStr, ctx.indent, valueComment)
   }
 }
