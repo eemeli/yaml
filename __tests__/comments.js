@@ -506,7 +506,14 @@ entryB:
 # Ending comment
 # Ending comment 2\n`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(src)
+    expect(String(doc)).toBe(`# This comment is ok
+entryA:
+  - foo
+
+entryB:
+  - bar # bar comment
+# Ending comment
+# Ending comment 2\n`)
   })
 
   test('collection end comment', () => {

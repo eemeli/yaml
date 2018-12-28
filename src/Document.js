@@ -159,7 +159,8 @@ export default class Document {
               ? `${cb}\n${cbNode.commentBefore}`
               : cb
           }
-          if (this.contents.spaceAfter) delete this.contents.spaceAfter
+          if (this.contents instanceof Collection)
+            delete this.contents.spaceAfter
         } else {
           comments.after = comments.before.concat(comments.after)
         }

@@ -17,23 +17,22 @@ export default class Collection extends Node {
       (this.type && this.type.substr(0, 4) === 'FLOW') || ctx.inFlow
     if (inFlow) itemIndent += '  '
     ctx = Object.assign({}, ctx, { indent: itemIndent, inFlow, type: null })
-    let hasItemWithComment = false
     let hasItemWithNewLine = false
     const nodes = this.items.reduce((nodes, item, i) => {
       let comment
       if (item) {
         if (item.spaceBefore) {
-          hasItemWithComment = true
+          hasItemWithNewLine = true
           nodes.push({ type: 'comment', str: '' })
         }
         if (item.commentBefore) {
-          hasItemWithComment = true
+          hasItemWithNewLine = true
           item.commentBefore.match(/^.*$/gm).forEach(line => {
             nodes.push({ type: 'comment', str: `#${line}` })
           })
         }
         if (item.comment) {
-          hasItemWithComment = true
+          hasItemWithNewLine = true
           comment = item.comment
         }
       }
@@ -54,7 +53,6 @@ export default class Collection extends Node {
       const { start, end } = flowChars
       const strings = nodes.map(({ str }) => str)
       if (
-        hasItemWithComment ||
         hasItemWithNewLine ||
         strings.reduce((sum, str) => sum + str.length + 2, 2) >
           Collection.maxFlowStringSingleLineLength
@@ -74,7 +72,6 @@ export default class Collection extends Node {
       str += '\n' + this.comment.replace(/^/gm, `${indent}#`)
       if (onComment) onComment()
     }
-    if (this.spaceAfter) str += '\n'
     return str
   }
 }
