@@ -1,4 +1,5 @@
 import { YAMLSemanticError } from '../errors'
+import BlankLine from './BlankLine'
 import Node, { Type } from './Node'
 import Range from './Range'
 
@@ -6,6 +7,10 @@ export default class CollectionItem extends Node {
   constructor(type, props) {
     super(type, props)
     this.node = null
+  }
+
+  get includesTrailingLines() {
+    return !!this.node && this.node.includesTrailingLines
   }
 
   /**
@@ -27,15 +32,21 @@ export default class CollectionItem extends Node {
     let offset = Node.endOfWhiteSpace(src, start + 1)
     let ch = src[offset]
     while (ch === '\n' || ch === '#') {
-      const next = offset + 1
       if (ch === '#') {
-        const end = Node.endOfLine(src, next)
+        const end = Node.endOfLine(src, offset + 1)
         this.props.push(new Range(offset, end))
         offset = end
       } else {
         atLineStart = true
-        lineStart = next
-        offset = Node.endOfWhiteSpace(src, next) // against spec, to match \t allowed after indicator
+        lineStart = offset + 1
+        const wsEnd = Node.endOfWhiteSpace(src, lineStart)
+        if (src[wsEnd] === '\n') {
+          const blankLine = new BlankLine()
+          lineStart = blankLine.parse({ src }, lineStart)
+          const items = context.parent.items || context.parent.contents
+          items.push(blankLine)
+        }
+        offset = Node.endOfIndent(src, lineStart)
       }
       ch = src[offset]
     }

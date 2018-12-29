@@ -86,9 +86,9 @@ describe('seq unindent to non-empty indent', () => {
     - b
   - c\n`
     const doc = parse(src)[0]
-    expect(doc.contents).toHaveLength(1)
-    expect(doc.contents[0].items).toHaveLength(2)
-    expect(doc.contents[0].items[1].error).toBeNull()
+    expect(doc.contents).toHaveLength(2)
+    expect(doc.contents[1].items).toHaveLength(2)
+    expect(doc.contents[1].items[1].error).toBeNull()
   })
 
   test('after seq', () => {
@@ -97,9 +97,9 @@ describe('seq unindent to non-empty indent', () => {
     - a
   - b\n`
     const doc = parse(src)[0]
-    expect(doc.contents).toHaveLength(1)
-    expect(doc.contents[0].items).toHaveLength(2)
-    expect(doc.contents[0].items[1].error).toBeNull()
+    expect(doc.contents).toHaveLength(2)
+    expect(doc.contents[1].items).toHaveLength(2)
+    expect(doc.contents[1].items[1].error).toBeNull()
   })
 })
 
@@ -110,9 +110,9 @@ test('eemeli/yaml#10', () => {
   c: d
 `
   const doc = parse(src)[0]
-  expect(doc.contents).toHaveLength(1)
-  expect(doc.contents[0].items).toHaveLength(4)
-  expect(doc.contents[0].items[1].error).toBeNull()
+  expect(doc.contents).toHaveLength(2)
+  expect(doc.contents[1].items).toHaveLength(4)
+  expect(doc.contents[1].items[1].error).toBeNull()
 })
 
 test('eemeli/yaml#19', () => {
@@ -144,7 +144,7 @@ test('eemeli/yaml#38', () => {
  -
 `
   const doc = parse(src)[0]
-  const { items } = doc.contents[0]
+  const { items } = doc.contents[1]
   expect(items).toHaveLength(3)
   items.forEach(item => {
     expect(item.error).toBe(null)
@@ -209,4 +209,10 @@ test('parse an empty string as an empty document', () => {
     error: null,
     contents: []
   })
+})
+
+test('re-stringify flow seq with comments', () => {
+  const src = '[ #c\n1, #d\n2 ]\n'
+  const doc = parse(src)
+  expect(String(doc)).toBe(src)
 })

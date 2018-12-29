@@ -36,7 +36,7 @@ export const binary = {
     }
   },
   options: { defaultType: Type.BLOCK_LITERAL, lineWidth: 76 },
-  stringify: ({ comment, type, value }, ctx, onComment) => {
+  stringify: ({ comment, type, value }, ctx, onComment, onChompKeep) => {
     let src
     if (typeof Buffer === 'function') {
       src =
@@ -64,7 +64,7 @@ export const binary = {
       }
       value = lines.join(type === Type.BLOCK_LITERAL ? '\n' : ' ')
     }
-    return stringifyStr({ comment, type, value }, ctx, onComment)
+    return stringifyStr({ comment, type, value }, ctx, onComment, onChompKeep)
   }
 }
 

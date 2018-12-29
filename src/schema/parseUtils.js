@@ -20,14 +20,21 @@ export function checkKeyLength(errors, node, itemIdx, key, keyStart) {
 }
 
 export function resolveComments(collection, comments) {
-  comments.forEach(({ comment, before }) => {
-    const item = collection.items[before]
+  for (const { afterKey, before, comment } of comments) {
+    let item = collection.items[before]
     if (!item) {
-      if (collection.comment) collection.comment += '\n' + comment
-      else collection.comment = comment
+      if (comment !== undefined) {
+        if (collection.comment) collection.comment += '\n' + comment
+        else collection.comment = comment
+      }
     } else {
-      if (item.commentBefore) item.commentBefore += '\n' + comment
-      else item.commentBefore = comment
+      if (afterKey && item.value) item = item.value
+      if (comment === undefined) {
+        if (afterKey || !item.commentBefore) item.spaceBefore = true
+      } else {
+        if (item.commentBefore) item.commentBefore += '\n' + comment
+        else item.commentBefore = comment
+      }
     }
-  })
+  }
 }

@@ -106,16 +106,33 @@ export default class Document {
     this.commentBefore = directiveComments.join('\n') || null
     const comments = { before: [], after: [] }
     const contentNodes = []
+    let spaceBefore = false
     contents.forEach(node => {
       if (node.valueRange) {
         if (contentNodes.length === 1) {
           const msg = 'Document is not valid YAML (bad indentation?)'
           this.errors.push(new YAMLSyntaxError(node, msg))
         }
-        contentNodes.push(this.resolveNode(node))
+        const res = this.resolveNode(node)
+        if (spaceBefore) {
+          res.spaceBefore = true
+          spaceBefore = false
+        }
+        contentNodes.push(res)
       } else if (node.comment) {
         const cc = contentNodes.length === 0 ? comments.before : comments.after
         cc.push(node.comment)
+      } else if (node.type === Type.BLANK_LINE) {
+        spaceBefore = true
+        if (
+          contentNodes.length === 0 &&
+          comments.before.length > 0 &&
+          !this.commentBefore
+        ) {
+          // space-separated comments at start are parsed as document comments
+          this.commentBefore = comments.before.join('\n')
+          comments.before = []
+        }
       }
     })
     switch (contentNodes.length) {
@@ -425,7 +442,8 @@ export default class Document {
       throw new Error('Document with errors cannot be stringified')
     this.setSchema()
     const lines = []
-    if (this.commentBefore) lines.push(this.commentBefore.replace(/^/gm, '#'))
+    if (this.commentBefore)
+      lines.push(this.commentBefore.replace(/^/gm, '#'), '')
     let hasDirectives = false
     if (this.version) {
       let vd = '%YAML 1.2'
@@ -449,20 +467,31 @@ export default class Document {
       doc: this,
       indent: ''
     }
+    let chompKeep = false
+    let contentComment = null
     if (this.contents) {
+      if (this.contents.spaceBefore && hasDirectives) lines.push('')
       if (this.contents.commentBefore)
         lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
       // top-level block scalars need to be indented if followed by a comment
       ctx.forceBlockIndent = !!this.comment
-      let comment = this.contents.comment
-      const body = this.schema.stringify(this.contents, ctx, () => {
-        comment = null
-      })
-      lines.push(addComment(body, '', comment))
+      contentComment = this.contents.comment
+      const onChompKeep = contentComment ? null : () => (chompKeep = true)
+      const body = this.schema.stringify(
+        this.contents,
+        ctx,
+        () => (contentComment = null),
+        onChompKeep
+      )
+      lines.push(addComment(body, '', contentComment))
     } else if (this.contents !== undefined) {
       lines.push(this.schema.stringify(this.contents, ctx))
     }
-    if (this.comment) lines.push(this.comment.replace(/^/gm, '#'))
+    if (this.comment) {
+      if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')
+        lines.push('')
+      lines.push(this.comment.replace(/^/gm, '#'))
+    }
     return lines.join('\n') + '\n'
   }
 }

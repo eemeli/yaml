@@ -15,6 +15,10 @@ export default class BlockValue extends Node {
     this.header = null
   }
 
+  get includesTrailingLines() {
+    return this.chomping === Chomp.KEEP
+  }
+
   get strValue() {
     if (!this.valueRange || !this.context) return null
     let { start, end } = this.valueRange
@@ -113,6 +117,7 @@ export default class BlockValue extends Node {
   parseBlockValue(start) {
     const { indent, inFlow, src } = this.context
     let offset = start
+    let valueEnd = start
     let bi = this.blockIndent ? indent + this.blockIndent - 1 : indent
     let minBlockIndent = 1
     for (let ch = src[offset]; ch === '\n'; ch = src[offset]) {
@@ -136,7 +141,14 @@ export default class BlockValue extends Node {
           minBlockIndent = lineIndent
         }
       }
-      offset = Node.endOfLine(src, end)
+      if (src[end] === '\n') {
+        offset = end
+      } else {
+        offset = valueEnd = Node.endOfLine(src, end)
+      }
+    }
+    if (this.chomping !== Chomp.KEEP) {
+      offset = src[valueEnd] ? valueEnd + 1 : valueEnd
     }
     this.valueRange = new Range(start + 1, offset)
     return offset

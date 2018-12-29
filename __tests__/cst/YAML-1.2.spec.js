@@ -231,10 +231,11 @@ Sammy Sosa: {
               items: [
                 { type: Type.SEQ_ITEM, node: 'Mark McGwire' },
                 { type: Type.SEQ_ITEM, node: 'Sammy Sosa' },
-                { type: Type.SEQ_ITEM, node: 'Ken Griffey' },
-                { comment: ' Team ranking' }
+                { type: Type.SEQ_ITEM, node: 'Ken Griffey' }
               ]
-            }
+            },
+            { type: Type.BLANK_LINE },
+            { comment: ' Team ranking' }
           ]
         },
         {
@@ -418,6 +419,7 @@ rbi:
                     items: [{ type: Type.SEQ_ITEM, node: '2001-07-23' }]
                   }
                 },
+                { type: Type.BLANK_LINE },
                 {
                   type: Type.MAP_KEY,
                   node: {
@@ -599,6 +601,7 @@ tie-fighter: '|\\-*-/|'`,
                 { type: Type.MAP_VALUE, node: '\b1998\t1999\t2000\n' },
                 'hex esc',
                 { type: Type.MAP_VALUE, node: '\r\n is \r\n' },
+                { type: Type.BLANK_LINE },
                 'single',
                 { type: Type.MAP_VALUE, node: '"Howdy!" he cried.' },
                 'quoted',
@@ -629,6 +632,7 @@ quoted: "So does this
                   type: Type.MAP_VALUE,
                   node: 'This unquoted scalar spans many lines.'
                 },
+                { type: Type.BLANK_LINE },
                 'quoted',
                 { type: Type.MAP_VALUE, node: 'So does this quoted scalar.\n' }
               ]
@@ -770,6 +774,7 @@ application specific tag: !something |
                     strValue: '2002-04-28'
                   }
                 },
+                { type: Type.BLANK_LINE },
                 'picture',
                 {
                   type: Type.MAP_VALUE,
@@ -779,6 +784,7 @@ application specific tag: !something |
                       'R0lGODlhDAAMAIQAAP//9/X\n17unp5WZmZgAAAOfn515eXv\nPz7Y6OjuDg4J+fn5OTk6enp\n56enmleECcgggoBADs=\n'
                   }
                 },
+                { type: Type.BLANK_LINE },
                 'application specific tag',
                 {
                   type: Type.MAP_VALUE,
@@ -1505,6 +1511,7 @@ Not indented:
           contents: [
             { comment: ' Leading comment line spaces are' },
             { comment: ' neither content nor indentation.' },
+            { type: Type.BLANK_LINE },
             {
               items: [
                 'Not indented',
@@ -2882,7 +2889,7 @@ foo: bar
 ·text`.replace(/·/g, ' '),
       tgt: [
         {
-          contents: [{ items: [{ node: '' }] }, 'text']
+          contents: [{ items: [{ node: '' }] }, { type: 'BLANK_LINE' }, 'text']
         },
         {
           contents: [{ items: [{ node: 'text\n' }] }, 'text']
@@ -2945,24 +2952,29 @@ keep: |+
       tgt: [
         {
           contents: [
+            { type: Type.BLANK_LINE },
             { comment: ' Strip' },
             { comment: ' Comments:' },
             {
               items: [
                 'strip',
                 { type: Type.MAP_VALUE, node: '# text' },
+                { type: Type.BLANK_LINE },
                 { comment: ' Clip' },
                 { comment: ' comments:' },
+                { type: Type.BLANK_LINE },
                 'clip',
                 { type: Type.MAP_VALUE, node: '# text\n' },
+                { type: Type.BLANK_LINE },
                 { comment: ' Keep' },
                 { comment: ' comments:' },
+                { type: Type.BLANK_LINE },
                 'keep',
-                { type: Type.MAP_VALUE, node: '# text\n\n' },
-                { comment: ' Trail' },
-                { comment: ' comments.' }
+                { type: Type.MAP_VALUE, node: '# text\n\n' }
               ]
-            }
+            },
+            { comment: ' Trail' },
+            { comment: ' comments.' }
           ]
         }
       ]
@@ -2981,8 +2993,10 @@ keep: |+\n\n`,
               items: [
                 'strip',
                 { type: Type.MAP_VALUE, node: '' },
+                { type: Type.BLANK_LINE },
                 'clip',
                 { type: Type.MAP_VALUE, node: '' },
+                { type: Type.BLANK_LINE },
                 'keep',
                 { type: Type.MAP_VALUE, node: '\n' }
               ]

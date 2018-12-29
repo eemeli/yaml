@@ -144,7 +144,7 @@ function singleQuotedString(value, ctx) {
     : foldFlowLines(res, indent, FOLD_FLOW, strOptions.fold)
 }
 
-function blockString({ comment, type, value }, ctx, onComment) {
+function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
   // 1. Block can't end in whitespace unless the last line is non-empty.
   // 2. Strings consisting of only whitespace are best rendered explicitly.
   if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
@@ -169,6 +169,7 @@ function blockString({ comment, type, value }, ctx, onComment) {
         header += '-' // strip
       } else if (value === ws || n !== ws.length - 1) {
         header += '+' // keep
+        if (onChompKeep) onChompKeep()
       }
       wsEnd = ws.replace(/\n$/, '')
       return ''
@@ -209,7 +210,7 @@ function blockString({ comment, type, value }, ctx, onComment) {
   return `${header}\n${indent}${body}`
 }
 
-function plainString(item, ctx, onComment) {
+function plainString(item, ctx, onComment, onChompKeep) {
   const { comment, type, value } = item
   const { implicitKey, indent, inFlow, tags } = ctx
   if (
@@ -234,7 +235,7 @@ function plainString(item, ctx, onComment) {
       ? value.indexOf('"') !== -1 && value.indexOf("'") === -1
         ? singleQuotedString(value, ctx)
         : doubleQuotedString(value, ctx)
-      : blockString(item, ctx, onComment)
+      : blockString(item, ctx, onComment, onChompKeep)
   }
   if (
     !implicitKey &&
@@ -243,7 +244,7 @@ function plainString(item, ctx, onComment) {
     value.indexOf('\n') !== -1
   ) {
     // Where allowed & type not set explicitly, prefer block style for multiline strings
-    return blockString(item, ctx, onComment)
+    return blockString(item, ctx, onComment, onChompKeep)
   }
   // Need to verify that output will be parsed as a string
   const str = value.replace(/\n+/g, `$&\n${indent}`)
@@ -264,7 +265,7 @@ function plainString(item, ctx, onComment) {
   return body
 }
 
-export function stringify(item, ctx, onComment) {
+export function stringify(item, ctx, onComment, onChompKeep) {
   const { defaultType } = strOptions
   const { implicitKey, inFlow } = ctx
   let { type, value } = item
@@ -276,13 +277,13 @@ export function stringify(item, ctx, onComment) {
     switch (_type) {
       case Type.BLOCK_FOLDED:
       case Type.BLOCK_LITERAL:
-        return blockString(item, ctx, onComment)
+        return blockString(item, ctx, onComment, onChompKeep)
       case Type.QUOTE_DOUBLE:
         return doubleQuotedString(value, ctx)
       case Type.QUOTE_SINGLE:
         return singleQuotedString(value, ctx)
       case Type.PLAIN:
-        return plainString(item, ctx, onComment)
+        return plainString(item, ctx, onComment, onChompKeep)
       default:
         return null
     }

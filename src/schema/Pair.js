@@ -23,15 +23,6 @@ export default class Pair extends Node {
     this.key.commentBefore = cb
   }
 
-  get comment() {
-    return this.value && this.value.comment
-  }
-
-  set comment(comment) {
-    if (this.value == null) this.value = new Scalar(null)
-    this.value.comment = comment
-  }
-
   get stringKey() {
     const key = toJSON(this.key)
     if (key === null) return ''
@@ -51,7 +42,7 @@ export default class Pair extends Node {
     return pair
   }
 
-  toString(ctx, onComment) {
+  toString(ctx, onComment, onChompKeep) {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
     const { key, value } = this
     let keyComment = key instanceof Node && key.comment
@@ -61,24 +52,38 @@ export default class Pair extends Node {
       implicitKey: !explicitKey,
       indent: indent + '  '
     })
-    let keyStr = doc.schema.stringify(key, ctx, () => {
+    let str = doc.schema.stringify(key, ctx, () => {
       keyComment = null
     })
-    if (keyComment) keyStr = addComment(keyStr, ctx.indent, keyComment)
-    ctx.implicitKey = false
-    const valueStr = doc.schema.stringify(value, ctx, onComment)
-    const vcb =
-      value && value.commentBefore
-        ? ` #${value.commentBefore.replace(/\n+(?!\n|$)/g, `$&${ctx.indent}#`)}`
-        : ''
-    if (explicitKey) {
-      return `? ${keyStr}\n${indent}:${
-        vcb ? `${vcb}\n${ctx.indent}` : ' '
-      }${valueStr}`
-    } else if (value instanceof Collection) {
-      return `${keyStr}:${vcb}\n${ctx.indent}${valueStr}`
-    } else {
-      return `${keyStr}:${vcb ? `${vcb}\n${ctx.indent}` : ' '}${valueStr}`
+    str = addComment(str, ctx.indent, keyComment)
+    str = explicitKey ? `? ${str}\n${indent}:` : `${str}:` // FIXME: Allow for `? key` w/o value
+    if (this.comment) {
+      // expected (but not strictly required) to be a single-line comment
+      str = addComment(str, ctx.indent, this.comment)
+      if (onComment) onComment()
     }
+    let vcb = ''
+    if (value) {
+      if (value.spaceBefore) vcb = '\n'
+      if (value.commentBefore) {
+        const cs = value.commentBefore.replace(/^/gm, `${ctx.indent}#`)
+        vcb += `\n${cs}`
+      }
+    }
+    ctx.implicitKey = false
+    let valueComment = value instanceof Node && value.comment
+    let chompKeep = false
+    let valueStr = doc.schema.stringify(
+      value,
+      ctx,
+      () => (valueComment = null),
+      () => (chompKeep = true)
+    )
+    const ws =
+      vcb || this.comment || (!explicitKey && value instanceof Collection)
+        ? `${vcb}\n${ctx.indent}`
+        : ' '
+    if (chompKeep && !valueComment && onChompKeep) onChompKeep()
+    return addComment(str + ws + valueStr, ctx.indent, valueComment)
   }
 }

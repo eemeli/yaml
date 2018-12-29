@@ -1,7 +1,38 @@
+import BlankLine from './BlankLine'
 import CollectionItem from './CollectionItem'
 import Comment from './Comment'
 import Node, { Type } from './Node'
 import Range from './Range'
+
+export function grabCollectionEndComments(node) {
+  let cnode = node
+  while (cnode instanceof CollectionItem) cnode = cnode.node
+  if (!(cnode instanceof Collection)) return null
+  const len = cnode.items.length
+  let ci = -1
+  for (let i = len - 1; i >= 0; --i) {
+    const n = cnode.items[i]
+    if (n.type === Type.COMMENT) {
+      // Keep sufficiently indented comments with preceding node
+      const { indent, lineStart } = n.context
+      if (indent > 0 && n.range.start >= lineStart + indent) break
+      ci = i
+    } else if (n.type === Type.BLANK_LINE) ci = i
+    else break
+  }
+  if (ci === -1) return null
+  const ca = cnode.items.splice(ci, len - ci)
+  trace: 'item-end-comments', ca
+  const prevEnd = ca[0].range.start
+  while (true) {
+    cnode.range.end = prevEnd
+    if (cnode.valueRange && cnode.valueRange.end > prevEnd)
+      cnode.valueRange.end = prevEnd
+    if (cnode === node) break
+    cnode = cnode.context.parent
+  }
+  return ca
+}
 
 export default class Collection extends Node {
   static nextContentHasIndent(src, offset, indent) {
@@ -16,7 +47,6 @@ export default class Collection extends Node {
 
   constructor(firstItem) {
     super(firstItem.type === Type.SEQ_ITEM ? Type.SEQ : Type.MAP)
-    this.items = [firstItem]
     for (let i = firstItem.props.length - 1; i >= 0; --i) {
       if (firstItem.props[i].start < firstItem.context.lineStart) {
         // props on previous line are assumed by the collection
@@ -27,6 +57,13 @@ export default class Collection extends Node {
         break
       }
     }
+    this.items = [firstItem]
+    const ec = grabCollectionEndComments(firstItem)
+    if (ec) Array.prototype.push.apply(this.items, ec)
+  }
+
+  get includesTrailingLines() {
+    return this.items.length > 0
   }
 
   /**
@@ -51,10 +88,22 @@ export default class Collection extends Node {
     offset = Node.normalizeOffset(src, offset)
     let ch = src[offset]
     let atLineStart = Node.endOfWhiteSpace(src, lineStart) === offset
+    let prevIncludesTrailingLines = false
     trace: 'items-start', { offset, indent, lineStart, ch: JSON.stringify(ch) }
     while (ch) {
       while (ch === '\n' || ch === '#') {
-        if (ch === '#') {
+        if (atLineStart && ch === '\n' && !prevIncludesTrailingLines) {
+          const blankLine = new BlankLine()
+          offset = blankLine.parse({ src }, offset)
+          this.valueRange.end = offset
+          if (offset >= src.length) {
+            ch = null
+            break
+          }
+          this.items.push(blankLine)
+          trace: 'collection-blankline', blankLine.range
+          offset -= 1 // blankLine.parse() consumes terminal newline
+        } else if (ch === '#') {
           if (
             offset < lineStart + indent &&
             !Collection.nextContentHasIndent(src, offset, indent)
@@ -63,7 +112,7 @@ export default class Collection extends Node {
             return offset
           }
           const comment = new Comment()
-          offset = comment.parse({ src }, offset)
+          offset = comment.parse({ indent, lineStart, src }, offset)
           this.items.push(comment)
           this.valueRange.end = offset
           if (offset >= src.length) {
@@ -118,10 +167,11 @@ export default class Collection extends Node {
       offset = Node.normalizeOffset(src, node.range.end)
       ch = src[offset]
       atLineStart = false
+      prevIncludesTrailingLines = node.includesTrailingLines
       // Need to reset lineStart and atLineStart here if preceding node's range
       // has advanced to check the current line's indentation level
       // -- eemeli/yaml#10 & eemeli/yaml#38
-      if (ch && ch !== '\n' && ch !== '#') {
+      if (ch) {
         let ls = offset - 1
         let prev = src[ls]
         while (prev === ' ' || prev === '\t') prev = src[--ls]
@@ -130,6 +180,8 @@ export default class Collection extends Node {
           atLineStart = true
         }
       }
+      const ec = grabCollectionEndComments(node)
+      if (ec) Array.prototype.push.apply(this.items, ec)
       trace: 'item-end', node.type, { offset, ch: JSON.stringify(ch) }
     }
     trace: 'items', this.items

@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 import Node from '../src/cst/Node'
-import { YAMLSemanticError } from '../src/errors'
 import YAML from '../src/index'
 
 test('eemeli/yaml#2', () => {
@@ -78,8 +77,8 @@ aliases:
       path.resolve(__dirname, './artifacts/prettier-circleci-config.yml'),
       'utf8'
     )
-    const cfg = YAML.parse(src)
-    expect(cfg).toMatchObject({
+    const doc = YAML.parseDocument(src)
+    expect(doc.toJSON()).toMatchObject({
       aliases: [
         { restore_cache: { keys: ['v1-yarn-cache'] } },
         { save_cache: { key: 'v1-yarn-cache', paths: ['~/.cache/yarn'] } },
@@ -171,6 +170,7 @@ aliases:
         version: 2
       }
     })
+    expect(String(doc)).toBe(src)
   })
 
   test('minimal', () => {
@@ -191,10 +191,11 @@ describe('eemeli/yaml#l19', () => {
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe('a: null # 123\n')
   })
+
   test('seq', () => {
     const src = '- a: # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('- a: null # 123\n')
+    expect(String(doc)).toBe('- a: # 123\n    null\n')
   })
 })
 
@@ -258,4 +259,19 @@ test('fake node should respect setOrigRanges()', () => {
 test('parse an empty string as null', () => {
   const value = YAML.parse('')
   expect(value).toBeNull()
+})
+
+test('fail on map value indented with tab', () => {
+  const src = 'a:\n\t1\nb:\n\t2\n'
+  const doc = YAML.parseDocument(src)
+  expect(doc.errors).toMatchObject([
+    { name: 'YAMLSemanticError' },
+    { name: 'YAMLSemanticError' }
+  ])
+})
+
+test('comment on single-line value in flow map', () => {
+  const src = '{a: 1 #c\n}'
+  const doc = YAML.parseDocument(src)
+  expect(String(doc)).toBe('{\n  a: 1 #c\n}\n')
 })

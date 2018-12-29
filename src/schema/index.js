@@ -175,7 +175,7 @@ export default class Schema {
     return props.join(' ')
   }
 
-  stringify(item, ctx, onComment) {
+  stringify(item, ctx, onComment, onChompKeep) {
     let tagObj
     if (!(item instanceof Node)) {
       tagObj = this.tags.find(
@@ -188,11 +188,11 @@ export default class Schema {
         : createNode(item, true)
     }
     ctx.tags = this
-    if (item instanceof Pair) return item.toString(ctx, onComment)
+    if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)
     const props = this.stringifyProps(item, tagObj, ctx)
     const stringify = tagObj.stringify || Schema.defaultStringify
-    const str = stringify(item, ctx, onComment)
+    const str = stringify(item, ctx, onComment, onChompKeep)
     return props
       ? item instanceof Collection && str[0] !== '{' && str[0] !== '['
         ? `${props}\n${ctx.indent}${str}`
