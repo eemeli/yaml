@@ -558,3 +558,141 @@ c: cc\n`
     expect(String(doc)).toBe(src)
   })
 })
+
+describe('collection end comments', () => {
+  test('seq in seq', () => {
+    const src = `#0
+- - a
+  - b
+  #1
+
+#2
+- d\n`
+    const doc = YAML.parseDocument(src)
+    expect(doc.contents).toMatchObject({
+      items: [
+        { items: [{ value: 'a' }, { value: 'b' }], comment: '1' },
+        { spaceBefore: true, commentBefore: '2', value: 'd' }
+      ]
+    })
+    expect(String(doc)).toBe(src)
+  })
+
+  test('map in seq', () => {
+    const src = `#0
+- a: 1
+  b: 2
+  #1
+
+#2
+- d\n`
+    const doc = YAML.parseDocument(src)
+    expect(doc.contents).toMatchObject({
+      items: [
+        {
+          items: [
+            { key: { value: 'a' }, value: { value: 1 } },
+            { key: { value: 'b' }, value: { value: 2 } }
+          ],
+          comment: '1'
+        },
+        { spaceBefore: true, commentBefore: '2', value: 'd' }
+      ]
+    })
+    expect(String(doc)).toBe(src)
+  })
+
+  test('seq in map', () => {
+    const src = `#0
+a:
+  - b
+  - c
+  #1
+
+#2
+d: 1\n`
+    const doc = YAML.parseDocument(src)
+    expect(doc.contents).toMatchObject({
+      items: [
+        {
+          key: { value: 'a' },
+          value: { items: [{ value: 'b' }, { value: 'c' }], comment: '1' }
+        },
+        {
+          spaceBefore: true,
+          commentBefore: '2',
+          key: { value: 'd' },
+          value: { value: 1 }
+        }
+      ]
+    })
+    expect(String(doc)).toBe(src)
+  })
+
+  test('map in map', () => {
+    const src = `#0
+a:
+  b: 1
+  c: 2
+  #1
+
+#2
+d: 1\n`
+    const doc = YAML.parseDocument(src)
+    expect(doc.contents).toMatchObject({
+      items: [
+        {
+          key: { value: 'a' },
+          value: {
+            items: [
+              { key: { value: 'b' }, value: { value: 1 } },
+              { key: { value: 'c' }, value: { value: 2 } }
+            ],
+            comment: '1'
+          }
+        },
+        {
+          spaceBefore: true,
+          commentBefore: '2',
+          key: { value: 'd' },
+          value: { value: 1 }
+        }
+      ]
+    })
+    expect(String(doc)).toBe(src)
+  })
+
+  test('indented seq in map in seq', () => {
+    const src = `#0
+a:
+  #1
+  - b:
+      - c
+
+  #2
+  - e\n`
+    const doc = YAML.parseDocument(src)
+    expect(doc.contents).toMatchObject({
+      items: [
+        {
+          key: { value: 'a' },
+          value: {
+            commentBefore: '1',
+            items: [
+              {
+                items: [
+                  {
+                    key: { value: 'b' },
+                    value: { items: [{ value: 'c' }] }
+                  }
+                ]
+              },
+              { spaceBefore: true, commentBefore: '2', value: 'e' }
+            ]
+          }
+        }
+      ]
+    })
+    expect(String(doc)).toBe(src.replace('\n\n', '\n  \n'))
+  })
+})
