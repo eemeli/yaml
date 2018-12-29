@@ -4,6 +4,36 @@ import Comment from './Comment'
 import Node, { Type } from './Node'
 import Range from './Range'
 
+export function grabCollectionEndComments(node) {
+  let cnode = node
+  while (cnode instanceof CollectionItem) cnode = cnode.node
+  if (!(cnode instanceof Collection)) return null
+  const len = cnode.items.length
+  let ci = -1
+  for (let i = len - 1; i >= 0; --i) {
+    const n = cnode.items[i]
+    if (n.type === Type.COMMENT) {
+      // Keep sufficiently indented comments with preceding node
+      const { indent, lineStart } = n.context
+      if (n.range.start >= lineStart + indent) break
+      ci = i
+    } else if (n.type === Type.BLANK_LINE) ci = i
+    else break
+  }
+  if (ci === -1) return null
+  const ca = cnode.items.splice(ci, len - ci)
+  trace: 'item-end-comments', ca
+  const prevEnd = ca[0].range.start
+  while (true) {
+    cnode.range.end = prevEnd
+    if (cnode.valueRange && cnode.valueRange.end > prevEnd)
+      cnode.valueRange.end = prevEnd
+    if (cnode === node) break
+    cnode = cnode.context.parent
+  }
+  return ca
+}
+
 export default class Collection extends Node {
   static nextContentHasIndent(src, offset, indent) {
     const lineStart = Node.endOfLine(src, offset) + 1
@@ -17,7 +47,6 @@ export default class Collection extends Node {
 
   constructor(firstItem) {
     super(firstItem.type === Type.SEQ_ITEM ? Type.SEQ : Type.MAP)
-    this.items = [firstItem]
     for (let i = firstItem.props.length - 1; i >= 0; --i) {
       if (firstItem.props[i].start < firstItem.context.lineStart) {
         // props on previous line are assumed by the collection
@@ -28,39 +57,9 @@ export default class Collection extends Node {
         break
       }
     }
-    this.grabCollectionEndComments(firstItem)
-  }
-
-  grabCollectionEndComments(node) {
-    let cnode = node
-    while (cnode instanceof CollectionItem) cnode = cnode.node
-    if (cnode instanceof Collection) {
-      const len = cnode.items.length
-      let ci = -1
-      for (let i = len - 1; i >= 0; --i) {
-        const n = cnode.items[i]
-        if (n.type === Type.COMMENT) {
-          // Keep sufficiently indented comments with preceding node
-          const { indent, lineStart } = n.context
-          if (n.range.start >= lineStart + indent) break
-          ci = i
-        } else if (n.type === Type.BLANK_LINE) ci = i
-        else break
-      }
-      if (ci >= 0) {
-        const ca = cnode.items.splice(ci, len - ci)
-        trace: 'item-end-comments', ca
-        const prevEnd = ca[0].range.start
-        while (true) {
-          cnode.range.end = prevEnd
-          if (cnode.valueRange && cnode.valueRange.end > prevEnd)
-            cnode.valueRange.end = prevEnd
-          if (cnode === node) break
-          cnode = cnode.context.parent
-        }
-        Array.prototype.push.apply(this.items, ca)
-      }
-    }
+    this.items = [firstItem]
+    const ec = grabCollectionEndComments(firstItem)
+    if (ec) Array.prototype.push.apply(this.items, ec)
   }
 
   get includesTrailingLines() {
@@ -181,7 +180,8 @@ export default class Collection extends Node {
           atLineStart = true
         }
       }
-      this.grabCollectionEndComments(node)
+      const ec = grabCollectionEndComments(node)
+      if (ec) Array.prototype.push.apply(this.items, ec)
       trace: 'item-end', node.type, { offset, ch: JSON.stringify(ch) }
     }
     trace: 'items', this.items

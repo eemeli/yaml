@@ -2889,7 +2889,7 @@ foo: bar
 ·text`.replace(/·/g, ' '),
       tgt: [
         {
-          contents: [{ items: [{ node: '' }] }, 'text']
+          contents: [{ items: [{ node: '' }] }, { type: 'BLANK_LINE' }, 'text']
         },
         {
           contents: [{ items: [{ node: 'text\n' }] }, 'text']

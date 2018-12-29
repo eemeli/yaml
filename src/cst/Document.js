@@ -1,5 +1,6 @@
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import BlankLine from './BlankLine'
+import { grabCollectionEndComments } from './Collection'
 import Comment from './Comment'
 import Directive from './Directive'
 import Node, { Char, Type } from './Node'
@@ -135,6 +136,8 @@ export default class Document extends Node {
           this.contents.push(node)
           offset = node.range.end
           atLineStart = false
+          const ec = grabCollectionEndComments(node)
+          if (ec) Array.prototype.push.apply(this.contents, ec)
           trace: 'content-node',
             { valueRange: node.valueRange, comment: node.comment },
             JSON.stringify(node.rawValue)
