@@ -1,42 +1,74 @@
 import addComment from '../addComment'
 import Node from './Node'
+import Pair from './Pair'
+import Scalar from './Scalar'
 
 export default class Collection extends Node {
   static maxFlowStringSingleLineLength = 60
 
   items = []
 
+  hasAllNullValues() {
+    return this.items.every(node => {
+      if (!(node instanceof Pair)) return false
+      const n = node.value
+      return (
+        n == null ||
+        (n instanceof Scalar &&
+          n.value == null &&
+          !n.commentBefore &&
+          !n.comment &&
+          !n.tag)
+      )
+    })
+  }
+
   // overridden in implementations
   toJSON() {
     return null
   }
 
-  toString(ctx, { blockItem, flowChars, itemIndent }, onComment, onChompKeep) {
+  toString(
+    ctx,
+    { blockItem, flowChars, isMap, itemIndent },
+    onComment,
+    onChompKeep
+  ) {
     const { doc, indent } = ctx
     const inFlow =
       (this.type && this.type.substr(0, 4) === 'FLOW') || ctx.inFlow
     if (inFlow) itemIndent += '  '
-    ctx = Object.assign({}, ctx, { indent: itemIndent, inFlow, type: null })
+    const allNullValues = isMap && this.hasAllNullValues()
+    ctx = Object.assign({}, ctx, {
+      allNullValues,
+      indent: itemIndent,
+      inFlow,
+      type: null
+    })
     let chompKeep = false
     let hasItemWithNewLine = false
     const nodes = this.items.reduce((nodes, item, i) => {
       let comment
       if (item) {
-        if (!chompKeep && item.spaceBefore) {
-          hasItemWithNewLine = true
+        if (!chompKeep && item.spaceBefore)
           nodes.push({ type: 'comment', str: '' })
-        }
-        if (item.commentBefore) {
-          hasItemWithNewLine = true
+
+        if (item.commentBefore)
           item.commentBefore.match(/^.*$/gm).forEach(line => {
             nodes.push({ type: 'comment', str: `#${line}` })
           })
-        }
-        if (item.comment) {
+
+        if (item.comment) comment = item.comment
+
+        if (
+          inFlow &&
+          ((!chompKeep && item.spaceBefore) ||
+            item.commentBefore ||
+            item.comment ||
+            (item.key && (item.key.commentBefore || item.key.comment)) ||
+            (item.value && (item.value.commentBefore || item.value.comment)))
+        )
           hasItemWithNewLine = true
-          comment = item.comment
-        }
-        if (item.value && item.value.comment) hasItemWithNewLine = true
       }
       chompKeep = false
       let str = doc.schema.stringify(
@@ -45,7 +77,7 @@ export default class Collection extends Node {
         () => (comment = null),
         () => (chompKeep = true)
       )
-      if (!hasItemWithNewLine && str.indexOf('\n') !== -1)
+      if (inFlow && !hasItemWithNewLine && str.includes('\n'))
         hasItemWithNewLine = true
       if (inFlow && i < this.items.length - 1) str += ','
       str = addComment(str, itemIndent, comment)

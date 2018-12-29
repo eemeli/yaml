@@ -76,6 +76,7 @@ export default class YAMLMap extends Collection {
       {
         blockItem: n => n.str,
         flowChars: { start: '{', end: '}' },
+        isMap: true,
         itemIndent: ctx.indent || ''
       },
       onComment,
