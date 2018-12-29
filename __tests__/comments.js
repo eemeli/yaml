@@ -1,5 +1,4 @@
 import YAML from '../src/index'
-import { Type } from '../src/cst/Node'
 
 describe('parse comments', () => {
   describe('body', () => {
@@ -693,6 +692,6 @@ a:
         }
       ]
     })
-    expect(String(doc)).toBe(src.replace('\n\n', '\n  \n'))
+    expect(String(doc)).toBe(src)
   })
 })

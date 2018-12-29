@@ -51,7 +51,7 @@ export default class Collection extends Node {
       str = flowChars.start + flowChars.end
     } else if (inFlow) {
       const { start, end } = flowChars
-      const strings = nodes.map(({ str }) => str)
+      const strings = nodes.map(n => n.str)
       if (
         hasItemWithNewLine ||
         strings.reduce((sum, str) => sum + str.length + 2, 2) >
@@ -66,7 +66,9 @@ export default class Collection extends Node {
         str = `${start} ${strings.join(' ')} ${end}`
       }
     } else {
-      str = nodes.map(blockItem).join(`\n${indent}`)
+      const strings = nodes.map(blockItem)
+      str = strings.shift()
+      for (const s of strings) str += s ? `\n${indent}${s}` : '\n'
     }
     if (this.comment) {
       str += '\n' + this.comment.replace(/^/gm, `${indent}#`)

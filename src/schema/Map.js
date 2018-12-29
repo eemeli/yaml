@@ -74,7 +74,7 @@ export default class YAMLMap extends Collection {
     return super.toString(
       ctx,
       {
-        blockItem: ({ str }) => str,
+        blockItem: n => n.str,
         flowChars: { start: '{', end: '}' },
         itemIndent: ctx.indent || ''
       },

@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 import Node from '../src/cst/Node'
-import { YAMLSemanticError } from '../src/errors'
 import YAML from '../src/index'
 
 test('eemeli/yaml#2', () => {
@@ -78,8 +77,8 @@ aliases:
       path.resolve(__dirname, './artifacts/prettier-circleci-config.yml'),
       'utf8'
     )
-    const cfg = YAML.parse(src)
-    expect(cfg).toMatchObject({
+    const doc = YAML.parseDocument(src)
+    expect(doc.toJSON()).toMatchObject({
       aliases: [
         { restore_cache: { keys: ['v1-yarn-cache'] } },
         { save_cache: { key: 'v1-yarn-cache', paths: ['~/.cache/yarn'] } },
@@ -171,6 +170,7 @@ aliases:
         version: 2
       }
     })
+    expect(String(doc)).toBe(src)
   })
 
   test('minimal', () => {

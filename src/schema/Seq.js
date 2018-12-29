@@ -13,7 +13,7 @@ export default class YAMLSeq extends Collection {
     return super.toString(
       ctx,
       {
-        blockItem: ({ type, str }) => (type === 'comment' ? str : `- ${str}`),
+        blockItem: n => (n.type === 'comment' ? n.str : `- ${n.str}`),
         flowChars: { start: '[', end: ']' },
         itemIndent: (ctx.indent || '') + '  '
       },
