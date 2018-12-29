@@ -15,7 +15,7 @@ export function grabCollectionEndComments(node) {
     if (n.type === Type.COMMENT) {
       // Keep sufficiently indented comments with preceding node
       const { indent, lineStart } = n.context
-      if (n.range.start >= lineStart + indent) break
+      if (indent > 0 && n.range.start >= lineStart + indent) break
       ci = i
     } else if (n.type === Type.BLANK_LINE) ci = i
     else break

@@ -231,11 +231,11 @@ Sammy Sosa: {
               items: [
                 { type: Type.SEQ_ITEM, node: 'Mark McGwire' },
                 { type: Type.SEQ_ITEM, node: 'Sammy Sosa' },
-                { type: Type.SEQ_ITEM, node: 'Ken Griffey' },
-                { type: Type.BLANK_LINE },
-                { comment: ' Team ranking' }
+                { type: Type.SEQ_ITEM, node: 'Ken Griffey' }
               ]
-            }
+            },
+            { type: Type.BLANK_LINE },
+            { comment: ' Team ranking' }
           ]
         },
         {
@@ -2970,11 +2970,11 @@ keep: |+
                 { comment: ' comments:' },
                 { type: Type.BLANK_LINE },
                 'keep',
-                { type: Type.MAP_VALUE, node: '# text\n\n' },
-                { comment: ' Trail' },
-                { comment: ' comments.' }
+                { type: Type.MAP_VALUE, node: '# text\n\n' }
               ]
-            }
+            },
+            { comment: ' Trail' },
+            { comment: ' comments.' }
           ]
         }
       ]

@@ -58,41 +58,82 @@ describe('parse comments', () => {
 
   describe('seq entry comments', () => {
     test('plain', () => {
-      const src = '#c0\n- value 1\n#c1\n\n- value 2\n\n#c2'
+      const src = `#c0
+- value 1
+#c1
+
+- value 2
+
+#c2`
       const doc = YAML.parseDocument(src)
-      expect(doc.contents.items).toHaveLength(2)
-      expect(doc.contents.items[0].commentBefore).toBe('c0')
-      expect(doc.contents.items[1].commentBefore).toBe('c1')
-      expect(doc.contents.items[0].range).toMatchObject([6, 13])
-      expect(doc.contents.comment).toBe('c2')
-      expect(doc.contents.range).toMatchObject([4, 33])
+      expect(doc).toMatchObject({
+        contents: {
+          items: [
+            { commentBefore: 'c0', range: [6, 13] },
+            { commentBefore: 'c1' }
+          ],
+          range: [4, 29]
+        },
+        comment: 'c2'
+      })
     })
 
     test('multiline', () => {
-      const src = '- value 1\n#c0\n#c1\n\n#c2\n- value 2\n\n#c3\n#c4'
+      const src = `
+- value 1
+#c0
+#c1
+
+#c2
+- value 2
+
+#c3
+#c4`
       const doc = YAML.parseDocument(src)
-      expect(doc.contents.items).toHaveLength(2)
-      expect(doc.contents.items[1].commentBefore).toBe('c0\nc1\nc2')
-      expect(doc.contents.comment).toBe('c3\nc4')
+      expect(doc).toMatchObject({
+        contents: {
+          items: [{}, { commentBefore: 'c0\nc1\nc2' }]
+        },
+        comment: 'c3\nc4'
+      })
     })
   })
 
   describe('map entry comments', () => {
     test('plain', () => {
-      const src = '#c0\nkey1: value 1\n#c1\n\nkey2: value 2\n\n#c2'
+      const src = `#c0
+key1: value 1
+#c1
+
+key2: value 2
+
+#c2`
       const doc = YAML.parseDocument(src)
-      expect(doc.contents.items).toHaveLength(2)
-      expect(doc.contents.items[0].commentBefore).toBe('c0')
-      expect(doc.contents.items[1].commentBefore).toBe('c1')
-      expect(doc.contents.comment).toBe('c2')
+      expect(doc).toMatchObject({
+        contents: {
+          items: [{ commentBefore: 'c0' }, { commentBefore: 'c1' }]
+        },
+        comment: 'c2'
+      })
     })
 
     test('multiline', () => {
-      const src = 'key1: value 1\n#c0\n#c1\n\n#c2\nkey2: value 2\n\n#c3\n#c4'
+      const src = `key1: value 1
+#c0
+#c1
+
+#c2
+key2: value 2
+
+#c3
+#c4`
       const doc = YAML.parseDocument(src)
-      expect(doc.contents.items).toHaveLength(2)
-      expect(doc.contents.items[1].commentBefore).toBe('c0\nc1\nc2')
-      expect(doc.contents.comment).toBe('c3\nc4')
+      expect(doc).toMatchObject({
+        contents: {
+          items: [{}, { commentBefore: 'c0\nc1\nc2' }]
+        },
+        comment: 'c3\nc4'
+      })
     })
   })
 
@@ -107,13 +148,17 @@ describe('parse comments', () => {
   k3: v3
 #c5\n`
       const doc = YAML.parseDocument(src)
-      expect(doc.contents.items).toHaveLength(1)
-      expect(doc.contents.items[0].items).toHaveLength(3)
-      expect(doc.contents.items[0].commentBefore).toBe('c0\nc1')
-      expect(doc.contents.items[0].items[1].commentBefore).toBe('c2')
-      expect(doc.contents.items[0].items[1].value.comment).toBe('c3')
-      expect(doc.contents.items[0].items[2].commentBefore).toBe('c4')
-      expect(doc.contents.comment).toBe('c5')
+      expect(doc.contents.items).toMatchObject([
+        {
+          commentBefore: 'c0\nc1',
+          items: [
+            {},
+            { commentBefore: 'c2', value: { comment: 'c3' } },
+            { commentBefore: 'c4' }
+          ]
+        }
+      ])
+      expect(doc.comment).toBe('c5')
       expect(String(doc)).toBe(`#c0
 #c1
 - k1: v1
@@ -121,6 +166,7 @@ describe('parse comments', () => {
   k2: v2 #c3
   #c4
   k3: v3
+
 #c5\n`)
     })
   })
@@ -137,23 +183,21 @@ k2:
   - v3 #c4
 #c5\n`
       const doc = YAML.parseDocument(src)
-      expect(doc.contents).toMatchObject({
-        items: [
-          {
-            comment: 'c1',
-            key: { commentBefore: 'c0', value: 'k1' },
-            value: {
-              items: [{ value: 'v1' }, { commentBefore: 'c2', value: 'v2' }],
-              comment: 'c3'
-            }
-          },
-          {
-            key: { value: 'k2' },
-            value: { items: [{ value: 'v3', comment: 'c4' }] }
+      expect(doc.contents.items).toMatchObject([
+        {
+          comment: 'c1',
+          key: { commentBefore: 'c0', value: 'k1' },
+          value: {
+            items: [{ value: 'v1' }, { commentBefore: 'c2', value: 'v2' }],
+            comment: 'c3'
           }
-        ],
-        comment: 'c5'
-      })
+        },
+        {
+          key: { value: 'k2' },
+          value: { items: [{ value: 'v3', comment: 'c4' }] }
+        }
+      ])
+      expect(doc.comment).toBe('c5')
       expect(String(doc)).toBe(`#c0
 k1: #c1
   - v1
@@ -162,6 +206,7 @@ k1: #c1
   #c3
 k2:
   - v3 #c4
+
 #c5\n`)
     })
   })
@@ -554,6 +599,7 @@ entryA:
 
 entryB:
   - bar # bar comment
+
 # Ending comment
 # Ending comment 2\n`)
   })
@@ -561,7 +607,7 @@ entryB:
   test('collection end comment', () => {
     const src = `a: b #c\n#d\n`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(src)
+    expect(String(doc)).toBe(`a: b #c\n\n#d\n`)
   })
 
   test('comment association by indentation', () => {
@@ -571,8 +617,8 @@ a:
 #d\n`
     const cst = YAML.parseCST(src)
     const collection = cst[0].contents[1]
-    expect(collection.items).toHaveLength(3)
-    const comment = collection.items[2]
+    expect(collection.items).toHaveLength(2)
+    const comment = cst[0].contents[2]
     expect(comment.type).toBe('COMMENT')
     expect(comment.comment).toBe('d')
   })
