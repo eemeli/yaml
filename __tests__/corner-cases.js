@@ -269,3 +269,9 @@ test('fail on map value indented with tab', () => {
     { name: 'YAMLSemanticError' }
   ])
 })
+
+test('comment on single-line value in flow map', () => {
+  const src = '{a: 1 #c\n}'
+  const doc = YAML.parseDocument(src)
+  expect(String(doc)).toBe('{\n  a: 1 #c\n}\n')
+})

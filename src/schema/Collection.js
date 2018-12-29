@@ -36,6 +36,7 @@ export default class Collection extends Node {
           hasItemWithNewLine = true
           comment = item.comment
         }
+        if (item.value && item.value.comment) hasItemWithNewLine = true
       }
       chompKeep = false
       let str = doc.schema.stringify(
