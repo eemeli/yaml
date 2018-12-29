@@ -6,7 +6,7 @@ describe('parse comments', () => {
       const src = '#comment\n%YAML 1.2 #comment\n---\nstring\n'
       const doc = YAML.parseDocument(src)
       expect(doc.commentBefore).toBe('comment\ncomment')
-      expect(String(doc)).toBe('#comment\n#comment\n%YAML 1.2\n---\nstring\n')
+      expect(String(doc)).toBe('#comment\n#comment\n\n%YAML 1.2\n---\nstring\n')
     })
 
     test('body start comments', () => {
@@ -220,7 +220,7 @@ describe('stringify comments', () => {
       const doc = YAML.parseDocument(src)
       expect(doc.commentBefore).toBe('c0')
       doc.commentBefore += '\nc1'
-      expect(String(doc)).toBe('#c0\n#c1\nstring\n')
+      expect(String(doc)).toBe('#c0\n#c1\n\nstring\n')
     })
   })
 
@@ -359,7 +359,7 @@ describe('blank lines', () => {
     test('directive comment', () => {
       const src = '\n\n#cc\n%YAML 1.2\n---\nstr\n'
       const doc = YAML.parseDocument(src)
-      expect(String(doc)).toBe('#cc\n%YAML 1.2\n---\nstr\n')
+      expect(String(doc)).toBe('#cc\n\n%YAML 1.2\n---\nstr\n')
     })
   })
 
@@ -385,7 +385,7 @@ describe('blank lines', () => {
     test('empty/comment contents', () => {
       const src = '#cc\n\n\n'
       const doc = YAML.parseDocument(src)
-      expect(String(doc)).toBe('#cc\nnull\n')
+      expect(String(doc)).toBe('#cc\n\nnull\n')
     })
   })
 

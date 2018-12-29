@@ -53,7 +53,6 @@ export default class Document {
     this.errors = []
     this.options = options
     this.schema = null
-    this.spaceBefore = false
     this.tagPrefixes = []
     this.version = null
     this.warnings = []
@@ -98,11 +97,6 @@ export default class Document {
             const msg = `YAML only supports %TAG and %YAML directives, and not %${name}`
             this.warnings.push(new YAMLWarning(directive, msg))
           }
-          if (
-            directive.type === Type.BLANK_LINE &&
-            directiveComments.length > 0
-          )
-            this.spaceBefore = true
       }
       if (comment) directiveComments.push(comment)
     })
@@ -448,10 +442,8 @@ export default class Document {
       throw new Error('Document with errors cannot be stringified')
     this.setSchema()
     const lines = []
-    if (this.commentBefore) {
-      lines.push(this.commentBefore.replace(/^/gm, '#'))
-      if (this.spaceBefore) lines.push('')
-    }
+    if (this.commentBefore)
+      lines.push(this.commentBefore.replace(/^/gm, '#'), '')
     let hasDirectives = false
     if (this.version) {
       let vd = '%YAML 1.2'
@@ -476,7 +468,7 @@ export default class Document {
       indent: ''
     }
     if (this.contents) {
-      if (this.contents.spaceBefore && lines.length > 0) lines.push('')
+      if (this.contents.spaceBefore && hasDirectives) lines.push('')
       if (this.contents.commentBefore)
         lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
       // top-level block scalars need to be indented if followed by a comment
