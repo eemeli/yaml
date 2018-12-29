@@ -17,6 +17,7 @@ function createMapNode(iterable, wrapScalars) {
 
 export default function createNode(value, wrapScalars = true) {
   if (value == null) return new Scalar(null)
+  if (typeof value.toJSON === 'function') value = value.toJSON()
   if (typeof value !== 'object') return wrapScalars ? new Scalar(value) : value
   if (Array.isArray(value)) {
     const seq = new Seq()

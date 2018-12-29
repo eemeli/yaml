@@ -283,3 +283,11 @@ y:
     })
   })
 })
+
+describe('toJSON()', () => {
+  test('Date', () => {
+    const date = new Date('2018-12-22T08:02:52Z')
+    const node = createNode(date)
+    expect(node.value).toBe(date.toJSON())
+  })
+})
