@@ -59,7 +59,7 @@ export default class Pair extends Node {
     str = explicitKey ? `? ${str}\n${indent}:` : `${str}:`
     if (this.comment) {
       // expected (but not strictly required) to be a single-line comment
-      str = addComment(str, indent, this.comment)
+      str = addComment(str, ctx.indent, this.comment)
       if (onComment) onComment()
     }
     let vcb = ''

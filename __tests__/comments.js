@@ -293,8 +293,16 @@ describe('stringify comments', () => {
       const doc = YAML.parseDocument(src)
       doc.contents.items[0].commentBefore = 'c0'
       doc.contents.items[1].commentBefore = 'c1'
-      doc.contents.comment = 'c2'
-      expect(String(doc)).toBe('#c0\nkey1: value 1\n#c1\nkey2: value 2\n#c2\n')
+      doc.contents.items[1].comment = 'c2'
+      doc.contents.items[1].value.spaceBefore = true
+      doc.contents.comment = 'c3'
+      expect(String(doc)).toBe(`#c0
+key1: value 1
+#c1
+key2: #c2
+
+  value 2
+#c3\n`)
     })
 
     test('multiline', () => {
@@ -302,7 +310,10 @@ describe('stringify comments', () => {
       const doc = YAML.parseDocument(src)
       doc.contents.items[0].commentBefore = 'c0\nc1'
       doc.contents.items[1].commentBefore = '\nc2\n\nc3'
-      doc.contents.comment = 'c4\nc5'
+      doc.contents.items[1].comment = 'c4\nc5'
+      doc.contents.items[1].value.spaceBefore = true
+      doc.contents.items[1].value.commentBefore = 'c6'
+      doc.contents.comment = 'c7\nc8'
       expect(String(doc)).toBe(
         `#c0
 #c1
@@ -311,9 +322,14 @@ key1: value 1
 #c2
 #
 #c3
-key2: value 2
-#c4
-#c5
+key2:
+  #c4
+  #c5
+
+  #c6
+  value 2
+#c7
+#c8
 `
       )
     })
