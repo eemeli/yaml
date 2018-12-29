@@ -481,7 +481,10 @@ export default class Document {
     } else if (this.contents !== undefined) {
       lines.push(this.schema.stringify(this.contents, ctx))
     }
-    if (this.comment) lines.push(this.comment.replace(/^/gm, '#'))
+    if (this.comment) {
+      if (lines[lines.length - 1] !== '') lines.push('')
+      lines.push(this.comment.replace(/^/gm, '#'))
+    }
     return lines.join('\n') + '\n'
   }
 }

@@ -20,7 +20,7 @@ describe('parse comments', () => {
       const src = '\nstring\n#comment\n#comment\n'
       const doc = YAML.parseDocument(src)
       expect(doc.comment).toBe('comment\ncomment')
-      expect(String(doc)).toBe('string\n#comment\n#comment\n')
+      expect(String(doc)).toBe('string\n\n#comment\n#comment\n')
     })
   })
 
