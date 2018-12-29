@@ -467,22 +467,29 @@ export default class Document {
       doc: this,
       indent: ''
     }
+    let chompKeep = false
+    let contentComment = null
     if (this.contents) {
       if (this.contents.spaceBefore && hasDirectives) lines.push('')
       if (this.contents.commentBefore)
         lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
       // top-level block scalars need to be indented if followed by a comment
       ctx.forceBlockIndent = !!this.comment
-      let comment = this.contents.comment
-      const body = this.schema.stringify(this.contents, ctx, () => {
-        comment = null
-      })
-      lines.push(addComment(body, '', comment))
+      contentComment = this.contents.comment
+      const onChompKeep = contentComment ? null : () => (chompKeep = true)
+      const body = this.schema.stringify(
+        this.contents,
+        ctx,
+        () => (contentComment = null),
+        onChompKeep
+      )
+      lines.push(addComment(body, '', contentComment))
     } else if (this.contents !== undefined) {
       lines.push(this.schema.stringify(this.contents, ctx))
     }
     if (this.comment) {
-      if (lines[lines.length - 1] !== '') lines.push('')
+      if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')
+        lines.push('')
       lines.push(this.comment.replace(/^/gm, '#'))
     }
     return lines.join('\n') + '\n'

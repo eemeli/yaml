@@ -413,6 +413,33 @@ describe('blank lines', () => {
     expect(String(doc)).toBe('#A\n- a\n\n#B\n- b\n\n#C\n- c\n')
   })
 
+  describe('not after block scalar with keep chomping', () => {
+    const cases = [
+      { name: 'in seq', src: '- |+\n  a\n\n- b\n' },
+      { name: 'in map', src: 'a: |+\n  A\n\nb: B\n' },
+      { name: 'in seq in map', src: 'a:\n  - |+\n    A\n\nb: B\n' }
+    ]
+    for (const { name, src } of cases) {
+      test(name, () => {
+        const doc = YAML.parseDocument(src)
+        expect(String(doc)).toBe(src)
+        expect(doc.contents.items[1]).not.toHaveProperty('spaceBefore', true)
+        doc.contents.items[1].spaceBefore = true
+        expect(String(doc)).toBe(src)
+      })
+    }
+
+    test('as contents', () => {
+      const src = '|+\n a\n\n#c\n'
+      const doc = YAML.parseDocument(src)
+      expect(doc).toMatchObject({
+        comment: 'c',
+        contents: { value: 'a\n\n' }
+      })
+      expect(String(doc)).toBe(src)
+    })
+  })
+
   test('before block map values', () => {
     const src = 'a:\n\n  1\nb:\n\n  #c\n  2\n'
     const doc = YAML.parseDocument(src)

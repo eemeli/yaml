@@ -63,7 +63,7 @@ export default class YAMLMap extends Collection {
     return map
   }
 
-  toString(ctx, onComment) {
+  toString(ctx, onComment, onChompKeep) {
     if (!ctx) return JSON.stringify(this)
     this.items.forEach(item => {
       if (!(item instanceof Pair))
@@ -78,7 +78,8 @@ export default class YAMLMap extends Collection {
         flowChars: { start: '{', end: '}' },
         itemIndent: ctx.indent || ''
       },
-      onComment
+      onComment,
+      onChompKeep
     )
   }
 }

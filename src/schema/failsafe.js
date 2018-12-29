@@ -9,7 +9,8 @@ export const map = {
   default: true,
   tag: 'tag:yaml.org,2002:map',
   resolve: parseMap,
-  stringify: (value, ctx, onComment) => value.toString(ctx, onComment)
+  stringify: (value, ctx, onComment, onChompKeep) =>
+    value.toString(ctx, onComment, onChompKeep)
 }
 
 export const seq = {
@@ -17,7 +18,8 @@ export const seq = {
   default: true,
   tag: 'tag:yaml.org,2002:seq',
   resolve: parseSeq,
-  stringify: (value, ctx, onComment) => value.toString(ctx, onComment)
+  stringify: (value, ctx, onComment, onChompKeep) =>
+    value.toString(ctx, onComment, onChompKeep)
 }
 
 export default [map, seq, str]

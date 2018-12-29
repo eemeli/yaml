@@ -11,17 +11,18 @@ export default class Collection extends Node {
     return null
   }
 
-  toString(ctx, { blockItem, flowChars, itemIndent }, onComment) {
+  toString(ctx, { blockItem, flowChars, itemIndent }, onComment, onChompKeep) {
     const { doc, indent } = ctx
     const inFlow =
       (this.type && this.type.substr(0, 4) === 'FLOW') || ctx.inFlow
     if (inFlow) itemIndent += '  '
     ctx = Object.assign({}, ctx, { indent: itemIndent, inFlow, type: null })
+    let chompKeep = false
     let hasItemWithNewLine = false
     const nodes = this.items.reduce((nodes, item, i) => {
       let comment
       if (item) {
-        if (item.spaceBefore) {
+        if (!chompKeep && item.spaceBefore) {
           hasItemWithNewLine = true
           nodes.push({ type: 'comment', str: '' })
         }
@@ -36,13 +37,18 @@ export default class Collection extends Node {
           comment = item.comment
         }
       }
-      let str = doc.schema.stringify(item, ctx, () => {
-        comment = null
-      })
+      chompKeep = false
+      let str = doc.schema.stringify(
+        item,
+        ctx,
+        () => (comment = null),
+        () => (chompKeep = true)
+      )
       if (!hasItemWithNewLine && str.indexOf('\n') !== -1)
         hasItemWithNewLine = true
       if (inFlow && i < this.items.length - 1) str += ','
       str = addComment(str, itemIndent, comment)
+      if (chompKeep && (comment || inFlow)) chompKeep = false
       nodes.push({ type: 'item', str })
       return nodes
     }, [])
@@ -73,7 +79,7 @@ export default class Collection extends Node {
     if (this.comment) {
       str += '\n' + this.comment.replace(/^/gm, `${indent}#`)
       if (onComment) onComment()
-    }
+    } else if (chompKeep && onChompKeep) onChompKeep()
     return str
   }
 }

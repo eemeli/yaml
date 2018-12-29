@@ -8,7 +8,7 @@ export default class YAMLSeq extends Collection {
     return this.items.map((v, i) => toJSON(v, String(i), opt))
   }
 
-  toString(ctx, onComment) {
+  toString(ctx, onComment, onChompKeep) {
     if (!ctx) return JSON.stringify(this)
     return super.toString(
       ctx,
@@ -17,7 +17,8 @@ export default class YAMLSeq extends Collection {
         flowChars: { start: '[', end: ']' },
         itemIndent: (ctx.indent || '') + '  '
       },
-      onComment
+      onComment,
+      onChompKeep
     )
   }
 }

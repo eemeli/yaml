@@ -42,7 +42,7 @@ export default class Pair extends Node {
     return pair
   }
 
-  toString(ctx, onComment) {
+  toString(ctx, onComment, onChompKeep) {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
     const { key, value } = this
     let keyComment = key instanceof Node && key.comment
@@ -56,7 +56,7 @@ export default class Pair extends Node {
       keyComment = null
     })
     str = addComment(str, ctx.indent, keyComment)
-    str = explicitKey ? `? ${str}\n${indent}:` : `${str}:`
+    str = explicitKey ? `? ${str}\n${indent}:` : `${str}:` // FIXME: Allow for `? key` w/o value
     if (this.comment) {
       // expected (but not strictly required) to be a single-line comment
       str = addComment(str, ctx.indent, this.comment)
@@ -72,13 +72,18 @@ export default class Pair extends Node {
     }
     ctx.implicitKey = false
     let valueComment = value instanceof Node && value.comment
-    let valueStr = doc.schema.stringify(value, ctx, () => {
-      valueComment = null
-    })
+    let chompKeep = false
+    let valueStr = doc.schema.stringify(
+      value,
+      ctx,
+      () => (valueComment = null),
+      () => (chompKeep = true)
+    )
     const ws =
       vcb || this.comment || (!explicitKey && value instanceof Collection)
         ? `${vcb}\n${ctx.indent}`
         : ' '
+    if (chompKeep && !valueComment && onChompKeep) onChompKeep()
     return addComment(str + ws + valueStr, ctx.indent, valueComment)
   }
 }
