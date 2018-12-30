@@ -209,10 +209,9 @@ export default class Node {
   commentHasRequiredWhitespace(start) {
     const { src } = this.context
     if (this.header && start === this.header.end) return false
-    if (this.valueRange) {
-      const { end } = this.valueRange
-      return start !== end || Node.atBlank(src, end - 1)
-    }
+    if (!this.valueRange) return false
+    const { end } = this.valueRange
+    return start !== end || Node.atBlank(src, end - 1)
   }
 
   get hasComment() {
@@ -262,6 +261,7 @@ export default class Node {
         if (tag[1] === '<') {
           return { verbatim: tag.slice(2, -1) }
         } else {
+          // eslint-disable-next-line no-unused-vars
           const [_, handle, suffix] = tag.match(/^(.*!)([^!]*)$/)
           return { handle, suffix }
         }

@@ -73,7 +73,7 @@ export default class Pair extends Node {
     ctx.implicitKey = false
     let valueComment = value instanceof Node && value.comment
     let chompKeep = false
-    let valueStr = doc.schema.stringify(
+    const valueStr = doc.schema.stringify(
       value,
       ctx,
       () => (valueComment = null),

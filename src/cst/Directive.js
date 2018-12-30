@@ -45,7 +45,6 @@ export default class Directive extends Node {
 
   parse(context, start) {
     this.context = context
-    const { src } = context
     let offset = this.parseName(start + 1)
     offset = this.parseParameters(offset)
     offset = this.parseComment(offset)

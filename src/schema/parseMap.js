@@ -110,39 +110,41 @@ function resolveBlockMapItems(doc, cst) {
         keyStart = null
         break
       case Type.MAP_VALUE:
-        if (key === undefined) key = null
-        if (item.error) doc.errors.push(item.error)
-        if (
-          !item.context.atLineStart &&
-          item.node &&
-          item.node.type === Type.MAP &&
-          !item.node.context.atLineStart
-        ) {
-          const msg = 'Nested mappings are not allowed in compact mappings'
-          doc.errors.push(new YAMLSemanticError(item.node, msg))
-        }
-        let valueNode = item.node
-        if (!valueNode && item.props.length > 0) {
-          // Comments on an empty mapping value need to be preserved, so we
-          // need to construct a minimal empty node here to use instead of the
-          // missing `item.node`. -- eemeli/yaml#19
-          valueNode = new PlainValue(Type.PLAIN, [])
-          valueNode.context = { parent: item, src: item.context.src }
-          const pos = item.range.start + 1
-          valueNode.range = { start: pos, end: pos }
-          valueNode.valueRange = { start: pos, end: pos }
-          if (typeof item.range.origStart === 'number') {
-            const origPos = item.range.origStart + 1
-            valueNode.range.origStart = valueNode.range.origEnd = origPos
-            valueNode.valueRange.origStart = valueNode.valueRange.origEnd = origPos
+        {
+          if (key === undefined) key = null
+          if (item.error) doc.errors.push(item.error)
+          if (
+            !item.context.atLineStart &&
+            item.node &&
+            item.node.type === Type.MAP &&
+            !item.node.context.atLineStart
+          ) {
+            const msg = 'Nested mappings are not allowed in compact mappings'
+            doc.errors.push(new YAMLSemanticError(item.node, msg))
           }
+          let valueNode = item.node
+          if (!valueNode && item.props.length > 0) {
+            // Comments on an empty mapping value need to be preserved, so we
+            // need to construct a minimal empty node here to use instead of the
+            // missing `item.node`. -- eemeli/yaml#19
+            valueNode = new PlainValue(Type.PLAIN, [])
+            valueNode.context = { parent: item, src: item.context.src }
+            const pos = item.range.start + 1
+            valueNode.range = { start: pos, end: pos }
+            valueNode.valueRange = { start: pos, end: pos }
+            if (typeof item.range.origStart === 'number') {
+              const origPos = item.range.origStart + 1
+              valueNode.range.origStart = valueNode.range.origEnd = origPos
+              valueNode.valueRange.origStart = valueNode.valueRange.origEnd = origPos
+            }
+          }
+          const pair = new Pair(key, doc.resolveNode(valueNode))
+          resolvePairComment(item, pair)
+          items.push(pair)
+          checkKeyLength(doc.errors, cst, i, key, keyStart)
+          key = undefined
+          keyStart = null
         }
-        const pair = new Pair(key, doc.resolveNode(valueNode))
-        resolvePairComment(item, pair)
-        items.push(pair)
-        checkKeyLength(doc.errors, cst, i, key, keyStart)
-        key = undefined
-        keyStart = null
         break
       default:
         if (key !== undefined) items.push(new Pair(key))
@@ -158,8 +160,12 @@ function resolveBlockMapItems(doc, cst) {
             case Type.MAP_VALUE:
               break next
             default:
-              const msg = 'Implicit map keys need to be followed by map values'
-              doc.errors.push(new YAMLSemanticError(item, msg))
+              doc.errors.push(
+                new YAMLSemanticError(
+                  item,
+                  'Implicit map keys need to be followed by map values'
+                )
+              )
               break next
           }
         }

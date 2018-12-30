@@ -1,3 +1,5 @@
+/* global atob, btoa, Buffer */
+
 // Published as 'yaml/types/binary'
 
 import { YAMLReferenceError } from '../errors'
@@ -45,7 +47,7 @@ export const binary = {
           : Buffer.from(value.buffer).toString('base64')
     } else if (typeof btoa === 'function') {
       let s = ''
-      for (let i = 0; i < value.length; ++i) s += String.fromCharCode(buf[i])
+      for (let i = 0; i < value.length; ++i) s += String.fromCharCode(value[i])
       src = btoa(s)
     } else {
       throw new Error(

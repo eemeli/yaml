@@ -278,23 +278,25 @@ export default class Document {
     const props = isCollectionItem(node.context.parent)
       ? node.context.parent.props.concat(node.props)
       : node.props
-    props.forEach(({ start, end }, i) => {
+    for (const { start, end } of props) {
       switch (node.context.src[start]) {
         case Char.COMMENT:
-          if (!node.commentHasRequiredWhitespace(start)) {
-            const msg =
-              'Comments must be separated from other tokens by white space characters'
-            errors.push(new YAMLSemanticError(node, msg))
-          }
-          const c = node.context.src.slice(start + 1, end)
-          const { header, valueRange } = node
-          if (
-            valueRange &&
-            (start > valueRange.start || (header && start > header.start))
-          ) {
-            comments.after.push(c)
-          } else {
-            comments.before.push(c)
+          {
+            if (!node.commentHasRequiredWhitespace(start)) {
+              const msg =
+                'Comments must be separated from other tokens by white space characters'
+              errors.push(new YAMLSemanticError(node, msg))
+            }
+            const c = node.context.src.slice(start + 1, end)
+            const { header, valueRange } = node
+            if (
+              valueRange &&
+              (start > valueRange.start || (header && start > header.start))
+            ) {
+              comments.after.push(c)
+            } else {
+              comments.before.push(c)
+            }
           }
           break
         case Char.ANCHOR:
@@ -312,7 +314,7 @@ export default class Document {
           hasTag = true
           break
       }
-    })
+    }
     if (hasAnchor) {
       const name = node.anchor
       const prev = anchors.getNode(name)
@@ -412,7 +414,7 @@ export default class Document {
       }
       if (!p) return tag[0] === '!' ? tag : `!<${tag}>`
       const suffix = tag.substr(p.prefix.length).replace(
-        /[!,\[]{}]/g,
+        /[!,[\]{}]/g,
         ch =>
           ({
             '!': '%21',

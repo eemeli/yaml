@@ -1,4 +1,3 @@
-import { YAMLReferenceError } from '../errors'
 import binary from './_binary'
 import timestamp from './_timestamp'
 import { stringifyNumber } from './core'

@@ -44,7 +44,10 @@ export default function testEvents(src, options) {
 }
 
 function addEvents(events, doc, e, node) {
-  if (!node) return events.push('=VAL :')
+  if (!node) {
+    events.push('=VAL :')
+    return
+  }
   if (e && node.cstNode === e) throw new Error()
   let props = ''
   let anchor = doc.anchors.getName(node)
@@ -62,12 +65,14 @@ function addEvents(events, doc, e, node) {
   let scalar = null
   switch (node.type) {
     case 'ALIAS':
-      let alias = doc.anchors.getName(node.source)
-      if (/\d$/.test(alias)) {
-        const alt = alias.replace(/\d$/, '')
-        if (doc.anchors.getNode(alt)) alias = alt
+      {
+        let alias = doc.anchors.getName(node.source)
+        if (/\d$/.test(alias)) {
+          const alt = alias.replace(/\d$/, '')
+          if (doc.anchors.getNode(alt)) alias = alt
+        }
+        events.push(`=ALI${props} *${alias}`)
       }
-      events.push(`=ALI${props} *${alias}`)
       break
     case 'BLOCK_FOLDED':
       scalar = '>'

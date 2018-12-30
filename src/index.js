@@ -1,3 +1,5 @@
+/* global console */
+
 import parseCST from './cst/parse'
 import createNode from './createNode'
 import YAMLDocument from './Document'
@@ -34,6 +36,7 @@ function parseDocument(src, options) {
 
 function parse(src, options) {
   const doc = parseDocument(src, options)
+  // eslint-disable-next-line no-console
   doc.warnings.forEach(warning => console.warn(warning))
   if (doc.errors.length > 0) throw doc.errors[0]
   return doc.toJSON()

@@ -55,7 +55,7 @@ export default class BlockValue extends Node {
         if (src[i] !== ' ') break
         i += 1
       }
-      let ch = src[i]
+      const ch = src[i]
       if (ch === '\n') {
         if (sep === '\n') str += '\n'
         else sep = '\n'
@@ -85,7 +85,7 @@ export default class BlockValue extends Node {
     let offset = start + 1
     let bi = ''
     while (true) {
-      let ch = src[offset]
+      const ch = src[offset]
       switch (ch) {
         case '-':
           this.chomping = Chomp.STRIP
@@ -115,7 +115,7 @@ export default class BlockValue extends Node {
   }
 
   parseBlockValue(start) {
-    const { indent, inFlow, src } = this.context
+    const { indent, src } = this.context
     let offset = start
     let valueEnd = start
     let bi = this.blockIndent ? indent + this.blockIndent - 1 : indent

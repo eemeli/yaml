@@ -26,7 +26,7 @@ export default class QuoteDouble extends Node {
     // escaped backslashes; also, this should be faster.
     let str = ''
     for (let i = start + 1; i < end - 1; ++i) {
-      let ch = src[i]
+      const ch = src[i]
       if (ch === '\n') {
         if (Node.atDocumentBoundary(src, i + 1))
           errors.push(

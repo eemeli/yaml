@@ -60,39 +60,41 @@ function doubleQuotedString(value, { implicitKey, indent }) {
     if (ch === '\\')
       switch (json[i + 1]) {
         case 'u':
-          str += json.slice(start, i)
-          const code = json.substr(i + 2, 4)
-          switch (code) {
-            case '0000':
-              str += '\\0'
-              break
-            case '0007':
-              str += '\\a'
-              break
-            case '000b':
-              str += '\\v'
-              break
-            case '001b':
-              str += '\\e'
-              break
-            case '0085':
-              str += '\\N'
-              break
-            case '00a0':
-              str += '\\_'
-              break
-            case '2028':
-              str += '\\L'
-              break
-            case '2029':
-              str += '\\P'
-              break
-            default:
-              if (code.substr(0, 2) === '00') str += '\\x' + code.substr(2)
-              else str += json.substr(i, 6)
+          {
+            str += json.slice(start, i)
+            const code = json.substr(i + 2, 4)
+            switch (code) {
+              case '0000':
+                str += '\\0'
+                break
+              case '0007':
+                str += '\\a'
+                break
+              case '000b':
+                str += '\\v'
+                break
+              case '001b':
+                str += '\\e'
+                break
+              case '0085':
+                str += '\\N'
+                break
+              case '00a0':
+                str += '\\_'
+                break
+              case '2028':
+                str += '\\L'
+                break
+              case '2029':
+                str += '\\P'
+                break
+              default:
+                if (code.substr(0, 2) === '00') str += '\\x' + code.substr(2)
+                else str += json.substr(i, 6)
+            }
+            i += 5
+            start = i + 1
           }
-          i += 5
-          start = i + 1
           break
         case 'n':
           if (

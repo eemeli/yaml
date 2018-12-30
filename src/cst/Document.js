@@ -201,12 +201,7 @@ export default class Document extends Node {
   }
 
   toString() {
-    const {
-      contents,
-      context: { src },
-      directives,
-      value
-    } = this
+    const { contents, directives, value } = this
     if (value != null) return value
     let str = directives.join('')
     if (contents.length > 0) {

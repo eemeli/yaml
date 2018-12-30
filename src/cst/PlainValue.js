@@ -39,7 +39,7 @@ export default class PlainValue extends Node {
       ch = src[++start]
     let str = ''
     for (let i = start; i < end; ++i) {
-      let ch = src[i]
+      const ch = src[i]
       if (ch === '\n') {
         const { fold, offset } = Node.foldNewline(src, i, -1)
         str += fold
@@ -111,7 +111,7 @@ export default class PlainValue extends Node {
     trace: 'plain-start', context.pretty, { start }
     const { inFlow, src } = context
     let offset = start
-    let ch = src[offset]
+    const ch = src[offset]
     if (ch && ch !== '#' && ch !== '\n') {
       offset = PlainValue.endOfLine(src, start, inFlow)
     }

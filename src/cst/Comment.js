@@ -15,8 +15,7 @@ export default class Comment extends Node {
    */
   parse(context, start) {
     this.context = context
-    const { src } = context
-    let offset = this.parseComment(start)
+    const offset = this.parseComment(start)
     this.range = new Range(start, offset)
     trace: this.type, this.range, this.comment
     return offset

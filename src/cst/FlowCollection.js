@@ -81,8 +81,8 @@ export default class FlowCollection extends Node {
             offset += 1
             break
           }
-          // fallthrough
         }
+        // fallthrough
         default: {
           const node = parseNode(
             {
