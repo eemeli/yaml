@@ -388,6 +388,17 @@ date (00:00:00Z): 2002-12-14\n`)
         expect(String(doc)).toBe(src)
       })
 
+    test('require null values', () => {
+      const src = `!!set\n? a\n? b\nc: d\n`
+      const doc = YAML.parseDocument(src, { version: '1.1' })
+      expect(doc.errors).toMatchObject([
+        {
+          name: 'YAMLSemanticError',
+          message: 'Set items must all have null values'
+        }
+      ])
+    })
+
     test('stringify', () => {
       const set = new Set(['a', 'b', 'c'])
       const str = YAML.stringify(set, { version: '1.1' })

@@ -1,3 +1,4 @@
+import { YAMLSemanticError } from '../errors'
 import toJSON from '../toJSON'
 import YAMLMap from './Map'
 import Merge from './Merge'
@@ -35,6 +36,8 @@ export class YAMLSet extends YAMLMap {
 
 function parseSet(doc, cst) {
   const map = parseMap(doc, cst)
+  if (!map.hasAllNullValues())
+    throw new YAMLSemanticError(cst, 'Set items must all have null values')
   return Object.assign(new YAMLSet(), map)
 }
 
