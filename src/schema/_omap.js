@@ -6,6 +6,13 @@ import YAMLSeq from './Seq'
 import { createPairs, parsePairs } from './_pairs'
 
 export class YAMLOMap extends YAMLSeq {
+  static tag = 'tag:yaml.org,2002:omap'
+
+  constructor() {
+    super()
+    this.tag = YAMLOMap.tag
+  }
+
   toJSON(_, opt) {
     const map = new Map()
     for (const pair of this.items) {
@@ -41,8 +48,8 @@ function parseOMap(doc, cst) {
 }
 
 function createOMap(schema, iterable, wrapScalars) {
-  const omap = new YAMLOMap()
   const pairs = createPairs(schema, iterable, wrapScalars)
+  const omap = new YAMLOMap()
   omap.items = pairs.items
   return omap
 }

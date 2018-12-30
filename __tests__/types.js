@@ -393,6 +393,18 @@ date (00:00:00Z): 2002-12-14\n`)
         expect(doc.toJSON()).toMatchObject([{ a: 1 }, { b: 2 }, { a: 3 }])
         expect(String(doc)).toBe(src)
       })
+
+    test('stringify', () => {
+      const doc = new YAML.Document({ version: '1.1' })
+      doc.setSchema()
+      doc.contents = doc.schema.createNode(
+        [['a', 1], ['b', 2], ['a', 3]],
+        false,
+        '!!pairs'
+      )
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:pairs')
+      expect(String(doc)).toBe(`!!pairs\n- a: 1\n- b: 2\n- a: 3\n`)
+    })
   })
 
   describe('!!omap', () => {
@@ -421,12 +433,24 @@ date (00:00:00Z): 2002-12-14\n`)
       ])
     })
 
-    test('stringify', () => {
+    test('stringify Map', () => {
       const map = new Map([['a', 1], ['b', 2], ['c', 3]])
       const str = YAML.stringify(map, { version: '1.1' })
       expect(str).toBe(`!!omap\n- a: 1\n- b: 2\n- c: 3\n`)
       const str2 = YAML.stringify(map)
       expect(str2).toBe(`a: 1\nb: 2\nc: 3\n`)
+    })
+
+    test('stringify Array', () => {
+      const doc = new YAML.Document({ version: '1.1' })
+      doc.setSchema()
+      doc.contents = doc.schema.createNode(
+        [['a', 1], ['b', 2], ['a', 3]],
+        false,
+        '!!omap'
+      )
+      expect(doc.contents).toBeInstanceOf(YAMLOMap)
+      expect(String(doc)).toBe(`!!omap\n- a: 1\n- b: 2\n- a: 3\n`)
     })
   })
 

@@ -175,11 +175,19 @@ export default class Schema {
     return props.join(' ')
   }
 
-  createNode(item, wrapScalars, onTagObj) {
-    const tagObj = this.tags.find(
-      t => t.class && item instanceof t.class && !t.format
-    )
-    if (!tagObj) return createNode(item, wrapScalars)
+  createNode(item, wrapScalars, tag, onTagObj) {
+    let tagObj
+    if (tag) {
+      if (tag.startsWith('!!')) tag = Schema.defaultPrefix + tag.slice(2)
+      const match = this.tags.filter(t => t.tag === tag)
+      tagObj = match.find(t => !t.format) || match[0]
+      if (!tagObj) throw new Error(`Tag ${tag} not found`)
+    } else {
+      tagObj = this.tags.find(
+        t => t.class && item instanceof t.class && !t.format
+      )
+      if (!tagObj) return createNode(item, wrapScalars)
+    }
     if (onTagObj) onTagObj(tagObj)
     return tagObj.createNode
       ? tagObj.createNode(this, item, wrapScalars)
@@ -189,7 +197,7 @@ export default class Schema {
   stringify(item, ctx, onComment, onChompKeep) {
     let tagObj
     if (!(item instanceof Node))
-      item = this.createNode(item, true, o => (tagObj = o))
+      item = this.createNode(item, true, null, o => (tagObj = o))
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)
