@@ -20,6 +20,7 @@
   "scripts": {
     "build": "babel src/ --out-dir dist/",
     "prettier": "prettier --write \"{src,__tests__}/**/*.js\"",
+    "lint": "eslint src/",
     "test": "TRACE_LEVEL=log jest",
     "test:trace": "TRACE_LEVEL=trace,log jest --no-cache",
     "docs:install": "cd docs/ && bundle install",
@@ -65,15 +66,58 @@
     "semi": false,
     "singleQuote": true
   },
+  "eslintConfig": {
+    "root": true,
+    "parser": "babel-eslint",
+    "env": {
+      "es6": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "prettier"
+    ],
+    "rules": {
+      "array-callback-return": "error",
+      "camelcase": "error",
+      "consistent-return": "error",
+      "eqeqeq": [
+        "error",
+        "always",
+        {
+          "null": "ignore"
+        }
+      ],
+      "no-constant-condition": [
+        "error",
+        {
+          "checkLoops": false
+        }
+      ],
+      "no-control-regex": 0,
+      "no-implicit-globals": "error",
+      "no-template-curly-in-string": "warn",
+      "no-unused-labels": 0,
+      "no-var": "error",
+      "prefer-const": [
+        "warn",
+        {
+          "destructuring": "all"
+        }
+      ]
+    }
+  },
   "devDependencies": {
     "@babel/cli": "^7.2.0",
     "@babel/core": "^7.2.0",
     "@babel/plugin-proposal-class-properties": "^7.2.1",
     "@babel/preset-env": "^7.2.0",
     "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-plugin-trace": "^1.1.0",
+    "eslint": "^5.11.1",
+    "eslint-config-prettier": "^3.3.0",
     "fast-check": "^1.8.2",
     "jest": "^23.6.0",
     "prettier": "^1.15.3"
