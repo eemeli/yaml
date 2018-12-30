@@ -998,11 +998,11 @@ bar`,
         const tags = [
           {
             tag: '!foo',
-            resolve: (doc, node) => 'private'
+            resolve: () => 'private'
           },
           {
             tag: 'tag:example.com,2000:app/foo',
-            resolve: (doc, node) => 'global'
+            resolve: () => 'global'
           }
         ]
         const docs = YAML.parseAllDocuments(src, { tags })
@@ -1023,7 +1023,7 @@ bar`,
       special: src => {
         const tag = {
           tag: 'tag:example.com,2000:app/int',
-          resolve: (doc, node) => 'interval'
+          resolve: () => 'interval'
         }
         const res = YAML.parse(src, { tags: [tag] })
         expect(res).toBe('interval')

@@ -1,0 +1,9 @@
+/dist/
+/docs/*.*
+/docs/build/
+/docs/lib/
+/docs/source/javascripts/
+/docs/source/layouts/
+/docs/source/stylesheets/
+/package-lock.json
+/__tests__/yaml-test-suite/

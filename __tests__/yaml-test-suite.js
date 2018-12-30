@@ -48,17 +48,25 @@ testDirs.forEach(dir => {
   try {
     fs.readFileSync(path.resolve(root, 'error'), 'utf8')
     error = true
-  } catch (e) {}
+  } catch (e) {
+    /* ignore error */
+  }
   try {
     // Too much variance in event stream length for error cases
     events = !error && fs.readFileSync(path.resolve(root, 'test.event'), 'utf8')
-  } catch (e) {}
+  } catch (e) {
+    /* ignore error */
+  }
   try {
     json = fs.readFileSync(path.resolve(root, 'in.json'), 'utf8')
-  } catch (e) {}
+  } catch (e) {
+    /* ignore error */
+  }
   try {
     outYaml = fs.readFileSync(path.resolve(root, 'out.yaml'), 'utf8')
-  } catch (e) {}
+  } catch (e) {
+    /* ignore error */
+  }
 
   describe(`${dir}: ${name}`, () => {
     const docs = YAML.parseAllDocuments(yaml)

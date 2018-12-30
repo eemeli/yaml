@@ -1,4 +1,4 @@
-import Node, { Type } from '../../src/cst/Node'
+import { Type } from '../../src/cst/Node'
 import parse from '../../src/cst/parse'
 import { pretty, testSpec } from './common'
 

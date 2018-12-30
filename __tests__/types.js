@@ -455,7 +455,7 @@ perl: !perl/Text::Tabs {}`
 ---
 date: 2001-01-23
 number: 123
-string: \"123\"
+string: "123"
 pool:
   !ball { number: 8 }
 perl:

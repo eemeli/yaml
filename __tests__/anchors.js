@@ -57,10 +57,7 @@ describe('create', () => {
 
   test('doc.anchors.createAlias', () => {
     const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
-    const {
-      items: [a, b]
-    } = doc.contents
-    const alias = doc.anchors.createAlias(a, 'AA')
+    const alias = doc.anchors.createAlias(doc.contents.items[0], 'AA')
     doc.contents.items.push(alias)
     expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
     expect(String(doc)).toMatch('[ &AA { a: A }, { b: B }, *AA ]\n')
