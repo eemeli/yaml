@@ -1,9 +1,9 @@
 import { YAMLSemanticError } from '../errors'
 import toJSON from '../toJSON'
-import YAMLMap from './Map'
 import Pair from './Pair'
-import parseSeq from './parseSeq'
+import Scalar from './Scalar'
 import YAMLSeq from './Seq'
+import { createPairs, parsePairs } from './_pairs'
 
 export class YAMLOMap extends YAMLSeq {
   toJSON(_, opt) {
@@ -24,42 +24,15 @@ export class YAMLOMap extends YAMLSeq {
   }
 }
 
-function parsePairs(doc, cst) {
-  const seq = parseSeq(doc, cst)
-  const omap = Object.assign(new YAMLOMap(), seq)
-  for (let i = 0; i < omap.items.length; ++i) {
-    let item = omap.items[i]
-    if (item instanceof Pair) continue
-    else if (item instanceof YAMLMap) {
-      if (item.items.length > 1) {
-        const msg = 'Each pair must have its own sequence indicator'
-        throw new YAMLSemanticError(cst, msg)
-      }
-      const pair = item.items[0] || new Pair()
-      if (item.commentBefore)
-        pair.commentBefore = pair.commentBefore
-          ? `${item.commentBefore}\n${pair.commentBefore}`
-          : item.commentBefore
-      if (item.comment)
-        pair.comment = pair.comment
-          ? `${item.comment}\n${pair.comment}`
-          : item.comment
-      item = pair
-    }
-    omap.items[i] = item instanceof Pair ? item : new Pair(item)
-  }
-  return omap
+function parseOMap(doc, cst) {
+  const pairs = parsePairs(doc, cst)
+  return Object.assign(new YAMLOMap(), pairs)
 }
 
-function createPairs(schema, iterable, wrapScalars) {
+function createOMap(schema, iterable, wrapScalars) {
   const omap = new YAMLOMap()
-  for (const it of iterable) {
-    if (!Array.isArray(it) || it.length !== 2)
-      throw new TypeError(`Expected [key, value] tuple: ${it}`)
-    const k = schema.createNode(it[0], wrapScalars)
-    const v = schema.createNode(it[1], wrapScalars)
-    omap.items.push(new Pair(k, v))
-  }
+  const pairs = createPairs(schema, iterable, wrapScalars)
+  omap.items = pairs.items
   return omap
 }
 
@@ -67,8 +40,8 @@ export default {
   class: Map,
   default: false,
   tag: 'tag:yaml.org,2002:omap',
-  resolve: parsePairs,
-  createNode: createPairs,
+  resolve: parseOMap,
+  createNode: createOMap,
   stringify: (value, ctx, onComment, onChompKeep) =>
     value.toString(ctx, onComment, onChompKeep)
 }

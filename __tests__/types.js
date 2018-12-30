@@ -1,6 +1,6 @@
 import YAML from '../src/index'
 import Scalar from '../src/schema/Scalar'
-import Seq from '../src/schema/Seq'
+import YAMLSeq from '../src/schema/Seq'
 import { YAMLOMap } from '../src/schema/_omap'
 import { YAMLSet } from '../src/schema/_set'
 import { strOptions } from '../src/schema/_string'
@@ -376,6 +376,25 @@ date (00:00:00Z): 2002-12-14\n`)
     })
   })
 
+  describe('!!pairs', () => {
+    for (const { name, src } of [
+      { name: 'parse block seq', src: `!!pairs\n- a: 1\n- b: 2\n- a: 3\n` },
+      { name: 'parse flow seq', src: `!!pairs [ a: 1, b: 2, a: 3 ]\n` }
+    ])
+      test(name, () => {
+        const doc = YAML.parseDocument(src, { version: '1.1' })
+        expect(doc.contents).toBeInstanceOf(YAMLSeq)
+        expect(doc.contents.items).toMatchObject([
+          { key: { value: 'a' }, value: { value: 1 } },
+          { key: { value: 'b' }, value: { value: 2 } },
+          { key: { value: 'a' }, value: { value: 3 } }
+        ])
+        expect(doc.toJSON()).toBeInstanceOf(Array)
+        expect(doc.toJSON()).toMatchObject([{ a: 1 }, { b: 2 }, { a: 3 }])
+        expect(String(doc)).toBe(src)
+      })
+  })
+
   describe('!!omap', () => {
     for (const { name, src } of [
       { name: 'parse block seq', src: `!!omap\n- a: 1\n- b: 2\n- c: 3\n` },
@@ -445,7 +464,7 @@ describe('custom tags', () => {
 
   test('parse', () => {
     const doc = YAML.parseDocument(src)
-    expect(doc.contents).toBeInstanceOf(Seq)
+    expect(doc.contents).toBeInstanceOf(YAMLSeq)
     expect(doc.contents.tag).toBe('tag:example.com,2000:test/x')
     const { items } = doc.contents
     expect(items).toHaveLength(4)

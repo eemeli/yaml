@@ -1,5 +1,6 @@
 import binary from './_binary'
 import omap from './_omap'
+import pairs from './_pairs'
 import set from './_set'
 import timestamp from './_timestamp'
 import { stringifyNumber } from './core'
@@ -98,6 +99,7 @@ export default failsafe.concat(
   ],
   binary,
   omap,
+  pairs,
   set,
   timestamp
 )
