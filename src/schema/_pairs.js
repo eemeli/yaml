@@ -34,10 +34,23 @@ export function createPairs(schema, iterable, wrapScalars) {
   const pairs = new YAMLSeq()
   pairs.tag = 'tag:yaml.org,2002:pairs'
   for (const it of iterable) {
-    if (!Array.isArray(it) || it.length !== 2)
-      throw new TypeError(`Expected [key, value] tuple: ${it}`)
-    const k = schema.createNode(it[0], wrapScalars)
-    const v = schema.createNode(it[1], wrapScalars)
+    let key, value
+    if (Array.isArray(it)) {
+      if (it.length === 2) {
+        key = it[0]
+        value = it[1]
+      } else throw new TypeError(`Expected [key, value] tuple: ${it}`)
+    } else if (it && it instanceof Object) {
+      const keys = Object.keys(it)
+      if (keys.length === 1) {
+        key = keys[0]
+        value = it[key]
+      } else throw new TypeError(`Expected { key: value } tuple: ${it}`)
+    } else {
+      key = it
+    }
+    const k = schema.createNode(key, wrapScalars)
+    const v = schema.createNode(value, wrapScalars)
     pairs.items.push(new Pair(k, v))
   }
   return pairs
