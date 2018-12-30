@@ -1,6 +1,7 @@
 import YAML from '../src/index'
 import Scalar from '../src/schema/Scalar'
 import Seq from '../src/schema/Seq'
+import { YAMLSet } from '../src/schema/_set'
 import { strOptions } from '../src/schema/_string'
 
 let origFoldOptions
@@ -371,6 +372,28 @@ date (00:00:00Z): 2002-12-14\n`)
       expect(str).toBe('2018-12-22T08:02:52.000Z\n')
       const str2 = YAML.stringify(date, { version: '1.1' })
       expect(str2).toBe('2018-12-22T08:02:52\n')
+    })
+  })
+
+  describe('!!set', () => {
+    for (const { name, src } of [
+      { name: 'parse block map', src: `!!set\n? a\n? b\n? c\n` },
+      { name: 'parse flow map', src: `!!set { a, b, c }\n` }
+    ])
+      test(name, () => {
+        const doc = YAML.parseDocument(src, { version: '1.1' })
+        expect(doc.contents).toBeInstanceOf(YAMLSet)
+        expect(doc.toJSON()).toBeInstanceOf(Set)
+        expect(doc.toJSON()).toMatchObject(new Set(['a', 'b', 'c']))
+        expect(String(doc)).toBe(src)
+      })
+
+    test('stringify', () => {
+      const set = new Set(['a', 'b', 'c'])
+      const str = YAML.stringify(set, { version: '1.1' })
+      expect(str).toBe(`!!set\n? a\n? b\n? c\n`)
+      const str2 = YAML.stringify(set)
+      expect(str2).toBe(`- a\n- b\n- c\n`)
     })
   })
 })

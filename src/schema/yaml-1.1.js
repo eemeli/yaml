@@ -1,4 +1,5 @@
 import binary from './_binary'
+import set from './_set'
 import timestamp from './_timestamp'
 import { stringifyNumber } from './core'
 import failsafe from './failsafe'
@@ -94,6 +95,7 @@ export default failsafe.concat(
       stringify: stringifyNumber
     }
   ],
-  timestamp,
-  binary
+  binary,
+  set,
+  timestamp
 )
