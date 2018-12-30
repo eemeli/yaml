@@ -56,6 +56,7 @@ function createOMap(schema, iterable, wrapScalars) {
 
 export default {
   class: Map,
+  nodeClass: YAMLOMap,
   default: false,
   tag: 'tag:yaml.org,2002:omap',
   resolve: parseOMap,

@@ -133,8 +133,8 @@ export default class Schema {
       if (!tagObj) throw new Error('Tag not resolved for null value')
       return tagObj
     }
-    let obj = item
-    if (item.hasOwnProperty('value')) {
+    let tagObj, obj
+    if (item instanceof Scalar) {
       switch (typeof item.value) {
         case 'boolean':
           obj = new Boolean()
@@ -148,10 +148,13 @@ export default class Schema {
         default:
           obj = item.value
       }
+      const match = this.tags.filter(t => t.class && obj instanceof t.class)
+      tagObj =
+        match.find(t => t.format === item.format) || match.find(t => !t.format)
+    } else {
+      obj = item
+      tagObj = this.tags.find(t => t.nodeClass && obj instanceof t.nodeClass)
     }
-    const match = this.tags.filter(t => t.class && obj instanceof t.class)
-    const tagObj =
-      match.find(t => t.format === item.format) || match.find(t => !t.format)
     if (!tagObj) {
       const name = obj && obj.constructor ? obj.constructor.name : typeof obj
       throw new Error(`Tag not resolved for ${name} value`)

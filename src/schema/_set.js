@@ -52,6 +52,7 @@ function createSet(schema, iterable, wrapScalars) {
 
 export default {
   class: Set,
+  nodeClass: YAMLSet,
   default: false,
   tag: 'tag:yaml.org,2002:set',
   resolve: parseSet,
