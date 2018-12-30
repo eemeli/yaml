@@ -17,7 +17,7 @@ export class YAMLOMap extends YAMLSeq {
         key = toJSON(pair, '', opt)
       }
       if (map.has(key))
-        throw new Error('Ordered maps must not include duplicate values')
+        throw new Error('Ordered maps must not include duplicate keys')
       map.set(key, value)
     }
     return map
@@ -26,6 +26,17 @@ export class YAMLOMap extends YAMLSeq {
 
 function parseOMap(doc, cst) {
   const pairs = parsePairs(doc, cst)
+  const seenKeys = []
+  for (const { key } of pairs.items) {
+    if (key instanceof Scalar) {
+      if (seenKeys.includes(key.value)) {
+        const msg = 'Ordered maps must not include duplicate keys'
+        throw new YAMLSemanticError(cst, msg)
+      } else {
+        seenKeys.push(key.value)
+      }
+    }
+  }
   return Object.assign(new YAMLOMap(), pairs)
 }
 

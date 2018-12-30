@@ -410,6 +410,17 @@ date (00:00:00Z): 2002-12-14\n`)
         expect(String(doc)).toBe(src)
       })
 
+    test('require unique keys', () => {
+      const src = `!!omap\n- a: 1\n- b: 2\n- b: 9\n`
+      const doc = YAML.parseDocument(src, { version: '1.1' })
+      expect(doc.errors).toMatchObject([
+        {
+          name: 'YAMLSemanticError',
+          message: 'Ordered maps must not include duplicate keys'
+        }
+      ])
+    })
+
     test('stringify', () => {
       const map = new Map([['a', 1], ['b', 2], ['c', 3]])
       const str = YAML.stringify(map, { version: '1.1' })
