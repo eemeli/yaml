@@ -3,7 +3,8 @@ import YAML from '../src/index'
 import YAMLMap from '../src/schema/Map'
 import Pair from '../src/schema/Pair'
 import Scalar from '../src/schema/Scalar'
-import Seq from '../src/schema/Seq'
+import YAMLSeq from '../src/schema/Seq'
+import { YAMLSet } from '../src/schema/_set'
 
 describe('scalars', () => {
   describe('createNode(value, false)', () => {
@@ -63,30 +64,30 @@ describe('createNode(value, true)', () => {
 describe('arrays', () => {
   test('createNode([])', () => {
     const s = createNode([])
-    expect(s).toBeInstanceOf(Seq)
+    expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toHaveLength(0)
   })
   test('createNode([true], false)', () => {
     const s = createNode([true], false)
-    expect(s).toBeInstanceOf(Seq)
+    expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toMatchObject([true])
   })
   describe('[3, ["four", 5]]', () => {
     const array = [3, ['four', 5]]
     test('createNode(value, false)', () => {
       const s = createNode(array, false)
-      expect(s).toBeInstanceOf(Seq)
+      expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0]).toBe(3)
-      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1]).toBeInstanceOf(YAMLSeq)
       expect(s.items[1].items).toMatchObject(['four', 5])
     })
     test('createNode(value, true)', () => {
       const s = createNode(array, true)
-      expect(s).toBeInstanceOf(Seq)
+      expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0].value).toBe(3)
-      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1]).toBeInstanceOf(YAMLSeq)
       expect(s.items[1].items).toHaveLength(2)
       expect(s.items[1].items[0].value).toBe('four')
       expect(s.items[1].items[1].value).toBe(5)
@@ -173,30 +174,30 @@ z:
 describe('Set', () => {
   test('createNode(new Set)', () => {
     const s = createNode(new Set())
-    expect(s).toBeInstanceOf(Seq)
+    expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toHaveLength(0)
   })
   test('createNode(new Set([true]), false)', () => {
     const s = createNode(new Set([true]), false)
-    expect(s).toBeInstanceOf(Seq)
+    expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toMatchObject([true])
   })
   describe("Set { 3, Set { 'four', 5 } }", () => {
     const set = new Set([3, new Set(['four', 5])])
     test('createNode(set, false)', () => {
       const s = createNode(set, false)
-      expect(s).toBeInstanceOf(Seq)
+      expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0]).toBe(3)
-      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1]).toBeInstanceOf(YAMLSeq)
       expect(s.items[1].items).toMatchObject(['four', 5])
     })
     test('createNode(set, true)', () => {
       const s = createNode(set, true)
-      expect(s).toBeInstanceOf(Seq)
+      expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0].value).toBe(3)
-      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1]).toBeInstanceOf(YAMLSeq)
       expect(s.items[1].items).toHaveLength(2)
       expect(s.items[1].items[0].value).toBe('four')
       expect(s.items[1].items[1].value).toBe(5)
@@ -210,6 +211,26 @@ describe('Set', () => {
       expect(String(doc)).toBe(res)
       doc.contents = createNode(set, true)
       expect(String(doc)).toBe(res)
+    })
+    test('Schema#createNode() - YAML 1.2', () => {
+      const doc = new YAML.Document()
+      doc.setSchema()
+      const s = doc.schema.createNode(set, true)
+      expect(s).toBeInstanceOf(YAMLSeq)
+      expect(s.items).toMatchObject([
+        { value: 3 },
+        { items: [{ value: 'four' }, { value: 5 }] }
+      ])
+    })
+    test('Schema#createNode() - YAML 1.1', () => {
+      const doc = new YAML.Document({ version: '1.1' })
+      doc.setSchema()
+      const s = doc.schema.createNode(set, true)
+      expect(s).toBeInstanceOf(YAMLSet)
+      expect(s.items).toMatchObject([
+        { key: { value: 3 } },
+        { key: { items: [{ key: { value: 'four' } }, { key: { value: 5 } }] } }
+      ])
     })
   })
 })

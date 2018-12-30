@@ -175,18 +175,21 @@ export default class Schema {
     return props.join(' ')
   }
 
+  createNode(item, wrapScalars, onTagObj) {
+    const tagObj = this.tags.find(
+      t => t.class && item instanceof t.class && !t.format
+    )
+    if (!tagObj) return createNode(item, wrapScalars)
+    if (onTagObj) onTagObj(tagObj)
+    return tagObj.createNode
+      ? tagObj.createNode(this, item, wrapScalars)
+      : new Scalar(item)
+  }
+
   stringify(item, ctx, onComment, onChompKeep) {
     let tagObj
-    if (!(item instanceof Node)) {
-      tagObj = this.tags.find(
-        t => t.class && item instanceof t.class && !t.format
-      )
-      item = tagObj
-        ? tagObj.createNode
-          ? tagObj.createNode(item)
-          : new Scalar(item)
-        : createNode(item, true)
-    }
+    if (!(item instanceof Node))
+      item = this.createNode(item, true, o => (tagObj = o))
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)

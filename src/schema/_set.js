@@ -1,4 +1,3 @@
-import createNode from '../createNode'
 import toJSON from '../toJSON'
 import YAMLMap from './Map'
 import Merge from './Merge'
@@ -39,10 +38,10 @@ function parseSet(doc, cst) {
   return Object.assign(new YAMLSet(), map)
 }
 
-function createSet(iterable) {
+function createSet(schema, iterable, wrapScalars) {
   const set = new YAMLSet()
-  for (const [value] of iterable) {
-    const v = createNode(value, true)
+  for (const value of iterable) {
+    const v = schema.createNode(value, wrapScalars)
     set.items.push(new Pair(v))
   }
   return set
