@@ -1,6 +1,7 @@
 import YAML from '../src/index'
 import Scalar from '../src/schema/Scalar'
 import Seq from '../src/schema/Seq'
+import { YAMLOMap } from '../src/schema/_omap'
 import { YAMLSet } from '../src/schema/_set'
 import { strOptions } from '../src/schema/_string'
 
@@ -372,6 +373,30 @@ date (00:00:00Z): 2002-12-14\n`)
       expect(str).toBe('2018-12-22T08:02:52.000Z\n')
       const str2 = YAML.stringify(date, { version: '1.1' })
       expect(str2).toBe('2018-12-22T08:02:52\n')
+    })
+  })
+
+  describe('!!omap', () => {
+    for (const { name, src } of [
+      { name: 'parse block seq', src: `!!omap\n- a: 1\n- b: 2\n- c: 3\n` },
+      { name: 'parse flow seq', src: `!!omap [ a: 1, b: 2, c: 3 ]\n` }
+    ])
+      test(name, () => {
+        const doc = YAML.parseDocument(src, { version: '1.1' })
+        expect(doc.contents).toBeInstanceOf(YAMLOMap)
+        expect(doc.toJSON()).toBeInstanceOf(Map)
+        expect(doc.toJSON()).toMatchObject(
+          new Map([['a', 1], ['b', 2], ['c', 3]])
+        )
+        expect(String(doc)).toBe(src)
+      })
+
+    test('stringify', () => {
+      const map = new Map([['a', 1], ['b', 2], ['c', 3]])
+      const str = YAML.stringify(map, { version: '1.1' })
+      expect(str).toBe(`!!omap\n- a: 1\n- b: 2\n- c: 3\n`)
+      const str2 = YAML.stringify(map)
+      expect(str2).toBe(`a: 1\nb: 2\nc: 3\n`)
     })
   })
 
