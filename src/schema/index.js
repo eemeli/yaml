@@ -1,10 +1,9 @@
 import { Type } from '../cst/Node'
-import createNode from '../createNode'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import Alias from './Alias'
 import Collection from './Collection'
 import core from './core'
-import failsafe from './failsafe'
+import failsafe, { map, seq } from './failsafe'
 import json from './json'
 import Node from './Node'
 import Pair from './Pair'
@@ -49,6 +48,31 @@ export default class Schema {
     } else if (typeof tags === 'function') {
       this.tags = tags(this.tags.slice())
     }
+  }
+
+  createNode(value, wrapScalars, tag, onTagObj) {
+    let tagObj
+    if (tag) {
+      if (tag.startsWith('!!')) tag = Schema.defaultPrefix + tag.slice(2)
+      const match = this.tags.filter(t => t.tag === tag)
+      tagObj = match.find(t => !t.format) || match[0]
+      if (!tagObj) throw new Error(`Tag ${tag} not found`)
+    } else {
+      tagObj = this.tags.find(
+        t => t.class && value instanceof t.class && !t.format
+      )
+      if (!tagObj) {
+        if (value == null) return new Scalar(null)
+        if (typeof value.toJSON === 'function') value = value.toJSON()
+        if (typeof value !== 'object')
+          return wrapScalars ? new Scalar(value) : value
+        tagObj = value instanceof Map ? map : value[Symbol.iterator] ? seq : map
+      }
+    }
+    if (onTagObj) onTagObj(tagObj)
+    return tagObj.createNode
+      ? tagObj.createNode(this, value, wrapScalars)
+      : new Scalar(value)
   }
 
   // falls back to string on no match
@@ -176,25 +200,6 @@ export default class Schema {
       props.push(doc.stringifyTag(tagObj.tag))
     }
     return props.join(' ')
-  }
-
-  createNode(item, wrapScalars, tag, onTagObj) {
-    let tagObj
-    if (tag) {
-      if (tag.startsWith('!!')) tag = Schema.defaultPrefix + tag.slice(2)
-      const match = this.tags.filter(t => t.tag === tag)
-      tagObj = match.find(t => !t.format) || match[0]
-      if (!tagObj) throw new Error(`Tag ${tag} not found`)
-    } else {
-      tagObj = this.tags.find(
-        t => t.class && item instanceof t.class && !t.format
-      )
-      if (!tagObj) return createNode(item, wrapScalars)
-    }
-    if (onTagObj) onTagObj(tagObj)
-    return tagObj.createNode
-      ? tagObj.createNode(this, item, wrapScalars)
-      : new Scalar(item)
   }
 
   stringify(item, ctx, onComment, onChompKeep) {
