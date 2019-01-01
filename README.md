@@ -1,6 +1,6 @@
 # YAML <a href="https://www.npmjs.com/package/yaml"><img align="right" src="https://badge.fury.io/js/yaml.svg" title="npm package" /></a><a href="https://travis-ci.org/eemeli/yaml"><img align="right" src="https://travis-ci.org/eemeli/yaml.svg?branch=master" title="Build status" /></a>
 
-`yaml` is a JavaScript parser and stringifier for [YAML](http://yaml.org/), a human friendly data serialization standard. It supports both parsing and stringifying data using all versions of YAML, along with all common data schemas. As a particularly distinguishing feature, `yaml` fully supports reading and writing comments in YAML documents.
+`yaml` is a JavaScript parser and stringifier for [YAML](http://yaml.org/), a human friendly data serialization standard. It supports both parsing and stringifying data using all versions of YAML, along with all common data schemas. As a particularly distinguishing feature, `yaml` fully supports reading and writing comments and blank lines in YAML documents.
 
 The library is released under the ISC open source license, and the code is [available on GitHub](https://github.com/eemeli/yaml/). It has no external dependencies, and is usable in both browser and node environments.
 
@@ -33,7 +33,7 @@ const YAML = require('yaml')
 
 ### YAML Documents
 
-* [`YAML.createNode(value, wrapScalars): Node`](https://eemeli.org/yaml/#creating-nodes)
+* [`YAML.createNode(value, wrapScalars, tag): Node`](https://eemeli.org/yaml/#creating-nodes)
 * [`YAML.defaultOptions`](https://eemeli.org/yaml/#options)
 * [`YAML.Document`](https://eemeli.org/yaml/#yaml-documents)
   * [`constructor(options)`](https://eemeli.org/yaml/#creating-documents)
