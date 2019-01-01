@@ -52,11 +52,22 @@ export default class Pair extends Node {
       implicitKey: !explicitKey,
       indent: indent + '  '
     })
-    let str = doc.schema.stringify(key, ctx, () => {
-      keyComment = null
-    })
+    let chompKeep = false
+    let str = doc.schema.stringify(
+      key,
+      ctx,
+      () => (keyComment = null),
+      () => (chompKeep = true)
+    )
     str = addComment(str, ctx.indent, keyComment)
-    str = explicitKey ? `? ${str}\n${indent}:` : `${str}:` // FIXME: Allow for `? key` w/o value
+    if (ctx.allNullValues) {
+      if (this.comment) {
+        str = addComment(str, ctx.indent, this.comment)
+        if (onComment) onComment()
+      } else if (chompKeep && !keyComment && onChompKeep) onChompKeep()
+      return ctx.inFlow ? str : `? ${str}`
+    }
+    str = explicitKey ? `? ${str}\n${indent}:` : `${str}:`
     if (this.comment) {
       // expected (but not strictly required) to be a single-line comment
       str = addComment(str, ctx.indent, this.comment)
@@ -72,7 +83,7 @@ export default class Pair extends Node {
     }
     ctx.implicitKey = false
     let valueComment = value instanceof Node && value.comment
-    let chompKeep = false
+    chompKeep = false
     const valueStr = doc.schema.stringify(
       value,
       ctx,

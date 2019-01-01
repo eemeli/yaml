@@ -1,32 +1,32 @@
-import createNode from '../src/createNode'
 import YAML from '../src/index'
 import YAMLMap from '../src/schema/Map'
 import Pair from '../src/schema/Pair'
 import Scalar from '../src/schema/Scalar'
-import Seq from '../src/schema/Seq'
+import YAMLSeq from '../src/schema/Seq'
+import { YAMLSet } from '../src/schema/_set'
 
 describe('scalars', () => {
   describe('createNode(value, false)', () => {
     test('boolean', () => {
-      const s = createNode(false, false)
+      const s = YAML.createNode(false, false)
       expect(s).toBe(false)
     })
     test('null', () => {
-      const s = createNode(null, false)
+      const s = YAML.createNode(null, false)
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(null)
     })
     test('undefined', () => {
-      const s = createNode(undefined, false)
+      const s = YAML.createNode(undefined, false)
       expect(s).toBeInstanceOf(Scalar)
       expect(s.value).toBe(null)
     })
     test('number', () => {
-      const s = createNode(3, false)
+      const s = YAML.createNode(3, false)
       expect(s).toBe(3)
     })
     test('string', () => {
-      const s = createNode('test', false)
+      const s = YAML.createNode('test', false)
       expect(s).toBe('test')
     })
   })
@@ -34,27 +34,27 @@ describe('scalars', () => {
 
 describe('createNode(value, true)', () => {
   test('boolean', () => {
-    const s = createNode(false, true)
+    const s = YAML.createNode(false, true)
     expect(s).toBeInstanceOf(Scalar)
     expect(s.value).toBe(false)
   })
   test('null', () => {
-    const s = createNode(null, true)
+    const s = YAML.createNode(null, true)
     expect(s).toBeInstanceOf(Scalar)
     expect(s.value).toBe(null)
   })
   test('undefined', () => {
-    const s = createNode(undefined, true)
+    const s = YAML.createNode(undefined, true)
     expect(s).toBeInstanceOf(Scalar)
     expect(s.value).toBe(null)
   })
   test('number', () => {
-    const s = createNode(3, true)
+    const s = YAML.createNode(3, true)
     expect(s).toBeInstanceOf(Scalar)
     expect(s.value).toBe(3)
   })
   test('string', () => {
-    const s = createNode('test', true)
+    const s = YAML.createNode('test', true)
     expect(s).toBeInstanceOf(Scalar)
     expect(s.value).toBe('test')
   })
@@ -62,31 +62,31 @@ describe('createNode(value, true)', () => {
 
 describe('arrays', () => {
   test('createNode([])', () => {
-    const s = createNode([])
-    expect(s).toBeInstanceOf(Seq)
+    const s = YAML.createNode([])
+    expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toHaveLength(0)
   })
   test('createNode([true], false)', () => {
-    const s = createNode([true], false)
-    expect(s).toBeInstanceOf(Seq)
+    const s = YAML.createNode([true], false)
+    expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toMatchObject([true])
   })
   describe('[3, ["four", 5]]', () => {
     const array = [3, ['four', 5]]
     test('createNode(value, false)', () => {
-      const s = createNode(array, false)
-      expect(s).toBeInstanceOf(Seq)
+      const s = YAML.createNode(array, false)
+      expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0]).toBe(3)
-      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1]).toBeInstanceOf(YAMLSeq)
       expect(s.items[1].items).toMatchObject(['four', 5])
     })
     test('createNode(value, true)', () => {
-      const s = createNode(array, true)
-      expect(s).toBeInstanceOf(Seq)
+      const s = YAML.createNode(array, true)
+      expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0].value).toBe(3)
-      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1]).toBeInstanceOf(YAMLSeq)
       expect(s.items[1].items).toHaveLength(2)
       expect(s.items[1].items[0].value).toBe('four')
       expect(s.items[1].items[1].value).toBe(5)
@@ -96,9 +96,9 @@ describe('arrays', () => {
       const doc = new YAML.Document()
       doc.contents = array
       expect(String(doc)).toBe(res)
-      doc.contents = createNode(array, false)
+      doc.contents = YAML.createNode(array, false)
       expect(String(doc)).toBe(res)
-      doc.contents = createNode(array, true)
+      doc.contents = YAML.createNode(array, true)
       expect(String(doc)).toBe(res)
     })
   })
@@ -106,12 +106,12 @@ describe('arrays', () => {
 
 describe('objects', () => {
   test('createNode({})', () => {
-    const s = createNode({})
+    const s = YAML.createNode({})
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toHaveLength(0)
   })
   test('createNode({ x: true }, false)', () => {
-    const s = createNode({ x: true }, false)
+    const s = YAML.createNode({ x: true }, false)
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toHaveLength(1)
     expect(s.items[0]).toBeInstanceOf(Pair)
@@ -120,7 +120,7 @@ describe('objects', () => {
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {
     const object = { x: 3, y: [4], z: { w: 'five', v: 6 } }
     test('createNode(value, false)', () => {
-      const s = createNode(object, false)
+      const s = YAML.createNode(object, false)
       expect(s).toBeInstanceOf(YAMLMap)
       expect(s.items).toHaveLength(3)
       expect(s.items).toMatchObject([
@@ -135,7 +135,7 @@ describe('objects', () => {
       ])
     })
     test('createNode(value, true)', () => {
-      const s = createNode(object, true)
+      const s = YAML.createNode(object, true)
       expect(s).toBeInstanceOf(YAMLMap)
       expect(s.items).toHaveLength(3)
       expect(s.items).toMatchObject([
@@ -162,9 +162,9 @@ z:
       const doc = new YAML.Document()
       doc.contents = object
       expect(String(doc)).toBe(res)
-      doc.contents = createNode(object, false)
+      doc.contents = YAML.createNode(object, false)
       expect(String(doc)).toBe(res)
-      doc.contents = createNode(object, true)
+      doc.contents = YAML.createNode(object, true)
       expect(String(doc)).toBe(res)
     })
   })
@@ -172,31 +172,31 @@ z:
 
 describe('Set', () => {
   test('createNode(new Set)', () => {
-    const s = createNode(new Set())
-    expect(s).toBeInstanceOf(Seq)
+    const s = YAML.createNode(new Set())
+    expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toHaveLength(0)
   })
   test('createNode(new Set([true]), false)', () => {
-    const s = createNode(new Set([true]), false)
-    expect(s).toBeInstanceOf(Seq)
+    const s = YAML.createNode(new Set([true]), false)
+    expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toMatchObject([true])
   })
   describe("Set { 3, Set { 'four', 5 } }", () => {
     const set = new Set([3, new Set(['four', 5])])
     test('createNode(set, false)', () => {
-      const s = createNode(set, false)
-      expect(s).toBeInstanceOf(Seq)
+      const s = YAML.createNode(set, false)
+      expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0]).toBe(3)
-      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1]).toBeInstanceOf(YAMLSeq)
       expect(s.items[1].items).toMatchObject(['four', 5])
     })
     test('createNode(set, true)', () => {
-      const s = createNode(set, true)
-      expect(s).toBeInstanceOf(Seq)
+      const s = YAML.createNode(set, true)
+      expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toHaveLength(2)
       expect(s.items[0].value).toBe(3)
-      expect(s.items[1]).toBeInstanceOf(Seq)
+      expect(s.items[1]).toBeInstanceOf(YAMLSeq)
       expect(s.items[1].items).toHaveLength(2)
       expect(s.items[1].items[0].value).toBe('four')
       expect(s.items[1].items[1].value).toBe(5)
@@ -206,22 +206,42 @@ describe('Set', () => {
       const doc = new YAML.Document()
       doc.contents = set
       expect(String(doc)).toBe(res)
-      doc.contents = createNode(set, false)
+      doc.contents = YAML.createNode(set, false)
       expect(String(doc)).toBe(res)
-      doc.contents = createNode(set, true)
+      doc.contents = YAML.createNode(set, true)
       expect(String(doc)).toBe(res)
+    })
+    test('Schema#createNode() - YAML 1.2', () => {
+      const doc = new YAML.Document()
+      doc.setSchema()
+      const s = doc.schema.createNode(set, true)
+      expect(s).toBeInstanceOf(YAMLSeq)
+      expect(s.items).toMatchObject([
+        { value: 3 },
+        { items: [{ value: 'four' }, { value: 5 }] }
+      ])
+    })
+    test('Schema#createNode() - YAML 1.1', () => {
+      const doc = new YAML.Document({ version: '1.1' })
+      doc.setSchema()
+      const s = doc.schema.createNode(set, true)
+      expect(s).toBeInstanceOf(YAMLSet)
+      expect(s.items).toMatchObject([
+        { key: { value: 3 } },
+        { key: { items: [{ key: { value: 'four' } }, { key: { value: 5 } }] } }
+      ])
     })
   })
 })
 
 describe('Map', () => {
   test('createNode(new Map)', () => {
-    const s = createNode(new Map())
+    const s = YAML.createNode(new Map())
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toHaveLength(0)
   })
   test('createNode(new Map([["x", true]]), false)', () => {
-    const s = createNode(new Map([['x', true]]), false)
+    const s = YAML.createNode(new Map([['x', true]]), false)
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toHaveLength(1)
     expect(s.items[0]).toBeInstanceOf(Pair)
@@ -234,7 +254,7 @@ describe('Map', () => {
       [new Map([['w', 'five'], ['v', 6]]), 'z']
     ])
     test('createNode(map, false)', () => {
-      const s = createNode(map, false)
+      const s = YAML.createNode(map, false)
       expect(s).toBeInstanceOf(YAMLMap)
       expect(s.items).toHaveLength(3)
       expect(s.items).toMatchObject([
@@ -249,7 +269,7 @@ describe('Map', () => {
       ])
     })
     test('createNode(map, true)', () => {
-      const s = createNode(map, true)
+      const s = YAML.createNode(map, true)
       expect(s).toBeInstanceOf(YAMLMap)
       expect(s.items).toHaveLength(3)
       expect(s.items).toMatchObject([
@@ -276,9 +296,9 @@ y:
       const doc = new YAML.Document()
       doc.contents = map
       expect(String(doc)).toBe(res)
-      doc.contents = createNode(map, false)
+      doc.contents = YAML.createNode(map, false)
       expect(String(doc)).toBe(res)
-      doc.contents = createNode(map, true)
+      doc.contents = YAML.createNode(map, true)
       expect(String(doc)).toBe(res)
     })
   })
@@ -287,7 +307,7 @@ y:
 describe('toJSON()', () => {
   test('Date', () => {
     const date = new Date('2018-12-22T08:02:52Z')
-    const node = createNode(date)
+    const node = YAML.createNode(date)
     expect(node.value).toBe(date.toJSON())
   })
 })

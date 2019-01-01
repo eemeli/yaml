@@ -195,7 +195,7 @@ describe('eemeli/yaml#l19', () => {
   test('seq', () => {
     const src = '- a: # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('- a: # 123\n    null\n')
+    expect(String(doc)).toBe('- ? a # 123\n')
   })
 })
 
@@ -274,4 +274,24 @@ test('comment on single-line value in flow map', () => {
   const src = '{a: 1 #c\n}'
   const doc = YAML.parseDocument(src)
   expect(String(doc)).toBe('{\n  a: 1 #c\n}\n')
+})
+
+describe('maps with no values', () => {
+  test('block map', () => {
+    const src = `a: null\n? b #c`
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe(`? a\n? b #c\n`)
+    doc.contents.items[1].value = 'x'
+    expect(String(doc)).toBe(`a: null\n? b #c\n: x\n`)
+  })
+
+  test('flow map', () => {
+    const src = `{\na: null,\n? b\n}`
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe(`{ a, b }\n`)
+    doc.contents.items[1].comment = 'c'
+    expect(String(doc)).toBe(`{\n  a,\n  b #c\n}\n`)
+    doc.contents.items[1].value = 'x'
+    expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n    x\n}\n`)
+  })
 })

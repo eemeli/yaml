@@ -65,17 +65,18 @@ export default class YAMLMap extends Collection {
 
   toString(ctx, onComment, onChompKeep) {
     if (!ctx) return JSON.stringify(this)
-    this.items.forEach(item => {
+    for (const item of this.items) {
       if (!(item instanceof Pair))
         throw new Error(
           `Map items must all be pairs; found ${JSON.stringify(item)} instead`
         )
-    })
+    }
     return super.toString(
       ctx,
       {
         blockItem: n => n.str,
         flowChars: { start: '{', end: '}' },
+        isMap: true,
         itemIndent: ctx.indent || ''
       },
       onComment,

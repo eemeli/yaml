@@ -15,6 +15,7 @@ export default class YAMLSeq extends Collection {
       {
         blockItem: n => (n.type === 'comment' ? n.str : `- ${n.str}`),
         flowChars: { start: '[', end: ']' },
+        isMap: false,
         itemIndent: (ctx.indent || '') + '  '
       },
       onComment,

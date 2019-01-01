@@ -1,10 +1,9 @@
 import { Type } from '../cst/Node'
-import createNode from '../createNode'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import Alias from './Alias'
 import Collection from './Collection'
 import core from './core'
-import failsafe from './failsafe'
+import failsafe, { map, seq } from './failsafe'
 import json from './json'
 import Node from './Node'
 import Pair from './Pair'
@@ -49,6 +48,31 @@ export default class Schema {
     } else if (typeof tags === 'function') {
       this.tags = tags(this.tags.slice())
     }
+  }
+
+  createNode(value, wrapScalars, tag, onTagObj) {
+    let tagObj
+    if (tag) {
+      if (tag.startsWith('!!')) tag = Schema.defaultPrefix + tag.slice(2)
+      const match = this.tags.filter(t => t.tag === tag)
+      tagObj = match.find(t => !t.format) || match[0]
+      if (!tagObj) throw new Error(`Tag ${tag} not found`)
+    } else {
+      tagObj = this.tags.find(
+        t => t.class && value instanceof t.class && !t.format
+      )
+      if (!tagObj) {
+        if (value == null) return new Scalar(null)
+        if (typeof value.toJSON === 'function') value = value.toJSON()
+        if (typeof value !== 'object')
+          return wrapScalars ? new Scalar(value) : value
+        tagObj = value instanceof Map ? map : value[Symbol.iterator] ? seq : map
+      }
+    }
+    if (onTagObj) onTagObj(tagObj)
+    return tagObj.createNode
+      ? tagObj.createNode(this, value, wrapScalars)
+      : new Scalar(value)
   }
 
   // falls back to string on no match
@@ -133,8 +157,8 @@ export default class Schema {
       if (!tagObj) throw new Error('Tag not resolved for null value')
       return tagObj
     }
-    let obj = item
-    if (item.hasOwnProperty('value')) {
+    let tagObj, obj
+    if (item instanceof Scalar) {
       switch (typeof item.value) {
         case 'boolean':
           obj = new Boolean()
@@ -148,10 +172,13 @@ export default class Schema {
         default:
           obj = item.value
       }
+      const match = this.tags.filter(t => t.class && obj instanceof t.class)
+      tagObj =
+        match.find(t => t.format === item.format) || match.find(t => !t.format)
+    } else {
+      obj = item
+      tagObj = this.tags.find(t => t.nodeClass && obj instanceof t.nodeClass)
     }
-    const match = this.tags.filter(t => t.class && obj instanceof t.class)
-    const tagObj =
-      match.find(t => t.format === item.format) || match.find(t => !t.format)
     if (!tagObj) {
       const name = obj && obj.constructor ? obj.constructor.name : typeof obj
       throw new Error(`Tag not resolved for ${name} value`)
@@ -177,16 +204,8 @@ export default class Schema {
 
   stringify(item, ctx, onComment, onChompKeep) {
     let tagObj
-    if (!(item instanceof Node)) {
-      tagObj = this.tags.find(
-        t => t.class && item instanceof t.class && !t.format
-      )
-      item = tagObj
-        ? tagObj.createNode
-          ? tagObj.createNode(item)
-          : new Scalar(item)
-        : createNode(item, true)
-    }
+    if (!(item instanceof Node))
+      item = this.createNode(item, true, null, o => (tagObj = o))
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)

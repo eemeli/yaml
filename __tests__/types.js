@@ -1,6 +1,8 @@
 import YAML from '../src/index'
 import Scalar from '../src/schema/Scalar'
-import Seq from '../src/schema/Seq'
+import YAMLSeq from '../src/schema/Seq'
+import { YAMLOMap } from '../src/schema/_omap'
+import { YAMLSet } from '../src/schema/_set'
 import { strOptions } from '../src/schema/_string'
 
 let origFoldOptions
@@ -373,6 +375,117 @@ date (00:00:00Z): 2002-12-14\n`)
       expect(str2).toBe('2018-12-22T08:02:52\n')
     })
   })
+
+  describe('!!pairs', () => {
+    for (const { name, src } of [
+      { name: 'parse block seq', src: `!!pairs\n- a: 1\n- b: 2\n- a: 3\n` },
+      { name: 'parse flow seq', src: `!!pairs [ a: 1, b: 2, a: 3 ]\n` }
+    ])
+      test(name, () => {
+        const doc = YAML.parseDocument(src, { version: '1.1' })
+        expect(doc.contents).toBeInstanceOf(YAMLSeq)
+        expect(doc.contents.items).toMatchObject([
+          { key: { value: 'a' }, value: { value: 1 } },
+          { key: { value: 'b' }, value: { value: 2 } },
+          { key: { value: 'a' }, value: { value: 3 } }
+        ])
+        expect(doc.toJSON()).toBeInstanceOf(Array)
+        expect(doc.toJSON()).toMatchObject([{ a: 1 }, { b: 2 }, { a: 3 }])
+        expect(String(doc)).toBe(src)
+      })
+
+    test('stringify', () => {
+      const doc = new YAML.Document({ version: '1.1' })
+      doc.setSchema()
+      doc.contents = doc.schema.createNode(
+        [['a', 1], ['b', 2], ['a', 3]],
+        false,
+        '!!pairs'
+      )
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:pairs')
+      expect(String(doc)).toBe(`!!pairs\n- a: 1\n- b: 2\n- a: 3\n`)
+    })
+  })
+
+  describe('!!omap', () => {
+    for (const { name, src } of [
+      { name: 'parse block seq', src: `!!omap\n- a: 1\n- b: 2\n- c: 3\n` },
+      { name: 'parse flow seq', src: `!!omap [ a: 1, b: 2, c: 3 ]\n` }
+    ])
+      test(name, () => {
+        const doc = YAML.parseDocument(src, { version: '1.1' })
+        expect(doc.contents).toBeInstanceOf(YAMLOMap)
+        expect(doc.toJSON()).toBeInstanceOf(Map)
+        expect(doc.toJSON()).toMatchObject(
+          new Map([['a', 1], ['b', 2], ['c', 3]])
+        )
+        expect(String(doc)).toBe(src)
+      })
+
+    test('require unique keys', () => {
+      const src = `!!omap\n- a: 1\n- b: 2\n- b: 9\n`
+      const doc = YAML.parseDocument(src, { version: '1.1' })
+      expect(doc.errors).toMatchObject([
+        {
+          name: 'YAMLSemanticError',
+          message: 'Ordered maps must not include duplicate keys'
+        }
+      ])
+    })
+
+    test('stringify Map', () => {
+      const map = new Map([['a', 1], ['b', 2], ['c', 3]])
+      const str = YAML.stringify(map, { version: '1.1' })
+      expect(str).toBe(`!!omap\n- a: 1\n- b: 2\n- c: 3\n`)
+      const str2 = YAML.stringify(map)
+      expect(str2).toBe(`a: 1\nb: 2\nc: 3\n`)
+    })
+
+    test('stringify Array', () => {
+      const doc = new YAML.Document({ version: '1.1' })
+      doc.setSchema()
+      doc.contents = doc.schema.createNode(
+        [['a', 1], ['b', 2], ['a', 3]],
+        false,
+        '!!omap'
+      )
+      expect(doc.contents).toBeInstanceOf(YAMLOMap)
+      expect(String(doc)).toBe(`!!omap\n- a: 1\n- b: 2\n- a: 3\n`)
+    })
+  })
+
+  describe('!!set', () => {
+    for (const { name, src } of [
+      { name: 'parse block map', src: `!!set\n? a\n? b\n? c\n` },
+      { name: 'parse flow map', src: `!!set { a, b, c }\n` }
+    ])
+      test(name, () => {
+        const doc = YAML.parseDocument(src, { version: '1.1' })
+        expect(doc.contents).toBeInstanceOf(YAMLSet)
+        expect(doc.toJSON()).toBeInstanceOf(Set)
+        expect(doc.toJSON()).toMatchObject(new Set(['a', 'b', 'c']))
+        expect(String(doc)).toBe(src)
+      })
+
+    test('require null values', () => {
+      const src = `!!set\n? a\n? b\nc: d\n`
+      const doc = YAML.parseDocument(src, { version: '1.1' })
+      expect(doc.errors).toMatchObject([
+        {
+          name: 'YAMLSemanticError',
+          message: 'Set items must all have null values'
+        }
+      ])
+    })
+
+    test('stringify', () => {
+      const set = new Set(['a', 'b', 'c'])
+      const str = YAML.stringify(set, { version: '1.1' })
+      expect(str).toBe(`!!set\n? a\n? b\n? c\n`)
+      const str2 = YAML.stringify(set)
+      expect(str2).toBe(`- a\n- b\n- c\n`)
+    })
+  })
 })
 
 describe('custom tags', () => {
@@ -386,7 +499,7 @@ describe('custom tags', () => {
 
   test('parse', () => {
     const doc = YAML.parseDocument(src)
-    expect(doc.contents).toBeInstanceOf(Seq)
+    expect(doc.contents).toBeInstanceOf(YAMLSeq)
     expect(doc.contents.tag).toBe('tag:example.com,2000:test/x')
     const { items } = doc.contents
     expect(items).toHaveLength(4)
