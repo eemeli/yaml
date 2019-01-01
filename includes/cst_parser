@@ -129,7 +129,7 @@ mapping: { sky: blue, sea: green }
 </code></pre>
 <p>Each node in the CST extends a common ancestor <code>Node</code>. Additional undocumented properties are available, but are likely only useful during parsing.</p>
 
-<p>If a node has its <code>value</code> set, that will be used when re-stringifying.</p>
+<p>If a node has its <code>value</code> set, that will be used when re-stringifying (initially <code>undefined</code> for all nodes).</p>
 
 <h3 style="clear:both">Scalars</h3>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Alias</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
@@ -151,8 +151,13 @@ mapping: { sky: blue, sea: green }
   <span class="o">+</span><span class="nx">rawValue</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
   <span class="o">+</span><span class="nx">tag</span><span class="p">:</span> <span class="kc">null</span>
 <span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">BlankLine</span> <span class="kr">extends</span> <span class="nx">Comment</span> <span class="p">{</span>
+  <span class="nl">type</span><span class="p">:</span> <span class="s1">'BLANK_LINE'</span><span class="p">,</span>   <span class="c1">// may represent multiple consecutive empty</span>
+  <span class="o">+</span><span class="nx">comment</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>       <span class="c1">//   lines, which may include whitespace</span>
+<span class="p">}</span>
 </code></pre>
-<p>While <code>Alias</code> and <code>Comment</code> nodes are not technically scalars, they are parsed as such at this level.</p>
+<p>While <code>Alias</code>, <code>BlankLine</code> and <code>Comment</code> nodes are not technically scalars, they are parsed as such at this level.</p>
 
 <p>Due to parsing differences, each scalar type is implemented using its own class.</p>
 

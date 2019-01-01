@@ -299,6 +299,9 @@
                   <li>
                     <a href="#comments" class="toc-h2 toc-link" data-title="Comments">Comments</a>
                   </li>
+                  <li>
+                    <a href="#blank-lines" class="toc-h2 toc-link" data-title="Blank Lines">Blank Lines</a>
+                  </li>
               </ul>
           </li>
           <li>
@@ -331,7 +334,7 @@
           </li>
       </ul>
         <ul class="toc-footer">
-            <li><a href='https://github.com/eemeli/yaml/releases'>Version 1.1.0 (changelog)</a></li>
+            <li><a href='https://github.com/eemeli/yaml/releases'>Version 1.2.0 (changelog)</a></li>
             <li><a href='https://github.com/eemeli/yaml'>github.com/eemeli/yaml</a></li>
             <li><a href='https://www.npmjs.com/package/yaml'><code>npm install yaml</code></a></li>
         </ul>
@@ -373,7 +376,7 @@ yarn add yaml
 <h3>YAML Documents</h3>
 
 <ul>
-<li><a href="#creating-nodes"><code>YAML.createNode(value, wrapScalars): Node</code></a></li>
+<li><a href="#creating-nodes"><code>YAML.createNode(value, wrapScalars, tag): Node</code></a></li>
 <li><a href="#options"><code>YAML.defaultOptions</code></a></li>
 <li><a href="#yaml-documents"><code>YAML.Document</code></a>
 
@@ -588,6 +591,11 @@ target:
 <td>A JavaScript class that should be matched to this tag, e.g. <code>Date</code> for <code>!!timestamp</code>.</td>
 </tr>
 <tr>
+<td>createNode</td>
+<td><code>function?</code></td>
+<td>Optional factory function, used e.g. by collections. If set, will be called as <code>createNode(schema, value, wrapScalars)</code> and should return a class extending <code>Node</code>.</td>
+</tr>
+<tr>
 <td>default</td>
 <td><code>boolean?</code></td>
 <td>If <code>true</code>, the tag should not be explicitly included when stringifying.</td>
@@ -596,6 +604,11 @@ target:
 <td>format</td>
 <td><code>string?</code></td>
 <td>If a tag has multiple forms that should be parsed and/or stringified differently, use <code>format</code> to identify them.</td>
+</tr>
+<tr>
+<td>nodeClass</td>
+<td><code>class?</code></td>
+<td>The <code>Node</code> child class that implements this tag. Required for collections and tags that have overlapping JS representations.</td>
 </tr>
 <tr>
 <td>options</td>
@@ -696,11 +709,11 @@ target:
 <p>The most significant difference between YAML 1.1 and YAML 1.2 is the introduction of the core data schema as the recommended default, replacing the YAML 1.1 type library:</p>
 
 <ul>
-<li>Only <code>true</code> and <code>false</code> strings are parsed (case-insensitively) as booleans; <code>y</code>, <code>yes</code>, <code>on</code>, and their negative counterparts are parsed as strings.</li>
+<li>Only <code>true</code> and <code>false</code> strings are parsed as booleans (including <code>True</code> and <code>TRUE</code>); <code>y</code>, <code>yes</code>, <code>on</code>, and their negative counterparts are parsed as strings.</li>
 <li>Underlines <code>_</code> cannot be used within numerical values.</li>
 <li>Octal values need a <code>0o</code> prefix; e.g. <code>010</code> is now parsed with the value 10 rather than 8.</li>
 <li>The binary and sexagesimal integer formats have been dropped.</li>
-<li>The <code>!!timestamp</code> and <code>!!binary</code> types have been dropped.</li>
+<li>The <code>!!pairs</code>, <code>!!omap</code>, <code>!!set</code>, <code>!!timestamp</code> and <code>!!binary</code> types have been dropped.</li>
 <li>The merge <code>&lt;&lt;</code> and value <code>=</code> special mapping keys have been removed.</li>
 </ul>
 
@@ -824,16 +837,16 @@ invoice: !domain.tld,2002/^invoice
 <tr>
 <td>commentBefore</td>
 <td><code>string?</code></td>
-<td>A comment at the very beginning of the document.</td>
+<td>A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line when stringified.</td>
 </tr>
 <tr>
 <td>comment</td>
 <td><code>string?</code></td>
-<td>A comment at the end of the document.</td>
+<td>A comment at the end of the document. If not empty, separated from the rest of the document by a blank line when stringified.</td>
 </tr>
 <tr>
 <td>contents</td>
-<td><a href="#ast-nodes"><code>Node</code></a>&vert;<code>any</code></td>
+<td><a href="#content-nodes"><code>Node</code></a>&vert;<code>any</code></td>
 <td>The document contents.</td>
 </tr>
 <tr>
@@ -881,6 +894,11 @@ invoice: !domain.tld,2002/^invoice
 <td>Parse a CST into this document</td>
 </tr>
 <tr>
+<td>setSchema()</td>
+<td><code>void</code></td>
+<td>When a document is created with <code>new YAML.Document()</code>, the schema object is not set as it may be influenced by parsed directives; call this to set it manually.</td>
+</tr>
+<tr>
 <td>setTagPrefix(handle, prefix)</td>
 <td><code>undefined</code></td>
 <td>Set <code>handle</code> as a shorthand string for the <code>prefix</code> tag namespace.</td>
@@ -916,7 +934,21 @@ invoice: !domain.tld,2002/^invoice
 <p><strong><code>parse(cst)</code></strong> is mostly an internal method, modifying the document according to the contents of the parsed <code>cst</code>. Calling this multiple times on a Document is not recommended.</p>
 
 <p>To define a tag prefix to use when stringifying, use <strong><code>setTagPrefix(handle, prefix)</code></strong> rather than setting a value directly in <code>tagPrefixes</code>. This will guarantee that the <code>handle</code> is valid (by throwing an error), and will overwrite any previous definition for the <code>handle</code>. Use an empty <code>prefix</code> value to remove a prefix.</p>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types/timestamp'</span>
 
+<span class="kr">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="s1">'1969-07-21T02:56:15Z'</span>
+<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">tags</span><span class="p">:</span> <span class="p">[</span><span class="nx">timestamp</span><span class="p">]</span> <span class="p">})</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="c1">// Date { 1969-07-21T02:56:15.000Z }</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">options</span><span class="p">.</span><span class="nx">keepBlobsInJSON</span> <span class="o">=</span> <span class="kc">false</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="c1">// '1969-07-21T02:56:15.000Z'</span>
+
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// '1969-07-21T02:56:15\n'</span>
+</code></pre>
 <p>For a plain JavaScript representation of the document, <strong><code>toJSON()</code></strong> is your friend. By default the values wrapped in scalar nodes will not be forced to JSON, so e.g. a <code>!!timestamp</code> will remain a <code>Date</code> in the output. To change this behaviour and enforce JSON values only, set the <a href="#options"><code>keepBlobsInJSON</code> option</a> to <code>false</code>.</p>
 
 <p>Conversely, to stringify a document as YAML, use <strong><code>toString()</code></strong>. This will also be called by <code>String(doc)</code>. This method will throw if the <code>errors</code> array is not empty.</p>
@@ -1017,6 +1049,8 @@ invoice: !domain.tld,2002/^invoice
   <span class="nx">range</span><span class="p">:</span> <span class="p">?[</span><span class="nx">number</span><span class="p">,</span> <span class="nx">number</span><span class="p">],</span>
       <span class="c1">// the [start, end] range of characters of the source parsed</span>
       <span class="c1">// into this node (undefined for pairs or if not parsed)</span>
+  <span class="nx">spaceBefore</span><span class="p">:</span> <span class="p">?</span><span class="kr">boolean</span><span class="p">,</span>
+      <span class="c1">// a blank line before this node and its commentBefore</span>
   <span class="nx">tag</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>       <span class="c1">// a fully qualified tag, if required</span>
   <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>       <span class="c1">// a plain JS representation of this node</span>
 <span class="p">}</span>
@@ -1054,6 +1088,8 @@ invoice: !domain.tld,2002/^invoice
 <p>Within a YAML document, two forms of collections are supported: sequential <code>Seq</code> collections and key-value <code>Map</code> collections. The JavaScript representations of these collections both have an <code>items</code> array, which may (<code>Seq</code>) or must (<code>Map</code>) consist of <code>Pair</code> objects that contain a <code>key</code> and a <code>value</code> of any type, including <code>null</code>. The <code>items</code> array of a <code>Seq</code> object may contain values of any type.</p>
 
 <p>When stringifying collections, by default block notation will be used. Flow notation will be selected if <code>type</code> is <code>FLOW_MAP</code> or <code>FLOW_SEQ</code>, the collection is within a surrounding flow collection, or if the collection is in an implicit key.</p>
+
+<p>The <code>yaml-1.1</code> schema includes <a href="https://yaml.org/type/index.html">additional collections</a> that are based on <code>Map</code> and <code>Seq</code>: <code>OMap</code> and <code>Pairs</code> are sequences of <code>Pair</code> objects (<code>OMap</code> requires unique keys &amp; corresponds to the JS Map object), and <code>Set</code> is a map of keys with null values that corresponds to the JS Set object.</p>
 <h2 id='alias-nodes'>Alias Nodes</h2><pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Alias</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
   <span class="nl">source</span><span class="p">:</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">Map</span> <span class="o">|</span> <span class="nx">Seq</span><span class="p">,</span>
   <span class="nx">type</span><span class="p">:</span> <span class="s1">'ALIAS'</span>
@@ -1088,10 +1124,12 @@ invoice: !domain.tld,2002/^invoice
 <span class="c1">// - some # A commented item</span>
 <span class="c1">// - values</span>
 <span class="c1">// - balloons: 99</span>
-</code></pre><h4 id='yaml-createnode-value-map-seq-scalar'><code>YAML.createNode(value): Map | Seq | Scalar</code></h4><h4 id='yaml-createnode-value-false-map-seq-string-number-boolean-null'><code>YAML.createNode(value, false): Map | Seq | string | number | boolean | null</code></h4>
-<p><code>YAML.createNode</code> recursively turns objects into <a href="#collections">collections</a>. Generic objects as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences. If the second <code>wrapScalars</code> argument is undefined or <code>true</code>, it also wraps plain values in <code>Scalar</code> objects. Its primary use is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output.</p>
+</code></pre><h4 id='yaml-createnode-value-wrapscalars-tag-node'><code>YAML.createNode(value, wrapScalars?, tag?): Node</code></h4>
+<p><code>YAML.createNode</code> recursively turns objects into <a href="#collections">collections</a>. Generic objects as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences. If <code>wrapScalars</code> is undefined or <code>true</code>, it also wraps plain values in <code>Scalar</code> objects; if it is false and <code>value</code> is not an object, it will be returned directly.</p>
 
-<p>To stringify the output of <code>YAML.createNode</code> as YAML, you&#39;ll need to assign it to the <code>contents</code> of a Document (or somewhere within said contents), as the document&#39;s schema is required for YAML string output.</p>
+<p>To specify the collection type, set <code>tag</code> to its identifying string, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available based on the default options. To use a specific document&#39;s schema, use the wrapped method <code>doc.schema.createNode(value, wrapScalars, tag)</code>.</p>
+
+<p>The primary purpose of this function is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output. To that end, you&#39;ll need to assign its return value to the <code>contents</code> of a Document (or somewhere within said contents), as the document&#39;s schema is required for YAML string output.</p>
 
 <h4 style="clear:both"><code>new Map(), new Seq(), new Pair(key, value)</code></h4>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
@@ -1116,7 +1154,7 @@ invoice: !domain.tld,2002/^invoice
 </code></pre>
 <p>To construct a <code>Seq</code> or <code>Map</code>, use <a href="#yaml-createnode"><code>YAML.createNode()</code></a> with array, object or iterable input, or create the collections directly by importing the classes from <code>yaml/seq</code> and <code>yaml/map</code>.</p>
 
-<p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created by importing the class from <code>yaml/pair</code> and using its <code>new Pair(key, value)</code> constructor. Note in particular that this is required to create non-<code>string</code> keys.</p>
+<p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created by importing the class from <code>yaml/pair</code> and using its <code>new Pair(key, value)</code> constructor.</p>
 <h2 id='comments'>Comments</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---
@@ -1137,6 +1175,7 @@ it has:
 
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
 <span class="c1">// # This is YAML.</span>
+<span class="c1">//</span>
 <span class="c1">// it has:</span>
 <span class="c1">//   - an array # item comment</span>
 <span class="c1">//   - of values</span>
@@ -1144,9 +1183,30 @@ it has:
 </code></pre>
 <p>A primary differentiator between this and other YAML libraries is the ability to programmatically handle comments, which according to <a href="http://yaml.org/spec/1.2/spec.html#id2767100">the spec</a> &quot;must not have any effect on the serialization tree or representation graph. In particular, comments are not associated with a particular node.&quot;</p>
 
-<p>This library does allow comments to be handled programmatically, and does attach them to particular nodes. Each <code>Scalar</code>, <code>Map</code>, <code>Seq</code> and the <code>Document</code> itself has <code>comment</code> and <code>commentBefore</code> members that may be set to a stringifiable value. The string contents of comments are not processed by the library, except for merging adjacent comment lines together and prefixing each line with the <code>#</code> comment indicator.</p>
+<p>This library does allow comments to be handled programmatically, and does attach them to particular nodes (most often, the following node). Each <code>Scalar</code>, <code>Map</code>, <code>Seq</code> and the <code>Document</code> itself has <code>comment</code> and <code>commentBefore</code> members that may be set to a stringifiable value.</p>
 
-<p><strong>Note</strong>: Due to implementation details, the library&#39;s comment handling is not completely stable. In particular, when reading and writing a YAML file, comments may move around a bit due to getting associated with a different node than intended.</p>
+<p>The string contents of comments are not processed by the library, except for merging adjacent comment lines together and prefixing each line with the <code>#</code> comment indicator. Document comments will be separated from the rest of the document by a blank line.</p>
+
+<p><strong>Note</strong>: Due to implementation details, the library&#39;s comment handling is not completely stable. In particular, when creating, writing, and then reading a YAML file, comments may sometimes be associated with a different node.</p>
+<h2 id='blank-lines'>Blank Lines</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s1">'[ one, two, three ]'</span><span class="p">)</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">comment</span> <span class="o">=</span> <span class="s1">' item comment'</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">spaceBefore</span> <span class="o">=</span> <span class="kc">true</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">comment</span> <span class="o">=</span> <span class="s1">' document end comment'</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
+<span class="c1">// [</span>
+<span class="c1">//   one, # item comment</span>
+<span class="c1">//</span>
+<span class="c1">//   two,</span>
+<span class="c1">//   three</span>
+<span class="c1">// ]</span>
+<span class="c1">//</span>
+<span class="c1">// # document end comment</span>
+</code></pre>
+<p>Similarly to comments, the YAML spec instructs non-content blank lines to be discarded. Instead of doing that, <code>yaml</code> provides a <code>spaceBefore</code> boolean property for each node. If true, the node (and its <code>commentBefore</code>, if any) will be separated from the preceding node by a blank line.</p>
+
+<p>Note that scalar block values with &quot;keep&quot; chomping (i.e. with <code>+</code> in their header) consider any trailing empty lines to be a part of their content, so the <code>spaceBefore</code> setting of a node following such a value is ignored.</p>
 <h1 id='cst-parser'>CST Parser</h1>
 <p>For ease of implementation and to provide better error handling and reporting, the lowest level of the library&#39;s parser turns any input string into a <a href="https://en.wikipedia.org/wiki/Concrete_syntax_tree"><strong>Concrete Syntax Tree</strong></a> of nodes as if the input were YAML. This level of the API has not been designed to be particularly user-friendly for external users, but it is fast, robust, and not dependent on the rest of the library.</p>
 <h2 id='parsecst'>parseCST</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">parseCST</span> <span class="nx">from</span> <span class="s1">'yaml/parse-cst'</span>
@@ -1278,7 +1338,7 @@ mapping: { sky: blue, sea: green }
 </code></pre>
 <p>Each node in the CST extends a common ancestor <code>Node</code>. Additional undocumented properties are available, but are likely only useful during parsing.</p>
 
-<p>If a node has its <code>value</code> set, that will be used when re-stringifying.</p>
+<p>If a node has its <code>value</code> set, that will be used when re-stringifying (initially <code>undefined</code> for all nodes).</p>
 
 <h3 style="clear:both">Scalars</h3>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Alias</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
@@ -1300,8 +1360,13 @@ mapping: { sky: blue, sea: green }
   <span class="o">+</span><span class="nx">rawValue</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
   <span class="o">+</span><span class="nx">tag</span><span class="p">:</span> <span class="kc">null</span>
 <span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">BlankLine</span> <span class="kr">extends</span> <span class="nx">Comment</span> <span class="p">{</span>
+  <span class="nl">type</span><span class="p">:</span> <span class="s1">'BLANK_LINE'</span><span class="p">,</span>   <span class="c1">// may represent multiple consecutive empty</span>
+  <span class="o">+</span><span class="nx">comment</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>       <span class="c1">//   lines, which may include whitespace</span>
+<span class="p">}</span>
 </code></pre>
-<p>While <code>Alias</code> and <code>Comment</code> nodes are not technically scalars, they are parsed as such at this level.</p>
+<p>While <code>Alias</code>, <code>BlankLine</code> and <code>Comment</code> nodes are not technically scalars, they are parsed as such at this level.</p>
 
 <p>Due to parsing differences, each scalar type is implemented using its own class.</p>
 

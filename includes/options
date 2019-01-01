@@ -126,6 +126,11 @@ target:
 <td>A JavaScript class that should be matched to this tag, e.g. <code>Date</code> for <code>!!timestamp</code>.</td>
 </tr>
 <tr>
+<td>createNode</td>
+<td><code>function?</code></td>
+<td>Optional factory function, used e.g. by collections. If set, will be called as <code>createNode(schema, value, wrapScalars)</code> and should return a class extending <code>Node</code>.</td>
+</tr>
+<tr>
 <td>default</td>
 <td><code>boolean?</code></td>
 <td>If <code>true</code>, the tag should not be explicitly included when stringifying.</td>
@@ -134,6 +139,11 @@ target:
 <td>format</td>
 <td><code>string?</code></td>
 <td>If a tag has multiple forms that should be parsed and/or stringified differently, use <code>format</code> to identify them.</td>
+</tr>
+<tr>
+<td>nodeClass</td>
+<td><code>class?</code></td>
+<td>The <code>Node</code> child class that implements this tag. Required for collections and tags that have overlapping JS representations.</td>
 </tr>
 <tr>
 <td>options</td>

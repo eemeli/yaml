@@ -50,11 +50,11 @@
 <p>The most significant difference between YAML 1.1 and YAML 1.2 is the introduction of the core data schema as the recommended default, replacing the YAML 1.1 type library:</p>
 
 <ul>
-<li>Only <code>true</code> and <code>false</code> strings are parsed (case-insensitively) as booleans; <code>y</code>, <code>yes</code>, <code>on</code>, and their negative counterparts are parsed as strings.</li>
+<li>Only <code>true</code> and <code>false</code> strings are parsed as booleans (including <code>True</code> and <code>TRUE</code>); <code>y</code>, <code>yes</code>, <code>on</code>, and their negative counterparts are parsed as strings.</li>
 <li>Underlines <code>_</code> cannot be used within numerical values.</li>
 <li>Octal values need a <code>0o</code> prefix; e.g. <code>010</code> is now parsed with the value 10 rather than 8.</li>
 <li>The binary and sexagesimal integer formats have been dropped.</li>
-<li>The <code>!!timestamp</code> and <code>!!binary</code> types have been dropped.</li>
+<li>The <code>!!pairs</code>, <code>!!omap</code>, <code>!!set</code>, <code>!!timestamp</code> and <code>!!binary</code> types have been dropped.</li>
 <li>The merge <code>&lt;&lt;</code> and value <code>=</code> special mapping keys have been removed.</li>
 </ul>
 
