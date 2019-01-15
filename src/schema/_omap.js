@@ -1,5 +1,6 @@
 import { YAMLSemanticError } from '../errors'
 import toJSON from '../toJSON'
+import YAMLMap from './Map'
 import Pair from './Pair'
 import Scalar from './Scalar'
 import YAMLSeq from './Seq'
@@ -12,6 +13,9 @@ export class YAMLOMap extends YAMLSeq {
     super()
     this.tag = YAMLOMap.tag
   }
+
+  get = YAMLMap.prototype.get.bind(this)
+  set = YAMLMap.prototype.set.bind(this)
 
   toJSON(_, opt) {
     const map = new Map()

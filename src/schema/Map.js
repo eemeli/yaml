@@ -4,8 +4,32 @@ import toJSON from '../toJSON'
 import Collection from './Collection'
 import Merge from './Merge'
 import Pair from './Pair'
+import Scalar from './Scalar'
+
+export function findPair(items, key) {
+  const k = key instanceof Scalar ? key.value : key
+  for (const it of items) {
+    if (it instanceof Pair) {
+      if (it.key === key || it.key === k) return it
+      if (it.key && it.key.value === k) return it
+    }
+  }
+  return undefined
+}
 
 export default class YAMLMap extends Collection {
+  get(key, keepScalar) {
+    const it = findPair(this.items, key)
+    const node = it && it.value
+    return !keepScalar && node instanceof Scalar ? node.value : node
+  }
+
+  set(key, value) {
+    const prev = findPair(this.items, key)
+    if (prev) prev.value = value
+    else this.items.push(new Pair(key, value))
+  }
+
   toJSON(_, opt) {
     if (opt && opt.mapAsMap) return this.toJSMap(opt)
     return this.items.reduce((map, item) => {

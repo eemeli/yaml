@@ -1,11 +1,34 @@
 import { YAMLSemanticError } from '../errors'
 import toJSON from '../toJSON'
-import YAMLMap from './Map'
+import YAMLMap, { findPair } from './Map'
 import Merge from './Merge'
 import Pair from './Pair'
 import parseMap from './parseMap'
+import Scalar from './Scalar'
 
 export class YAMLSet extends YAMLMap {
+  get(key, keepPair) {
+    const pair = findPair(this.items, key)
+    return !keepPair && pair instanceof Pair
+      ? pair.key instanceof Scalar
+        ? pair.key.value
+        : pair.key
+      : pair
+  }
+
+  set(key, value) {
+    if (typeof value !== 'boolean')
+      throw new Error(
+        `Expected boolean value for set(key, value) in a YAML set, not ${typeof value}`
+      )
+    const prev = findPair(this.items, key)
+    if (prev && !value) {
+      this.items.splice(this.items.indexOf(prev), 1)
+    } else if (!prev && value) {
+      this.items.push(new Pair(key))
+    }
+  }
+
   toJSON(_, opt) {
     const set = new Set()
     for (const item of this.items) {

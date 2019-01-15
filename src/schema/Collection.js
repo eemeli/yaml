@@ -8,6 +8,17 @@ export default class Collection extends Node {
 
   items = []
 
+  getIn([key, ...rest], keepScalar) {
+    const node = this.get(key, true)
+    if (node === undefined) return undefined
+    if (rest.length === 0)
+      return !keepScalar && node instanceof Scalar ? node.value : node
+    if (node instanceof Collection) return node.getIn(rest, keepScalar)
+    throw new Error(
+      `Expected a YAML collection at ${key}, but found ${node}. Remaining path: ${rest}`
+    )
+  }
+
   hasAllNullValues() {
     return this.items.every(node => {
       if (!(node instanceof Pair)) return false
@@ -21,6 +32,19 @@ export default class Collection extends Node {
           !n.tag)
       )
     })
+  }
+
+  setIn([key, ...rest], value) {
+    if (rest.length === 0) {
+      this.set(key, value)
+    } else {
+      const node = this.get(key, true)
+      if (node instanceof Collection) node.setIn(rest, value)
+      else
+        throw new Error(
+          `Cannot create intermediate YAML collection at ${key}. Remaining path: ${rest}`
+        )
+    }
   }
 
   // overridden in implementations
