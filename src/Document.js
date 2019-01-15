@@ -17,6 +17,11 @@ import Scalar from './schema/Scalar'
 const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
+// null, undefined, or an empty non-string iterable (e.g. [])
+const isEmptyPath = path =>
+  path == null ||
+  (typeof path === 'object' && path[Symbol.iterator]().next().done)
+
 export default class Document {
   static defaults = {
     '1.0': {
@@ -64,6 +69,28 @@ export default class Document {
       Document.defaults[this.options.version] ||
       {}
     )
+  }
+
+  getIn(path, keepScalar) {
+    if (isEmptyPath(path))
+      return !keepScalar && this.contents instanceof Scalar
+        ? this.contents.value
+        : this.contents
+    if (this.contents instanceof Collection)
+      return this.contents.getIn(path, keepScalar)
+    throw new Error(
+      `Document contents must be a YAML collection for getIn([${path}])`
+    )
+  }
+
+  setIn(path, value) {
+    if (isEmptyPath(path)) this.contents = value
+    else if (this.contents instanceof Collection)
+      this.contents.setIn(path, value)
+    else
+      throw new Error(
+        `Document contents must be a YAML collection for setIn([${path}], ...)`
+      )
   }
 
   setSchema() {

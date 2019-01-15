@@ -124,6 +124,50 @@ describe('Seq', () => {
   })
 })
 
+describe('Document', () => {
+  let doc
+  beforeEach(() => {
+    doc = new YAML.Document()
+    doc.contents = YAML.createNode({ a: 1, b: [2, 3] })
+    expect(doc.contents.items).toMatchObject([
+      { key: { value: 'a' }, value: { value: 1 } },
+      {
+        key: { value: 'b' },
+        value: { items: [{ value: 2 }, { value: 3 }] }
+      }
+    ])
+  })
+
+  test('getIn collection', () => {
+    expect(doc.getIn(['a'])).toBe(1)
+    expect(doc.getIn(['a'], true)).toMatchObject({ value: 1 })
+    expect(doc.getIn(['b', 1])).toBe(3)
+    expect(doc.getIn(['b', 1], true)).toMatchObject({ value: 3 })
+    expect(doc.getIn(['b', 'e'])).toBeUndefined()
+    expect(doc.getIn(['c', 'e'])).toBeUndefined()
+    expect(() => doc.getIn(['a', 'e'])).toThrow(/Expected a YAML collection/)
+  })
+
+  test('getIn scalar', () => {
+    doc.contents = YAML.createNode('s')
+    expect(doc.getIn([])).toBe('s')
+    expect(doc.getIn(null, true)).toMatchObject({ value: 's' })
+    expect(() => doc.getIn([0])).toThrow(/Document contents/)
+  })
+
+  test('setIn', () => {
+    doc.setIn(['a'], 2)
+    expect(doc.getIn(['a'])).toBe(2)
+    expect(doc.getIn(['a'], true)).toBe(2)
+    doc.setIn(['b', 1], 5)
+    expect(doc.getIn(['b', 1])).toBe(5)
+    doc.setIn(['c'], 6)
+    expect(doc.getIn(['c'])).toBe(6)
+    expect(() => doc.setIn(['a', 'e'])).toThrow(/Cannot create/)
+    expect(() => doc.setIn(['e', 'e'])).toThrow(/Cannot create/)
+  })
+})
+
 describe('Set', () => {
   let doc
   beforeAll(() => {
