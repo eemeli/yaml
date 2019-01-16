@@ -47,13 +47,23 @@ describe('Map', () => {
     expect(map.has(YAML.createNode())).toBe(false)
   })
 
-  test('set', () => {
+  test('set with value', () => {
     map.set('a', 2)
     expect(map.get('a')).toBe(2)
     expect(map.get('a', true)).toBe(2)
     map.set('b', 5)
     expect(map.get('b')).toBe(5)
     map.set('c', 6)
+    expect(map.get('c')).toBe(6)
+  })
+
+  test('set with node', () => {
+    map.set(YAML.createNode('a'), 2)
+    expect(map.get('a')).toBe(2)
+    expect(map.get('a', true)).toBe(2)
+    map.set(YAML.createNode('b'), 5)
+    expect(map.get('b')).toBe(5)
+    map.set(YAML.createNode('c'), 6)
     expect(map.get('c')).toBe(6)
   })
 })
@@ -101,13 +111,23 @@ describe('Seq', () => {
     expect(seq.has(YAML.createNode())).toBe(false)
   })
 
-  test('set', () => {
+  test('set with value', () => {
     seq.set(0, 2)
     expect(seq.get(0)).toBe(2)
     expect(seq.get(0, true)).toBe(2)
-    seq.set(1, 5)
+    seq.set('1', 5)
     expect(seq.get(1)).toBe(5)
     seq.set(2, 6)
+    expect(seq.get(2)).toBe(6)
+  })
+
+  test('set with node', () => {
+    seq.set(YAML.createNode(0), 2)
+    expect(seq.get(0)).toBe(2)
+    expect(seq.get(0, true)).toBe(2)
+    seq.set(YAML.createNode('1'), 5)
+    expect(seq.get(1)).toBe(5)
+    seq.set(YAML.createNode(2), 6)
     expect(seq.get(2)).toBe(6)
   })
 })

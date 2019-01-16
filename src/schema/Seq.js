@@ -19,9 +19,10 @@ export default class YAMLSeq extends Collection {
   }
 
   set(key, value) {
-    const k = typeof key === 'number' ? key : Number(key)
+    let k = key instanceof Scalar ? key.value : key
+    if (k && typeof k === 'string') k = Number(k)
     if (k < 0 || !Number.isInteger(k))
-      throw new Error(`Expected a valid index for YAML sequence, not ${key}.`)
+      throw new Error(`Expected a valid index for YAML sequence, not ${k}.`)
     this.items[k] = value
   }
 
