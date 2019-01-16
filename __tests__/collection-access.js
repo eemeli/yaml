@@ -32,14 +32,19 @@ describe('Map', () => {
     expect(map.get(YAML.createNode('c'))).toBeUndefined()
   })
 
-  test('getIn', () => {
-    expect(map.getIn(['a'])).toBe(1)
-    expect(map.getIn(['a'], true)).toMatchObject({ value: 1 })
-    expect(map.getIn(['b', 'c'])).toBe(3)
-    expect(map.getIn(['b', 'c'], true)).toMatchObject({ value: 3 })
-    expect(map.getIn(['b', 'e'])).toBeUndefined()
-    expect(map.getIn(['c', 'e'])).toBeUndefined()
-    expect(() => map.getIn(['a', 'e'])).toThrow(/Expected a YAML collection/)
+  test('has with value', () => {
+    expect(map.has('a')).toBe(true)
+    expect(map.has('b')).toBe(true)
+    expect(map.has('c')).toBe(false)
+    expect(map.has('')).toBe(false)
+    expect(map.has()).toBe(false)
+  })
+
+  test('has with node', () => {
+    expect(map.has(YAML.createNode('a'))).toBe(true)
+    expect(map.has(YAML.createNode('b'))).toBe(true)
+    expect(map.has(YAML.createNode('c'))).toBe(false)
+    expect(map.has(YAML.createNode())).toBe(false)
   })
 
   test('set', () => {
@@ -50,18 +55,6 @@ describe('Map', () => {
     expect(map.get('b')).toBe(5)
     map.set('c', 6)
     expect(map.get('c')).toBe(6)
-  })
-
-  test('setIn', () => {
-    map.setIn(['a'], 2)
-    expect(map.get('a')).toBe(2)
-    expect(map.get('a', true)).toBe(2)
-    map.setIn(['b', 'c'], 5)
-    expect(map.getIn(['b', 'c'])).toBe(5)
-    map.setIn(['c'], 6)
-    expect(map.get('c')).toBe(6)
-    expect(() => map.setIn(['a', 'e'])).toThrow(/Cannot create/)
-    expect(() => map.setIn(['e', 'e'])).toThrow(/Cannot create/)
   })
 })
 
@@ -91,14 +84,21 @@ describe('Seq', () => {
     expect(seq.get(YAML.createNode(2))).toBeUndefined()
   })
 
-  test('getIn', () => {
-    expect(seq.getIn([0])).toBe(1)
-    expect(seq.getIn([0], true)).toMatchObject({ value: 1 })
-    expect(seq.getIn([1, 1])).toBe(3)
-    expect(seq.getIn([1, 1], true)).toMatchObject({ value: 3 })
-    expect(seq.getIn([1, 2])).toBeUndefined()
-    expect(seq.getIn([2, 2])).toBeUndefined()
-    expect(() => seq.getIn([0, 1])).toThrow(/Expected a YAML collection/)
+  test('has with value', () => {
+    expect(seq.has(0)).toBe(true)
+    expect(seq.has(1)).toBe(true)
+    expect(seq.has(2)).toBe(false)
+    expect(seq.has('0')).toBe(true)
+    expect(seq.has('')).toBe(false)
+    expect(seq.has()).toBe(false)
+  })
+
+  test('has with node', () => {
+    expect(seq.has(YAML.createNode(0))).toBe(true)
+    expect(seq.has(YAML.createNode('0'))).toBe(true)
+    expect(seq.has(YAML.createNode(2))).toBe(false)
+    expect(seq.has(YAML.createNode(''))).toBe(false)
+    expect(seq.has(YAML.createNode())).toBe(false)
   })
 
   test('set', () => {
@@ -110,8 +110,48 @@ describe('Seq', () => {
     seq.set(2, 6)
     expect(seq.get(2)).toBe(6)
   })
+})
 
-  test('setIn', () => {
+describe('Collection', () => {
+  let map, seq
+  beforeEach(() => {
+    map = YAML.createNode({ a: 1, b: { c: 3, d: 4 } })
+    seq = YAML.createNode([1, [2, 3]])
+  })
+
+  test('getIn map', () => {
+    expect(map.getIn(['a'])).toBe(1)
+    expect(map.getIn(['a'], true)).toMatchObject({ value: 1 })
+    expect(map.getIn(['b', 'c'])).toBe(3)
+    expect(map.getIn(['b', 'c'], true)).toMatchObject({ value: 3 })
+    expect(map.getIn(['b', 'e'])).toBeUndefined()
+    expect(map.getIn(['c', 'e'])).toBeUndefined()
+    expect(() => map.getIn(['a', 'e'])).toThrow(/Expected a YAML collection/)
+  })
+
+  test('getIn seq', () => {
+    expect(seq.getIn([0])).toBe(1)
+    expect(seq.getIn([0], true)).toMatchObject({ value: 1 })
+    expect(seq.getIn([1, 1])).toBe(3)
+    expect(seq.getIn([1, 1], true)).toMatchObject({ value: 3 })
+    expect(seq.getIn([1, 2])).toBeUndefined()
+    expect(seq.getIn([2, 2])).toBeUndefined()
+    expect(() => seq.getIn([0, 1])).toThrow(/Expected a YAML collection/)
+  })
+
+  test('setIn map', () => {
+    map.setIn(['a'], 2)
+    expect(map.get('a')).toBe(2)
+    expect(map.get('a', true)).toBe(2)
+    map.setIn(['b', 'c'], 5)
+    expect(map.getIn(['b', 'c'])).toBe(5)
+    map.setIn(['c'], 6)
+    expect(map.get('c')).toBe(6)
+    expect(() => map.setIn(['a', 'e'])).toThrow(/Cannot create/)
+    expect(() => map.setIn(['e', 'e'])).toThrow(/Cannot create/)
+  })
+
+  test('setIn seq', () => {
     seq.setIn([0], 2)
     expect(seq.get(0)).toBe(2)
     expect(seq.get(0, true)).toBe(2)
@@ -238,6 +278,14 @@ describe('OMap', () => {
     expect(omap.get('a', true)).toMatchObject({ value: 1 })
     expect(omap.get('b').toJSON()).toMatchObject({ c: 3, d: 4 })
     expect(omap.get('c')).toBeUndefined()
+  })
+
+  test('has', () => {
+    expect(omap.has('a')).toBe(true)
+    expect(omap.has('b')).toBe(true)
+    expect(omap.has('c')).toBe(false)
+    expect(omap.has('')).toBe(false)
+    expect(omap.has()).toBe(false)
   })
 
   test('set', () => {

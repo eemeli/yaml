@@ -15,6 +15,7 @@ export class YAMLOMap extends YAMLSeq {
   }
 
   get = YAMLMap.prototype.get.bind(this)
+  has = YAMLMap.prototype.has.bind(this)
   set = YAMLMap.prototype.set.bind(this)
 
   toJSON(_, opt) {

@@ -12,6 +12,12 @@ export default class YAMLSeq extends Collection {
     return !keepScalar && it instanceof Scalar ? it.value : it
   }
 
+  has(key) {
+    let k = key instanceof Scalar ? key.value : key
+    if (k && typeof k === 'string') k = Number(k)
+    return Number.isInteger(k) && k >= 0 && k < this.items.length
+  }
+
   set(key, value) {
     const k = typeof key === 'number' ? key : Number(key)
     if (k < 0 || !Number.isInteger(k))

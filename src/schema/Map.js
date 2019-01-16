@@ -24,6 +24,10 @@ export default class YAMLMap extends Collection {
     return !keepScalar && node instanceof Scalar ? node.value : node
   }
 
+  has(key) {
+    return !!findPair(this.items, key)
+  }
+
   set(key, value) {
     const prev = findPair(this.items, key)
     if (prev) prev.value = value
