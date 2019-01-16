@@ -34,6 +34,16 @@ export default class Collection extends Node {
     })
   }
 
+  hasIn([key, ...rest]) {
+    if (rest.length === 0) return this.has(key)
+    const node = this.get(key, true)
+    if (node === undefined) return false
+    if (node instanceof Collection) return node.hasIn(rest)
+    throw new Error(
+      `Expected a YAML collection at ${key}, but found ${node}. Remaining path: ${rest}`
+    )
+  }
+
   setIn([key, ...rest], value) {
     if (rest.length === 0) {
       this.set(key, value)

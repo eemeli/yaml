@@ -83,6 +83,14 @@ export default class Document {
     )
   }
 
+  hasIn(path) {
+    if (isEmptyPath(path)) return this.contents !== undefined
+    if (this.contents instanceof Collection) return this.contents.hasIn(path)
+    throw new Error(
+      `Document contents must be a YAML collection for hasIn([${path}])`
+    )
+  }
+
   setIn(path, value) {
     if (isEmptyPath(path)) this.contents = value
     else if (this.contents instanceof Collection)
