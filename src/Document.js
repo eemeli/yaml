@@ -76,19 +76,16 @@ export default class Document {
       return !keepScalar && this.contents instanceof Scalar
         ? this.contents.value
         : this.contents
-    if (this.contents instanceof Collection)
-      return this.contents.getIn(path, keepScalar)
-    throw new Error(
-      `Document contents must be a YAML collection for getIn([${path}])`
-    )
+    return this.contents instanceof Collection
+      ? this.contents.getIn(path, keepScalar)
+      : undefined
   }
 
   hasIn(path) {
     if (isEmptyPath(path)) return this.contents !== undefined
-    if (this.contents instanceof Collection) return this.contents.hasIn(path)
-    throw new Error(
-      `Document contents must be a YAML collection for hasIn([${path}])`
-    )
+    return this.contents instanceof Collection
+      ? this.contents.hasIn(path)
+      : false
   }
 
   setIn(path, value) {

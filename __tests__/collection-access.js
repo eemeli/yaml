@@ -146,7 +146,7 @@ describe('Collection', () => {
     expect(map.getIn(['b', 1], true)).toMatchObject({ value: 3 })
     expect(map.getIn(['b', 2])).toBeUndefined()
     expect(map.getIn(['c', 'e'])).toBeUndefined()
-    expect(() => map.getIn(['a', 'e'])).toThrow(/Expected a YAML collection/)
+    expect(map.getIn(['a', 'e'])).toBeUndefined()
   })
 
   test('hasIn', () => {
@@ -155,7 +155,7 @@ describe('Collection', () => {
     expect(map.hasIn(['b', '1'])).toBe(true)
     expect(map.hasIn(['b', 2])).toBe(false)
     expect(map.hasIn(['c', 'e'])).toBe(false)
-    expect(() => map.hasIn(['a', 'e'])).toThrow(/Expected a YAML collection/)
+    expect(map.hasIn(['a', 'e'])).toBe(false)
   })
 
   test('setIn', () => {
@@ -194,14 +194,14 @@ describe('Document', () => {
     expect(doc.getIn(['b', 1], true)).toMatchObject({ value: 3 })
     expect(doc.getIn(['b', 'e'])).toBeUndefined()
     expect(doc.getIn(['c', 'e'])).toBeUndefined()
-    expect(() => doc.getIn(['a', 'e'])).toThrow(/Expected a YAML collection/)
+    expect(doc.getIn(['a', 'e'])).toBeUndefined()
   })
 
   test('getIn scalar', () => {
     doc.contents = YAML.createNode('s')
     expect(doc.getIn([])).toBe('s')
     expect(doc.getIn(null, true)).toMatchObject({ value: 's' })
-    expect(() => doc.getIn([0])).toThrow(/Document contents/)
+    expect(doc.getIn([0])).toBeUndefined()
   })
 
   test('hasIn', () => {
@@ -209,7 +209,7 @@ describe('Document', () => {
     expect(doc.hasIn(['b', 1])).toBe(true)
     expect(doc.hasIn(['b', 'e'])).toBe(false)
     expect(doc.hasIn(['c', 'e'])).toBe(false)
-    expect(() => doc.hasIn(['a', 'e'])).toThrow(/Expected a YAML collection/)
+    expect(doc.hasIn(['a', 'e'])).toBe(false)
   })
 
   test('setIn', () => {

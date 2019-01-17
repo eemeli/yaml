@@ -10,13 +10,12 @@ export default class Collection extends Node {
 
   getIn([key, ...rest], keepScalar) {
     const node = this.get(key, true)
-    if (node === undefined) return undefined
     if (rest.length === 0)
       return !keepScalar && node instanceof Scalar ? node.value : node
-    if (node instanceof Collection) return node.getIn(rest, keepScalar)
-    throw new Error(
-      `Expected a YAML collection at ${key}, but found ${node}. Remaining path: ${rest}`
-    )
+    else
+      return node instanceof Collection
+        ? node.getIn(rest, keepScalar)
+        : undefined
   }
 
   hasAllNullValues() {
@@ -37,11 +36,7 @@ export default class Collection extends Node {
   hasIn([key, ...rest]) {
     if (rest.length === 0) return this.has(key)
     const node = this.get(key, true)
-    if (node === undefined) return false
-    if (node instanceof Collection) return node.hasIn(rest)
-    throw new Error(
-      `Expected a YAML collection at ${key}, but found ${node}. Remaining path: ${rest}`
-    )
+    return node instanceof Collection ? node.hasIn(rest) : false
   }
 
   setIn([key, ...rest], value) {
