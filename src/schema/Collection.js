@@ -13,6 +13,19 @@ export default class Collection extends Node {
 
   items = []
 
+  addIn(path, value) {
+    if (isEmptyPath(path)) this.add(value)
+    else {
+      const [key, ...rest] = path
+      const node = this.get(key, true)
+      if (node instanceof Collection) node.addIn(rest, value)
+      else
+        throw new Error(
+          `Expected YAML collection at ${key}. Remaining path: ${rest}`
+        )
+    }
+  }
+
   deleteIn([key, ...rest]) {
     if (rest.length === 0) return this.delete(key)
     const node = this.get(key, true)

@@ -294,6 +294,17 @@ describe('Collection', () => {
     map = YAML.createNode({ a: 1, b: [2, 3] })
   })
 
+  test('addIn', () => {
+    map.addIn(['b'], 4)
+    expect(map.getIn(['b', 2])).toBe(4)
+    map.addIn([], new Pair('c', 5))
+    expect(map.get('c')).toBe(5)
+    expect(() => map.addIn(['a'])).toThrow(/Expected YAML collection/)
+    expect(() => map.addIn(['b', 3])).toThrow(/Expected YAML collection/)
+    expect(map.items).toHaveLength(3)
+    expect(map.get('b').items).toHaveLength(3)
+  })
+
   test('deleteIn', () => {
     expect(map.deleteIn(['a'])).toBe(true)
     expect(map.get('a')).toBeUndefined()
@@ -355,6 +366,25 @@ describe('Document', () => {
         value: { items: [{ value: 2 }, { value: 3 }] }
       }
     ])
+  })
+
+  test('add', () => {
+    doc.add(new Pair('c', 'x'))
+    expect(doc.get('c')).toBe('x')
+    expect(() => doc.add('a')).toThrow(/Expected a pair/)
+    expect(() => doc.add(new Pair('c', 'y'))).toThrow(/already set/)
+    expect(doc.contents.items).toHaveLength(3)
+  })
+
+  test('addIn', () => {
+    doc.addIn(['b'], 4)
+    expect(doc.getIn(['b', 2])).toBe(4)
+    doc.addIn([], new Pair('c', 5))
+    expect(doc.get('c')).toBe(5)
+    expect(() => doc.addIn(['a'])).toThrow(/Expected YAML collection/)
+    expect(() => doc.addIn(['b', 3])).toThrow(/Expected YAML collection/)
+    expect(doc.contents.items).toHaveLength(3)
+    expect(doc.get('b').items).toHaveLength(3)
   })
 
   test('delete', () => {

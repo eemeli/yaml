@@ -63,6 +63,16 @@ export default class Document {
     throw new Error('Expected a YAML collection as document contents')
   }
 
+  add(value) {
+    this.assertCollectionContents()
+    return this.contents.add(value)
+  }
+
+  addIn(path, value) {
+    this.assertCollectionContents()
+    this.contents.addIn(path, value)
+  }
+
   delete(key) {
     this.assertCollectionContents()
     return this.contents.delete(key)
