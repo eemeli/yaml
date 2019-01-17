@@ -119,7 +119,7 @@ export default class Document {
           spaceBefore = false
         }
         contentNodes.push(res)
-      } else if (node.comment) {
+      } else if (node.comment !== null) {
         const cc = contentNodes.length === 0 ? comments.before : comments.after
         cc.push(node.comment)
       } else if (node.type === Type.BLANK_LINE) {
