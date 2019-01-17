@@ -11,6 +11,10 @@ function asItemIndex(key) {
 }
 
 export default class YAMLSeq extends Collection {
+  add(value) {
+    this.items.push(value)
+  }
+
   delete(key) {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number') return false

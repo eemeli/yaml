@@ -1,4 +1,5 @@
 import YAML from '../src/index'
+import Pair from '../src/schema/Pair'
 
 describe('Map', () => {
   let map
@@ -16,6 +17,14 @@ describe('Map', () => {
         }
       }
     ])
+  })
+
+  test('add', () => {
+    map.add(new Pair('c', 'x'))
+    expect(map.get('c')).toBe('x')
+    expect(() => map.add('a')).toThrow(/Expected a pair/)
+    expect(() => map.add(new Pair('c', 'y'))).toThrow(/already set/)
+    expect(map.items).toHaveLength(3)
   })
 
   test('delete', () => {
@@ -86,6 +95,13 @@ describe('Seq', () => {
       { value: 1 },
       { items: [{ value: 2 }, { value: 3 }] }
     ])
+  })
+
+  test('add', () => {
+    seq.add('x')
+    expect(seq.get(2)).toBe('x')
+    seq.add(1)
+    expect(seq.items).toHaveLength(4)
   })
 
   test('delete', () => {
@@ -332,6 +348,17 @@ describe('Set', () => {
     ])
   })
 
+  test('add', () => {
+    set.add('x')
+    expect(set.get('x')).toBe('x')
+    set.add('x')
+    const y0 = new Pair('y')
+    set.add(y0)
+    set.add(new Pair('y'))
+    expect(set.get('y', true)).toBe(y0)
+    expect(set.items).toHaveLength(5)
+  })
+
   test('get', () => {
     expect(set.get(1)).toBe(1)
     expect(set.get(1, true)).toMatchObject({ key: { value: 1 }, value: null })
@@ -379,6 +406,14 @@ describe('OMap', () => {
         }
       }
     ])
+  })
+
+  test('add', () => {
+    omap.add(new Pair('c', 'x'))
+    expect(omap.get('c')).toBe('x')
+    expect(() => omap.add('a')).toThrow(/Expected a pair/)
+    expect(() => omap.add(new Pair('c', 'y'))).toThrow(/already set/)
+    expect(omap.items).toHaveLength(3)
   })
 
   test('delete', () => {

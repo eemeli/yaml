@@ -18,6 +18,14 @@ export function findPair(items, key) {
 }
 
 export default class YAMLMap extends Collection {
+  add(pair) {
+    if (pair instanceof Pair) {
+      const prev = findPair(this.items, pair.key)
+      if (prev) throw new Error(`Key ${pair.key} already set`)
+      this.items.push(pair)
+    } else throw new Error('Expected a pair as argument for Map add()')
+  }
+
   delete(key) {
     const it = findPair(this.items, key)
     if (!it) return false
