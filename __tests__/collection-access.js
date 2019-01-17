@@ -158,6 +158,18 @@ describe('Collection', () => {
     map = YAML.createNode({ a: 1, b: [2, 3] })
   })
 
+  test('deleteIn', () => {
+    expect(map.deleteIn(['a'])).toBe(true)
+    expect(map.get('a')).toBeUndefined()
+    expect(map.deleteIn(['b', 1])).toBe(true)
+    expect(map.getIn(['b', 1])).toBeUndefined()
+    expect(map.deleteIn([1])).toBe(false)
+    expect(map.deleteIn(['b', 2])).toBe(false)
+    expect(() => map.deleteIn(['a', 'e'])).toThrow(/Expected/)
+    expect(map.items).toHaveLength(1)
+    expect(map.get('b').items).toHaveLength(1)
+  })
+
   test('getIn', () => {
     expect(map.getIn(['a'])).toBe(1)
     expect(map.getIn(['a'], true)).toMatchObject({ value: 1 })
@@ -207,6 +219,28 @@ describe('Document', () => {
         value: { items: [{ value: 2 }, { value: 3 }] }
       }
     ])
+  })
+
+  test('delete', () => {
+    expect(doc.delete('a')).toBe(true)
+    expect(doc.delete('a')).toBe(false)
+    expect(doc.get('a')).toBeUndefined()
+    expect(doc.contents.items).toHaveLength(1)
+
+    doc.contents = YAML.createNode('s')
+    expect(() => doc.set('a', 1)).toThrow(/document contents/)
+  })
+
+  test('deleteIn', () => {
+    expect(doc.deleteIn(['a'])).toBe(true)
+    expect(doc.get('a')).toBeUndefined()
+    expect(doc.deleteIn(['b', 1])).toBe(true)
+    expect(doc.getIn(['b', 1])).toBeUndefined()
+    expect(doc.deleteIn([1])).toBe(false)
+    expect(doc.deleteIn(['b', 2])).toBe(false)
+    expect(() => doc.deleteIn(['a', 'e'])).toThrow(/Expected/)
+    expect(doc.contents.items).toHaveLength(1)
+    expect(doc.get('b').items).toHaveLength(1)
   })
 
   test('get', () => {
@@ -260,7 +294,7 @@ describe('Document', () => {
     expect(doc.contents.items).toHaveLength(3)
 
     doc.contents = YAML.createNode('s')
-    expect(() => doc.set('a', 1)).toThrow(/Document contents/)
+    expect(() => doc.set('a', 1)).toThrow(/document contents/)
   })
 
   test('setIn', () => {
@@ -277,7 +311,7 @@ describe('Document', () => {
     expect(doc.get('b').items).toHaveLength(2)
 
     doc.contents = YAML.createNode('s')
-    expect(() => doc.setIn(['a'], 1)).toThrow(/Document contents/)
+    expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
   })
 })
 

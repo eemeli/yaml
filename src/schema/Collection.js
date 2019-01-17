@@ -8,6 +8,16 @@ export default class Collection extends Node {
 
   items = []
 
+  deleteIn([key, ...rest]) {
+    if (rest.length === 0) return this.delete(key)
+    const node = this.get(key, true)
+    if (node instanceof Collection) return node.deleteIn(rest)
+    else
+      throw new Error(
+        `Expected YAML collection at ${key}. Remaining path: ${rest}`
+      )
+  }
+
   getIn([key, ...rest], keepScalar) {
     const node = this.get(key, true)
     if (rest.length === 0)

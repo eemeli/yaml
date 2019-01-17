@@ -63,6 +63,21 @@ export default class Document {
     this.warnings = []
   }
 
+  delete(key) {
+    if (this.contents instanceof Collection) return this.contents.delete(key)
+    else throw new Error('Expected a YAML collection as document contents')
+  }
+
+  deleteIn(path) {
+    if (isEmptyPath(path)) {
+      if (this.contents == null) return false
+      this.contents = null
+      return true
+    }
+    if (this.contents instanceof Collection) return this.contents.deleteIn(path)
+    else throw new Error('Expected a YAML collection as document contents')
+  }
+
   getDefaults() {
     return (
       Document.defaults[this.version] ||
@@ -100,16 +115,14 @@ export default class Document {
 
   set(key, value) {
     if (this.contents instanceof Collection) this.contents.set(key, value)
-    else
-      throw new Error(`Document contents must be a YAML collection for set()`)
+    else throw new Error('Expected a YAML collection as document contents')
   }
 
   setIn(path, value) {
     if (isEmptyPath(path)) this.contents = value
     else if (this.contents instanceof Collection)
       this.contents.setIn(path, value)
-    else
-      throw new Error(`Document contents must be a YAML collection for setIn()`)
+    else throw new Error('Expected a YAML collection as document contents')
   }
 
   setSchema() {
