@@ -168,169 +168,6 @@ describe('Seq', () => {
   })
 })
 
-describe('Collection', () => {
-  let map
-  beforeEach(() => {
-    map = YAML.createNode({ a: 1, b: [2, 3] })
-  })
-
-  test('deleteIn', () => {
-    expect(map.deleteIn(['a'])).toBe(true)
-    expect(map.get('a')).toBeUndefined()
-    expect(map.deleteIn(['b', 1])).toBe(true)
-    expect(map.getIn(['b', 1])).toBeUndefined()
-    expect(map.deleteIn([1])).toBe(false)
-    expect(map.deleteIn(['b', 2])).toBe(false)
-    expect(() => map.deleteIn(['a', 'e'])).toThrow(/Expected/)
-    expect(map.items).toHaveLength(1)
-    expect(map.get('b').items).toHaveLength(1)
-  })
-
-  test('getIn', () => {
-    expect(map.getIn(['a'])).toBe(1)
-    expect(map.getIn(['a'], true)).toMatchObject({ value: 1 })
-    expect(map.getIn(['b', 1])).toBe(3)
-    expect(map.getIn(['b', '1'])).toBe(3)
-    expect(map.getIn(['b', 1], true)).toMatchObject({ value: 3 })
-    expect(map.getIn(['b', 2])).toBeUndefined()
-    expect(map.getIn(['c', 'e'])).toBeUndefined()
-    expect(map.getIn(['a', 'e'])).toBeUndefined()
-  })
-
-  test('hasIn', () => {
-    expect(map.hasIn(['a'])).toBe(true)
-    expect(map.hasIn(['b', 1])).toBe(true)
-    expect(map.hasIn(['b', '1'])).toBe(true)
-    expect(map.hasIn(['b', 2])).toBe(false)
-    expect(map.hasIn(['c', 'e'])).toBe(false)
-    expect(map.hasIn(['a', 'e'])).toBe(false)
-  })
-
-  test('setIn', () => {
-    map.setIn(['a'], 2)
-    expect(map.get('a')).toBe(2)
-    expect(map.get('a', true)).toBe(2)
-    map.setIn(['b', 1], 5)
-    expect(map.getIn(['b', 1])).toBe(5)
-    map.setIn([1], 6)
-    expect(map.get(1)).toBe(6)
-    map.setIn(['b', 2], 6)
-    expect(map.getIn(['b', 2])).toBe(6)
-    expect(() => map.setIn(['a', 'e'])).toThrow(/Cannot create/)
-    expect(() => map.setIn(['e', 'e'])).toThrow(/Cannot create/)
-    expect(map.items).toHaveLength(3)
-    expect(map.get('b').items).toHaveLength(3)
-  })
-})
-
-describe('Document', () => {
-  let doc
-  beforeEach(() => {
-    doc = new YAML.Document()
-    doc.contents = YAML.createNode({ a: 1, b: [2, 3] })
-    expect(doc.contents.items).toMatchObject([
-      { key: { value: 'a' }, value: { value: 1 } },
-      {
-        key: { value: 'b' },
-        value: { items: [{ value: 2 }, { value: 3 }] }
-      }
-    ])
-  })
-
-  test('delete', () => {
-    expect(doc.delete('a')).toBe(true)
-    expect(doc.delete('a')).toBe(false)
-    expect(doc.get('a')).toBeUndefined()
-    expect(doc.contents.items).toHaveLength(1)
-
-    doc.contents = YAML.createNode('s')
-    expect(() => doc.set('a', 1)).toThrow(/document contents/)
-  })
-
-  test('deleteIn', () => {
-    expect(doc.deleteIn(['a'])).toBe(true)
-    expect(doc.get('a')).toBeUndefined()
-    expect(doc.deleteIn(['b', 1])).toBe(true)
-    expect(doc.getIn(['b', 1])).toBeUndefined()
-    expect(doc.deleteIn([1])).toBe(false)
-    expect(doc.deleteIn(['b', 2])).toBe(false)
-    expect(() => doc.deleteIn(['a', 'e'])).toThrow(/Expected/)
-    expect(doc.contents.items).toHaveLength(1)
-    expect(doc.get('b').items).toHaveLength(1)
-  })
-
-  test('get', () => {
-    expect(doc.get('a')).toBe(1)
-    expect(doc.get('a', true)).toMatchObject({ value: 1 })
-    expect(doc.get('c')).toBeUndefined()
-
-    doc.contents = YAML.createNode('s')
-    expect(doc.get('a')).toBeUndefined()
-  })
-
-  test('getIn collection', () => {
-    expect(doc.getIn(['a'])).toBe(1)
-    expect(doc.getIn(['a'], true)).toMatchObject({ value: 1 })
-    expect(doc.getIn(['b', 1])).toBe(3)
-    expect(doc.getIn(['b', 1], true)).toMatchObject({ value: 3 })
-    expect(doc.getIn(['b', 'e'])).toBeUndefined()
-    expect(doc.getIn(['c', 'e'])).toBeUndefined()
-    expect(doc.getIn(['a', 'e'])).toBeUndefined()
-  })
-
-  test('getIn scalar', () => {
-    doc.contents = YAML.createNode('s')
-    expect(doc.getIn([])).toBe('s')
-    expect(doc.getIn(null, true)).toMatchObject({ value: 's' })
-    expect(doc.getIn([0])).toBeUndefined()
-  })
-
-  test('has', () => {
-    expect(doc.has('a')).toBe(true)
-    expect(doc.has('c')).toBe(false)
-
-    doc.contents = YAML.createNode('s')
-    expect(doc.has('a')).toBe(false)
-  })
-
-  test('hasIn', () => {
-    expect(doc.hasIn(['a'])).toBe(true)
-    expect(doc.hasIn(['b', 1])).toBe(true)
-    expect(doc.hasIn(['b', 'e'])).toBe(false)
-    expect(doc.hasIn(['c', 'e'])).toBe(false)
-    expect(doc.hasIn(['a', 'e'])).toBe(false)
-  })
-
-  test('set', () => {
-    doc.set('a', 2)
-    expect(doc.get('a')).toBe(2)
-    expect(doc.get('a', true)).toBe(2)
-    doc.set('c', 6)
-    expect(doc.get('c')).toBe(6)
-    expect(doc.contents.items).toHaveLength(3)
-
-    doc.contents = YAML.createNode('s')
-    expect(() => doc.set('a', 1)).toThrow(/document contents/)
-  })
-
-  test('setIn', () => {
-    doc.setIn(['a'], 2)
-    expect(doc.getIn(['a'])).toBe(2)
-    expect(doc.getIn(['a'], true)).toBe(2)
-    doc.setIn(['b', 1], 5)
-    expect(doc.getIn(['b', 1])).toBe(5)
-    doc.setIn(['c'], 6)
-    expect(doc.getIn(['c'])).toBe(6)
-    expect(() => doc.setIn(['a', 'e'])).toThrow(/Cannot create/)
-    expect(() => doc.setIn(['e', 'e'], 1)).toThrow(/Cannot create/)
-    expect(doc.contents.items).toHaveLength(3)
-    expect(doc.get('b').items).toHaveLength(2)
-
-    doc.contents = YAML.createNode('s')
-    expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
-  })
-})
-
 describe('Set', () => {
   let doc
   beforeAll(() => {
@@ -448,5 +285,168 @@ describe('OMap', () => {
     omap.set('c', 6)
     expect(omap.get('c')).toBe(6)
     expect(omap.items).toHaveLength(3)
+  })
+})
+
+describe('Collection', () => {
+  let map
+  beforeEach(() => {
+    map = YAML.createNode({ a: 1, b: [2, 3] })
+  })
+
+  test('deleteIn', () => {
+    expect(map.deleteIn(['a'])).toBe(true)
+    expect(map.get('a')).toBeUndefined()
+    expect(map.deleteIn(['b', 1])).toBe(true)
+    expect(map.getIn(['b', 1])).toBeUndefined()
+    expect(map.deleteIn([1])).toBe(false)
+    expect(map.deleteIn(['b', 2])).toBe(false)
+    expect(() => map.deleteIn(['a', 'e'])).toThrow(/Expected YAML collection/)
+    expect(map.items).toHaveLength(1)
+    expect(map.get('b').items).toHaveLength(1)
+  })
+
+  test('getIn', () => {
+    expect(map.getIn(['a'])).toBe(1)
+    expect(map.getIn(['a'], true)).toMatchObject({ value: 1 })
+    expect(map.getIn(['b', 1])).toBe(3)
+    expect(map.getIn(['b', '1'])).toBe(3)
+    expect(map.getIn(['b', 1], true)).toMatchObject({ value: 3 })
+    expect(map.getIn(['b', 2])).toBeUndefined()
+    expect(map.getIn(['c', 'e'])).toBeUndefined()
+    expect(map.getIn(['a', 'e'])).toBeUndefined()
+  })
+
+  test('hasIn', () => {
+    expect(map.hasIn(['a'])).toBe(true)
+    expect(map.hasIn(['b', 1])).toBe(true)
+    expect(map.hasIn(['b', '1'])).toBe(true)
+    expect(map.hasIn(['b', 2])).toBe(false)
+    expect(map.hasIn(['c', 'e'])).toBe(false)
+    expect(map.hasIn(['a', 'e'])).toBe(false)
+  })
+
+  test('setIn', () => {
+    map.setIn(['a'], 2)
+    expect(map.get('a')).toBe(2)
+    expect(map.get('a', true)).toBe(2)
+    map.setIn(['b', 1], 5)
+    expect(map.getIn(['b', 1])).toBe(5)
+    map.setIn([1], 6)
+    expect(map.get(1)).toBe(6)
+    map.setIn(['b', 2], 6)
+    expect(map.getIn(['b', 2])).toBe(6)
+    expect(() => map.setIn(['a', 'e'])).toThrow(/Expected YAML collection/)
+    expect(() => map.setIn(['e', 'e'])).toThrow(/Expected YAML collection/)
+    expect(map.items).toHaveLength(3)
+    expect(map.get('b').items).toHaveLength(3)
+  })
+})
+
+describe('Document', () => {
+  let doc
+  beforeEach(() => {
+    doc = new YAML.Document()
+    doc.contents = YAML.createNode({ a: 1, b: [2, 3] })
+    expect(doc.contents.items).toMatchObject([
+      { key: { value: 'a' }, value: { value: 1 } },
+      {
+        key: { value: 'b' },
+        value: { items: [{ value: 2 }, { value: 3 }] }
+      }
+    ])
+  })
+
+  test('delete', () => {
+    expect(doc.delete('a')).toBe(true)
+    expect(doc.delete('a')).toBe(false)
+    expect(doc.get('a')).toBeUndefined()
+    expect(doc.contents.items).toHaveLength(1)
+
+    doc.contents = YAML.createNode('s')
+    expect(() => doc.set('a', 1)).toThrow(/document contents/)
+  })
+
+  test('deleteIn', () => {
+    expect(doc.deleteIn(['a'])).toBe(true)
+    expect(doc.get('a')).toBeUndefined()
+    expect(doc.deleteIn(['b', 1])).toBe(true)
+    expect(doc.getIn(['b', 1])).toBeUndefined()
+    expect(doc.deleteIn([1])).toBe(false)
+    expect(doc.deleteIn(['b', 2])).toBe(false)
+    expect(() => doc.deleteIn(['a', 'e'])).toThrow(/Expected/)
+    expect(doc.contents.items).toHaveLength(1)
+    expect(doc.get('b').items).toHaveLength(1)
+  })
+
+  test('get', () => {
+    expect(doc.get('a')).toBe(1)
+    expect(doc.get('a', true)).toMatchObject({ value: 1 })
+    expect(doc.get('c')).toBeUndefined()
+
+    doc.contents = YAML.createNode('s')
+    expect(doc.get('a')).toBeUndefined()
+  })
+
+  test('getIn collection', () => {
+    expect(doc.getIn(['a'])).toBe(1)
+    expect(doc.getIn(['a'], true)).toMatchObject({ value: 1 })
+    expect(doc.getIn(['b', 1])).toBe(3)
+    expect(doc.getIn(['b', 1], true)).toMatchObject({ value: 3 })
+    expect(doc.getIn(['b', 'e'])).toBeUndefined()
+    expect(doc.getIn(['c', 'e'])).toBeUndefined()
+    expect(doc.getIn(['a', 'e'])).toBeUndefined()
+  })
+
+  test('getIn scalar', () => {
+    doc.contents = YAML.createNode('s')
+    expect(doc.getIn([])).toBe('s')
+    expect(doc.getIn(null, true)).toMatchObject({ value: 's' })
+    expect(doc.getIn([0])).toBeUndefined()
+  })
+
+  test('has', () => {
+    expect(doc.has('a')).toBe(true)
+    expect(doc.has('c')).toBe(false)
+
+    doc.contents = YAML.createNode('s')
+    expect(doc.has('a')).toBe(false)
+  })
+
+  test('hasIn', () => {
+    expect(doc.hasIn(['a'])).toBe(true)
+    expect(doc.hasIn(['b', 1])).toBe(true)
+    expect(doc.hasIn(['b', 'e'])).toBe(false)
+    expect(doc.hasIn(['c', 'e'])).toBe(false)
+    expect(doc.hasIn(['a', 'e'])).toBe(false)
+  })
+
+  test('set', () => {
+    doc.set('a', 2)
+    expect(doc.get('a')).toBe(2)
+    expect(doc.get('a', true)).toBe(2)
+    doc.set('c', 6)
+    expect(doc.get('c')).toBe(6)
+    expect(doc.contents.items).toHaveLength(3)
+
+    doc.contents = YAML.createNode('s')
+    expect(() => doc.set('a', 1)).toThrow(/document contents/)
+  })
+
+  test('setIn', () => {
+    doc.setIn(['a'], 2)
+    expect(doc.getIn(['a'])).toBe(2)
+    expect(doc.getIn(['a'], true)).toBe(2)
+    doc.setIn(['b', 1], 5)
+    expect(doc.getIn(['b', 1])).toBe(5)
+    doc.setIn(['c'], 6)
+    expect(doc.getIn(['c'])).toBe(6)
+    expect(() => doc.setIn(['a', 'e'])).toThrow(/Expected YAML collection/)
+    expect(() => doc.setIn(['e', 'e'], 1)).toThrow(/Expected YAML collection/)
+    expect(doc.contents.items).toHaveLength(3)
+    expect(doc.get('b').items).toHaveLength(2)
+
+    doc.contents = YAML.createNode('s')
+    expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
   })
 })

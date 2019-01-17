@@ -10,17 +10,12 @@ import {
 import listTagNames from './listTagNames'
 import Schema from './schema'
 import Alias from './schema/Alias'
-import Collection from './schema/Collection'
+import Collection, { isEmptyPath } from './schema/Collection'
 import toJSON from './toJSON'
 import Scalar from './schema/Scalar'
 
 const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
-
-// null, undefined, or an empty non-string iterable (e.g. [])
-const isEmptyPath = path =>
-  path == null ||
-  (typeof path === 'object' && path[Symbol.iterator]().next().done)
 
 export default class Document {
   static defaults = {
@@ -63,9 +58,14 @@ export default class Document {
     this.warnings = []
   }
 
+  assertCollectionContents() {
+    if (this.contents instanceof Collection) return true
+    throw new Error('Expected a YAML collection as document contents')
+  }
+
   delete(key) {
-    if (this.contents instanceof Collection) return this.contents.delete(key)
-    else throw new Error('Expected a YAML collection as document contents')
+    this.assertCollectionContents()
+    return this.contents.delete(key)
   }
 
   deleteIn(path) {
@@ -74,8 +74,8 @@ export default class Document {
       this.contents = null
       return true
     }
-    if (this.contents instanceof Collection) return this.contents.deleteIn(path)
-    else throw new Error('Expected a YAML collection as document contents')
+    this.assertCollectionContents()
+    return this.contents.deleteIn(path)
   }
 
   getDefaults() {
@@ -114,15 +114,16 @@ export default class Document {
   }
 
   set(key, value) {
-    if (this.contents instanceof Collection) this.contents.set(key, value)
-    else throw new Error('Expected a YAML collection as document contents')
+    this.assertCollectionContents()
+    this.contents.set(key, value)
   }
 
   setIn(path, value) {
     if (isEmptyPath(path)) this.contents = value
-    else if (this.contents instanceof Collection)
+    else {
+      this.assertCollectionContents()
       this.contents.setIn(path, value)
-    else throw new Error('Expected a YAML collection as document contents')
+    }
   }
 
   setSchema() {

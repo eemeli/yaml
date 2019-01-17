@@ -3,6 +3,11 @@ import Node from './Node'
 import Pair from './Pair'
 import Scalar from './Scalar'
 
+// null, undefined, or an empty non-string iterable (e.g. [])
+export const isEmptyPath = path =>
+  path == null ||
+  (typeof path === 'object' && path[Symbol.iterator]().next().done)
+
 export default class Collection extends Node {
   static maxFlowStringSingleLineLength = 60
 
@@ -57,7 +62,7 @@ export default class Collection extends Node {
       if (node instanceof Collection) node.setIn(rest, value)
       else
         throw new Error(
-          `Cannot create intermediate YAML collection at ${key}. Remaining path: ${rest}`
+          `Expected YAML collection at ${key}. Remaining path: ${rest}`
         )
     }
   }
