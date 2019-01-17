@@ -23,6 +23,7 @@ describe('Map', () => {
     expect(map.get('a')).toBeUndefined()
     map.delete('c')
     expect(map.get('b')).toMatchObject({ items: [{}, {}] })
+    expect(map.items).toHaveLength(1)
   })
 
   test('get with value', () => {
@@ -62,6 +63,7 @@ describe('Map', () => {
     expect(map.get('b')).toBe(5)
     map.set('c', 6)
     expect(map.get('c')).toBe(6)
+    expect(map.items).toHaveLength(3)
   })
 
   test('set with node', () => {
@@ -72,6 +74,7 @@ describe('Map', () => {
     expect(map.get('b')).toBe(5)
     map.set(YAML.createNode('c'), 6)
     expect(map.get('c')).toBe(6)
+    expect(map.items).toHaveLength(3)
   })
 })
 
@@ -90,6 +93,7 @@ describe('Seq', () => {
     seq.delete(2)
     seq.delete('a')
     expect(seq.get(0)).toMatchObject({ items: [{ value: 2 }, { value: 3 }] })
+    expect(seq.items).toHaveLength(1)
   })
 
   test('get with value', () => {
@@ -133,6 +137,7 @@ describe('Seq', () => {
     expect(seq.get(1)).toBe(5)
     seq.set(2, 6)
     expect(seq.get(2)).toBe(6)
+    expect(seq.items).toHaveLength(3)
   })
 
   test('set with node', () => {
@@ -143,6 +148,7 @@ describe('Seq', () => {
     expect(seq.get(1)).toBe(5)
     seq.set(YAML.createNode(2), 6)
     expect(seq.get(2)).toBe(6)
+    expect(seq.items).toHaveLength(3)
   })
 })
 
@@ -184,6 +190,8 @@ describe('Collection', () => {
     expect(map.getIn(['b', 2])).toBe(6)
     expect(() => map.setIn(['a', 'e'])).toThrow(/Cannot create/)
     expect(() => map.setIn(['e', 'e'])).toThrow(/Cannot create/)
+    expect(map.items).toHaveLength(3)
+    expect(map.get('b').items).toHaveLength(3)
   })
 })
 
@@ -205,6 +213,7 @@ describe('Document', () => {
     expect(doc.get('a')).toBe(1)
     expect(doc.get('a', true)).toMatchObject({ value: 1 })
     expect(doc.get('c')).toBeUndefined()
+
     doc.contents = YAML.createNode('s')
     expect(doc.get('a')).toBeUndefined()
   })
@@ -229,6 +238,7 @@ describe('Document', () => {
   test('has', () => {
     expect(doc.has('a')).toBe(true)
     expect(doc.has('c')).toBe(false)
+
     doc.contents = YAML.createNode('s')
     expect(doc.has('a')).toBe(false)
   })
@@ -247,6 +257,8 @@ describe('Document', () => {
     expect(doc.get('a', true)).toBe(2)
     doc.set('c', 6)
     expect(doc.get('c')).toBe(6)
+    expect(doc.contents.items).toHaveLength(3)
+
     doc.contents = YAML.createNode('s')
     expect(() => doc.set('a', 1)).toThrow(/Document contents/)
   })
@@ -261,6 +273,9 @@ describe('Document', () => {
     expect(doc.getIn(['c'])).toBe(6)
     expect(() => doc.setIn(['a', 'e'])).toThrow(/Cannot create/)
     expect(() => doc.setIn(['e', 'e'], 1)).toThrow(/Cannot create/)
+    expect(doc.contents.items).toHaveLength(3)
+    expect(doc.get('b').items).toHaveLength(2)
+
     doc.contents = YAML.createNode('s')
     expect(() => doc.setIn(['a'], 1)).toThrow(/Document contents/)
   })
@@ -300,6 +315,7 @@ describe('Set', () => {
     set.set(4, true)
     expect(set.get(4)).toBe(4)
     expect(set.get(4, true)).toMatchObject({ key: 4, value: null })
+    expect(set.items).toHaveLength(3)
   })
 })
 
@@ -336,6 +352,7 @@ describe('OMap', () => {
     expect(omap.get('a')).toBeUndefined()
     omap.delete('c')
     expect(omap.get('b')).toMatchObject({ items: [{}, {}] })
+    expect(omap.items).toHaveLength(1)
   })
 
   test('get', () => {
@@ -361,5 +378,6 @@ describe('OMap', () => {
     expect(omap.get('b')).toBe(5)
     omap.set('c', 6)
     expect(omap.get('c')).toBe(6)
+    expect(omap.items).toHaveLength(3)
   })
 })
