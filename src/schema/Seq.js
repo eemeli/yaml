@@ -4,26 +4,35 @@ import toJSON from '../toJSON'
 import Collection from './Collection'
 import Scalar from './Scalar'
 
+function asItemIndex(key) {
+  let idx = key instanceof Scalar ? key.value : key
+  if (idx && typeof idx === 'string') idx = Number(idx)
+  return Number.isInteger(idx) && idx >= 0 ? idx : null
+}
+
 export default class YAMLSeq extends Collection {
+  delete(key) {
+    const idx = asItemIndex(key)
+    if (typeof idx === 'number') this.items.splice(idx, 1)
+  }
+
   get(key, keepScalar) {
-    const k = key instanceof Scalar ? key.value : key
-    if (!isFinite(k)) return undefined
-    const it = this.items[k]
+    const idx = asItemIndex(key)
+    if (typeof idx !== 'number') return undefined
+    const it = this.items[idx]
     return !keepScalar && it instanceof Scalar ? it.value : it
   }
 
   has(key) {
-    let k = key instanceof Scalar ? key.value : key
-    if (k && typeof k === 'string') k = Number(k)
-    return Number.isInteger(k) && k >= 0 && k < this.items.length
+    const idx = asItemIndex(key)
+    return typeof idx === 'number' && idx < this.items.length
   }
 
   set(key, value) {
-    let k = key instanceof Scalar ? key.value : key
-    if (k && typeof k === 'string') k = Number(k)
-    if (k < 0 || !Number.isInteger(k))
-      throw new Error(`Expected a valid index for YAML sequence, not ${k}.`)
-    this.items[k] = value
+    const idx = asItemIndex(key)
+    if (typeof idx !== 'number')
+      throw new Error(`Expected a valid index, not ${key}.`)
+    this.items[idx] = value
   }
 
   toJSON(_, opt) {

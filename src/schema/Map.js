@@ -18,6 +18,11 @@ export function findPair(items, key) {
 }
 
 export default class YAMLMap extends Collection {
+  delete(key) {
+    const it = findPair(this.items, key)
+    if (it) this.items.splice(this.items.indexOf(it), 1)
+  }
+
   get(key, keepScalar) {
     const it = findPair(this.items, key)
     const node = it && it.value

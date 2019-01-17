@@ -18,6 +18,13 @@ describe('Map', () => {
     ])
   })
 
+  test('delete', () => {
+    map.delete('a')
+    expect(map.get('a')).toBeUndefined()
+    map.delete('c')
+    expect(map.get('b')).toMatchObject({ items: [{}, {}] })
+  })
+
   test('get with value', () => {
     expect(map.get('a')).toBe(1)
     expect(map.get('a', true)).toMatchObject({ value: 1 })
@@ -76,6 +83,13 @@ describe('Seq', () => {
       { value: 1 },
       { items: [{ value: 2 }, { value: 3 }] }
     ])
+  })
+
+  test('delete', () => {
+    seq.delete(0)
+    seq.delete(2)
+    seq.delete('a')
+    expect(seq.get(0)).toMatchObject({ items: [{ value: 2 }, { value: 3 }] })
   })
 
   test('get with value', () => {
@@ -315,6 +329,13 @@ describe('OMap', () => {
         }
       }
     ])
+  })
+
+  test('delete', () => {
+    omap.delete('a')
+    expect(omap.get('a')).toBeUndefined()
+    omap.delete('c')
+    expect(omap.get('b')).toMatchObject({ items: [{}, {}] })
   })
 
   test('get', () => {

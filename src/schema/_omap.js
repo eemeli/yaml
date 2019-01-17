@@ -14,6 +14,7 @@ export class YAMLOMap extends YAMLSeq {
     this.tag = YAMLOMap.tag
   }
 
+  delete = YAMLMap.prototype.delete.bind(this)
   get = YAMLMap.prototype.get.bind(this)
   has = YAMLMap.prototype.has.bind(this)
   set = YAMLMap.prototype.set.bind(this)
