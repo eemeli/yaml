@@ -20,9 +20,9 @@ describe('Map', () => {
   })
 
   test('add', () => {
-    map.add(new Pair('c', 'x'))
+    map.add({ key: 'c', value: 'x' })
     expect(map.get('c')).toBe('x')
-    expect(() => map.add('a')).toThrow(/Expected a pair/)
+    expect(() => map.add('a')).toThrow(/already set/)
     expect(() => map.add(new Pair('c', 'y'))).toThrow(/already set/)
     expect(map.items).toHaveLength(3)
   })
@@ -246,9 +246,9 @@ describe('OMap', () => {
   })
 
   test('add', () => {
-    omap.add(new Pair('c', 'x'))
+    omap.add({ key: 'c', value: 'x' })
     expect(omap.get('c')).toBe('x')
-    expect(() => omap.add('a')).toThrow(/Expected a pair/)
+    expect(() => omap.add('a')).toThrow(/already set/)
     expect(() => omap.add(new Pair('c', 'y'))).toThrow(/already set/)
     expect(omap.items).toHaveLength(3)
   })
@@ -369,9 +369,9 @@ describe('Document', () => {
   })
 
   test('add', () => {
-    doc.add(new Pair('c', 'x'))
+    doc.add({ key: 'c', value: 'x' })
     expect(doc.get('c')).toBe('x')
-    expect(() => doc.add('a')).toThrow(/Expected a pair/)
+    expect(() => doc.add('a')).toThrow(/already set/)
     expect(() => doc.add(new Pair('c', 'y'))).toThrow(/already set/)
     expect(doc.contents.items).toHaveLength(3)
   })
