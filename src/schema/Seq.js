@@ -13,7 +13,9 @@ function asItemIndex(key) {
 export default class YAMLSeq extends Collection {
   delete(key) {
     const idx = asItemIndex(key)
-    if (typeof idx === 'number') this.items.splice(idx, 1)
+    if (typeof idx !== 'number') return false
+    const del = this.items.splice(idx, 1)
+    return del.length > 0
   }
 
   get(key, keepScalar) {

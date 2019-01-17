@@ -19,9 +19,9 @@ describe('Map', () => {
   })
 
   test('delete', () => {
-    map.delete('a')
+    expect(map.delete('a')).toBe(true)
     expect(map.get('a')).toBeUndefined()
-    map.delete('c')
+    expect(map.delete('c')).toBe(false)
     expect(map.get('b')).toMatchObject({ items: [{}, {}] })
     expect(map.items).toHaveLength(1)
   })
@@ -89,9 +89,9 @@ describe('Seq', () => {
   })
 
   test('delete', () => {
-    seq.delete(0)
-    seq.delete(2)
-    seq.delete('a')
+    expect(seq.delete(0)).toBe(true)
+    expect(seq.delete(2)).toBe(false)
+    expect(seq.delete('a')).toBe(false)
     expect(seq.get(0)).toMatchObject({ items: [{ value: 2 }, { value: 3 }] })
     expect(seq.items).toHaveLength(1)
   })
@@ -348,9 +348,9 @@ describe('OMap', () => {
   })
 
   test('delete', () => {
-    omap.delete('a')
+    expect(omap.delete('a')).toBe(true)
     expect(omap.get('a')).toBeUndefined()
-    omap.delete('c')
+    expect(omap.delete('c')).toBe(false)
     expect(omap.get('b')).toMatchObject({ items: [{}, {}] })
     expect(omap.items).toHaveLength(1)
   })

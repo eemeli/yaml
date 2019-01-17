@@ -20,7 +20,9 @@ export function findPair(items, key) {
 export default class YAMLMap extends Collection {
   delete(key) {
     const it = findPair(this.items, key)
-    if (it) this.items.splice(this.items.indexOf(it), 1)
+    if (!it) return false
+    const del = this.items.splice(this.items.indexOf(it), 1)
+    return del.length > 0
   }
 
   get(key, keepScalar) {
