@@ -187,6 +187,14 @@ describe('Document', () => {
     ])
   })
 
+  test('get', () => {
+    expect(doc.get('a')).toBe(1)
+    expect(doc.get('a', true)).toMatchObject({ value: 1 })
+    expect(doc.get('c')).toBeUndefined()
+    doc.contents = YAML.createNode('s')
+    expect(doc.get('a')).toBeUndefined()
+  })
+
   test('getIn collection', () => {
     expect(doc.getIn(['a'])).toBe(1)
     expect(doc.getIn(['a'], true)).toMatchObject({ value: 1 })
@@ -204,12 +212,29 @@ describe('Document', () => {
     expect(doc.getIn([0])).toBeUndefined()
   })
 
+  test('has', () => {
+    expect(doc.has('a')).toBe(true)
+    expect(doc.has('c')).toBe(false)
+    doc.contents = YAML.createNode('s')
+    expect(doc.has('a')).toBe(false)
+  })
+
   test('hasIn', () => {
     expect(doc.hasIn(['a'])).toBe(true)
     expect(doc.hasIn(['b', 1])).toBe(true)
     expect(doc.hasIn(['b', 'e'])).toBe(false)
     expect(doc.hasIn(['c', 'e'])).toBe(false)
     expect(doc.hasIn(['a', 'e'])).toBe(false)
+  })
+
+  test('set', () => {
+    doc.set('a', 2)
+    expect(doc.get('a')).toBe(2)
+    expect(doc.get('a', true)).toBe(2)
+    doc.set('c', 6)
+    expect(doc.get('c')).toBe(6)
+    doc.contents = YAML.createNode('s')
+    expect(() => doc.set('a', 1)).toThrow(/Document contents/)
   })
 
   test('setIn', () => {
@@ -221,7 +246,9 @@ describe('Document', () => {
     doc.setIn(['c'], 6)
     expect(doc.getIn(['c'])).toBe(6)
     expect(() => doc.setIn(['a', 'e'])).toThrow(/Cannot create/)
-    expect(() => doc.setIn(['e', 'e'])).toThrow(/Cannot create/)
+    expect(() => doc.setIn(['e', 'e'], 1)).toThrow(/Cannot create/)
+    doc.contents = YAML.createNode('s')
+    expect(() => doc.setIn(['a'], 1)).toThrow(/Document contents/)
   })
 })
 

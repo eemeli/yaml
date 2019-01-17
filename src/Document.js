@@ -71,6 +71,12 @@ export default class Document {
     )
   }
 
+  get(key, keepScalar) {
+    return this.contents instanceof Collection
+      ? this.contents.get(key, keepScalar)
+      : undefined
+  }
+
   getIn(path, keepScalar) {
     if (isEmptyPath(path))
       return !keepScalar && this.contents instanceof Scalar
@@ -81,6 +87,10 @@ export default class Document {
       : undefined
   }
 
+  has(key) {
+    return this.contents instanceof Collection ? this.contents.has(key) : false
+  }
+
   hasIn(path) {
     if (isEmptyPath(path)) return this.contents !== undefined
     return this.contents instanceof Collection
@@ -88,14 +98,18 @@ export default class Document {
       : false
   }
 
+  set(key, value) {
+    if (this.contents instanceof Collection) this.contents.set(key, value)
+    else
+      throw new Error(`Document contents must be a YAML collection for set()`)
+  }
+
   setIn(path, value) {
     if (isEmptyPath(path)) this.contents = value
     else if (this.contents instanceof Collection)
       this.contents.setIn(path, value)
     else
-      throw new Error(
-        `Document contents must be a YAML collection for setIn([${path}], ...)`
-      )
+      throw new Error(`Document contents must be a YAML collection for setIn()`)
   }
 
   setSchema() {
