@@ -10,7 +10,7 @@ import {
 import listTagNames from './listTagNames'
 import Schema from './schema'
 import Alias from './schema/Alias'
-import Collection from './schema/Collection'
+import Collection, { isEmptyPath } from './schema/Collection'
 import toJSON from './toJSON'
 import Scalar from './schema/Scalar'
 
@@ -58,12 +58,82 @@ export default class Document {
     this.warnings = []
   }
 
+  assertCollectionContents() {
+    if (this.contents instanceof Collection) return true
+    throw new Error('Expected a YAML collection as document contents')
+  }
+
+  add(value) {
+    this.assertCollectionContents()
+    return this.contents.add(value)
+  }
+
+  addIn(path, value) {
+    this.assertCollectionContents()
+    this.contents.addIn(path, value)
+  }
+
+  delete(key) {
+    this.assertCollectionContents()
+    return this.contents.delete(key)
+  }
+
+  deleteIn(path) {
+    if (isEmptyPath(path)) {
+      if (this.contents == null) return false
+      this.contents = null
+      return true
+    }
+    this.assertCollectionContents()
+    return this.contents.deleteIn(path)
+  }
+
   getDefaults() {
     return (
       Document.defaults[this.version] ||
       Document.defaults[this.options.version] ||
       {}
     )
+  }
+
+  get(key, keepScalar) {
+    return this.contents instanceof Collection
+      ? this.contents.get(key, keepScalar)
+      : undefined
+  }
+
+  getIn(path, keepScalar) {
+    if (isEmptyPath(path))
+      return !keepScalar && this.contents instanceof Scalar
+        ? this.contents.value
+        : this.contents
+    return this.contents instanceof Collection
+      ? this.contents.getIn(path, keepScalar)
+      : undefined
+  }
+
+  has(key) {
+    return this.contents instanceof Collection ? this.contents.has(key) : false
+  }
+
+  hasIn(path) {
+    if (isEmptyPath(path)) return this.contents !== undefined
+    return this.contents instanceof Collection
+      ? this.contents.hasIn(path)
+      : false
+  }
+
+  set(key, value) {
+    this.assertCollectionContents()
+    this.contents.set(key, value)
+  }
+
+  setIn(path, value) {
+    if (isEmptyPath(path)) this.contents = value
+    else {
+      this.assertCollectionContents()
+      this.contents.setIn(path, value)
+    }
   }
 
   setSchema() {
