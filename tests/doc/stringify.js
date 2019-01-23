@@ -1,5 +1,5 @@
-import YAML from '../src/index'
-import { strOptions } from '../src/schema/_string'
+import YAML from '../../src/index'
+import { strOptions } from '../../src/schema/_string'
 
 test('undefined', () => {
   expect(YAML.stringify()).toBe('\n')

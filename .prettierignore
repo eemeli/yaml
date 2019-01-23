@@ -6,4 +6,4 @@
 /docs/source/layouts/
 /docs/source/stylesheets/
 /package*.json
-/__tests__/yaml-test-suite/
+/tests/yaml-test-suite/

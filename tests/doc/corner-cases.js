@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import Node from '../src/cst/Node'
-import YAML from '../src/index'
+import Node from '../../src/cst/Node'
+import YAML from '../../src/index'
 
 test('eemeli/yaml#2', () => {
   const src = `
@@ -74,7 +74,7 @@ aliases:
 
   test('complete file', () => {
     const src = fs.readFileSync(
-      path.resolve(__dirname, './artifacts/prettier-circleci-config.yml'),
+      path.resolve(__dirname, '../artifacts/prettier-circleci-config.yml'),
       'utf8'
     )
     const doc = YAML.parseDocument(src)

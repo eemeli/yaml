@@ -1,6 +1,6 @@
-import fold, { FOLD_FLOW, FOLD_QUOTED } from '../src/foldFlowLines'
-import YAML from '../src/index'
-import { strOptions } from '../src/schema/_string'
+import fold, { FOLD_FLOW, FOLD_QUOTED } from '../../src/foldFlowLines'
+import YAML from '../../src/index'
+import { strOptions } from '../../src/schema/_string'
 
 describe('plain', () => {
   const src = 'abc def ghi jkl mno pqr stu vwx yz\n'

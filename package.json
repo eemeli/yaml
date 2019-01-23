@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "build": "babel src/ --out-dir dist/",
-    "prettier": "prettier --write \"{src,__tests__}/**/*.js\"",
+    "prettier": "prettier --write \"{src,tests}/**/*.js\"",
     "lint": "eslint src/",
     "test": "TRACE_LEVEL=log jest",
     "test:trace": "TRACE_LEVEL=trace,log jest --no-cache",
@@ -57,9 +57,12 @@
     ]
   },
   "jest": {
+    "testMatch": [
+      "**/tests/**/*.js"
+    ],
     "testPathIgnorePatterns": [
-      "__tests__/common",
-      "__tests__/cst/common"
+      "tests/common",
+      "tests/cst/common"
     ]
   },
   "prettier": {
@@ -117,8 +120,7 @@
       },
       {
         "files": [
-          "__tests__/*.js",
-          "__tests__/cst/*.js"
+          "tests/**/*.js"
         ],
         "env": {
           "es6": true,
