@@ -1,84 +1,50 @@
-import YAML from '../../src/index'
-import { findLineOffsets, charPosToLineCol } from '../../src/cst/getLinePos'
+import getLinePos from '../../src/cst/getLinePos'
+import parse from '../../src/cst/parse'
 
-describe('lineOffsets', () => {
-  test('lineOffsets for empty document', () => {
-    const src = ''
-    const lineOffsets = findLineOffsets(src)
-    expect(lineOffsets).toMatchObject([0])
-  })
+test('lineStarts for empty document', () => {
+  const src = ''
+  const cst = parse(src)
+  expect(() => getLinePos(0, cst)).not.toThrow()
+  expect(cst[0].lineStarts).toMatchObject([0])
+})
 
-  test('lineOffsets for multiple documents', () => {
-    const src = 'foo\n...\nbar\n'
-    const lineOffsets = findLineOffsets(src)
-    expect(lineOffsets).toMatchObject([0, 4, 8, 12])
-  })
+test('lineStarts for multiple documents', () => {
+  const src = 'foo\n...\nbar\n'
+  const cst = parse(src)
+  expect(() => getLinePos(0, cst)).not.toThrow()
+  expect(cst[0].lineStarts).toMatchObject([0, 4, 8, 12])
+})
 
-  test('lineOffsets for malformed document', () => {
-    const src = '- foo\n\t- bar\n'
-    const lineOffsets = findLineOffsets(src)
-    expect(lineOffsets).toMatchObject([0, 6, 13])
-  })
+test('lineStarts for malformed document', () => {
+  const src = '- foo\n\t- bar\n'
+  const cst = parse(src)
+  expect(() => getLinePos(0, cst)).not.toThrow()
+  expect(cst[0].lineStarts).toMatchObject([0, 6, 13])
+})
 
-  test('offset conversion to line and col', () => {
-    const src = '- foo\n- bar\n'
-    const cst = YAML.parseCST(src)
-    expect(charPosToLineCol()).toMatchObject({
-      line: undefined,
-      col: undefined
-    })
-    expect(charPosToLineCol(0)).toMatchObject({
-      line: undefined,
-      col: undefined
-    })
-    expect(charPosToLineCol(1)).toMatchObject({
-      line: undefined,
-      col: undefined
-    })
-    expect(charPosToLineCol(-1, cst)).toMatchObject({
-      line: undefined,
-      col: undefined
-    })
-    expect(charPosToLineCol(0, cst)).toMatchObject({
-      line: 0,
-      col: 0
-    })
-    expect(charPosToLineCol(1, cst)).toMatchObject({
-      line: 0,
-      col: 1
-    })
-    expect(charPosToLineCol(2, cst)).toMatchObject({
-      line: 0,
-      col: 2
-    })
-    expect(charPosToLineCol(5, cst)).toMatchObject({
-      line: 0,
-      col: 5
-    })
-    expect(charPosToLineCol(6, cst)).toMatchObject({
-      line: 1,
-      col: 0
-    })
-    expect(charPosToLineCol(7, cst)).toMatchObject({
-      line: 1,
-      col: 1
-    })
-    expect(charPosToLineCol(11, cst)).toMatchObject({
-      line: 1,
-      col: 5
-    })
-    expect(charPosToLineCol(12, cst)).toMatchObject({
-      line: 2,
-      col: 0
-    })
-    expect(charPosToLineCol(13, cst)).toMatchObject({
-      line: undefined,
-      col: undefined
-    })
-    expect(charPosToLineCol(Math.MAXINT, cst)).toMatchObject({
-      line: undefined,
-      col: undefined
-    })
-    expect(cst[0].lineOffsets).toMatchObject([0, 6, 12])
-  })
+test('getLinePos()', () => {
+  const src = '- foo\n- bar\n'
+  const cst = parse(src)
+  expect(cst[0].lineStarts).toBeUndefined()
+  expect(getLinePos(0, cst)).toMatchObject({ line: 0, col: 0 })
+  expect(getLinePos(1, cst)).toMatchObject({ line: 0, col: 1 })
+  expect(getLinePos(2, cst)).toMatchObject({ line: 0, col: 2 })
+  expect(getLinePos(5, cst)).toMatchObject({ line: 0, col: 5 })
+  expect(getLinePos(6, cst)).toMatchObject({ line: 1, col: 0 })
+  expect(getLinePos(7, cst)).toMatchObject({ line: 1, col: 1 })
+  expect(getLinePos(11, cst)).toMatchObject({ line: 1, col: 5 })
+  expect(getLinePos(12, cst)).toMatchObject({ line: 2, col: 0 })
+  expect(cst[0].lineStarts).toMatchObject([0, 6, 12])
+})
+
+test('invalid args for getLinePos()', () => {
+  const src = '- foo\n- bar\n'
+  const cst = parse(src)
+  const undefLinePos = { line: undefined, col: undefined }
+  expect(getLinePos()).toMatchObject(undefLinePos)
+  expect(getLinePos(0)).toMatchObject(undefLinePos)
+  expect(getLinePos(1)).toMatchObject(undefLinePos)
+  expect(getLinePos(-1, cst)).toMatchObject(undefLinePos)
+  expect(getLinePos(13, cst)).toMatchObject(undefLinePos)
+  expect(getLinePos(Math.MAXINT, cst)).toMatchObject(undefLinePos)
 })
