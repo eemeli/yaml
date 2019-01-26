@@ -10,8 +10,7 @@ const defaultOptions = {
   keepBlobsInJSON: true,
   mapAsMap: false,
   tags: null,
-  version: '1.2',
-  computeLineOffsets: false
+  version: '1.2'
 }
 
 function createNode(value, wrapScalars = true, tag) {
@@ -35,17 +34,12 @@ class Document extends YAMLDocument {
 }
 
 function parseAllDocuments(src, options) {
-  return parseCST(src, {
-    computeLineOffsets: options ? options.computeLineOffsets : false
-  }).map(cstDoc => new Document(options).parse(cstDoc))
+  return parseCST(src).map(cstDoc => new Document(options).parse(cstDoc))
 }
 
 function parseDocument(src, options) {
-  const cst = parseCST(src, {
-    computeLineOffsets: options ? options.computeLineOffsets : false
-  })
+  const cst = parseCST(src)
   const doc = new Document(options).parse(cst[0])
-  if (options && options.computeLineOffsets) doc.lineOffsets = cst.lineOffsets
   if (cst.length > 1) {
     const errMsg =
       'Source contains multiple documents; please use YAML.parseAllDocuments()'
