@@ -179,6 +179,7 @@ export default class Document extends Node {
    * @returns {number} - Index of the character after this
    */
   parse(context, start) {
+    context.root = this
     this.context = context
     const { src } = context
     trace: 'DOC START', JSON.stringify(src.slice(start))
