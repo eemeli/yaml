@@ -9,15 +9,27 @@ export function findLineOffsets(src) {
   return lf
 }
 
-export function charPosToLineCol(offset, lineOffsets) {
-  if (typeof offset === 'number' && offset >= 0 && lineOffsets) {
-    for (let i = 0; i < lineOffsets.length; ++i) {
-      const start = lineOffsets[i]
-      if (offset < start) {
-        const line = i - 1
-        return { line, col: offset - lineOffsets[line] }
+export function charPosToLineCol(offset, cst) {
+  if (typeof offset === 'number' && offset >= 0) {
+    let lineOffsets
+    if (typeof cst === 'string') {
+      lineOffsets = findLineOffsets(cst)
+    } else {
+      if (Array.isArray(cst)) cst = cst[0] // accept array of CST documents
+      if (cst) {
+        if (!cst.lineOffsets) cst.lineOffsets = findLineOffsets(cst.context.src)
+        lineOffsets = cst.lineOffsets
       }
-      if (offset === start) return { line: i, col: 0 }
+    }
+    if (lineOffsets) {
+      for (let i = 0; i < lineOffsets.length; ++i) {
+        const start = lineOffsets[i]
+        if (offset < start) {
+          const line = i - 1
+          return { line, col: offset - lineOffsets[line] }
+        }
+        if (offset === start) return { line: i, col: 0 }
+      }
     }
   }
   return { line: undefined, col: undefined }
