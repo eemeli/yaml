@@ -25,17 +25,19 @@ function findLineStarts(src) {
  */
 export default function getLinePos(offset, cst) {
   if (typeof offset === 'number' && offset >= 0) {
-    let lineStarts
+    let lineStarts, srcLength
     if (typeof cst === 'string') {
       lineStarts = findLineStarts(cst)
+      srcLength = cst.length
     } else {
       if (Array.isArray(cst)) cst = cst[0]
       if (cst) {
         if (!cst.lineStarts) cst.lineStarts = findLineStarts(cst.context.src)
         lineStarts = cst.lineStarts
+        srcLength = cst.context.src.length
       }
     }
-    if (lineStarts) {
+    if (lineStarts && offset <= srcLength) {
       for (let i = 0; i < lineStarts.length; ++i) {
         const start = lineStarts[i]
         if (offset < start) {
@@ -44,6 +46,8 @@ export default function getLinePos(offset, cst) {
         }
         if (offset === start) return { line: i, col: 0 }
       }
+      const line = lineStarts.length - 1
+      return { line, col: offset - lineStarts[line] }
     }
   }
   return undefined
