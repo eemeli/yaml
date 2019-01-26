@@ -10,19 +10,14 @@ export function findLineOffsets(src) {
 }
 
 export function charPosToLineCol(offset, lineOffsets) {
-  if (
-    !lineOffsets ||
-    typeof offset === 'undefined' ||
-    offset < 0 ||
-    offset > lineOffsets[lineOffsets.length - 1]
-  )
-    return { line: undefined, col: undefined }
-  const lineIndex = lineOffsets.indexOf(offset)
-  if (lineIndex >= 0)
-    return { line: lineIndex, col: offset - lineOffsets[lineIndex] }
-  for (let i = 0; i < lineOffsets.length; i++) {
-    if (lineOffsets[i] > offset) {
-      return { line: i - 1, col: offset - lineOffsets[i - 1] }
+  if (typeof offset === 'number' && offset >= 0 && lineOffsets) {
+    for (let i = 0; i < lineOffsets.length; ++i) {
+      const start = lineOffsets[i]
+      if (offset < start) {
+        const line = i - 1
+        return { line, col: offset - lineOffsets[line] }
+      }
+      if (offset === start) return { line: i, col: 0 }
     }
   }
   return { line: undefined, col: undefined }
