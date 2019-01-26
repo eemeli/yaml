@@ -60,8 +60,8 @@ import Seq from 'yaml/seq'
 import parseCST from 'yaml/parse-cst'
 ```
 
-* [`parseCST(str, options): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
-* [`YAML.parseCST(str, options): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
+* [`parseCST(str): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
+* [`YAML.parseCST(str): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
 
 ## YAML.parse
 
