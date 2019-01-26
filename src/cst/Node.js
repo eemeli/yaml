@@ -1,3 +1,4 @@
+import getLinePos from './getLinePos'
 import Range from './Range'
 
 export const Type = {
@@ -246,6 +247,14 @@ export default class Node {
       Type.QUOTE_SINGLE
     ]
     return jsonLikeTypes.indexOf(this.type) !== -1
+  }
+
+  get rangeAsLinePos() {
+    if (!this.range || !this.context) return undefined
+    const start = getLinePos(this.range.start, this.context.root)
+    if (!start) return undefined
+    const end = getLinePos(this.range.end, this.context.root)
+    return { start, end }
   }
 
   get rawValue() {
