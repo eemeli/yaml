@@ -65,20 +65,19 @@
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
     "@babel/plugin-transform-runtime": "^7.2.0",
-    "@babel/preset-env": "^7.2.3",
-    "babel-core": "^7.0.0-bridge.0",
+    "@babel/preset-env": "^7.3.1",
     "babel-eslint": "^10.0.1",
-    "babel-jest": "^23.6.0",
+    "babel-jest": "^24.0.0",
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-plugin-trace": "^1.1.0",
     "cpy-cli": "^2.0.0",
-    "eslint": "^5.11.1",
-    "eslint-config-prettier": "^3.3.0",
-    "fast-check": "^1.9.1",
-    "jest": "^23.6.0",
-    "prettier": "^1.15.3"
+    "eslint": "^5.12.1",
+    "eslint-config-prettier": "^4.0.0",
+    "fast-check": "^1.10.0",
+    "jest": "^24.0.0",
+    "prettier": "^1.16.1"
   },
   "dependencies": {},
   "engines": {
