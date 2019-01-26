@@ -32,5 +32,5 @@ export default function getLinePos(offset, cst) {
       }
     }
   }
-  return { line: undefined, col: undefined }
+  return undefined
 }
