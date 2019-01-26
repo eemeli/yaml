@@ -1,7 +1,6 @@
 {
   "name": "yaml",
-  "version": "1.2.0",
-  "main": "dist/index.js",
+  "version": "1.2.1",
   "license": "ISC",
   "author": "Eemeli Aro <eemeli@gmail.com>",
   "repository": "github:eemeli/yaml",
@@ -13,13 +12,33 @@
   ],
   "homepage": "https://eemeli.org/yaml/",
   "files": [
+    "browser/",
     "dist/",
     "types/",
-    "*.js"
+    "*.js",
+    "!.*.js"
   ],
+  "main": "./dist/index.js",
+  "browser": {
+    "./dist/index.js": "./browser/dist/index.js",
+    "./map.js": "./browser/map.js",
+    "./pair.js": "./browser/pair.js",
+    "./parse-cst.js": "./browser/parse-cst.js",
+    "./scalar.js": "./browser/scalar.js",
+    "./schema.js": "./browser/schema.js",
+    "./seq.js": "./browser/seq.js",
+    "./types/binary.js": "./browser/types/binary.js",
+    "./types/omap.js": "./browser/types/omap.js",
+    "./types/pairs.js": "./browser/types/pairs.js",
+    "./types/set.js": "./browser/types/set.js",
+    "./types/timestamp.js": "./browser/types/timestamp.js"
+  },
   "scripts": {
-    "build": "babel src/ --out-dir dist/",
-    "prettier": "prettier --write \"{src,__tests__}/**/*.js\"",
+    "browser:build": "BABEL_ENV=browser babel src/ --out-dir browser/dist/",
+    "browser:copy": "cpy '*.js' '!*.config.js' types/ browser/ --parents",
+    "dist:build": "babel src/ --out-dir dist/",
+    "build": "npm run dist:build && npm run browser:build && npm run browser:copy",
+    "prettier": "prettier --write \"{src,tests}/**/*.js\"",
     "lint": "eslint src/",
     "test": "TRACE_LEVEL=log jest",
     "test:trace": "TRACE_LEVEL=trace,log jest --no-cache",
@@ -29,122 +48,36 @@
     "preversion": "npm test && npm run build",
     "prepublishOnly": "npm test && npm run build"
   },
-  "babel": {
-    "presets": [
-      [
-        "@babel/env",
-        {
-          "targets": {
-            "node": "6"
-          }
-        }
-      ]
-    ],
-    "plugins": [
-      "@babel/plugin-proposal-class-properties",
-      [
-        "babel-plugin-trace",
-        {
-          "strip": true
-        }
-      ],
-      [
-        "babel-plugin-add-module-exports",
-        {
-          "addDefaultProperty": true
-        }
-      ]
-    ]
-  },
+  "browserslist": "> 0.5%, not dead",
   "jest": {
+    "testMatch": [
+      "**/tests/**/*.js"
+    ],
     "testPathIgnorePatterns": [
-      "__tests__/common",
-      "__tests__/cst/common"
+      "tests/common",
+      "tests/cst/common"
     ]
   },
   "prettier": {
     "semi": false,
     "singleQuote": true
   },
-  "eslintConfig": {
-    "root": true,
-    "parser": "babel-eslint",
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "eslint:recommended",
-      "prettier"
-    ],
-    "rules": {
-      "array-callback-return": "error",
-      "camelcase": "error",
-      "consistent-return": "error",
-      "eqeqeq": [
-        "error",
-        "always",
-        {
-          "null": "ignore"
-        }
-      ],
-      "no-constant-condition": [
-        "error",
-        {
-          "checkLoops": false
-        }
-      ],
-      "no-control-regex": 0,
-      "no-implicit-globals": "error",
-      "no-template-curly-in-string": "warn",
-      "no-unused-labels": 0,
-      "no-var": "error",
-      "prefer-const": [
-        "warn",
-        {
-          "destructuring": "all"
-        }
-      ]
-    },
-    "overrides": [
-      {
-        "files": [
-          "src/**/*.js"
-        ],
-        "env": {
-          "es6": true,
-          "node": false
-        }
-      },
-      {
-        "files": [
-          "__tests__/*.js",
-          "__tests__/cst/*.js"
-        ],
-        "env": {
-          "es6": true,
-          "jest": true
-        },
-        "rules": {
-          "camelcase": 0
-        }
-      }
-    ]
-  },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.2.3",
-    "@babel/preset-env": "^7.2.3",
-    "babel-core": "^7.0.0-bridge.0",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/preset-env": "^7.3.1",
     "babel-eslint": "^10.0.1",
-    "babel-jest": "^23.6.0",
+    "babel-jest": "^24.0.0",
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-plugin-trace": "^1.1.0",
-    "eslint": "^5.11.1",
-    "eslint-config-prettier": "^3.3.0",
-    "fast-check": "^1.9.1",
-    "jest": "^23.6.0",
-    "prettier": "^1.15.3"
+    "cpy-cli": "^2.0.0",
+    "eslint": "^5.12.1",
+    "eslint-config-prettier": "^4.0.0",
+    "fast-check": "^1.10.0",
+    "jest": "^24.0.0",
+    "prettier": "^1.16.1"
   },
   "dependencies": {},
   "engines": {

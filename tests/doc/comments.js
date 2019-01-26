@@ -1,4 +1,4 @@
-import YAML from '../src/index'
+import YAML from '../../src/index'
 
 describe('parse comments', () => {
   describe('body', () => {
@@ -14,6 +14,13 @@ describe('parse comments', () => {
       const doc = YAML.parseDocument(src)
       expect(doc.contents.commentBefore).toBe('comment\ncomment')
       expect(String(doc)).toBe('#comment\n#comment\nstring\n')
+    })
+
+    test('body start comments with empty comment line', () => {
+      const src = '---\n#comment\n#\n#comment\nstring\n'
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents.commentBefore).toBe('comment\n\ncomment')
+      expect(String(doc)).toBe('#comment\n#\n#comment\nstring\n')
     })
 
     test('body end comments', () => {

@@ -1,3 +1,4 @@
+/browser/
 /dist/
 /docs/*.*
 /docs/build/
@@ -6,4 +7,4 @@
 /docs/source/layouts/
 /docs/source/stylesheets/
 /package-lock.json
-/__tests__/yaml-test-suite/
+/tests/yaml-test-suite/

@@ -4,8 +4,52 @@ import toJSON from '../toJSON'
 import Collection from './Collection'
 import Merge from './Merge'
 import Pair from './Pair'
+import Scalar from './Scalar'
+
+export function findPair(items, key) {
+  const k = key instanceof Scalar ? key.value : key
+  for (const it of items) {
+    if (it instanceof Pair) {
+      if (it.key === key || it.key === k) return it
+      if (it.key && it.key.value === k) return it
+    }
+  }
+  return undefined
+}
 
 export default class YAMLMap extends Collection {
+  add(pair) {
+    if (!pair) pair = new Pair(pair)
+    else if (!(pair instanceof Pair))
+      pair = new Pair(pair.key || pair, pair.value)
+    const prev = findPair(this.items, pair.key)
+    if (prev) throw new Error(`Key ${pair.key} already set`)
+    this.items.push(pair)
+  }
+
+  delete(key) {
+    const it = findPair(this.items, key)
+    if (!it) return false
+    const del = this.items.splice(this.items.indexOf(it), 1)
+    return del.length > 0
+  }
+
+  get(key, keepScalar) {
+    const it = findPair(this.items, key)
+    const node = it && it.value
+    return !keepScalar && node instanceof Scalar ? node.value : node
+  }
+
+  has(key) {
+    return !!findPair(this.items, key)
+  }
+
+  set(key, value) {
+    const prev = findPair(this.items, key)
+    if (prev) prev.value = value
+    else this.items.push(new Pair(key, value))
+  }
+
   toJSON(_, opt) {
     if (opt && opt.mapAsMap) return this.toJSMap(opt)
     return this.items.reduce((map, item) => {

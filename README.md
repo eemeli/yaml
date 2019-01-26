@@ -18,7 +18,7 @@ Note: `yaml` 0.x and 1.x are rather different implementations. For the earlier `
 
 ## API Overview
 
-The API provided by `yaml` has three layers, depending on how deep you need to go: [Pure JavaScript](https://eemeli.org/yaml/#pure-javascript), [YAML Documents](https://eemeli.org/yaml/#yaml-documents), and the [CST Parser](https://eemeli.org/yaml/#cst-parser). The first has the simplest API and "just works", the second gets you all the bells and whistles supported by the library along with a decent AST, and the third is the closest to YAML source, making it fast, raw, and crude.
+The API provided by `yaml` has three layers, depending on how deep you need to go: [Pure JavaScript](https://eemeli.org/yaml/#pure-javascript), [YAML Documents](https://eemeli.org/yaml/#yaml-documents), and the [CST Parser](https://eemeli.org/yaml/#cst-parser). The first has the simplest API and "just works", the second gets you all the bells and whistles supported by the library along with a decent [AST](https://eemeli.org/yaml/#content-nodes), and the third is the closest to YAML source, making it fast, raw, and crude.
 
 ```js
 import YAML from 'yaml'

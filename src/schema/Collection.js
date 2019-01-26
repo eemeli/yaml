@@ -3,10 +3,48 @@ import Node from './Node'
 import Pair from './Pair'
 import Scalar from './Scalar'
 
+// null, undefined, or an empty non-string iterable (e.g. [])
+export const isEmptyPath = path =>
+  path == null ||
+  (typeof path === 'object' && path[Symbol.iterator]().next().done)
+
 export default class Collection extends Node {
   static maxFlowStringSingleLineLength = 60
 
   items = []
+
+  addIn(path, value) {
+    if (isEmptyPath(path)) this.add(value)
+    else {
+      const [key, ...rest] = path
+      const node = this.get(key, true)
+      if (node instanceof Collection) node.addIn(rest, value)
+      else
+        throw new Error(
+          `Expected YAML collection at ${key}. Remaining path: ${rest}`
+        )
+    }
+  }
+
+  deleteIn([key, ...rest]) {
+    if (rest.length === 0) return this.delete(key)
+    const node = this.get(key, true)
+    if (node instanceof Collection) return node.deleteIn(rest)
+    else
+      throw new Error(
+        `Expected YAML collection at ${key}. Remaining path: ${rest}`
+      )
+  }
+
+  getIn([key, ...rest], keepScalar) {
+    const node = this.get(key, true)
+    if (rest.length === 0)
+      return !keepScalar && node instanceof Scalar ? node.value : node
+    else
+      return node instanceof Collection
+        ? node.getIn(rest, keepScalar)
+        : undefined
+  }
 
   hasAllNullValues() {
     return this.items.every(node => {
@@ -21,6 +59,25 @@ export default class Collection extends Node {
           !n.tag)
       )
     })
+  }
+
+  hasIn([key, ...rest]) {
+    if (rest.length === 0) return this.has(key)
+    const node = this.get(key, true)
+    return node instanceof Collection ? node.hasIn(rest) : false
+  }
+
+  setIn([key, ...rest], value) {
+    if (rest.length === 0) {
+      this.set(key, value)
+    } else {
+      const node = this.get(key, true)
+      if (node instanceof Collection) node.setIn(rest, value)
+      else
+        throw new Error(
+          `Expected YAML collection at ${key}. Remaining path: ${rest}`
+        )
+    }
   }
 
   // overridden in implementations

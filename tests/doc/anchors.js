@@ -1,6 +1,6 @@
-import YAML from '../src/index'
-import Map from '../src/schema/Map'
-import Merge from '../src/schema/Merge'
+import YAML from '../../src/index'
+import Map from '../../src/schema/Map'
+import Merge from '../../src/schema/Merge'
 
 test('basic', () => {
   const src = `- &a 1\n- *a\n`

@@ -1,9 +1,9 @@
-import YAML from '../src/index'
-import YAMLMap from '../src/schema/Map'
-import Pair from '../src/schema/Pair'
-import Scalar from '../src/schema/Scalar'
-import YAMLSeq from '../src/schema/Seq'
-import { YAMLSet } from '../src/schema/_set'
+import YAML from '../../src/index'
+import YAMLMap from '../../src/schema/Map'
+import Pair from '../../src/schema/Pair'
+import Scalar from '../../src/schema/Scalar'
+import YAMLSeq from '../../src/schema/Seq'
+import { YAMLSet } from '../../src/schema/_set'
 
 describe('scalars', () => {
   describe('createNode(value, false)', () => {
