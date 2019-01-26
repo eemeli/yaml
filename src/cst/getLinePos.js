@@ -1,9 +1,11 @@
 export function findLineOffsets(src) {
   const lf = [0]
-  src = src.replace(/\n/g, (match, offset) => {
-    lf.push(offset + 1)
-    return '\n'
-  })
+  let offset = src.indexOf('\n')
+  while (offset !== -1) {
+    offset += 1
+    lf.push(offset)
+    offset = src.indexOf('\n', offset)
+  }
   return lf
 }
 
