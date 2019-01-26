@@ -9,13 +9,27 @@ function findLineStarts(src) {
   return ls
 }
 
+/**
+ * Determine the line/col position matching a character offset.
+ *
+ * Accepts a source string or a CST document as the second parameter. With
+ * the latter, starting indices for lines are cached in the document as
+ * `lineStarts: number[]`.
+ *
+ * Returns a zero-indexed `{ line, col }` location if found, or
+ * `undefined` otherwise.
+ *
+ * @param {number} offset
+ * @param {string|Document|Document[]} cst
+ * @returns {{ line: number, col: number }|undefined}
+ */
 export default function getLinePos(offset, cst) {
   if (typeof offset === 'number' && offset >= 0) {
     let lineStarts
     if (typeof cst === 'string') {
       lineStarts = findLineStarts(cst)
     } else {
-      if (Array.isArray(cst)) cst = cst[0] // accept array of CST documents
+      if (Array.isArray(cst)) cst = cst[0]
       if (cst) {
         if (!cst.lineStarts) cst.lineStarts = findLineStarts(cst.context.src)
         lineStarts = cst.lineStarts
