@@ -172,7 +172,11 @@ export default class Schema {
         default:
           obj = item.value
       }
-      const match = this.tags.filter(t => t.class && obj instanceof t.class)
+      const match = this.tags.filter(t => t.class && (
+        obj instanceof t.class || (
+          obj && obj.constructor === t.class
+        )
+      ))
       tagObj =
         match.find(t => t.format === item.format) || match.find(t => !t.format)
     } else {
