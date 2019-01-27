@@ -1,4 +1,4 @@
-<h1 id='pure-javascript'>Pure JavaScript</h1><pre class="highlight yaml tab-yaml"><code><span class="c1"># file.yml</span>
+<h1 id='parse-amp-stringify'>Parse &amp; Stringify</h1><pre class="highlight yaml tab-yaml"><code><span class="c1"># file.yml</span>
 <span class="na">YAML</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="s">A human-readable data serialization language</span>
   <span class="pi">-</span> <span class="s">https://en.wikipedia.org/wiki/YAML</span>

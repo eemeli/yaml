@@ -1,4 +1,4 @@
-<h1 id='yaml-documents'>YAML Documents</h1>
+<h1 id='documents'>Documents</h1>
 <p>In order to work with YAML features not directly supported by native JavaScript data types, such as comments and non-string keys, <code>yaml</code> provides the <code>YAML.Document</code> API.</p>
 <h2 id='parsing-documents'>Parsing Documents</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">fs</span> <span class="nx">from</span> <span class="s1">'fs'</span>
 <span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
@@ -102,45 +102,6 @@
 <td>Warnings encountered during parsing.</td>
 </tr>
 </tbody></table>
-
-<table><thead>
-<tr>
-<th>Method</th>
-<th>Return&nbsp;type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>listNonDefaultTags()</td>
-<td><code>string[]</code></td>
-<td>List the tags used in the document that are not in the default <code>tag:yaml.org,2002:</code> namespace.</td>
-</tr>
-<tr>
-<td>parse(cst)</td>
-<td><code>Document</code></td>
-<td>Parse a CST into this document</td>
-</tr>
-<tr>
-<td>setSchema()</td>
-<td><code>void</code></td>
-<td>When a document is created with <code>new YAML.Document()</code>, the schema object is not set as it may be influenced by parsed directives; call this to set it manually.</td>
-</tr>
-<tr>
-<td>setTagPrefix(handle, prefix)</td>
-<td><code>undefined</code></td>
-<td>Set <code>handle</code> as a shorthand string for the <code>prefix</code> tag namespace.</td>
-</tr>
-<tr>
-<td>toJSON()</td>
-<td><code>any</code></td>
-<td>A plain JavaScript representation of the document <code>contents</code>.</td>
-</tr>
-<tr>
-<td>toString()</td>
-<td><code>string</code></td>
-<td>A YAML representation of the document.</td>
-</tr>
-</tbody></table>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">version</span> <span class="o">=</span> <span class="kc">true</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span> <span class="o">=</span> <span class="s1">' A commented document'</span>
@@ -157,8 +118,54 @@
 <p>The Document members are all modifiable, though it&#39;s unlikely that you&#39;ll have reason to change <code>errors</code>, <code>schema</code> or <code>warnings</code>. In particular you may be interested in both reading and writing <strong><code>contents</code></strong>. Although <code>YAML.parseDocument()</code> and <code>YAML.parseAllDocuments()</code> will leave it with <code>Map</code>, <code>Seq</code>, <code>Scalar</code> or <code>null</code> contents, it can be set to anything.</p>
 
 <p>During stringification, a document with a true-ish <code>version</code> value will include a <code>%YAML</code> directive; the version number will be set to <code>1.2</code> unless the <code>yaml-1.1</code> schema is in use.</p>
-
-<p><strong><code>parse(cst)</code></strong> is mostly an internal method, modifying the document according to the contents of the parsed <code>cst</code>. Calling this multiple times on a Document is not recommended.</p>
+<h2 id='document-methods'>Document Methods</h2>
+<table><thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>listNonDefaultTags()</td>
+<td><code>string[]</code></td>
+<td>List the tags used in the document that are not in the default <code>tag:yaml.org,2002:</code> namespace.</td>
+</tr>
+<tr>
+<td>parse(cst)</td>
+<td><code>Document</code></td>
+<td>Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed <code>cst</code>. Calling this multiple times on a Document is not recommended.</td>
+</tr>
+<tr>
+<td>setSchema()</td>
+<td><code>void</code></td>
+<td>When a document is created with <code>new YAML.Document()</code>, the schema object is not set as it may be influenced by parsed directives; call this to set it manually.</td>
+</tr>
+<tr>
+<td>setTagPrefix(handle, prefix)</td>
+<td><code>void</code></td>
+<td>Set <code>handle</code> as a shorthand string for the <code>prefix</code> tag namespace.</td>
+</tr>
+<tr>
+<td>toJSON()</td>
+<td><code>any</code></td>
+<td>A plain JavaScript representation of the document <code>contents</code>.</td>
+</tr>
+<tr>
+<td>toString()</td>
+<td><code>string</code></td>
+<td>A YAML representation of the document.</td>
+</tr>
+</tbody></table>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s1">'a: 1\nb: [2, 3]\n'</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span> <span class="c1">// 1</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([])</span> <span class="c1">// YAMLMap { items: [Pair, Pair], ... }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">hasIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="c1">// true</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span> <span class="c1">// -&gt; doc.get('b').items.length === 3</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">deleteIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// true</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// 4</span>
+</code></pre>
+<p>In addition to the above, the document object also provides the same <strong>accessor methods</strong> as <a href="#collections">collections</a>, based on the top-level collection: <code>add</code>, <code>delete</code>, <code>get</code>, <code>has</code>, and <code>set</code>, along with their deeper variants <code>addIn</code>, <code>deleteIn</code>, <code>getIn</code>, <code>hasIn</code>, and <code>setIn</code>. For the <code>*In</code> methods using an empty <code>path</code> value (i.e. <code>null</code>, <code>undefined</code>, or <code>[]</code>) will refer to the document&#39;s top-level <code>contents</code>.</p>
 
 <p>To define a tag prefix to use when stringifying, use <strong><code>setTagPrefix(handle, prefix)</code></strong> rather than setting a value directly in <code>tagPrefixes</code>. This will guarantee that the <code>handle</code> is valid (by throwing an error), and will overwrite any previous definition for the <code>handle</code>. Use an empty <code>prefix</code> value to remove a prefix.</p>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types/timestamp'</span>
@@ -187,7 +194,7 @@
 <table><thead>
 <tr>
 <th>Method</th>
-<th>Return&nbsp;type</th>
+<th>Returns</th>
 <th>Description</th>
 </tr>
 </thead><tbody>

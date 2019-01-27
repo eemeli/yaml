@@ -103,6 +103,7 @@ mapping: { sky: blue, sea: green }
   <span class="nl">context</span><span class="p">:</span> <span class="p">{</span>
     <span class="nl">atLineStart</span><span class="p">:</span> <span class="kr">boolean</span><span class="p">,</span> <span class="c1">// is this node the first one on this line</span>
     <span class="nx">indent</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>     <span class="c1">// current level of indentation (may be -1)</span>
+    <span class="nx">root</span><span class="p">:</span> <span class="nx">CSTDocument</span><span class="p">,</span>  <span class="c1">// a reference to the parent document</span>
     <span class="nx">src</span><span class="p">:</span> <span class="nx">string</span>         <span class="c1">// the full original source</span>
   <span class="p">},</span>
   <span class="nx">error</span><span class="p">:</span> <span class="p">?</span><span class="nb">Error</span><span class="p">,</span>        <span class="c1">// if not null, indicates a parser failure</span>
@@ -117,6 +118,9 @@ mapping: { sky: blue, sea: green }
                         <span class="c1">//   source value when stringified</span>
   <span class="o">+</span><span class="nx">anchor</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>     <span class="c1">// anchor, if set</span>
   <span class="o">+</span><span class="nx">comment</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>    <span class="c1">// newline-delimited comment(s), if any</span>
+  <span class="o">+</span><span class="nx">rangeAsLinePos</span><span class="p">:</span>      <span class="c1">// human-friendly source location</span>
+    <span class="p">?{</span> <span class="na">start</span><span class="p">:</span> <span class="nx">LinePos</span><span class="p">,</span> <span class="na">end</span><span class="p">:</span> <span class="p">?</span><span class="nx">LinePos</span> <span class="p">},</span>
+    <span class="c1">// LinePos here is { line: number, col: number }</span>
   <span class="o">+</span><span class="nx">rawValue</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>   <span class="c1">// an unprocessed slice of context.src</span>
                         <span class="c1">//   determining this node's value</span>
   <span class="o">+</span><span class="nx">tag</span><span class="p">:</span>                 <span class="c1">// this node's tag, if set</span>

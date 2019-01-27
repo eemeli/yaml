@@ -42,11 +42,67 @@
   <span class="nx">type</span><span class="p">:</span> <span class="s1">'FLOW_SEQ'</span> <span class="o">|</span> <span class="s1">'SEQ'</span> <span class="o">|</span> <span class="kc">undefined</span>
 <span class="p">}</span>
 </code></pre>
-<p>Within a YAML document, two forms of collections are supported: sequential <code>Seq</code> collections and key-value <code>Map</code> collections. The JavaScript representations of these collections both have an <code>items</code> array, which may (<code>Seq</code>) or must (<code>Map</code>) consist of <code>Pair</code> objects that contain a <code>key</code> and a <code>value</code> of any type, including <code>null</code>. The <code>items</code> array of a <code>Seq</code> object may contain values of any type.</p>
+<p>Within all YAML documents, two forms of collections are supported: sequential <code>Seq</code> collections and key-value <code>Map</code> collections. The JavaScript representations of these collections both have an <code>items</code> array, which may (<code>Seq</code>) or must (<code>Map</code>) consist of <code>Pair</code> objects that contain a <code>key</code> and a <code>value</code> of any type, including <code>null</code>. The <code>items</code> array of a <code>Seq</code> object may contain values of any type.</p>
 
 <p>When stringifying collections, by default block notation will be used. Flow notation will be selected if <code>type</code> is <code>FLOW_MAP</code> or <code>FLOW_SEQ</code>, the collection is within a surrounding flow collection, or if the collection is in an implicit key.</p>
 
 <p>The <code>yaml-1.1</code> schema includes <a href="https://yaml.org/type/index.html">additional collections</a> that are based on <code>Map</code> and <code>Seq</code>: <code>OMap</code> and <code>Pairs</code> are sequences of <code>Pair</code> objects (<code>OMap</code> requires unique keys &amp; corresponds to the JS Map object), and <code>Set</code> is a map of keys with null values that corresponds to the JS Set object.</p>
+
+<p>All of the collections provide the following accessor methods:</p>
+
+<table><thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>add(value)</td>
+<td><code>void</code></td>
+<td>Adds a value to the collection. For <code>!!map</code> and <code>!!omap</code> the value must be a Pair instance or a <code>{ key, value }</code> object, which may not have a key that already exists in the map.</td>
+</tr>
+<tr>
+<td>delete(key)</td>
+<td><code>boolean</code></td>
+<td>Removes a value from the collection. Returns <code>true</code> if the item was found and removed.</td>
+</tr>
+<tr>
+<td>get(key,&nbsp;[keepScalar])</td>
+<td><code>any</code></td>
+<td>Returns item at <code>key</code>, or <code>undefined</code> if not found. By default unwraps scalar values from their surrounding node; to disable set <code>keepScalar</code> to <code>true</code> (collections are always returned intact).</td>
+</tr>
+<tr>
+<td>has(key)</td>
+<td><code>boolean</code></td>
+<td>Checks if the collection includes a value with the key <code>key</code>.</td>
+</tr>
+<tr>
+<td>set(key, value)</td>
+<td><code>any</code></td>
+<td>Sets a value in this collection. For <code>!!set</code>, <code>value</code> needs to be a boolean to add/remove the item from the set.</td>
+</tr>
+</tbody></table>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">map</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">createNode</span><span class="p">({</span> <span class="na">a</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="p">})</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span> <span class="na">key</span><span class="p">:</span> <span class="s1">'c'</span><span class="p">,</span> <span class="na">value</span><span class="p">:</span> <span class="mi">4</span> <span class="p">})</span>
+  <span class="c1">// -&gt; map.get('c') === 4 &amp;&amp; map.has('c') === true</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">],</span> <span class="mi">5</span><span class="p">)</span> <span class="c1">// -&gt; map.getIn(['b', 2]) === 5</span>
+<span class="nx">map</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="s1">'c'</span><span class="p">)</span> <span class="c1">// true</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">deleteIn</span><span class="p">([</span><span class="s1">'c'</span><span class="p">,</span> <span class="s1">'f'</span><span class="p">])</span> <span class="c1">// false</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span> <span class="c1">// 1</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">YAML</span><span class="p">.</span><span class="nx">createNode</span><span class="p">(</span><span class="s1">'a'</span><span class="p">),</span> <span class="kc">true</span><span class="p">)</span> <span class="c1">// Scalar { value: 1 }</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// 3</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="s1">'c'</span><span class="p">)</span> <span class="c1">// false</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">hasIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">])</span> <span class="c1">// true</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'c'</span><span class="p">,</span> <span class="kc">null</span><span class="p">)</span>
+  <span class="c1">// -&gt; map.get('c') === null &amp;&amp; map.has('c') === true</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">setIn</span><span class="p">([</span><span class="s1">'c'</span><span class="p">,</span> <span class="s1">'x'</span><span class="p">])</span>
+  <span class="c1">// throws Error:</span>
+  <span class="c1">// Expected YAML collection at c. Remaining path: x</span>
+</code></pre>
+<p>For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. <code>42</code> will match <code>Scalar { value: 42 }</code>) . Keys for <code>!!seq</code> should be positive integers, or their string representations. <code>add()</code> and <code>set()</code> do not automatically call <code>createNode()</code> to wrap the value.</p>
+
+<p>Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections: <code>addIn(path, value)</code>, <code>deleteIn(path)</code>, <code>getIn(path, keepScalar)</code>, <code>hasIn(path)</code>, <code>setIn(path, value)</code>. <code>getIn</code> and <code>hasIn</code> will return <code>undefined</code> or <code>false</code> (respectively) if any of the intermediate collections is not found or if the key path attempts to extend within a scalar value, but the others will throw an error in such cases. Note that for <code>addIn</code> the path argument points to the collection rather than the item.</p>
 <h2 id='alias-nodes'>Alias Nodes</h2><pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Alias</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
   <span class="nl">source</span><span class="p">:</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">Map</span> <span class="o">|</span> <span class="nx">Seq</span><span class="p">,</span>
   <span class="nx">type</span><span class="p">:</span> <span class="s1">'ALIAS'</span>

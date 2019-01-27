@@ -1,5 +1,5 @@
-<h1 id='syntax-and-schema'>Syntax and Schema</h1>
-<p>A YAML schema is a combination of a set of tags and a mechanism for resolving non-specific tags, i.e. values that do not have an explicit tag such as <code>!!int</code>. The default schema is the <code>&#39;core&#39;</code> schema, which is the recommended one for YAML 1.2. For YAML 1.0 and YAML 1.1 documents the default is <code>&#39;yaml-1.1&#39;</code>.</p>
+<h1 id='yaml-syntax'>YAML Syntax</h1>
+<p>A YAML <em>schema</em> is a combination of a set of tags and a mechanism for resolving non-specific tags, i.e. values that do not have an explicit tag such as <code>!!int</code>. The <a href="#data-schemas">default schema</a> is the <code>&#39;core&#39;</code> schema, which is the recommended one for YAML 1.2. For YAML 1.0 and YAML 1.1 documents the default is <code>&#39;yaml-1.1&#39;</code>.</p>
 <h2 id='tags'>Tags</h2><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'"42"'</span><span class="p">)</span>
 <span class="c1">// '42'</span>
 

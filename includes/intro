@@ -17,9 +17,9 @@ yarn add yaml
 
 <p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies, and is usable in both browser and node environments.</p>
 <h2 id='api-overview'>API Overview</h2>
-<p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#pure-javascript">Pure JavaScript</a>, <a href="#yaml-documents">YAML Documents</a>, and the <a href="#cst-parser">CST Parser</a>. The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library along with a decent <a href="#content-nodes">AST</a>, and the third is the closest to YAML source, making it fast, raw, and crude.</p>
+<p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the <a href="#cst-parser">CST Parser</a>. The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library along with a decent <a href="#content-nodes">AST</a>, and the third is the closest to YAML source, making it fast, raw, and crude.</p>
 
-<h3>Pure JavaScript</h3>
+<h3>Parse & Stringify</h3>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
 <span class="c1">// or</span>
 <span class="kr">const</span> <span class="nx">YAML</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'yaml'</span><span class="p">)</span>
@@ -29,7 +29,7 @@ yarn add yaml
 <li><a href="#yaml-stringify"><code>YAML.stringify(value, options): string</code></a></li>
 </ul>
 
-<h3>YAML Documents</h3>
+<h3>Documents</h3>
 
 <ul>
 <li><a href="#creating-nodes"><code>YAML.createNode(value, wrapScalars, tag): Node</code></a></li>
