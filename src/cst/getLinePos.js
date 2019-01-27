@@ -16,7 +16,7 @@ function findLineStarts(src) {
  * the latter, starting indices for lines are cached in the document as
  * `lineStarts: number[]`.
  *
- * Returns a zero-indexed `{ line, col }` location if found, or
+ * Returns a one-indexed `{ line, col }` location if found, or
  * `undefined` otherwise.
  *
  * @param {number} offset
@@ -41,13 +41,12 @@ export default function getLinePos(offset, cst) {
       for (let i = 0; i < lineStarts.length; ++i) {
         const start = lineStarts[i]
         if (offset < start) {
-          const line = i - 1
-          return { line, col: offset - lineStarts[line] }
+          return { line: i, col: offset - lineStarts[i - 1] + 1 }
         }
-        if (offset === start) return { line: i, col: 0 }
+        if (offset === start) return { line: i + 1, col: 1 }
       }
-      const line = lineStarts.length - 1
-      return { line, col: offset - lineStarts[line] }
+      const line = lineStarts.length
+      return { line, col: offset - lineStarts[line - 1] + 1 }
     }
   }
   return undefined

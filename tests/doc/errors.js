@@ -8,8 +8,8 @@ test('eemeli/yaml#6', () => {
   const node = doc.errors[0].source
   expect(node).toBeInstanceOf(Node)
   expect(node.rangeAsLinePos).toMatchObject({
-    start: { line: 1, col: 0 },
-    end: { line: 1, col: 3 }
+    start: { line: 2, col: 1 },
+    end: { line: 2, col: 4 }
   })
 })
 
@@ -25,8 +25,8 @@ describe('eemeli/yaml#7', () => {
     const node = docs[0].errors[0].source
     expect(node).toBeInstanceOf(Node)
     expect(node.rangeAsLinePos).toMatchObject({
-      start: { line: 0, col: 0 },
-      end: { line: 0, col: 5 }
+      start: { line: 1, col: 1 },
+      end: { line: 1, col: 6 }
     })
   })
   test('seq', () => {
@@ -40,8 +40,8 @@ describe('eemeli/yaml#7', () => {
     const node = docs[1].errors[0].source
     expect(node).toBeInstanceOf(Node)
     expect(node.rangeAsLinePos).toMatchObject({
-      start: { line: 2, col: 0 },
-      end: { line: 2, col: 10 }
+      start: { line: 3, col: 1 },
+      end: { line: 3, col: 11 }
     })
   })
 })
@@ -53,7 +53,7 @@ test('eemeli/yaml#8', () => {
   const node = doc.errors[0].source
   expect(node).toBeInstanceOf(Node)
   expect(node.rangeAsLinePos).toMatchObject({
-    start: { line: 0, col: 0 },
-    end: { line: 0, col: 1 }
+    start: { line: 1, col: 1 },
+    end: { line: 1, col: 2 }
   })
 })
