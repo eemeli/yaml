@@ -15,7 +15,7 @@ yarn add yaml
 <li>Supports parsing, modifying, and writing YAML comments.</li>
 </ul>
 
-<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies, and is usable in both browser and node environments.</p>
+<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It runs on Node.js 6 and later with no external dependencies, and in browsers from IE 11 upwards using <code>@babel/runtime</code> (Note: not included in dependencies, install separately).</p>
 <h2 id='api-overview'>API Overview</h2>
 <p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the <a href="#cst-parser">CST Parser</a>. The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library along with a decent <a href="#content-nodes">AST</a>, and the third is the closest to YAML source, making it fast, raw, and crude.</p>
 
