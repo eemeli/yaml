@@ -156,6 +156,8 @@ describe('setOrigRanges()', () => {
       value: null,
       valueRange: { end: 12, origEnd: 14, origStart: 0, start: 0 }
     })
+    expect(cst[0].context.root).toBe(cst[0])
+    expect(cst[0].contents[0].items[1].node.context.root).toBe(cst[0])
   })
 
   test('stream of two documents', () => {
@@ -204,6 +206,8 @@ describe('setOrigRanges()', () => {
       value: null,
       valueRange: { end: 12, origEnd: 15, origStart: 10, start: 8 }
     })
+    expect(cst[0].context.root).toBe(cst[0])
+    expect(cst[1].context.root).toBe(cst[1])
   })
 
   test('flow collections', () => {
@@ -242,5 +246,7 @@ describe('setOrigRanges()', () => {
       value: null,
       valueRange: { end: 7, origEnd: 9, origStart: 2, start: 1 }
     })
+    expect(cst[0].context.root).toBe(cst[0])
+    expect(cst[0].contents[1].context.root).toBe(cst[0])
   })
 })

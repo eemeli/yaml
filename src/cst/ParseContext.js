@@ -65,6 +65,7 @@ export default class ParseContext {
     this.indent = indent != null ? indent : orig.indent
     this.lineStart = lineStart != null ? lineStart : orig.lineStart
     this.parent = parent != null ? parent : orig.parent || {}
+    this.root = orig.root
     this.src = orig.src
   }
 

@@ -1,6 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import Node from '../../src/cst/Node'
 import YAML from '../../src/index'
 
 test('eemeli/yaml#2', () => {
@@ -23,36 +22,6 @@ test('eemeli/yaml#3', () => {
   expect(doc.errors).toHaveLength(0)
   expect(doc.contents.items[0].key).toBeNull()
   expect(doc.contents.items[0].value.value).toBe(123)
-})
-
-test('eemeli/yaml#6', () => {
-  const src = 'abc: 123\ndef'
-  const doc = YAML.parseDocument(src)
-  expect(doc.errors).toHaveLength(1)
-  expect(doc.errors[0].name).toBe('YAMLSemanticError')
-  expect(doc.errors[0].source).toBeInstanceOf(Node)
-})
-
-describe('eemeli/yaml#7', () => {
-  test('map', () => {
-    const src = '{ , }\n---\n{ 123,,, }\n'
-    const docs = YAML.parseAllDocuments(src)
-    expect(docs[0].errors).toHaveLength(1)
-    expect(docs[1].errors).toHaveLength(2)
-  })
-  test('seq', () => {
-    const src = '[ , ]\n---\n[ 123,,, ]\n'
-    const docs = YAML.parseAllDocuments(src)
-    expect(docs[0].errors).toHaveLength(1)
-    expect(docs[1].errors).toHaveLength(2)
-  })
-})
-
-test('eemeli/yaml#8', () => {
-  const src = '{'
-  const doc = YAML.parseDocument(src)
-  expect(doc.errors).toHaveLength(1)
-  expect(doc.errors[0].name).toBe('YAMLSemanticError')
 })
 
 describe('eemeli/yaml#10', () => {

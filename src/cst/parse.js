@@ -11,11 +11,11 @@ export default function parse(src) {
       return '\n'
     })
   }
-  const context = new ParseContext({ src })
   const documents = []
   let offset = 0
   do {
     const doc = new Document()
+    const context = new ParseContext({ src })
     offset = doc.parse(context, offset)
     documents.push(doc)
   } while (offset < src.length)
