@@ -485,6 +485,12 @@ date (00:00:00Z): 2002-12-14\n`)
       const str2 = YAML.stringify(set)
       expect(str2).toBe(`- a\n- b\n- c\n`)
     })
+
+    test('eemeli/yaml#78', () => {
+      const set = new Set(['a', 'b', 'c'])
+      const str = YAML.stringify({ set }, { version: '1.1' })
+      expect(str).toBe(`set:\n  !!set\n  ? a\n  ? b\n  ? c\n`)
+    })
   })
 })
 

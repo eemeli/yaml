@@ -7,6 +7,13 @@ import parseMap from './parseMap'
 import Scalar from './Scalar'
 
 export class YAMLSet extends YAMLMap {
+  static tag = 'tag:yaml.org,2002:set'
+
+  constructor() {
+    super()
+    this.tag = YAMLSet.tag
+  }
+
   add(key) {
     const pair = key instanceof Pair ? key : new Pair(key)
     const prev = findPair(this.items, pair.key)
