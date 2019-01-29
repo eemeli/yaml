@@ -125,3 +125,8 @@ test('eemeli/yaml#52: Quoting item markers', () => {
   expect(() => YAML.parse(str2)).not.toThrow()
   expect(str2).toBe('key: "?"\n')
 })
+
+test('reserved names', () => {
+  const str = YAML.stringify({ comment: 'foo' })
+  expect(str).toBe('comment: foo\n')
+})
