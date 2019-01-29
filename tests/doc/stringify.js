@@ -1,5 +1,5 @@
 import YAML from '../../src/index'
-import { strOptions } from '../../src/schema/_string'
+import { stringify as stringifyStr, strOptions } from '../../src/schema/_string'
 
 test('undefined', () => {
   expect(YAML.stringify()).toBe('\n')
@@ -124,4 +124,56 @@ test('eemeli/yaml#52: Quoting item markers', () => {
   const str2 = String(doc)
   expect(() => YAML.parse(str2)).not.toThrow()
   expect(str2).toBe('key: "?"\n')
+})
+
+describe('eemeli/yaml#80', () => {
+  const regexp = {
+    class: RegExp,
+    tag: 'tag:node-tap.org,2019:regexp',
+    resolve(doc, src, flags) {
+      return new RegExp(src, flags)
+    },
+    default: true,
+    test: /^\/(.*)\/([gimuy]+)$/,
+    stringify(item, ctx, onComment, onChompKeep) {
+      return stringifyStr(
+        { value: item.value.toString() },
+        ctx,
+        onComment,
+        onChompKeep
+      )
+    }
+  }
+
+  beforeAll(() => {
+    YAML.defaultOptions.tags = [regexp]
+  })
+
+  afterAll(() => {
+    YAML.defaultOptions.tags = []
+  })
+
+  test('stringify as plain scalar', () => {
+    const str = YAML.stringify(/re/g)
+    expect(str).toBe('/re/g\n')
+  })
+
+  test('stringify as non-default plain scalar', () => {
+    regexp.default = false
+    const str = YAML.stringify(/re/g)
+    regexp.default = true
+    expect(str).toBe('!<tag:node-tap.org,2019:regexp> /re/g\n')
+  })
+
+  test('stringify as quoted scalar', () => {
+    regexp.stringify = (item, ctx, onComment, onChompKeep) =>
+      stringifyStr(
+        { value: item.value.toString() },
+        Object.assign({ reqStringParse: true }, ctx),
+        onComment,
+        onChompKeep
+      )
+    const str = YAML.stringify(/re/g)
+    expect(str).toBe('"/re/g"\n')
+  })
 })
