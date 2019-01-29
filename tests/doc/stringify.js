@@ -177,3 +177,8 @@ describe('eemeli/yaml#80', () => {
     expect(str).toBe('"/re/g"\n')
   })
 })
+
+test('reserved names', () => {
+  const str = YAML.stringify({ comment: 'foo' })
+  expect(str).toBe('comment: foo\n')
+})

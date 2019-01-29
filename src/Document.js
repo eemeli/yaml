@@ -11,8 +11,9 @@ import listTagNames from './listTagNames'
 import Schema from './schema'
 import Alias from './schema/Alias'
 import Collection, { isEmptyPath } from './schema/Collection'
-import toJSON from './toJSON'
+import Node from './schema/Node'
 import Scalar from './schema/Scalar'
+import toJSON from './toJSON'
 
 const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
@@ -542,12 +543,14 @@ export default class Document {
     let chompKeep = false
     let contentComment = null
     if (this.contents) {
-      if (this.contents.spaceBefore && hasDirectives) lines.push('')
-      if (this.contents.commentBefore)
-        lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
-      // top-level block scalars need to be indented if followed by a comment
-      ctx.forceBlockIndent = !!this.comment
-      contentComment = this.contents.comment
+      if (this.contents instanceof Node) {
+        if (this.contents.spaceBefore && hasDirectives) lines.push('')
+        if (this.contents.commentBefore)
+          lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
+        // top-level block scalars need to be indented if followed by a comment
+        ctx.forceBlockIndent = !!this.comment
+        contentComment = this.contents.comment
+      }
       const onChompKeep = contentComment ? null : () => (chompKeep = true)
       const body = this.schema.stringify(
         this.contents,
