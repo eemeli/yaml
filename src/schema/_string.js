@@ -279,6 +279,9 @@ export function stringify(item, ctx, onComment, onChompKeep) {
   if (typeof value !== 'string') {
     value = String(value)
     item = Object.assign({}, item, { value })
+    ctx = Object.assign({}, ctx, { reqStringParse: false })
+  } else {
+    ctx = Object.assign({}, ctx, { reqStringParse: true })
   }
   const _stringify = _type => {
     switch (_type) {

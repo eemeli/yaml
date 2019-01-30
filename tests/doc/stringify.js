@@ -137,7 +137,7 @@ describe('eemeli/yaml#80', () => {
     test: /^\/(.*)\/([gimuy]+)$/,
     stringify(item, ctx, onComment, onChompKeep) {
       return stringifyStr(
-        { value: item.value.toString() },
+        item,
         ctx,
         onComment,
         onChompKeep
