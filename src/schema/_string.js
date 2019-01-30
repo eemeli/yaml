@@ -214,7 +214,7 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
 
 function plainString(item, ctx, onComment, onChompKeep) {
   const { comment, type, value } = item
-  const { implicitKey, indent, inFlow, reqStringParse, tags } = ctx
+  const { actualString, implicitKey, indent, inFlow, tags } = ctx
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
@@ -248,12 +248,13 @@ function plainString(item, ctx, onComment, onChompKeep) {
     // Where allowed & type not set explicitly, prefer block style for multiline strings
     return blockString(item, ctx, onComment, onChompKeep)
   }
-  // Need to verify that output will be parsed as a string
   const str = value.replace(/\n+/g, `$&\n${indent}`)
+  // Need to verify that output will be parsed as a string, as plain numbers and
+  // booleans get parsed with those types, e.g. '42', 'true' & '0.9e-3'.
+  // Custom tags may set ctx.actualString === false to skip this check.
   if (
-    // for built-in tags, catch e.g. '42', 'true' & '0.9e-3'
-    // for custom tags, allow forced check via ctx.reqParseAsString
-    (reqStringParse || (typeof value === 'string' && !/[^\w.+-]/.test(str))) &&
+    actualString !== false &&
+    /^[\w.+-]+$/.test(str) &&
     typeof tags.resolveScalar(str).value !== 'string'
   ) {
     return doubleQuotedString(value, ctx)
