@@ -26,23 +26,23 @@ import YAML from 'yaml'
 const YAML = require('yaml')
 ```
 
-### Pure JavaScript
+### Parse & Stringify
 
-* [`YAML.parse(str, options): value`](https://eemeli.org/yaml/#yaml-parse)
-* [`YAML.stringify(value, options): string`](https://eemeli.org/yaml/#yaml-stringify)
+- [`YAML.parse(str, options): value`](https://eemeli.org/yaml/#yaml-parse)
+- [`YAML.stringify(value, options): string`](https://eemeli.org/yaml/#yaml-stringify)
 
 ### YAML Documents
 
-* [`YAML.createNode(value, wrapScalars, tag): Node`](https://eemeli.org/yaml/#creating-nodes)
-* [`YAML.defaultOptions`](https://eemeli.org/yaml/#options)
-* [`YAML.Document`](https://eemeli.org/yaml/#yaml-documents)
-  * [`constructor(options)`](https://eemeli.org/yaml/#creating-documents)
-  * [`defaults`](https://eemeli.org/yaml/#options)
-  * [`#anchors`](https://eemeli.org/yaml/#working-with-anchors)
-  * [`#contents`](https://eemeli.org/yaml/#content-nodes)
-  * [`#errors`](https://eemeli.org/yaml/#errors)
-* [`YAML.parseAllDocuments(str, options): YAML.Document[]`](https://eemeli.org/yaml/#parsing-documents)
-* [`YAML.parseDocument(str, options): YAML.Document`](https://eemeli.org/yaml/#parsing-documents)
+- [`YAML.createNode(value, wrapScalars, tag): Node`](https://eemeli.org/yaml/#creating-nodes)
+- [`YAML.defaultOptions`](https://eemeli.org/yaml/#options)
+- [`YAML.Document`](https://eemeli.org/yaml/#yaml-documents)
+  - [`constructor(options)`](https://eemeli.org/yaml/#creating-documents)
+  - [`defaults`](https://eemeli.org/yaml/#options)
+  - [`#anchors`](https://eemeli.org/yaml/#working-with-anchors)
+  - [`#contents`](https://eemeli.org/yaml/#content-nodes)
+  - [`#errors`](https://eemeli.org/yaml/#errors)
+- [`YAML.parseAllDocuments(str, options): YAML.Document[]`](https://eemeli.org/yaml/#parsing-documents)
+- [`YAML.parseDocument(str, options): YAML.Document`](https://eemeli.org/yaml/#parsing-documents)
 
 ```js
 import Map from 'yaml/map'
@@ -50,9 +50,9 @@ import Pair from 'yaml/pair'
 import Seq from 'yaml/seq'
 ```
 
-* [`new Map()`](https://eemeli.org/yaml/#creating-nodes)
-* [`new Pair(key, value)`](https://eemeli.org/yaml/#creating-nodes)
-* [`new Seq()`](https://eemeli.org/yaml/#creating-nodes)
+- [`new Map()`](https://eemeli.org/yaml/#creating-nodes)
+- [`new Pair(key, value)`](https://eemeli.org/yaml/#creating-nodes)
+- [`new Seq()`](https://eemeli.org/yaml/#creating-nodes)
 
 ### CST Parser
 
@@ -60,8 +60,8 @@ import Seq from 'yaml/seq'
 import parseCST from 'yaml/parse-cst'
 ```
 
-* [`parseCST(str): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
-* [`YAML.parseCST(str): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
+- [`parseCST(str): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
+- [`YAML.parseCST(str): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
 
 ## YAML.parse
 
@@ -119,3 +119,11 @@ YAML.stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
 //   lines
 // `
 ```
+
+---
+
+Browser testing provided by:
+
+<a href="https://www.browserstack.com/open-source">
+<img width=200 src="https://eemeli.org/yaml/images/browserstack.svg" />
+</a>
