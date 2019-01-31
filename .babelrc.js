@@ -1,6 +1,6 @@
 const isBrowser = process.env.BABEL_ENV === 'browser'
 
-const envOptions = { useBuiltIns: 'entry' }
+const envOptions = { useBuiltIns: false }
 if (!isBrowser) envOptions.targets = { node: '6.5' }
 const presets = [['@babel/env', envOptions]]
 
