@@ -25,7 +25,14 @@ overrides:
     env:
       es6: true
       node: false
-  - files: tests/**/*.js
+  - files: playground/src/**/*.js
+    env:
+      browser: true
+      es6: true
+      node: false
+  - files:
+      - tests/**/*.js
+      - playground/browser-test/**/*.js
     env:
       es6: true
       jest: true

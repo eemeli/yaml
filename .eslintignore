@@ -7,4 +7,5 @@
 /docs/source/layouts/
 /docs/source/stylesheets/
 /package-lock.json
+/playground/dist/
 /tests/yaml-test-suite/
