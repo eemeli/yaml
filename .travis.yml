@@ -4,6 +4,25 @@ node_js:
   - 'lts/*'
   - '6.0.0'
 
-script:
-  - npm test
-  - npm run lint
+addons:
+  browserstack:
+    username: eemeliaro2
+    access_key:
+      secure: 'XKuJ4p4Gli7dI+I4nSkaMF6Za+PbCwhtlyTctS179c8Y7M+awS//myc7WHCy+kZAMUqySN4zHmuDK4yxVcyFcF1nYPBPykFQjaXskommXaL+3lQGcdtQpxHPbNxMrgJomd3mfvwTUChvjDG4NMF6aMDerBL0jlb43rE81dnPHueCb25/TEvt6XOHA472PS6v3/dsRjN0oRmYf8B98IS4l354K73/J5d2x4LHzmNIUppf9zWN6MoY+NTbRxazZk4Dj1+Ov/jgJyvj/mP5Pr1/W3JuNep9jC/IpAfVXgzwvZPaSpcAvSPB4eYJQ5etYAv+gNE04ptns3R4BNhQi2/qxa/YWfXkeNkHK3WrOTOAPPDZ+8OShZDlergqcWE1rIRTVHq18hNa/2VnY2HIYS4hJYl0cUC0ohWbABalV9FNJtXRJt7nPNN7vVQMwGsnce2B3zNNMZyqSrTojRWmVglbe2ADHwHLHoEQq6bWCQvq+U1CoP3gtGPAAWCwYSsQ2pIbFVo4mPfIN14BhAY9gyMDUKjAukRcCS2+n/GVaTrea0w2eaaf3XdiQecQ1rsr8ZUxpc7NarBHt1QpZN+5nmxoqX0A+pUvKDHS1puuGv5BXeyvJlTh88tCQQRDADzkuYY7V6hXrKrmhwKNrmERX8Ux3C9ZCkieuT6Z8nZ8MV8frU8='
+
+jobs:
+  include:
+    - stage: lint
+      node_js: node
+      script:
+        - npm run lint
+
+    - stage: browser tests
+      node_js: node
+      script:
+        - npm run build
+        - cd playground
+        - npm install
+        - npm start &
+        - sleep 10
+        - npm test
