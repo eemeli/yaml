@@ -75,9 +75,20 @@ export default class Schema {
       ctx.onTagObj(tagObj)
       delete ctx.onTagObj
     }
-    return tagObj.createNode
+    const obj = {}
+    if (typeof value === 'object' && ctx.prevObjects) {
+      const prev = ctx.prevObjects.find(o => o.value === value)
+      if (prev) {
+        const alias = new Alias(prev) // leaves source dirty; must be cleaned by caller
+        ctx.aliasNodes.push(alias)
+        return alias
+      }
+      obj.value = value
+      ctx.prevObjects.push(obj)
+    }
+    return (obj.node = tagObj.createNode
       ? tagObj.createNode(this, value, ctx)
-      : new Scalar(value)
+      : new Scalar(value))
   }
 
   // falls back to string on no match
@@ -214,8 +225,21 @@ export default class Schema {
   stringify(item, ctx, onComment, onChompKeep) {
     let tagObj
     if (!(item instanceof Node)) {
-      const createCtx = { onTagObj: o => (tagObj = o) }
+      const createCtx = {
+        aliasNodes: [],
+        onTagObj: o => (tagObj = o),
+        prevObjects: []
+      }
       item = this.createNode(item, true, null, createCtx)
+      const { anchors } = ctx.doc
+      for (const alias of createCtx.aliasNodes) {
+        alias.source = alias.source.node
+        let name = anchors.getName(alias.source)
+        if (!name) {
+          name = anchors.newName('ref')
+          anchors.map[name] = alias.source
+        }
+      }
     }
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
