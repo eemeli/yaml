@@ -7,6 +7,7 @@ import Schema from './schema'
 
 const defaultOptions = {
   anchorPrefix: 'a',
+  keepCstNodes: false,
   keepNodeTypes: true,
   keepBlobsInJSON: true,
   mapAsMap: false,
