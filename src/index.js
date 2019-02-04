@@ -6,6 +6,7 @@ import { YAMLSemanticError } from './errors'
 import Schema from './schema'
 
 const defaultOptions = {
+  anchorPrefix: 'a',
   keepNodeTypes: true,
   keepBlobsInJSON: true,
   mapAsMap: false,

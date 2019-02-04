@@ -47,7 +47,7 @@ export default class Document {
   }
 
   constructor(options) {
-    this.anchors = new Anchors()
+    this.anchors = new Anchors(options.anchorPrefix)
     this.commentBefore = null
     this.comment = null
     this.contents = null

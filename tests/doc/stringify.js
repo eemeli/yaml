@@ -79,33 +79,33 @@ describe('circular references', () => {
   test('parent at root', () => {
     const map = { foo: 'bar' }
     map.map = map
-    expect(YAML.stringify(map)).toBe(`&ref1
+    expect(YAML.stringify(map)).toBe(`&a1
 foo: bar
-map: *ref1\n`)
+map: *a1\n`)
   })
 
   test('ancestor at root', () => {
     const baz = {}
     const map = { foo: { bar: { baz } } }
     baz.map = map
-    expect(YAML.stringify(map)).toBe(`&ref1
+    expect(YAML.stringify(map)).toBe(`&a1
 foo:
   bar:
     baz:
-      map: *ref1\n`)
+      map: *a1\n`)
   })
 
   test('sibling sequences', () => {
     const one = ['one']
     const two = ['two']
     const seq = [one, two, one, one, two]
-    expect(YAML.stringify(seq)).toBe(`- &ref1
+    expect(YAML.stringify(seq)).toBe(`- &a1
   - one
-- &ref2
+- &a2
   - two
-- *ref1
-- *ref1
-- *ref2\n`)
+- *a1
+- *a1
+- *a2\n`)
   })
 
   test('further relatives', () => {
@@ -114,25 +114,26 @@ foo:
     expect(YAML.stringify(seq)).toBe(`- foo:
     bar:
       baz:
-        &ref1
+        &a1
         a: 1
 - fe:
     fi:
       fo:
-        baz: *ref1\n`)
+        baz: *a1\n`)
   })
 
   test('only match objects', () => {
     const date = new Date('2001-12-15T02:59:43.1Z')
     const seq = ['a', 'a', 1, 1, true, true, date, date]
-    expect(YAML.stringify(seq, { version: '1.1' })).toBe(`- a
+    expect(YAML.stringify(seq, { anchorPrefix: 'foo', version: '1.1' }))
+      .toBe(`- a
 - a
 - 1
 - 1
 - true
 - true
-- &ref1 2001-12-15T02:59:43.100Z
-- *ref1\n`)
+- &foo1 2001-12-15T02:59:43.100Z
+- *foo1\n`)
   })
 })
 

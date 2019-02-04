@@ -11,6 +11,10 @@ export default class Anchors {
 
   map = {}
 
+  constructor(prefix) {
+    this.prefix = prefix
+  }
+
   createAlias(node, name) {
     this.setAnchor(node, name)
     return new Alias(node)
@@ -39,6 +43,7 @@ export default class Anchors {
   }
 
   newName(prefix) {
+    if (!prefix) prefix = this.prefix
     const names = Object.keys(this.map)
     for (let i = 1; true; ++i) {
       const name = `${prefix}${i}`
@@ -79,7 +84,7 @@ export default class Anchors {
     } else {
       if (!name) {
         if (!node) return null
-        name = this.newName('a')
+        name = this.newName()
       }
       map[name] = node
     }

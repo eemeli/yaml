@@ -236,7 +236,7 @@ export default class Schema {
         alias.source = alias.source.node
         let name = anchors.getName(alias.source)
         if (!name) {
-          name = anchors.newName('ref')
+          name = anchors.newName()
           anchors.map[name] = alias.source
         }
       }
