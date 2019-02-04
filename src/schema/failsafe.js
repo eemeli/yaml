@@ -5,29 +5,29 @@ import { str } from './_string'
 import parseMap from './parseMap'
 import parseSeq from './parseSeq'
 
-function createMap(schema, obj, wrapScalars) {
+function createMap(schema, obj, ctx) {
   const map = new YAMLMap()
   if (obj instanceof Map) {
     for (const [key, value] of obj) {
-      const k = schema.createNode(key, wrapScalars)
-      const v = schema.createNode(value, wrapScalars)
+      const k = schema.createNode(key, ctx.wrapScalars, null, ctx)
+      const v = schema.createNode(value, ctx.wrapScalars, null, ctx)
       map.items.push(new Pair(k, v))
     }
   } else if (obj && typeof obj === 'object') {
     map.items = Object.keys(obj).map(key => {
-      const k = schema.createNode(key, wrapScalars)
-      const v = schema.createNode(obj[key], wrapScalars)
+      const k = schema.createNode(key, ctx.wrapScalars, null, ctx)
+      const v = schema.createNode(obj[key], ctx.wrapScalars, null, ctx)
       return new Pair(k, v)
     })
   }
   return map
 }
 
-function createSeq(schema, obj, wrapScalars) {
+function createSeq(schema, obj, ctx) {
   const seq = new YAMLSeq()
   if (obj && obj[Symbol.iterator]) {
     for (const it of obj) {
-      const v = schema.createNode(it, wrapScalars)
+      const v = schema.createNode(it, ctx.wrapScalars, null, ctx)
       seq.items.push(v)
     }
   }

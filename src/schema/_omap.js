@@ -54,8 +54,8 @@ function parseOMap(doc, cst) {
   return Object.assign(new YAMLOMap(), pairs)
 }
 
-function createOMap(schema, iterable, wrapScalars) {
-  const pairs = createPairs(schema, iterable, wrapScalars)
+function createOMap(schema, iterable, ctx) {
+  const pairs = createPairs(schema, iterable, ctx)
   const omap = new YAMLOMap()
   omap.items = pairs.items
   return omap

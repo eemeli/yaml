@@ -69,9 +69,14 @@ export default class Schema {
         tagObj = value instanceof Map ? map : value[Symbol.iterator] ? seq : map
       }
     }
-    if (ctx && ctx.onTagObj) ctx.onTagObj(tagObj)
+    if (!ctx) ctx = { wrapScalars }
+    else ctx.wrapScalars = wrapScalars
+    if (ctx.onTagObj) {
+      ctx.onTagObj(tagObj)
+      delete ctx.onTagObj
+    }
     return tagObj.createNode
-      ? tagObj.createNode(this, value, wrapScalars)
+      ? tagObj.createNode(this, value, ctx)
       : new Scalar(value)
   }
 
