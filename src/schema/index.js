@@ -50,7 +50,7 @@ export default class Schema {
     }
   }
 
-  createNode(value, wrapScalars, tag, onTagObj) {
+  createNode(value, wrapScalars, tag, ctx) {
     let tagObj
     if (tag) {
       if (tag.startsWith('!!')) tag = Schema.defaultPrefix + tag.slice(2)
@@ -69,7 +69,7 @@ export default class Schema {
         tagObj = value instanceof Map ? map : value[Symbol.iterator] ? seq : map
       }
     }
-    if (onTagObj) onTagObj(tagObj)
+    if (ctx && ctx.onTagObj) ctx.onTagObj(tagObj)
     return tagObj.createNode
       ? tagObj.createNode(this, value, wrapScalars)
       : new Scalar(value)
@@ -172,11 +172,11 @@ export default class Schema {
         default:
           obj = item.value
       }
-      const match = this.tags.filter(t => t.class && (
-        obj instanceof t.class || (
-          obj && obj.constructor === t.class
-        )
-      ))
+      const match = this.tags.filter(
+        t =>
+          t.class &&
+          (obj instanceof t.class || (obj && obj.constructor === t.class))
+      )
       tagObj =
         match.find(t => t.format === item.format) || match.find(t => !t.format)
     } else {
@@ -208,8 +208,10 @@ export default class Schema {
 
   stringify(item, ctx, onComment, onChompKeep) {
     let tagObj
-    if (!(item instanceof Node))
-      item = this.createNode(item, true, null, o => (tagObj = o))
+    if (!(item instanceof Node)) {
+      const createCtx = { onTagObj: o => (tagObj = o) }
+      item = this.createNode(item, true, null, createCtx)
+    }
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)
