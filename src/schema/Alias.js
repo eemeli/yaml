@@ -24,7 +24,9 @@ export default class Alias extends Node {
     throw new Error('Alias nodes cannot have tags')
   }
 
-  toJSON(arg, opt) {
-    return toJSON(this.source, arg, opt)
+  toJSON(arg, ctx) {
+    const anchor =
+      ctx && ctx.anchors && ctx.anchors.find(a => a.node === this.source)
+    return (anchor && anchor.res) || toJSON(this.source, arg, ctx)
   }
 }

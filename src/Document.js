@@ -501,13 +501,14 @@ export default class Document {
   }
 
   toJSON(arg) {
-    const cr = this.warnings.find(w => /circular reference/.test(w.message))
-    if (cr) throw new YAMLSemanticError(cr.source, cr.message)
     const keep =
       this.options.keepBlobsInJSON &&
       (typeof arg !== 'string' || !(this.contents instanceof Scalar))
-    const mapAsMap = keep && !!this.options.mapAsMap
-    return toJSON(this.contents, arg, { keep, mapAsMap })
+    const ctx = { keep, mapAsMap: keep && !!this.options.mapAsMap }
+    const anchorNodes = Object.values(this.anchors.map)
+    if (anchorNodes.length > 0)
+      ctx.anchors = anchorNodes.map(node => ({ alias: [], node }))
+    return toJSON(this.contents, arg, ctx)
   }
 
   toString() {

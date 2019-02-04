@@ -36,7 +36,8 @@ test('circular reference', () => {
   const { items } = doc.contents
   expect(items).toHaveLength(2)
   expect(items[1].source).toBe(doc.contents)
-  expect(() => doc.toJSON()).toThrow(message)
+  const res = doc.toJSON()
+  expect(res[1]).toBe(res)
   expect(String(doc)).toBe(src)
 })
 
@@ -175,7 +176,7 @@ describe('merge <<', () => {
       const message =
         'Alias node contains a circular reference, which cannot be resolved as JSON'
       expect(doc.warnings).toMatchObject([{ message }])
-      expect(() => doc.toJSON()).toThrow(message)
+      expect(() => doc.toJSON()).toThrow('Maximum call stack size exceeded')
       expect(String(doc)).toBe(src)
     })
   })

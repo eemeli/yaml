@@ -50,9 +50,11 @@ export default class YAMLMap extends Collection {
     else this.items.push(new Pair(key, value))
   }
 
-  toJSON(_, opt) {
-    if (opt && opt.mapAsMap) return this.toJSMap(opt)
-    return this.items.reduce((map, item) => {
+  toJSON(_, ctx) {
+    if (ctx && ctx.mapAsMap) return this.toJSMap(ctx)
+    const map = {}
+    if (ctx && ctx.onCreate) ctx.onCreate(map)
+    for (const item of this.items) {
       if (item instanceof Merge) {
         // If the value associated with a merge key is a single mapping node,
         // each of its key/value pairs is inserted into the current mapping,
@@ -67,7 +69,7 @@ export default class YAMLMap extends Collection {
         for (let i = items.length - 1; i >= 0; --i) {
           const { source } = items[i]
           if (source instanceof YAMLMap) {
-            const obj = source.toJSON('', opt)
+            const obj = source.toJSON('', ctx)
             Object.keys(obj).forEach(key => {
               if (!keys.includes(key)) map[key] = obj[key]
             })
@@ -77,21 +79,22 @@ export default class YAMLMap extends Collection {
         }
       } else {
         const { stringKey, value } = item
-        map[stringKey] = toJSON(value, stringKey, opt)
+        map[stringKey] = toJSON(value, stringKey, ctx)
       }
-      return map
-    }, {})
+    }
+    return map
   }
 
-  toJSMap(opt) {
+  toJSMap(ctx) {
     const map = new Map()
+    if (ctx && ctx.onCreate) ctx.onCreate(map)
     for (const item of this.items) {
       if (item instanceof Merge) {
         const { items } = item.value
         for (let i = items.length - 1; i >= 0; --i) {
           const { source } = items[i]
           if (source instanceof YAMLMap) {
-            for (const [key, value] of source.toJSMap(opt)) {
+            for (const [key, value] of source.toJSMap(ctx)) {
               if (!map.has(key)) map.set(key, value)
             }
           } else {
@@ -99,8 +102,8 @@ export default class YAMLMap extends Collection {
           }
         }
       } else {
-        const key = toJSON(item.key, '', opt)
-        const value = toJSON(item.value, key, opt)
+        const key = toJSON(item.key, '', ctx)
+        const value = toJSON(item.value, key, ctx)
         map.set(key, value)
       }
     }

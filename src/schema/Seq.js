@@ -41,8 +41,12 @@ export default class YAMLSeq extends Collection {
     this.items[idx] = value
   }
 
-  toJSON(_, opt) {
-    return this.items.map((v, i) => toJSON(v, String(i), opt))
+  toJSON(_, ctx) {
+    const seq = []
+    if (ctx && ctx.onCreate) ctx.onCreate(seq)
+    let i = 0
+    for (const item of this.items) seq.push(toJSON(item, String(i++), ctx))
+    return seq
   }
 
   toString(ctx, onComment, onChompKeep) {
