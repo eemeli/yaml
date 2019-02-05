@@ -505,9 +505,12 @@ export default class Document {
       this.options.keepBlobsInJSON &&
       (typeof arg !== 'string' || !(this.contents instanceof Scalar))
     const ctx = { keep, mapAsMap: keep && !!this.options.mapAsMap }
-    const anchorNodes = Object.values(this.anchors.map)
-    if (anchorNodes.length > 0)
-      ctx.anchors = anchorNodes.map(node => ({ alias: [], node }))
+    const anchorNames = Object.keys(this.anchors.map)
+    if (anchorNames.length > 0)
+      ctx.anchors = anchorNames.map(name => ({
+        alias: [],
+        node: this.anchors.map[name]
+      }))
     return toJSON(this.contents, arg, ctx)
   }
 
