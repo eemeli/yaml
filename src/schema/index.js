@@ -174,13 +174,6 @@ export default class Schema {
       if (match.length > 0)
         return match.find(t => t.format === item.format) || match[0]
     }
-    if (item.value === null) {
-      const tagObj = this.tags.find(
-        t => t.identify && t.identify(null) && !t.format
-      )
-      if (!tagObj) throw new Error('Tag not resolved for null value')
-      return tagObj
-    }
     let tagObj, obj
     if (item instanceof Scalar) {
       obj = item.value
