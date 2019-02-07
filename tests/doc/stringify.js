@@ -130,8 +130,9 @@ describe('eemeli/yaml#80', () => {
   const regexp = {
     class: RegExp,
     tag: '!re',
-    resolve(doc, src, flags) {
-      return new RegExp(src, flags)
+    resolve(doc, cst) {
+      const match = cst.strValue.match(/^\/(.*)\/([gimuy]*)$/)
+      return new RegExp(match[1], match[2])
     },
     stringify(item, ctx, onComment, onChompKeep) {
       ctx = Object.assign({ actualString: false }, ctx)
