@@ -319,7 +319,7 @@ export function stringify(item, ctx, onComment, onChompKeep) {
 }
 
 export const str = {
-  class: String,
+  identify: value => typeof value === 'string',
   default: true,
   tag: 'tag:yaml.org,2002:str',
   resolve,

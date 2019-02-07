@@ -58,11 +58,14 @@ export default class Schema {
       tagObj = match.find(t => !t.format) || match[0]
       if (!tagObj) throw new Error(`Tag ${tag} not found`)
     } else {
+      // TODO: deprecate/remove class check
       tagObj = this.tags.find(
-        t => t.class && value instanceof t.class && !t.format
+        t =>
+          ((t.identify && t.identify(value)) ||
+            (t.class && value instanceof t.class)) &&
+          !t.format
       )
       if (!tagObj) {
-        if (value == null) return new Scalar(null)
         if (typeof value.toJSON === 'function') value = value.toJSON()
         if (typeof value !== 'object')
           return wrapScalars ? new Scalar(value) : value
@@ -86,9 +89,12 @@ export default class Schema {
       obj.value = value
       ctx.prevObjects.push(obj)
     }
-    return (obj.node = tagObj.createNode
+    obj.node = tagObj.createNode
       ? tagObj.createNode(this, value, ctx)
-      : new Scalar(value))
+      : wrapScalars
+      ? new Scalar(value)
+      : value
+    return obj.node
   }
 
   // falls back to string on no match
@@ -169,29 +175,19 @@ export default class Schema {
         return match.find(t => t.format === item.format) || match[0]
     }
     if (item.value === null) {
-      const tagObj = this.tags.find(t => t.class === null && !t.format)
+      const tagObj = this.tags.find(
+        t => t.identify && t.identify(null) && !t.format
+      )
       if (!tagObj) throw new Error('Tag not resolved for null value')
       return tagObj
     }
     let tagObj, obj
     if (item instanceof Scalar) {
-      switch (typeof item.value) {
-        case 'boolean':
-          obj = new Boolean()
-          break
-        case 'number':
-          obj = new Number()
-          break
-        case 'string':
-          obj = new String()
-          break
-        default:
-          obj = item.value
-      }
+      obj = item.value
+      // TODO: deprecate/remove class check
       const match = this.tags.filter(
         t =>
-          t.class &&
-          (obj instanceof t.class || (obj && obj.constructor === t.class))
+          (t.identify && t.identify(obj)) || (t.class && obj instanceof t.class)
       )
       tagObj =
         match.find(t => t.format === item.format) || match.find(t => !t.format)

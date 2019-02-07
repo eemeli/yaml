@@ -88,7 +88,7 @@ function createSet(schema, iterable, ctx) {
 }
 
 export default {
-  class: Set,
+  identify: value => value instanceof Set,
   nodeClass: YAMLSet,
   default: false,
   tag: 'tag:yaml.org,2002:set',

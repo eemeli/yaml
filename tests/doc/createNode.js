@@ -13,13 +13,11 @@ describe('scalars', () => {
     })
     test('null', () => {
       const s = YAML.createNode(null, false)
-      expect(s).toBeInstanceOf(Scalar)
-      expect(s.value).toBe(null)
+      expect(s).toBeNull()
     })
     test('undefined', () => {
       const s = YAML.createNode(undefined, false)
-      expect(s).toBeInstanceOf(Scalar)
-      expect(s.value).toBe(null)
+      expect(s).toBeNull()
     })
     test('number', () => {
       const s = YAML.createNode(3, false)

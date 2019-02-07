@@ -7,7 +7,7 @@ import { Type } from '../cst/Node'
 import { resolve as resolveStr, stringify as stringifyStr } from './_string'
 
 export const binary = {
-  class: Uint8Array, // Buffer inherits from Uint8Array
+  identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array
   default: false,
   tag: 'tag:yaml.org,2002:binary',
   /**

@@ -190,7 +190,7 @@ test('eemeli/yaml#52: Quoting item markers', () => {
 
 describe('eemeli/yaml#80', () => {
   const regexp = {
-    class: RegExp,
+    identify: value => value instanceof RegExp,
     tag: '!re',
     resolve(doc, cst) {
       const match = cst.strValue.match(/^\/(.*)\/([gimuy]*)$/)

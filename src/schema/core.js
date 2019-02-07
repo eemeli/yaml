@@ -1,4 +1,5 @@
 import failsafe from './failsafe'
+import Scalar from './Scalar'
 
 export const stringifyNumber = ({ value }) =>
   isFinite(value)
@@ -13,7 +14,9 @@ export const nullOptions = { nullStr: 'null' }
 
 export default failsafe.concat([
   {
-    class: null,
+    identify: value => value == null,
+    createNode: (schema, value, ctx) =>
+      ctx.wrapScalars ? new Scalar(null) : null,
     default: true,
     tag: 'tag:yaml.org,2002:null',
     test: /^(?:~|[Nn]ull|NULL)?$/,
@@ -22,14 +25,14 @@ export default failsafe.concat([
     stringify: () => nullOptions.nullStr
   },
   {
-    class: Boolean,
+    identify: value => typeof value === 'boolean',
     default: true,
     tag: 'tag:yaml.org,2002:bool',
     test: /^(?:[Tt]rue|TRUE|[Ff]alse|FALSE)$/,
     resolve: str => str[0] === 't' || str[0] === 'T'
   },
   {
-    class: Number,
+    identify: value => typeof value === 'number',
     default: true,
     tag: 'tag:yaml.org,2002:int',
     format: 'OCT',
@@ -38,7 +41,7 @@ export default failsafe.concat([
     stringify: ({ value }) => '0o' + value.toString(8)
   },
   {
-    class: Number,
+    identify: value => typeof value === 'number',
     default: true,
     tag: 'tag:yaml.org,2002:int',
     test: /^[-+]?[0-9]+$/,
@@ -46,7 +49,7 @@ export default failsafe.concat([
     stringify: stringifyNumber
   },
   {
-    class: Number,
+    identify: value => typeof value === 'number',
     default: true,
     tag: 'tag:yaml.org,2002:int',
     format: 'HEX',
@@ -55,7 +58,7 @@ export default failsafe.concat([
     stringify: ({ value }) => '0x' + value.toString(16)
   },
   {
-    class: Number,
+    identify: value => typeof value === 'number',
     default: true,
     tag: 'tag:yaml.org,2002:float',
     test: /^(?:[-+]?\.inf|(\.nan))$/i,
@@ -68,7 +71,7 @@ export default failsafe.concat([
     stringify: stringifyNumber
   },
   {
-    class: Number,
+    identify: value => typeof value === 'number',
     default: true,
     tag: 'tag:yaml.org,2002:float',
     test: /^[-+]?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][-+]?[0-9]+)?$/,

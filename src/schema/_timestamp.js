@@ -36,7 +36,7 @@ const stringifySexagesimal = ({ value }) => {
 }
 
 export const intTime = {
-  class: Number,
+  identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:int',
   format: 'TIME',
@@ -47,7 +47,7 @@ export const intTime = {
 }
 
 export const floatTime = {
-  class: Number,
+  identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
   format: 'TIME',
@@ -58,7 +58,7 @@ export const floatTime = {
 }
 
 export const timestamp = {
-  class: Date,
+  identify: value => value instanceof Date,
   default: true,
   tag: 'tag:yaml.org,2002:timestamp',
   // If the time zone is omitted, the timestamp is assumed to be specified in UTC. The time part

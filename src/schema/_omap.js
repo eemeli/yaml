@@ -63,7 +63,7 @@ function createOMap(schema, iterable, ctx) {
 }
 
 export default {
-  class: Map,
+  identify: value => value instanceof Map,
   nodeClass: YAMLOMap,
   default: false,
   tag: 'tag:yaml.org,2002:omap',
