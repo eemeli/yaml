@@ -29,7 +29,8 @@ export default failsafe.concat([
     default: true,
     tag: 'tag:yaml.org,2002:bool',
     test: /^(?:[Tt]rue|TRUE|[Ff]alse|FALSE)$/,
-    resolve: str => str[0] === 't' || str[0] === 'T'
+    resolve: str => str[0] === 't' || str[0] === 'T',
+    stringify: value => JSON.stringify(value)
   },
   {
     identify: value => typeof value === 'number',

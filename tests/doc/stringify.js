@@ -195,8 +195,7 @@ describe('eemeli/yaml#80', () => {
     resolve(doc, cst) {
       const match = cst.strValue.match(/^\/(.*)\/([gimuy]*)$/)
       return new RegExp(match[1], match[2])
-    },
-    stringify
+    }
   }
 
   beforeAll(() => {

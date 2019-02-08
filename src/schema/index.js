@@ -1,5 +1,6 @@
 import { Type } from '../cst/Node'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
+import stringify from '../stringify'
 import Alias from './Alias'
 import Collection from './Collection'
 import core from './core'
@@ -29,10 +30,6 @@ export default class Schema {
     failsafe,
     json,
     'yaml-1.1': yaml11
-  }
-
-  static defaultStringify(value) {
-    return JSON.stringify(value)
   }
 
   constructor({ merge, schema, tags }) {
@@ -234,8 +231,12 @@ export default class Schema {
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)
     const props = this.stringifyProps(item, tagObj, ctx)
-    const stringify = tagObj.stringify || Schema.defaultStringify
-    const str = stringify(item, ctx, onComment, onChompKeep)
+    const str = (tagObj.stringify || stringify)(
+      item,
+      ctx,
+      onComment,
+      onChompKeep
+    )
     return props
       ? item instanceof Collection && str[0] !== '{' && str[0] !== '['
         ? `${props}\n${ctx.indent}${str}`
