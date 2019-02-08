@@ -50,7 +50,7 @@ export default class Schema {
     }
   }
 
-  createNode(value, wrapScalars, tag, onTagObj) {
+  createNode(value, wrapScalars, tag, ctx) {
     let tagObj
     if (tag) {
       if (tag.startsWith('!!')) tag = Schema.defaultPrefix + tag.slice(2)
@@ -69,10 +69,26 @@ export default class Schema {
         tagObj = value instanceof Map ? map : value[Symbol.iterator] ? seq : map
       }
     }
-    if (onTagObj) onTagObj(tagObj)
-    return tagObj.createNode
-      ? tagObj.createNode(this, value, wrapScalars)
-      : new Scalar(value)
+    if (!ctx) ctx = { wrapScalars }
+    else ctx.wrapScalars = wrapScalars
+    if (ctx.onTagObj) {
+      ctx.onTagObj(tagObj)
+      delete ctx.onTagObj
+    }
+    const obj = {}
+    if (typeof value === 'object' && ctx.prevObjects) {
+      const prev = ctx.prevObjects.find(o => o.value === value)
+      if (prev) {
+        const alias = new Alias(prev) // leaves source dirty; must be cleaned by caller
+        ctx.aliasNodes.push(alias)
+        return alias
+      }
+      obj.value = value
+      ctx.prevObjects.push(obj)
+    }
+    return (obj.node = tagObj.createNode
+      ? tagObj.createNode(this, value, ctx)
+      : new Scalar(value))
   }
 
   // falls back to string on no match
@@ -172,11 +188,11 @@ export default class Schema {
         default:
           obj = item.value
       }
-      const match = this.tags.filter(t => t.class && (
-        obj instanceof t.class || (
-          obj && obj.constructor === t.class
-        )
-      ))
+      const match = this.tags.filter(
+        t =>
+          t.class &&
+          (obj instanceof t.class || (obj && obj.constructor === t.class))
+      )
       tagObj =
         match.find(t => t.format === item.format) || match.find(t => !t.format)
     } else {
@@ -208,8 +224,23 @@ export default class Schema {
 
   stringify(item, ctx, onComment, onChompKeep) {
     let tagObj
-    if (!(item instanceof Node))
-      item = this.createNode(item, true, null, o => (tagObj = o))
+    if (!(item instanceof Node)) {
+      const createCtx = {
+        aliasNodes: [],
+        onTagObj: o => (tagObj = o),
+        prevObjects: []
+      }
+      item = this.createNode(item, true, null, createCtx)
+      const { anchors } = ctx.doc
+      for (const alias of createCtx.aliasNodes) {
+        alias.source = alias.source.node
+        let name = anchors.getName(alias.source)
+        if (!name) {
+          name = anchors.newName()
+          anchors.map[name] = alias.source
+        }
+      }
+    }
     ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)

@@ -20,15 +20,16 @@ export class YAMLOMap extends YAMLSeq {
   has = YAMLMap.prototype.has.bind(this)
   set = YAMLMap.prototype.set.bind(this)
 
-  toJSON(_, opt) {
+  toJSON(_, ctx) {
     const map = new Map()
+    if (ctx && ctx.onCreate) ctx.onCreate(map)
     for (const pair of this.items) {
       let key, value
       if (pair instanceof Pair) {
-        key = toJSON(pair.key, '', opt)
-        value = toJSON(pair.value, key, opt)
+        key = toJSON(pair.key, '', ctx)
+        value = toJSON(pair.value, key, ctx)
       } else {
-        key = toJSON(pair, '', opt)
+        key = toJSON(pair, '', ctx)
       }
       if (map.has(key))
         throw new Error('Ordered maps must not include duplicate keys')
@@ -54,8 +55,8 @@ function parseOMap(doc, cst) {
   return Object.assign(new YAMLOMap(), pairs)
 }
 
-function createOMap(schema, iterable, wrapScalars) {
-  const pairs = createPairs(schema, iterable, wrapScalars)
+function createOMap(schema, iterable, ctx) {
+  const pairs = createPairs(schema, iterable, ctx)
   const omap = new YAMLOMap()
   omap.items = pairs.items
   return omap

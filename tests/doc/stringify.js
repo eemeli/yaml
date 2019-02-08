@@ -75,6 +75,68 @@ blah blah\n`)
   })
 })
 
+describe('circular references', () => {
+  test('parent at root', () => {
+    const map = { foo: 'bar' }
+    map.map = map
+    expect(YAML.stringify(map)).toBe(`&a1
+foo: bar
+map: *a1\n`)
+  })
+
+  test('ancestor at root', () => {
+    const baz = {}
+    const map = { foo: { bar: { baz } } }
+    baz.map = map
+    expect(YAML.stringify(map)).toBe(`&a1
+foo:
+  bar:
+    baz:
+      map: *a1\n`)
+  })
+
+  test('sibling sequences', () => {
+    const one = ['one']
+    const two = ['two']
+    const seq = [one, two, one, one, two]
+    expect(YAML.stringify(seq)).toBe(`- &a1
+  - one
+- &a2
+  - two
+- *a1
+- *a1
+- *a2\n`)
+  })
+
+  test('further relatives', () => {
+    const baz = { a: 1 }
+    const seq = [{ foo: { bar: { baz } } }, { fe: { fi: { fo: { baz } } } }]
+    expect(YAML.stringify(seq)).toBe(`- foo:
+    bar:
+      baz:
+        &a1
+        a: 1
+- fe:
+    fi:
+      fo:
+        baz: *a1\n`)
+  })
+
+  test('only match objects', () => {
+    const date = new Date('2001-12-15T02:59:43.1Z')
+    const seq = ['a', 'a', 1, 1, true, true, date, date]
+    expect(YAML.stringify(seq, { anchorPrefix: 'foo', version: '1.1' }))
+      .toBe(`- a
+- a
+- 1
+- 1
+- true
+- true
+- &foo1 2001-12-15T02:59:43.100Z
+- *foo1\n`)
+  })
+})
+
 test('array', () => {
   const array = [3, ['four', 5]]
   const str = YAML.stringify(array)

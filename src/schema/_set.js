@@ -42,21 +42,22 @@ export class YAMLSet extends YAMLMap {
     }
   }
 
-  toJSON(_, opt) {
+  toJSON(_, ctx) {
     const set = new Set()
+    if (ctx && ctx.onCreate) ctx.onCreate(set)
     for (const item of this.items) {
       if (item instanceof Merge) {
         const { items } = item.value
         for (let i = items.length - 1; i >= 0; --i) {
           const { source } = items[i]
           if (source instanceof YAMLMap) {
-            for (const [key] of source.toJSMap(opt)) set.add(key)
+            for (const [key] of source.toJSMap(ctx)) set.add(key)
           } else {
             throw new Error('Merge sources must be maps')
           }
         }
       } else {
-        set.add(toJSON(item.key, '', opt))
+        set.add(toJSON(item.key, '', ctx))
       }
     }
     return set
@@ -77,10 +78,10 @@ function parseSet(doc, cst) {
   return Object.assign(new YAMLSet(), map)
 }
 
-function createSet(schema, iterable, wrapScalars) {
+function createSet(schema, iterable, ctx) {
   const set = new YAMLSet()
   for (const value of iterable) {
-    const v = schema.createNode(value, wrapScalars)
+    const v = schema.createNode(value, ctx.wrapScalars, null, ctx)
     set.items.push(new Pair(v))
   }
   return set

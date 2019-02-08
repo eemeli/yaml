@@ -47,7 +47,7 @@ export default class Document {
   }
 
   constructor(options) {
-    this.anchors = new Anchors()
+    this.anchors = new Anchors(options.anchorPrefix)
     this.commentBefore = null
     this.comment = null
     this.contents = null
@@ -413,11 +413,6 @@ export default class Document {
       // Lazy resolution for circular references
       res = new Alias(src)
       anchors._cstAliases.push(res)
-      if (!src.resolved) {
-        const msg =
-          'Alias node contains a circular reference, which cannot be resolved as JSON'
-        this.warnings.push(new YAMLWarning(node, msg))
-      }
     } else {
       const tagName = this.resolveTagName(node)
       if (tagName) {
@@ -501,13 +496,17 @@ export default class Document {
   }
 
   toJSON(arg) {
-    const cr = this.warnings.find(w => /circular reference/.test(w.message))
-    if (cr) throw new YAMLSemanticError(cr.source, cr.message)
     const keep =
       this.options.keepBlobsInJSON &&
       (typeof arg !== 'string' || !(this.contents instanceof Scalar))
-    const mapAsMap = keep && !!this.options.mapAsMap
-    return toJSON(this.contents, arg, { keep, mapAsMap })
+    const ctx = { keep, mapAsMap: keep && !!this.options.mapAsMap }
+    const anchorNames = Object.keys(this.anchors.map)
+    if (anchorNames.length > 0)
+      ctx.anchors = anchorNames.map(name => ({
+        alias: [],
+        node: this.anchors.map[name]
+      }))
+    return toJSON(this.contents, arg, ctx)
   }
 
   toString() {

@@ -30,7 +30,7 @@ export function parsePairs(doc, cst) {
   return seq
 }
 
-export function createPairs(schema, iterable, wrapScalars) {
+export function createPairs(schema, iterable, ctx) {
   const pairs = new YAMLSeq()
   pairs.tag = 'tag:yaml.org,2002:pairs'
   for (const it of iterable) {
@@ -49,8 +49,8 @@ export function createPairs(schema, iterable, wrapScalars) {
     } else {
       key = it
     }
-    const k = schema.createNode(key, wrapScalars)
-    const v = schema.createNode(value, wrapScalars)
+    const k = schema.createNode(key, ctx.wrapScalars, null, ctx)
+    const v = schema.createNode(value, ctx.wrapScalars, null, ctx)
     pairs.items.push(new Pair(k, v))
   }
   return pairs

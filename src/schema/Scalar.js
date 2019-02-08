@@ -9,8 +9,8 @@ export default class Scalar extends Node {
     this.value = value
   }
 
-  toJSON(arg, opt) {
-    return opt && opt.keep ? this.value : toJSON(this.value, arg, opt)
+  toJSON(arg, ctx) {
+    return ctx && ctx.keep ? this.value : toJSON(this.value, arg, ctx)
   }
 
   toString() {

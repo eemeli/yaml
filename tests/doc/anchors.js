@@ -29,14 +29,13 @@ test('re-defined anchor', () => {
 test('circular reference', () => {
   const src = '&a [ 1, *a ]\n'
   const doc = YAML.parseDocument(src)
-  const message =
-    'Alias node contains a circular reference, which cannot be resolved as JSON'
   expect(doc.errors).toHaveLength(0)
-  expect(doc.warnings).toMatchObject([{ message }])
+  expect(doc.warnings).toHaveLength(0)
   const { items } = doc.contents
   expect(items).toHaveLength(2)
   expect(items[1].source).toBe(doc.contents)
-  expect(() => doc.toJSON()).toThrow(message)
+  const res = doc.toJSON()
+  expect(res[1]).toBe(res)
   expect(String(doc)).toBe(src)
 })
 
@@ -172,10 +171,8 @@ describe('merge <<', () => {
       const src = '&A { <<: *A, B: b }\n'
       const doc = YAML.parseDocument(src, { merge: true })
       expect(doc.errors).toHaveLength(0)
-      const message =
-        'Alias node contains a circular reference, which cannot be resolved as JSON'
-      expect(doc.warnings).toMatchObject([{ message }])
-      expect(() => doc.toJSON()).toThrow(message)
+      expect(doc.warnings).toHaveLength(0)
+      expect(() => doc.toJSON()).toThrow('Maximum call stack size exceeded')
       expect(String(doc)).toBe(src)
     })
   })
