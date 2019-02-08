@@ -413,11 +413,6 @@ export default class Document {
       // Lazy resolution for circular references
       res = new Alias(src)
       anchors._cstAliases.push(res)
-      if (!src.resolved) {
-        const msg =
-          'Alias node contains a circular reference, which cannot be resolved as JSON'
-        this.warnings.push(new YAMLWarning(node, msg))
-      }
     } else {
       const tagName = this.resolveTagName(node)
       if (tagName) {
