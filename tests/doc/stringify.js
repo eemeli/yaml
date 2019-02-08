@@ -177,3 +177,19 @@ test('reserved names', () => {
   const str = YAML.stringify({ comment: 'foo' })
   expect(str).toBe('comment: foo\n')
 })
+
+describe('eemeli/yaml#85', () => {
+  test('reported', () => {
+    const str = `testArray: []\ntestObject: {}\ntestArray2: [ "hello" ]\n`
+    const doc = YAML.parseDocument(str)
+    expect(String(doc)).toBe(str)
+  })
+
+  test('multiline flow collection', () => {
+    const str = `foo: [ bar, bar, bar, bar, bar, bar, bar, bar, bar, bar, bar, bar, bar, bar, bar, bar, bar, bar ]`
+    const doc = YAML.parseDocument(str)
+    const str2 = String(doc)
+    expect(str2).toMatch(/^foo:\n {2}\[\n {4}bar/)
+    expect(YAML.parse(str2)).toMatchObject(doc.toJSON())
+  })
+})

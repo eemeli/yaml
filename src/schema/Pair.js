@@ -90,10 +90,13 @@ export default class Pair extends Node {
       () => (valueComment = null),
       () => (chompKeep = true)
     )
-    const ws =
-      vcb || this.comment || (!explicitKey && value instanceof Collection)
-        ? `${vcb}\n${ctx.indent}`
-        : ' '
+    let ws = ' '
+    if (vcb || this.comment) {
+      ws = `${vcb}\n${ctx.indent}`
+    } else if (!explicitKey && value instanceof Collection) {
+      const flow = valueStr[0] === '[' || valueStr[0] === '{'
+      if (!flow || valueStr.includes('\n')) ws = `\n${ctx.indent}`
+    }
     if (chompKeep && !valueComment && onChompKeep) onChompKeep()
     return addComment(str + ws + valueStr, ctx.indent, valueComment)
   }
