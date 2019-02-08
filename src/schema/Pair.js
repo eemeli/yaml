@@ -44,7 +44,7 @@ export default class Pair extends Node {
 
   toString(ctx, onComment, onChompKeep) {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
-    const { key, value } = this
+    let { key, value } = this
     let keyComment = key instanceof Node && key.comment
     const explicitKey = !key || keyComment || key instanceof Collection
     const { doc, indent } = ctx
@@ -74,15 +74,18 @@ export default class Pair extends Node {
       if (onComment) onComment()
     }
     let vcb = ''
-    if (value) {
+    let valueComment = null
+    if (value instanceof Node) {
       if (value.spaceBefore) vcb = '\n'
       if (value.commentBefore) {
         const cs = value.commentBefore.replace(/^/gm, `${ctx.indent}#`)
         vcb += `\n${cs}`
       }
+      valueComment = value.comment
+    } else if (value && typeof value === 'object') {
+      value = doc.schema.createNode(value, true)
     }
     ctx.implicitKey = false
-    let valueComment = value instanceof Node && value.comment
     chompKeep = false
     const valueStr = doc.schema.stringify(
       value,

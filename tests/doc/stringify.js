@@ -193,3 +193,9 @@ describe('eemeli/yaml#85', () => {
     expect(YAML.parse(str2)).toMatchObject(doc.toJSON())
   })
 })
+
+test('eemeli/yaml#87', () => {
+  const doc = YAML.parseDocument('test: x')
+  doc.set('test', { a: 'test' })
+  expect(String(doc)).toBe('test:\n  a: test\n')
+})
