@@ -1,5 +1,5 @@
 import YAML from '../../src/index'
-import { strOptions } from '../../src/schema/_string'
+import { strOptions } from '../../src/stringify'
 
 const spec = {
   '2.1. Collections': {

@@ -1,5 +1,5 @@
 import YAML from '../../src/index'
-import { stringify as stringifyStr, strOptions } from '../../src/schema/_string'
+import stringify, { strOptions } from '../../src/stringify'
 
 test('undefined', () => {
   expect(YAML.stringify()).toBe('\n')
@@ -198,7 +198,7 @@ describe('eemeli/yaml#80', () => {
     },
     stringify(item, ctx, onComment, onChompKeep) {
       ctx = Object.assign({ actualString: false }, ctx)
-      return stringifyStr(item, ctx, onComment, onChompKeep)
+      return stringify(item, ctx, onComment, onChompKeep)
     }
   }
 
