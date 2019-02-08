@@ -188,46 +188,78 @@ test('eemeli/yaml#52: Quoting item markers', () => {
   expect(str2).toBe('key: "?"\n')
 })
 
-describe('eemeli/yaml#80', () => {
+describe('eemeli/yaml#80: custom tags', () => {
   const regexp = {
     identify: value => value instanceof RegExp,
     tag: '!re',
     resolve(doc, cst) {
-      const match = cst.strValue.match(/^\/(.*)\/([gimuy]*)$/)
+      const match = cst.strValue.match(/^\/([\s\S]+)\/([gimuy]*)$/)
       return new RegExp(match[1], match[2])
     }
   }
 
+  const sharedSymbol = {
+    identify: value => value.constructor === Symbol,
+    tag: '!symbol/shared',
+    resolve: (doc, cst) => Symbol.for(cst.strValue),
+    stringify(item, ctx, onComment, onChompKeep) {
+      const key = Symbol.keyFor(item.value)
+      if (key === undefined)
+        throw new Error('Only shared symbols are supported')
+      return stringify({ value: key }, ctx, onComment, onChompKeep)
+    }
+  }
+
   beforeAll(() => {
-    YAML.defaultOptions.tags = [regexp]
+    YAML.defaultOptions.tags = [regexp, sharedSymbol]
   })
 
   afterAll(() => {
     YAML.defaultOptions.tags = []
   })
 
-  test('stringify as plain scalar', () => {
-    const str = YAML.stringify(/re/g)
-    expect(str).toBe('!re /re/g\n')
-    const res = YAML.parse(str)
-    expect(res).toBeInstanceOf(RegExp)
+  describe('RegExp', () => {
+    test('stringify as plain scalar', () => {
+      const str = YAML.stringify(/re/g)
+      expect(str).toBe('!re /re/g\n')
+      const res = YAML.parse(str)
+      expect(res).toBeInstanceOf(RegExp)
+    })
+
+    test('stringify as quoted scalar', () => {
+      const str = YAML.stringify(/re: /g)
+      expect(str).toBe('!re "/re: /g"\n')
+      const res = YAML.parse(str)
+      expect(res).toBeInstanceOf(RegExp)
+    })
+
+    test('parse plain string as string', () => {
+      const res = YAML.parse('/re/g')
+      expect(res).toBe('/re/g')
+    })
+
+    test('parse quoted string as string', () => {
+      const res = YAML.parse('"/re/g"')
+      expect(res).toBe('/re/g')
+    })
   })
 
-  test('stringify as quoted scalar', () => {
-    const str = YAML.stringify(/re: /g)
-    expect(str).toBe('!re "/re: /g"\n')
-    const res = YAML.parse(str)
-    expect(res).toBeInstanceOf(RegExp)
-  })
+  describe('Symbol', () => {
+    test('stringify as plain scalar', () => {
+      const symbol = Symbol.for('foo')
+      const str = YAML.stringify(symbol)
+      expect(str).toBe('!symbol/shared foo\n')
+      const res = YAML.parse(str)
+      expect(res).toBe(symbol)
+    })
 
-  test('parse plain string as string', () => {
-    const res = YAML.parse('/re/g')
-    expect(res).toBe('/re/g')
-  })
-
-  test('parse quoted string as string', () => {
-    const res = YAML.parse('"/re/g"')
-    expect(res).toBe('/re/g')
+    test('stringify as block scalar', () => {
+      const symbol = Symbol.for('foo\nbar')
+      const str = YAML.stringify(symbol)
+      expect(str).toBe('!symbol/shared |-\nfoo\nbar\n')
+      const res = YAML.parse(str)
+      expect(res).toBe(symbol)
+    })
   })
 })
 
