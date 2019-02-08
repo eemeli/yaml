@@ -17,6 +17,9 @@ export const str = {
   default: true,
   tag: 'tag:yaml.org,2002:str',
   resolve,
-  stringify,
+  stringify(item, ctx, onComment, onChompKeep) {
+    ctx = Object.assign({ actualString: true }, ctx)
+    return stringify(item, ctx, onComment, onChompKeep)
+  },
   options: strOptions
 }

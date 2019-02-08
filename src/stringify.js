@@ -237,11 +237,10 @@ function plainString(item, ctx, onComment, onChompKeep) {
     return blockString(item, ctx, onComment, onChompKeep)
   }
   const str = value.replace(/\n+/g, `$&\n${indent}`)
-  // Need to verify that output will be parsed as a string, as plain numbers and
-  // booleans get parsed with those types, e.g. '42', 'true' & '0.9e-3'.
-  // Custom tags may set ctx.actualString === false to skip this check.
+  // May need to verify that output will be parsed as a string, as plain numbers
+  // and booleans get parsed with those types, e.g. '42', 'true' & '0.9e-3'.
   if (
-    actualString !== false &&
+    actualString &&
     /^[\w.+-]+$/.test(str) &&
     typeof tags.resolveScalar(str).value !== 'string'
   ) {
