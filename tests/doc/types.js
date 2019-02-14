@@ -3,7 +3,7 @@ import Scalar from '../../src/schema/Scalar'
 import YAMLSeq from '../../src/schema/Seq'
 import { YAMLOMap } from '../../src/schema/_omap'
 import { YAMLSet } from '../../src/schema/_set'
-import { strOptions } from '../../src/schema/_string'
+import { strOptions } from '../../src/stringify'
 
 let origFoldOptions
 

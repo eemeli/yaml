@@ -4,10 +4,11 @@
 
 import { YAMLReferenceError } from '../errors'
 import { Type } from '../cst/Node'
-import { resolve as resolveStr, stringify as stringifyStr } from './_string'
+import stringify from '../stringify'
+import { resolve as resolveStr } from './_string'
 
 export const binary = {
-  class: Uint8Array, // Buffer inherits from Uint8Array
+  identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array
   default: false,
   tag: 'tag:yaml.org,2002:binary',
   /**
@@ -66,7 +67,7 @@ export const binary = {
       }
       value = lines.join(type === Type.BLOCK_LITERAL ? '\n' : ' ')
     }
-    return stringifyStr({ comment, type, value }, ctx, onComment, onChompKeep)
+    return stringify({ comment, type, value }, ctx, onComment, onChompKeep)
   }
 }
 

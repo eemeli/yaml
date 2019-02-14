@@ -5,6 +5,7 @@ import set from './_set'
 import timestamp from './_timestamp'
 import { stringifyNumber } from './core'
 import failsafe from './failsafe'
+import Scalar from './Scalar'
 
 export const nullOptions = { nullStr: 'null' }
 export const boolOptions = { trueStr: 'true', falseStr: 'false' }
@@ -12,7 +13,9 @@ export const boolOptions = { trueStr: 'true', falseStr: 'false' }
 export default failsafe.concat(
   [
     {
-      class: null,
+      identify: value => value == null,
+      createNode: (schema, value, ctx) =>
+        ctx.wrapScalars ? new Scalar(null) : null,
       default: true,
       tag: 'tag:yaml.org,2002:null',
       test: /^(?:~|[Nn]ull|NULL)?$/,
@@ -21,7 +24,7 @@ export default failsafe.concat(
       stringify: () => nullOptions.nullStr
     },
     {
-      class: Boolean,
+      identify: value => typeof value === 'boolean',
       default: true,
       tag: 'tag:yaml.org,2002:bool',
       test: /^(?:Y|y|[Yy]es|YES|[Tt]rue|TRUE|[Oo]n|ON)$/,
@@ -31,7 +34,7 @@ export default failsafe.concat(
         value ? boolOptions.trueStr : boolOptions.falseStr
     },
     {
-      class: Boolean,
+      identify: value => typeof value === 'boolean',
       default: true,
       tag: 'tag:yaml.org,2002:bool',
       test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
@@ -41,7 +44,7 @@ export default failsafe.concat(
         value ? boolOptions.trueStr : boolOptions.falseStr
     },
     {
-      class: Number,
+      identify: value => typeof value === 'number',
       default: true,
       tag: 'tag:yaml.org,2002:int',
       format: 'BIN',
@@ -50,7 +53,7 @@ export default failsafe.concat(
       stringify: ({ value }) => '0b' + value.toString(2)
     },
     {
-      class: Number,
+      identify: value => typeof value === 'number',
       default: true,
       tag: 'tag:yaml.org,2002:int',
       format: 'OCT',
@@ -59,7 +62,7 @@ export default failsafe.concat(
       stringify: ({ value }) => (value < 0 ? '-0' : '0') + value.toString(8)
     },
     {
-      class: Number,
+      identify: value => typeof value === 'number',
       default: true,
       tag: 'tag:yaml.org,2002:int',
       test: /^[-+]?[0-9][0-9_]*$/,
@@ -67,7 +70,7 @@ export default failsafe.concat(
       stringify: stringifyNumber
     },
     {
-      class: Number,
+      identify: value => typeof value === 'number',
       default: true,
       tag: 'tag:yaml.org,2002:int',
       format: 'HEX',
@@ -76,7 +79,7 @@ export default failsafe.concat(
       stringify: ({ value }) => (value < 0 ? '-0x' : '0x') + value.toString(16)
     },
     {
-      class: Number,
+      identify: value => typeof value === 'number',
       default: true,
       tag: 'tag:yaml.org,2002:float',
       test: /^(?:[-+]?\.inf|(\.nan))$/i,
@@ -89,7 +92,7 @@ export default failsafe.concat(
       stringify: stringifyNumber
     },
     {
-      class: Number,
+      identify: value => typeof value === 'number',
       default: true,
       tag: 'tag:yaml.org,2002:float',
       test: /^[-+]?([0-9][0-9_]*)?\.[0-9_]*([eE][-+]?[0-9]+)?$/,

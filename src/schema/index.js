@@ -1,5 +1,6 @@
 import { Type } from '../cst/Node'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
+import stringify from '../stringify'
 import Alias from './Alias'
 import Collection from './Collection'
 import core from './core'
@@ -31,10 +32,6 @@ export default class Schema {
     'yaml-1.1': yaml11
   }
 
-  static defaultStringify(value) {
-    return JSON.stringify(value)
-  }
-
   constructor({ merge, schema, tags }) {
     this.merge = !!merge
     this.name = schema
@@ -58,11 +55,14 @@ export default class Schema {
       tagObj = match.find(t => !t.format) || match[0]
       if (!tagObj) throw new Error(`Tag ${tag} not found`)
     } else {
+      // TODO: deprecate/remove class check
       tagObj = this.tags.find(
-        t => t.class && value instanceof t.class && !t.format
+        t =>
+          ((t.identify && t.identify(value)) ||
+            (t.class && value instanceof t.class)) &&
+          !t.format
       )
       if (!tagObj) {
-        if (value == null) return new Scalar(null)
         if (typeof value.toJSON === 'function') value = value.toJSON()
         if (typeof value !== 'object')
           return wrapScalars ? new Scalar(value) : value
@@ -76,7 +76,7 @@ export default class Schema {
       delete ctx.onTagObj
     }
     const obj = {}
-    if (typeof value === 'object' && ctx.prevObjects) {
+    if (value && typeof value === 'object' && ctx.prevObjects) {
       const prev = ctx.prevObjects.find(o => o.value === value)
       if (prev) {
         const alias = new Alias(prev) // leaves source dirty; must be cleaned by caller
@@ -86,9 +86,12 @@ export default class Schema {
       obj.value = value
       ctx.prevObjects.push(obj)
     }
-    return (obj.node = tagObj.createNode
+    obj.node = tagObj.createNode
       ? tagObj.createNode(this, value, ctx)
-      : new Scalar(value))
+      : wrapScalars
+      ? new Scalar(value)
+      : value
+    return obj.node
   }
 
   // falls back to string on no match
@@ -168,30 +171,13 @@ export default class Schema {
       if (match.length > 0)
         return match.find(t => t.format === item.format) || match[0]
     }
-    if (item.value === null) {
-      const tagObj = this.tags.find(t => t.class === null && !t.format)
-      if (!tagObj) throw new Error('Tag not resolved for null value')
-      return tagObj
-    }
     let tagObj, obj
     if (item instanceof Scalar) {
-      switch (typeof item.value) {
-        case 'boolean':
-          obj = new Boolean()
-          break
-        case 'number':
-          obj = new Number()
-          break
-        case 'string':
-          obj = new String()
-          break
-        default:
-          obj = item.value
-      }
+      obj = item.value
+      // TODO: deprecate/remove class check
       const match = this.tags.filter(
         t =>
-          t.class &&
-          (obj instanceof t.class || (obj && obj.constructor === t.class))
+          (t.identify && t.identify(obj)) || (t.class && obj instanceof t.class)
       )
       tagObj =
         match.find(t => t.format === item.format) || match.find(t => !t.format)
@@ -245,8 +231,12 @@ export default class Schema {
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)
     const props = this.stringifyProps(item, tagObj, ctx)
-    const stringify = tagObj.stringify || Schema.defaultStringify
-    const str = stringify(item, ctx, onComment, onChompKeep)
+    const str = (tagObj.stringify || stringify)(
+      item,
+      ctx,
+      onComment,
+      onChompKeep
+    )
     return props
       ? item instanceof Collection && str[0] !== '{' && str[0] !== '['
         ? `${props}\n${ctx.indent}${str}`
