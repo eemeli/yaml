@@ -76,7 +76,7 @@ export default class Schema {
       delete ctx.onTagObj
     }
     const obj = {}
-    if (typeof value === 'object' && ctx.prevObjects) {
+    if (value && typeof value === 'object' && ctx.prevObjects) {
       const prev = ctx.prevObjects.find(o => o.value === value)
       if (prev) {
         const alias = new Alias(prev) // leaves source dirty; must be cleaned by caller

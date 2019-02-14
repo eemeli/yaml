@@ -135,6 +135,11 @@ foo:
 - &foo1 2001-12-15T02:59:43.100Z
 - *foo1\n`)
   })
+
+  test('do not match nulls', () => {
+    const set = { a: null, b: null }
+    expect(YAML.stringify(set)).toBe('? a\n? b\n')
+  })
 })
 
 test('array', () => {
