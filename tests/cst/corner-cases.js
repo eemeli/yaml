@@ -216,3 +216,17 @@ test('re-stringify flow seq with comments', () => {
   const doc = parse(src)
   expect(String(doc)).toBe(src)
 })
+
+test('blank line after less-indented comment (eemeli/yaml#91)', () => {
+  const src = `
+  foo1: bar
+# comment
+
+  foo2: baz`
+  const doc = parse(src)
+  expect(doc).toHaveLength(1)
+  expect(doc[0].contents).toMatchObject([
+    { type: 'BLANK_LINE' },
+    { type: 'MAP' }
+  ])
+})

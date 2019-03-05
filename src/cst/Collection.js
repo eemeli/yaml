@@ -41,7 +41,7 @@ export default class Collection extends Node {
     const ch = src[offset]
     if (!ch) return false
     if (offset >= lineStart + indent) return true
-    if (ch !== '#') return false
+    if (ch !== '#' && ch !== '\n') return false
     return Collection.nextContentHasIndent(src, offset, indent)
   }
 

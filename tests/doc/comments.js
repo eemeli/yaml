@@ -570,6 +570,25 @@ describe('blank lines', () => {
       expect(String(doc)).toBe(src)
     })
   })
+
+  test('blank line after less-indented comment (eemeli/yaml#91)', () => {
+    const src = `
+map:
+  foo0:
+    key2: value2
+
+#   foo1:
+#     key0: value0
+#     key1: value1
+
+  foo2:
+    key3: value3`
+    const doc = YAML.parseDocument(src)
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.toJSON()).toMatchObject({
+      map: { foo0: { key2: 'value2' }, foo2: { key3: 'value3' } }
+    })
+  })
 })
 
 describe('eemeli/yaml#18', () => {
