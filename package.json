@@ -40,6 +40,7 @@
     "build": "npm run dist:build && npm run browser:build && npm run browser:copy",
     "prettier": "prettier --write \"{src,tests}/**/*.js\"",
     "lint": "eslint src/",
+    "start": "npm run dist:build && node -i -e 'YAML=require(\".\")'",
     "test": "TRACE_LEVEL=log jest",
     "test:trace": "TRACE_LEVEL=trace,log jest --no-cache",
     "docs:install": "cd docs/ && bundle install",
