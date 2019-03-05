@@ -1,6 +1,7 @@
 import YAML from '../../src/index'
 import Scalar from '../../src/schema/Scalar'
 import YAMLSeq from '../../src/schema/Seq'
+import { binary } from '../../src/schema/_binary'
 import { YAMLOMap } from '../../src/schema/_omap'
 import { YAMLSet } from '../../src/schema/_set'
 import { strOptions } from '../../src/stringify'
@@ -603,5 +604,31 @@ invoice:
     - !^customer
       given: Chris
       family: Dumars\n`)
+  })
+
+  describe('custom tag objects', () => {
+    const src = `!!binary |
+      R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5
+      OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+
+      +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC
+      AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=`
+
+    test('tag object in tags', () => {
+      const bin = YAML.parse(src, { tags: [binary] })
+      expect(bin).toBeInstanceOf(Uint8Array)
+    })
+
+    test('tag array in tags', () => {
+      const bin = YAML.parse(src, { tags: [[binary]] })
+      expect(bin).toBeInstanceOf(Uint8Array)
+    })
+
+    test('no custom tag object', () => {
+      const doc = YAML.parseDocument(src)
+      const message =
+        'The tag tag:yaml.org,2002:binary is unavailable, falling back to tag:yaml.org,2002:str'
+      expect(doc.warnings).toMatchObject([{ message }])
+      expect(typeof doc.contents.value).toBe('string')
+    })
   })
 })

@@ -41,7 +41,7 @@ export default class Schema {
       throw new Error(`Unknown schema; use one of ${keys.join(', ')}`)
     }
     if (Array.isArray(tags)) {
-      this.tags = this.tags.concat(tags)
+      for (const tag of tags) this.tags = this.tags.concat(tag)
     } else if (typeof tags === 'function') {
       this.tags = tags(this.tags.slice())
     }
