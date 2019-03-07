@@ -65,23 +65,23 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.3.0",
-    "@babel/plugin-transform-runtime": "^7.2.0",
-    "@babel/preset-env": "^7.3.1",
+    "@babel/core": "^7.3.4",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/plugin-transform-runtime": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
     "babel-eslint": "^10.0.1",
-    "babel-jest": "^24.0.0",
+    "babel-jest": "^24.3.0",
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-plugin-trace": "^1.1.0",
     "cpy-cli": "^2.0.0",
-    "eslint": "^5.12.1",
-    "eslint-config-prettier": "^4.0.0",
-    "fast-check": "^1.10.0",
-    "jest": "^24.0.0",
-    "prettier": "^1.16.1"
+    "eslint": "^5.15.1",
+    "eslint-config-prettier": "^4.1.0",
+    "fast-check": "^1.12.0",
+    "jest": "^24.3.0",
+    "prettier": "^1.16.4"
   },
   "dependencies": {
-    "@babel/runtime": "^7.3.1"
+    "@babel/runtime": "^7.3.4"
   },
   "engines": {
     "node": ">= 6"
