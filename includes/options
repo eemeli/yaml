@@ -20,6 +20,11 @@
 </tr>
 </thead><tbody>
 <tr>
+<td>anchorPrefix</td>
+<td><code>string</code></td>
+<td>Default prefix for anchors. By default <code>&#39;a&#39;</code>, resulting in anchors <code>a1</code>, <code>a2</code>, etc.</td>
+</tr>
+<tr>
 <td>keepBlobsInJSON</td>
 <td><code>boolean</code></td>
 <td>Allow non-JSON JavaScript objects to remain in the <code>toJSON</code> output. Relevant with the YAML 1.1 <code>!!timestamp</code> and <code>!!binary</code> tags. By default <code>true</code>.</td>
@@ -87,90 +92,6 @@ target:
 <span class="c1">// { a: 1, b: 'base' }</span>
 </code></pre>
 <p><strong>Merge</strong> keys are a <a href="http://yaml.org/type/merge.html">YAML 1.1 feature</a> that is not a part of the 1.2 spec. To use a merge key, assign an alias node or an array of alias nodes as the value of a <code>&lt;&lt;</code> key in a mapping.</p>
-<h2 id='custom-tags'>Custom Tags</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">binary</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types/binary'</span>
-<span class="kr">import</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types/timestamp'</span>
-
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'!!timestamp 2001-12-15 2:59:43'</span><span class="p">)</span>
-<span class="c1">// YAMLWarning:</span>
-<span class="c1">//   The tag tag:yaml.org,2002:timestamp is unavailable,</span>
-<span class="c1">//   falling back to tag:yaml.org,2002:str</span>
-<span class="c1">// '2001-12-15 2:59:43'</span>
-
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">tags</span> <span class="o">=</span> <span class="p">[</span><span class="nx">binary</span><span class="p">,</span> <span class="nx">timestamp</span><span class="p">]</span>
-
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'2001-12-15 2:59:43'</span><span class="p">)</span>
-<span class="c1">// 2001-12-15T02:59:43.000Z</span>
-
-<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s1">'2001-12-15 2:59:43'</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">toDateString</span><span class="p">()</span>
-<span class="c1">// 'Sat Dec 15 2001'</span>
-</code></pre>
-<p>The easiest way to extend a schema is by defining the additional <strong>tags</strong> that you wish to support. For further customisation, <code>tags</code> may also be a function <code>(Tag[]) =&gt; (Tag[])</code> that may modify the schema&#39;s base tag array.</p>
-
-<p>The <code>!!binary</code> and <code>!!timestamp</code> YAML 1.1 tags are available as exports under <code>yaml/types/</code>, should you wish to use them with the YAML 1.2 <code>core</code> schema.</p>
-
-<p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/master/src/schema/_binary.js"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/master/src/schema/_timestamp.js"><code>!!timestamp</code></a> tags provide relatively cohesive examples to study.</p>
-
-<h4 id="tag" style="clear:both"><code>Tag</code></h4>
-
-<table><thead>
-<tr>
-<th>Member</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>class</td>
-<td><code>class?</code></td>
-<td>A JavaScript class that should be matched to this tag, e.g. <code>Date</code> for <code>!!timestamp</code>.</td>
-</tr>
-<tr>
-<td>createNode</td>
-<td><code>function?</code></td>
-<td>Optional factory function, used e.g. by collections. If set, will be called as <code>createNode(schema, value, wrapScalars)</code> and should return a class extending <code>Node</code>.</td>
-</tr>
-<tr>
-<td>default</td>
-<td><code>boolean?</code></td>
-<td>If <code>true</code>, the tag should not be explicitly included when stringifying.</td>
-</tr>
-<tr>
-<td>format</td>
-<td><code>string?</code></td>
-<td>If a tag has multiple forms that should be parsed and/or stringified differently, use <code>format</code> to identify them.</td>
-</tr>
-<tr>
-<td>nodeClass</td>
-<td><code>class?</code></td>
-<td>The <code>Node</code> child class that implements this tag. Required for collections and tags that have overlapping JS representations.</td>
-</tr>
-<tr>
-<td>options</td>
-<td><code>object?</code></td>
-<td>Used by some tags to configure their stringification, where applicable.</td>
-</tr>
-<tr>
-<td>resolve</td>
-<td><code>() =&gt; Node</code></td>
-<td>Should return an instance of a class extending <code>Node</code>. If <code>test</code> is set, will be called with the resulting match as arguments. Otherwise, will be called as <code>resolve(doc, cstNode)</code>.</td>
-</tr>
-<tr>
-<td>stringify</td>
-<td><code>() =&gt; string</code></td>
-<td>Called as <code>stringify(item, ctx, onComment)</code>, where <code>item</code> is the node being stringified, <code>ctx</code> contains the stringifying context variables, and <code>onComment</code> is a function that should be called if the stringifier includes the item&#39;s comment in its output.</td>
-</tr>
-<tr>
-<td>tag</td>
-<td><code>string</code></td>
-<td>The fully qualified name of the tag.</td>
-</tr>
-<tr>
-<td>test</td>
-<td><code>RegExp?</code></td>
-<td>Used to match string values of scalar nodes; captured parts will be passed as arguments of <code>resolve()</code>.</td>
-</tr>
-</tbody></table>
 <h2 id='tag-stringifier-options'>Tag Stringifier Options</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">nullOptions</span><span class="p">,</span> <span class="nx">strOptions</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/schema'</span>
 
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
