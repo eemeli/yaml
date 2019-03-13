@@ -2,9 +2,11 @@ import { Type } from '../cst/Node'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import stringify from '../stringify'
 import core from '../tags/core'
-import failsafe, { map, seq } from '../tags/failsafe'
+import failsafe from '../tags/failsafe'
+import map from '../tags/failsafe/map'
+import seq from '../tags/failsafe/seq'
 import json from '../tags/json'
-import { resolve as resolveStr } from '../tags/failsafe/string'
+import { resolveString } from '../tags/failsafe/string'
 import yaml11 from '../tags/yaml-1.1'
 import Alias from './Alias'
 import Collection from './Collection'
@@ -123,7 +125,7 @@ export default class Schema {
         if (!(res instanceof Collection)) res = new Scalar(res)
         node.resolved = res
       } else {
-        const str = resolveStr(doc, node)
+        const str = resolveString(doc, node)
         if (typeof str === 'string' && tags.length > 0) {
           node.resolved = this.resolveScalar(str, tags)
         }

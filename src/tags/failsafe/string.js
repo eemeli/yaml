@@ -1,6 +1,6 @@
 import stringify, { strOptions } from '../../stringify'
 
-export const resolve = (doc, node) => {
+export const resolveString = (doc, node) => {
   // on error, will return { str: string, errors: Error[] }
   const res = node.strValue
   if (!res) return ''
@@ -12,11 +12,11 @@ export const resolve = (doc, node) => {
   return res.str
 }
 
-export const str = {
+export default {
   identify: value => typeof value === 'string',
   default: true,
   tag: 'tag:yaml.org,2002:str',
-  resolve,
+  resolve: resolveString,
   stringify(item, ctx, onComment, onChompKeep) {
     ctx = Object.assign({ actualString: true }, ctx)
     return stringify(item, ctx, onComment, onChompKeep)

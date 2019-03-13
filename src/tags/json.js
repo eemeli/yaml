@@ -1,6 +1,7 @@
-import { map, seq } from './failsafe'
+import map from './failsafe/map'
+import seq from './failsafe/seq'
 import Scalar from '../schema/Scalar'
-import { resolve as resolveStr } from './failsafe/string'
+import { resolveString } from './failsafe/string'
 
 const schema = [
   map,
@@ -9,7 +10,7 @@ const schema = [
     identify: value => typeof value === 'string',
     default: true,
     tag: 'tag:yaml.org,2002:str',
-    resolve: resolveStr,
+    resolve: resolveString,
     stringify: value => JSON.stringify(value)
   },
   {

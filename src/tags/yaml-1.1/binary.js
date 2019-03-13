@@ -5,7 +5,7 @@
 import { YAMLReferenceError } from '../../errors'
 import { Type } from '../../cst/Node'
 import stringify from '../../stringify'
-import { resolve as resolveStr } from '../failsafe/string'
+import { resolveString } from '../failsafe/string'
 
 export const binary = {
   identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array
@@ -21,10 +21,10 @@ export const binary = {
    */
   resolve: (doc, node) => {
     if (typeof Buffer === 'function') {
-      const src = resolveStr(doc, node)
+      const src = resolveString(doc, node)
       return Buffer.from(src, 'base64')
     } else if (typeof atob === 'function') {
-      const src = atob(resolveStr(doc, node))
+      const src = atob(resolveString(doc, node))
       const buffer = new Uint8Array(src.length)
       for (let i = 0; i < src.length; ++i) buffer[i] = src.charCodeAt(i)
       return buffer
