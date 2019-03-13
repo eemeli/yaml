@@ -1,11 +1,11 @@
-import binary from './_binary'
-import omap from './_omap'
-import pairs from './_pairs'
-import set from './_set'
-import timestamp from './_timestamp'
-import { stringifyNumber } from './core'
-import failsafe from './failsafe'
-import Scalar from './Scalar'
+import binary from './binary'
+import omap from './omap'
+import pairs from './pairs'
+import set from './set'
+import timestamp from './timestamp'
+import { stringifyNumber } from '../core'
+import failsafe from '../failsafe'
+import Scalar from '../../schema/Scalar'
 
 export const nullOptions = { nullStr: 'null' }
 export const boolOptions = { trueStr: 'true', falseStr: 'false' }

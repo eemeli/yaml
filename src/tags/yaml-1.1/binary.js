@@ -2,10 +2,10 @@
 
 // Published as 'yaml/types/binary'
 
-import { YAMLReferenceError } from '../errors'
-import { Type } from '../cst/Node'
-import stringify from '../stringify'
-import { resolve as resolveStr } from './_string'
+import { YAMLReferenceError } from '../../errors'
+import { Type } from '../../cst/Node'
+import stringify from '../../stringify'
+import { resolve as resolveStr } from '../failsafe/string'
 
 export const binary = {
   identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array

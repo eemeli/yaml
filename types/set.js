@@ -1,1 +1,1 @@
-module.exports = require('../dist/schema/_set').default
+module.exports = require('../dist/tags/yaml-1.1/set').default

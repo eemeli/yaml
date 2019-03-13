@@ -1,1 +1,1 @@
-module.exports = require('../dist/schema/_pairs').default
+module.exports = require('../dist/tags/yaml-1.1/pairs').default

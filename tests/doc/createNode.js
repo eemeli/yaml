@@ -3,7 +3,7 @@ import YAMLMap from '../../src/schema/Map'
 import Pair from '../../src/schema/Pair'
 import Scalar from '../../src/schema/Scalar'
 import YAMLSeq from '../../src/schema/Seq'
-import { YAMLSet } from '../../src/schema/_set'
+import { YAMLSet } from '../../src/tags/yaml-1.1/set'
 
 describe('scalars', () => {
   describe('createNode(value, false)', () => {

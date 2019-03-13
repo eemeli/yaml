@@ -1,9 +1,9 @@
-import YAMLMap from './Map'
-import Pair from './Pair'
-import YAMLSeq from './Seq'
-import { str } from './_string'
-import parseMap from './parseMap'
-import parseSeq from './parseSeq'
+import YAMLMap from '../../schema/Map'
+import Pair from '../../schema/Pair'
+import YAMLSeq from '../../schema/Seq'
+import parseMap from '../../schema/parseMap'
+import parseSeq from '../../schema/parseSeq'
+import { str } from './string'
 
 function createMap(schema, obj, ctx) {
   const map = new YAMLMap()

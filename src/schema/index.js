@@ -1,16 +1,16 @@
 import { Type } from '../cst/Node'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import stringify from '../stringify'
+import core from '../tags/core'
+import failsafe, { map, seq } from '../tags/failsafe'
+import json from '../tags/json'
+import { resolve as resolveStr } from '../tags/failsafe/string'
+import yaml11 from '../tags/yaml-1.1'
 import Alias from './Alias'
 import Collection from './Collection'
-import core from './core'
-import failsafe, { map, seq } from './failsafe'
-import json from './json'
 import Node from './Node'
 import Pair from './Pair'
 import Scalar from './Scalar'
-import { resolve as resolveStr } from './_string'
-import yaml11 from './yaml-1.1'
 
 const isMap = ({ type }) => type === Type.FLOW_MAP || type === Type.MAP
 

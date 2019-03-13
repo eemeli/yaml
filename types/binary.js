@@ -1,1 +1,1 @@
-module.exports = require('../dist/schema/_binary')
+module.exports = require('../dist/tags/yaml-1.1/binary')

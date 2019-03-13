@@ -1,6 +1,6 @@
 import { map, seq } from './failsafe'
-import Scalar from './Scalar'
-import { resolve as resolveStr } from './_string'
+import Scalar from '../schema/Scalar'
+import { resolve as resolveStr } from './failsafe/string'
 
 const schema = [
   map,

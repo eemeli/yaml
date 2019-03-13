@@ -1,10 +1,10 @@
-import { YAMLSemanticError } from '../errors'
-import toJSON from '../toJSON'
-import YAMLMap, { findPair } from './Map'
-import Merge from './Merge'
-import Pair from './Pair'
-import parseMap from './parseMap'
-import Scalar from './Scalar'
+import { YAMLSemanticError } from '../../errors'
+import toJSON from '../../toJSON'
+import YAMLMap, { findPair } from '../../schema/Map'
+import Merge from '../../schema/Merge'
+import Pair from '../../schema/Pair'
+import parseMap from '../../schema/parseMap'
+import Scalar from '../../schema/Scalar'
 
 export class YAMLSet extends YAMLMap {
   static tag = 'tag:yaml.org,2002:set'

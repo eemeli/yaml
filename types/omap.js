@@ -1,1 +1,1 @@
-module.exports = require('../dist/schema/_omap').default
+module.exports = require('../dist/tags/yaml-1.1/omap').default

@@ -1,8 +1,8 @@
-import { YAMLSemanticError } from '../errors'
-import YAMLMap from './Map'
-import Pair from './Pair'
-import parseSeq from './parseSeq'
-import YAMLSeq from './Seq'
+import { YAMLSemanticError } from '../../errors'
+import YAMLMap from '../../schema/Map'
+import Pair from '../../schema/Pair'
+import parseSeq from '../../schema/parseSeq'
+import YAMLSeq from '../../schema/Seq'
 
 export function parsePairs(doc, cst) {
   const seq = parseSeq(doc, cst)

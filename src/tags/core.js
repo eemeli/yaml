@@ -1,5 +1,5 @@
 import failsafe from './failsafe'
-import Scalar from './Scalar'
+import Scalar from '../schema/Scalar'
 
 export const stringifyNumber = ({ value }) =>
   isFinite(value)
