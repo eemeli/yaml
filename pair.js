@@ -1,1 +1,1 @@
-module.exports = require('./dist/schema/Pair')
+module.exports = require('./dist/schema/Pair').default

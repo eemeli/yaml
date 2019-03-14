@@ -1,1 +1,1 @@
-module.exports = require('./dist/schema/Seq')
+module.exports = require('./dist/schema/Seq').default
