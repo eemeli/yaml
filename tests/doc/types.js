@@ -574,8 +574,8 @@ perl: !perl/Text::Tabs {}`
     expect(String(doc)).toBe(`%YAML:1.0
 ---
 date: 2001-01-23
-number: 123
-string: "123"
+number: !yaml.org,2002:int 123
+string: !yaml.org,2002:str "123"
 pool:
   !ball { number: 8 }
 perl:
@@ -601,6 +601,7 @@ invoice: !domain.tld,2002/^invoice
 invoice:
   !domain.tld,2002/^invoice
   customers:
+    !yaml.org,2002:seq
     - !^customer
       given: Chris
       family: Dumars\n`)

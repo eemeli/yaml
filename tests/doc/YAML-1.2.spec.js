@@ -1729,7 +1729,16 @@ mapping: !!map
           sequence: ['entry', ['nested']],
           mapping: { foo: 'bar' }
         }
-      ]
+      ],
+      special: src => {
+        const doc = YAML.parseDocument(src)
+        expect(doc.contents.tag).toBeUndefined()
+        expect(doc.contents.items[0].value.tag).toBe('tag:yaml.org,2002:seq')
+        expect(doc.contents.items[0].value.items[1].tag).toBe(
+          'tag:yaml.org,2002:seq'
+        )
+        expect(doc.contents.items[1].value.tag).toBe('tag:yaml.org,2002:map')
+      }
     }
   },
 

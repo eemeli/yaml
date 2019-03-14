@@ -2,6 +2,79 @@ import fs from 'fs'
 import path from 'path'
 import YAML from '../../src/index'
 
+describe('tags', () => {
+  describe('implicit tags', () => {
+    test('plain string', () => {
+      const doc = YAML.parseDocument('foo')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.value).toBe('foo')
+    })
+    test('quoted string', () => {
+      const doc = YAML.parseDocument('"foo"')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.value).toBe('foo')
+    })
+    test('flow map', () => {
+      const doc = YAML.parseDocument('{ foo }')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+    })
+    test('flow seq', () => {
+      const doc = YAML.parseDocument('[ foo ]')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+    })
+    test('block map', () => {
+      const doc = YAML.parseDocument('foo:\n')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+    })
+    test('block seq', () => {
+      const doc = YAML.parseDocument('- foo')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+    })
+  })
+
+  describe('explicit tags', () => {
+    test('plain string', () => {
+      const doc = YAML.parseDocument('!!str foo')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:str')
+      expect(doc.contents.value).toBe('foo')
+    })
+    test('quoted string', () => {
+      const doc = YAML.parseDocument('!!str "foo"')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:str')
+      expect(doc.contents.value).toBe('foo')
+    })
+    test('flow map', () => {
+      const doc = YAML.parseDocument('!!map { foo }')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:map')
+      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+    })
+    test('flow seq', () => {
+      const doc = YAML.parseDocument('!!seq [ foo ]')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
+      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+    })
+    test('block map', () => {
+      const doc = YAML.parseDocument('!!map\nfoo:\n')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:map')
+      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+    })
+    test('block seq', () => {
+      const doc = YAML.parseDocument('!!seq\n- foo')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
+      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+    })
+  })
+
+  test('eemeli/yaml#97', () => {
+    const doc = YAML.parseDocument('foo: !!float 3.0')
+    expect(String(doc)).toBe('foo: !!float 3\n')
+  })
+})
+
 test('eemeli/yaml#2', () => {
   const src = `
 aliases:

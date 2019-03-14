@@ -136,7 +136,7 @@ export default class Schema {
       node.resolved = null
     }
     if (!node.resolved) return null
-    if (tagName) node.resolved.tag = tagName
+    if (tagName && node.tag) node.resolved.tag = tagName
     return node.resolved
   }
 
@@ -202,7 +202,7 @@ export default class Schema {
       anchors[anchor] = node
       props.push(`&${anchor}`)
     }
-    if (node.tag && node.tag !== tagObj.tag) {
+    if (node.tag) {
       props.push(doc.stringifyTag(node.tag))
     } else if (!tagObj.default) {
       props.push(doc.stringifyTag(tagObj.tag))
