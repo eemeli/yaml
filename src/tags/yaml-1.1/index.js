@@ -2,7 +2,7 @@ import binary from './binary'
 import omap from './omap'
 import pairs from './pairs'
 import set from './set'
-import timestamp from './timestamp'
+import { intTime, floatTime, timestamp } from './timestamp'
 import { stringifyNumber } from '../core'
 import failsafe from '../failsafe'
 import Scalar from '../../schema/Scalar'
@@ -104,5 +104,7 @@ export default failsafe.concat(
   omap,
   pairs,
   set,
+  intTime,
+  floatTime,
   timestamp
 )

@@ -2,7 +2,7 @@ import YAML from '../../src/index'
 import { strOptions } from '../../src/stringify'
 import Scalar from '../../src/schema/Scalar'
 import YAMLSeq from '../../src/schema/Seq'
-import { binary } from '../../src/tags/yaml-1.1/binary'
+import binary from '../../src/tags/yaml-1.1/binary'
 import { YAMLOMap } from '../../src/tags/yaml-1.1/omap'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set'
 

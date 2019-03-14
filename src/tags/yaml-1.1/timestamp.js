@@ -1,5 +1,3 @@
-// Published as 'yaml/types/timestamp'
-
 import { stringifyNumber } from '../core'
 
 const parseSexagesimal = (sign, parts) => {
@@ -94,5 +92,3 @@ export const timestamp = {
   stringify: ({ value }) =>
     value.toISOString().replace(/((T00:00)?:00)?\.000Z$/, '')
 }
-
-export default [intTime, floatTime, timestamp]
