@@ -2,7 +2,7 @@ import YAMLMap from '../../schema/Map'
 import Pair from '../../schema/Pair'
 import parseMap from '../../schema/parseMap'
 
-function createMap(schema, obj, ctx) {
+export function createMap(schema, obj, ctx) {
   const map = new YAMLMap()
   if (obj instanceof Map) {
     for (const [key, value] of obj) {
