@@ -18,20 +18,22 @@
     "*.js",
     "!.*.js"
   ],
-  "main": "./dist/index.js",
+  "main": "./index.js",
   "browser": {
-    "./dist/index.js": "./browser/dist/index.js",
+    "./index.js": "./browser/index.js",
     "./map.js": "./browser/map.js",
     "./pair.js": "./browser/pair.js",
     "./parse-cst.js": "./browser/parse-cst.js",
     "./scalar.js": "./browser/scalar.js",
     "./schema.js": "./browser/schema.js",
     "./seq.js": "./browser/seq.js",
+    "./types.js": "./browser/types.js",
     "./types/binary.js": "./browser/types/binary.js",
     "./types/omap.js": "./browser/types/omap.js",
     "./types/pairs.js": "./browser/types/pairs.js",
     "./types/set.js": "./browser/types/set.js",
-    "./types/timestamp.js": "./browser/types/timestamp.js"
+    "./types/timestamp.js": "./browser/types/timestamp.js",
+    "./util.js": "./browser/util.js"
   },
   "scripts": {
     "browser:build": "BABEL_ENV=browser babel src/ --out-dir browser/dist/",
