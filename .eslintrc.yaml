@@ -5,7 +5,7 @@ env:
 
 extends:
   - eslint:recommended
-  - prettier
+  - plugin:prettier/recommended
 
 rules:
   array-callback-return: error
@@ -19,6 +19,7 @@ rules:
   no-unused-labels: 0
   no-var: error
   prefer-const: [warn, destructuring: all]
+  prettier/prettier: error
 
 overrides:
   - files: src/**/*.js

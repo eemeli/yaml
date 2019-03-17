@@ -1,8 +1,4 @@
-// Published as 'yaml/map'
-
-import toJSON from '../toJSON'
 import Collection from './Collection'
-import Merge from './Merge'
 import Pair from './Pair'
 import Scalar from './Scalar'
 

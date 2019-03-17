@@ -1,7 +1,5 @@
 import { YAMLSemanticError } from '../../errors'
-import toJSON from '../../toJSON'
 import YAMLMap, { findPair } from '../../schema/Map'
-import Merge from '../../schema/Merge'
 import Pair from '../../schema/Pair'
 import parseMap from '../../schema/parseMap'
 import Scalar from '../../schema/Scalar'
