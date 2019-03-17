@@ -59,7 +59,5 @@ export default {
   default: false,
   tag: 'tag:yaml.org,2002:pairs',
   resolve: parsePairs,
-  createNode: createPairs,
-  stringify: (value, ctx, onComment, onChompKeep) =>
-    value.toString(ctx, onComment, onChompKeep)
+  createNode: createPairs
 }

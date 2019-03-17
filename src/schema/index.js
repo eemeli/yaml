@@ -239,12 +239,12 @@ export default class Schema {
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)
     const props = this.stringifyProps(item, tagObj, ctx)
-    const str = (tagObj.stringify || stringify)(
-      item,
-      ctx,
-      onComment,
-      onChompKeep
-    )
+    const str =
+      typeof tagObj.stringify === 'function'
+        ? tagObj.stringify(item, ctx, onComment, onChompKeep)
+        : item instanceof Collection
+        ? item.toString(ctx, onComment, onChompKeep)
+        : stringify(item, ctx, onComment, onChompKeep)
     return props
       ? item instanceof Collection && str[0] !== '{' && str[0] !== '['
         ? `${props}\n${ctx.indent}${str}`

@@ -68,7 +68,5 @@ export default {
   default: false,
   tag: 'tag:yaml.org,2002:omap',
   resolve: parseOMap,
-  createNode: createOMap,
-  stringify: (value, ctx, onComment, onChompKeep) =>
-    value.toString(ctx, onComment, onChompKeep)
+  createNode: createOMap
 }

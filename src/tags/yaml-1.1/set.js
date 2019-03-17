@@ -91,7 +91,5 @@ export default {
   default: false,
   tag: 'tag:yaml.org,2002:set',
   resolve: parseSet,
-  createNode: createSet,
-  stringify: (value, ctx, onComment, onChompKeep) =>
-    value.toString(ctx, onComment, onChompKeep)
+  createNode: createSet
 }

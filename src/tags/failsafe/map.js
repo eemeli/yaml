@@ -18,7 +18,5 @@ export default {
   default: true,
   nodeClass: YAMLMap,
   tag: 'tag:yaml.org,2002:map',
-  resolve: parseMap,
-  stringify: (value, ctx, onComment, onChompKeep) =>
-    value.toString(ctx, onComment, onChompKeep)
+  resolve: parseMap
 }
