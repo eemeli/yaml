@@ -49,9 +49,8 @@ export function createPairs(schema, iterable, ctx) {
     } else {
       key = it
     }
-    const k = schema.createNode(key, ctx.wrapScalars, null, ctx)
-    const v = schema.createNode(value, ctx.wrapScalars, null, ctx)
-    pairs.items.push(new Pair(k, v))
+    const pair = schema.createPair(key, value, ctx)
+    pairs.items.push(pair)
   }
   return pairs
 }

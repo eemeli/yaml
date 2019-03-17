@@ -96,6 +96,12 @@ export default class Schema {
     return obj.node
   }
 
+  createPair(key, value, ctx) {
+    const k = this.createNode(key, ctx.wrapScalars, null, ctx)
+    const v = this.createNode(value, ctx.wrapScalars, null, ctx)
+    return new Pair(k, v)
+  }
+
   // falls back to string on no match
   resolveScalar(str, tags) {
     if (!tags) tags = this.tags

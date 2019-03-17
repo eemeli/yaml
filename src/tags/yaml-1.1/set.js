@@ -80,10 +80,8 @@ function parseSet(doc, cst) {
 
 function createSet(schema, iterable, ctx) {
   const set = new YAMLSet()
-  for (const value of iterable) {
-    const v = schema.createNode(value, ctx.wrapScalars, null, ctx)
-    set.items.push(new Pair(v))
-  }
+  for (const value of iterable)
+    set.items.push(schema.createPair(value, null, ctx))
   return set
 }
 

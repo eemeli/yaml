@@ -1,21 +1,14 @@
 import YAMLMap from '../../schema/Map'
-import Pair from '../../schema/Pair'
 import parseMap from '../../schema/parseMap'
 
-export function createMap(schema, obj, ctx) {
+function createMap(schema, obj, ctx) {
   const map = new YAMLMap()
   if (obj instanceof Map) {
-    for (const [key, value] of obj) {
-      const k = schema.createNode(key, ctx.wrapScalars, null, ctx)
-      const v = schema.createNode(value, ctx.wrapScalars, null, ctx)
-      map.items.push(new Pair(k, v))
-    }
+    for (const [key, value] of obj)
+      map.items.push(schema.createPair(key, value, ctx))
   } else if (obj && typeof obj === 'object') {
-    map.items = Object.keys(obj).map(key => {
-      const k = schema.createNode(key, ctx.wrapScalars, null, ctx)
-      const v = schema.createNode(obj[key], ctx.wrapScalars, null, ctx)
-      return new Pair(k, v)
-    })
+    for (const key of Object.keys(obj))
+      map.items.push(schema.createPair(key, obj[key], ctx))
   }
   return map
 }

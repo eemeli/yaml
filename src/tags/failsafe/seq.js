@@ -1,7 +1,7 @@
 import parseSeq from '../../schema/parseSeq'
 import YAMLSeq from '../../schema/Seq'
 
-export function createSeq(schema, obj, ctx) {
+function createSeq(schema, obj, ctx) {
   const seq = new YAMLSeq()
   if (obj && obj[Symbol.iterator]) {
     for (const it of obj) {
