@@ -43,24 +43,7 @@ export class YAMLSet extends YAMLMap {
   }
 
   toJSON(_, ctx) {
-    const set = new Set()
-    if (ctx && ctx.onCreate) ctx.onCreate(set)
-    for (const item of this.items) {
-      if (item instanceof Merge) {
-        const { items } = item.value
-        for (let i = items.length - 1; i >= 0; --i) {
-          const { source } = items[i]
-          if (source instanceof YAMLMap) {
-            for (const [key] of source.toJSMap(ctx)) set.add(key)
-          } else {
-            throw new Error('Merge sources must be maps')
-          }
-        }
-      } else {
-        set.add(toJSON(item.key, '', ctx))
-      }
-    }
-    return set
+    return super.toJSON(_, ctx, Set)
   }
 
   toString(ctx, onComment, onChompKeep) {

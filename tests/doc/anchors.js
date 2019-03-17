@@ -1,5 +1,5 @@
 import YAML from '../../src/index'
-import Map from '../../src/schema/Map'
+import YAMLMap from '../../src/schema/Map'
 import Merge from '../../src/schema/Merge'
 
 test('basic', () => {
@@ -121,7 +121,7 @@ describe('merge <<', () => {
       const merge = items[0]
       expect(merge).toBeInstanceOf(Merge)
       merge.value.items.forEach(({ source }) => {
-        expect(source).toBeInstanceOf(Map)
+        expect(source).toBeInstanceOf(YAMLMap)
       })
     })
   })
@@ -137,13 +137,66 @@ describe('merge <<', () => {
     expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
   })
 
-  test('merge multiple times', () => {
-    const src =
-      'x:\n  - &a\n    key1: value1\n  - &b\n    key2: value2\nfoo:\n  bar: baz\n  <<: *a\n  <<: *b'
-    const res = YAML.parse(src, { merge: true })
-    expect(res).toEqual({
-      x: [{ key1: 'value1' }, { key2: 'value2' }],
-      foo: { bar: 'baz', key1: 'value1', key2: 'value2' }
+  describe('merge multiple times', () => {
+    const srcKeys = `
+x:
+  - &a
+    k0: v1
+    k1: v1
+  - &b
+    k1: v2
+    k2: v2
+y:
+  k0: v0
+  <<: *a
+  <<: *b`
+
+    const srcSeq = `
+x:
+  - &a
+    k0: v1
+    k1: v1
+  - &b
+    k1: v2
+    k2: v2
+y:
+  k0: v0
+  <<: [ *a, *b ]`
+
+    const expObj = {
+      x: [{ k0: 'v1', k1: 'v1' }, { k1: 'v2', k2: 'v2' }],
+      y: { k0: 'v0', k1: 'v1', k2: 'v2' }
+    }
+
+    const expMap = new Map([
+      [
+        'x',
+        [
+          new Map([['k0', 'v1'], ['k1', 'v1']]),
+          new Map([['k1', 'v2'], ['k2', 'v2']])
+        ]
+      ],
+      ['y', new Map([['k0', 'v0'], ['k1', 'v1'], ['k2', 'v2']])]
+    ])
+
+    test('multiple merge keys, masAsMap: false', () => {
+      const res = YAML.parse(srcKeys, { merge: true })
+      expect(res).toEqual(expObj)
+    })
+
+    test('multiple merge keys, masAsMap: true', () => {
+      const res = YAML.parse(srcKeys, { merge: true, mapAsMap: true })
+      expect(res).toEqual(expMap)
+    })
+
+    test('sequence of anchors, masAsMap: false', () => {
+      const res = YAML.parse(srcSeq, { merge: true })
+      expect(res).toEqual(expObj)
+    })
+
+    test('sequence of anchors, masAsMap: true', () => {
+      const res = YAML.parse(srcSeq, { merge: true, mapAsMap: true })
+      expect(res).toEqual(expMap)
     })
   })
 

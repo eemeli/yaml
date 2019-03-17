@@ -23,23 +23,28 @@ export default class Pair extends Node {
     this.key.commentBefore = cb
   }
 
-  get stringKey() {
-    const key = toJSON(this.key)
-    if (key === null) return ''
-    if (typeof key === 'object')
-      try {
-        return JSON.stringify(key)
-      } catch (e) {
-        /* should not happen, but let's ignore in any case */
-      }
-    return String(key)
+  addToJSMap(ctx, map) {
+    const key = toJSON(this.key, '', ctx)
+    if (map instanceof Map) {
+      const value = toJSON(this.value, key, ctx)
+      map.set(key, value)
+    } else if (map instanceof Set) {
+      map.add(key)
+    } else {
+      const stringKey =
+        key === null
+          ? ''
+          : typeof key === 'object'
+          ? JSON.stringify(key)
+          : String(key)
+      map[stringKey] = toJSON(this.value, stringKey, ctx)
+    }
+    return map
   }
 
   toJSON(_, ctx) {
-    const pair = {}
-    const sk = this.stringKey
-    pair[sk] = toJSON(this.value, sk, ctx)
-    return pair
+    const pair = ctx && ctx.mapAsMap ? new Map() : {}
+    return this.addToJSMap(ctx, pair)
   }
 
   toString(ctx, onComment, onChompKeep) {
