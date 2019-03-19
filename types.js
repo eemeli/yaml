@@ -1,11 +1,11 @@
 var opt = require('./dist/tags/options')
 exports.boolOptions = opt.boolOptions
 exports.nullOptions = opt.nullOptions
-exports.strOptions = require('./dist/stringify').strOptions
+exports.strOptions = opt.strOptions
 
 exports.Schema = require('./dist/schema').default
-exports.Map = exports.YAMLMap = require('./dist/schema/Map').default
-exports.Seq = exports.YAMLSeq = require('./dist/schema/Seq').default
+exports.YAMLMap = require('./dist/schema/Map').default
+exports.YAMLSeq = require('./dist/schema/Seq').default
 exports.Pair = require('./dist/schema/Pair').default
 exports.Scalar = require('./dist/schema/Scalar').default
 

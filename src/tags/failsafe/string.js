@@ -1,4 +1,5 @@
-import stringify, { strOptions } from '../../stringify'
+import stringify from '../../stringify'
+import { strOptions } from '../options'
 
 export const resolveString = (doc, node) => {
   // on error, will return { str: string, errors: Error[] }

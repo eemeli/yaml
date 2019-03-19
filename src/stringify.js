@@ -5,18 +5,7 @@ import foldFlowLines, {
   FOLD_FLOW,
   FOLD_QUOTED
 } from './foldFlowLines'
-
-export const strOptions = {
-  defaultType: Type.PLAIN,
-  doubleQuoted: {
-    jsonEncoding: false,
-    minMultiLineLength: 40
-  },
-  fold: {
-    lineWidth: 80,
-    minContentWidth: 20
-  }
-}
+import { strOptions } from './tags/options'
 
 function lineLengthOverLimit(str, limit) {
   const strLen = str.length

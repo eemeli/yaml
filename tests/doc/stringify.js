@@ -1,5 +1,6 @@
 import YAML from '../../src/index'
-import stringify, { strOptions } from '../../src/stringify'
+import stringify from '../../src/stringify'
+import { strOptions } from '../../src/tags/options'
 
 test('undefined', () => {
   expect(YAML.stringify()).toBe('\n')
