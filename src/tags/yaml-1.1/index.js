@@ -1,14 +1,12 @@
+import Scalar from '../../schema/Scalar'
+import { stringifyNumber } from '../core'
+import failsafe from '../failsafe'
+import { boolOptions, nullOptions } from '../options'
 import binary from './binary'
 import omap from './omap'
 import pairs from './pairs'
 import set from './set'
 import { intTime, floatTime, timestamp } from './timestamp'
-import { stringifyNumber } from '../core'
-import failsafe from '../failsafe'
-import Scalar from '../../schema/Scalar'
-
-export const nullOptions = { nullStr: 'null' }
-export const boolOptions = { trueStr: 'true', falseStr: 'false' }
 
 export default failsafe.concat(
   [

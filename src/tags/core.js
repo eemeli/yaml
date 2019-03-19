@@ -1,5 +1,6 @@
-import failsafe from './failsafe'
 import Scalar from '../schema/Scalar'
+import failsafe from './failsafe'
+import { boolOptions, nullOptions } from './options'
 
 export const stringifyNumber = ({ value }) =>
   isFinite(value)
@@ -9,8 +10,6 @@ export const stringifyNumber = ({ value }) =>
     : value < 0
     ? '-.inf'
     : '.inf'
-
-export const nullOptions = { nullStr: 'null' }
 
 export default failsafe.concat([
   {
@@ -30,7 +29,9 @@ export default failsafe.concat([
     tag: 'tag:yaml.org,2002:bool',
     test: /^(?:[Tt]rue|TRUE|[Ff]alse|FALSE)$/,
     resolve: str => str[0] === 't' || str[0] === 'T',
-    stringify: value => JSON.stringify(value)
+    options: boolOptions,
+    stringify: ({ value }) =>
+      value ? boolOptions.trueStr : boolOptions.falseStr
   },
   {
     identify: value => typeof value === 'number',
