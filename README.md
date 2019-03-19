@@ -45,14 +45,12 @@ const YAML = require('yaml')
 - [`YAML.parseDocument(str, options): YAML.Document`](https://eemeli.org/yaml/#parsing-documents)
 
 ```js
-import Map from 'yaml/map'
-import Pair from 'yaml/pair'
-import Seq from 'yaml/seq'
+import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'
 ```
 
-- [`new Map()`](https://eemeli.org/yaml/#creating-nodes)
 - [`new Pair(key, value)`](https://eemeli.org/yaml/#creating-nodes)
-- [`new Seq()`](https://eemeli.org/yaml/#creating-nodes)
+- [`new YAMLMap()`](https://eemeli.org/yaml/#creating-nodes)
+- [`new YAMLSeq()`](https://eemeli.org/yaml/#creating-nodes)
 
 ### CST Parser
 
