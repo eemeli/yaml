@@ -6,3 +6,5 @@ exports.default = [ts.intTime, ts.floatTime, ts.timestamp]
 exports.floatTime = ts.floatTime
 exports.intTime = ts.intTime
 exports.timestamp = ts.timestamp
+
+require('../dist/deprecation').warn(__filename)
