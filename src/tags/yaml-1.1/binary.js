@@ -2,7 +2,7 @@
 
 import { YAMLReferenceError } from '../../errors'
 import { Type } from '../../cst/Node'
-import stringify from '../../stringify'
+import { stringifyString } from '../../stringify'
 import { resolveString } from '../failsafe/string'
 
 const options = { defaultType: Type.BLOCK_LITERAL, lineWidth: 76 }
@@ -67,6 +67,11 @@ export default {
       }
       value = lines.join(type === Type.BLOCK_LITERAL ? '\n' : ' ')
     }
-    return stringify({ comment, type, value }, ctx, onComment, onChompKeep)
+    return stringifyString(
+      { comment, type, value },
+      ctx,
+      onComment,
+      onChompKeep
+    )
   }
 }

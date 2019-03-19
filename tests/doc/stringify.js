@@ -1,5 +1,5 @@
 import YAML from '../../src/index'
-import stringify from '../../src/stringify'
+import { stringifyString } from '../../src/stringify'
 import { strOptions } from '../../src/tags/options'
 
 test('undefined', () => {
@@ -212,7 +212,7 @@ describe('eemeli/yaml#80: custom tags', () => {
       const key = Symbol.keyFor(item.value)
       if (key === undefined)
         throw new Error('Only shared symbols are supported')
-      return stringify({ value: key }, ctx, onComment, onChompKeep)
+      return stringifyString({ value: key }, ctx, onComment, onChompKeep)
     }
   }
 

@@ -249,7 +249,7 @@ function plainString(item, ctx, onComment, onChompKeep) {
   return body
 }
 
-export default function stringify(item, ctx, onComment, onChompKeep) {
+export function stringifyString(item, ctx, onComment, onChompKeep) {
   const { defaultType } = strOptions
   const { implicitKey, inFlow } = ctx
   let { type, value } = item

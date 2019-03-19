@@ -1,6 +1,6 @@
 import { Type } from '../cst/Node'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
-import stringify from '../stringify'
+import { stringifyString } from '../stringify'
 import core from '../tags/core'
 import failsafe from '../tags/failsafe'
 import map from '../tags/failsafe/map'
@@ -244,7 +244,7 @@ export default class Schema {
         ? tagObj.stringify(item, ctx, onComment, onChompKeep)
         : item instanceof Collection
         ? item.toString(ctx, onComment, onChompKeep)
-        : stringify(item, ctx, onComment, onChompKeep)
+        : stringifyString(item, ctx, onComment, onChompKeep)
     return props
       ? item instanceof Collection && str[0] !== '{' && str[0] !== '['
         ? `${props}\n${ctx.indent}${str}`

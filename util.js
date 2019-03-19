@@ -3,7 +3,7 @@ exports.parseMap = require('./dist/schema/parseMap').default
 exports.parseSeq = require('./dist/schema/parseSeq').default
 
 exports.stringifyNumber = require('./dist/tags/core').stringifyNumber
-exports.stringifyString = require('./dist/stringify').default
+exports.stringifyString = require('./dist/stringify').stringifyString
 exports.toJSON = require('./dist/toJSON').default
 exports.Type = require('./dist/cst/Node').Type
 
