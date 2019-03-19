@@ -2,8 +2,9 @@ exports.findPair = require('./dist/schema/Map').findPair
 exports.parseMap = require('./dist/schema/parseMap').default
 exports.parseSeq = require('./dist/schema/parseSeq').default
 
-exports.stringifyNumber = require('./dist/tags/core').stringifyNumber
-exports.stringifyString = require('./dist/stringify').stringifyString
+var str = require('./dist/stringify')
+exports.stringifyNumber = str.stringifyNumber
+exports.stringifyString = str.stringifyString
 exports.toJSON = require('./dist/toJSON').default
 exports.Type = require('./dist/cst/Node').Type
 

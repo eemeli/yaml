@@ -1,5 +1,5 @@
 import Scalar from '../../schema/Scalar'
-import { stringifyNumber } from '../core'
+import { stringifyNumber } from '../../stringify'
 import failsafe from '../failsafe'
 import { boolOptions, nullOptions } from '../options'
 import binary from './binary'

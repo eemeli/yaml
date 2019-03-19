@@ -7,6 +7,15 @@ import foldFlowLines, {
 } from './foldFlowLines'
 import { strOptions } from './tags/options'
 
+export const stringifyNumber = ({ value }) =>
+  isFinite(value)
+    ? JSON.stringify(value)
+    : isNaN(value)
+    ? '.nan'
+    : value < 0
+    ? '-.inf'
+    : '.inf'
+
 function lineLengthOverLimit(str, limit) {
   const strLen = str.length
   if (strLen <= limit) return false

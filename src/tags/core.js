@@ -1,15 +1,7 @@
 import Scalar from '../schema/Scalar'
+import { stringifyNumber } from '../stringify'
 import failsafe from './failsafe'
 import { boolOptions, nullOptions } from './options'
-
-export const stringifyNumber = ({ value }) =>
-  isFinite(value)
-    ? JSON.stringify(value)
-    : isNaN(value)
-    ? '.nan'
-    : value < 0
-    ? '-.inf'
-    : '.inf'
 
 export default failsafe.concat([
   {
