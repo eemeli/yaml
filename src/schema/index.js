@@ -27,13 +27,28 @@ export default class Schema {
     this.name = schema
     this.tags = schemas[schema.replace(/\W/g, '')] // 'yaml-1.1' -> 'yaml11'
     if (!this.tags) {
-      const keys = Object.keys(schemas).map(key => JSON.stringify(key))
-      throw new Error(`Unknown schema; use one of ${keys.join(', ')}`)
+      const keys = Object.keys(schemas)
+        .map(key => JSON.stringify(key))
+        .join(', ')
+      throw new Error(`Unknown schema "${schema}"; use one of ${keys}`)
     }
     if (Array.isArray(customTags)) {
       for (const tag of customTags) this.tags = this.tags.concat(tag)
     } else if (typeof customTags === 'function') {
       this.tags = customTags(this.tags.slice())
+    }
+    for (let i = 0; i < this.tags.length; ++i) {
+      const tag = this.tags[i]
+      if (typeof tag === 'string') {
+        const tagObj = tags[tag]
+        if (!tagObj) {
+          const keys = Object.keys(tags)
+            .map(key => JSON.stringify(key))
+            .join(', ')
+          throw new Error(`Unknown custom tag "${tag}"; use one of ${keys}`)
+        }
+        this.tags[i] = tagObj
+      }
     }
   }
 

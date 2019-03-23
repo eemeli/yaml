@@ -624,6 +624,16 @@ invoice:
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 
+    test('tag string in tags', () => {
+      const bin = YAML.parse(src, { tags: ['binary'] })
+      expect(bin).toBeInstanceOf(Uint8Array)
+    })
+
+    test('tag string in tag array', () => {
+      const bin = YAML.parse(src, { tags: [['binary']] })
+      expect(bin).toBeInstanceOf(Uint8Array)
+    })
+
     test('no custom tag object', () => {
       const doc = YAML.parseDocument(src)
       const message =
