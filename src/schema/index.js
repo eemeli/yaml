@@ -1,13 +1,8 @@
 import { Type } from '../cst/Node'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify'
-import core from '../tags/core'
-import failsafe from '../tags/failsafe'
-import map from '../tags/failsafe/map'
-import seq from '../tags/failsafe/seq'
-import json from '../tags/json'
+import { schemas, tags } from '../tags'
 import { resolveString } from '../tags/failsafe/string'
-import yaml11 from '../tags/yaml-1.1'
 import Alias from './Alias'
 import Collection from './Collection'
 import Node from './Node'
@@ -27,25 +22,18 @@ export default class Schema {
     STR: 'tag:yaml.org,2002:str'
   }
 
-  static tags = {
-    core,
-    failsafe,
-    json,
-    'yaml-1.1': yaml11
-  }
-
-  constructor({ merge, schema, tags }) {
+  constructor({ merge, schema, tags: customTags }) {
     this.merge = !!merge
     this.name = schema
-    this.tags = Schema.tags[schema]
+    this.tags = schemas[schema.replace(/\W/g, '')] // 'yaml-1.1' -> 'yaml11'
     if (!this.tags) {
-      const keys = Object.keys(Schema.tags).map(key => JSON.stringify(key))
+      const keys = Object.keys(schemas).map(key => JSON.stringify(key))
       throw new Error(`Unknown schema; use one of ${keys.join(', ')}`)
     }
-    if (Array.isArray(tags)) {
-      for (const tag of tags) this.tags = this.tags.concat(tag)
-    } else if (typeof tags === 'function') {
-      this.tags = tags(this.tags.slice())
+    if (Array.isArray(customTags)) {
+      for (const tag of customTags) this.tags = this.tags.concat(tag)
+    } else if (typeof customTags === 'function') {
+      this.tags = customTags(this.tags.slice())
     }
   }
 
@@ -68,7 +56,12 @@ export default class Schema {
         if (typeof value.toJSON === 'function') value = value.toJSON()
         if (typeof value !== 'object')
           return wrapScalars ? new Scalar(value) : value
-        tagObj = value instanceof Map ? map : value[Symbol.iterator] ? seq : map
+        tagObj =
+          value instanceof Map
+            ? tags.map
+            : value[Symbol.iterator]
+            ? tags.seq
+            : tags.map
       }
     }
     if (!ctx) ctx = { wrapScalars }
