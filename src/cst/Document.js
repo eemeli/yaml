@@ -1,9 +1,10 @@
+import { Char, Type } from '../constants'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import BlankLine from './BlankLine'
 import { grabCollectionEndComments } from './Collection'
 import Comment from './Comment'
 import Directive from './Directive'
-import Node, { Char, Type } from './Node'
+import Node from './Node'
 import Range from './Range'
 
 export default class Document extends Node {

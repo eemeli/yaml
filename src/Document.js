@@ -1,6 +1,6 @@
 import addComment from './addComment'
 import Anchors from './Anchors'
-import { Char, Type } from './cst/Node'
+import { Char, Type } from './constants'
 import {
   YAMLReferenceError,
   YAMLSemanticError,

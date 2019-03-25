@@ -1,4 +1,4 @@
-import { Type } from '../cst/Node'
+import { Type } from '../constants'
 
 export const binaryOptions = {
   defaultType: Type.BLOCK_LITERAL,

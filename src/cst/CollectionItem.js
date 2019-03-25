@@ -1,6 +1,7 @@
+import { Type } from '../constants'
 import { YAMLSemanticError } from '../errors'
 import BlankLine from './BlankLine'
-import Node, { Type } from './Node'
+import Node from './Node'
 import Range from './Range'
 
 export default class CollectionItem extends Node {

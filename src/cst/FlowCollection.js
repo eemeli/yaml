@@ -1,7 +1,8 @@
+import { Type } from '../constants'
 import { YAMLSemanticError } from '../errors'
 import BlankLine from './BlankLine'
 import Comment from './Comment'
-import Node, { Type } from './Node'
+import Node from './Node'
 import Range from './Range'
 
 export default class FlowCollection extends Node {

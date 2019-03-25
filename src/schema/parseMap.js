@@ -1,4 +1,4 @@
-import { Char, Type } from '../cst/Node'
+import { Char, Type } from '../constants'
 import PlainValue from '../cst/PlainValue'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Map from './Map'

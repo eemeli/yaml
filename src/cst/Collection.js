@@ -1,7 +1,8 @@
+import { Type } from '../constants'
 import BlankLine from './BlankLine'
 import CollectionItem from './CollectionItem'
 import Comment from './Comment'
-import Node, { Type } from './Node'
+import Node from './Node'
 import Range from './Range'
 
 export function grabCollectionEndComments(node) {

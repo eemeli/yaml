@@ -1,4 +1,4 @@
-import { Type } from '../cst/Node'
+import { Type } from '../constants'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Pair from './Pair'
 import { checkKeyLength, resolveComments } from './parseUtils'

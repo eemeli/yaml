@@ -1,4 +1,5 @@
-import Node, { Type } from './Node'
+import { Type } from '../constants'
+import Node from './Node'
 import Range from './Range'
 
 export default class BlankLine extends Node {

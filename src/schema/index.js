@@ -1,4 +1,4 @@
-import { Type } from '../cst/Node'
+import { Type } from '../constants'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify'
 import { schemas, tags } from '../tags'

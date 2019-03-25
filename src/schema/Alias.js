@@ -1,4 +1,4 @@
-import { Type } from '../cst/Node'
+import { Type } from '../constants'
 import toJSON from '../toJSON'
 import Node from './Node'
 

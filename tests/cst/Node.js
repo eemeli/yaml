@@ -1,4 +1,5 @@
-import Node, { Type } from '../../src/cst/Node'
+import { Type } from '../../src/constants'
+import Node from '../../src/cst/Node'
 import Range from '../../src/cst/Range'
 
 describe('internals', () => {

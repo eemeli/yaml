@@ -1,7 +1,7 @@
 /* global atob, btoa, Buffer */
 
+import { Type } from '../../constants'
 import { YAMLReferenceError } from '../../errors'
-import { Type } from '../../cst/Node'
 import { stringifyString } from '../../stringify'
 import { resolveString } from '../failsafe/string'
 import { binaryOptions as options } from '../options'
