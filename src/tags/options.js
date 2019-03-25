@@ -1,5 +1,10 @@
 import { Type } from '../cst/Node'
 
+export const binaryOptions = {
+  defaultType: Type.BLOCK_LITERAL,
+  lineWidth: 76
+}
+
 export const boolOptions = { trueStr: 'true', falseStr: 'false' }
 
 export const nullOptions = { nullStr: 'null' }

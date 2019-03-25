@@ -4,8 +4,7 @@ import { YAMLReferenceError } from '../../errors'
 import { Type } from '../../cst/Node'
 import { stringifyString } from '../../stringify'
 import { resolveString } from '../failsafe/string'
-
-const options = { defaultType: Type.BLOCK_LITERAL, lineWidth: 76 }
+import { binaryOptions as options } from '../options'
 
 export default {
   identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array
