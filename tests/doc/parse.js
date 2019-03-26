@@ -75,6 +75,52 @@ describe('tags', () => {
   })
 })
 
+describe('number types', () => {
+  test('Version 1.1', () => {
+    const src = `
+- 0b10_10
+- 0123
+- -00
+- 123_456
+- 3.1e+2
+- 5.1_2_3E-1
+- 4.20`
+    const doc = YAML.parseDocument(src, { version: '1.1' })
+    expect(doc.contents.items).toMatchObject([
+      { value: 10, format: 'BIN' },
+      { value: 83, format: 'OCT' },
+      { value: 0, format: 'OCT' },
+      { value: 123456 },
+      { value: 310, format: 'EXP' },
+      { value: 0.5123, format: 'EXP' },
+      { value: 4.2 }
+    ])
+    expect(doc.contents.items[3]).not.toHaveProperty('format')
+    expect(doc.contents.items[6]).not.toHaveProperty('format')
+  })
+
+  test('Version 1.2', () => {
+    const src = `
+- 0o123
+- 0o0
+- 123456
+- 3.1e+2
+- 5.123E-1
+- 4.20`
+    const doc = YAML.parseDocument(src, { version: '1.2' })
+    expect(doc.contents.items).toMatchObject([
+      { value: 83, format: 'OCT' },
+      { value: 0, format: 'OCT' },
+      { value: 123456 },
+      { value: 310, format: 'EXP' },
+      { value: 0.5123, format: 'EXP' },
+      { value: 4.2 }
+    ])
+    expect(doc.contents.items[2]).not.toHaveProperty('format')
+    expect(doc.contents.items[5]).not.toHaveProperty('format')
+  })
+})
+
 test('eemeli/yaml#2', () => {
   const src = `
 aliases:

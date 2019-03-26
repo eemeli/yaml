@@ -68,7 +68,16 @@ export default failsafe.concat([
     identify: value => typeof value === 'number',
     default: true,
     tag: 'tag:yaml.org,2002:float',
-    test: /^[-+]?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][-+]?[0-9]+)?$/,
+    format: 'EXP',
+    test: /^[-+]?(?:0|[1-9][0-9]*)(\.[0-9]*)?[eE][-+]?[0-9]+$/,
+    resolve: str => parseFloat(str),
+    stringify: ({ value }) => Number(value).toExponential()
+  },
+  {
+    identify: value => typeof value === 'number',
+    default: true,
+    tag: 'tag:yaml.org,2002:float',
+    test: /^[-+]?(?:0|[1-9][0-9]*)\.[0-9]*$/,
     resolve: str => parseFloat(str),
     stringify: stringifyNumber
   }

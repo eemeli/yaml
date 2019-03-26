@@ -119,7 +119,7 @@ not a number: .NaN`
       'negative infinity': Number.NEGATIVE_INFINITY,
       'not a number': NaN
     })
-    expect(String(doc)).toBe(`canonical: 685230.15
+    expect(String(doc)).toBe(`canonical: 6.8523015e+5
 fixed: 685230.15
 negative infinity: -.inf
 not a number: .nan\n`)
@@ -278,8 +278,8 @@ not a number: .NaN`
     })
     expect(String(doc)).toBe(`%YAML 1.1
 ---
-canonical: 685230.15
-exponential: 685230.15
+canonical: 6.8523015e+5
+exponential: 6.8523015e+5
 fixed: 685230.15
 sexagesimal: 190:20:30.15
 negative infinity: -.inf
