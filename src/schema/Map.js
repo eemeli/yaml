@@ -1,8 +1,4 @@
-// Published as 'yaml/map'
-
-import toJSON from '../toJSON'
 import Collection from './Collection'
-import Merge from './Merge'
 import Pair from './Pair'
 import Scalar from './Scalar'
 
@@ -50,63 +46,16 @@ export default class YAMLMap extends Collection {
     else this.items.push(new Pair(key, value))
   }
 
-  toJSON(_, ctx) {
-    if (ctx && ctx.mapAsMap) return this.toJSMap(ctx)
-    const map = {}
+  /**
+   * @param {*} arg ignored
+   * @param {*} ctx Conversion context, originally set in Document#toJSON()
+   * @param {Class} Type If set, forces the returned collection type
+   * @returns {*} Instance of Type, Map, or Object
+   */
+  toJSON(_, ctx, Type) {
+    const map = Type ? new Type() : ctx && ctx.mapAsMap ? new Map() : {}
     if (ctx && ctx.onCreate) ctx.onCreate(map)
-    for (const item of this.items) {
-      if (item instanceof Merge) {
-        // If the value associated with a merge key is a single mapping node,
-        // each of its key/value pairs is inserted into the current mapping,
-        // unless the key already exists in it. If the value associated with the
-        // merge key is a sequence, then this sequence is expected to contain
-        // mapping nodes and each of these nodes is merged in turn according to
-        // its order in the sequence. Keys in mapping nodes earlier in the
-        // sequence override keys specified in later mapping nodes.
-        // -- http://yaml.org/type/merge.html
-        const keys = Object.keys(map)
-        const { items } = item.value
-        for (let i = items.length - 1; i >= 0; --i) {
-          const { source } = items[i]
-          if (source instanceof YAMLMap) {
-            const obj = source.toJSON('', ctx)
-            Object.keys(obj).forEach(key => {
-              if (!keys.includes(key)) map[key] = obj[key]
-            })
-          } else {
-            throw new Error('Merge sources must be maps')
-          }
-        }
-      } else {
-        const { stringKey, value } = item
-        map[stringKey] = toJSON(value, stringKey, ctx)
-      }
-    }
-    return map
-  }
-
-  toJSMap(ctx) {
-    const map = new Map()
-    if (ctx && ctx.onCreate) ctx.onCreate(map)
-    for (const item of this.items) {
-      if (item instanceof Merge) {
-        const { items } = item.value
-        for (let i = items.length - 1; i >= 0; --i) {
-          const { source } = items[i]
-          if (source instanceof YAMLMap) {
-            for (const [key, value] of source.toJSMap(ctx)) {
-              if (!map.has(key)) map.set(key, value)
-            }
-          } else {
-            throw new Error('Merge sources must be maps')
-          }
-        }
-      } else {
-        const key = toJSON(item.key, '', ctx)
-        const value = toJSON(item.value, key, ctx)
-        map.set(key, value)
-      }
-    }
+    for (const item of this.items) item.addToJSMap(ctx, map)
     return map
   }
 

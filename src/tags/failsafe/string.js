@@ -1,4 +1,5 @@
-import stringify, { strOptions } from '../../stringify'
+import { stringifyString } from '../../stringify'
+import { strOptions } from '../options'
 
 export const resolveString = (doc, node) => {
   // on error, will return { str: string, errors: Error[] }
@@ -19,7 +20,7 @@ export default {
   resolve: resolveString,
   stringify(item, ctx, onComment, onChompKeep) {
     ctx = Object.assign({ actualString: true }, ctx)
-    return stringify(item, ctx, onComment, onChompKeep)
+    return stringifyString(item, ctx, onComment, onChompKeep)
   },
   options: strOptions
 }

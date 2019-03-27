@@ -1,3 +1,4 @@
+import YAMLMap from './Map'
 import Pair from './Pair'
 import Scalar from './Scalar'
 import Seq from './Seq'
@@ -19,6 +20,31 @@ export default class Merge extends Pair {
       super(new Scalar(MERGE_KEY), new Seq())
     }
     this.type = 'MERGE_PAIR'
+  }
+
+  // If the value associated with a merge key is a single mapping node, each of
+  // its key/value pairs is inserted into the current mapping, unless the key
+  // already exists in it. If the value associated with the merge key is a
+  // sequence, then this sequence is expected to contain mapping nodes and each
+  // of these nodes is merged in turn according to its order in the sequence.
+  // Keys in mapping nodes earlier in the sequence override keys specified in
+  // later mapping nodes. -- http://yaml.org/type/merge.html
+  addToJSMap(ctx, map) {
+    for (const { source } of this.value.items) {
+      if (!(source instanceof YAMLMap))
+        throw new Error('Merge sources must be maps')
+      const srcMap = source.toJSON(null, ctx, Map)
+      for (const [key, value] of srcMap) {
+        if (map instanceof Map) {
+          if (!map.has(key)) map.set(key, value)
+        } else if (map instanceof Set) {
+          map.add(key)
+        } else {
+          if (!map.hasOwnProperty(key)) map[key] = value
+        }
+      }
+    }
+    return map
   }
 
   toString(ctx, onComment) {

@@ -5,18 +5,16 @@ import foldFlowLines, {
   FOLD_FLOW,
   FOLD_QUOTED
 } from './foldFlowLines'
+import { strOptions } from './tags/options'
 
-export const strOptions = {
-  defaultType: Type.PLAIN,
-  doubleQuoted: {
-    jsonEncoding: false,
-    minMultiLineLength: 40
-  },
-  fold: {
-    lineWidth: 80,
-    minContentWidth: 20
-  }
-}
+export const stringifyNumber = ({ value }) =>
+  isFinite(value)
+    ? JSON.stringify(value)
+    : isNaN(value)
+    ? '.nan'
+    : value < 0
+    ? '-.inf'
+    : '.inf'
 
 function lineLengthOverLimit(str, limit) {
   const strLen = str.length
@@ -260,7 +258,7 @@ function plainString(item, ctx, onComment, onChompKeep) {
   return body
 }
 
-export default function stringify(item, ctx, onComment, onChompKeep) {
+export function stringifyString(item, ctx, onComment, onChompKeep) {
   const { defaultType } = strOptions
   const { implicitKey, inFlow } = ctx
   let { type, value } = item

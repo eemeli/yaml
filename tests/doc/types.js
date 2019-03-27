@@ -1,8 +1,8 @@
 import YAML from '../../src/index'
-import { strOptions } from '../../src/stringify'
 import Scalar from '../../src/schema/Scalar'
 import YAMLSeq from '../../src/schema/Seq'
-import { binary } from '../../src/tags/yaml-1.1/binary'
+import { strOptions } from '../../src/tags/options'
+import binary from '../../src/tags/yaml-1.1/binary'
 import { YAMLOMap } from '../../src/tags/yaml-1.1/omap'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set'
 
@@ -621,6 +621,16 @@ invoice:
 
     test('tag array in tags', () => {
       const bin = YAML.parse(src, { tags: [[binary]] })
+      expect(bin).toBeInstanceOf(Uint8Array)
+    })
+
+    test('tag string in tags', () => {
+      const bin = YAML.parse(src, { tags: ['binary'] })
+      expect(bin).toBeInstanceOf(Uint8Array)
+    })
+
+    test('tag string in tag array', () => {
+      const bin = YAML.parse(src, { tags: [['binary']] })
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 

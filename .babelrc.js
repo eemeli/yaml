@@ -6,8 +6,7 @@ const presets = [['@babel/env', envOptions]]
 
 const plugins = [
   '@babel/plugin-proposal-class-properties',
-  ['babel-plugin-trace', { strip: true }],
-  ['babel-plugin-add-module-exports', { addDefaultProperty: true }]
+  ['babel-plugin-trace', { strip: true }]
 ]
 if (isBrowser) plugins.push('@babel/plugin-transform-runtime')
 

@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 import YAML from '../src/index'
-import { strOptions } from '../src/stringify'
+import { strOptions } from '../src/tags/options'
 import testEvents from '../src/test-events'
 
 const testDirs = fs

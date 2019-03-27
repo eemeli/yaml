@@ -179,9 +179,9 @@ describe('Set', () => {
   beforeEach(() => {
     set = doc.schema.createNode([1, 2, 3], true, '!!set')
     expect(set.items).toMatchObject([
-      { key: { value: 1 }, value: null },
-      { key: { value: 2 }, value: null },
-      { key: { value: 3 }, value: null }
+      { key: { value: 1 }, value: { value: null } },
+      { key: { value: 2 }, value: { value: null } },
+      { key: { value: 3 }, value: { value: null } }
     ])
   })
 
@@ -198,7 +198,10 @@ describe('Set', () => {
 
   test('get', () => {
     expect(set.get(1)).toBe(1)
-    expect(set.get(1, true)).toMatchObject({ key: { value: 1 }, value: null })
+    expect(set.get(1, true)).toMatchObject({
+      key: { value: 1 },
+      value: { value: null }
+    })
     expect(set.get(0)).toBeUndefined()
     expect(set.get('1')).toBeUndefined()
   })

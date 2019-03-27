@@ -17,7 +17,5 @@ export default {
   default: true,
   nodeClass: YAMLSeq,
   tag: 'tag:yaml.org,2002:seq',
-  resolve: parseSeq,
-  stringify: (value, ctx, onComment, onChompKeep) =>
-    value.toString(ctx, onComment, onChompKeep)
+  resolve: parseSeq
 }
