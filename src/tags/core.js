@@ -77,8 +77,13 @@ export default failsafe.concat([
     identify: value => typeof value === 'number',
     default: true,
     tag: 'tag:yaml.org,2002:float',
-    test: /^[-+]?(?:0|[1-9][0-9]*)\.[0-9]*$/,
-    resolve: str => parseFloat(str),
+    test: /^[-+]?(?:0|[1-9][0-9]*)\.([0-9]*)$/,
+    resolve(str, frac) {
+      const node = new Scalar(parseFloat(str))
+      if (frac && frac[frac.length - 1] === '0')
+        node.minFractionDigits = frac.length
+      return node
+    },
     stringify: stringifyNumber
   }
 ])

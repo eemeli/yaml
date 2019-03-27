@@ -102,8 +102,15 @@ export default failsafe.concat(
       identify: value => typeof value === 'number',
       default: true,
       tag: 'tag:yaml.org,2002:float',
-      test: /^[-+]?([0-9][0-9_]*)?\.[0-9_]*$/,
-      resolve: str => parseFloat(str.replace(/_/g, '')),
+      test: /^[-+]?(?:[0-9][0-9_]*)?\.([0-9_]*)$/,
+      resolve(str, frac) {
+        const node = new Scalar(parseFloat(str.replace(/_/g, '')))
+        if (frac) {
+          const f = frac.replace(/_/g, '')
+          if (f[f.length - 1] === '0') node.minFractionDigits = f.length
+        }
+        return node
+      },
       stringify: stringifyNumber
     }
   ],

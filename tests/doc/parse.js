@@ -71,7 +71,7 @@ describe('tags', () => {
 
   test('eemeli/yaml#97', () => {
     const doc = YAML.parseDocument('foo: !!float 3.0')
-    expect(String(doc)).toBe('foo: !!float 3\n')
+    expect(String(doc)).toBe('foo: !!float 3.0\n')
   })
 })
 
@@ -84,6 +84,7 @@ describe('number types', () => {
 - 123_456
 - 3.1e+2
 - 5.1_2_3E-1
+- 4.02
 - 4.20`
     const doc = YAML.parseDocument(src, { version: '1.1' })
     expect(doc.contents.items).toMatchObject([
@@ -93,10 +94,13 @@ describe('number types', () => {
       { value: 123456 },
       { value: 310, format: 'EXP' },
       { value: 0.5123, format: 'EXP' },
-      { value: 4.2 }
+      { value: 4.02 },
+      { value: 4.2, minFractionDigits: 2 }
     ])
     expect(doc.contents.items[3]).not.toHaveProperty('format')
     expect(doc.contents.items[6]).not.toHaveProperty('format')
+    expect(doc.contents.items[6]).not.toHaveProperty('minFractionDigits')
+    expect(doc.contents.items[7]).not.toHaveProperty('format')
   })
 
   test('Version 1.2', () => {
@@ -106,6 +110,7 @@ describe('number types', () => {
 - 123456
 - 3.1e+2
 - 5.123E-1
+- 4.02
 - 4.20`
     const doc = YAML.parseDocument(src, { version: '1.2' })
     expect(doc.contents.items).toMatchObject([
@@ -114,10 +119,13 @@ describe('number types', () => {
       { value: 123456 },
       { value: 310, format: 'EXP' },
       { value: 0.5123, format: 'EXP' },
-      { value: 4.2 }
+      { value: 4.02 },
+      { value: 4.2, minFractionDigits: 2 }
     ])
     expect(doc.contents.items[2]).not.toHaveProperty('format')
     expect(doc.contents.items[5]).not.toHaveProperty('format')
+    expect(doc.contents.items[5]).not.toHaveProperty('minFractionDigits')
+    expect(doc.contents.items[6]).not.toHaveProperty('format')
   })
 })
 
