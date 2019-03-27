@@ -32,6 +32,12 @@ describe('number', () => {
   test('NaN', () => {
     expect(YAML.stringify(NaN)).toBe('.nan\n')
   })
+  test('float with trailing zeros', () => {
+    const doc = new YAML.Document()
+    doc.contents = YAML.createNode(3, true)
+    doc.contents.minFractionDigits = 2
+    expect(String(doc)).toBe('3.00\n')
+  })
 })
 
 describe('string', () => {

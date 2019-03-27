@@ -7,14 +7,25 @@ import foldFlowLines, {
 } from './foldFlowLines'
 import { strOptions } from './tags/options'
 
-export const stringifyNumber = ({ value }) =>
-  isFinite(value)
-    ? JSON.stringify(value)
-    : isNaN(value)
-    ? '.nan'
-    : value < 0
-    ? '-.inf'
-    : '.inf'
+export function stringifyNumber({ minFractionDigits, tag, value }) {
+  if (!isFinite(value))
+    return isNaN(value) ? '.nan' : value < 0 ? '-.inf' : '.inf'
+  let n = JSON.stringify(value)
+  if (
+    minFractionDigits &&
+    (!tag || tag === 'tag:yaml.org,2002:float') &&
+    /^\d/.test(n)
+  ) {
+    let i = n.indexOf('.')
+    if (i < 0) {
+      i = n.length
+      n += '.'
+    }
+    let d = minFractionDigits - (n.length - i - 1)
+    while (d-- > 0) n += '0'
+  }
+  return n
+}
 
 function lineLengthOverLimit(str, limit) {
   const strLen = str.length
