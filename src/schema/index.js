@@ -118,7 +118,8 @@ export default class Schema {
       if (test) {
         const match = str.match(test)
         if (match) {
-          const res = new Scalar(resolve.apply(null, match))
+          let res = resolve.apply(null, match)
+          if (!(res instanceof Scalar)) res = new Scalar(res)
           if (format) res.format = format
           return res
         }
