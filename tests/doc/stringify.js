@@ -38,6 +38,13 @@ describe('number', () => {
     doc.contents.minFractionDigits = 2
     expect(String(doc)).toBe('3.00\n')
   })
+  test('scientific float ignores minFractionDigits', () => {
+    const doc = new YAML.Document()
+    doc.contents = YAML.createNode(3, true)
+    doc.contents.format = 'EXP'
+    doc.contents.minFractionDigits = 2
+    expect(String(doc)).toBe('3e+0\n')
+  })
 })
 
 describe('string', () => {

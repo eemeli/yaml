@@ -7,11 +7,12 @@ import foldFlowLines, {
 } from './foldFlowLines'
 import { strOptions } from './tags/options'
 
-export function stringifyNumber({ minFractionDigits, tag, value }) {
+export function stringifyNumber({ format, minFractionDigits, tag, value }) {
   if (!isFinite(value))
     return isNaN(value) ? '.nan' : value < 0 ? '-.inf' : '.inf'
   let n = JSON.stringify(value)
   if (
+    !format &&
     minFractionDigits &&
     (!tag || tag === 'tag:yaml.org,2002:float') &&
     /^\d/.test(n)
