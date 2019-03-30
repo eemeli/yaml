@@ -29,4 +29,10 @@ export default class Alias extends Node {
       ctx && ctx.anchors && ctx.anchors.find(a => a.node === this.source)
     return (anchor && anchor.res) || toJSON(this.source, arg, ctx)
   }
+
+  // Only called when stringifying an alias mapping key while constructing
+  // Object output.
+  toString(ctx) {
+    return this.source.toString(ctx)
+  }
 }

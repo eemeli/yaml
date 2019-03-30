@@ -192,8 +192,8 @@ rbi:
     2001-08-14 ]`,
       tgt: [
         {
-          '["Detroit Tigers","Chicago cubs"]': ['2001-07-23'],
-          '["New York Yankees","Atlanta Braves"]': [
+          '[ Detroit Tigers, Chicago cubs ]': ['2001-07-23'],
+          '[ New York Yankees, Atlanta Braves ]': [
             '2001-07-02',
             '2001-08-12',
             '2001-08-14'
@@ -913,7 +913,7 @@ Chomping: |
      65
   avg: # Average
    0.278`,
-      tgt: [{ '{"first":"Sammy","last":"Sosa"}': { hr: 65, avg: 0.278 } }]
+      tgt: [{ '{ first: Sammy, last: Sosa }': { hr: 65, avg: 0.278 } }]
     }
   },
   '6.8. Directives': {
@@ -1422,7 +1422,7 @@ foo: bar
         [
           [{ YAML: 'separate' }],
           [{ '': 'empty key entry' }],
-          [{ '{"JSON":"like"}': 'adjacent' }]
+          [{ '{ JSON: like }': 'adjacent' }]
         ]
       ]
     },
@@ -1681,7 +1681,7 @@ last line
       src: `- sun: yellow
 - ? earth: blue
   : moon: white\n`,
-      tgt: [[{ sun: 'yellow' }, { '{"earth":"blue"}': { moon: 'white' } }]]
+      tgt: [[{ sun: 'yellow' }, { '{ earth: blue }': { moon: 'white' } }]]
     }
   },
 

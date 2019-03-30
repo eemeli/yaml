@@ -391,3 +391,29 @@ describe('maps with no values', () => {
     expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n    x\n}\n`)
   })
 })
+
+describe('excessive self-referential large tree as map key', () => {
+  test('case 1', () => {
+    const src = fs.readFileSync(
+      path.resolve(__dirname, '../artifacts/pr104-case1.yml'),
+      'utf8'
+    )
+    const obj = YAML.parse(src)
+    expect(obj).toMatchObject({})
+    const key = Object.keys(obj)[0]
+    expect(key.length).toBeGreaterThan(2000)
+    expect(key.length).toBeLessThan(8000)
+  })
+
+  test('case 2', () => {
+    const src = fs.readFileSync(
+      path.resolve(__dirname, '../artifacts/pr104-case2.yml'),
+      'utf8'
+    )
+    const arr = YAML.parse(src)
+    expect(arr).toHaveLength(2)
+    const key = Object.keys(arr[1])[0]
+    expect(key.length).toBeGreaterThan(2000)
+    expect(key.length).toBeLessThan(8000)
+  })
+})
