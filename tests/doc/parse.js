@@ -413,8 +413,7 @@ describe('excessive self-referential large tree as map key', () => {
     const arr = YAML.parse(src)
     expect(arr).toHaveLength(2)
     const key = Object.keys(arr[1])[0]
-    expect(key.length).toBeGreaterThan(2000)
-    expect(key.length).toBeLessThan(8000)
+    expect(key).toBe('*id057')
   })
 
   test('Billion laughs attack', () => {
@@ -432,6 +431,6 @@ j: { *i : lol }`
     const obj = YAML.parse(src)
     expect(Object.keys(obj)).toHaveLength(10)
     const key = Object.keys(obj.j)[0]
-    expect(key).toBe('[ *h, *h, *h, *h, *h, *h, *h, *h, *h ]')
+    expect(key).toBe('*i')
   })
 })

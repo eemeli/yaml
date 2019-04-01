@@ -38,6 +38,6 @@ export default class Alias extends Node {
   // Only called when stringifying an alias mapping key while constructing
   // Object output.
   toString(ctx) {
-    return this.source.toString(ctx)
+    return Alias.stringify(this, ctx)
   }
 }
