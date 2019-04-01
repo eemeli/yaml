@@ -14,7 +14,8 @@ const stringifyKey = (key, jsKey, ctx) => {
       anchors: {},
       doc: ctx.doc,
       indent: '',
-      inFlow: true
+      inFlow: true,
+      inStringifyKey: true
     })
   return JSON.stringify(jsKey)
 }

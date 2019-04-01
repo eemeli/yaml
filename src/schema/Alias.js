@@ -5,8 +5,13 @@ import Node from './Node'
 export default class Alias extends Node {
   static default = true
 
-  static stringify({ range, source }, { anchors, doc, implicitKey }) {
-    const anchor = Object.keys(anchors).find(a => anchors[a] === source)
+  static stringify(
+    { range, source },
+    { anchors, doc, implicitKey, inStringifyKey }
+  ) {
+    let anchor = Object.keys(anchors).find(a => anchors[a] === source)
+    if (!anchor && inStringifyKey)
+      anchor = doc.anchors.getName(source) || doc.anchors.newName()
     if (anchor) return `*${anchor}${implicitKey ? ' ' : ''}`
     const msg = doc.anchors.getName(source)
       ? 'Alias node must be after source node'
