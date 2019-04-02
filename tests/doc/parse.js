@@ -392,32 +392,11 @@ describe('maps with no values', () => {
   })
 })
 
-describe('excessive self-referential large tree as map key', () => {
-  test('case 1', () => {
-    const src = fs.readFileSync(
-      path.resolve(__dirname, '../artifacts/pr104-case1.yml'),
-      'utf8'
-    )
-    const obj = YAML.parse(src)
-    expect(obj).toMatchObject({})
-    const key = Object.keys(obj)[0]
-    expect(key.length).toBeGreaterThan(2000)
-    expect(key.length).toBeLessThan(8000)
-  })
-
-  test('case 2', () => {
-    const src = fs.readFileSync(
-      path.resolve(__dirname, '../artifacts/pr104-case2.yml'),
-      'utf8'
-    )
-    const arr = YAML.parse(src)
-    expect(arr).toHaveLength(2)
-    const key = Object.keys(arr[1])[0]
-    expect(key).toBe('*id057')
-  })
-
-  test('Billion laughs attack', () => {
-    const src = `
+describe('Billion laughs attacks', () => {
+  const root = path.resolve(__dirname, '../artifacts')
+  const src1 = fs.readFileSync(path.resolve(root, 'pr104-case1.yml'), 'utf8')
+  const src2 = fs.readFileSync(path.resolve(root, 'pr104-case2.yml'), 'utf8')
+  const src3 = `
 a: &a [lol,lol,lol,lol,lol,lol,lol,lol,lol]
 b: &b [*a,*a,*a,*a,*a,*a,*a,*a,*a]
 c: &c [*b,*b,*b,*b,*b,*b,*b,*b,*b]
@@ -426,11 +405,39 @@ e: &e [*d,*d,*d,*d,*d,*d,*d,*d,*d]
 f: &f [*e,*e,*e,*e,*e,*e,*e,*e,*e]
 g: &g [*f,*f,*f,*f,*f,*f,*f,*f,*f]
 h: &h [*g,*g,*g,*g,*g,*g,*g,*g,*g]
-i: &i [*h,*h,*h,*h,*h,*h,*h,*h,*h]
-j: { *i : lol }`
-    const obj = YAML.parse(src)
-    expect(Object.keys(obj)).toHaveLength(10)
-    const key = Object.keys(obj.j)[0]
-    expect(key).toBe('*i')
+i: &i [*h,*h,*h,*h,*h,*h,*h,*h,*h]`
+
+  describe('Limit depth by default', () => {
+    for (const [name, src] of [
+      ['js-yaml case 1', src1],
+      ['js-yaml case 2', src2],
+      ['Wikipedia', src3]
+    ]) {
+      test(name, () => {
+        expect(() => YAML.parse(src)).toThrow(/Excessive alias depth/)
+      })
+    }
+  })
+
+  describe('Disable limit depth control', () => {
+    test('js-yaml case 1', () => {
+      const obj = YAML.parse(src1, { maxAliasDepth: false })
+      expect(obj).toMatchObject({})
+      const key = Object.keys(obj)[0]
+      expect(key.length).toBeGreaterThan(2000)
+      expect(key.length).toBeLessThan(8000)
+    })
+
+    test('js-yaml case 2', () => {
+      const arr = YAML.parse(src2, { maxAliasDepth: -1 })
+      expect(arr).toHaveLength(2)
+      const key = Object.keys(arr[1])[0]
+      expect(key).toBe('*id057')
+    })
+
+    test('Wikipedia', () => {
+      const obj = YAML.parse(src3, { maxAliasDepth: 8 })
+      expect(Object.keys(obj)).toHaveLength(9)
+    })
   })
 })

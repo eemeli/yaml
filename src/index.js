@@ -11,6 +11,7 @@ const defaultOptions = {
   keepNodeTypes: true,
   keepBlobsInJSON: true,
   mapAsMap: false,
+  maxAliasDepth: 2,
   tags: null,
   version: '1.2'
 }
