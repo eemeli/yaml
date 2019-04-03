@@ -412,6 +412,7 @@ export default class Document {
       }
       // Lazy resolution for circular references
       res = new Alias(src)
+      res.cstNode = node // required for Alias#toJSON() errors
       anchors._cstAliases.push(res)
     } else {
       const tagName = this.resolveTagName(node)
@@ -496,14 +497,16 @@ export default class Document {
   }
 
   toJSON(arg) {
+    const { keepBlobsInJSON, mapAsMap, maxAliasDepth } = this.options
     const keep =
-      this.options.keepBlobsInJSON &&
+      keepBlobsInJSON &&
       (typeof arg !== 'string' || !(this.contents instanceof Scalar))
-    const ctx = { keep, mapAsMap: keep && !!this.options.mapAsMap }
+    const ctx = { doc: this, keep, mapAsMap: keep && !!mapAsMap, maxAliasDepth }
     const anchorNames = Object.keys(this.anchors.map)
     if (anchorNames.length > 0)
       ctx.anchors = anchorNames.map(name => ({
         alias: [],
+        depth: 0,
         node: this.anchors.map[name]
       }))
     return toJSON(this.contents, arg, ctx)

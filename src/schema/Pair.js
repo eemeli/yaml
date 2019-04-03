@@ -6,6 +6,20 @@ import Collection from './Collection'
 import Node from './Node'
 import Scalar from './Scalar'
 
+const stringifyKey = (key, jsKey, ctx) => {
+  if (jsKey === null) return ''
+  if (typeof jsKey !== 'object') return String(jsKey)
+  if (key instanceof Node && ctx && ctx.doc)
+    return key.toString({
+      anchors: {},
+      doc: ctx.doc,
+      indent: '',
+      inFlow: true,
+      inStringifyKey: true
+    })
+  return JSON.stringify(jsKey)
+}
+
 export default class Pair extends Node {
   constructor(key, value = null) {
     super()
@@ -31,12 +45,7 @@ export default class Pair extends Node {
     } else if (map instanceof Set) {
       map.add(key)
     } else {
-      const stringKey =
-        key === null
-          ? ''
-          : typeof key === 'object'
-          ? JSON.stringify(key)
-          : String(key)
+      const stringKey = stringifyKey(this.key, key, ctx)
       map[stringKey] = toJSON(this.value, stringKey, ctx)
     }
     return map

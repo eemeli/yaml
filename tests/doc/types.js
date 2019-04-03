@@ -173,7 +173,7 @@ one: 1
       expect(doc.toJSON()).toMatchObject({
         one: 1,
         '2': 'two',
-        '{"3":4}': 'many'
+        '{ 3: 4 }': 'many'
       })
       expect(doc.errors).toHaveLength(0)
     })
