@@ -5,23 +5,23 @@ import Collection from './Collection'
 import Node from './Node'
 import Pair from './Pair'
 
-const getAliasDepth = (node, anchors) => {
+const getAliasCount = (node, anchors) => {
   if (node instanceof Alias) {
     const anchor = anchors.find(a => a.node === node.source)
-    return anchor.depth + 1
+    return anchor.count * anchor.aliasCount
   } else if (node instanceof Collection) {
-    let maxDepth = 0
+    let count = 0
     for (const item of node.items) {
-      const depth = getAliasDepth(item, anchors)
-      if (depth > maxDepth) maxDepth = depth
+      const c = getAliasCount(item, anchors)
+      if (c > count) count = c
     }
-    return maxDepth
+    return count
   } else if (node instanceof Pair) {
-    const keyDepth = getAliasDepth(node.key, anchors)
-    const valDepth = getAliasDepth(node.value, anchors)
-    return Math.max(keyDepth, valDepth)
+    const kc = getAliasCount(node.key, anchors)
+    const vc = getAliasCount(node.value, anchors)
+    return Math.max(kc, vc)
   }
-  return 0
+  return 1
 }
 
 export default class Alias extends Node {
@@ -53,17 +53,19 @@ export default class Alias extends Node {
 
   toJSON(arg, ctx) {
     if (!ctx) return toJSON(this.source, arg, ctx)
-    const { anchors, maxAliasDepth } = ctx
+    const { anchors, maxAliasCount } = ctx
     const anchor = anchors.find(a => a.node === this.source)
     if (!anchor || !anchor.res) {
       const msg = 'This should not happen: Alias anchor was not resolved?'
       throw new YAMLReferenceError(this.cstNode, msg)
     }
-    if (typeof maxAliasDepth === 'number' && maxAliasDepth >= 0) {
-      anchor.depth = getAliasDepth(this.source, anchors)
-      if (anchor.depth > maxAliasDepth) {
+    if (maxAliasCount >= 0) {
+      anchor.count += 1
+      if (anchor.aliasCount === 0)
+        anchor.aliasCount = getAliasCount(this.source, anchors)
+      if (anchor.count * anchor.aliasCount > maxAliasCount) {
         const msg =
-          'Excessive alias depth indicates a resource exhaustion attack'
+          'Excessive alias count indicates a resource exhaustion attack'
         throw new YAMLReferenceError(this.cstNode, msg)
       }
     }

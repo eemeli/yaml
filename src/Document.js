@@ -497,16 +497,17 @@ export default class Document {
   }
 
   toJSON(arg) {
-    const { keepBlobsInJSON, mapAsMap, maxAliasDepth } = this.options
+    const { keepBlobsInJSON, mapAsMap, maxAliasCount } = this.options
     const keep =
       keepBlobsInJSON &&
       (typeof arg !== 'string' || !(this.contents instanceof Scalar))
-    const ctx = { doc: this, keep, mapAsMap: keep && !!mapAsMap, maxAliasDepth }
+    const ctx = { doc: this, keep, mapAsMap: keep && !!mapAsMap, maxAliasCount }
     const anchorNames = Object.keys(this.anchors.map)
     if (anchorNames.length > 0)
       ctx.anchors = anchorNames.map(name => ({
         alias: [],
-        depth: 0,
+        aliasCount: 0,
+        count: 1,
         node: this.anchors.map[name]
       }))
     return toJSON(this.contents, arg, ctx)
