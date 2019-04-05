@@ -1,5 +1,5 @@
 /* global global, console */
-export function warn(filename) {
+export function warnFileDeprecation(filename) {
   if (global && global._YAML_SILENCE_DEPRECATION_WARNINGS) return
   const path = filename
     .replace(/.*yaml[/\\]/i, '')
