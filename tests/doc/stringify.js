@@ -230,11 +230,11 @@ describe('eemeli/yaml#80: custom tags', () => {
   }
 
   beforeAll(() => {
-    YAML.defaultOptions.tags = [regexp, sharedSymbol]
+    YAML.defaultOptions.customTags = [regexp, sharedSymbol]
   })
 
   afterAll(() => {
-    YAML.defaultOptions.tags = []
+    YAML.defaultOptions.customTags = []
   })
 
   describe('RegExp', () => {
