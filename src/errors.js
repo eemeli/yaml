@@ -1,49 +1,36 @@
 import Node from './cst/Node'
 
-export class YAMLReferenceError extends ReferenceError {
-  constructor(source, message) {
-    if (!message || !(source instanceof Node)) {
-      throw new Error('Invalid arguments for new YAMLReferenceError')
-    }
+class YAMLError extends Error {
+  constructor(name, source, message) {
+    if (!message || !(source instanceof Node))
+      throw new Error(`Invalid arguments for new ${name}`)
     super()
-    this.name = 'YAMLReferenceError'
+    this.name = name
     this.message = message
     this.source = source
   }
 }
 
-export class YAMLSemanticError extends SyntaxError {
+export class YAMLReferenceError extends YAMLError {
   constructor(source, message) {
-    if (!message || !(source instanceof Node)) {
-      throw new Error('Invalid arguments for new YAMLSemanticError')
-    }
-    super()
-    this.name = 'YAMLSemanticError'
-    this.message = message
-    this.source = source
+    super('YAMLReferenceError', source, message)
   }
 }
 
-export class YAMLSyntaxError extends SyntaxError {
+export class YAMLSemanticError extends YAMLError {
   constructor(source, message) {
-    if (!message || !(source instanceof Node)) {
-      throw new Error('Invalid arguments for new YAMLSyntaxError')
-    }
-    super()
-    this.name = 'YAMLSyntaxError'
-    this.message = message
-    this.source = source
+    super('YAMLSemanticError', source, message)
   }
 }
 
-export class YAMLWarning extends Error {
+export class YAMLSyntaxError extends YAMLError {
   constructor(source, message) {
-    if (!message || !(source instanceof Node)) {
-      throw new Error('Invalid arguments for new YAMLWarning')
-    }
-    super()
-    this.name = 'YAMLWarning'
-    this.message = message
-    this.source = source
+    super('YAMLSyntaxError', source, message)
+  }
+}
+
+export class YAMLWarning extends YAMLError {
+  constructor(source, message) {
+    super('YAMLWarning', source, message)
   }
 }
