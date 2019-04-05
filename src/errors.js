@@ -1,6 +1,6 @@
 import Node from './cst/Node'
 
-class YAMLError extends Error {
+export class YAMLError extends Error {
   constructor(name, source, message) {
     if (!message || !(source instanceof Node))
       throw new Error(`Invalid arguments for new ${name}`)
@@ -8,6 +8,15 @@ class YAMLError extends Error {
     this.name = name
     this.message = message
     this.source = source
+  }
+
+  makePretty() {
+    if (this.source) {
+      this.nodeType = this.source.type
+      this.range = this.source.range
+      this.linePos = this.source.rangeAsLinePos
+      delete this.source
+    }
   }
 }
 

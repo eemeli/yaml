@@ -2,6 +2,7 @@ import addComment from './addComment'
 import Anchors from './Anchors'
 import { Char, Type } from './constants'
 import {
+  YAMLError,
   YAMLReferenceError,
   YAMLSemanticError,
   YAMLSyntaxError,
@@ -238,6 +239,12 @@ export default class Document {
     }
     this.comment = comments.after.join('\n') || null
     this.anchors.resolveNodes()
+    if (this.options.prettyErrors) {
+      for (const error of this.errors)
+        if (error instanceof YAMLError) error.makePretty()
+      for (const warn of this.warnings)
+        if (warn instanceof YAMLError) warn.makePretty()
+    }
     return this
   }
 

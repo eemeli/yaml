@@ -7,12 +7,13 @@ import Schema from './schema'
 
 const defaultOptions = {
   anchorPrefix: 'a',
+  customTags: null,
   keepCstNodes: false,
   keepNodeTypes: true,
   keepBlobsInJSON: true,
   mapAsMap: false,
   maxAliasCount: 100,
-  customTags: null,
+  prettyErrors: false, // TODO Set true in v2
   version: '1.2'
 }
 
