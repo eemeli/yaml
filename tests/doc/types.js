@@ -615,22 +615,22 @@ invoice:
       AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=`
 
     test('tag object in tags', () => {
-      const bin = YAML.parse(src, { tags: [binary] })
+      const bin = YAML.parse(src, { customTags: [binary] })
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 
     test('tag array in tags', () => {
-      const bin = YAML.parse(src, { tags: [[binary]] })
+      const bin = YAML.parse(src, { customTags: [[binary]] })
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 
     test('tag string in tags', () => {
-      const bin = YAML.parse(src, { tags: ['binary'] })
+      const bin = YAML.parse(src, { customTags: ['binary'] })
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 
     test('tag string in tag array', () => {
-      const bin = YAML.parse(src, { tags: [['binary']] })
+      const bin = YAML.parse(src, { customTags: [['binary']] })
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 

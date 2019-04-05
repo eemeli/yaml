@@ -1,3 +1,4 @@
+import { warnOptionDeprecation } from '../deprecation'
 import { Type } from '../constants'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify'
@@ -22,7 +23,7 @@ export default class Schema {
     STR: 'tag:yaml.org,2002:str'
   }
 
-  constructor({ merge, schema, tags: customTags }) {
+  constructor({ customTags, merge, schema, tags: deprecatedCustomTags }) {
     this.merge = !!merge
     this.name = schema
     this.tags = schemas[schema.replace(/\W/g, '')] // 'yaml-1.1' -> 'yaml11'
@@ -31,6 +32,10 @@ export default class Schema {
         .map(key => JSON.stringify(key))
         .join(', ')
       throw new Error(`Unknown schema "${schema}"; use one of ${keys}`)
+    }
+    if (!customTags && deprecatedCustomTags) {
+      customTags = deprecatedCustomTags
+      warnOptionDeprecation('tags', 'customTags')
     }
     if (Array.isArray(customTags)) {
       for (const tag of customTags) this.tags = this.tags.concat(tag)

@@ -678,7 +678,7 @@ alias: *anchor`,
           tag: '!local',
           resolve: (doc, node) => 'local:' + node.strValue
         }
-        const res = YAML.parse(src, { tags: [tag] })
+        const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject({
           anchored: 'local:value',
           alias: 'local:value'
@@ -995,7 +995,7 @@ bar`,
         ]
       ],
       special: src => {
-        const tags = [
+        const customTags = [
           {
             tag: '!foo',
             resolve: () => 'private'
@@ -1005,7 +1005,7 @@ bar`,
             resolve: () => 'global'
           }
         ]
-        const docs = YAML.parseAllDocuments(src, { tags })
+        const docs = YAML.parseAllDocuments(src, { customTags })
         expect(docs.map(d => d.toJSON())).toMatchObject(['private', 'global'])
       }
     },
@@ -1025,7 +1025,7 @@ bar`,
           tag: 'tag:example.com,2000:app/int',
           resolve: () => 'interval'
         }
-        const res = YAML.parse(src, { tags: [tag] })
+        const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toBe('interval')
       }
     },
@@ -1045,7 +1045,7 @@ bar`,
           tag: 'tag:example.com,2000:app/foo',
           resolve: (doc, node) => 'foo' + node.strValue
         }
-        const res = YAML.parse(src, { tags: [tag] })
+        const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toBe('foobar')
       }
     },
@@ -1072,7 +1072,7 @@ bar`,
           tag: '!my-light',
           resolve: (doc, node) => 'light:' + node.strValue
         }
-        const docs = YAML.parseAllDocuments(src, { tags: [tag] })
+        const docs = YAML.parseAllDocuments(src, { customTags: [tag] })
         expect(docs.map(d => d.toJSON())).toMatchObject([
           'light:fluorescent',
           'light:green'
@@ -1095,7 +1095,7 @@ bar`,
           tag: 'tag:example.com,2000:app/foo',
           resolve: (doc, node) => 'foo' + node.strValue
         }
-        const res = YAML.parse(src, { tags: [tag] })
+        const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject(['foobar'])
       }
     }
@@ -1120,7 +1120,7 @@ bar`,
           tag: '!bar',
           resolve: (doc, node) => 'bar' + node.strValue
         }
-        const res = YAML.parse(src, { tags: [tag] })
+        const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject({ foo: 'barbaz' })
       }
     },
@@ -1149,7 +1149,7 @@ bar`,
         ]
       ],
       special: src => {
-        const tags = [
+        const customTags = [
           {
             tag: '!local',
             resolve: (doc, node) => 'local:' + node.strValue
@@ -1159,7 +1159,7 @@ bar`,
             resolve: (doc, node) => 'tag!' + node.strValue
           }
         ]
-        const res = YAML.parse(src, { tags })
+        const res = YAML.parse(src, { customTags })
         expect(res).toMatchObject(['local:foo', 'bar', 'tag!baz'])
       }
     },
@@ -1712,7 +1712,7 @@ folded:
           tag: '!foo',
           resolve: (doc, node) => 'foo' + node.strValue
         }
-        const res = YAML.parse(src, { tags: [tag] })
+        const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject({ literal: 'value\n', folded: 'foovalue\n' })
       }
     },

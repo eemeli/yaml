@@ -12,7 +12,7 @@ const defaultOptions = {
   keepBlobsInJSON: true,
   mapAsMap: false,
   maxAliasCount: 100,
-  tags: null,
+  customTags: null,
   version: '1.2'
 }
 
