@@ -57,7 +57,8 @@ export default class Alias extends Node {
     const anchor = anchors.find(a => a.node === this.source)
     if (!anchor || !anchor.res) {
       const msg = 'This should not happen: Alias anchor was not resolved?'
-      throw new YAMLReferenceError(this.cstNode, msg)
+      if (this.cstNode) throw new YAMLReferenceError(this.cstNode, msg)
+      else throw new ReferenceError(msg)
     }
     if (maxAliasCount >= 0) {
       anchor.count += 1
@@ -66,7 +67,8 @@ export default class Alias extends Node {
       if (anchor.count * anchor.aliasCount > maxAliasCount) {
         const msg =
           'Excessive alias count indicates a resource exhaustion attack'
-        throw new YAMLReferenceError(this.cstNode, msg)
+        if (this.cstNode) throw new YAMLReferenceError(this.cstNode, msg)
+        else throw new ReferenceError(msg)
       }
     }
     return anchor.res

@@ -419,7 +419,6 @@ export default class Document {
       }
       // Lazy resolution for circular references
       res = new Alias(src)
-      res.cstNode = node // required for Alias#toJSON() errors
       anchors._cstAliases.push(res)
     } else {
       const tagName = this.resolveTagName(node)
