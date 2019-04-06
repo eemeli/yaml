@@ -34,7 +34,7 @@ yarn add yaml
 <ul>
 <li><a href="#creating-nodes"><code>YAML.createNode(value, wrapScalars, tag): Node</code></a></li>
 <li><a href="#options"><code>YAML.defaultOptions</code></a></li>
-<li><a href="#yaml-documents"><code>YAML.Document</code></a>
+<li><a href="#documents"><code>YAML.Document</code></a>
 
 <ul>
 <li><a href="#creating-documents"><code>constructor(options)</code></a></li>

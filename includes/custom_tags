@@ -13,10 +13,10 @@
 <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">toDateString</span><span class="p">()</span>
 <span class="c1">// 'Sat Dec 15 2001'</span>
 </code></pre>
-<p>The easiest way to extend a <a href="#data-schemas">schema</a> is by defining the additional <strong>tags</strong> that you wish to support. For further customisation, <code>customTags</code> may also be a function <code>(Tag[]) =&gt; (Tag[])</code> that may modify the schema&#39;s base tag array.</p>
-<h2 id='built-in-custom-tags'>Built-in Custom Tags</h2>
-<p>For ease of use, the tags that are a part of the <code>yaml-1.1</code> schema but not the default <code>core</code> schema may be referred to by their string identifiers.</p>
+<p>The easiest way to extend a <a href="#data-schemas">schema</a> is by defining the additional <strong>tags</strong> that you wish to support. To do that, the <code>customTags</code> option allows you to provide an array of custom tag objects or tag identifiers. In particular, the built-in tags that are a part of the <code>yaml-1.1</code> schema but not the default <code>core</code> schema may be referred to by their string identifiers.</p>
 
+<p>For further customisation, <code>customTags</code> may also be a function <code>(Tag[]) =&gt; (Tag[])</code> that may modify the schema&#39;s base tag array.</p>
+<h2 id='built-in-custom-tags'>Built-in Custom Tags</h2>
 <table><thead>
 <tr>
 <th>Identifier</th>
@@ -114,7 +114,17 @@
 <p>As values may be wrapped within objects and arrays, <code>YAML.createNode()</code> uses each tag&#39;s <code>identify(value): boolean</code> function to detect custom data types. For the same reason, collections need to define their own <code>createNode(schema, value, ctx): Collection</code> functions that may recursively construct their equivalent collection class instances.</p>
 
 <p>Finally, <code>stringify(item, ctx, ...): string</code> defines how your data should be represented as a YAML string, in case the default stringifiers aren&#39;t enough. For collections in particular, the default stringifier should be perfectly sufficient. <code>&#39;yaml/util&#39;</code> exports <code>stringifyNumber(item)</code> and <code>stringifyString(item, ctx, ...)</code>, which may be of use for custom scalar data.</p>
-<h3 id='custom-tag-api'>Custom Tag API</h3>
+<h3 id='custom-tag-api'>Custom Tag API</h3><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span>
+  <span class="nx">findPair</span><span class="p">,</span> <span class="c1">// (items, key) =&gt; Pair? -- Given a key, find a matching Pair</span>
+  <span class="nx">parseMap</span><span class="p">,</span> <span class="c1">// (doc, cstNode) =&gt; new YAMLMap</span>
+  <span class="nx">parseSeq</span><span class="p">,</span> <span class="c1">// (doc, cstNode) =&gt; new YAMLSeq</span>
+  <span class="nx">stringifyNumber</span><span class="p">,</span> <span class="c1">// (node) =&gt; string</span>
+  <span class="nx">stringifyString</span><span class="p">,</span> <span class="c1">// (node, ctx, ...) =&gt; string</span>
+  <span class="nx">toJSON</span><span class="p">,</span> <span class="c1">// (value, arg, ctx) =&gt; any -- Recursively convert to plain JS</span>
+  <span class="nx">Type</span><span class="p">,</span> <span class="c1">// { [string]: string } -- Used as enum for node types</span>
+  <span class="nx">YAMLReferenceError</span><span class="p">,</span> <span class="nx">YAMLSemanticError</span><span class="p">,</span> <span class="nx">YAMLSyntaxError</span><span class="p">,</span> <span class="nx">YAMLWarning</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/util'</span>
+</code></pre>
 <p>To define your own tag, you&#39;ll need to define an object comprising of some of the following fields. Those in bold are required:</p>
 
 <ul>

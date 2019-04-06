@@ -25,6 +25,11 @@
 <td>Default prefix for anchors. By default <code>&#39;a&#39;</code>, resulting in anchors <code>a1</code>, <code>a2</code>, etc.</td>
 </tr>
 <tr>
+<td>customTags</td>
+<td><a href="#custom-data-types"><code>Tag[]</code></a> &vert; <code>function</code></td>
+<td>Array of additional (custom) tags to include in the schema</td>
+</tr>
+<tr>
 <td>keepBlobsInJSON</td>
 <td><code>boolean</code></td>
 <td>Allow non-JSON JavaScript objects to remain in the <code>toJSON</code> output. Relevant with the YAML 1.1 <code>!!timestamp</code> and <code>!!binary</code> tags. By default <code>true</code>.</td>
@@ -63,11 +68,6 @@
 <td>schema</td>
 <td><code>&#39;core&#39;</code> &vert; <code>&#39;failsafe&#39;</code> &vert; <code>&#39;json&#39;</code> &vert; <code>&#39;yaml-1.1&#39;</code></td>
 <td>The base schema to use. By default <code>&#39;core&#39;</code> for YAML 1.2 and <code>&#39;yaml-1.1&#39;</code> for earlier versions.</td>
-</tr>
-<tr>
-<td>customTags</td>
-<td><a href="#tag"><code>Tag[]</code></a> &vert; <code>function</code></td>
-<td>Array of additional (custom) tags to include in the schema</td>
 </tr>
 <tr>
 <td>version</td>
