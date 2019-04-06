@@ -1,6 +1,6 @@
 {
   "name": "yaml",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "license": "ISC",
   "author": "Eemeli Aro <eemeli@gmail.com>",
   "repository": "github:eemeli/yaml",
