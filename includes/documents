@@ -1,5 +1,5 @@
 <h1 id='documents'>Documents</h1>
-<p>In order to work with YAML features not directly supported by native JavaScript data types, such as comments and non-string keys, <code>yaml</code> provides the <code>YAML.Document</code> API.</p>
+<p>In order to work with YAML features not directly supported by native JavaScript data types, such as comments, anchors and aliases, <code>yaml</code> provides the <code>YAML.Document</code> API.</p>
 <h2 id='parsing-documents'>Parsing Documents</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">fs</span> <span class="nx">from</span> <span class="s1">'fs'</span>
 <span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
 
@@ -168,10 +168,8 @@
 <p>In addition to the above, the document object also provides the same <strong>accessor methods</strong> as <a href="#collections">collections</a>, based on the top-level collection: <code>add</code>, <code>delete</code>, <code>get</code>, <code>has</code>, and <code>set</code>, along with their deeper variants <code>addIn</code>, <code>deleteIn</code>, <code>getIn</code>, <code>hasIn</code>, and <code>setIn</code>. For the <code>*In</code> methods using an empty <code>path</code> value (i.e. <code>null</code>, <code>undefined</code>, or <code>[]</code>) will refer to the document&#39;s top-level <code>contents</code>.</p>
 
 <p>To define a tag prefix to use when stringifying, use <strong><code>setTagPrefix(handle, prefix)</code></strong> rather than setting a value directly in <code>tagPrefixes</code>. This will guarantee that the <code>handle</code> is valid (by throwing an error), and will overwrite any previous definition for the <code>handle</code>. Use an empty <code>prefix</code> value to remove a prefix.</p>
-<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types/timestamp'</span>
-
-<span class="kr">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="s1">'1969-07-21T02:56:15Z'</span>
-<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">tags</span><span class="p">:</span> <span class="p">[</span><span class="nx">timestamp</span><span class="p">]</span> <span class="p">})</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="s1">'1969-07-21T02:56:15Z'</span>
+<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="s1">'timestamp'</span><span class="p">]</span> <span class="p">})</span>
 
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// Date { 1969-07-21T02:56:15.000Z }</span>

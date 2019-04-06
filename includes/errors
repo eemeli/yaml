@@ -1,5 +1,5 @@
 <h1 id='errors'>Errors</h1>
-<p>All errors and warnings produced by the <code>yaml</code> parser functions contain the following fields:</p>
+<p>Nearly all errors and warnings produced by the <code>yaml</code> parser functions contain the following fields:</p>
 
 <table><thead>
 <tr>
@@ -21,9 +21,37 @@
 <tr>
 <td>source</td>
 <td><code>CST Node</code></td>
-<td>The CST node at which this error or warning was encountered</td>
+<td>The CST node at which this error or warning was encountered. Note that in particular <code>source.context</code> is likely to be a complex object and include some circular references.</td>
 </tr>
 </tbody></table>
+
+<p>If the <code>prettyErrors</code> option is enabled, <code>source</code> is dropped from the errors and the following fields are added with summary information regarding the error&#39;s source node, if available:</p>
+
+<table><thead>
+<tr>
+<th>Member</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>nodeType</td>
+<td><code>string</code></td>
+<td>A string constant identifying the type of node</td>
+</tr>
+<tr>
+<td>range</td>
+<td><code>{ start: number, end: ?number }</code></td>
+<td>Character offset in the input string</td>
+</tr>
+<tr>
+<td>linePos</td>
+<td><code>{ start: LinePos, end: ?LinePos }</code></td>
+<td>One-indexed human-friendly source location. <code>LinePos</code> here is <code>{ line: number, col: number }</code></td>
+</tr>
+</tbody></table>
+
+<p>In rare cases, the library may produce a more generic error. In particular, <code>TypeError</code> may occur when parsing invalid input using the <code>json</code> schema, and <code>ReferenceError</code> when the <code>maxAliasCount</code> limit is enountered.</p>
 <h2 id='yamlreferenceerror'>YAMLReferenceError</h2>
 <p>An error resolving a tag or an anchor that is referred to in the source. It is likely that the contents of the <code>source</code> node have not been completely parsed into the document. Not used by the CST parser.</p>
 <h2 id='yamlsemanticerror'>YAMLSemanticError</h2>

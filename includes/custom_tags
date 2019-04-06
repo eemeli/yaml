@@ -1,25 +1,74 @@
-<h1 id='custom-data-types'>Custom Data Types</h1><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">binary</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types/binary'</span>
-<span class="kr">import</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types/timestamp'</span>
-
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'!!timestamp 2001-12-15 2:59:43'</span><span class="p">)</span>
+<h1 id='custom-data-types'>Custom Data Types</h1><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'!!timestamp 2001-12-15 2:59:43'</span><span class="p">)</span>
 <span class="c1">// YAMLWarning:</span>
 <span class="c1">//   The tag tag:yaml.org,2002:timestamp is unavailable,</span>
 <span class="c1">//   falling back to tag:yaml.org,2002:str</span>
 <span class="c1">// '2001-12-15 2:59:43'</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">tags</span> <span class="o">=</span> <span class="p">[</span><span class="nx">binary</span><span class="p">,</span> <span class="nx">timestamp</span><span class="p">]</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">customTags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'timestamp'</span><span class="p">]</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'2001-12-15 2:59:43'</span><span class="p">)</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'2001-12-15 2:59:43'</span><span class="p">)</span> <span class="c1">// returns a Date instance</span>
 <span class="c1">// 2001-12-15T02:59:43.000Z</span>
 
 <span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s1">'2001-12-15 2:59:43'</span><span class="p">)</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">toDateString</span><span class="p">()</span>
 <span class="c1">// 'Sat Dec 15 2001'</span>
 </code></pre>
-<p>The easiest way to extend a <a href="#data-schemas">schema</a> is by defining the additional <strong>tags</strong> that you wish to support. For further customisation, <code>tags</code> may also be a function <code>(Tag[]) =&gt; (Tag[])</code> that may modify the schema&#39;s base tag array.</p>
+<p>The easiest way to extend a <a href="#data-schemas">schema</a> is by defining the additional <strong>tags</strong> that you wish to support. For further customisation, <code>customTags</code> may also be a function <code>(Tag[]) =&gt; (Tag[])</code> that may modify the schema&#39;s base tag array.</p>
+<h2 id='built-in-custom-tags'>Built-in Custom Tags</h2>
+<p>For ease of use, the tags that are a part of the <code>yaml-1.1</code> schema but not the default <code>core</code> schema may be referred to by their string identifiers.</p>
 
-<p>YAML 1.1 tags are available as exports under <code>yaml/types/</code>, should you wish to use them with the YAML 1.2 <code>core</code> schema.</p>
-<h2 id='writing-custom-tags'>Writing Custom Tags</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">stringify</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/schema'</span>
+<table><thead>
+<tr>
+<th>Identifier</th>
+<th>YAML Type</th>
+<th>JS Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>&#39;binary&#39;</code></td>
+<td><a href="https://yaml.org/type/binary.html"><code>!!binary</code></a></td>
+<td><code>Uint8Array</code></td>
+<td>Binary data, represented in YAML as base64 encoded characters.</td>
+</tr>
+<tr>
+<td><code>&#39;floatTime&#39;</code></td>
+<td><a href="https://yaml.org/type/float.html"><code>!!float</code></a></td>
+<td><code>Number</code></td>
+<td>Sexagesimal floating-point number format, e.g. <code>190:20:30.15</code>. To stringify with this tag, the node <code>format</code> must be <code>&#39;TIME&#39;</code>.</td>
+</tr>
+<tr>
+<td><code>&#39;intTime&#39;</code></td>
+<td><a href="https://yaml.org/type/int.html"><code>!!int</code></a></td>
+<td><code>Number</code></td>
+<td>Sexagesimal integer number format, e.g. <code>190:20:30</code>. To stringify with this tag, the node <code>format</code> must be <code>&#39;TIME&#39;</code>.</td>
+</tr>
+<tr>
+<td><code>&#39;omap&#39;</code></td>
+<td><a href="https://yaml.org/type/omap.html"><code>!!omap</code></a></td>
+<td><code>Map</code></td>
+<td>Ordered sequence of key: value pairs without duplicates. Using <code>mapAsMap: true</code> together with this tag is not recommended, as it makes the parse → stringify loop non-idempotent.</td>
+</tr>
+<tr>
+<td><code>&#39;pairs&#39;</code></td>
+<td><a href="https://yaml.org/type/pairs.html"><code>!!pairs</code></a></td>
+<td><code>Array</code></td>
+<td>Ordered sequence of key: value pairs allowing duplicates. To create from JS, you&#39;ll need to explicitly use <code>&#39;!!pairs&#39;</code> as the third argument of <a href="#creating-nodes"><code>createNode()</code></a>.</td>
+</tr>
+<tr>
+<td><code>&#39;set&#39;</code></td>
+<td><a href="https://yaml.org/type/set.html"><code>!!set</code></a></td>
+<td><code>Set</code></td>
+<td>Unordered set of non-equal values.</td>
+</tr>
+<tr>
+<td><code>&#39;timestamp&#39;</code></td>
+<td><a href="https://yaml.org/type/timestamp.html"><code>!!timestamp</code></a></td>
+<td><code>Date</code></td>
+<td>A point in time.</td>
+</tr>
+</tbody></table>
+<h2 id='writing-custom-tags'>Writing Custom Tags</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">stringifyString</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/util'</span>
 
 <span class="kr">const</span> <span class="nx">regexp</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">identify</span><span class="p">:</span> <span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">value</span> <span class="k">instanceof</span> <span class="nb">RegExp</span><span class="p">,</span>
@@ -36,13 +85,12 @@
   <span class="na">resolve</span><span class="p">:</span> <span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">cst</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="nx">cst</span><span class="p">.</span><span class="nx">strValue</span><span class="p">),</span>
   <span class="nx">stringify</span><span class="p">(</span><span class="nx">item</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">onComment</span><span class="p">,</span> <span class="nx">onChompKeep</span><span class="p">)</span> <span class="p">{</span>
     <span class="kr">const</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">.</span><span class="nx">keyFor</span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Only shared symbols are supported'</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nx">stringify</span><span class="p">({</span> <span class="na">value</span><span class="p">:</span> <span class="nx">key</span> <span class="p">},</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">onComment</span><span class="p">,</span> <span class="nx">onChompKeep</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Only shared symbols are supported'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">stringifyString</span><span class="p">({</span> <span class="na">value</span><span class="p">:</span> <span class="nx">key</span> <span class="p">},</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">onComment</span><span class="p">,</span> <span class="nx">onChompKeep</span><span class="p">)</span>
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">tags</span> <span class="o">=</span> <span class="p">[</span><span class="nx">regexp</span><span class="p">,</span> <span class="nx">sharedSymbol</span><span class="p">]</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">customTags</span> <span class="o">=</span> <span class="p">[</span><span class="nx">regexp</span><span class="p">,</span> <span class="nx">sharedSymbol</span><span class="p">]</span>
 
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
   <span class="na">regexp</span><span class="p">:</span> <span class="sr">/foo/gi</span><span class="p">,</span>
@@ -51,25 +99,32 @@
 <span class="c1">// regexp: !re /foo/gi</span>
 <span class="c1">// symbol: !symbol/shared bar</span>
 </code></pre>
-<p>In YAML-speak, a custom data type is represented by a <em>tag</em>. The default tags are mostly stringified with <em>implicit</em> tags, meaning that their type is detected automatically when parsing. Custom tags, on the other hand, are mostly <em>explicit</em>, meaning that they are prefixed with a local <code>!tag</code>, a shorthand <code>!ns!tag</code>, or a verbatim <code>!&lt;tag:example.com,2019:tag&gt;</code>.</p>
+<p>In YAML-speak, a custom data type is represented by a <em>tag</em>. To define your own tag, you need to account for the ways that your data is both parsed and stringified. Furthermore, both of those processes are split into two stages by the intermediate AST node structure.</p>
 
-<p>To define your own tag, you&#39;ll need to define three or four things:</p>
+<p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/master/src/tags/yaml-1.1/binary.js"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/master/src/tags/yaml-1.1/set.js"><code>!!set</code></a> tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.</p>
+<h3 id='parsing-custom-data'>Parsing Custom Data</h3>
+<p>At the lowest level, <a href="#cst-parser"><code>YAML.parseCST()</code></a> will take care of turning string input into a concrete syntax tree (CST). In the CST all scalar values are available as strings, and maps &amp; sequences as collections of nodes. Each schema includes a set of default data types, which handle converting at least strings, maps and sequences into their AST nodes. These are considered to have <em>implicit</em> tags, and are autodetected. Custom tags, on the other hand, should almost always define an <em>explicit</em> <code>tag</code> with which their value will be prefixed. This may be application-specific local <code>!tag</code>, a shorthand <code>!ns!tag</code>, or a verbatim <code>!&lt;tag:example.com,2019:tag&gt;</code>.</p>
 
-<ol>
-<li><strong><code>identify(value): boolean</code></strong> is used by <code>YAML.createNode</code> to detect your data type, e.g. using <code>typeof</code> or <code>instanceof</code>.</li>
-<li><strong><code>tag</code></strong> is the string identifier for your data type, with which its stringified form will be prefixed. Should either be a !-prefixed local <code>!tag</code>, or a fully qualified <code>tag:domain,date:foo</code>.</li>
-<li><strong><code>resolve(doc, cst): any</code></strong> turns a <code>cst</code> node into its encoded value; <code>doc</code> is the resulting <code>YAML.Document</code> instance.</li>
-<li><strong><code>stringify(item, ctx, onComment, onChompKeep): string</code></strong> is an optional function stringifying the <code>item</code> AST node in the current context <code>ctx</code>. <code>onComment</code> and <code>onChompKeep</code> are callback functions for a couple of special cases. If your data includes a suitable <code>.toString()</code> method, you can probably leave this undefined and use the default stringifier.</li>
-</ol>
+<p>Once identified by matching the <code>tag</code>, the <code>resolve(doc, cstNode): Node | any</code> function will turn a CST node into an AST node. For scalars, this is relatively simple, as the stringified node value is directly available, and should be converted to its actual value. Collections are trickier, and it&#39;s almost certain that it&#39;ll make sense to use the <code>parseMap(doc, cstNode)</code> and <code>parseSeq(doc, cstNode)</code> functions exported from <code>&#39;yaml/util&#39;</code> to initially resolve the CST collection into a <code>YAMLMap</code> or <code>YAMLSeq</code> object, and to work with that instead -- this is for instance what the YAML 1.1 collections do.</p>
 
-<p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/master/src/schema/_binary.js"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/master/src/schema/_timestamp.js"><code>!!timestamp</code></a> tags provide relatively cohesive examples to study.</p>
+<p>Note that during the CST -&gt; AST parsing, the anchors and comments attached to each node are also resolved for each node. This metadata will unfortunately be lost when converting the values to JS objects, so collections should have values that extend one of the existing collection classes. Collections should therefore either fall back to their parent classes&#39; <code>toJSON()</code> methods, or define their own in order to allow their contents to be expressed as the appropriate JS object.</p>
+<h3 id='creating-nodes-and-stringifying-custom-data'>Creating Nodes and Stringifying Custom Data</h3>
+<p>As with parsing, turning input data into its YAML string representation is a two-stage process as the input is first turned into an AST tree before stringifying it. This allows for metadata and comments to be attached to each node, and for e.g. circular references to be resolved. For scalar values, this means just wrapping the value within a <code>Scalar</code> class while keeping it unchanged.</p>
 
-<p>The default schema types also include a few additional properties:</p>
+<p>As values may be wrapped within objects and arrays, <code>YAML.createNode()</code> uses each tag&#39;s <code>identify(value): boolean</code> function to detect custom data types. For the same reason, collections need to define their own <code>createNode(schema, value, ctx): Collection</code> functions that may recursively construct their equivalent collection class instances.</p>
+
+<p>Finally, <code>stringify(item, ctx, ...): string</code> defines how your data should be represented as a YAML string, in case the default stringifiers aren&#39;t enough. For collections in particular, the default stringifier should be perfectly sufficient. <code>&#39;yaml/util&#39;</code> exports <code>stringifyNumber(item)</code> and <code>stringifyString(item, ctx, ...)</code>, which may be of use for custom scalar data.</p>
+<h3 id='custom-tag-api'>Custom Tag API</h3>
+<p>To define your own tag, you&#39;ll need to define an object comprising of some of the following fields. Those in bold are required:</p>
 
 <ul>
-<li><code>test</code> and <code>default</code> allow for values to be stringified without an explicit tag and detected using a regular expression. For most cases, it&#39;s unlikely that you&#39;ll actually want to use these, even if you first think you do.</li>
-<li><code>createNode</code> is an optional factory function, used e.g. by collections. If set, will be called as <code>createNode(schema, value, wrapScalars)</code> and should return a class extending <code>Node</code>.</li>
-<li><code>nodeClass</code> is the <code>Node</code> child class that implements this tag. Required for collections and tags that have overlapping JS representations.</li>
-<li>If a tag has multiple forms that should be parsed and/or stringified differently, use <code>format</code> to identify them.</li>
-<li><code>options</code> are used by some tags to configure their stringification.</li>
+<li><code>createNode(schema, value, ctx): Node</code> is an optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.</li>
+<li><code>format: string</code> If a tag has multiple forms that should be parsed and/or stringified differently, use <code>format</code> to identify them. Used by <code>!!int</code> and <code>!!float</code>.</li>
+<li><strong><code>identify(value): boolean</code></strong> is used by <code>YAML.createNode</code> to detect your data type, e.g. using <code>typeof</code> or <code>instanceof</code>. Required.</li>
+<li><code>nodeClass: Node</code> is the <code>Node</code> child class that implements this tag. Required for collections and tags that have overlapping JS representations.</li>
+<li><code>options: Object</code> is used by some tags to configure their stringification.</li>
+<li><strong><code>resolve(doc, cstNode): Node | any</code></strong> turns a CST node into an AST node; <code>doc</code> is the resulting <code>YAML.Document</code> instance. If returning a non-<code>Node</code> value, the output will be wrapped as a <code>Scalar</code>. Required.</li>
+<li><code>stringify(item, ctx, onComment, onChompKeep): string</code> is an optional function stringifying the <code>item</code> AST node in the current context <code>ctx</code>. <code>onComment</code> and <code>onChompKeep</code> are callback functions for a couple of special cases. If your data includes a suitable <code>.toString()</code> method, you can probably leave this undefined and use the default stringifier.</li>
+<li><strong><code>tag: string</code></strong> is the identifier for your data type, with which its stringified form will be prefixed. Should either be a !-prefixed local <code>!tag</code>, or a fully qualified <code>tag:domain,date:foo</code>. Required.</li>
+<li><code>test: RegExp</code> and <code>default: boolean</code> allow for values to be stringified without an explicit tag and detected using a regular expression. For most cases, it&#39;s unlikely that you&#39;ll actually want to use these, even if you first think you do.</li>
 </ul>

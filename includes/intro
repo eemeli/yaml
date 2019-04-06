@@ -46,14 +46,12 @@ yarn add yaml
 <li><a href="#parsing-documents"><code>YAML.parseAllDocuments(str, options): YAML.Document[]</code></a></li>
 <li><a href="#parsing-documents"><code>YAML.parseDocument(str, options): YAML.Document</code></a></li>
 </ul>
-<pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">Map</span> <span class="nx">from</span> <span class="s1">'yaml/map'</span>
-<span class="kr">import</span> <span class="nx">Pair</span> <span class="nx">from</span> <span class="s1">'yaml/pair'</span>
-<span class="kr">import</span> <span class="nx">Seq</span> <span class="nx">from</span> <span class="s1">'yaml/seq'</span>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">Pair</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types'</span>
 </code></pre>
 <ul>
-<li><a href="#creating-nodes"><code>new Map()</code></a></li>
 <li><a href="#creating-nodes"><code>new Pair(key, value)</code></a></li>
-<li><a href="#creating-nodes"><code>new Seq()</code></a></li>
+<li><a href="#creating-nodes"><code>new YAMLMap()</code></a></li>
+<li><a href="#creating-nodes"><code>new YAMLSeq()</code></a></li>
 </ul>
 
 <h3>CST Parser</h3>

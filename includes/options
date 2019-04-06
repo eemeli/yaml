@@ -45,9 +45,19 @@
 <td>When outputting JS, use Map rather than Object to represent mappings. By default <code>false</code>.</td>
 </tr>
 <tr>
+<td>maxAliasCount</td>
+<td><code>number</code></td>
+<td>Prevent <a href="https://en.wikipedia.org/wiki/Billion_laughs_attack">exponential entity expansion attacks</a> by limiting data aliasing count; set to <code>-1</code> to disable checks; <code>0</code> disallows all alias nodes. By default <code>100</code>.</td>
+</tr>
+<tr>
 <td>merge</td>
 <td><code>boolean</code></td>
-<td>Enable support for <code>&lt;&lt;</code> merge keys.</td>
+<td>Enable support for <code>&lt;&lt;</code> merge keys. By default <code>false</code> for YAML 1.2 and <code>true</code> for earlier versions.</td>
+</tr>
+<tr>
+<td>prettyErrors</td>
+<td><code>boolean</code></td>
+<td>Include line position &amp; node type directly in errors; drop their verbose source and context. By default <code>false</code>.</td>
 </tr>
 <tr>
 <td>schema</td>
@@ -55,7 +65,7 @@
 <td>The base schema to use. By default <code>&#39;core&#39;</code> for YAML 1.2 and <code>&#39;yaml-1.1&#39;</code> for earlier versions.</td>
 </tr>
 <tr>
-<td>tags</td>
+<td>customTags</td>
 <td><a href="#tag"><code>Tag[]</code></a> &vert; <code>function</code></td>
 <td>Array of additional (custom) tags to include in the schema</td>
 </tr>
@@ -92,24 +102,28 @@ target:
 <span class="c1">// { a: 1, b: 'base' }</span>
 </code></pre>
 <p><strong>Merge</strong> keys are a <a href="http://yaml.org/type/merge.html">YAML 1.1 feature</a> that is not a part of the 1.2 spec. To use a merge key, assign an alias node or an array of alias nodes as the value of a <code>&lt;&lt;</code> key in a mapping.</p>
-<h2 id='tag-stringifier-options'>Tag Stringifier Options</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">nullOptions</span><span class="p">,</span> <span class="nx">strOptions</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/schema'</span>
+<h2 id='tag-stringifier-options'>Tag Stringifier Options</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">binaryOptions</span><span class="p">,</span> <span class="nx">boolOptions</span><span class="p">,</span> <span class="nx">nullOptions</span><span class="p">,</span> <span class="nx">strOptions</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types'</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
-<span class="c1">// this is: null</span>
+<span class="nx">binaryOptions</span> <span class="c1">// Used by !!binary, part of the yaml-1.1 schema</span>
+<span class="c1">// { defaultType: 'BLOCK_LITERAL', lineWidth: 76 }</span>
+
+<span class="nx">boolOptions</span>
+<span class="c1">// { trueStr: 'true', falseStr: 'false' }</span>
 
 <span class="nx">nullOptions</span>
 <span class="c1">// { nullStr: 'null' }</span>
-<span class="nx">nullOptions</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="s1">'~'</span>
 
 <span class="nx">strOptions</span>
 <span class="c1">// { defaultType: 'PLAIN',</span>
 <span class="c1">//   doubleQuoted: { jsonEncoding: false, minMultiLineLength: 40 },</span>
 <span class="c1">//   fold: { lineWidth: 80, minContentWidth: 20 } }</span>
-<span class="nx">strOptions</span><span class="p">.</span><span class="nx">defaultType</span> <span class="o">=</span> <span class="s1">'QUOTE_SINGLE'</span>
 
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
+<span class="c1">// this is: null</span>
+
+<span class="nx">nullOptions</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="s1">'~'</span>
+<span class="nx">strOptions</span><span class="p">.</span><span class="nx">defaultType</span> <span class="o">=</span> <span class="s1">'QUOTE_SINGLE'</span>
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
 <span class="c1">// 'this is': ~</span>
 </code></pre>
-<p>To customise the YAML stringification, the <code>nullOptions</code> and <code>strOptions</code> objects are exported from <code>&#39;yaml/schema&#39;</code>. Note that these values are used by all documents. For example, to disable the automatic line wrapping, set <code>strOptions.fold.lineWidth</code> to <code>0</code>.</p>
-
-<p>The optional <code>!!binary</code> type (available at <code>&#39;yaml/types/binary&#39;</code>) also provides for some configuration via its <code>options</code> object.</p>
+<p>To customise the YAML stringification, some options objects are exported from <code>&#39;yaml/types&#39;</code>. Note that these values are used by all documents. For example, to disable the automatic line wrapping, set <code>strOptions.fold.lineWidth</code> to <code>0</code>.</p>

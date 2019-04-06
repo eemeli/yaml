@@ -31,7 +31,7 @@ mapping: { sky: blue, sea: green }
 
 <p>Care should be taken when modifying the CST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren&#39;t broken. In other words, this is an engineering tool and you may hurt yourself. If you&#39;re looking to generate a brand new YAML document, see the section on <a href="#creating-documents">Creating Documents</a>.</p>
 
-<p>For more usage examples and CST trees, have a look through the <a href="https://github.com/eemeli/yaml/tree/master/__tests__/cst">extensive test suite</a> included in the project&#39;s repository.</p>
+<p>For more usage examples and CST trees, have a look through the <a href="https://github.com/eemeli/yaml/tree/master/tests/cst">extensive test suite</a> included in the project&#39;s repository.</p>
 
 <h3 style="clear:both">Error detection</h3>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
