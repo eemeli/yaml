@@ -65,7 +65,8 @@
 <li>Tag shorthands can no longer include any of the characters <code>,[]{}</code>, but can include <code>#</code>. To work around this, either fix your tag names or use verbatim tags.</li>
 <li>Anchors can no longer include any of the characters <code>,[]{}</code>.</li>
 <li>Inside double-quoted strings <code>\/</code> is now a valid escape for the <code>/</code> character.</li>
-<li>Quoted content can include practically all Unicode characters</li>
+<li>Quoted content can include practically all Unicode characters.</li>
+<li>Documents in streams are now independent of each other, and no longer inherit preceding document directives if they do not define their own.</li>
 </ul>
 <h3 id='changes-from-yaml-1-0-to-1-1'>Changes from YAML 1.0 to 1.1</h3><pre class="highlight plaintext"><code>%YAML:1.0
 ---
