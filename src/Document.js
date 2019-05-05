@@ -145,7 +145,7 @@ export default class Document {
       )
   }
 
-  parse(node) {
+  parse(node, prevDoc) {
     if (this.options.keepCstNodes) this.cstNode = node
     if (this.options.keepNodeTypes) this.type = 'DOCUMENT'
     const { directives = [], contents = [], error, valueRange } = node
@@ -154,15 +154,18 @@ export default class Document {
       this.errors.push(error)
     }
     const directiveComments = []
+    let hasDirectives = false
     directives.forEach(directive => {
       const { comment, name } = directive
       switch (name) {
         case 'TAG':
           this.resolveTagDirective(directive)
+          hasDirectives = true
           break
         case 'YAML':
         case 'YAML:1.0':
           this.resolveYamlDirective(directive)
+          hasDirectives = true
           break
         default:
           if (name) {
@@ -172,6 +175,15 @@ export default class Document {
       }
       if (comment) directiveComments.push(comment)
     })
+    if (
+      prevDoc &&
+      !hasDirectives &&
+      '1.1' === (this.version || prevDoc.version || this.options.version)
+    ) {
+      const copyTagPrefix = ({ handle, prefix }) => ({ handle, prefix })
+      this.tagPrefixes = prevDoc.tagPrefixes.map(copyTagPrefix)
+      this.version = prevDoc.version
+    }
     this.range = valueRange ? [valueRange.start, valueRange.end] : null
     this.setSchema()
     this.anchors._cstAliases = []

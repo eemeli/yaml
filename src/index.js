@@ -38,7 +38,15 @@ class Document extends YAMLDocument {
 }
 
 function parseAllDocuments(src, options) {
-  return parseCST(src).map(cstDoc => new Document(options).parse(cstDoc))
+  const stream = []
+  let prev
+  for (const cstDoc of parseCST(src)) {
+    const doc = new Document(options)
+    doc.parse(cstDoc, prev)
+    stream.push(doc)
+    prev = doc
+  }
+  return stream
 }
 
 function parseDocument(src, options) {
