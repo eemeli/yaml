@@ -6,7 +6,7 @@ var str = require('./dist/stringify')
 exports.stringifyNumber = str.stringifyNumber
 exports.stringifyString = str.stringifyString
 exports.toJSON = require('./dist/toJSON').default
-exports.Type = require('./dist/cst/Node').Type
+exports.Type = require('./dist/constants').Type
 
 var err = require('./dist/errors')
 exports.YAMLReferenceError = err.YAMLReferenceError
