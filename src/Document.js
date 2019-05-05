@@ -153,6 +153,22 @@ export default class Document {
       if (!error.source) error.source = this
       this.errors.push(error)
     }
+    this.parseDirectives(directives, prevDoc)
+    this.range = valueRange ? [valueRange.start, valueRange.end] : null
+    this.setSchema()
+    this.anchors._cstAliases = []
+    this.parseContents(contents)
+    this.anchors.resolveNodes()
+    if (this.options.prettyErrors) {
+      for (const error of this.errors)
+        if (error instanceof YAMLError) error.makePretty()
+      for (const warn of this.warnings)
+        if (warn instanceof YAMLError) warn.makePretty()
+    }
+    return this
+  }
+
+  parseDirectives(directives, prevDoc) {
     const directiveComments = []
     let hasDirectives = false
     directives.forEach(directive => {
@@ -184,10 +200,10 @@ export default class Document {
       this.tagPrefixes = prevDoc.tagPrefixes.map(copyTagPrefix)
       this.version = prevDoc.version
     }
-    this.range = valueRange ? [valueRange.start, valueRange.end] : null
-    this.setSchema()
-    this.anchors._cstAliases = []
     this.commentBefore = directiveComments.join('\n') || null
+  }
+
+  parseContents(contents) {
     const comments = { before: [], after: [] }
     const contentNodes = []
     let spaceBefore = false
@@ -250,14 +266,6 @@ export default class Document {
         }
     }
     this.comment = comments.after.join('\n') || null
-    this.anchors.resolveNodes()
-    if (this.options.prettyErrors) {
-      for (const error of this.errors)
-        if (error instanceof YAMLError) error.makePretty()
-      for (const warn of this.warnings)
-        if (warn instanceof YAMLError) warn.makePretty()
-    }
-    return this
   }
 
   resolveTagDirective(directive) {
