@@ -74,6 +74,7 @@
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.8.0",
     "babel-plugin-trace": "^1.1.0",
+    "common-tags": "^1.8.0",
     "cpy-cli": "^2.0.0",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.2.0",
