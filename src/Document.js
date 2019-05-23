@@ -52,6 +52,7 @@ export default class Document {
     this.commentBefore = null
     this.comment = null
     this.contents = null
+    this.directivesEndMarker = null
     this.errors = []
     this.options = options
     this.schema = null
@@ -148,12 +149,19 @@ export default class Document {
   parse(node, prevDoc) {
     if (this.options.keepCstNodes) this.cstNode = node
     if (this.options.keepNodeTypes) this.type = 'DOCUMENT'
-    const { directives = [], contents = [], error, valueRange } = node
+    const {
+      directives = [],
+      contents = [],
+      directivesEndMarker,
+      error,
+      valueRange
+    } = node
     if (error) {
       if (!error.source) error.source = this
       this.errors.push(error)
     }
     this.parseDirectives(directives, prevDoc)
+    if (directivesEndMarker) this.directivesEndMarker = true
     this.range = valueRange ? [valueRange.start, valueRange.end] : null
     this.setSchema()
     this.anchors._cstAliases = []
@@ -544,8 +552,6 @@ export default class Document {
       throw new Error('Document with errors cannot be stringified')
     this.setSchema()
     const lines = []
-    if (this.commentBefore)
-      lines.push(this.commentBefore.replace(/^/gm, '#'), '')
     let hasDirectives = false
     if (this.version) {
       let vd = '%YAML 1.2'
@@ -563,7 +569,11 @@ export default class Document {
         hasDirectives = true
       }
     })
-    if (hasDirectives) lines.push('---')
+    if (hasDirectives || this.directivesEndMarker) lines.push('---')
+    if (this.commentBefore) {
+      if (hasDirectives || !this.directivesEndMarker) lines.unshift('')
+      lines.unshift(this.commentBefore.replace(/^/gm, '#'))
+    }
     const ctx = {
       anchors: {},
       doc: this,
@@ -573,7 +583,11 @@ export default class Document {
     let contentComment = null
     if (this.contents) {
       if (this.contents instanceof Node) {
-        if (this.contents.spaceBefore && hasDirectives) lines.push('')
+        if (
+          this.contents.spaceBefore &&
+          (hasDirectives || this.directivesEndMarker)
+        )
+          lines.push('')
         if (this.contents.commentBefore)
           lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
         // top-level block scalars need to be indented if followed by a comment

@@ -1,3 +1,4 @@
+import { source } from 'common-tags'
 import YAML from '../../src/index'
 
 describe('parse comments', () => {
@@ -10,17 +11,28 @@ describe('parse comments', () => {
     })
 
     test('body start comments', () => {
-      const src = '---\n#comment\n#comment\nstring\n'
+      const src = source`
+        ---
+        #comment
+        #comment
+        string
+      `
       const doc = YAML.parseDocument(src)
       expect(doc.contents.commentBefore).toBe('comment\ncomment')
-      expect(String(doc)).toBe('#comment\n#comment\nstring\n')
+      expect(String(doc)).toBe(src + '\n')
     })
 
     test('body start comments with empty comment line', () => {
-      const src = '---\n#comment\n#\n#comment\nstring\n'
+      const src = source`
+        ---
+        #comment
+        #
+        #comment
+        string
+      `
       const doc = YAML.parseDocument(src)
       expect(doc.contents.commentBefore).toBe('comment\n\ncomment')
-      expect(String(doc)).toBe('#comment\n#\n#comment\nstring\n')
+      expect(String(doc)).toBe(src + '\n')
     })
 
     test('body end comments', () => {
@@ -268,11 +280,22 @@ describe('stringify comments', () => {
 
   describe('document comments', () => {
     test('directive', () => {
-      const src = '#c0\n---\nstring'
+      const src = source`
+        #c0
+        ---
+        string
+      `
       const doc = YAML.parseDocument(src)
       expect(doc.commentBefore).toBe('c0')
       doc.commentBefore += '\nc1'
-      expect(String(doc)).toBe('#c0\n#c1\n\nstring\n')
+      expect(String(doc)).toBe(
+        source`
+          #c0
+          #c1
+          ---
+          string
+        ` + '\n'
+      )
     })
   })
 
