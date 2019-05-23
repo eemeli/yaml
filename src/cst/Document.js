@@ -18,6 +18,8 @@ export default class Document extends Node {
     super(Type.DOCUMENT)
     this.directives = null
     this.contents = null
+    this.directivesEndMarker = null
+    this.documentEndMarker = null
   }
 
   parseDirectives(start) {
@@ -76,7 +78,10 @@ export default class Document extends Node {
           return offset
       }
     }
-    if (src[offset]) return offset + 3
+    if (src[offset]) {
+      this.directivesEndMarker = new Range(offset, offset + 3)
+      return offset + 3
+    }
     if (hasDirectives) {
       this.error = new YAMLSemanticError(
         this,
@@ -148,6 +153,7 @@ export default class Document extends Node {
     }
     this.valueRange.end = offset
     if (src[offset]) {
+      this.documentEndMarker = new Range(offset, offset + 3)
       offset += 3
       if (src[offset]) {
         offset = Node.endOfWhiteSpace(src, offset)
@@ -196,9 +202,13 @@ export default class Document extends Node {
     this.directives.forEach(node => {
       offset = node.setOrigRanges(cr, offset)
     })
+    if (this.directivesEndMarker)
+      offset = this.directivesEndMarker.setOrigRange(cr, offset)
     this.contents.forEach(node => {
       offset = node.setOrigRanges(cr, offset)
     })
+    if (this.documentEndMarker)
+      offset = this.documentEndMarker.setOrigRange(cr, offset)
     return offset
   }
 

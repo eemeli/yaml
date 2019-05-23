@@ -1,7 +1,7 @@
 import parse from '../../src/cst/parse'
 
 test('return value', () => {
-  const src = '- foo\n- bar\n'
+  const src = '---\n- foo\n- bar\n'
   const cst = parse(src)
   expect(cst).toHaveLength(1)
   expect(cst[0]).toMatchObject({
@@ -14,48 +14,50 @@ test('return value', () => {
             node: {
               error: null,
               props: [],
-              range: { end: 5, start: 2 },
+              range: { end: 9, start: 6 },
               type: 'PLAIN',
               value: null,
-              valueRange: { end: 5, start: 2 }
+              valueRange: { end: 9, start: 6 }
             },
             props: [],
-            range: { end: 5, start: 0 },
+            range: { end: 9, start: 4 },
             type: 'SEQ_ITEM',
             value: null,
-            valueRange: { end: 5, start: 0 }
+            valueRange: { end: 9, start: 4 }
           },
           {
             error: null,
             node: {
               error: null,
               props: [],
-              range: { end: 11, start: 8 },
+              range: { end: 15, start: 12 },
               type: 'PLAIN',
               value: null,
-              valueRange: { end: 11, start: 8 }
+              valueRange: { end: 15, start: 12 }
             },
             props: [],
-            range: { end: 11, start: 6 },
+            range: { end: 15, start: 10 },
             type: 'SEQ_ITEM',
             value: null,
-            valueRange: { end: 11, start: 6 }
+            valueRange: { end: 15, start: 10 }
           }
         ],
         props: [],
-        range: { end: 12, start: 0 },
+        range: { end: 16, start: 4 },
         type: 'SEQ',
         value: null,
-        valueRange: { end: 11, start: 0 }
+        valueRange: { end: 15, start: 4 }
       }
     ],
     directives: [],
+    directivesEndMarker: { start: 0, end: 3 },
+    documentEndMarker: null,
     error: null,
     props: [],
     range: null,
     type: 'DOCUMENT',
     value: null,
-    valueRange: { end: 12, start: 0 }
+    valueRange: { start: 3, end: 16 }
   })
 })
 
@@ -149,6 +151,8 @@ describe('setOrigRanges()', () => {
         }
       ],
       directives: [],
+      directivesEndMarker: null,
+      documentEndMarker: null,
       error: null,
       props: [],
       range: null,
@@ -180,6 +184,8 @@ describe('setOrigRanges()', () => {
         }
       ],
       directives: [],
+      directivesEndMarker: null,
+      documentEndMarker: { start: 4, end: 7, origStart: 5, origEnd: 8 },
       error: null,
       props: [],
       range: null,
@@ -199,6 +205,8 @@ describe('setOrigRanges()', () => {
         }
       ],
       directives: [],
+      directivesEndMarker: null,
+      documentEndMarker: null,
       error: null,
       props: [],
       range: null,
@@ -239,6 +247,8 @@ describe('setOrigRanges()', () => {
         }
       ],
       directives: [],
+      directivesEndMarker: null,
+      documentEndMarker: null,
       error: null,
       props: [],
       range: null,
