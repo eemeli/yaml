@@ -1,3 +1,4 @@
+import { source } from 'common-tags'
 import parse from '../../src/cst/parse'
 
 describe('folded block with chomp: keep', () => {
@@ -229,4 +230,76 @@ test('blank line after less-indented comment (eemeli/yaml#91)', () => {
     { type: 'BLANK_LINE' },
     { type: 'MAP' }
   ])
+})
+
+describe('flow collection as same-line mapping key value', () => {
+  test('eemeli/yaml#113', () => {
+    const src = source`
+      ---
+      foo:
+        bar:
+          enum: [
+            "abc",
+            "cde"
+          ]
+    `
+    const doc = parse(src)
+    const barValue = doc[0].contents[0].items[1].node.items[1].node
+    expect(barValue.items[1].node).toMatchObject({
+      error: null,
+      items: [
+        { char: '[' },
+        { type: 'QUOTE_DOUBLE' },
+        { char: ',' },
+        { type: 'QUOTE_DOUBLE' },
+        { char: ']' }
+      ],
+      type: 'FLOW_SEQ'
+    })
+  })
+
+  test('eemeli/yaml#114', () => {
+    const src = source`
+      foo: {
+        bar: boom
+      }
+    `
+    const doc = parse(src)
+    const flowCollection = doc[0].contents[0].items[1].node
+    expect(flowCollection).toMatchObject({
+      error: null,
+      items: [
+        { char: '{' },
+        { type: 'PLAIN' },
+        { char: ':' },
+        { type: 'PLAIN' },
+        { char: '}' }
+      ],
+      type: 'FLOW_MAP'
+    })
+  })
+
+  test('Fails on insufficient indent', () => {
+    const src = source`
+      foo: {
+        bar: boom
+      }
+    `
+    const doc = parse(' ' + src)
+    const flowCollection = doc[0].contents[0].items[1].node
+    expect(flowCollection).toMatchObject({
+      error: {
+        message: 'Insufficient indentation in flow collection',
+        name: 'YAMLSemanticError'
+      },
+      items: [
+        { char: '{' },
+        { type: 'PLAIN' },
+        { char: ':' },
+        { type: 'PLAIN' },
+        { char: '}' }
+      ],
+      type: 'FLOW_MAP'
+    })
+  })
 })

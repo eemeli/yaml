@@ -47,11 +47,16 @@ export default class FlowCollection extends Node {
               this.items.push(blankLine)
             }
             offset = Node.endOfIndent(src, lineStart)
-            if (offset - lineStart <= indent)
-              this.error = new YAMLSemanticError(
-                this,
-                'Insufficient indentation in flow collection'
-              )
+            if (offset <= lineStart + indent) {
+              char = src[offset]
+              if (
+                offset < lineStart + indent ||
+                (char !== ']' && char !== '}')
+              ) {
+                const msg = 'Insufficient indentation in flow collection'
+                this.error = new YAMLSemanticError(this, msg)
+              }
+            }
           }
           break
         case ',':
