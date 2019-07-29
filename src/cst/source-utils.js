@@ -23,7 +23,7 @@ function findLineStarts(src) {
  * @param {string|Document|Document[]} cst
  * @returns {{ line: number, col: number }|undefined}
  */
-export default function getLinePos(offset, cst) {
+export function getLinePos(offset, cst) {
   if (typeof offset === 'number' && offset >= 0) {
     let lineStarts, srcLength
     if (typeof cst === 'string') {

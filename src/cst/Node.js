@@ -1,5 +1,5 @@
 import { Char, Type } from '../constants'
-import getLinePos from './getLinePos'
+import { getLinePos } from './source-utils'
 import Range from './Range'
 
 /** Root class of all nodes */
