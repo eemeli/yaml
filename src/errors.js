@@ -1,4 +1,5 @@
 import Node from './cst/Node'
+import { getPrettyContext } from './cst/source-utils'
 
 export class YAMLError extends Error {
   constructor(name, source, message) {
@@ -15,6 +16,13 @@ export class YAMLError extends Error {
       this.nodeType = this.source.type
       this.range = this.source.range
       this.linePos = this.source.rangeAsLinePos
+      if (this.linePos) {
+        const { line, col } = this.linePos.start
+        this.message += ` at line ${line}, column ${col}`
+        const cst = this.source.context && this.source.context.root
+        const ctx = cst && getPrettyContext(this.linePos, cst)
+        if (ctx) this.message += `:\n\n${ctx}\n`
+      }
       delete this.source
     }
   }

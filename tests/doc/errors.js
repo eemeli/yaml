@@ -65,7 +65,8 @@ describe('pretty errors', () => {
     expect(doc.errors).toMatchObject([
       {
         name: 'YAMLSemanticError',
-        message: 'Implicit map keys need to be followed by map values',
+        message:
+          'Implicit map keys need to be followed by map values at line 2, column 1:\n\ndef\n^^^\n',
         nodeType: 'PLAIN',
         range: { start: 9, end: 12 },
         linePos: { start: { line: 2, col: 1 }, end: { line: 2, col: 4 } }
@@ -80,24 +81,27 @@ describe('pretty errors', () => {
     expect(docs[0].errors).toMatchObject([
       {
         name: 'YAMLSyntaxError',
-        message: 'Flow map contains an unexpected ,',
+        message:
+          'Flow map contains an unexpected , at line 1, column 1:\n\n{ , }\n^^^^^\n',
         nodeType: 'FLOW_MAP',
         range: { start: 0, end: 5 },
         linePos: { start: { line: 1, col: 1 }, end: { line: 1, col: 6 } }
       }
     ])
     expect(docs[0].errors[0]).not.toHaveProperty('source')
+    const message =
+      'Flow map contains an unexpected , at line 3, column 1:\n\n{ 123,,, }\n^^^^^^^^^^\n'
     expect(docs[1].errors).toMatchObject([
       {
         name: 'YAMLSyntaxError',
-        message: 'Flow map contains an unexpected ,',
+        message,
         nodeType: 'FLOW_MAP',
         range: { start: 10, end: 20 },
         linePos: { start: { line: 3, col: 1 }, end: { line: 3, col: 11 } }
       },
       {
         name: 'YAMLSyntaxError',
-        message: 'Flow map contains an unexpected ,',
+        message,
         nodeType: 'FLOW_MAP',
         range: { start: 10, end: 20 },
         linePos: { start: { line: 3, col: 1 }, end: { line: 3, col: 11 } }

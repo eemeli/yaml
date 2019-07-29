@@ -40,10 +40,10 @@ test('getLinePos()', () => {
 test('invalid args for getLinePos()', () => {
   const src = '- foo\n- bar\n'
   const cst = parse(src)
-  expect(getLinePos()).toBeUndefined()
-  expect(getLinePos(0)).toBeUndefined()
-  expect(getLinePos(1)).toBeUndefined()
-  expect(getLinePos(-1, cst)).toBeUndefined()
-  expect(getLinePos(13, cst)).toBeUndefined()
-  expect(getLinePos(Math.MAXINT, cst)).toBeUndefined()
+  expect(getLinePos()).toBeNull()
+  expect(getLinePos(0)).toBeNull()
+  expect(getLinePos(1)).toBeNull()
+  expect(getLinePos(-1, cst)).toBeNull()
+  expect(getLinePos(13, cst)).toBeNull()
+  expect(getLinePos(Math.MAXINT, cst)).toBeNull()
 })

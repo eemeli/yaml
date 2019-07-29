@@ -29,7 +29,7 @@ test('Use preceding directives if none defined', () => {
     ---
     !bar "Using previous YAML directive"
   `
-  const docs = YAML.parseAllDocuments(src, { prettyErrors: true })
+  const docs = YAML.parseAllDocuments(src, { prettyErrors: false })
   expect(docs).toHaveLength(5)
   expect(docs.map(doc => doc.errors)).toMatchObject([[], [], [], [], []])
   const warn = tag => ({
