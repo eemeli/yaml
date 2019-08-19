@@ -1,4 +1,45 @@
 import { YAMLSemanticError } from '../errors'
+import { Type } from '../constants'
+
+export function checkFlowCollectionEnd(errors, cst) {
+  let char, name
+  switch (cst.type) {
+    case Type.FLOW_MAP:
+      char = '}'
+      name = 'flow map'
+      break
+    case Type.FLOW_SEQ:
+      char = ']'
+      name = 'flow sequence'
+      break
+    default:
+      errors.push(new YAMLSemanticError(cst, 'Not a flow collection!?'))
+      return
+  }
+
+  let lastItem
+  for (let i = cst.items.length - 1; i >= 0; --i) {
+    const item = cst.items[i]
+    if (!item || item.type !== Type.COMMENT) {
+      lastItem = item
+      break
+    }
+  }
+
+  if (lastItem && lastItem.char !== char) {
+    const msg = `Expected ${name} to end with ${char}`
+    let err
+    if (typeof lastItem.offset === 'number') {
+      err = new YAMLSemanticError(cst, msg)
+      err.offset = lastItem.offset + 1
+    } else {
+      err = new YAMLSemanticError(lastItem, msg)
+      if (lastItem.range && lastItem.range.end)
+        err.offset = lastItem.range.end - lastItem.range.start
+    }
+    errors.push(err)
+  }
+}
 
 export function checkKeyLength(errors, node, itemIdx, key, keyStart) {
   if (!key || typeof keyStart !== 'number') return

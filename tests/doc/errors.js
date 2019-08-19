@@ -46,15 +46,47 @@ describe('eemeli/yaml#7', () => {
   })
 })
 
-test('eemeli/yaml#8', () => {
-  const src = '{'
-  const doc = YAML.parseDocument(src)
-  expect(doc.errors).toMatchObject([{ name: 'YAMLSemanticError' }])
-  const node = doc.errors[0].source
-  expect(node).toBeInstanceOf(Node)
-  expect(node.rangeAsLinePos).toMatchObject({
-    start: { line: 1, col: 1 },
-    end: { line: 1, col: 2 }
+describe('missing flow collection terminator', () => {
+  test('start only of flow map (eemeli/yaml#8)', () => {
+    const doc = YAML.parseDocument('{', { prettyErrors: true })
+    expect(doc.errors).toMatchObject([
+      {
+        name: 'YAMLSemanticError',
+        message:
+          'Expected flow map to end with } at line 1, column 1:\n\n{\n^\n',
+        nodeType: 'FLOW_MAP',
+        range: { start: 0, end: 1 },
+        linePos: { start: { line: 1, col: 1 }, end: { line: 1, col: 2 } }
+      }
+    ])
+  })
+
+  test('start only of flow sequence (eemeli/yaml#8)', () => {
+    const doc = YAML.parseDocument('[', { prettyErrors: true })
+    expect(doc.errors).toMatchObject([
+      {
+        name: 'YAMLSemanticError',
+        message:
+          'Expected flow sequence to end with ] at line 1, column 1:\n\n[\n^\n',
+        nodeType: 'FLOW_SEQ',
+        range: { start: 0, end: 1 },
+        linePos: { start: { line: 1, col: 1 }, end: { line: 1, col: 2 } }
+      }
+    ])
+  })
+
+  test('flow sequence without end', () => {
+    const doc = YAML.parseDocument('[ foo, bar,', { prettyErrors: true })
+    expect(doc.errors).toMatchObject([
+      {
+        name: 'YAMLSemanticError',
+        message:
+          'Expected flow sequence to end with ] at line 1, column 1:\n\n[ foo, bar,\n^^^^^^^^^^^\n',
+        nodeType: 'FLOW_SEQ',
+        range: { start: 0, end: 11 },
+        linePos: { start: { line: 1, col: 1 }, end: { line: 1, col: 12 } }
+      }
+    ])
   })
 })
 

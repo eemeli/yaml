@@ -1,7 +1,11 @@
 import { Type } from '../constants'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Pair from './Pair'
-import { checkKeyLength, resolveComments } from './parseUtils'
+import {
+  checkFlowCollectionEnd,
+  checkKeyLength,
+  resolveComments
+} from './parseUtils'
 import Seq from './Seq'
 
 export default function parseSeq(doc, cst) {
@@ -113,10 +117,7 @@ function resolveFlowSeqItems(doc, cst) {
       next = ','
     }
   }
-  if (cst.items[cst.items.length - 1].char !== ']')
-    doc.errors.push(
-      new YAMLSemanticError(cst, 'Expected flow sequence to end with ]')
-    )
+  checkFlowCollectionEnd(doc.errors, cst)
   if (key !== undefined) items.push(new Pair(key))
   return { comments, items }
 }

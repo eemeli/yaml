@@ -4,7 +4,11 @@ import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
 import Map from './Map'
 import Merge, { MERGE_KEY } from './Merge'
 import Pair from './Pair'
-import { checkKeyLength, resolveComments } from './parseUtils'
+import {
+  checkFlowCollectionEnd,
+  checkKeyLength,
+  resolveComments
+} from './parseUtils'
 import Alias from './Alias'
 
 export default function parseMap(doc, cst) {
@@ -252,10 +256,7 @@ function resolveFlowMapItems(doc, cst) {
       explicitKey = false
     }
   }
-  if (cst.items[cst.items.length - 1].char !== '}')
-    doc.errors.push(
-      new YAMLSemanticError(cst, 'Expected flow map to end with }')
-    )
+  checkFlowCollectionEnd(doc.errors, cst)
   if (key !== undefined) items.push(new Pair(key))
   return { comments, items }
 }
