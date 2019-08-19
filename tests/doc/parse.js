@@ -475,3 +475,8 @@ describe('Excessive entity expansion attacks', () => {
     }
   })
 })
+
+test('Anchor for empty node (6KGN)', () => {
+  const src = `a: &anchor\nb: *anchor`
+  expect(YAML.parse(src)).toMatchObject({ a: null, b: null })
+})
