@@ -1,5 +1,6 @@
 import Node from './cst/Node'
-import { getPrettyContext } from './cst/source-utils'
+import { getLinePos, getPrettyContext } from './cst/source-utils'
+import Range from './cst/Range'
 
 export class YAMLError extends Error {
   constructor(name, source, message) {
@@ -12,19 +13,28 @@ export class YAMLError extends Error {
   }
 
   makePretty() {
-    if (this.source) {
-      this.nodeType = this.source.type
+    if (!this.source) return
+    this.nodeType = this.source.type
+    const cst = this.source.context && this.source.context.root
+    if (typeof this.offset === 'number') {
+      this.range = new Range(this.offset, this.offset + 1)
+      const start = cst && getLinePos(this.offset, cst)
+      if (start) {
+        const end = { line: start.line, col: start.col + 1 }
+        this.linePos = { start, end }
+      }
+      delete this.offset
+    } else {
       this.range = this.source.range
       this.linePos = this.source.rangeAsLinePos
-      if (this.linePos) {
-        const { line, col } = this.linePos.start
-        this.message += ` at line ${line}, column ${col}`
-        const cst = this.source.context && this.source.context.root
-        const ctx = cst && getPrettyContext(this.linePos, cst)
-        if (ctx) this.message += `:\n\n${ctx}\n`
-      }
-      delete this.source
     }
+    if (this.linePos) {
+      const { line, col } = this.linePos.start
+      this.message += ` at line ${line}, column ${col}`
+      const ctx = cst && getPrettyContext(this.linePos, cst)
+      if (ctx) this.message += `:\n\n${ctx}\n`
+    }
+    delete this.source
   }
 }
 

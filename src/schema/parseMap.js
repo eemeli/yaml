@@ -194,7 +194,7 @@ function resolveFlowMapItems(doc, cst) {
     checkKeyLength(doc.errors, cst, i, key, keyStart)
     const item = cst.items[i]
     if (typeof item.char === 'string') {
-      const { char } = item
+      const { char, offset } = item
       if (char === '?' && key === undefined && !explicitKey) {
         explicitKey = true
         next = ':'
@@ -227,9 +227,10 @@ function resolveFlowMapItems(doc, cst) {
         next = ':'
         continue
       }
-      doc.errors.push(
-        new YAMLSyntaxError(cst, `Flow map contains an unexpected ${char}`)
-      )
+      const msg = `Flow map contains an unexpected ${char}`
+      const err = new YAMLSyntaxError(cst, msg)
+      err.offset = offset
+      doc.errors.push(err)
     } else if (item.type === Type.BLANK_LINE) {
       comments.push({ afterKey: !!key, before: items.length })
     } else if (item.type === Type.COMMENT) {

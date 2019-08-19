@@ -53,10 +53,10 @@ describe('missing flow collection terminator', () => {
       {
         name: 'YAMLSemanticError',
         message:
-          'Expected flow map to end with } at line 1, column 1:\n\n{\n^\n',
+          'Expected flow map to end with } at line 1, column 2:\n\n{\n ^\n',
         nodeType: 'FLOW_MAP',
-        range: { start: 0, end: 1 },
-        linePos: { start: { line: 1, col: 1 }, end: { line: 1, col: 2 } }
+        range: { start: 1, end: 2 },
+        linePos: { start: { line: 1, col: 2 }, end: { line: 1, col: 3 } }
       }
     ])
   })
@@ -67,10 +67,10 @@ describe('missing flow collection terminator', () => {
       {
         name: 'YAMLSemanticError',
         message:
-          'Expected flow sequence to end with ] at line 1, column 1:\n\n[\n^\n',
+          'Expected flow sequence to end with ] at line 1, column 2:\n\n[\n ^\n',
         nodeType: 'FLOW_SEQ',
-        range: { start: 0, end: 1 },
-        linePos: { start: { line: 1, col: 1 }, end: { line: 1, col: 2 } }
+        range: { start: 1, end: 2 },
+        linePos: { start: { line: 1, col: 2 }, end: { line: 1, col: 3 } }
       }
     ])
   })
@@ -81,10 +81,10 @@ describe('missing flow collection terminator', () => {
       {
         name: 'YAMLSemanticError',
         message:
-          'Expected flow sequence to end with ] at line 1, column 1:\n\n[ foo, bar,\n^^^^^^^^^^^\n',
+          'Expected flow sequence to end with ] at line 1, column 12:\n\n[ foo, bar,\n           ^\n',
         nodeType: 'FLOW_SEQ',
-        range: { start: 0, end: 11 },
-        linePos: { start: { line: 1, col: 1 }, end: { line: 1, col: 12 } }
+        range: { start: 11, end: 12 },
+        linePos: { start: { line: 1, col: 12 }, end: { line: 1, col: 13 } }
       }
     ])
   })
@@ -114,29 +114,29 @@ describe('pretty errors', () => {
       {
         name: 'YAMLSyntaxError',
         message:
-          'Flow map contains an unexpected , at line 1, column 1:\n\n{ , }\n^^^^^\n',
+          'Flow map contains an unexpected , at line 1, column 3:\n\n{ , }\n  ^\n',
         nodeType: 'FLOW_MAP',
-        range: { start: 0, end: 5 },
-        linePos: { start: { line: 1, col: 1 }, end: { line: 1, col: 6 } }
+        range: { start: 2, end: 3 },
+        linePos: { start: { line: 1, col: 3 }, end: { line: 1, col: 4 } }
       }
     ])
     expect(docs[0].errors[0]).not.toHaveProperty('source')
-    const message =
-      'Flow map contains an unexpected , at line 3, column 1:\n\n{ 123,,, }\n^^^^^^^^^^\n'
     expect(docs[1].errors).toMatchObject([
       {
         name: 'YAMLSyntaxError',
-        message,
+        message:
+          'Flow map contains an unexpected , at line 3, column 7:\n\n{ 123,,, }\n      ^\n',
         nodeType: 'FLOW_MAP',
-        range: { start: 10, end: 20 },
-        linePos: { start: { line: 3, col: 1 }, end: { line: 3, col: 11 } }
+        range: { start: 16, end: 17 },
+        linePos: { start: { line: 3, col: 7 }, end: { line: 3, col: 8 } }
       },
       {
         name: 'YAMLSyntaxError',
-        message,
+        message:
+          'Flow map contains an unexpected , at line 3, column 8:\n\n{ 123,,, }\n       ^\n',
         nodeType: 'FLOW_MAP',
-        range: { start: 10, end: 20 },
-        linePos: { start: { line: 3, col: 1 }, end: { line: 3, col: 11 } }
+        range: { start: 17, end: 18 },
+        linePos: { start: { line: 3, col: 8 }, end: { line: 3, col: 9 } }
       }
     ])
     expect(docs[1].errors[0]).not.toHaveProperty('source')

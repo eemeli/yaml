@@ -66,7 +66,7 @@ function resolveFlowSeqItems(doc, cst) {
   for (let i = 0; i < cst.items.length; ++i) {
     const item = cst.items[i]
     if (typeof item.char === 'string') {
-      const { char } = item
+      const { char, offset } = item
       if (char !== ':' && (explicitKey || key !== undefined)) {
         if (explicitKey && key === undefined) key = next ? items.pop() : null
         items.push(new Pair(key))
@@ -82,9 +82,10 @@ function resolveFlowSeqItems(doc, cst) {
         if (next === ',') {
           key = items.pop()
           if (key instanceof Pair) {
-            const msg =
-              'Chaining flow sequence pairs is invalid (e.g. [ a : b : c ])'
-            doc.errors.push(new YAMLSemanticError(char, msg))
+            const msg = 'Chaining flow sequence pairs is invalid'
+            const err = new YAMLSemanticError(cst, msg)
+            err.offset = offset
+            doc.errors.push(err)
           }
           if (!explicitKey) checkKeyLength(doc.errors, cst, i, key, keyStart)
         } else {
@@ -95,7 +96,9 @@ function resolveFlowSeqItems(doc, cst) {
         next = null
       } else if (next === '[' || char !== ']' || i < cst.items.length - 1) {
         const msg = `Flow sequence contains an unexpected ${char}`
-        doc.errors.push(new YAMLSyntaxError(cst, msg))
+        const err = new YAMLSyntaxError(cst, msg)
+        err.offset = offset
+        doc.errors.push(err)
       }
     } else if (item.type === Type.BLANK_LINE) {
       comments.push({ before: items.length })
@@ -103,7 +106,7 @@ function resolveFlowSeqItems(doc, cst) {
       comments.push({ comment: item.comment, before: items.length })
     } else {
       if (next) {
-        const msg = `Expected a ${next} here in flow sequence`
+        const msg = `Expected a ${next} in flow sequence`
         doc.errors.push(new YAMLSemanticError(item, msg))
       }
       const value = doc.resolveNode(item)
