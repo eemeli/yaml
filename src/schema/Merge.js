@@ -40,7 +40,7 @@ export default class Merge extends Pair {
         } else if (map instanceof Set) {
           map.add(key)
         } else {
-          if (!map.hasOwnProperty(key)) map[key] = value
+          if (!Object.prototype.hasOwnProperty.call(map, key)) map[key] = value
         }
       }
     }

@@ -48,7 +48,7 @@ export default function parseMap(doc, cst) {
           iKey === jKey ||
           (iKey &&
             jKey &&
-            iKey.hasOwnProperty('value') &&
+            Object.prototype.hasOwnProperty.call(iKey, 'value') &&
             iKey.value === jKey.value)
         ) {
           const msg = `Map keys must be unique; "${iKey}" is repeated`

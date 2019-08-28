@@ -162,7 +162,7 @@ export default class Schema {
 
   resolveNodeWithFallback(doc, node, tagName) {
     const res = this.resolveNode(doc, node, tagName)
-    if (node.hasOwnProperty('resolved')) return res
+    if (Object.prototype.hasOwnProperty.call(node, 'resolved')) return res
     const fallback = isMap(node)
       ? Schema.defaultTags.MAP
       : isSeq(node)
