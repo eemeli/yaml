@@ -247,13 +247,10 @@ function plainString(item, ctx, onComment, onChompKeep) {
     return blockString(item, ctx, onComment, onChompKeep)
   }
   const str = value.replace(/\n+/g, `$&\n${indent}`)
-  // May need to verify that output will be parsed as a string, as plain numbers
-  // and booleans get parsed with those types, e.g. '42', 'true' & '0.9e-3'.
-  if (
-    actualString &&
-    /^[\w.+-]+$/.test(str) &&
-    typeof tags.resolveScalar(str).value !== 'string'
-  ) {
+  // Verify that output will be parsed as a string, as e.g. plain numbers and
+  // booleans get parsed with those types in v1.2 (e.g. '42', 'true' & '0.9e-3'),
+  // and others in v1.1.
+  if (actualString && typeof tags.resolveScalar(str).value !== 'string') {
     return doubleQuotedString(value, ctx)
   }
   const body = implicitKey

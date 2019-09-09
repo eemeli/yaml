@@ -89,6 +89,21 @@ blah blah\n`)
   })
 })
 
+describe('timestamp-like string (YAML 1.1)', () => {
+  for (const [name, str] of Object.entries({
+    canonical: '2001-12-15T02:59:43.1Z',
+    validIso8601: '2001-12-14t21:59:43.10-05:00',
+    spaceSeparated: '2001-12-14 21:59:43.10 -5',
+    noTimeZone: '2001-12-15 2:59:43.10'
+  })) {
+    test(name, () => {
+      const res = YAML.stringify(str, { version: '1.1' })
+      expect(res).toBe(`"${str}"\n`)
+      expect(YAML.parse(res, { version: '1.1' })).toBe(str)
+    })
+  }
+})
+
 describe('circular references', () => {
   test('parent at root', () => {
     const map = { foo: 'bar' }
