@@ -7,4 +7,4 @@ exports.floatTime = ts.floatTime
 exports.intTime = ts.intTime
 exports.timestamp = ts.timestamp
 
-require('../dist/deprecation').warnFileDeprecation(__filename)
+require('../dist/warnings').warnFileDeprecation(__filename)
