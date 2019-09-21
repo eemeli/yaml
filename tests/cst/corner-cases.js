@@ -202,6 +202,18 @@ describe('collection indicator as last char', () => {
       ]
     })
   })
+
+  test('implicit map value separator', () => {
+    const src = 'a:'
+    const doc = parse(src)[0]
+    expect(doc.contents[0]).toMatchObject({
+      type: 'MAP',
+      items: [
+        { type: 'PLAIN', strValue: 'a' },
+        { type: 'MAP_VALUE', node: null }
+      ]
+    })
+  })
 })
 
 test('parse an empty string as an empty document', () => {

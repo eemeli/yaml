@@ -14,7 +14,8 @@ export default class PlainValue extends Node {
       const next = src[offset + 1]
       if (
         ch === ':' &&
-        (next === '\n' ||
+        (!next ||
+          next === '\n' ||
           next === '\t' ||
           next === ' ' ||
           (inFlow && next === ','))
