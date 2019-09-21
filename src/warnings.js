@@ -1,11 +1,14 @@
 /* global global, console */
 
-function warn(msg) {
-  if (global && global.process && global.process.emitWarning) {
-    global.process.emitWarning(msg, 'DeprecationWarning')
-  } else {
+export function warn(warning, type) {
+  if (global && global._YAML_SILENCE_WARNINGS) return
+  const { emitWarning } = global && global.process
+  // This will throw in Jest if `warning` is an Error instance due to
+  // https://github.com/facebook/jest/issues/2549
+  if (emitWarning) emitWarning(warning, type)
+  else {
     // eslint-disable-next-line no-console
-    console.warn(`DeprecationWarning: ${msg}`)
+    console.warn(type ? `${type}: ${warning}` : warning)
   }
 }
 
@@ -15,7 +18,10 @@ export function warnFileDeprecation(filename) {
     .replace(/.*yaml[/\\]/i, '')
     .replace(/\.js$/, '')
     .replace(/\\/g, '/')
-  warn(`The endpoint 'yaml/${path}' will be removed in a future release.`)
+  warn(
+    `The endpoint 'yaml/${path}' will be removed in a future release.`,
+    'DeprecationWarning'
+  )
 }
 
 const warned = {}
@@ -25,5 +31,5 @@ export function warnOptionDeprecation(name, alternative) {
   warned[name] = true
   let msg = `The option '${name}' will be removed in a future release`
   msg += alternative ? `, use '${alternative}' instead.` : '.'
-  warn(msg)
+  warn(msg, 'DeprecationWarning')
 }

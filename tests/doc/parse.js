@@ -408,8 +408,12 @@ describe('Excessive entity expansion attacks', () => {
   const srcB = fs.readFileSync(path.resolve(root, 'billion-laughs.yml'), 'utf8')
   const srcQ = fs.readFileSync(path.resolve(root, 'quadratic.yml'), 'utf8')
 
+  let origEmitWarning
+  beforeAll(() => {
+    origEmitWarning = process.emitWarning
+  })
   afterAll(() => {
-    delete console.warn
+    process.emitWarning = origEmitWarning
   })
 
   describe('Limit count by default', () => {
@@ -420,7 +424,7 @@ describe('Excessive entity expansion attacks', () => {
       ['quadratic expansion', srcQ]
     ]) {
       test(name, () => {
-        console.warn = jest.fn()
+        process.emitWarning = jest.fn()
         expect(() => YAML.parse(src)).toThrow(/Excessive alias count/)
       })
     }
@@ -428,13 +432,13 @@ describe('Excessive entity expansion attacks', () => {
 
   describe('Work sensibly even with disabled limits', () => {
     test('js-yaml case 1', () => {
-      console.warn = jest.fn()
+      process.emitWarning = jest.fn()
       const obj = YAML.parse(src1, { maxAliasCount: -1 })
       expect(obj).toMatchObject({})
       const key = Object.keys(obj)[0]
       expect(key.length).toBeGreaterThan(2000)
       expect(key.length).toBeLessThan(8000)
-      expect(console.warn).toHaveBeenCalled()
+      expect(process.emitWarning).toHaveBeenCalled()
     })
 
     test('js-yaml case 2', () => {
@@ -498,8 +502,12 @@ test('Anchor for empty node (6KGN)', () => {
 })
 
 describe('handling complex keys', () => {
+  let origEmitWarning
+  beforeAll(() => {
+    origEmitWarning = process.emitWarning
+  })
   afterAll(() => {
-    delete console.warn
+    process.emitWarning = origEmitWarning
   })
 
   test('add warning to doc when casting key in collection to string', () => {
@@ -515,16 +523,16 @@ describe('handling complex keys', () => {
   })
 
   test('warn when casting key in collection to string', () => {
-    console.warn = jest.fn()
+    process.emitWarning = jest.fn()
     const obj = YAML.parse('[foo]: bar')
     expect(Object.keys(obj)).toMatchObject(['[ foo ]'])
-    expect(console.warn).toHaveBeenCalled()
+    expect(process.emitWarning).toHaveBeenCalled()
   })
 
   test('warn when casting key in sequence to string', () => {
-    console.warn = jest.fn()
+    process.emitWarning = jest.fn()
     const obj = YAML.parse('[ [foo]: bar ]')
     expect(obj).toMatchObject([{ '[ foo ]': 'bar' }])
-    expect(console.warn).toHaveBeenCalled()
+    expect(process.emitWarning).toHaveBeenCalled()
   })
 })

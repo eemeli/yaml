@@ -1,9 +1,8 @@
-/* global console */
-
 import parseCST from './cst/parse'
 import YAMLDocument from './Document'
 import { YAMLSemanticError } from './errors'
 import Schema from './schema'
+import { warn } from './warnings'
 
 const defaultOptions = {
   anchorPrefix: 'a',
@@ -62,8 +61,7 @@ function parseDocument(src, options) {
 
 function parse(src, options) {
   const doc = parseDocument(src, options)
-  // eslint-disable-next-line no-console
-  doc.warnings.forEach(warning => console.warn(warning))
+  doc.warnings.forEach(warning => warn(warning))
   if (doc.errors.length > 0) throw doc.errors[0]
   return doc.toJSON()
 }
