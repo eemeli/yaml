@@ -1,6 +1,9 @@
 import YAML from '../../src/index'
 import { strOptions } from '../../src/tags/options'
 
+const collectionKeyWarning =
+  'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
+
 const spec = {
   '2.1. Collections': {
     'Example 2.1. Sequence of Scalars': {
@@ -199,7 +202,8 @@ rbi:
             '2001-08-14'
           ]
         }
-      ]
+      ],
+      warnings: [[collectionKeyWarning]]
     },
 
     'Example 2.12. Compact Nested Mapping': {
@@ -913,7 +917,8 @@ Chomping: |
      65
   avg: # Average
    0.278`,
-      tgt: [{ '{ first: Sammy, last: Sosa }': { hr: 65, avg: 0.278 } }]
+      tgt: [{ '{ first: Sammy, last: Sosa }': { hr: 65, avg: 0.278 } }],
+      warnings: [[collectionKeyWarning]]
     }
   },
   '6.8. Directives': {
@@ -1424,7 +1429,8 @@ foo: bar
           [{ '': 'empty key entry' }],
           [{ '{ JSON: like }': 'adjacent' }]
         ]
-      ]
+      ],
+      warnings: [[collectionKeyWarning]]
     },
 
     'Example 7.22. Invalid Implicit Keys': {
@@ -1681,7 +1687,8 @@ last line
       src: `- sun: yellow
 - ? earth: blue
   : moon: white\n`,
-      tgt: [[{ sun: 'yellow' }, { '{ earth: blue }': { moon: 'white' } }]]
+      tgt: [[{ sun: 'yellow' }, { '{ earth: blue }': { moon: 'white' } }]],
+      warnings: [[collectionKeyWarning]]
     }
   },
 

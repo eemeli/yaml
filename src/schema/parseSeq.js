@@ -1,5 +1,5 @@
 import { Type } from '../constants'
-import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
+import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
 import Pair from './Pair'
 import {
   checkFlowCollectionEnd,
@@ -7,6 +7,7 @@ import {
   resolveComments
 } from './parseUtils'
 import Seq from './Seq'
+import Collection from './Collection'
 
 export default function parseSeq(doc, cst) {
   if (cst.type !== Type.SEQ && cst.type !== Type.FLOW_SEQ) {
@@ -21,6 +22,14 @@ export default function parseSeq(doc, cst) {
   const seq = new Seq()
   seq.items = items
   resolveComments(seq, comments)
+  if (
+    !doc.options.mapAsMap &&
+    items.some(it => it instanceof Pair && it.key instanceof Collection)
+  ) {
+    const warn =
+      'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
+    doc.warnings.push(new YAMLWarning(cst, warn))
+  }
   cst.resolved = seq
   return seq
 }

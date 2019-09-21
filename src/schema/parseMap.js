@@ -1,6 +1,6 @@
 import { Char, Type } from '../constants'
 import PlainValue from '../cst/PlainValue'
-import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
+import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
 import Map from './Map'
 import Merge, { MERGE_KEY } from './Merge'
 import Pair from './Pair'
@@ -10,6 +10,7 @@ import {
   resolveComments
 } from './parseUtils'
 import Alias from './Alias'
+import Collection from './Collection'
 
 export default function parseMap(doc, cst) {
   if (cst.type !== Type.MAP && cst.type !== Type.FLOW_MAP) {
@@ -24,8 +25,10 @@ export default function parseMap(doc, cst) {
   const map = new Map()
   map.items = items
   resolveComments(map, comments)
+  let hasCollectionKey = false
   for (let i = 0; i < items.length; ++i) {
     const { key: iKey } = items[i]
+    if (iKey instanceof Collection) hasCollectionKey = true
     if (doc.schema.merge && iKey && iKey.value === MERGE_KEY) {
       items[i] = new Merge(items[i])
       const sources = items[i].value.items
@@ -57,6 +60,11 @@ export default function parseMap(doc, cst) {
         }
       }
     }
+  }
+  if (hasCollectionKey && !doc.options.mapAsMap) {
+    const warn =
+      'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
+    doc.warnings.push(new YAMLWarning(cst, warn))
   }
   cst.resolved = map
   return map
