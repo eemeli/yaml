@@ -643,3 +643,41 @@ invoice:
     })
   })
 })
+
+describe('schema changes', () => {
+  test('write as json', () => {
+    const doc = YAML.parseDocument('foo: bar', { schema: 'core' })
+    expect(doc.options.schema).toBe('core')
+    doc.setSchema('json')
+    expect(doc.options.schema).toBe('json')
+    expect(String(doc)).toBe('"foo": "bar"\n')
+  })
+
+  test('fail for missing type', () => {
+    const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
+      version: '1.1'
+    })
+    expect(doc.options.version).toBe('1.1')
+    doc.setSchema('1.2')
+    expect(doc.version).toBeNull()
+    expect(doc.options.version).toBe('1.2')
+    expect(doc.options.schema).toBeUndefined()
+    expect(() => String(doc)).toThrow(/Tag not resolved for Date value/)
+  })
+
+  test('set schema + custom tags', () => {
+    const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
+      version: '1.1'
+    })
+    doc.setSchema('json', ['timestamp'])
+    expect(String(doc)).toBe('"foo": 1971-02-03T12:13:14\n')
+  })
+
+  test('set version + custom tags', () => {
+    const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
+      version: '1.1'
+    })
+    doc.setSchema(1.2, ['timestamp'])
+    expect(String(doc)).toBe('foo: 1971-02-03T12:13:14\n')
+  })
+})

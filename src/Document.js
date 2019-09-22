@@ -139,11 +139,19 @@ export default class Document {
     }
   }
 
-  setSchema() {
-    if (!this.schema)
-      this.schema = new Schema(
-        Object.assign({}, this.getDefaults(), this.options)
-      )
+  setSchema(id, customTags) {
+    if (!id && !customTags && this.schema) return
+    if (typeof id === 'number') id = id.toFixed(1)
+    if (id === '1.0' || id === '1.1' || id === '1.2') {
+      if (this.version) this.version = id
+      else this.options.version = id
+      delete this.options.schema
+    } else if (id && typeof id === 'string') {
+      this.options.schema = id
+    }
+    if (Array.isArray(customTags)) this.options.customTags = customTags
+    const opt = Object.assign({}, this.getDefaults(), this.options)
+    this.schema = new Schema(opt)
   }
 
   parse(node, prevDoc) {
