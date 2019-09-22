@@ -1,6 +1,7 @@
 // Published as 'yaml/pair'
 
 import addComment from '../addComment'
+import { Type } from '../constants'
 import toJSON from '../toJSON'
 import Collection from './Collection'
 import Node from './Node'
@@ -60,7 +61,12 @@ export default class Pair extends Node {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
     let { key, value } = this
     let keyComment = key instanceof Node && key.comment
-    const explicitKey = !key || keyComment || key instanceof Collection
+    const explicitKey =
+      !key ||
+      keyComment ||
+      key instanceof Collection ||
+      key.type === Type.BLOCK_FOLDED ||
+      key.type === Type.BLOCK_LITERAL
     const { doc, indent } = ctx
     ctx = Object.assign({}, ctx, {
       implicitKey: !explicitKey,

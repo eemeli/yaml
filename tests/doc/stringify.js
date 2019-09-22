@@ -181,25 +181,32 @@ test('array', () => {
   )
 })
 
-test('object', () => {
-  const object = { x: 3, y: [4], z: { w: 'five', v: 6 } }
-  const str = YAML.stringify(object)
-  expect(str).toBe(
-    `x: 3
+describe('maps', () => {
+  test('JS Object', () => {
+    const object = { x: 3, y: [4], z: { w: 'five', v: 6 } }
+    const str = YAML.stringify(object)
+    expect(str).toBe(
+      `x: 3
 y:
   - 4
 z:
   w: five
   v: 6\n`
-  )
-})
+    )
+  })
 
-test('Map with non-Pair item', () => {
-  const doc = new YAML.Document()
-  doc.contents = YAML.createNode({ x: 3, y: 4 })
-  expect(String(doc)).toBe('x: 3\ny: 4\n')
-  doc.contents.items.push('TEST')
-  expect(() => String(doc)).toThrow(/^Map items must all be pairs.*TEST/)
+  test('Map with non-Pair item', () => {
+    const doc = new YAML.Document()
+    doc.contents = YAML.createNode({ x: 3, y: 4 })
+    expect(String(doc)).toBe('x: 3\ny: 4\n')
+    doc.contents.items.push('TEST')
+    expect(() => String(doc)).toThrow(/^Map items must all be pairs.*TEST/)
+  })
+
+  test('Keep block scalar types for keys', () => {
+    const doc = YAML.parseDocument('? >\n foo\n: bar')
+    expect(String(doc)).toBe('? >\n  foo\n: bar\n')
+  })
 })
 
 test('eemeli/yaml#43: Quoting colons', () => {
