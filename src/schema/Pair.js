@@ -59,14 +59,25 @@ export default class Pair extends Node {
 
   toString(ctx, onComment, onChompKeep) {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
+    const { simpleKeys } = ctx.doc.options
     let { key, value } = this
     let keyComment = key instanceof Node && key.comment
+    if (simpleKeys) {
+      if (keyComment) {
+        throw new Error('With simple keys, key nodes cannot have comments')
+      }
+      if (key instanceof Collection) {
+        const msg = 'With simple keys, collection cannot be used as a key value'
+        throw new Error(msg)
+      }
+    }
     const explicitKey =
-      !key ||
-      keyComment ||
-      key instanceof Collection ||
-      key.type === Type.BLOCK_FOLDED ||
-      key.type === Type.BLOCK_LITERAL
+      !simpleKeys &&
+      (!key ||
+        keyComment ||
+        key instanceof Collection ||
+        key.type === Type.BLOCK_FOLDED ||
+        key.type === Type.BLOCK_LITERAL)
     const { doc, indent } = ctx
     ctx = Object.assign({}, ctx, {
       implicitKey: !explicitKey,
@@ -80,7 +91,7 @@ export default class Pair extends Node {
       () => (chompKeep = true)
     )
     str = addComment(str, ctx.indent, keyComment)
-    if (ctx.allNullValues) {
+    if (ctx.allNullValues && !simpleKeys) {
       if (this.comment) {
         str = addComment(str, ctx.indent, this.comment)
         if (onComment) onComment()

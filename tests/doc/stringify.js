@@ -330,3 +330,39 @@ test('eemeli/yaml#87', () => {
   doc.set('test', { a: 'test' })
   expect(String(doc)).toBe('test:\n  a: test\n')
 })
+
+describe('simple keys', () => {
+  test('key with null value', () => {
+    const doc = YAML.parseDocument('~: ~')
+    expect(String(doc)).toBe('? null\n')
+    doc.options.simpleKeys = true
+    expect(String(doc)).toBe('null: null\n')
+  })
+
+  test('key with block scalar value', () => {
+    const doc = YAML.parseDocument('foo: bar')
+    doc.contents.items[0].key.type = 'BLOCK_LITERAL'
+    expect(String(doc)).toBe('? |-\n  foo\n: bar\n')
+    doc.options.simpleKeys = true
+    expect(String(doc)).toBe('"foo": bar\n')
+  })
+
+  test('key with comment', () => {
+    const doc = YAML.parseDocument('foo: bar')
+    doc.contents.items[0].key.comment = 'FOO'
+    expect(String(doc)).toBe('? foo #FOO\n: bar\n')
+    doc.options.simpleKeys = true
+    expect(() => String(doc)).toThrow(
+      /With simple keys, key nodes cannot have comments/
+    )
+  })
+
+  test('key with collection value', () => {
+    const doc = YAML.parseDocument('[foo]: bar')
+    expect(String(doc)).toBe('? [ foo ]\n: bar\n')
+    doc.options.simpleKeys = true
+    expect(() => String(doc)).toThrow(
+      /With simple keys, collection cannot be used as a key value/
+    )
+  })
+})
