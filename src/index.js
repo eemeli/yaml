@@ -13,6 +13,7 @@ const defaultOptions = {
   mapAsMap: false,
   maxAliasCount: 100,
   prettyErrors: false, // TODO Set true in v2
+  simpleKeys: false,
   version: '1.2'
 }
 
