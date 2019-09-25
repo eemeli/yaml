@@ -70,6 +70,11 @@
 <td>The base schema to use. By default <code>&#39;core&#39;</code> for YAML 1.2 and <code>&#39;yaml-1.1&#39;</code> for earlier versions.</td>
 </tr>
 <tr>
+<td>simpleKeys</td>
+<td><code>boolean</code></td>
+<td>When stringifying, require keys to be scalars and to use implicit rather than explicit notation. By default <code>false</code>.</td>
+</tr>
+<tr>
 <td>version</td>
 <td><code>string</code></td>
 <td>The YAML version used by documents without a <code>%YAML</code> directive. By default <code>&#39;1.2&#39;</code>.</td>

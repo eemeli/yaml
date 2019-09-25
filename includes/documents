@@ -64,7 +64,7 @@
 <tr>
 <td>commentBefore</td>
 <td><code>string?</code></td>
-<td>A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line when stringified.</td>
+<td>A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line or the directives-end indicator when stringified.</td>
 </tr>
 <tr>
 <td>comment</td>
@@ -75,6 +75,11 @@
 <td>contents</td>
 <td><a href="#content-nodes"><code>Node</code></a>&vert;<code>any</code></td>
 <td>The document contents.</td>
+</tr>
+<tr>
+<td>directivesEndMarker</td>
+<td><code>boolean?</code></td>
+<td>Whether the document should always include a directives-end marker <code>---</code> at its start, even if it includes no directives.</td>
 </tr>
 <tr>
 <td>errors</td>
@@ -137,9 +142,9 @@
 <td>Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed <code>cst</code>. Calling this multiple times on a Document is not recommended.</td>
 </tr>
 <tr>
-<td>setSchema()</td>
+<td>setSchema(id, customTags)</td>
 <td><code>void</code></td>
-<td>When a document is created with <code>new YAML.Document()</code>, the schema object is not set as it may be influenced by parsed directives; call this to set it manually.</td>
+<td>When a document is created with <code>new YAML.Document()</code>, the schema object is not set as it may be influenced by parsed directives; call this with no arguments to set it manually, or with arguments to change the schema used by the document. <code>id</code> may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, <code>customTags</code> should have the same shape as the similarly-named option.</td>
 </tr>
 <tr>
 <td>setTagPrefix(handle, prefix)</td>

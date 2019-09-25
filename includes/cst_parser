@@ -213,9 +213,11 @@ mapping: { sky: blue, sea: green }
   <span class="nl">directives</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Comment</span> <span class="o">|</span> <span class="nx">Directive</span><span class="o">&gt;</span><span class="p">,</span>
   <span class="nx">contents</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">ContentNode</span><span class="o">&gt;</span><span class="p">,</span>
   <span class="nx">type</span><span class="p">:</span> <span class="s1">'DOCUMENT'</span><span class="p">,</span>
+  <span class="nx">directivesEndMarker</span><span class="p">:</span> <span class="nx">Range</span> <span class="o">|</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="nx">documentEndMarker</span><span class="p">:</span> <span class="nx">Range</span> <span class="o">|</span> <span class="kc">null</span><span class="p">,</span>
   <span class="o">+</span><span class="nx">anchor</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
   <span class="o">+</span><span class="nx">comment</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
   <span class="o">+</span><span class="nx">tag</span><span class="p">:</span> <span class="kc">null</span>
 <span class="p">}</span>
 </code></pre>
-<p>The CST tree of a valid YAML document should have a single non-<code>Comment</code> <code>ContentNode</code> in its <code>contents</code> array. Multiple values indicates that the input is malformed in a way that made it impossible to determine the proper structure of the document.</p>
+<p>The CST tree of a valid YAML document should have a single non-<code>Comment</code> <code>ContentNode</code> in its <code>contents</code> array. Multiple values indicates that the input is malformed in a way that made it impossible to determine the proper structure of the document. If <code>directivesEndMarker</code> or <code>documentEndMarker</code> are non-empty, the document includes (respectively) a directives-end marker <code>---</code> or a document-end marker <code>...</code> with the indicated range.</p>

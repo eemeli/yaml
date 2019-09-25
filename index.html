@@ -544,6 +544,11 @@ yarn add yaml
 <td>The base schema to use. By default <code>&#39;core&#39;</code> for YAML 1.2 and <code>&#39;yaml-1.1&#39;</code> for earlier versions.</td>
 </tr>
 <tr>
+<td>simpleKeys</td>
+<td><code>boolean</code></td>
+<td>When stringifying, require keys to be scalars and to use implicit rather than explicit notation. By default <code>false</code>.</td>
+</tr>
+<tr>
 <td>version</td>
 <td><code>string</code></td>
 <td>The YAML version used by documents without a <code>%YAML</code> directive. By default <code>&#39;1.2&#39;</code>.</td>
@@ -667,7 +672,7 @@ target:
 <tr>
 <td>commentBefore</td>
 <td><code>string?</code></td>
-<td>A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line when stringified.</td>
+<td>A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line or the directives-end indicator when stringified.</td>
 </tr>
 <tr>
 <td>comment</td>
@@ -678,6 +683,11 @@ target:
 <td>contents</td>
 <td><a href="#content-nodes"><code>Node</code></a>&vert;<code>any</code></td>
 <td>The document contents.</td>
+</tr>
+<tr>
+<td>directivesEndMarker</td>
+<td><code>boolean?</code></td>
+<td>Whether the document should always include a directives-end marker <code>---</code> at its start, even if it includes no directives.</td>
 </tr>
 <tr>
 <td>errors</td>
@@ -740,9 +750,9 @@ target:
 <td>Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed <code>cst</code>. Calling this multiple times on a Document is not recommended.</td>
 </tr>
 <tr>
-<td>setSchema()</td>
+<td>setSchema(id, customTags)</td>
 <td><code>void</code></td>
-<td>When a document is created with <code>new YAML.Document()</code>, the schema object is not set as it may be influenced by parsed directives; call this to set it manually.</td>
+<td>When a document is created with <code>new YAML.Document()</code>, the schema object is not set as it may be influenced by parsed directives; call this with no arguments to set it manually, or with arguments to change the schema used by the document. <code>id</code> may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, <code>customTags</code> should have the same shape as the similarly-named option.</td>
 </tr>
 <tr>
 <td>setTagPrefix(handle, prefix)</td>
@@ -1464,12 +1474,14 @@ mapping: { sky: blue, sea: green }
   <span class="nl">directives</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Comment</span> <span class="o">|</span> <span class="nx">Directive</span><span class="o">&gt;</span><span class="p">,</span>
   <span class="nx">contents</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">ContentNode</span><span class="o">&gt;</span><span class="p">,</span>
   <span class="nx">type</span><span class="p">:</span> <span class="s1">'DOCUMENT'</span><span class="p">,</span>
+  <span class="nx">directivesEndMarker</span><span class="p">:</span> <span class="nx">Range</span> <span class="o">|</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="nx">documentEndMarker</span><span class="p">:</span> <span class="nx">Range</span> <span class="o">|</span> <span class="kc">null</span><span class="p">,</span>
   <span class="o">+</span><span class="nx">anchor</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
   <span class="o">+</span><span class="nx">comment</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
   <span class="o">+</span><span class="nx">tag</span><span class="p">:</span> <span class="kc">null</span>
 <span class="p">}</span>
 </code></pre>
-<p>The CST tree of a valid YAML document should have a single non-<code>Comment</code> <code>ContentNode</code> in its <code>contents</code> array. Multiple values indicates that the input is malformed in a way that made it impossible to determine the proper structure of the document.</p>
+<p>The CST tree of a valid YAML document should have a single non-<code>Comment</code> <code>ContentNode</code> in its <code>contents</code> array. Multiple values indicates that the input is malformed in a way that made it impossible to determine the proper structure of the document. If <code>directivesEndMarker</code> or <code>documentEndMarker</code> are non-empty, the document includes (respectively) a directives-end marker <code>---</code> or a document-end marker <code>...</code> with the indicated range.</p>
 <h1 id='errors'>Errors</h1>
 <p>Nearly all errors and warnings produced by the <code>yaml</code> parser functions contain the following fields:</p>
 
