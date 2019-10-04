@@ -145,7 +145,10 @@ export default class Node {
   }
 
   constructor(type, props, context) {
-    this.context = context || null
+    Object.defineProperty(this, 'context', {
+      value: context || null,
+      writable: true
+    })
     this.error = null
     this.range = null
     this.valueRange = null
