@@ -316,57 +316,82 @@ describe('flow collection as same-line mapping key value', () => {
   })
 })
 
-describe('blank lines before empty collection item value (eemeli/yaml#126', () => {
+describe('blank lines before empty collection item value', () => {
   test('empty value followed by blank line at document end', () => {
     const src = 'a:\n\n'
     const doc = parse(src)[0]
-    expect(doc.contents[0].items).toMatchObject([
-      { type: 'PLAIN', props: [] },
-      { type: 'MAP_VALUE', node: null, props: [] }
+    expect(doc.contents).toMatchObject([
+      {
+        type: 'MAP',
+        items: [
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] }
+        ]
+      }
     ])
   })
 
   test('empty value with blank line before comment at document end', () => {
     const src = 'a:\n\n#c\n'
     const doc = parse(src)[0]
-    expect(doc.contents[0].items).toMatchObject([
-      { type: 'PLAIN', props: [] },
+    expect(doc.contents).toMatchObject([
+      {
+        type: 'MAP',
+        items: [
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] }
+        ]
+      },
       { type: 'BLANK_LINE', range: { start: 3, end: 4 } },
-      { type: 'MAP_VALUE', node: null, props: [{ start: 4, end: 6 }] }
+      { type: 'COMMENT', range: { start: 4, end: 6 } }
     ])
   })
 
   test('empty value with blank line after comment at document end', () => {
     const src = 'a: #c\n\n'
     const doc = parse(src)[0]
-    expect(doc.contents[0].items).toMatchObject([
-      { type: 'PLAIN', props: [] },
-      { type: 'MAP_VALUE', node: null, props: [{ start: 3, end: 5 }] }
+    expect(doc.contents).toMatchObject([
+      {
+        type: 'MAP',
+        items: [
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [{ start: 3, end: 5 }] }
+        ]
+      }
     ])
   })
 
   test('empty value with blank line before & after comment at document end', () => {
     const src = 'a:\n\n#c\n\n'
     const doc = parse(src)[0]
-    expect(doc.contents[0].items).toMatchObject([
-      { type: 'PLAIN', props: [] },
+    expect(doc.contents).toMatchObject([
+      {
+        type: 'MAP',
+        items: [
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] }
+        ]
+      },
       { type: 'BLANK_LINE', range: { start: 3, end: 4 } },
-      { type: 'MAP_VALUE', node: null, props: [{ start: 4, end: 6 }] }
+      { type: 'COMMENT', range: { start: 4, end: 6 } }
     ])
   })
 
   test('empty value with blank lines before & after two comments at document end', () => {
     const src = 'a:\n\n#c\n\n#d\n\n'
     const doc = parse(src)[0]
-    expect(doc.contents[0].items).toMatchObject([
-      { type: 'PLAIN', props: [] },
-      { type: 'BLANK_LINE', range: { start: 3, end: 4 } },
-      // blank line between #c & #d is dropped
+    expect(doc.contents).toMatchObject([
       {
-        type: 'MAP_VALUE',
-        node: null,
-        props: [{ start: 4, end: 6 }, { start: 8, end: 10 }]
-      }
+        type: 'MAP',
+        items: [
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] }
+        ]
+      },
+      { type: 'BLANK_LINE', range: { start: 3, end: 4 } },
+      { type: 'COMMENT', range: { start: 4, end: 6 } },
+      { type: 'BLANK_LINE', range: { start: 7, end: 8 } },
+      { type: 'COMMENT', range: { start: 8, end: 10 } }
     ])
   })
 
@@ -387,8 +412,9 @@ describe('blank lines before empty collection item value (eemeli/yaml#126', () =
     const doc = parse(src)[0]
     expect(doc.contents[0].items).toMatchObject([
       { type: 'PLAIN', props: [] },
+      { type: 'MAP_VALUE', node: null, props: [] },
       { type: 'BLANK_LINE', range: { start: 3, end: 4 } },
-      { type: 'MAP_VALUE', node: null, props: [{ start: 4, end: 6 }] },
+      { type: 'COMMENT', range: { start: 4, end: 6 } },
       { type: 'PLAIN', props: [] },
       { type: 'MAP_VALUE', node: null, props: [] }
     ])
@@ -411,8 +437,9 @@ describe('blank lines before empty collection item value (eemeli/yaml#126', () =
     const doc = parse(src)[0]
     expect(doc.contents[0].items).toMatchObject([
       { type: 'PLAIN', props: [] },
+      { type: 'MAP_VALUE', node: null, props: [] },
       { type: 'BLANK_LINE', range: { start: 3, end: 4 } },
-      { type: 'MAP_VALUE', node: null, props: [{ start: 4, end: 6 }] },
+      { type: 'COMMENT', range: { start: 4, end: 6 } },
       { type: 'BLANK_LINE', range: { start: 7, end: 8 } },
       { type: 'PLAIN', props: [] },
       { type: 'MAP_VALUE', node: null, props: [] }
@@ -423,16 +450,25 @@ describe('blank lines before empty collection item value (eemeli/yaml#126', () =
     const src = '\r\na:\r\n\r\n#c\r\n'
     const cst = parse(src)
     cst.setOrigRanges()
-    expect(cst[0].contents[1].items).toMatchObject([
-      { type: 'PLAIN', props: [] },
+    expect(cst[0].contents).toMatchObject([
+      {
+        type: 'BLANK_LINE',
+        range: { start: 0, end: 1, origStart: 1, origEnd: 2 }
+      },
+      {
+        type: 'MAP',
+        items: [
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] }
+        ]
+      },
       {
         type: 'BLANK_LINE',
         range: { start: 4, end: 5, origStart: 7, origEnd: 8 }
       },
       {
-        type: 'MAP_VALUE',
-        node: null,
-        props: [{ start: 5, end: 7, origStart: 8, origEnd: 10 }]
+        type: 'COMMENT',
+        range: { start: 5, end: 7, origStart: 8, origEnd: 10 }
       }
     ])
   })
@@ -455,23 +491,32 @@ describe('blank lines before empty collection item value (eemeli/yaml#126', () =
     const src = '\r\na:\r\n\r\n#c\r\n\r\nb:\r\n'
     const cst = parse(src)
     cst.setOrigRanges()
-    expect(cst[0].contents[1].items).toMatchObject([
-      { type: 'PLAIN', props: [] },
+    expect(cst[0].contents).toMatchObject([
       {
         type: 'BLANK_LINE',
-        range: { start: 4, end: 5, origStart: 7, origEnd: 8 }
+        range: { start: 0, end: 1, origStart: 1, origEnd: 2 }
       },
       {
-        type: 'MAP_VALUE',
-        node: null,
-        props: [{ start: 5, end: 7, origStart: 8, origEnd: 10 }]
-      },
-      {
-        type: 'BLANK_LINE',
-        range: { start: 8, end: 9, origStart: 13, origEnd: 14 }
-      },
-      { type: 'PLAIN', props: [] },
-      { type: 'MAP_VALUE', node: null, props: [] }
+        type: 'MAP',
+        items: [
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] },
+          {
+            type: 'BLANK_LINE',
+            range: { start: 4, end: 5, origStart: 7, origEnd: 8 }
+          },
+          {
+            type: 'COMMENT',
+            range: { start: 5, end: 7, origStart: 8, origEnd: 10 }
+          },
+          {
+            type: 'BLANK_LINE',
+            range: { start: 8, end: 9, origStart: 13, origEnd: 14 }
+          },
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] }
+        ]
+      }
     ])
   })
 
@@ -479,27 +524,40 @@ describe('blank lines before empty collection item value (eemeli/yaml#126', () =
     const src = '\r\na:\r\n\r\n#c\r\n\r\n#d\r\n\r\nb:\r\n'
     const cst = parse(src)
     cst.setOrigRanges()
-    expect(cst[0].contents[1].items).toMatchObject([
-      { type: 'PLAIN', props: [] },
+    expect(cst[0].contents).toMatchObject([
       {
         type: 'BLANK_LINE',
-        range: { start: 4, end: 5, origStart: 7, origEnd: 8 }
+        range: { start: 0, end: 1, origStart: 1, origEnd: 2 }
       },
-      // blank line between #c & #d is dropped
       {
-        type: 'MAP_VALUE',
-        node: null,
-        props: [
-          { start: 5, end: 7, origStart: 8, origEnd: 10 },
-          { start: 9, end: 11, origStart: 14, origEnd: 16 }
+        type: 'MAP',
+        items: [
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] },
+          {
+            type: 'BLANK_LINE',
+            range: { start: 4, end: 5, origStart: 7, origEnd: 8 }
+          },
+          {
+            type: 'COMMENT',
+            range: { start: 5, end: 7, origStart: 8, origEnd: 10 }
+          },
+          {
+            type: 'BLANK_LINE',
+            range: { start: 8, end: 9, origStart: 13, origEnd: 14 }
+          },
+          {
+            type: 'COMMENT',
+            range: { start: 9, end: 11, origStart: 14, origEnd: 16 }
+          },
+          {
+            type: 'BLANK_LINE',
+            range: { start: 12, end: 13, origStart: 19, origEnd: 20 }
+          },
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] }
         ]
-      },
-      {
-        type: 'BLANK_LINE',
-        range: { start: 12, end: 13, origStart: 19, origEnd: 20 }
-      },
-      { type: 'PLAIN', props: [] },
-      { type: 'MAP_VALUE', node: null, props: [] }
+      }
     ])
   })
 })

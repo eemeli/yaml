@@ -32,22 +32,18 @@ export default class CollectionItem extends Node {
     const indent = atLineStart ? start - lineStart : context.indent
     let offset = Node.endOfWhiteSpace(src, start + 1)
     let ch = src[offset]
+    const comments = []
     let blankLine = null
-    let isEmpty = true
     while (ch === '\n' || ch === '#') {
       if (ch === '#') {
         const end = Node.endOfLine(src, offset + 1)
-        this.props.push(new Range(offset, end))
+        comments.push(new Range(offset, end))
         offset = end
-        isEmpty = false
       } else {
         atLineStart = true
         lineStart = offset + 1
         const wsEnd = Node.endOfWhiteSpace(src, lineStart)
-        if (isEmpty && src[wsEnd] === '\n') {
-          // Only blank lines preceding non-empty chars are captured. Note that
-          // this means that collection item range start indices do not always
-          // increase monotonically. -- eemeli/yaml#126
+        if (src[wsEnd] === '\n' && comments.length === 0) {
           blankLine = new BlankLine()
           lineStart = blankLine.parse({ src }, lineStart)
         }
@@ -71,20 +67,26 @@ export default class CollectionItem extends Node {
         { atLineStart, inCollection: false, indent, lineStart, parent: this },
         offset
       )
-      if (this.node) {
-        offset = this.node.range.end
-        isEmpty = false
-      }
+      if (this.node) offset = this.node.range.end
     } else if (ch && lineStart > start + 1) {
       offset = lineStart - 1
+    }
+    if (blankLine && !this.node) {
+      // Only blank lines preceding non-empty nodes are captured. Note that
+      // this means that collection item range start indices do not always
+      // increase monotonically. -- eemeli/yaml#126
+      offset = blankLine.range.end
+      blankLine = null
+    } else {
+      if (blankLine) {
+        const items = context.parent.items || context.parent.contents
+        if (items) items.push(blankLine)
+      }
+      if (comments.length) Array.prototype.push.apply(this.props, comments)
     }
     const end = this.node ? this.node.valueRange.end : offset
     trace: 'item-end', { start, end, offset }
     this.valueRange = new Range(start, end)
-    if (blankLine && !isEmpty) {
-      const items = context.parent.items || context.parent.contents
-      if (items) items.push(blankLine)
-    }
     return offset
   }
 
