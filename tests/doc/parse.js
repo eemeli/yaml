@@ -285,7 +285,7 @@ describe('eemeli/yaml#l19', () => {
   test('map', () => {
     const src = 'a:\n  # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('a: null # 123\n')
+    expect(String(doc)).toBe('? a\n\n# 123\n')
   })
 
   test('seq', () => {
@@ -346,19 +346,13 @@ test('eemeli/yaml#120', () => {
   })
 })
 
-test('fake node should respect setOrigRanges()', () => {
-  const cst = YAML.parseCST('a:\r\n  # 123')
+test('empty node should respect setOrigRanges()', () => {
+  const cst = YAML.parseCST('\r\na: # 123\r\n')
+  expect(cst).toHaveLength(1)
   expect(cst.setOrigRanges()).toBe(true)
-  const ast = cst.map(doc =>
-    new YAML.Document({ keepCstNodes: true }).parse(doc)
-  )
-  const fakePlain = ast[0].contents.items[0].value.cstNode
-  expect(fakePlain.range).toEqual({
-    start: 2,
-    end: 2,
-    origStart: 2,
-    origEnd: 2
-  })
+  const doc = new YAML.Document({ keepCstNodes: true }).parse(cst[0])
+  const empty = doc.contents.items[0].value.cstNode
+  expect(empty.range).toEqual({ start: 3, end: 3, origStart: 4, origEnd: 4 })
 })
 
 test('parse an empty string as null', () => {

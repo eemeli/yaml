@@ -32,6 +32,7 @@ export default class CollectionItem extends Node {
     const indent = atLineStart ? start - lineStart : context.indent
     let offset = Node.endOfWhiteSpace(src, start + 1)
     let ch = src[offset]
+    const inlineComment = ch === '#'
     const comments = []
     let blankLine = null
     while (ch === '\n' || ch === '#') {
@@ -67,22 +68,27 @@ export default class CollectionItem extends Node {
         { atLineStart, inCollection: false, indent, lineStart, parent: this },
         offset
       )
-      if (this.node) offset = this.node.range.end
     } else if (ch && lineStart > start + 1) {
       offset = lineStart - 1
     }
-    if (blankLine && !this.node) {
-      // Only blank lines preceding non-empty nodes are captured. Note that
-      // this means that collection item range start indices do not always
-      // increase monotonically. -- eemeli/yaml#126
-      offset = blankLine.range.end
-      blankLine = null
-    } else {
+    if (this.node) {
       if (blankLine) {
+        // Only blank lines preceding non-empty nodes are captured. Note that
+        // this means that collection item range start indices do not always
+        // increase monotonically. -- eemeli/yaml#126
         const items = context.parent.items || context.parent.contents
         if (items) items.push(blankLine)
       }
       if (comments.length) Array.prototype.push.apply(this.props, comments)
+      offset = this.node.range.end
+    } else {
+      if (inlineComment) {
+        const c = comments[0]
+        this.props.push(c)
+        offset = c.end
+      } else {
+        offset = Node.endOfLine(src, start + 1)
+      }
     }
     const end = this.node ? this.node.valueRange.end : offset
     trace: 'item-end', { start, end, offset }

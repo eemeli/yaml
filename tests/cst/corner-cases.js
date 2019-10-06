@@ -119,9 +119,16 @@ test('eemeli/yaml#10', () => {
 test('eemeli/yaml#19', () => {
   const src = 'a:\n  # 123'
   const doc = parse(src)[0]
-  const { items } = doc.contents[0]
-  expect(items).toHaveLength(2)
-  expect(items[1].comment).toBe(' 123')
+  expect(doc.contents).toMatchObject([
+    {
+      type: 'MAP',
+      items: [
+        { type: 'PLAIN', range: { start: 0, end: 1 } },
+        { type: 'MAP_VALUE', range: { start: 1, end: 2 } }
+      ]
+    },
+    { type: 'COMMENT', range: { start: 5, end: 10 } }
+  ])
 })
 
 test('eemeli/yaml#20', () => {
@@ -347,7 +354,7 @@ describe('blank lines before empty collection item value', () => {
     ])
   })
 
-  test('empty value with blank line after comment at document end', () => {
+  test('empty value with blank line after inline comment at document end', () => {
     const src = 'a: #c\n\n'
     const doc = parse(src)[0]
     expect(doc.contents).toMatchObject([
@@ -358,6 +365,21 @@ describe('blank lines before empty collection item value', () => {
           { type: 'MAP_VALUE', node: null, props: [{ start: 3, end: 5 }] }
         ]
       }
+    ])
+  })
+
+  test('empty value with blank line after separate-line comment at document end', () => {
+    const src = 'a:\n#c\n\n'
+    const doc = parse(src)[0]
+    expect(doc.contents).toMatchObject([
+      {
+        type: 'MAP',
+        items: [
+          { type: 'PLAIN', props: [] },
+          { type: 'MAP_VALUE', node: null, props: [] }
+        ]
+      },
+      { type: 'COMMENT', range: { start: 3, end: 5 } }
     ])
   })
 
