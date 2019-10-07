@@ -38,6 +38,7 @@
   "scripts": {
     "browser:build": "BABEL_ENV=browser babel src/ --out-dir browser/dist/",
     "browser:copy": "cpy '*.js' '!*.config.js' types/ browser/ --parents",
+    "clean": "git clean -fdxe node_modules",
     "dist:build": "babel src/ --out-dir dist/",
     "build": "npm run dist:build && npm run browser:build && npm run browser:copy",
     "prettier": "prettier --write \"{src,tests}/**/*.js\"",
@@ -49,7 +50,7 @@
     "docs:deploy": "cd docs/ && ./deploy.sh",
     "docs": "cd docs/ && bundle exec middleman server",
     "preversion": "npm test && npm run build",
-    "prepublishOnly": "npm test && npm run build"
+    "prepublishOnly": "npm run clean && npm test && npm run build"
   },
   "browserslist": "> 0.5%, not dead",
   "jest": {
