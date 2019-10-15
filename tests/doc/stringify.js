@@ -1,3 +1,4 @@
+import { source } from 'common-tags'
 import YAML from '../../src/index'
 import { stringifyString } from '../../src/stringify'
 import { strOptions } from '../../src/tags/options'
@@ -365,4 +366,24 @@ describe('simple keys', () => {
       /With simple keys, collection cannot be used as a key value/
     )
   })
+})
+
+test('eemeli/yaml#128: YAML node inside object', () => {
+  const seq = YAML.createNode(['a'])
+  seq.commentBefore = 'sc'
+  const map = YAML.createNode({ foo: 'bar', seq })
+  map.commentBefore = 'mc'
+  const obj = { array: [1], map }
+  expect(YAML.stringify(obj)).toBe(
+    source`
+      array:
+        - 1
+      map:
+        #mc
+        foo: bar
+        seq:
+          #sc
+          - a
+    ` + '\n'
+  )
 })

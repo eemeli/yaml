@@ -58,6 +58,7 @@ export default class Schema {
   }
 
   createNode(value, wrapScalars, tag, ctx) {
+    if (value instanceof Node) return value
     let tagObj
     if (tag) {
       if (tag.startsWith('!!')) tag = Schema.defaultPrefix + tag.slice(2)
