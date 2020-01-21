@@ -23,9 +23,19 @@ export default class Schema {
     STR: 'tag:yaml.org,2002:str'
   }
 
-  constructor({ customTags, merge, schema, tags: deprecatedCustomTags }) {
+  constructor({
+    customTags,
+    merge,
+    schema,
+    sortMapEntries,
+    tags: deprecatedCustomTags
+  }) {
     this.merge = !!merge
     this.name = schema
+    this.sortMapEntries =
+      sortMapEntries === true
+        ? (a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0)
+        : sortMapEntries || null
     this.tags = schemas[schema.replace(/\W/g, '')] // 'yaml-1.1' -> 'yaml11'
     if (!this.tags) {
       const keys = Object.keys(schemas)

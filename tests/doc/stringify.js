@@ -1,5 +1,6 @@
 import { source } from 'common-tags'
 import YAML from '../../src/index'
+import Pair from '../../src/schema/Pair'
 import { stringifyString } from '../../src/stringify'
 import { strOptions } from '../../src/tags/options'
 
@@ -386,4 +387,32 @@ test('eemeli/yaml#128: YAML node inside object', () => {
           - a
     ` + '\n'
   )
+})
+
+describe('sortMapEntries', () => {
+  const obj = { b: 2, a: 1, c: 3 }
+  test('sortMapEntries: undefined', () => {
+    expect(YAML.stringify(obj)).toBe('b: 2\na: 1\nc: 3\n')
+  })
+  test('sortMapEntries: true', () => {
+    expect(YAML.stringify(obj, { sortMapEntries: true })).toBe('a: 1\nb: 2\nc: 3\n')
+  })
+  test('sortMapEntries: function', () => {
+    const sortMapEntries = (a, b) => (a.key < b.key ? 1 : a.key > b.key ? -1 : 0)
+    expect(YAML.stringify(obj, { sortMapEntries })).toBe('c: 3\nb: 2\na: 1\n')
+  })
+  test('doc.add', () => {
+    const doc = new YAML.Document({ sortMapEntries: true })
+    doc.setSchema()
+    doc.contents = doc.schema.createNode(obj)
+    doc.add(new Pair('bb', 4))
+    expect(String(doc)).toBe('a: 1\nb: 2\nbb: 4\nc: 3\n')
+  })
+  test('doc.set', () => {
+    const doc = new YAML.Document({ sortMapEntries: true })
+    doc.setSchema()
+    doc.contents = doc.schema.createNode(obj)
+    doc.set('bb', 4)
+    expect(String(doc)).toBe('a: 1\nb: 2\nbb: 4\nc: 3\n')
+  })
 })

@@ -10,6 +10,10 @@ function createMap(schema, obj, ctx) {
     for (const key of Object.keys(obj))
       map.items.push(schema.createPair(key, obj[key], ctx))
   }
+  if (typeof schema.sortMapEntries === 'function') {
+    map.items.sort(schema.sortMapEntries)
+    map.sortEntries = schema.sortMapEntries
+  }
   return map
 }
 

@@ -14,13 +14,21 @@ export function findPair(items, key) {
 }
 
 export default class YAMLMap extends Collection {
-  add(pair) {
+  add(pair, overwrite) {
     if (!pair) pair = new Pair(pair)
     else if (!(pair instanceof Pair))
       pair = new Pair(pair.key || pair, pair.value)
     const prev = findPair(this.items, pair.key)
-    if (prev) throw new Error(`Key ${pair.key} already set`)
-    this.items.push(pair)
+    if (prev) {
+      if (overwrite) prev.value = pair.value
+      else throw new Error(`Key ${pair.key} already set`)
+    } else if (this.sortEntries) {
+      const i = this.items.findIndex(item => this.sortEntries(pair, item) < 0)
+      if (i === -1) this.items.push(pair)
+      else this.items.splice(i, 0, pair)
+    } else {
+      this.items.push(pair)
+    }
   }
 
   delete(key) {
@@ -41,9 +49,7 @@ export default class YAMLMap extends Collection {
   }
 
   set(key, value) {
-    const prev = findPair(this.items, key)
-    if (prev) prev.value = value
-    else this.items.push(new Pair(key, value))
+    this.add(new Pair(key, value), true)
   }
 
   /**
