@@ -19,11 +19,12 @@ export default class YAMLMap extends Collection {
     else if (!(pair instanceof Pair))
       pair = new Pair(pair.key || pair, pair.value)
     const prev = findPair(this.items, pair.key)
+    const sortEntries = this.schema && this.schema.sortMapEntries
     if (prev) {
       if (overwrite) prev.value = pair.value
       else throw new Error(`Key ${pair.key} already set`)
-    } else if (this.sortEntries) {
-      const i = this.items.findIndex(item => this.sortEntries(pair, item) < 0)
+    } else if (sortEntries) {
+      const i = this.items.findIndex(item => sortEntries(pair, item) < 0)
       if (i === -1) this.items.push(pair)
       else this.items.splice(i, 0, pair)
     } else {

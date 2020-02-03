@@ -395,10 +395,13 @@ describe('sortMapEntries', () => {
     expect(YAML.stringify(obj)).toBe('b: 2\na: 1\nc: 3\n')
   })
   test('sortMapEntries: true', () => {
-    expect(YAML.stringify(obj, { sortMapEntries: true })).toBe('a: 1\nb: 2\nc: 3\n')
+    expect(YAML.stringify(obj, { sortMapEntries: true })).toBe(
+      'a: 1\nb: 2\nc: 3\n'
+    )
   })
   test('sortMapEntries: function', () => {
-    const sortMapEntries = (a, b) => (a.key < b.key ? 1 : a.key > b.key ? -1 : 0)
+    const sortMapEntries = (a, b) =>
+      a.key < b.key ? 1 : a.key > b.key ? -1 : 0
     expect(YAML.stringify(obj, { sortMapEntries })).toBe('c: 3\nb: 2\na: 1\n')
   })
   test('doc.add', () => {

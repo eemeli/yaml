@@ -31,7 +31,7 @@ export function parsePairs(doc, cst) {
 }
 
 export function createPairs(schema, iterable, ctx) {
-  const pairs = new YAMLSeq()
+  const pairs = new YAMLSeq(schema)
   pairs.tag = 'tag:yaml.org,2002:pairs'
   for (const it of iterable) {
     let key, value

@@ -2,7 +2,7 @@ import YAMLMap from '../../schema/Map'
 import parseMap from '../../schema/parseMap'
 
 function createMap(schema, obj, ctx) {
-  const map = new YAMLMap()
+  const map = new YAMLMap(schema)
   if (obj instanceof Map) {
     for (const [key, value] of obj)
       map.items.push(schema.createPair(key, value, ctx))
@@ -12,7 +12,6 @@ function createMap(schema, obj, ctx) {
   }
   if (typeof schema.sortMapEntries === 'function') {
     map.items.sort(schema.sortMapEntries)
-    map.sortEntries = schema.sortMapEntries
   }
   return map
 }

@@ -13,6 +13,11 @@ export default class Collection extends Node {
 
   items = []
 
+  constructor(schema) {
+    super()
+    this.schema = schema
+  }
+
   addIn(path, value) {
     if (isEmptyPath(path)) this.add(value)
     else {
