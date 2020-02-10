@@ -3,6 +3,17 @@ import Node from './Node'
 import Pair from './Pair'
 import Scalar from './Scalar'
 
+function collectionFromPath(schema, path, value) {
+  let v = value
+  for (let i = path.length - 1; i >= 0; --i) {
+    const k = path[i]
+    const o = Number.isInteger(k) && k >= 0 ? [] : {}
+    o[k] = v
+    v = o
+  }
+  return schema.createNode(v, false)
+}
+
 // null, undefined, or an empty non-string iterable (e.g. [])
 export const isEmptyPath = path =>
   path == null ||
@@ -24,6 +35,8 @@ export default class Collection extends Node {
       const [key, ...rest] = path
       const node = this.get(key, true)
       if (node instanceof Collection) node.addIn(rest, value)
+      else if (node === undefined && this.schema)
+        this.set(key, collectionFromPath(this.schema, rest, value))
       else
         throw new Error(
           `Expected YAML collection at ${key}. Remaining path: ${rest}`
@@ -78,6 +91,8 @@ export default class Collection extends Node {
     } else {
       const node = this.get(key, true)
       if (node instanceof Collection) node.setIn(rest, value)
+      else if (node === undefined && this.schema)
+        this.set(key, collectionFromPath(this.schema, rest, value))
       else
         throw new Error(
           `Expected YAML collection at ${key}. Remaining path: ${rest}`

@@ -303,9 +303,9 @@ describe('Collection', () => {
     map.addIn([], new Pair('c', 5))
     expect(map.get('c')).toBe(5)
     expect(() => map.addIn(['a'])).toThrow(/Expected YAML collection/)
-    expect(() => map.addIn(['b', 3])).toThrow(/Expected YAML collection/)
+    map.addIn(['b', 3], 6)
     expect(map.items).toHaveLength(3)
-    expect(map.get('b').items).toHaveLength(3)
+    expect(map.get('b').items).toHaveLength(4)
   })
 
   test('deleteIn', () => {
@@ -350,9 +350,10 @@ describe('Collection', () => {
     expect(map.get(1)).toBe(6)
     map.setIn(['b', 2], 6)
     expect(map.getIn(['b', 2])).toBe(6)
-    expect(() => map.setIn(['a', 'e'])).toThrow(/Expected YAML collection/)
-    expect(() => map.setIn(['e', 'e'])).toThrow(/Expected YAML collection/)
-    expect(map.items).toHaveLength(3)
+    map.setIn(['e', 'e'], 7)
+    expect(map.getIn(['e', 'e'])).toBe(7)
+    expect(() => map.setIn(['a', 'e'], 8)).toThrow(/Expected YAML collection/)
+    expect(map.items).toHaveLength(4)
     expect(map.get('b').items).toHaveLength(3)
   })
 })
@@ -385,9 +386,9 @@ describe('Document', () => {
     doc.addIn([], new Pair('c', 5))
     expect(doc.get('c')).toBe(5)
     expect(() => doc.addIn(['a'])).toThrow(/Expected YAML collection/)
-    expect(() => doc.addIn(['b', 3])).toThrow(/Expected YAML collection/)
+    doc.addIn(['b', 3], 6)
     expect(doc.contents.items).toHaveLength(3)
-    expect(doc.get('b').items).toHaveLength(3)
+    expect(doc.get('b').items).toHaveLength(4)
   })
 
   test('delete', () => {
@@ -474,10 +475,14 @@ describe('Document', () => {
     expect(doc.getIn(['b', 1])).toBe(5)
     doc.setIn(['c'], 6)
     expect(doc.getIn(['c'])).toBe(6)
-    expect(() => doc.setIn(['a', 'e'])).toThrow(/Expected YAML collection/)
-    expect(() => doc.setIn(['e', 'e'], 1)).toThrow(/Expected YAML collection/)
-    expect(doc.contents.items).toHaveLength(3)
+    doc.setIn(['e', 1, 'e'], 7)
+    expect(doc.getIn(['e', 1, 'e'])).toBe(7)
+    expect(() => doc.setIn(['a', 'e'], 8)).toThrow(/Expected YAML collection/)
+    expect(doc.contents.items).toHaveLength(4)
     expect(doc.get('b').items).toHaveLength(2)
+    expect(String(doc)).toBe(
+      'a: 2\nb:\n  - 2\n  - 5\nc: 6\ne:\n  - null\n  - e: 7\n'
+    )
 
     doc.contents = YAML.createNode('s')
     expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
