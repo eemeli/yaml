@@ -103,14 +103,14 @@ export default class Schema {
     }
     const obj = {}
     if (value && typeof value === 'object' && ctx.prevObjects) {
-      const prev = ctx.prevObjects.find(o => o.value === value)
+      const prev = ctx.prevObjects.get(value)
       if (prev) {
         const alias = new Alias(prev) // leaves source dirty; must be cleaned by caller
         ctx.aliasNodes.push(alias)
         return alias
       }
       obj.value = value
-      ctx.prevObjects.push(obj)
+      ctx.prevObjects.set(value, obj)
     }
     obj.node = tagObj.createNode
       ? tagObj.createNode(this, value, ctx)
@@ -247,7 +247,7 @@ export default class Schema {
       const createCtx = {
         aliasNodes: [],
         onTagObj: o => (tagObj = o),
-        prevObjects: []
+        prevObjects: new Map()
       }
       item = this.createNode(item, true, null, createCtx)
       const { anchors } = ctx.doc
