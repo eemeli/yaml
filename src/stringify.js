@@ -7,6 +7,11 @@ import foldFlowLines, {
 } from './foldFlowLines'
 import { strOptions } from './tags/options'
 
+const getFoldOptions = ({ indentAtStart }) =>
+  indentAtStart
+    ? Object.assign({ indentAtStart }, strOptions.fold)
+    : strOptions.fold
+
 export function stringifyNumber({ format, minFractionDigits, tag, value }) {
   if (!isFinite(value))
     return isNaN(value) ? '.nan' : value < 0 ? '-.inf' : '.inf'
@@ -41,7 +46,8 @@ function lineLengthOverLimit(str, limit) {
   return true
 }
 
-function doubleQuotedString(value, { implicitKey, indent }) {
+function doubleQuotedString(value, ctx) {
+  const { implicitKey, indent } = ctx
   const { jsonEncoding, minMultiLineLength } = strOptions.doubleQuoted
   const json = JSON.stringify(value)
   if (jsonEncoding) return json
@@ -126,7 +132,7 @@ function doubleQuotedString(value, { implicitKey, indent }) {
   str = start ? str + json.slice(start) : json
   return implicitKey
     ? str
-    : foldFlowLines(str, indent, FOLD_QUOTED, strOptions.fold)
+    : foldFlowLines(str, indent, FOLD_QUOTED, getFoldOptions(ctx))
 }
 
 function singleQuotedString(value, ctx) {
@@ -141,7 +147,7 @@ function singleQuotedString(value, ctx) {
     "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'"
   return implicitKey
     ? res
-    : foldFlowLines(res, indent, FOLD_FLOW, strOptions.fold)
+    : foldFlowLines(res, indent, FOLD_FLOW, getFoldOptions(ctx))
 }
 
 function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
@@ -255,7 +261,7 @@ function plainString(item, ctx, onComment, onChompKeep) {
   }
   const body = implicitKey
     ? str
-    : foldFlowLines(str, indent, FOLD_FLOW, strOptions.fold)
+    : foldFlowLines(str, indent, FOLD_FLOW, getFoldOptions(ctx))
   if (
     comment &&
     !inFlow &&

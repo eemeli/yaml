@@ -117,6 +117,8 @@ export default class Pair extends Node {
       value = doc.schema.createNode(value, true)
     }
     ctx.implicitKey = false
+    if (!explicitKey && !this.comment && value instanceof Scalar)
+      ctx.indentAtStart = str.length + 1
     chompKeep = false
     const valueStr = doc.schema.stringify(
       value,

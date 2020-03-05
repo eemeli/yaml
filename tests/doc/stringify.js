@@ -1,6 +1,7 @@
 import { source } from 'common-tags'
 import YAML from '../../src/index'
 import Pair from '../../src/schema/Pair'
+import { Type } from '../../src/constants'
 import { stringifyString } from '../../src/stringify'
 import { strOptions } from '../../src/tags/options'
 
@@ -88,6 +89,43 @@ blah blah
 blah blah blah blah
 blah blah blah blah
 blah blah\n`)
+  })
+
+  test('long line in map', () => {
+    const foo = 'fuzz'.repeat(16)
+    const doc = new YAML.Document()
+    doc.contents = YAML.createNode({ foo })
+    for (const node of doc.contents.items) node.value.type = Type.QUOTE_DOUBLE
+    expect(
+      String(doc)
+        .split('\n')
+        .map(line => line.length)
+    ).toMatchObject([20, 20, 20, 20, 0])
+  })
+
+  test('long line in sequence', () => {
+    const foo = 'fuzz'.repeat(16)
+    const doc = new YAML.Document()
+    doc.contents = YAML.createNode([foo])
+    for (const node of doc.contents.items) node.type = Type.QUOTE_DOUBLE
+    expect(
+      String(doc)
+        .split('\n')
+        .map(line => line.length)
+    ).toMatchObject([20, 20, 20, 17, 0])
+  })
+
+  test('long line in sequence in map', () => {
+    const foo = 'fuzz'.repeat(16)
+    const doc = new YAML.Document()
+    doc.contents = YAML.createNode({ foo: [foo] })
+    const seq = doc.contents.items[0].value
+    for (const node of seq.items) node.type = Type.QUOTE_DOUBLE
+    expect(
+      String(doc)
+        .split('\n')
+        .map(line => line.length)
+    ).toMatchObject([4, 20, 20, 20, 20, 10, 0])
   })
 })
 
