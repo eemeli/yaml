@@ -29,7 +29,7 @@ export default class Directive extends Node {
     const { src } = this.context
     let offset = start
     let ch = src[offset]
-    while (ch && (ch !== '\n' && ch !== '\t' && ch !== ' '))
+    while (ch && ch !== '\n' && ch !== '\t' && ch !== ' ')
       ch = src[(offset += 1)]
     this.name = src.slice(start, offset)
     return offset

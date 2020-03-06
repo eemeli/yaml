@@ -127,7 +127,10 @@ describe('objects', () => {
         {
           key: 'z',
           value: {
-            items: [{ key: 'w', value: 'five' }, { key: 'v', value: 6 }]
+            items: [
+              { key: 'w', value: 'five' },
+              { key: 'v', value: 6 }
+            ]
           }
         }
       ])
@@ -249,7 +252,13 @@ describe('Map', () => {
     const map = new Map([
       ['x', 3],
       ['y', new Set([4])],
-      [new Map([['w', 'five'], ['v', 6]]), 'z']
+      [
+        new Map([
+          ['w', 'five'],
+          ['v', 6]
+        ]),
+        'z'
+      ]
     ])
     test('createNode(map, false)', () => {
       const s = YAML.createNode(map, false)
@@ -260,7 +269,10 @@ describe('Map', () => {
         { key: 'y', value: { items: [4] } },
         {
           key: {
-            items: [{ key: 'w', value: 'five' }, { key: 'v', value: 6 }]
+            items: [
+              { key: 'w', value: 'five' },
+              { key: 'v', value: 6 }
+            ]
           },
           value: 'z'
         }

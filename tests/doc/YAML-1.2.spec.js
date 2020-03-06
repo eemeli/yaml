@@ -1338,7 +1338,12 @@ to a line feed, or \t\\
     'Example 7.13. Flow Sequence': {
       src: `- [ one, two, ]
 - [three ,four]`,
-      tgt: [[['one', 'two'], ['three', 'four']]]
+      tgt: [
+        [
+          ['one', 'two'],
+          ['three', 'four']
+        ]
+      ]
     },
 
     'Example 7.14. Flow Sequence Entries': {
@@ -1366,7 +1371,12 @@ single: pair,
     'Example 7.15. Flow Mappings': {
       src: `- { one : two , three: four , }
 - {five: six,seven : eight}`,
-      tgt: [[{ one: 'two', three: 'four' }, { five: 'six', seven: 'eight' }]]
+      tgt: [
+        [
+          { one: 'two', three: 'four' },
+          { five: 'six', seven: 'eight' }
+        ]
+      ]
     },
 
     'Example 7.16. Flow Mapping Entries': {
@@ -1515,7 +1525,11 @@ foo: bar
 ---
 - |2
 ·text`.replace(/·/g, ' '),
-      tgt: [[[''], 'text'], [['text\n'], 'text'], [[''], 'text']],
+      tgt: [
+        [[''], 'text'],
+        [['text\n'], 'text'],
+        [[''], 'text']
+      ],
       errors: [
         ['Document is not valid YAML (bad indentation?)'],
         ['Document is not valid YAML (bad indentation?)'],
