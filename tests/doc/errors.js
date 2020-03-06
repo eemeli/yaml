@@ -1,5 +1,29 @@
 import Node from '../../src/cst/Node'
+import { YAMLError } from '../../src/errors'
+import { warnFileDeprecation, warnOptionDeprecation } from '../../src/warnings'
 import YAML from '../../src/index'
+
+test('require a message and source for all errors', () => {
+  const exp = /Invalid arguments/
+  expect(() => new YAMLError()).toThrow(exp)
+  expect(() => new YAMLError('Foo')).toThrow(exp)
+  expect(() => new YAMLError('Foo', {})).toThrow(exp)
+  expect(() => new YAMLError('Foo', new Node())).toThrow(exp)
+  expect(() => new YAMLError('Foo', null, 'foo')).toThrow(exp)
+  expect(() => new YAMLError('Foo', new Node(), 'foo')).not.toThrow()
+})
+
+test('fail on map value indented with tab', () => {
+  const src = 'a:\n\t1\nb:\n\t2\n'
+  const doc = YAML.parseDocument(src)
+  expect(doc.errors).toMatchObject([
+    { name: 'YAMLSemanticError' },
+    { name: 'YAMLSemanticError' }
+  ])
+  expect(() => String(doc)).toThrow(
+    'Document with errors cannot be stringified'
+  )
+})
 
 test('eemeli/yaml#6', () => {
   const src = 'abc: 123\ndef'
@@ -142,4 +166,119 @@ describe('pretty errors', () => {
     expect(docs[1].errors[0]).not.toHaveProperty('source')
     expect(docs[1].errors[1]).not.toHaveProperty('source')
   })
+
+  test('pretty warnings', () => {
+    const src = '%FOO\n---bar\n'
+    const doc = YAML.parseDocument(src, { prettyErrors: true })
+    expect(doc.warnings).toMatchObject([
+      { name: 'YAMLWarning', nodeType: 'DIRECTIVE' }
+    ])
+  })
+})
+
+test('broken document with comment before first node', () => {
+  const doc = YAML.parseDocument('#c\n*x\nfoo\n')
+  expect(doc.contents).toMatchObject([null, { type: 'PLAIN' }])
+  expect(doc.errors).toMatchObject([
+    { name: 'YAMLReferenceError' },
+    { name: 'YAMLSyntaxError' }
+  ])
+})
+
+describe('incomplete directives', () => {
+  ;['%TAG', '%YAML'].forEach(tag => {
+    test(`incomplete ${tag} directive`, () => {
+      const doc = YAML.parseDocument(`${tag}\n---\n`)
+      expect(doc.errors).toMatchObject([
+        { name: 'YAMLSemanticError', source: { type: 'DIRECTIVE' } }
+      ])
+    })
+  })
+})
+
+test('multiple tags on one node', () => {
+  const doc = YAML.parseDocument('!foo !bar baz\n')
+  expect(doc.contents).toMatchObject({ value: 'baz', type: 'PLAIN' })
+  expect(doc.errors).toMatchObject([{ name: 'YAMLSemanticError' }])
+  expect(doc.warnings).toMatchObject([{}])
+})
+
+describe('deprecations', () => {
+  let mock
+  beforeEach(() => {
+    mock = jest.spyOn(global.process, 'emitWarning').mockImplementation()
+  })
+  afterEach(() => mock.mockRestore())
+
+  describe('env vars', () => {
+    let prevAll, prevDeprecations
+    beforeEach(() => {
+      prevAll = global._YAML_SILENCE_WARNINGS
+      prevDeprecations = global._YAML_SILENCE_DEPRECATION_WARNINGS
+    })
+    afterEach(() => {
+      global._YAML_SILENCE_WARNINGS = prevAll
+      global._YAML_SILENCE_DEPRECATION_WARNINGS = prevDeprecations
+    })
+
+    test('_YAML_SILENCE_WARNINGS', () => {
+      global._YAML_SILENCE_WARNINGS = true
+      warnFileDeprecation('foo')
+      warnOptionDeprecation('bar1', 'baz')
+      expect(mock).toHaveBeenCalledTimes(0)
+    })
+
+    test('_YAML_SILENCE_DEPRECATION_WARNINGS', () => {
+      global._YAML_SILENCE_DEPRECATION_WARNINGS = true
+      warnFileDeprecation('foo')
+      warnOptionDeprecation('bar2', 'baz')
+      expect(mock).toHaveBeenCalledTimes(0)
+    })
+  })
+
+  test('only warn once', () => {
+    warnOptionDeprecation('bar3')
+    warnOptionDeprecation('bar3')
+    expect(mock).toHaveBeenCalledTimes(1)
+  })
+
+  test('without process.emitWarning', () => {
+    global.process.emitWarning = null
+    const cMock = jest.spyOn(console, 'warn').mockImplementation()
+    try {
+      warnFileDeprecation('foo')
+      warnOptionDeprecation('bar4', 'baz')
+      expect(cMock).toHaveBeenCalledTimes(2)
+    } finally {
+      cMock.mockRestore()
+    }
+  })
+
+  test('tags option', () => {
+    const doc = new YAML.Document({ tags: [] })
+    doc.setSchema()
+    expect(mock).toHaveBeenCalledTimes(1)
+  })
+
+  const files = [
+    'map',
+    'pair',
+    'scalar',
+    'schema',
+    'seq',
+    'types/binary',
+    'types/omap',
+    'types/pairs',
+    'types/set',
+    'types/timestamp'
+  ]
+  for (const file of files)
+    test(`file: ${file}`, async () => {
+      try {
+        await import(`../../${file}`)
+      } catch (e) {
+        // ignore errors, only testing warnings here
+      }
+      expect(mock).toHaveBeenCalledTimes(1)
+    })
 })

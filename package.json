@@ -54,6 +54,9 @@
   },
   "browserslist": "> 0.5%, not dead",
   "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
     "testMatch": [
       "**/tests/**/*.js"
     ],

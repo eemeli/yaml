@@ -531,7 +531,12 @@ describe('custom tags', () => {
 
   test('modify', () => {
     const doc = YAML.parseDocument(src)
-    doc.setTagPrefix('!f!', 'tag:example.com,2000:other/')
+    const prefix = 'tag:example.com,2000:other/'
+    doc.setTagPrefix('!f!', prefix)
+    expect(doc.tagPrefixes).toMatchObject([
+      { handle: '!e!' },
+      { handle: '!f!' }
+    ])
     doc.contents.commentBefore = 'c'
     doc.contents.items[3].comment = 'cc'
     const s = new Scalar(6)
@@ -548,6 +553,12 @@ describe('custom tags', () => {
 - "7"
 - !f!w "4"
 - '5' #cc\n`
+    )
+
+    doc.setTagPrefix('!f!', null)
+    expect(doc.tagPrefixes).toMatchObject([{ handle: '!e!' }])
+    expect(() => doc.setTagPrefix('!f', prefix)).toThrow(
+      'Handle must start and end with !'
     )
   })
 

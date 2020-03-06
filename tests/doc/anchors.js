@@ -42,16 +42,24 @@ test('circular reference', () => {
 describe('create', () => {
   test('doc.anchors.setAnchor', () => {
     const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
-    const {
-      items: [a, b]
-    } = doc.contents
+    const [a, b] = doc.contents.items
+    expect(doc.anchors.setAnchor(null, null)).toBe(null)
+    expect(doc.anchors.setAnchor(a, 'XX')).toBe('XX')
     expect(doc.anchors.setAnchor(a, 'AA')).toBe('AA')
+    expect(doc.anchors.setAnchor(a, 'AA')).toBe('AA')
+    expect(doc.anchors.setAnchor(a)).toBe('AA')
     expect(doc.anchors.setAnchor(a.items[0].value)).toBe('a1')
     expect(doc.anchors.setAnchor(b.items[0].value)).toBe('a2')
     expect(doc.anchors.setAnchor(null, 'a1')).toBe('a1')
     expect(doc.anchors.getName(a)).toBe('AA')
     expect(doc.anchors.getNode('a2').value).toBe('B')
     expect(String(doc)).toBe('[ &AA { a: A }, { b: &a2 B } ]\n')
+    expect(() => doc.anchors.setAnchor(a.items[0])).toThrow(
+      'Anchors may only be set for Scalar, Seq and Map nodes'
+    )
+    expect(() => doc.anchors.setAnchor(a, 'A A')).toThrow(
+      'Anchor names must not contain whitespace or control characters'
+    )
   })
 
   test('doc.anchors.createAlias', () => {
@@ -126,15 +134,35 @@ describe('merge <<', () => {
     })
   })
 
-  test('doc.anchors.createMergePair', () => {
-    const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
-    const {
-      items: [a, b]
-    } = doc.contents
-    const merge = doc.anchors.createMergePair(a)
-    b.items.push(merge)
-    expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
-    expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
+  describe('doc.anchors.createMergePair', () => {
+    test('simple case', () => {
+      const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+      const [a, b] = doc.contents.items
+      const merge = doc.anchors.createMergePair(a)
+      b.items.push(merge)
+      expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
+      expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
+    })
+
+    test('merge pair of an alias', () => {
+      const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+      const [a, b] = doc.contents.items
+      const alias = doc.anchors.createAlias(a, 'AA')
+      const merge = doc.anchors.createMergePair(alias)
+      b.items.push(merge)
+      expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
+      expect(String(doc)).toBe('[ &AA { a: A }, { b: B, <<: *AA } ]\n')
+    })
+
+    test('require map node', () => {
+      const exp = 'Merge sources must be Map nodes or their Aliases'
+      const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+      const [a] = doc.contents.items
+      const merge = doc.anchors.createMergePair(a)
+      expect(() => doc.anchors.createMergePair(merge)).toThrow(exp)
+      const alias = doc.anchors.createAlias(a.items[0].value)
+      expect(() => doc.anchors.createMergePair(alias)).toThrow(exp)
+    })
   })
 
   describe('merge multiple times', () => {
@@ -164,7 +192,10 @@ y:
   <<: [ *a, *b ]`
 
     const expObj = {
-      x: [{ k0: 'v1', k1: 'v1' }, { k1: 'v2', k2: 'v2' }],
+      x: [
+        { k0: 'v1', k1: 'v1' },
+        { k1: 'v2', k2: 'v2' }
+      ],
       y: { k0: 'v0', k1: 'v1', k2: 'v2' }
     }
 
@@ -172,11 +203,24 @@ y:
       [
         'x',
         [
-          new Map([['k0', 'v1'], ['k1', 'v1']]),
-          new Map([['k1', 'v2'], ['k2', 'v2']])
+          new Map([
+            ['k0', 'v1'],
+            ['k1', 'v1']
+          ]),
+          new Map([
+            ['k1', 'v2'],
+            ['k2', 'v2']
+          ])
         ]
       ],
-      ['y', new Map([['k0', 'v0'], ['k1', 'v1'], ['k2', 'v2']])]
+      [
+        'y',
+        new Map([
+          ['k0', 'v0'],
+          ['k1', 'v1'],
+          ['k2', 'v2']
+        ])
+      ]
     ])
 
     test('multiple merge keys, masAsMap: false', () => {

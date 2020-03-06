@@ -411,6 +411,8 @@ describe('Document', () => {
     expect(() => doc.deleteIn(['a', 'e'])).toThrow(/Expected/)
     expect(doc.contents.items).toHaveLength(1)
     expect(doc.get('b').items).toHaveLength(1)
+    expect(doc.deleteIn(null)).toBe(true)
+    expect(doc.deleteIn(null)).toBe(false)
   })
 
   test('get', () => {

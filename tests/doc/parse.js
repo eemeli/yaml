@@ -329,7 +329,10 @@ test('eemeli/yaml#38', () => {
   expect(YAML.parse(src)).toEqual({
     content: {
       arrayOfArray: [
-        [{ first: 'John', last: 'Black' }, { first: 'Brian', last: 'Green' }],
+        [
+          { first: 'John', last: 'Black' },
+          { first: 'Brian', last: 'Green' }
+        ],
         [{ first: 'Mark', last: 'Orange' }],
         [{ first: 'Adam', last: 'Grey' }]
       ]
@@ -358,15 +361,6 @@ test('empty node should respect setOrigRanges()', () => {
 test('parse an empty string as null', () => {
   const value = YAML.parse('')
   expect(value).toBeNull()
-})
-
-test('fail on map value indented with tab', () => {
-  const src = 'a:\n\t1\nb:\n\t2\n'
-  const doc = YAML.parseDocument(src)
-  expect(doc.errors).toMatchObject([
-    { name: 'YAMLSemanticError' },
-    { name: 'YAMLSemanticError' }
-  ])
 })
 
 test('comment on single-line value in flow map', () => {

@@ -476,6 +476,13 @@ describe('blank lines', () => {
     expect(String(doc)).toBe('#cc\n\nstr\n')
   })
 
+  test('before first node in document with directives', () => {
+    const doc = YAML.parseDocument('str\n')
+    doc.directivesEndMarker = true
+    doc.contents.spaceBefore = true
+    expect(String(doc)).toBe('---\n\nstr\n')
+  })
+
   test('between seq items', () => {
     const src = '- a\n\n- b\n\n\n- c\n'
     const doc = YAML.parseDocument(src)
