@@ -90,14 +90,6 @@ export default class Node {
     return ch === '\n' || ch === '\t' || ch === ' ' || (endAsBlank && !ch)
   }
 
-  static atCollectionItem(src, offset) {
-    const ch = src[offset]
-    return (
-      (ch === '?' || ch === ':' || ch === '-') &&
-      Node.atBlank(src, offset + 1, true)
-    )
-  }
-
   static nextNodeIsIndented(ch, indentDiff, indicatorAsIndent) {
     if (!ch || indentDiff < 0) return false
     if (indentDiff > 0) return true
