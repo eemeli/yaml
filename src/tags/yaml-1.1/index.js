@@ -8,6 +8,9 @@ import pairs from './pairs'
 import set from './set'
 import { intTime, floatTime, timestamp } from './timestamp'
 
+const boolStringify = ({ value }) =>
+  value ? boolOptions.trueStr : boolOptions.falseStr
+
 export default failsafe.concat(
   [
     {
@@ -28,8 +31,7 @@ export default failsafe.concat(
       test: /^(?:Y|y|[Yy]es|YES|[Tt]rue|TRUE|[Oo]n|ON)$/,
       resolve: () => true,
       options: boolOptions,
-      stringify: ({ value }) =>
-        value ? boolOptions.trueStr : boolOptions.falseStr
+      stringify: boolStringify
     },
     {
       identify: value => typeof value === 'boolean',
@@ -38,8 +40,7 @@ export default failsafe.concat(
       test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
       resolve: () => false,
       options: boolOptions,
-      stringify: ({ value }) =>
-        value ? boolOptions.trueStr : boolOptions.falseStr
+      stringify: boolStringify
     },
     {
       identify: value => typeof value === 'number',

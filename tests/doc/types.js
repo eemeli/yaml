@@ -35,6 +35,9 @@ describe('json schema', () => {
       option: null
     })
     expect(doc.errors).toHaveLength(2)
+    doc.errors = []
+    doc.contents.items.splice(2, 2)
+    expect(String(doc)).toBe('"canonical": true\n"answer": false\n')
   })
 
   test('!!float', () => {
