@@ -55,6 +55,7 @@ export default class Alias extends Node {
     if (!ctx) return toJSON(this.source, arg, ctx)
     const { anchors, maxAliasCount } = ctx
     const anchor = anchors.find(a => a.node === this.source)
+    /* istanbul ignore if */
     if (!anchor || anchor.res === undefined) {
       const msg = 'This should not happen: Alias anchor was not resolved?'
       if (this.cstNode) throw new YAMLReferenceError(this.cstNode, msg)

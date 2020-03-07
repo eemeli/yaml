@@ -69,6 +69,17 @@ describe('create', () => {
     expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
     expect(String(doc)).toMatch('[ &AA { a: A }, { b: B }, *AA ]\n')
   })
+
+  test('errors', () => {
+    const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+    const node = doc.contents.items[0]
+    const alias = doc.anchors.createAlias(node, 'AA')
+    doc.contents.items.unshift(alias)
+    expect(() => String(doc)).toThrow('Alias node must be after source node')
+    expect(() => {
+      alias.tag = 'tag:yaml.org,2002:alias'
+    }).toThrow('Alias nodes cannot have tags')
+  })
 })
 
 describe('merge <<', () => {

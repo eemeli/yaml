@@ -101,6 +101,7 @@ export default class Collection extends Node {
   }
 
   // overridden in implementations
+  /* istanbul ignore next */
   toJSON() {
     return null
   }

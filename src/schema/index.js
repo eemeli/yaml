@@ -162,6 +162,7 @@ export default class Schema {
         }
       }
     } catch (error) {
+      /* istanbul ignore if */
       if (!error.source) error.source = node
       doc.errors.push(error)
       node.resolved = null
@@ -179,6 +180,7 @@ export default class Schema {
       : isSeq(node)
       ? Schema.defaultTags.SEQ
       : Schema.defaultTags.STR
+    /* istanbul ignore else */
     if (fallback) {
       doc.warnings.push(
         new YAMLWarning(
@@ -193,8 +195,8 @@ export default class Schema {
       doc.errors.push(
         new YAMLReferenceError(node, `The tag ${tagName} is unavailable`)
       )
+      return null
     }
-    return null
   }
 
   getTagObject(item) {

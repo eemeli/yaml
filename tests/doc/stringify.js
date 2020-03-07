@@ -244,8 +244,8 @@ z:
   })
 
   test('Keep block scalar types for keys', () => {
-    const doc = YAML.parseDocument('? >\n foo\n: bar')
-    expect(String(doc)).toBe('? >\n  foo\n: bar\n')
+    const doc = YAML.parseDocument('? >+ #comment\n foo\n\n: bar')
+    expect(String(doc)).toBe('? >+ #comment\n  foo\n\n: bar\n')
   })
 })
 

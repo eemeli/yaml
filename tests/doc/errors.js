@@ -176,6 +176,18 @@ describe('pretty errors', () => {
   })
 })
 
+describe('invalid options', () => {
+  test('unknown schema', () => {
+    const doc = new YAML.Document({ schema: 'foo' })
+    expect(() => doc.setSchema()).toThrow(/Unknown schema/)
+  })
+
+  test('unknown custom tag', () => {
+    const doc = new YAML.Document({ customTags: ['foo'] })
+    expect(() => doc.setSchema()).toThrow(/Unknown custom tag/)
+  })
+})
+
 test('broken document with comment before first node', () => {
   const doc = YAML.parseDocument('#c\n*x\nfoo\n')
   expect(doc.contents).toMatchObject([null, { type: 'PLAIN' }])
@@ -185,14 +197,20 @@ test('broken document with comment before first node', () => {
   ])
 })
 
-describe('incomplete directives', () => {
-  ;['%TAG', '%YAML'].forEach(tag => {
+describe('broken directives', () => {
+  for (const tag of ['%TAG', '%YAML'])
     test(`incomplete ${tag} directive`, () => {
       const doc = YAML.parseDocument(`${tag}\n---\n`)
       expect(doc.errors).toMatchObject([
         { name: 'YAMLSemanticError', source: { type: 'DIRECTIVE' } }
       ])
     })
+
+  test('missing separator', () => {
+    const doc = YAML.parseDocument(`%YAML 1.2\n`)
+    expect(doc.errors).toMatchObject([
+      { name: 'YAMLSemanticError', source: { type: 'DOCUMENT' } }
+    ])
   })
 })
 

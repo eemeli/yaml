@@ -51,6 +51,12 @@ describe('json schema', () => {
       'not a number': null
     })
     expect(doc.errors).toHaveLength(2)
+    doc.errors = []
+    doc.contents.items.splice(2, 2)
+    doc.contents.items[1].value.tag = 'tag:yaml.org,2002:float'
+    expect(String(doc)).toBe(
+      '"canonical": 685230.15\n"fixed": !!float 685230.15\n'
+    )
   })
 
   test('!!int', () => {
@@ -67,6 +73,9 @@ describe('json schema', () => {
       hexadecimal: null
     })
     expect(doc.errors).toHaveLength(2)
+    doc.errors = []
+    doc.contents.items.splice(2, 2)
+    expect(String(doc)).toBe('"canonical": 685230\n"decimal": -685230\n')
   })
 
   test('!!null', () => {
@@ -83,6 +92,10 @@ describe('json schema', () => {
       '': 'null key'
     })
     expect(doc.errors).toHaveLength(2)
+    doc.errors = []
+    expect(String(doc)).toBe(
+      '"empty": null\n"canonical": null\n"english": null\n? null\n: "null key"\n'
+    )
   })
 })
 
@@ -176,6 +189,12 @@ one: 1
         '{ 3: 4 }': 'many'
       })
       expect(doc.errors).toHaveLength(0)
+      doc.contents.items[2].key = { 3: 4 }
+      expect(doc.toJSON()).toMatchObject({
+        one: 1,
+        '2': 'two',
+        '{"3":4}': 'many'
+      })
     })
 
     test('mapAsMap: true', () => {
@@ -192,6 +211,14 @@ one: 1
         ])
       )
       expect(doc.errors).toHaveLength(0)
+      doc.contents.items[2].key = { 3: 4 }
+      expect(doc.toJSON()).toMatchObject(
+        new Map([
+          ['one', 1],
+          [2, 'two'],
+          [{ 3: 4 }, 'many']
+        ])
+      )
     })
   })
 })
@@ -662,6 +689,12 @@ invoice:
 
     test('tag string in tag array', () => {
       const bin = YAML.parse(src, { customTags: [['binary']] })
+      expect(bin).toBeInstanceOf(Uint8Array)
+    })
+
+    test('custom tags from function', () => {
+      const customTags = tags => tags.concat('binary')
+      const bin = YAML.parse(src, { customTags })
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 

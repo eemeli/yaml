@@ -97,6 +97,39 @@ describe('setOrigRanges()', () => {
     expect(() => parse(src).setOrigRanges()).not.toThrowError()
   })
 
+  test('directives', () => {
+    const src = '\r\n%YAML 1.2\r\n---\r\nfoo\r\n'
+    const cst = parse(src)
+    expect(cst.setOrigRanges()).toBe(true)
+    expect(cst[0]).toMatchObject({
+      directives: [
+        { type: 'BLANK_LINE' },
+        {
+          name: 'YAML',
+          range: { end: 10, origEnd: 11, origStart: 2, start: 1 }
+        }
+      ],
+      contents: [
+        {
+          type: 'PLAIN',
+          range: { end: 18, origEnd: 21, origStart: 18, start: 15 }
+        }
+      ]
+    })
+  })
+
+  test('block scalar', () => {
+    const src = '|\r\n  foo\r\n  bar\r\n'
+    const cst = parse(src)
+    expect(cst.setOrigRanges()).toBe(true)
+    const node = cst[0].contents[0]
+    expect(node).toMatchObject({
+      type: 'BLOCK_LITERAL',
+      range: { end: 14, origEnd: 17, origStart: 0, start: 0 }
+    })
+    expect(node.strValue).toBe('foo\nbar\n')
+  })
+
   test('single document', () => {
     const src = '- foo\r\n- bar\r\n'
     const cst = parse(src)
