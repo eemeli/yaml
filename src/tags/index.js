@@ -1,4 +1,13 @@
-import core from './core'
+import core, {
+  nullObj,
+  boolObj,
+  octObj,
+  intObj,
+  hexObj,
+  nanObj,
+  expObj,
+  floatObj
+} from './core'
 import failsafe from './failsafe'
 import json from './json'
 import yaml11 from './yaml-1.1'
@@ -14,9 +23,17 @@ import { floatTime, intTime, timestamp } from './yaml-1.1/timestamp'
 export const schemas = { core, failsafe, json, yaml11 }
 export const tags = {
   binary,
+  bool: boolObj,
+  float: floatObj,
+  floatExp: expObj,
+  floatNaN: nanObj,
   floatTime,
+  int: intObj,
+  intHex: hexObj,
+  intOct: octObj,
   intTime,
   map,
+  null: nullObj,
   omap,
   pairs,
   seq,
