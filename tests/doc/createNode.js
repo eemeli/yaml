@@ -58,6 +58,25 @@ describe('createNode(value, true)', () => {
   })
 })
 
+describe('explicit tags', () => {
+  test('wrapScalars: false', () => {
+    const s = YAML.createNode(3, false, 'tag:yaml.org,2002:str')
+    expect(s).toBe(3)
+  })
+
+  test('wrapScalars: true', () => {
+    const s = YAML.createNode(3, true, '!!str')
+    expect(s).toBeInstanceOf(Scalar)
+    expect(s).toMatchObject({ value: 3, tag: 'tag:yaml.org,2002:str' })
+  })
+
+  test('unknown tag', () => {
+    expect(() => YAML.createNode('3', true, '!foo')).toThrow(
+      'Tag !foo not found'
+    )
+  })
+})
+
 describe('arrays', () => {
   test('createNode([])', () => {
     const s = YAML.createNode([])

@@ -117,6 +117,7 @@ export default class Schema {
       : wrapScalars
       ? new Scalar(value)
       : value
+    if (tag && obj.node instanceof Node) obj.node.tag = tag
     return obj.node
   }
 
