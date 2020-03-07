@@ -31,7 +31,7 @@ export default class BlockValue extends Node {
       end -= 1
       if (end <= start) {
         if (this.chomping === Chomp.KEEP) break
-        else return ''
+        else return '' // probably never happens
       }
       if (ch === '\n') lastNewLine = end
       ch = src[end - 1]

@@ -11,6 +11,33 @@ import QuoteDouble from './QuoteDouble'
 import QuoteSingle from './QuoteSingle'
 import Range from './Range'
 
+function createNewNode(type, props) {
+  switch (type) {
+    case Type.ALIAS:
+      return new Alias(type, props)
+    case Type.BLOCK_FOLDED:
+    case Type.BLOCK_LITERAL:
+      return new BlockValue(type, props)
+    case Type.FLOW_MAP:
+    case Type.FLOW_SEQ:
+      return new FlowCollection(type, props)
+    case Type.MAP_KEY:
+    case Type.MAP_VALUE:
+    case Type.SEQ_ITEM:
+      return new CollectionItem(type, props)
+    case Type.COMMENT:
+    case Type.PLAIN:
+      return new PlainValue(type, props)
+    case Type.QUOTE_DOUBLE:
+      return new QuoteDouble(type, props)
+    case Type.QUOTE_SINGLE:
+      return new QuoteSingle(type, props)
+    /* istanbul ignore next */
+    default:
+      return null // should never happen
+  }
+}
+
 /**
  * @param {boolean} atLineStart - Node starts at beginning of line
  * @param {boolean} inFlow - true if currently in a flow context
@@ -68,19 +95,6 @@ export default class ParseContext {
     this.parent = parent != null ? parent : orig.parent || {}
     this.root = orig.root
     this.src = orig.src
-  }
-
-  // for logging
-  get pretty() {
-    const obj = {
-      start: `${this.lineStart} + ${this.indent}`,
-      in: [],
-      parent: this.parent.type
-    }
-    if (!this.atLineStart) obj.start += ' + N'
-    if (this.inCollection) obj.in.push('collection')
-    if (this.inFlow) obj.in.push('flow')
-    return obj
   }
 
   nodeStartsCollection(node) {
@@ -165,46 +179,22 @@ export default class ParseContext {
     if (Node.atDocumentBoundary(this.src, start)) return null
     const context = new ParseContext(this, overlay)
     const { props, type, valueStart } = context.parseProps(start)
-    trace: 'START', valueStart, type, props, context.pretty
-    let node
-    switch (type) {
-      case Type.ALIAS:
-        node = new Alias(type, props)
-        break
-      case Type.BLOCK_FOLDED:
-      case Type.BLOCK_LITERAL:
-        node = new BlockValue(type, props)
-        break
-      case Type.FLOW_MAP:
-      case Type.FLOW_SEQ:
-        node = new FlowCollection(type, props)
-        break
-      case Type.MAP_KEY:
-      case Type.MAP_VALUE:
-      case Type.SEQ_ITEM:
-        node = new CollectionItem(type, props)
-        break
-      case Type.COMMENT:
-      case Type.PLAIN:
-        node = new PlainValue(type, props)
-        break
-      case Type.QUOTE_DOUBLE:
-        node = new QuoteDouble(type, props)
-        break
-      case Type.QUOTE_SINGLE:
-        node = new QuoteSingle(type, props)
-        break
-      default:
-        node.error = new YAMLSyntaxError(
-          node,
-          `Unknown node type: ${JSON.stringify(type)}`
-        )
-        node.range = new Range(start, start + 1)
-        return node
-    }
+    trace: 'START',
+      { valueStart, type, props },
+      {
+        start: `${context.lineStart} + ${context.indent}`,
+        atLineStart: context.atLineStart,
+        inCollection: context.inCollection,
+        inFlow: context.inFlow,
+        parent: context.parent.type
+      }
+    const node = createNewNode(type, props)
     let offset = node.parse(context, valueStart)
     node.range = new Range(start, offset)
+    /* istanbul ignore if */
     if (offset <= start) {
+      // This should never happen, but if it does, let's make sure to at least
+      // step one character forward to avoid a busy loop.
       node.error = new Error(`Node#parse consumed no characters`)
       node.error.parseEnd = offset
       node.error.source = node

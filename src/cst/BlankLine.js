@@ -7,7 +7,10 @@ export default class BlankLine extends Node {
     super(Type.BLANK_LINE)
   }
 
+  /* istanbul ignore next */
   get includesTrailingLines() {
+    // This is never called from anywhere, but if it were,
+    // this is the value it should return.
     return true
   }
 
