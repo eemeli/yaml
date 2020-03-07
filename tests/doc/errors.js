@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import Node from '../../src/cst/Node'
 import { YAMLError } from '../../src/errors'
 import { warnFileDeprecation, warnOptionDeprecation } from '../../src/warnings'
@@ -290,13 +292,12 @@ describe('deprecations', () => {
     'types/set',
     'types/timestamp'
   ]
+  const root = path.resolve(__dirname, '../..')
+  const fileTest = fs.existsSync(path.resolve(root, 'dist')) ? test : test.skip
   for (const file of files)
-    test(`file: ${file}`, async () => {
-      try {
-        await import(`../../${file}`)
-      } catch (e) {
-        // ignore errors, only testing warnings here
-      }
+    fileTest(`file: ${file}`, async () => {
+      const fp = path.resolve(root, file)
+      await import(fp)
       expect(mock).toHaveBeenCalledTimes(1)
     })
 })
