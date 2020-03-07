@@ -16,8 +16,10 @@
     "dist/",
     "types/",
     "*.js",
+    "*.mjs",
     "!.*.js"
   ],
+  "type": "commonjs",
   "main": "./index.js",
   "browser": {
     "./index.js": "./browser/index.js",
@@ -34,6 +36,18 @@
     "./types/set.js": "./browser/types/set.js",
     "./types/timestamp.js": "./browser/types/timestamp.js",
     "./util.js": "./browser/util.js"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./parse-cst": "./parse-cst.js",
+    "./types": {
+      "require": "./types.js",
+      "import": "./types.mjs"
+    },
+    "./util": {
+      "require": "./util.js",
+      "import": "./util.mjs"
+    }
   },
   "scripts": {
     "browser:build": "BABEL_ENV=browser babel src/ --out-dir browser/dist/",
