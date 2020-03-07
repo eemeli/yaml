@@ -3,18 +3,6 @@ import Node from './Node'
 import Range from './Range'
 
 export default class Directive extends Node {
-  static endOfDirective(src, offset) {
-    let ch = src[offset]
-    while (ch && ch !== '\n' && ch !== '#') ch = src[(offset += 1)]
-    // last char can't be whitespace
-    ch = src[offset - 1]
-    while (ch === ' ' || ch === '\t') {
-      offset -= 1
-      ch = src[offset - 1]
-    }
-    return offset
-  }
-
   constructor() {
     super(Type.DIRECTIVE)
     this.name = null
