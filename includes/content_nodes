@@ -102,7 +102,15 @@
 </code></pre>
 <p>For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. <code>42</code> will match <code>Scalar { value: 42 }</code>) . Keys for <code>!!seq</code> should be positive integers, or their string representations. <code>add()</code> and <code>set()</code> do not automatically call <code>createNode()</code> to wrap the value.</p>
 
-<p>Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections: <code>addIn(path, value)</code>, <code>deleteIn(path)</code>, <code>getIn(path, keepScalar)</code>, <code>hasIn(path)</code>, <code>setIn(path, value)</code>. <code>getIn</code> and <code>hasIn</code> will return <code>undefined</code> or <code>false</code> (respectively) if any of the intermediate collections is not found or if the key path attempts to extend within a scalar value, but the others will throw an error in such cases. Note that for <code>addIn</code> the path argument points to the collection rather than the item.</p>
+<p>Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections: <code>addIn(path, value)</code>, <code>deleteIn(path)</code>, <code>getIn(path, keepScalar)</code>, <code>hasIn(path)</code>, <code>setIn(path, value)</code>. If any intermediate node in <code>path</code> is a scalar rather than a collection, an error will be thrown. If any of the intermediate collections is not found:</p>
+
+<ul>
+<li><code>getIn</code> and <code>hasIn</code> will return <code>undefined</code> or <code>false</code> (respectively)</li>
+<li><code>addIn</code> and <code>setIn</code> will create missing collections; non-negative integer keys will create sequences, all other keys create maps</li>
+<li><code>deleteIn</code> will throw an error</li>
+</ul>
+
+<p>Note that for <code>addIn</code> the path argument points to the collection rather than the item; for maps its <code>value</code> should be a <code>Pair</code> or an object with <code>{ key, value }</code> fields.</p>
 <h2 id='alias-nodes'>Alias Nodes</h2><pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Alias</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
   <span class="nl">source</span><span class="p">:</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">Map</span> <span class="o">|</span> <span class="nx">Seq</span><span class="p">,</span>
   <span class="nx">type</span><span class="p">:</span> <span class="s1">'ALIAS'</span>

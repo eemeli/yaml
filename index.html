@@ -197,8 +197,8 @@
   color: #f92672;
 }
     </style>
-    <link href="stylesheets/screen.css" rel="stylesheet" media="screen" />
-    <link href="stylesheets/print.css" rel="stylesheet" media="print" />
+    <link href="stylesheets/screen-143c663c.css" rel="stylesheet" media="screen" />
+    <link href="stylesheets/print-bccf8c07.css" rel="stylesheet" media="print" />
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-126084011-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -206,18 +206,18 @@
       gtag('js', new Date());
       gtag('config', 'UA-126084011-1');
     </script>
-      <script src="javascripts/all.js"></script>
+      <script src="javascripts/all-d4e2fb27.js"></script>
   </head>
 
   <body class="index" data-languages="[]">
     <a href="#" id="nav-button">
       <span>
         NAV
-        <img src="images/navbar.png" alt="Navbar" />
+        <img src="images/navbar-cad8cdcb.png" alt="Navbar" />
       </span>
     </a>
     <div class="toc-wrapper">
-      <img src="images/logo.png" class="logo" alt="Logo" />
+      <img src="images/logo-ff1f79b2.png" class="logo" alt="Logo" />
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
         </div>
@@ -547,6 +547,11 @@ yarn add yaml
 <td>simpleKeys</td>
 <td><code>boolean</code></td>
 <td>When stringifying, require keys to be scalars and to use implicit rather than explicit notation. By default <code>false</code>.</td>
+</tr>
+<tr>
+<td>sortMapEntries</td>
+<td><code>boolean</code> &vert; <code>(a, b: Pair) =&gt; number</code></td>
+<td>When stringifying, sort map entries. If <code>true</code>, sort by comparing key values with <code>&lt;</code>. By default <code>false</code>.</td>
 </tr>
 <tr>
 <td>version</td>
@@ -990,7 +995,15 @@ target:
 </code></pre>
 <p>For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. <code>42</code> will match <code>Scalar { value: 42 }</code>) . Keys for <code>!!seq</code> should be positive integers, or their string representations. <code>add()</code> and <code>set()</code> do not automatically call <code>createNode()</code> to wrap the value.</p>
 
-<p>Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections: <code>addIn(path, value)</code>, <code>deleteIn(path)</code>, <code>getIn(path, keepScalar)</code>, <code>hasIn(path)</code>, <code>setIn(path, value)</code>. <code>getIn</code> and <code>hasIn</code> will return <code>undefined</code> or <code>false</code> (respectively) if any of the intermediate collections is not found or if the key path attempts to extend within a scalar value, but the others will throw an error in such cases. Note that for <code>addIn</code> the path argument points to the collection rather than the item.</p>
+<p>Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections: <code>addIn(path, value)</code>, <code>deleteIn(path)</code>, <code>getIn(path, keepScalar)</code>, <code>hasIn(path)</code>, <code>setIn(path, value)</code>. If any intermediate node in <code>path</code> is a scalar rather than a collection, an error will be thrown. If any of the intermediate collections is not found:</p>
+
+<ul>
+<li><code>getIn</code> and <code>hasIn</code> will return <code>undefined</code> or <code>false</code> (respectively)</li>
+<li><code>addIn</code> and <code>setIn</code> will create missing collections; non-negative integer keys will create sequences, all other keys create maps</li>
+<li><code>deleteIn</code> will throw an error</li>
+</ul>
+
+<p>Note that for <code>addIn</code> the path argument points to the collection rather than the item; for maps its <code>value</code> should be a <code>Pair</code> or an object with <code>{ key, value }</code> fields.</p>
 <h2 id='alias-nodes'>Alias Nodes</h2><pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Alias</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
   <span class="nl">source</span><span class="p">:</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">Map</span> <span class="o">|</span> <span class="nx">Seq</span><span class="p">,</span>
   <span class="nx">type</span><span class="p">:</span> <span class="s1">'ALIAS'</span>
@@ -1134,10 +1147,93 @@ it has:
 <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">toDateString</span><span class="p">()</span>
 <span class="c1">// 'Sat Dec 15 2001'</span>
 </code></pre>
-<p>The easiest way to extend a <a href="#data-schemas">schema</a> is by defining the additional <strong>tags</strong> that you wish to support. To do that, the <code>customTags</code> option allows you to provide an array of custom tag objects or tag identifiers. In particular, the built-in tags that are a part of the <code>yaml-1.1</code> schema but not the default <code>core</code> schema may be referred to by their string identifiers.</p>
+<p>The easiest way to extend a <a href="#data-schemas">schema</a> is by defining the additional <strong>tags</strong> that you wish to support. To do that, the <code>customTags</code> option allows you to provide an array of custom tag objects or tag identifiers. In particular, the built-in tags that are a part of the <code>core</code> and <code>yaml-1.1</code> schemas may be referred to by their string identifiers. For those tags that are available in both, only the <code>core</code> variant is provided as a custom tag.</p>
 
 <p>For further customisation, <code>customTags</code> may also be a function <code>(Tag[]) =&gt; (Tag[])</code> that may modify the schema&#39;s base tag array.</p>
-<h2 id='built-in-custom-tags'>Built-in Custom Tags</h2>
+<h2 id='built-in-custom-tags'>Built-in Custom Tags</h2><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'[ one, true, 42 ]'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">v</span><span class="p">)</span>
+<span class="c1">// [ 'string', 'boolean', 'number' ]</span>
+
+<span class="kd">let</span> <span class="nx">opt</span> <span class="o">=</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'failsafe'</span> <span class="p">}</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'[ one, true, 42 ]'</span><span class="p">,</span> <span class="nx">opt</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">v</span><span class="p">)</span>
+<span class="c1">// [ 'string', 'string', 'string' ]</span>
+
+<span class="nx">opt</span> <span class="o">=</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'failsafe'</span><span class="p">,</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="s1">'int'</span><span class="p">]</span> <span class="p">}</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'[ one, true, 42 ]'</span><span class="p">,</span> <span class="nx">opt</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">v</span><span class="p">)</span>
+<span class="c1">// [ 'string', 'string', 'number' ]</span>
+</code></pre><h3 id='yaml-1-2-core-schema'>YAML 1.2 Core Schema</h3>
+<p>These tags are a part of the YAML 1.2 <a href="https://yaml.org/spec/1.2/spec.html#id2804923">Core Schema</a>, and may be useful when constructing a parser or stringifier for a more limited set of types, based on the <code>failsafe</code> schema. Some of these define a <code>format</code> value; this will be added to the parsed nodes and affects the node&#39;s stringification.</p>
+
+<p>If including more than one custom tag from this set, make sure that the <code>&#39;float&#39;</code> and <code>&#39;int&#39;</code> tags precede any of the other <code>!!float</code> and <code>!!int</code> tags.</p>
+
+<table><thead>
+<tr>
+<th>Identifier</th>
+<th>Regular expression</th>
+<th>YAML Type</th>
+<th>Format</th>
+<th>Example values</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>&#39;bool&#39;</code></td>
+<td><code>true⎮True⎮TRUE⎮false⎮False⎮FALSE</code></td>
+<td><code>!!bool</code></td>
+<td></td>
+<td><code>true</code>, <code>false</code></td>
+</tr>
+<tr>
+<td><code>&#39;float&#39;</code></td>
+<td><code>[-+]?(0⎮[1-9][0-9]*)\.[0-9]*</code></td>
+<td><code>!!float</code></td>
+<td></td>
+<td><code>4.2</code>, <code>-0.0</code></td>
+</tr>
+<tr>
+<td><code>&#39;floatExp&#39;</code></td>
+<td><code>[-+]?(0⎮[1-9][0-9]*)(\.[0-9]*)?[eE][-+]?[0-9]+</code></td>
+<td><code>!!float</code></td>
+<td><code>&#39;EXP&#39;</code></td>
+<td><code>4.2e9</code></td>
+</tr>
+<tr>
+<td><code>&#39;floatNaN&#39;</code></td>
+<td><code>[-+]?(\.inf⎮\.Inf⎮\.INF)⎮\.nan⎮\.NaN⎮\.NAN</code></td>
+<td><code>!!float</code></td>
+<td></td>
+<td><code>-Infinity</code></td>
+</tr>
+<tr>
+<td><code>&#39;int&#39;</code></td>
+<td><code>[-+]?[0-9]+</code></td>
+<td><code>!!int</code></td>
+<td></td>
+<td><code>42</code>, <code>-0</code></td>
+</tr>
+<tr>
+<td><code>&#39;intHex&#39;</code></td>
+<td><code>0x[0-9a-fA-F]+</code></td>
+<td><code>!!int</code></td>
+<td><code>&#39;HEX&#39;</code></td>
+<td><code>0xff0033</code></td>
+</tr>
+<tr>
+<td><code>&#39;intOct&#39;</code></td>
+<td><code>0o[0-7]+</code></td>
+<td><code>!!int</code></td>
+<td><code>&#39;OCT&#39;</code></td>
+<td><code>0o127</code></td>
+</tr>
+<tr>
+<td><code>&#39;null&#39;</code></td>
+<td><code>~⎮null⎮Null⎮NULL</code></td>
+<td><code>!!null</code></td>
+<td></td>
+<td><code>null</code></td>
+</tr>
+</tbody></table>
+<h3 id='yaml-1-1'>YAML 1.1</h3>
+<p>These tags are a part of the YAML 1.1 <a href="https://yaml.org/type/">language-independent types</a>, but are not a part of any default YAML 1.2 schema.</p>
+
 <table><thead>
 <tr>
 <th>Identifier</th>
@@ -1186,7 +1282,7 @@ it has:
 <td><code>&#39;timestamp&#39;</code></td>
 <td><a href="https://yaml.org/type/timestamp.html"><code>!!timestamp</code></a></td>
 <td><code>Date</code></td>
-<td>A point in time.</td>
+<td>A point in time, e.g. <code>2001-12-15T02:59:43</code>.</td>
 </tr>
 </tbody></table>
 <h2 id='writing-custom-tags'>Writing Custom Tags</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">stringifyString</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/util'</span>
@@ -1361,7 +1457,7 @@ mapping: { sky: blue, sea: green }
 
 <h3 style="clear:both">Node</h3>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Node</span> <span class="p">{</span>
-  <span class="nl">context</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">context</span><span class="p">:</span> <span class="p">{</span>            <span class="c1">// not enumerable, to simplify logging</span>
     <span class="nl">atLineStart</span><span class="p">:</span> <span class="kr">boolean</span><span class="p">,</span> <span class="c1">// is this node the first one on this line</span>
     <span class="nx">indent</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>     <span class="c1">// current level of indentation (may be -1)</span>
     <span class="nx">root</span><span class="p">:</span> <span class="nx">CSTDocument</span><span class="p">,</span>  <span class="c1">// a reference to the parent document</span>

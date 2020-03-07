@@ -100,7 +100,7 @@ mapping: { sky: blue, sea: green }
 
 <h3 style="clear:both">Node</h3>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Node</span> <span class="p">{</span>
-  <span class="nl">context</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">context</span><span class="p">:</span> <span class="p">{</span>            <span class="c1">// not enumerable, to simplify logging</span>
     <span class="nl">atLineStart</span><span class="p">:</span> <span class="kr">boolean</span><span class="p">,</span> <span class="c1">// is this node the first one on this line</span>
     <span class="nx">indent</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>     <span class="c1">// current level of indentation (may be -1)</span>
     <span class="nx">root</span><span class="p">:</span> <span class="nx">CSTDocument</span><span class="p">,</span>  <span class="c1">// a reference to the parent document</span>
