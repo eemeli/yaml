@@ -39,6 +39,7 @@
   },
   "exports": {
     ".": "./index.js",
+    "./": "./",
     "./parse-cst": "./parse-cst.js",
     "./types": [
       {
