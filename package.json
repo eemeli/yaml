@@ -40,14 +40,20 @@
   "exports": {
     ".": "./index.js",
     "./parse-cst": "./parse-cst.js",
-    "./types": {
-      "default": "./types.js",
-      "import": "./types.mjs"
-    },
-    "./util": {
-      "default": "./util.js",
-      "import": "./util.mjs"
-    }
+    "./types": [
+      {
+        "default": "./types.js",
+        "import": "./types.mjs"
+      },
+      "./types.js"
+    ],
+    "./util": [
+      {
+        "default": "./util.js",
+        "import": "./util.mjs"
+      },
+      "./util.js"
+    ]
   },
   "scripts": {
     "browser:build": "BABEL_ENV=browser babel src/ --out-dir browser/dist/",
