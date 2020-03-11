@@ -41,11 +41,11 @@
     ".": "./index.js",
     "./parse-cst": "./parse-cst.js",
     "./types": {
-      "require": "./types.js",
+      "default": "./types.js",
       "import": "./types.mjs"
     },
     "./util": {
-      "require": "./util.js",
+      "default": "./util.js",
       "import": "./util.mjs"
     }
   },
