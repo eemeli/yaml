@@ -30,12 +30,14 @@
     "./schema.js": "./browser/schema.js",
     "./seq.js": "./browser/seq.js",
     "./types.js": "./browser/types.js",
+    "./types.mjs": "./browser/types.js",
     "./types/binary.js": "./browser/types/binary.js",
     "./types/omap.js": "./browser/types/omap.js",
     "./types/pairs.js": "./browser/types/pairs.js",
     "./types/set.js": "./browser/types/set.js",
     "./types/timestamp.js": "./browser/types/timestamp.js",
-    "./util.js": "./browser/util.js"
+    "./util.js": "./browser/util.js",
+    "./util.mjs": "./browser/util.js"
   },
   "exports": {
     ".": "./index.js",
