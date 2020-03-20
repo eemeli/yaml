@@ -1,14 +1,15 @@
-const isBrowser = process.env.BABEL_ENV === 'browser'
-
-const envOptions = isBrowser
-  ? { modules: false, useBuiltIns: false }
-  : { targets: { node: '6.5' }, useBuiltIns: false }
-const presets = [['@babel/env', envOptions]]
-
 const plugins = [
   '@babel/plugin-proposal-class-properties',
   ['babel-plugin-trace', { strip: true }]
 ]
-if (isBrowser) plugins.push('@babel/plugin-transform-runtime')
+const envOptions = { modules: false, useBuiltIns: false }
 
+if (process.env.BABEL_ENV === 'browser') {
+  plugins.push('@babel/plugin-transform-runtime')
+} else {
+  plugins.push(['@babel/plugin-transform-modules-commonjs', { strict: true }])
+  envOptions.targets = { node: '6.5' }
+}
+
+const presets = [['@babel/env', envOptions]]
 module.exports = { presets, plugins }
