@@ -295,9 +295,11 @@ describe('deprecations', () => {
   const root = path.resolve(__dirname, '../..')
   const fileTest = fs.existsSync(path.resolve(root, 'dist')) ? test : test.skip
   for (const file of files)
-    fileTest(`file: ${file}`, async () => {
+    fileTest(`file: ${file}`, () => {
       const fp = path.resolve(root, file)
-      await import(fp)
+      // await import() may fail with ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING due
+      // to https://github.com/facebook/jest/issues/9430
+      require(fp)
       expect(mock).toHaveBeenCalledTimes(1)
     })
 })
