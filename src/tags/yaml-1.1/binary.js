@@ -19,21 +19,19 @@ export default {
    *   document.querySelector('#photo').src = URL.createObjectURL(blob)
    */
   resolve: (doc, node) => {
+    const src = resolveString(doc, node)
     if (typeof Buffer === 'function') {
-      const src = resolveString(doc, node)
       return Buffer.from(src, 'base64')
     } else if (typeof atob === 'function') {
-      const src = atob(resolveString(doc, node))
-      const buffer = new Uint8Array(src.length)
-      for (let i = 0; i < src.length; ++i) buffer[i] = src.charCodeAt(i)
+      // On IE 11, atob() can't handle newlines
+      const str = atob(src.replace(/[\n\r]/g, ''))
+      const buffer = new Uint8Array(str.length)
+      for (let i = 0; i < str.length; ++i) buffer[i] = str.charCodeAt(i)
       return buffer
     } else {
-      doc.errors.push(
-        new YAMLReferenceError(
-          node,
-          'This environment does not support reading binary tags; either Buffer or atob is required'
-        )
-      )
+      const msg =
+        'This environment does not support reading binary tags; either Buffer or atob is required'
+      doc.errors.push(new YAMLReferenceError(node, msg))
       return null
     }
   },
