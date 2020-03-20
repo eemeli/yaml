@@ -1,11 +1,11 @@
 import { Type } from '../constants'
 import { YAMLSemanticError } from '../errors'
-import BlankLine from './BlankLine'
-import Comment from './Comment'
-import Node from './Node'
-import Range from './Range'
+import { BlankLine } from './BlankLine'
+import { Comment } from './Comment'
+import { Node } from './Node'
+import { Range } from './Range'
 
-export default class FlowCollection extends Node {
+export class FlowCollection extends Node {
   constructor(type, props) {
     super(type, props)
     this.items = null

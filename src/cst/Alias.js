@@ -1,7 +1,7 @@
-import Node from './Node'
-import Range from './Range'
+import { Node } from './Node'
+import { Range } from './Range'
 
-export default class Alias extends Node {
+export class Alias extends Node {
   /**
    * Parses an *alias from the source
    *

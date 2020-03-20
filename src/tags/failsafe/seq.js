@@ -1,5 +1,5 @@
-import parseSeq from '../../schema/parseSeq'
-import YAMLSeq from '../../schema/Seq'
+import { parseSeq } from '../../schema/parseSeq'
+import { YAMLSeq } from '../../schema/Seq'
 
 function createSeq(schema, obj, ctx) {
   const seq = new YAMLSeq(schema)
@@ -12,7 +12,7 @@ function createSeq(schema, obj, ctx) {
   return seq
 }
 
-export default {
+export const seq = {
   createNode: createSeq,
   default: true,
   nodeClass: YAMLSeq,

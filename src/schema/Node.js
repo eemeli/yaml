@@ -1,1 +1,1 @@
-export default class Node {}
+export class Node {}

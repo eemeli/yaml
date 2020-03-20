@@ -1,8 +1,8 @@
 // Published as 'yaml/seq'
 
-import toJSON from '../toJSON'
-import Collection from './Collection'
-import Scalar from './Scalar'
+import { toJSON } from '../toJSON'
+import { Collection } from './Collection'
+import { Scalar } from './Scalar'
 
 function asItemIndex(key) {
   let idx = key instanceof Scalar ? key.value : key
@@ -10,7 +10,7 @@ function asItemIndex(key) {
   return Number.isInteger(idx) && idx >= 0 ? idx : null
 }
 
-export default class YAMLSeq extends Collection {
+export class YAMLSeq extends Collection {
   add(value) {
     this.items.push(value)
   }

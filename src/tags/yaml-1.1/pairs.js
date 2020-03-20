@@ -1,8 +1,8 @@
 import { YAMLSemanticError } from '../../errors'
-import YAMLMap from '../../schema/Map'
-import Pair from '../../schema/Pair'
-import parseSeq from '../../schema/parseSeq'
-import YAMLSeq from '../../schema/Seq'
+import { YAMLMap } from '../../schema/Map'
+import { Pair } from '../../schema/Pair'
+import { parseSeq } from '../../schema/parseSeq'
+import { YAMLSeq } from '../../schema/Seq'
 
 export function parsePairs(doc, cst) {
   const seq = parseSeq(doc, cst)
@@ -55,7 +55,7 @@ export function createPairs(schema, iterable, ctx) {
   return pairs
 }
 
-export default {
+export const pairs = {
   default: false,
   tag: 'tag:yaml.org,2002:pairs',
   resolve: parsePairs,

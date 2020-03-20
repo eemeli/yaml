@@ -1,5 +1,5 @@
-import addComment from './addComment'
-import Anchors from './Anchors'
+import { addComment } from './addComment'
+import { Anchors } from './Anchors'
 import { Char, Type } from './constants'
 import {
   YAMLError,
@@ -8,18 +8,18 @@ import {
   YAMLSyntaxError,
   YAMLWarning
 } from './errors'
-import listTagNames from './listTagNames'
-import Schema from './schema'
-import Alias from './schema/Alias'
-import Collection, { isEmptyPath } from './schema/Collection'
-import Node from './schema/Node'
-import Scalar from './schema/Scalar'
-import toJSON from './toJSON'
+import { listTagNames } from './listTagNames'
+import { Schema } from './schema'
+import { Alias } from './schema/Alias'
+import { Collection, isEmptyPath } from './schema/Collection'
+import { Node } from './schema/Node'
+import { Scalar } from './schema/Scalar'
+import { toJSON } from './toJSON'
 
 const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
-export default class Document {
+export class Document {
   static defaults = {
     '1.0': {
       schema: 'yaml-1.1',

@@ -1,5 +1,9 @@
-import fold, { FOLD_FLOW, FOLD_QUOTED } from '../../src/foldFlowLines'
-import YAML from '../../src/index'
+import {
+  foldFlowLines as fold,
+  FOLD_FLOW,
+  FOLD_QUOTED
+} from '../../src/foldFlowLines'
+import { YAML } from '../../src/index'
 import { strOptions } from '../../src/tags/options'
 
 describe('plain', () => {

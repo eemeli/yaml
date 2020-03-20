@@ -1,6 +1,6 @@
 import { Type } from '../constants'
-import Node from './Node'
-import Range from './Range'
+import { Node } from './Node'
+import { Range } from './Range'
 
 export const Chomp = {
   CLIP: 'CLIP',
@@ -8,7 +8,7 @@ export const Chomp = {
   STRIP: 'STRIP'
 }
 
-export default class BlockValue extends Node {
+export class BlockValue extends Node {
   constructor(type, props) {
     super(type, props)
     this.blockIndent = null

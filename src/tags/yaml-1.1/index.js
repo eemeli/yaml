@@ -1,17 +1,17 @@
-import Scalar from '../../schema/Scalar'
+import { Scalar } from '../../schema/Scalar'
 import { stringifyNumber } from '../../stringify'
-import failsafe from '../failsafe'
+import { failsafe } from '../failsafe'
 import { boolOptions, nullOptions } from '../options'
-import binary from './binary'
-import omap from './omap'
-import pairs from './pairs'
-import set from './set'
+import { binary } from './binary'
+import { omap } from './omap'
+import { pairs } from './pairs'
+import { set } from './set'
 import { intTime, floatTime, timestamp } from './timestamp'
 
 const boolStringify = ({ value }) =>
   value ? boolOptions.trueStr : boolOptions.falseStr
 
-export default failsafe.concat(
+export const yaml11 = failsafe.concat(
   [
     {
       identify: value => value == null,

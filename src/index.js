@@ -1,7 +1,7 @@
-import parseCST from './cst/parse'
-import YAMLDocument from './Document'
+import { parse as parseCST } from './cst/parse'
+import { Document as YAMLDocument } from './Document'
 import { YAMLSemanticError } from './errors'
-import Schema from './schema'
+import { Schema } from './schema'
 import { warn } from './warnings'
 
 const defaultOptions = {
@@ -73,7 +73,7 @@ function stringify(value, options) {
   return String(doc)
 }
 
-export default {
+export const YAML = {
   createNode,
   defaultOptions,
   Document,

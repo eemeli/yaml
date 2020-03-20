@@ -1,23 +1,23 @@
-import YAMLMap from './Map'
-import Pair from './Pair'
-import Scalar from './Scalar'
-import Seq from './Seq'
+import { YAMLMap } from './Map'
+import { Pair } from './Pair'
+import { Scalar } from './Scalar'
+import { YAMLSeq } from './Seq'
 
 export const MERGE_KEY = '<<'
 
-export default class Merge extends Pair {
+export class Merge extends Pair {
   constructor(pair) {
     if (pair instanceof Pair) {
       let seq = pair.value
-      if (!(seq instanceof Seq)) {
-        seq = new Seq()
+      if (!(seq instanceof YAMLSeq)) {
+        seq = new YAMLSeq()
         seq.items.push(pair.value)
         seq.range = pair.value.range
       }
       super(pair.key, seq)
       this.range = pair.range
     } else {
-      super(new Scalar(MERGE_KEY), new Seq())
+      super(new Scalar(MERGE_KEY), new YAMLSeq())
     }
     this.type = 'MERGE_PAIR'
   }

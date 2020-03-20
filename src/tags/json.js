@@ -1,9 +1,9 @@
-import map from './failsafe/map'
-import seq from './failsafe/seq'
-import Scalar from '../schema/Scalar'
+import { map } from './failsafe/map'
+import { seq } from './failsafe/seq'
+import { Scalar } from '../schema/Scalar'
 import { resolveString } from './failsafe/string'
 
-const schema = [
+export const json = [
   map,
   seq,
   {
@@ -49,8 +49,6 @@ const schema = [
   }
 ]
 
-schema.scalarFallback = str => {
+json.scalarFallback = str => {
   throw new SyntaxError(`Unresolved plain scalar ${JSON.stringify(str)}`)
 }
-
-export default schema

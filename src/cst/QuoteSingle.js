@@ -1,8 +1,8 @@
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
-import Node from './Node'
-import Range from './Range'
+import { Node } from './Node'
+import { Range } from './Range'
 
-export default class QuoteSingle extends Node {
+export class QuoteSingle extends Node {
   static endOfQuote(src, offset) {
     let ch = src[offset]
     while (ch) {

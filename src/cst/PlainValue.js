@@ -1,7 +1,7 @@
-import Node from './Node'
-import Range from './Range'
+import { Node } from './Node'
+import { Range } from './Range'
 
-export default class PlainValue extends Node {
+export class PlainValue extends Node {
   static endOfLine(src, start, inFlow) {
     let ch = src[start]
     let offset = start

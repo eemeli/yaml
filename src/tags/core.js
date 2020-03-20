@@ -1,6 +1,6 @@
-import Scalar from '../schema/Scalar'
+import { Scalar } from '../schema/Scalar'
 import { stringifyNumber } from '../stringify'
-import failsafe from './failsafe'
+import { failsafe } from './failsafe'
 import { boolOptions, nullOptions } from './options'
 
 export const nullObj = {
@@ -93,7 +93,7 @@ export const floatObj = {
   stringify: stringifyNumber
 }
 
-export default failsafe.concat([
+export const core = failsafe.concat([
   nullObj,
   boolObj,
   octObj,

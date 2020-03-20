@@ -1,5 +1,5 @@
-import YAMLMap from '../../schema/Map'
-import parseMap from '../../schema/parseMap'
+import { YAMLMap } from '../../schema/Map'
+import { parseMap } from '../../schema/parseMap'
 
 function createMap(schema, obj, ctx) {
   const map = new YAMLMap(schema)
@@ -16,7 +16,7 @@ function createMap(schema, obj, ctx) {
   return map
 }
 
-export default {
+export const map = {
   createNode: createMap,
   default: true,
   nodeClass: YAMLMap,

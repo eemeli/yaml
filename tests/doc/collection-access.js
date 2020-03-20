@@ -1,5 +1,5 @@
-import YAML from '../../src/index'
-import Pair from '../../src/schema/Pair'
+import { YAML } from '../../src/index'
+import { Pair } from '../../src/schema/Pair'
 
 describe('Map', () => {
   let map

@@ -1,10 +1,10 @@
 import { Type } from '../constants'
 import { YAMLSemanticError } from '../errors'
-import BlankLine from './BlankLine'
-import Node from './Node'
-import Range from './Range'
+import { BlankLine } from './BlankLine'
+import { Node } from './Node'
+import { Range } from './Range'
 
-export default class CollectionItem extends Node {
+export class CollectionItem extends Node {
   constructor(type, props) {
     super(type, props)
     this.node = null

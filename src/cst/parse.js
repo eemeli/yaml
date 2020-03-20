@@ -1,9 +1,9 @@
 // Published as 'yaml/parse-cst'
 
-import Document from './Document'
-import ParseContext from './ParseContext'
+import { Document } from './Document'
+import { ParseContext } from './ParseContext'
 
-export default function parse(src) {
+export function parse(src) {
   const cr = []
   if (src.indexOf('\r') !== -1) {
     src = src.replace(/\r\n?/g, (match, offset) => {

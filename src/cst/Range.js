@@ -1,4 +1,4 @@
-export default class Range {
+export class Range {
   static copy(orig) {
     return new Range(orig.start, orig.end)
   }

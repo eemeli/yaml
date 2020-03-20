@@ -1,15 +1,15 @@
 import { Char, Type } from '../constants'
 import { YAMLSyntaxError } from '../errors'
-import Alias from './Alias'
-import BlockValue from './BlockValue'
-import Collection from './Collection'
-import CollectionItem from './CollectionItem'
-import FlowCollection from './FlowCollection'
-import Node from './Node'
-import PlainValue from './PlainValue'
-import QuoteDouble from './QuoteDouble'
-import QuoteSingle from './QuoteSingle'
-import Range from './Range'
+import { Alias } from './Alias'
+import { BlockValue } from './BlockValue'
+import { Collection } from './Collection'
+import { CollectionItem } from './CollectionItem'
+import { FlowCollection } from './FlowCollection'
+import { Node } from './Node'
+import { PlainValue } from './PlainValue'
+import { QuoteDouble } from './QuoteDouble'
+import { QuoteSingle } from './QuoteSingle'
+import { Range } from './Range'
 
 function createNewNode(type, props) {
   switch (type) {
@@ -47,7 +47,7 @@ function createNewNode(type, props) {
  * @param {Node} parent - The parent of the node
  * @param {string} src - Source of the YAML document
  */
-export default class ParseContext {
+export class ParseContext {
   static parseType(src, offset, inFlow) {
     switch (src[offset]) {
       case '*':
