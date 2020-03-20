@@ -1,13 +1,13 @@
-import parseCST from './cst/parse'
-import Document from './Document'
+import { parse } from './cst/parse'
+import { Document } from './Document'
 
 // test harness for yaml-test-suite event tests
-export default function testEvents(src, options) {
+export function testEvents(src, options) {
   const opt = Object.assign(
     { keepCstNodes: true, keepNodeTypes: true, version: '1.2' },
     options
   )
-  const docs = parseCST(src).map(cstDoc => new Document(opt).parse(cstDoc))
+  const docs = parse(src).map(cstDoc => new Document(opt).parse(cstDoc))
   const errDoc = docs.find(doc => doc.errors.length > 0)
   const error = errDoc ? errDoc.errors[0].message : null
   const events = ['+STR']

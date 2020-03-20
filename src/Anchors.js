@@ -1,12 +1,16 @@
-import Alias from './schema/Alias'
-import Map from './schema/Map'
-import Merge from './schema/Merge'
-import Scalar from './schema/Scalar'
-import Seq from './schema/Seq'
+import { Alias } from './schema/Alias'
+import { YAMLMap } from './schema/Map'
+import { Merge } from './schema/Merge'
+import { Scalar } from './schema/Scalar'
+import { YAMLSeq } from './schema/Seq'
 
-export default class Anchors {
+export class Anchors {
   static validAnchorNode(node) {
-    return node instanceof Scalar || node instanceof Seq || node instanceof Map
+    return (
+      node instanceof Scalar ||
+      node instanceof YAMLSeq ||
+      node instanceof YAMLMap
+    )
   }
 
   map = {}
@@ -24,8 +28,8 @@ export default class Anchors {
     const merge = new Merge()
     merge.value.items = sources.map(s => {
       if (s instanceof Alias) {
-        if (s.source instanceof Map) return s
-      } else if (s instanceof Map) {
+        if (s.source instanceof YAMLMap) return s
+      } else if (s instanceof YAMLMap) {
         return this.createAlias(s)
       }
       throw new Error('Merge sources must be Map nodes or their Aliases')

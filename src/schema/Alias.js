@@ -1,9 +1,9 @@
 import { Type } from '../constants'
 import { YAMLReferenceError } from '../errors'
-import toJSON from '../toJSON'
-import Collection from './Collection'
-import Node from './Node'
-import Pair from './Pair'
+import { toJSON } from '../toJSON'
+import { Collection } from './Collection'
+import { Node } from './Node'
+import { Pair } from './Pair'
 
 const getAliasCount = (node, anchors) => {
   if (node instanceof Alias) {
@@ -24,7 +24,7 @@ const getAliasCount = (node, anchors) => {
   return 1
 }
 
-export default class Alias extends Node {
+export class Alias extends Node {
   static default = true
 
   static stringify(

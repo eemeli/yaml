@@ -1,4 +1,4 @@
-import YAML from '../src/index'
+import { YAML } from '../src/index'
 import * as fc from 'fast-check'
 
 describe('properties', () => {

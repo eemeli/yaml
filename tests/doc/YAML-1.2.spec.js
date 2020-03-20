@@ -1,4 +1,4 @@
-import YAML from '../../src/index'
+import { YAML } from '../../src/index'
 import { strOptions } from '../../src/tags/options'
 
 const collectionKeyWarning =

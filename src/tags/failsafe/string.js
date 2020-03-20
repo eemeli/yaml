@@ -13,7 +13,7 @@ export const resolveString = (doc, node) => {
   return res.str
 }
 
-export default {
+export const string = {
   identify: value => typeof value === 'string',
   default: true,
   tag: 'tag:yaml.org,2002:str',

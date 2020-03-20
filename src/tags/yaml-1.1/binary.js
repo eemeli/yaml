@@ -6,7 +6,7 @@ import { stringifyString } from '../../stringify'
 import { resolveString } from '../failsafe/string'
 import { binaryOptions as options } from '../options'
 
-export default {
+export const binary = {
   identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array
   default: false,
   tag: 'tag:yaml.org,2002:binary',

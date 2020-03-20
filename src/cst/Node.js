@@ -1,9 +1,9 @@
 import { Char, Type } from '../constants'
 import { getLinePos } from './source-utils'
-import Range from './Range'
+import { Range } from './Range'
 
 /** Root class of all nodes */
-export default class Node {
+export class Node {
   static addStringTerminator(src, offset, str) {
     if (str[str.length - 1] === '\n') return str
     const next = Node.endOfWhiteSpace(src, offset)

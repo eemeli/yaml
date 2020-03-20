@@ -1,8 +1,8 @@
 import { Type } from '../constants'
-import Node from './Node'
-import Range from './Range'
+import { Node } from './Node'
+import { Range } from './Range'
 
-export default class Comment extends Node {
+export class Comment extends Node {
   constructor() {
     super(Type.COMMENT)
   }

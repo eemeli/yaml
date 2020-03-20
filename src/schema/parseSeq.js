@@ -1,15 +1,15 @@
 import { Type } from '../constants'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
-import Pair from './Pair'
+import { Pair } from './Pair'
 import {
   checkFlowCollectionEnd,
   checkKeyLength,
   resolveComments
 } from './parseUtils'
-import Seq from './Seq'
-import Collection from './Collection'
+import { YAMLSeq } from './Seq'
+import { Collection } from './Collection'
 
-export default function parseSeq(doc, cst) {
+export function parseSeq(doc, cst) {
   if (cst.type !== Type.SEQ && cst.type !== Type.FLOW_SEQ) {
     const msg = `A ${cst.type} node cannot be resolved as a sequence`
     doc.errors.push(new YAMLSyntaxError(cst, msg))
@@ -19,7 +19,7 @@ export default function parseSeq(doc, cst) {
     cst.type === Type.FLOW_SEQ
       ? resolveFlowSeqItems(doc, cst)
       : resolveBlockSeqItems(doc, cst)
-  const seq = new Seq()
+  const seq = new YAMLSeq()
   seq.items = items
   resolveComments(seq, comments)
   if (

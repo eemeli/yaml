@@ -1,6 +1,7 @@
 import { addCommentBefore } from './addComment'
 import { Type } from './constants'
-import foldFlowLines, {
+import {
+  foldFlowLines,
   FOLD_BLOCK,
   FOLD_FLOW,
   FOLD_QUOTED

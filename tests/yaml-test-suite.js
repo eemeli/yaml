@@ -1,9 +1,9 @@
 import fs from 'fs'
 import path from 'path'
 
-import YAML from '../src/index'
+import { YAML } from '../src/index'
 import { strOptions } from '../src/tags/options'
-import testEvents from '../src/test-events'
+import { testEvents } from '../src/test-events'
 
 const testDirs = fs
   .readdirSync(path.resolve(__dirname, 'yaml-test-suite'))

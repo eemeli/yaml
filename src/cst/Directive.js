@@ -1,8 +1,8 @@
 import { Type } from '../constants'
-import Node from './Node'
-import Range from './Range'
+import { Node } from './Node'
+import { Range } from './Range'
 
-export default class Directive extends Node {
+export class Directive extends Node {
   constructor() {
     super(Type.DIRECTIVE)
     this.name = null

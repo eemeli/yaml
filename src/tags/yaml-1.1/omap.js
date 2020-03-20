@@ -1,9 +1,9 @@
 import { YAMLSemanticError } from '../../errors'
-import toJSON from '../../toJSON'
-import YAMLMap from '../../schema/Map'
-import Pair from '../../schema/Pair'
-import Scalar from '../../schema/Scalar'
-import YAMLSeq from '../../schema/Seq'
+import { toJSON } from '../../toJSON'
+import { YAMLMap } from '../../schema/Map'
+import { Pair } from '../../schema/Pair'
+import { Scalar } from '../../schema/Scalar'
+import { YAMLSeq } from '../../schema/Seq'
 import { createPairs, parsePairs } from './pairs'
 
 export class YAMLOMap extends YAMLSeq {
@@ -62,7 +62,7 @@ function createOMap(schema, iterable, ctx) {
   return omap
 }
 
-export default {
+export const omap = {
   identify: value => value instanceof Map,
   nodeClass: YAMLOMap,
   default: false,

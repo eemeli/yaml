@@ -4,17 +4,17 @@ import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify'
 import { schemas, tags } from '../tags'
 import { resolveString } from '../tags/failsafe/string'
-import Alias from './Alias'
-import Collection from './Collection'
-import Node from './Node'
-import Pair from './Pair'
-import Scalar from './Scalar'
+import { Alias } from './Alias'
+import { Collection } from './Collection'
+import { Node } from './Node'
+import { Pair } from './Pair'
+import { Scalar } from './Scalar'
 
 const isMap = ({ type }) => type === Type.FLOW_MAP || type === Type.MAP
 
 const isSeq = ({ type }) => type === Type.FLOW_SEQ || type === Type.SEQ
 
-export default class Schema {
+export class Schema {
   static defaultPrefix = 'tag:yaml.org,2002:'
 
   static defaultTags = {

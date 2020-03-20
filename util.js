@@ -1,14 +1,14 @@
 exports.findPair = require('./dist/schema/Map').findPair
-exports.parseMap = require('./dist/schema/parseMap').default
-exports.parseSeq = require('./dist/schema/parseSeq').default
+exports.parseMap = require('./dist/schema/parseMap').parseMap
+exports.parseSeq = require('./dist/schema/parseSeq').parseSeq
 
-var str = require('./dist/stringify')
+const str = require('./dist/stringify')
 exports.stringifyNumber = str.stringifyNumber
 exports.stringifyString = str.stringifyString
-exports.toJSON = require('./dist/toJSON').default
+exports.toJSON = require('./dist/toJSON').toJSON
 exports.Type = require('./dist/constants').Type
 
-var err = require('./dist/errors')
+const err = require('./dist/errors')
 exports.YAMLReferenceError = err.YAMLReferenceError
 exports.YAMLSemanticError = err.YAMLSemanticError
 exports.YAMLSyntaxError = err.YAMLSyntaxError

@@ -1,5 +1,5 @@
-import map from './map'
-import seq from './seq'
-import str from './string'
+import { map } from './map'
+import { seq } from './seq'
+import { string } from './string'
 
-export default [map, seq, str]
+export const failsafe = [map, seq, string]

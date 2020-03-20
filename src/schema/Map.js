@@ -1,6 +1,6 @@
-import Collection from './Collection'
-import Pair from './Pair'
-import Scalar from './Scalar'
+import { Collection } from './Collection'
+import { Pair } from './Pair'
+import { Scalar } from './Scalar'
 
 export function findPair(items, key) {
   const k = key instanceof Scalar ? key.value : key
@@ -13,7 +13,7 @@ export function findPair(items, key) {
   return undefined
 }
 
-export default class YAMLMap extends Collection {
+export class YAMLMap extends Collection {
   add(pair, overwrite) {
     if (!pair) pair = new Pair(pair)
     else if (!(pair instanceof Pair))

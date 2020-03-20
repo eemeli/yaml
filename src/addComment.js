@@ -4,7 +4,7 @@ export function addCommentBefore(str, indent, comment) {
   return `#${cc}\n${indent}${str}`
 }
 
-export default function addComment(str, indent, comment) {
+export function addComment(str, indent, comment) {
   return !comment
     ? str
     : comment.indexOf('\n') === -1

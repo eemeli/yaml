@@ -1,4 +1,4 @@
-export default function toJSON(value, arg, ctx) {
+export function toJSON(value, arg, ctx) {
   if (Array.isArray(value))
     return value.map((v, i) => toJSON(v, String(i), ctx))
   if (value && typeof value.toJSON === 'function') {

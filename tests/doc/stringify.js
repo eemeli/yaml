@@ -1,6 +1,6 @@
 import { source } from 'common-tags'
-import YAML from '../../src/index'
-import Pair from '../../src/schema/Pair'
+import { YAML } from '../../src/index'
+import { Pair } from '../../src/schema/Pair'
 import { Type } from '../../src/constants'
 import { stringifyString } from '../../src/stringify'
 import { strOptions } from '../../src/tags/options'

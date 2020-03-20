@@ -35,7 +35,7 @@ const consumeMoreIndentedLines = (text, i) => {
  * @param {function} options.onFold Called once if any line of text exceeds
  *   lineWidth characters
  */
-export default function foldFlowLines(
+export function foldFlowLines(
   text,
   indent,
   mode,

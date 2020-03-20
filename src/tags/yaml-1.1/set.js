@@ -1,8 +1,8 @@
 import { YAMLSemanticError } from '../../errors'
-import YAMLMap, { findPair } from '../../schema/Map'
-import Pair from '../../schema/Pair'
-import parseMap from '../../schema/parseMap'
-import Scalar from '../../schema/Scalar'
+import { YAMLMap, findPair } from '../../schema/Map'
+import { Pair } from '../../schema/Pair'
+import { parseMap } from '../../schema/parseMap'
+import { Scalar } from '../../schema/Scalar'
 
 export class YAMLSet extends YAMLMap {
   static tag = 'tag:yaml.org,2002:set'
@@ -66,7 +66,7 @@ function createSet(schema, iterable, ctx) {
   return set
 }
 
-export default {
+export const set = {
   identify: value => value instanceof Set,
   nodeClass: YAMLSet,
   default: false,

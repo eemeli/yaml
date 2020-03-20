@@ -1,11 +1,11 @@
 // Published as 'yaml/pair'
 
-import addComment from '../addComment'
+import { addComment } from '../addComment'
 import { Type } from '../constants'
-import toJSON from '../toJSON'
-import Collection from './Collection'
-import Node from './Node'
-import Scalar from './Scalar'
+import { toJSON } from '../toJSON'
+import { Collection } from './Collection'
+import { Node } from './Node'
+import { Scalar } from './Scalar'
 
 const stringifyKey = (key, jsKey, ctx) => {
   if (jsKey === null) return ''
@@ -21,7 +21,7 @@ const stringifyKey = (key, jsKey, ctx) => {
   return JSON.stringify(jsKey)
 }
 
-export default class Pair extends Node {
+export class Pair extends Node {
   constructor(key, value = null) {
     super()
     this.key = key

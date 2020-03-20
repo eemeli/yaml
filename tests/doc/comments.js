@@ -1,5 +1,5 @@
 import { source } from 'common-tags'
-import YAML from '../../src/index'
+import { YAML } from '../../src/index'
 
 describe('parse comments', () => {
   describe('body', () => {

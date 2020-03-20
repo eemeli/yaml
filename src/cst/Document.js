@@ -1,13 +1,13 @@
 import { Char, Type } from '../constants'
 import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
-import BlankLine from './BlankLine'
+import { BlankLine } from './BlankLine'
 import { grabCollectionEndComments } from './Collection'
-import Comment from './Comment'
-import Directive from './Directive'
-import Node from './Node'
-import Range from './Range'
+import { Comment } from './Comment'
+import { Directive } from './Directive'
+import { Node } from './Node'
+import { Range } from './Range'
 
-export default class Document extends Node {
+export class Document extends Node {
   static startCommentOrEndBlankLine(src, start) {
     const offset = Node.endOfWhiteSpace(src, start)
     const ch = src[offset]

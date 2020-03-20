@@ -1,9 +1,9 @@
 import { Type } from '../constants'
-import BlankLine from './BlankLine'
-import CollectionItem from './CollectionItem'
-import Comment from './Comment'
-import Node from './Node'
-import Range from './Range'
+import { BlankLine } from './BlankLine'
+import { CollectionItem } from './CollectionItem'
+import { Comment } from './Comment'
+import { Node } from './Node'
+import { Range } from './Range'
 
 export function grabCollectionEndComments(node) {
   let cnode = node
@@ -35,7 +35,7 @@ export function grabCollectionEndComments(node) {
   return ca
 }
 
-export default class Collection extends Node {
+export class Collection extends Node {
   static nextContentHasIndent(src, offset, indent) {
     const lineStart = Node.endOfLine(src, offset) + 1
     offset = Node.endOfWhiteSpace(src, lineStart)

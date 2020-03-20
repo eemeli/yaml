@@ -1,7 +1,7 @@
-import addComment from '../addComment'
-import Node from './Node'
-import Pair from './Pair'
-import Scalar from './Scalar'
+import { addComment } from '../addComment'
+import { Node } from './Node'
+import { Pair } from './Pair'
+import { Scalar } from './Scalar'
 
 function collectionFromPath(schema, path, value) {
   let v = value
@@ -19,7 +19,7 @@ export const isEmptyPath = path =>
   path == null ||
   (typeof path === 'object' && path[Symbol.iterator]().next().done)
 
-export default class Collection extends Node {
+export class Collection extends Node {
   static maxFlowStringSingleLineLength = 60
 
   items = []

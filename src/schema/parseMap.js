@@ -1,18 +1,18 @@
 import { Char, Type } from '../constants'
-import PlainValue from '../cst/PlainValue'
+import { PlainValue } from '../cst/PlainValue'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
-import Map from './Map'
-import Merge, { MERGE_KEY } from './Merge'
-import Pair from './Pair'
+import { YAMLMap } from './Map'
+import { Merge, MERGE_KEY } from './Merge'
+import { Pair } from './Pair'
 import {
   checkFlowCollectionEnd,
   checkKeyLength,
   resolveComments
 } from './parseUtils'
-import Alias from './Alias'
-import Collection from './Collection'
+import { Alias } from './Alias'
+import { Collection } from './Collection'
 
-export default function parseMap(doc, cst) {
+export function parseMap(doc, cst) {
   if (cst.type !== Type.MAP && cst.type !== Type.FLOW_MAP) {
     const msg = `A ${cst.type} node cannot be resolved as a mapping`
     doc.errors.push(new YAMLSyntaxError(cst, msg))
@@ -22,7 +22,7 @@ export default function parseMap(doc, cst) {
     cst.type === Type.FLOW_MAP
       ? resolveFlowMapItems(doc, cst)
       : resolveBlockMapItems(doc, cst)
-  const map = new Map()
+  const map = new YAMLMap()
   map.items = items
   resolveComments(map, comments)
   let hasCollectionKey = false
