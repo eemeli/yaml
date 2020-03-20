@@ -60,10 +60,9 @@
   },
   "scripts": {
     "browser:build": "BABEL_ENV=browser babel src/ --out-dir browser/dist/",
-    "browser:copy": "cpy '*.js' '!*.config.js' types/ browser/ --parents",
     "clean": "git clean -fdxe node_modules",
     "dist:build": "babel src/ --out-dir dist/",
-    "build": "npm run dist:build && npm run browser:build && npm run browser:copy",
+    "build": "npm run dist:build && npm run browser:build",
     "prettier": "prettier --write \"{src,tests}/**/*.js\"",
     "lint": "eslint src/",
     "start": "npm run dist:build && node -i -e 'YAML=require(\".\")'",

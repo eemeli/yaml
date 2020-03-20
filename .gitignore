@@ -1,5 +1,4 @@
 .*
-browser/
 coverage/
 dist/
 node_modules/
