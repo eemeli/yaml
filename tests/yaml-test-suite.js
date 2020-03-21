@@ -2,7 +2,6 @@ import fs from 'fs'
 import path from 'path'
 
 import { YAML } from '../src/index'
-import { strOptions } from '../src/tags/options'
 import { testEvents } from '../src/test-events'
 
 const testDirs = fs
@@ -29,15 +28,15 @@ const matchJson = (docs, json) => {
 let origFoldOptions
 
 beforeAll(() => {
-  origFoldOptions = strOptions.fold
-  strOptions.fold = {
+  origFoldOptions = YAML.scalarOptions.str.fold
+  YAML.scalarOptions.str.fold = {
     lineWidth: 20,
     minContentWidth: 0
   }
 })
 
 afterAll(() => {
-  strOptions.fold = origFoldOptions
+  YAML.scalarOptions.str.fold = origFoldOptions
 })
 
 testDirs.forEach(dir => {

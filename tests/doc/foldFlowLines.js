@@ -4,7 +4,6 @@ import {
   FOLD_QUOTED
 } from '../../src/foldFlowLines'
 import { YAML } from '../../src/index'
-import { strOptions } from '../../src/tags/options'
 
 describe('plain', () => {
   const src = 'abc def ghi jkl mno pqr stu vwx yz\n'
@@ -195,15 +194,15 @@ describe('end-to-end', () => {
   let origFoldOptions
 
   beforeAll(() => {
-    origFoldOptions = strOptions.fold
-    strOptions.fold = {
+    origFoldOptions = YAML.scalarOptions.str.fold
+    YAML.scalarOptions.str.fold = {
       lineWidth: 20,
       minContentWidth: 0
     }
   })
 
   afterAll(() => {
-    strOptions.fold = origFoldOptions
+    YAML.scalarOptions.str.fold = origFoldOptions
   })
 
   test('more-indented folded block', () => {

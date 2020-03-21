@@ -5,7 +5,6 @@ import { YAML } from '../../src/index'
 import { Pair } from '../../src/schema/Pair'
 import { Type } from '../../src/constants'
 import { stringifyString } from '../../src/stringify'
-import { strOptions } from '../../src/tags/options'
 
 for (const [name, version] of [
   ['YAML 1.1', '1.1'],
@@ -114,14 +113,14 @@ for (const [name, version] of [
     describe('string', () => {
       let origFoldOptions
       beforeAll(() => {
-        origFoldOptions = strOptions.fold
-        strOptions.fold = {
+        origFoldOptions = YAML.scalarOptions.str.fold
+        YAML.scalarOptions.str.fold = {
           lineWidth: 20,
           minContentWidth: 0
         }
       })
       afterAll(() => {
-        strOptions.fold = origFoldOptions
+        YAML.scalarOptions.str.fold = origFoldOptions
       })
 
       test('plain', () => {
