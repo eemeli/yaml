@@ -1,7 +1,6 @@
 import { YAML } from '../../src/index'
 import { Scalar } from '../../src/schema/Scalar'
 import { YAMLSeq } from '../../src/schema/Seq'
-import { strOptions } from '../../src/tags/options'
 import { binary } from '../../src/tags/yaml-1.1/binary'
 import { YAMLOMap } from '../../src/tags/yaml-1.1/omap'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set'
@@ -9,15 +8,15 @@ import { YAMLSet } from '../../src/tags/yaml-1.1/set'
 let origFoldOptions
 
 beforeAll(() => {
-  origFoldOptions = strOptions.fold
-  strOptions.fold = {
+  origFoldOptions = YAML.scalarOptions.str.fold
+  YAML.scalarOptions.str.fold = {
     lineWidth: 20,
     minContentWidth: 0
   }
 })
 
 afterAll(() => {
-  strOptions.fold = origFoldOptions
+  YAML.scalarOptions.str.fold = origFoldOptions
 })
 
 describe('json schema', () => {
@@ -259,7 +258,7 @@ description:
       genericStr += String.fromCharCode(generic[i])
     expect(canonicalStr).toBe(genericStr)
     expect(canonicalStr.substr(0, 5)).toBe('GIF89')
-    strOptions.fold.lineWidth = 80
+    YAML.scalarOptions.str.fold.lineWidth = 80
     expect(String(doc))
       .toBe(`canonical: !!binary "R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J\\
   +fn5OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/\\
@@ -271,7 +270,7 @@ generic: !!binary |-
   ZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLCAgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYN
   G84BwwEeECcgggoBADs=
 description: The binary value above is a tiny arrow encoded as a gif image.\n`)
-    strOptions.fold.lineWidth = 20
+    YAML.scalarOptions.str.fold.lineWidth = 20
   })
 
   test('!!bool', () => {

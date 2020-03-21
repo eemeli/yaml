@@ -1,5 +1,4 @@
 import { YAML } from '../../src/index'
-import { strOptions } from '../../src/tags/options'
 
 const collectionKeyWarning =
   'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
@@ -1840,15 +1839,15 @@ matches %: 20`,
 let origFoldOptions
 
 beforeAll(() => {
-  origFoldOptions = strOptions.fold
-  strOptions.fold = {
+  origFoldOptions = YAML.scalarOptions.str.fold
+  YAML.scalarOptions.str.fold = {
     lineWidth: 20,
     minContentWidth: 0
   }
 })
 
 afterAll(() => {
-  strOptions.fold = origFoldOptions
+  YAML.scalarOptions.str.fold = origFoldOptions
 })
 
 for (const section in spec) {

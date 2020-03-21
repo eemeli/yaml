@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 import { YAML } from '../../src/index'
-import { intOptions } from '../../src/tags/options'
 
 describe('tags', () => {
   describe('implicit tags', () => {
@@ -142,11 +141,11 @@ describe('number types', () => {
   describe('asBigInt: true', () => {
     let prevAsBigInt
     beforeAll(() => {
-      prevAsBigInt = intOptions.asBigInt
-      intOptions.asBigInt = true
+      prevAsBigInt = YAML.scalarOptions.int.asBigInt
+      YAML.scalarOptions.int.asBigInt = true
     })
     afterAll(() => {
-      intOptions.asBigInt = prevAsBigInt
+      YAML.scalarOptions.int.asBigInt = prevAsBigInt
     })
 
     test('Version 1.1', () => {
