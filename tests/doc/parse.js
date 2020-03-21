@@ -86,7 +86,8 @@ describe('number types', () => {
 - 5.1_2_3E-1
 - 4.02
 - 4.20
-- .42`
+- .42
+- 00.4`
     const doc = YAML.parseDocument(src, { version: '1.1' })
     expect(doc.contents.items).toMatchObject([
       { value: 10, format: 'BIN' },
@@ -97,7 +98,8 @@ describe('number types', () => {
       { value: 0.5123, format: 'EXP' },
       { value: 4.02 },
       { value: 4.2, minFractionDigits: 2 },
-      { value: 0.42 }
+      { value: 0.42 },
+      { value: 0.4 }
     ])
     expect(doc.contents.items[3]).not.toHaveProperty('format')
     expect(doc.contents.items[6]).not.toHaveProperty('format')
@@ -114,7 +116,8 @@ describe('number types', () => {
 - 5.123E-1
 - 4.02
 - 4.20
-- .42`
+- .42
+- 00.4`
     const doc = YAML.parseDocument(src, { version: '1.2' })
     expect(doc.contents.items).toMatchObject([
       { value: 83, format: 'OCT' },
@@ -124,7 +127,8 @@ describe('number types', () => {
       { value: 0.5123, format: 'EXP' },
       { value: 4.02 },
       { value: 4.2, minFractionDigits: 2 },
-      { value: 0.42 }
+      { value: 0.42 },
+      { value: 0.4 }
     ])
     expect(doc.contents.items[2]).not.toHaveProperty('format')
     expect(doc.contents.items[5]).not.toHaveProperty('format')
