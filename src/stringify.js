@@ -14,6 +14,7 @@ const getFoldOptions = ({ indentAtStart }) =>
     : strOptions.fold
 
 export function stringifyNumber({ format, minFractionDigits, tag, value }) {
+  if (typeof value === 'bigint') return String(value)
   if (!isFinite(value))
     return isNaN(value) ? '.nan' : value < 0 ? '-.inf' : '.inf'
   let n = JSON.stringify(value)

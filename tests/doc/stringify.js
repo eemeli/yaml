@@ -1,3 +1,5 @@
+/* global BigInt */
+
 import { source } from 'common-tags'
 import { YAML } from '../../src/index'
 import { Pair } from '../../src/schema/Pair'
@@ -5,129 +7,193 @@ import { Type } from '../../src/constants'
 import { stringifyString } from '../../src/stringify'
 import { strOptions } from '../../src/tags/options'
 
-test('undefined', () => {
-  expect(YAML.stringify()).toBe('\n')
-})
+for (const [name, version] of [
+  ['YAML 1.1', '1.1'],
+  ['YAML 1.2', '1.2']
+]) {
+  describe(name, () => {
+    let origVersion
+    beforeAll(() => {
+      origVersion = YAML.defaultOptions.version
+      YAML.defaultOptions.version = version
+    })
+    afterAll(() => {
+      YAML.defaultOptions.version = origVersion
+    })
 
-test('null', () => {
-  expect(YAML.stringify(null)).toBe('null\n')
-})
+    test('undefined', () => {
+      expect(YAML.stringify()).toBe('\n')
+    })
 
-describe('boolean', () => {
-  test('true', () => {
-    expect(YAML.stringify(true)).toBe('true\n')
-  })
-  test('false', () => {
-    expect(YAML.stringify(false)).toBe('false\n')
-  })
-})
+    test('null', () => {
+      expect(YAML.stringify(null)).toBe('null\n')
+    })
 
-describe('number', () => {
-  test('integer', () => {
-    expect(YAML.stringify(3)).toBe('3\n')
-  })
-  test('float', () => {
-    expect(YAML.stringify(3.141)).toBe('3.141\n')
-  })
-  test('zero', () => {
-    expect(YAML.stringify(0)).toBe('0\n')
-  })
-  test('NaN', () => {
-    expect(YAML.stringify(NaN)).toBe('.nan\n')
-  })
-  test('float with trailing zeros', () => {
-    const doc = new YAML.Document()
-    doc.contents = YAML.createNode(3, true)
-    doc.contents.minFractionDigits = 2
-    expect(String(doc)).toBe('3.00\n')
-  })
-  test('scientific float ignores minFractionDigits', () => {
-    const doc = new YAML.Document()
-    doc.contents = YAML.createNode(3, true)
-    doc.contents.format = 'EXP'
-    doc.contents.minFractionDigits = 2
-    expect(String(doc)).toBe('3e+0\n')
-  })
-})
+    describe('boolean', () => {
+      test('true', () => {
+        expect(YAML.stringify(true)).toBe('true\n')
+      })
+      test('false', () => {
+        expect(YAML.stringify(false)).toBe('false\n')
+      })
+    })
 
-describe('string', () => {
-  let origFoldOptions
-  beforeAll(() => {
-    origFoldOptions = strOptions.fold
-    strOptions.fold = {
-      lineWidth: 20,
-      minContentWidth: 0
-    }
-  })
-  afterAll(() => {
-    strOptions.fold = origFoldOptions
-  })
+    describe('number', () => {
+      test('integer', () => {
+        expect(YAML.stringify(3)).toBe('3\n')
+      })
+      test('float', () => {
+        expect(YAML.stringify(3.141)).toBe('3.141\n')
+      })
+      test('zero', () => {
+        expect(YAML.stringify(0)).toBe('0\n')
+      })
+      test('NaN', () => {
+        expect(YAML.stringify(NaN)).toBe('.nan\n')
+      })
 
-  test('plain', () => {
-    expect(YAML.stringify('STR')).toBe('STR\n')
-  })
-  test('double-quoted', () => {
-    expect(YAML.stringify('"x"')).toBe('\'"x"\'\n')
-  })
-  test('single-quoted', () => {
-    expect(YAML.stringify("'x'")).toBe('"\'x\'"\n')
-  })
-  test('escaped', () => {
-    expect(YAML.stringify('null: \u0000')).toBe('"null: \\0"\n')
-  })
-  test('short multiline', () => {
-    expect(YAML.stringify('blah\nblah\nblah')).toBe('|-\nblah\nblah\nblah\n')
-  })
-  test('long multiline', () => {
-    expect(
-      YAML.stringify(
-        'blah blah\nblah blah blah blah blah blah blah blah blah blah\n'
-      )
-    ).toBe(`>
+      test('float with trailing zeros', () => {
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode(3, true)
+        doc.contents.minFractionDigits = 2
+        expect(String(doc)).toBe('3.00\n')
+      })
+      test('scientific float ignores minFractionDigits', () => {
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode(3, true)
+        doc.contents.format = 'EXP'
+        doc.contents.minFractionDigits = 2
+        expect(String(doc)).toBe('3e+0\n')
+      })
+
+      test('integer with HEX format', () => {
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode(42, true)
+        doc.contents.format = 'HEX'
+        expect(String(doc)).toBe('0x2a\n')
+      })
+      test('float with HEX format', () => {
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode(4.2, true)
+        doc.contents.format = 'HEX'
+        expect(String(doc)).toBe('4.2\n')
+      })
+      test('negative integer with HEX format', () => {
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode(-42, true)
+        doc.contents.format = 'HEX'
+        const exp = version === '1.2' ? '-42\n' : '-0x2a\n'
+        expect(String(doc)).toBe(exp)
+      })
+
+      test('BigInt', () => {
+        expect(YAML.stringify(BigInt('-42'))).toBe('-42\n')
+      })
+      test('BigInt with HEX format', () => {
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode(BigInt('42'), true)
+        doc.contents.format = 'HEX'
+        expect(String(doc)).toBe('0x2a\n')
+      })
+      test('BigInt with OCT format', () => {
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode(BigInt('42'), true)
+        doc.contents.format = 'OCT'
+        const exp = version === '1.2' ? '0o52\n' : '052\n'
+        expect(String(doc)).toBe(exp)
+      })
+      test('negative BigInt with OCT format', () => {
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode(BigInt('-42'), true)
+        doc.contents.format = 'OCT'
+        const exp = version === '1.2' ? '-42\n' : '-052\n'
+        expect(String(doc)).toBe(exp)
+      })
+    })
+
+    describe('string', () => {
+      let origFoldOptions
+      beforeAll(() => {
+        origFoldOptions = strOptions.fold
+        strOptions.fold = {
+          lineWidth: 20,
+          minContentWidth: 0
+        }
+      })
+      afterAll(() => {
+        strOptions.fold = origFoldOptions
+      })
+
+      test('plain', () => {
+        expect(YAML.stringify('STR')).toBe('STR\n')
+      })
+      test('double-quoted', () => {
+        expect(YAML.stringify('"x"')).toBe('\'"x"\'\n')
+      })
+      test('single-quoted', () => {
+        expect(YAML.stringify("'x'")).toBe('"\'x\'"\n')
+      })
+      test('escaped', () => {
+        expect(YAML.stringify('null: \u0000')).toBe('"null: \\0"\n')
+      })
+      test('short multiline', () => {
+        expect(YAML.stringify('blah\nblah\nblah')).toBe(
+          '|-\nblah\nblah\nblah\n'
+        )
+      })
+      test('long multiline', () => {
+        expect(
+          YAML.stringify(
+            'blah blah\nblah blah blah blah blah blah blah blah blah blah\n'
+          )
+        ).toBe(`>
 blah blah
 
 blah blah blah blah
 blah blah blah blah
 blah blah\n`)
-  })
+      })
 
-  test('long line in map', () => {
-    const foo = 'fuzz'.repeat(16)
-    const doc = new YAML.Document()
-    doc.contents = YAML.createNode({ foo })
-    for (const node of doc.contents.items) node.value.type = Type.QUOTE_DOUBLE
-    expect(
-      String(doc)
-        .split('\n')
-        .map(line => line.length)
-    ).toMatchObject([20, 20, 20, 20, 0])
-  })
+      test('long line in map', () => {
+        const foo = 'fuzz'.repeat(16)
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode({ foo })
+        for (const node of doc.contents.items)
+          node.value.type = Type.QUOTE_DOUBLE
+        expect(
+          String(doc)
+            .split('\n')
+            .map(line => line.length)
+        ).toMatchObject([20, 20, 20, 20, 0])
+      })
 
-  test('long line in sequence', () => {
-    const foo = 'fuzz'.repeat(16)
-    const doc = new YAML.Document()
-    doc.contents = YAML.createNode([foo])
-    for (const node of doc.contents.items) node.type = Type.QUOTE_DOUBLE
-    expect(
-      String(doc)
-        .split('\n')
-        .map(line => line.length)
-    ).toMatchObject([20, 20, 20, 17, 0])
-  })
+      test('long line in sequence', () => {
+        const foo = 'fuzz'.repeat(16)
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode([foo])
+        for (const node of doc.contents.items) node.type = Type.QUOTE_DOUBLE
+        expect(
+          String(doc)
+            .split('\n')
+            .map(line => line.length)
+        ).toMatchObject([20, 20, 20, 17, 0])
+      })
 
-  test('long line in sequence in map', () => {
-    const foo = 'fuzz'.repeat(16)
-    const doc = new YAML.Document()
-    doc.contents = YAML.createNode({ foo: [foo] })
-    const seq = doc.contents.items[0].value
-    for (const node of seq.items) node.type = Type.QUOTE_DOUBLE
-    expect(
-      String(doc)
-        .split('\n')
-        .map(line => line.length)
-    ).toMatchObject([4, 20, 20, 20, 20, 10, 0])
+      test('long line in sequence in map', () => {
+        const foo = 'fuzz'.repeat(16)
+        const doc = new YAML.Document()
+        doc.contents = YAML.createNode({ foo: [foo] })
+        const seq = doc.contents.items[0].value
+        for (const node of seq.items) node.type = Type.QUOTE_DOUBLE
+        expect(
+          String(doc)
+            .split('\n')
+            .map(line => line.length)
+        ).toMatchObject([4, 20, 20, 20, 20, 10, 0])
+      })
+    })
   })
-})
+}
 
 describe('timestamp-like string (YAML 1.1)', () => {
   for (const [name, str] of [

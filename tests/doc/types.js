@@ -78,7 +78,10 @@ describe('json schema', () => {
     expect(doc.errors).toHaveLength(2)
     doc.errors = []
     doc.contents.items.splice(2, 2)
-    expect(String(doc)).toBe('"canonical": 685230\n"decimal": -685230\n')
+    doc.set('bigint', 42n)
+    expect(String(doc)).toBe(
+      '"canonical": 685230\n"decimal": -685230\n"bigint": 42\n'
+    )
   })
 
   test('!!null', () => {

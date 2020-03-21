@@ -7,6 +7,8 @@ export const binaryOptions = {
 
 export const boolOptions = { trueStr: 'true', falseStr: 'false' }
 
+export const intOptions = { asBigInt: false }
+
 export const nullOptions = { nullStr: 'null' }
 
 export const strOptions = {

@@ -1,6 +1,7 @@
 export {
   binaryOptions,
   boolOptions,
+  intOptions,
   nullOptions,
   strOptions
 } from './dist/tags/options'
