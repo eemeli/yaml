@@ -73,7 +73,7 @@ export const expObj = {
   default: true,
   tag: 'tag:yaml.org,2002:float',
   format: 'EXP',
-  test: /^[-+]?(?:0|[1-9][0-9]*)(\.[0-9]*)?[eE][-+]?[0-9]+$/,
+  test: /^[-+]?(?:\.[0-9]+|(?:0|[1-9][0-9]*)(\.[0-9]*)?)[eE][-+]?[0-9]+$/,
   resolve: str => parseFloat(str),
   stringify: ({ value }) => Number(value).toExponential()
 }
@@ -82,8 +82,9 @@ export const floatObj = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
-  test: /^[-+]?(?:0|[1-9][0-9]*)\.([0-9]*)$/,
-  resolve(str, frac) {
+  test: /^[-+]?(?:\.([0-9]+)|(?:0|[1-9][0-9]*)\.([0-9]*))$/,
+  resolve(str, frac1, frac2) {
+    const frac = frac1 || frac2
     const node = new Scalar(parseFloat(str))
     if (frac && frac[frac.length - 1] === '0')
       node.minFractionDigits = frac.length
