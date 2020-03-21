@@ -543,7 +543,13 @@ export class Document {
     const keep =
       keepBlobsInJSON &&
       (typeof arg !== 'string' || !(this.contents instanceof Scalar))
-    const ctx = { doc: this, keep, mapAsMap: keep && !!mapAsMap, maxAliasCount }
+    const ctx = {
+      doc: this,
+      indentStep: '  ',
+      keep,
+      mapAsMap: keep && !!mapAsMap,
+      maxAliasCount
+    }
     const anchorNames = Object.keys(this.anchors.map)
     if (anchorNames.length > 0)
       ctx.anchors = anchorNames.map(name => ({
@@ -558,6 +564,11 @@ export class Document {
   toString() {
     if (this.errors.length > 0)
       throw new Error('Document with errors cannot be stringified')
+    const indentSize = this.options.indent
+    if (!Number.isInteger(indentSize) || indentSize <= 0) {
+      const s = JSON.stringify(indentSize)
+      throw new Error(`"indent" option must be a positive integer, not ${s}`)
+    }
     this.setSchema()
     const lines = []
     let hasDirectives = false
@@ -585,7 +596,8 @@ export class Document {
     const ctx = {
       anchors: {},
       doc: this,
-      indent: ''
+      indent: '',
+      indentStep: ' '.repeat(indentSize)
     }
     let chompKeep = false
     let contentComment = null

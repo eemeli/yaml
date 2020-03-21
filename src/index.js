@@ -14,6 +14,7 @@ import { warn } from './warnings'
 const defaultOptions = {
   anchorPrefix: 'a',
   customTags: null,
+  indent: 2,
   keepCstNodes: false,
   keepNodeTypes: true,
   keepBlobsInJSON: true,

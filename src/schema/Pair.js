@@ -15,6 +15,7 @@ const stringifyKey = (key, jsKey, ctx) => {
       anchors: {},
       doc: ctx.doc,
       indent: '',
+      indentStep: ctx.indentStep,
       inFlow: true,
       inStringifyKey: true
     })
@@ -83,10 +84,10 @@ export class Pair extends Node {
         key instanceof Collection ||
         key.type === Type.BLOCK_FOLDED ||
         key.type === Type.BLOCK_LITERAL)
-    const { doc, indent } = ctx
+    const { doc, indent, indentStep } = ctx
     ctx = Object.assign({}, ctx, {
       implicitKey: !explicitKey,
-      indent: indent + '  '
+      indent: indent + indentStep
     })
     let chompKeep = false
     let str = doc.schema.stringify(

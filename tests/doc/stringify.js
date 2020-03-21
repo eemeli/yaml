@@ -522,3 +522,52 @@ describe('sortMapEntries', () => {
     expect(String(doc)).toBe('a: 1\nb: 2\nbb: 4\nc: 3\n')
   })
 })
+
+describe('custom indent', () => {
+  let obj
+  beforeEach(() => {
+    const seq = YAML.createNode(['a'])
+    seq.commentBefore = 'sc'
+    const map = YAML.createNode({ foo: 'bar', seq })
+    map.commentBefore = 'mc'
+    obj = { array: [{ a: 1, b: 2 }], map }
+  })
+
+  test('indent: 0', () => {
+    expect(() => YAML.stringify(obj, { indent: 0 })).toThrow(
+      /must be a positive integer/
+    )
+  })
+
+  test('indent: 1', () => {
+    expect(YAML.stringify(obj, { indent: 1 })).toBe(
+      source`
+       array:
+        - a: 1
+          b: 2
+       map:
+        #mc
+        foo: bar
+        seq:
+         #sc
+         - a
+      ` + '\n'
+    )
+  })
+
+  test('indent: 4', () => {
+    expect(YAML.stringify(obj, { indent: 4 })).toBe(
+      source`
+          array:
+              - a: 1
+                b: 2
+          map:
+              #mc
+              foo: bar
+              seq:
+                  #sc
+                  - a
+      ` + '\n'
+    )
+  })
+})
