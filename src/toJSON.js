@@ -12,5 +12,6 @@ export function toJSON(value, arg, ctx) {
     if (anchor && ctx.onCreate) ctx.onCreate(res)
     return res
   }
+  if ((!ctx || !ctx.keep) && typeof value === 'bigint') return Number(value)
   return value
 }
