@@ -15,6 +15,7 @@ const defaultOptions = {
   anchorPrefix: 'a',
   customTags: null,
   indent: 2,
+  indentSeq: true,
   keepCstNodes: false,
   keepNodeTypes: true,
   keepBlobsInJSON: true,

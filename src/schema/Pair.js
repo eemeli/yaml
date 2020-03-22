@@ -6,6 +6,7 @@ import { toJSON } from '../toJSON'
 import { Collection } from './Collection'
 import { Node } from './Node'
 import { Scalar } from './Scalar'
+import { YAMLSeq } from './Seq'
 
 const stringifyKey = (key, jsKey, ctx) => {
   if (jsKey === null) return ''
@@ -65,7 +66,7 @@ export class Pair extends Node {
 
   toString(ctx, onComment, onChompKeep) {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
-    const { simpleKeys } = ctx.doc.options
+    const { indent: indentSize, indentSeq, simpleKeys } = ctx.doc.options
     let { key, value } = this
     let keyComment = key instanceof Node && key.comment
     if (simpleKeys) {
@@ -126,6 +127,19 @@ export class Pair extends Node {
     if (!explicitKey && !this.comment && value instanceof Scalar)
       ctx.indentAtStart = str.length + 1
     chompKeep = false
+    if (
+      !indentSeq &&
+      indentSize >= 2 &&
+      !ctx.inFlow &&
+      !explicitKey &&
+      value instanceof YAMLSeq &&
+      value.type !== Type.FLOW_SEQ &&
+      !value.tag &&
+      !doc.anchors.getName(value)
+    ) {
+      // If indentSeq === false, consider '- ' as part of indentation where possible
+      ctx.indent = ctx.indent.substr(2)
+    }
     const valueStr = doc.schema.stringify(
       value,
       ctx,

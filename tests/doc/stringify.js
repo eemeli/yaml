@@ -571,3 +571,54 @@ describe('custom indent', () => {
     )
   })
 })
+
+describe('indentSeq: false', () => {
+  let obj
+  beforeEach(() => {
+    const seq = YAML.createNode(['a'])
+    seq.commentBefore = 'sc'
+    obj = { array: [{ a: 1, b: 2 }], map: { seq } }
+  })
+
+  test('indent: 1', () => {
+    expect(YAML.stringify(obj, { indent: 1, indentSeq: false })).toBe(
+      source`
+        array:
+         - a: 1
+           b: 2
+        map:
+         seq:
+          #sc
+          - a
+      ` + '\n'
+    )
+  })
+
+  test('indent: 2', () => {
+    expect(YAML.stringify(obj, { indent: 2, indentSeq: false })).toBe(
+      source`
+        array:
+        - a: 1
+          b: 2
+        map:
+          seq:
+            #sc
+          - a
+      ` + '\n'
+    )
+  })
+
+  test('indent: 4', () => {
+    expect(YAML.stringify(obj, { indent: 4, indentSeq: false })).toBe(
+      source`
+        array:
+          - a: 1
+            b: 2
+        map:
+            seq:
+                #sc
+              - a
+      ` + '\n'
+    )
+  })
+})

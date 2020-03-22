@@ -1,7 +1,6 @@
 import { addComment } from '../addComment'
 import { Type } from '../constants'
 import { Node } from './Node'
-import { Pair } from './Pair'
 import { Scalar } from './Scalar'
 
 function collectionFromPath(schema, path, value) {
@@ -67,7 +66,7 @@ export class Collection extends Node {
 
   hasAllNullValues() {
     return this.items.every(node => {
-      if (!(node instanceof Pair)) return false
+      if (!node || node.type !== 'PAIR') return false
       const n = node.value
       return (
         n == null ||
