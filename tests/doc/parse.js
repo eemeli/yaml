@@ -357,6 +357,16 @@ test('eemeli/yaml#120', () => {
   })
 })
 
+test('comment between key & : in flow collection (eemeli/yaml#149)', () => {
+  const src1 = '{"a"\n#c\n:1}'
+  expect(YAML.parse(src1)).toEqual({ a: 1 })
+
+  const src2 = '{a\n#c\n:1}'
+  expect(() => YAML.parse(src2)).toThrow(
+    'Indicator : missing in flow map entry'
+  )
+})
+
 test('empty node should respect setOrigRanges()', () => {
   const cst = YAML.parseCST('\r\na: # 123\r\n')
   expect(cst).toHaveLength(1)

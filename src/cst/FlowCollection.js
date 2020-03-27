@@ -16,7 +16,7 @@ export class FlowCollection extends Node {
     return (
       !!node &&
       (node.jsonLike ||
-        (node.type === Type.COMMENT && this.nodeIsJsonLike(idx - 1)))
+        (node.type === Type.COMMENT && this.prevNodeIsJsonLike(idx - 1)))
     )
   }
 
