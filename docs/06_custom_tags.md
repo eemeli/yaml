@@ -124,6 +124,7 @@ Finally, `stringify(item, ctx, ...): string` defines how your data should be rep
 
 ### Custom Tag API
 
+<!-- prettier-ignore -->
 ```js
 import {
   findPair, // (items, key) => Pair? -- Given a key, find a matching Pair

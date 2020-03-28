@@ -1967,7 +1967,10 @@ bar`,
           directives: [{ name: 'TAG', parameters: ['!m!', '!my-'] }],
           contents: [
             { comment: ' Bulb here' },
-            { tag: { handle: '!m!', suffix: 'light' }, strValue: 'fluorescent' }
+            {
+              tag: { handle: '!m!', suffix: 'light' },
+              strValue: 'fluorescent'
+            }
           ]
         },
         {
@@ -2835,7 +2838,10 @@ foo: bar
                 },
                 {
                   type: Type.SEQ_ITEM,
-                  node: { comment: ' Chomping indicator', strValue: 'keep\n\n' }
+                  node: {
+                    comment: ' Chomping indicator',
+                    strValue: 'keep\n\n'
+                  }
                 },
                 {
                   type: Type.SEQ_ITEM,

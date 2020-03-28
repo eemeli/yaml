@@ -4,6 +4,7 @@ For ease of implementation and to provide better error handling and reporting, t
 
 ## parseCST
 
+<!-- prettier-ignore -->
 ```js
 import parseCST from 'yaml/parse-cst'
 
@@ -50,7 +51,7 @@ import YAML from 'yaml'
 
 const cst = YAML.parseCST('this: is: bad YAML')
 
-cst[0].contents[0]  // Note: Simplified for clarity
+cst[0].contents[0] // Note: Simplified for clarity
 // { type: 'MAP',
 //   items: [
 //     { type: 'PLAIN', strValue: 'this' },

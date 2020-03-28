@@ -72,6 +72,7 @@ All of the collections provide the following accessor methods:
 | has(key)                    | `boolean` | Checks if the collection includes a value with the key `key`.                                                                                                                                     |
 | set(key, value)             | `any`     | Sets a value in this collection. For `!!set`, `value` needs to be a boolean to add/remove the item from the set.                                                                                  |
 
+<!-- prettier-ignore -->
 ```js
 const map = YAML.createNode({ a: 1, b: [2, 3] })
 map.add({ key: 'c', value: 4 })

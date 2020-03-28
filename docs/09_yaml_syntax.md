@@ -43,10 +43,10 @@ true: Yes
 octal: 014
 sexagesimal: 3:25:45
 picture: !!binary |
- R0lGODlhDAAMAIQAAP//9/X
- 17unp5WZmZgAAAOfn515eXv
- Pz7Y6OjuDg4J+fn5OTk6enp
- 56enmleECcgggoBADs=
+  R0lGODlhDAAMAIQAAP//9/X
+  17unp5WZmZgAAAOfn515eXv
+  Pz7Y6OjuDg4J+fn5OTk6enp
+  56enmleECcgggoBADs=
 ```
 
 ```js
@@ -65,21 +65,21 @@ picture: !!binary |
 
 The most significant difference between YAML 1.1 and YAML 1.2 is the introduction of the core data schema as the recommended default, replacing the YAML 1.1 type library:
 
-* Only `true` and `false` strings are parsed as booleans (including `True` and `TRUE`); `y`, `yes`, `on`, and their negative counterparts are parsed as strings.
-* Underlines `_` cannot be used within numerical values.
-* Octal values need a `0o` prefix; e.g. `010` is now parsed with the value 10 rather than 8.
-* The binary and sexagesimal integer formats have been dropped.
-* The `!!pairs`, `!!omap`, `!!set`, `!!timestamp` and `!!binary` types have been dropped.
-* The merge `<<` and value `=` special mapping keys have been removed.
+- Only `true` and `false` strings are parsed as booleans (including `True` and `TRUE`); `y`, `yes`, `on`, and their negative counterparts are parsed as strings.
+- Underlines `_` cannot be used within numerical values.
+- Octal values need a `0o` prefix; e.g. `010` is now parsed with the value 10 rather than 8.
+- The binary and sexagesimal integer formats have been dropped.
+- The `!!pairs`, `!!omap`, `!!set`, `!!timestamp` and `!!binary` types have been dropped.
+- The merge `<<` and value `=` special mapping keys have been removed.
 
 The other major change has been to make sure that YAML 1.2 is a valid superset of JSON. Additionally there are some minor differences between the parsing rules:
 
-* The next-line `\x85`, line-separator `\u2028` and paragraph-separator `\u2029` characters are no longer considered line-break characters. Within scalar values, this means that next-line characters will not be included in the white-space normalisation. Using any of these outside scalar values is likely to result in errors during parsing. For a relatively robust solution, try replacing `\x85` and `\u2028` with `\n` and `\u2029` with `\n\n`.
-* Tag shorthands can no longer include any of the characters `,[]{}`, but can include `#`. To work around this, either fix your tag names or use verbatim tags.
-* Anchors can no longer include any of the characters `,[]{}`.
-* Inside double-quoted strings `\/` is now a valid escape for the `/` character.
-* Quoted content can include practically all Unicode characters.
-* Documents in streams are now independent of each other, and no longer inherit preceding document directives if they do not define their own.
+- The next-line `\x85`, line-separator `\u2028` and paragraph-separator `\u2029` characters are no longer considered line-break characters. Within scalar values, this means that next-line characters will not be included in the white-space normalisation. Using any of these outside scalar values is likely to result in errors during parsing. For a relatively robust solution, try replacing `\x85` and `\u2028` with `\n` and `\u2029` with `\n\n`.
+- Tag shorthands can no longer include any of the characters `,[]{}`, but can include `#`. To work around this, either fix your tag names or use verbatim tags.
+- Anchors can no longer include any of the characters `,[]{}`.
+- Inside double-quoted strings `\/` is now a valid escape for the `/` character.
+- Quoted content can include practically all Unicode characters.
+- Documents in streams are now independent of each other, and no longer inherit preceding document directives if they do not define their own.
 
 ### Changes from YAML 1.0 to 1.1
 
@@ -116,16 +116,16 @@ invoice: !domain.tld,2002/^invoice
 
 The most significant difference between these versions is the complete refactoring of the tag syntax:
 
-* The `%TAG` directive has been added, along with the `!foo!` tag prefix shorthand notation.
-* The `^` character no longer enables tag prefixing.
-* The private vs. default scoping of `!` and `!!` tag prefixes has been switched around; `!!str` is now a default tag while `!bar` is an application-specific tag.
-* Verbatim `!<baz>` tag notation has been added.
-* The formal `tag:domain,date/path` format for tag names has been dropped as a requirement.
+- The `%TAG` directive has been added, along with the `!foo!` tag prefix shorthand notation.
+- The `^` character no longer enables tag prefixing.
+- The private vs. default scoping of `!` and `!!` tag prefixes has been switched around; `!!str` is now a default tag while `!bar` is an application-specific tag.
+- Verbatim `!<baz>` tag notation has been added.
+- The formal `tag:domain,date/path` format for tag names has been dropped as a requirement.
 
 Additionally, the formal description of the language describing the document structure has been completely refactored between these versions, but the described intent has not changed. Other changes include:
 
-* A `\` escape has been added for the tab character, in addition to the pre-existing `\t`
-* The `\^` escape has been removed
-* Directives now use a blank space `' '` rather than `:` as the separator between the name and its parameter/value.
+- A `\` escape has been added for the tab character, in addition to the pre-existing `\t`
+- The `\^` escape has been removed
+- Directives now use a blank space `' '` rather than `:` as the separator between the name and its parameter/value.
 
 `yaml` supports parsing and stringifying YAML 1.0 tags, but does not expand tags using the `^` notation. If this is something you'd find useful, please file a [GitHub issue](https://github.com/eemeli/yaml/issues) about it.
