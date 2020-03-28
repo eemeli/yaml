@@ -3,7 +3,7 @@
 	url = https://github.com/eemeli/yaml-test-suite.git
 	branch = fixed-data
 [submodule "docs"]
-	path = docs
+	path = docs-slate
 	url = https://github.com/eemeli/yaml-docs.git
 [submodule "playground"]
 	path = playground

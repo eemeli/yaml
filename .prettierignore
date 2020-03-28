@@ -1,9 +1,4 @@
 /dist/
-/docs/*.*
-/docs/build/
-/docs/lib/
-/docs/source/javascripts/
-/docs/source/layouts/
-/docs/source/stylesheets/
+/docs-slate/
 /package*.json
 /tests/yaml-test-suite/

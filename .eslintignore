@@ -1,11 +1,6 @@
 /browser/
 /dist/
-/docs/*.*
-/docs/build/
-/docs/lib/
-/docs/source/javascripts/
-/docs/source/layouts/
-/docs/source/stylesheets/
+/docs-slate/
 /package-lock.json
 /playground/dist/
 /tests/yaml-test-suite/

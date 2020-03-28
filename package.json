@@ -68,9 +68,9 @@
     "start": "npm run dist:build && node -i -e 'YAML=require(\".\")'",
     "test": "TRACE_LEVEL=log jest",
     "test:trace": "TRACE_LEVEL=trace,log jest --no-cache",
-    "docs:install": "cd docs/ && bundle install",
-    "docs:deploy": "cd docs/ && ./deploy.sh",
-    "docs": "cd docs/ && bundle exec middleman server",
+    "docs:install": "cd docs-slate && bundle install",
+    "docs:deploy": "cd docs-slate && ./deploy.sh",
+    "docs": "cd docs-slate && bundle exec middleman server",
     "preversion": "npm test && npm run build",
     "prepublishOnly": "npm run clean && npm test && npm run build"
   },
