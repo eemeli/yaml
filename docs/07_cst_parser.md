@@ -183,8 +183,8 @@ class Comment extends Node {
 }
 
 class BlankLine extends Comment {
-  type: 'BLANK_LINE',   // may represent multiple consecutive empty
-  +comment: null,       //   lines, which may include whitespace
+  type: 'BLANK_LINE',   // represents a single blank line, which
+  +comment: null        //   may include whitespace
 }
 ```
 
