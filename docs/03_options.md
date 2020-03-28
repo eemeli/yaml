@@ -104,3 +104,7 @@ These options objects are also exported individually from `'yaml/types'`.
 | str.fold           | `object`  | `{ lineWidth: 80,` `minContentWidth: 20 }`          | `lineWidth`: Maximum line width (set to `0` to disable folding); `minContentWidth`: Minimum width for highly-indented content                                              |
 
 [bigint]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt
+
+## Silencing Warnings
+
+By default, the library will emit warnings for uses of deprecated APIs and as required by the YAML spec during parsing. If you'd like to silence these, define a global variable `YAML_SILENCE_WARNINGS` with a true-ish value. To silence only deprecation warnings, use `YAML_SILENCE_DEPRECATION_WARNINGS`. These values may also be set in `process.env`.

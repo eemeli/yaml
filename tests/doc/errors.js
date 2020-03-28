@@ -233,23 +233,23 @@ describe('deprecations', () => {
   describe('env vars', () => {
     let prevAll, prevDeprecations
     beforeEach(() => {
-      prevAll = global._YAML_SILENCE_WARNINGS
-      prevDeprecations = global._YAML_SILENCE_DEPRECATION_WARNINGS
+      prevAll = global.YAML_SILENCE_WARNINGS
+      prevDeprecations = global.YAML_SILENCE_DEPRECATION_WARNINGS
     })
     afterEach(() => {
-      global._YAML_SILENCE_WARNINGS = prevAll
-      global._YAML_SILENCE_DEPRECATION_WARNINGS = prevDeprecations
+      global.YAML_SILENCE_WARNINGS = prevAll
+      global.YAML_SILENCE_DEPRECATION_WARNINGS = prevDeprecations
     })
 
-    test('_YAML_SILENCE_WARNINGS', () => {
-      global._YAML_SILENCE_WARNINGS = true
+    test('YAML_SILENCE_WARNINGS', () => {
+      global.YAML_SILENCE_WARNINGS = true
       warnFileDeprecation('foo')
       warnOptionDeprecation('bar1', 'baz')
       expect(mock).toHaveBeenCalledTimes(0)
     })
 
-    test('_YAML_SILENCE_DEPRECATION_WARNINGS', () => {
-      global._YAML_SILENCE_DEPRECATION_WARNINGS = true
+    test('YAML_SILENCE_DEPRECATION_WARNINGS', () => {
+      global.YAML_SILENCE_DEPRECATION_WARNINGS = true
       warnFileDeprecation('foo')
       warnOptionDeprecation('bar2', 'baz')
       expect(mock).toHaveBeenCalledTimes(0)
