@@ -63,7 +63,7 @@
     "clean": "git clean -fdxe node_modules",
     "dist:build": "babel src/ --out-dir dist/",
     "build": "npm run dist:build && npm run browser:build",
-    "prettier": "prettier --write \"{src,tests}/**/*.js\"",
+    "prettier": "prettier --write .",
     "lint": "eslint src/",
     "start": "npm run dist:build && node -i -e 'YAML=require(\".\")'",
     "test": "TRACE_LEVEL=log jest",
@@ -88,8 +88,10 @@
     ]
   },
   "prettier": {
+    "arrowParens": "avoid",
     "semi": false,
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "none"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -106,7 +108,7 @@
     "eslint-plugin-prettier": "^3.1.2",
     "fast-check": "^1.23.0",
     "jest": "^25.1.0",
-    "prettier": "^1.19.1"
+    "prettier": "^2.0.2"
   },
   "dependencies": {
     "@babel/runtime": "^7.9.0"
