@@ -293,3 +293,15 @@ describe('setOrigRanges()', () => {
     expect(cst[0].contents[1].context.root).toBe(cst[0])
   })
 })
+
+test('blank lines', () => {
+  const src = '#cc\n\n\n\n##dd'
+  const cst = parse(src)
+  expect(cst[0].contents).toMatchObject([
+    { type: 'COMMENT', error: null },
+    { type: 'BLANK_LINE', error: null },
+    { type: 'BLANK_LINE', error: null },
+    { type: 'BLANK_LINE', error: null },
+    { type: 'COMMENT', error: null }
+  ])
+})
