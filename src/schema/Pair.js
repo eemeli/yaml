@@ -22,11 +22,16 @@ const stringifyKey = (key, jsKey, ctx) => {
 }
 
 export class Pair extends Node {
+  static Type = {
+    PAIR: 'PAIR',
+    MERGE_PAIR: 'MERGE_PAIR'
+  }
+
   constructor(key, value = null) {
     super()
     this.key = key
     this.value = value
-    this.type = 'PAIR'
+    this.type = Pair.Type.PAIR
   }
 
   get commentBefore() {

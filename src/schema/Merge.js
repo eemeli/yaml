@@ -19,7 +19,7 @@ export class Merge extends Pair {
     } else {
       super(new Scalar(MERGE_KEY), new YAMLSeq())
     }
-    this.type = 'MERGE_PAIR'
+    this.type = Pair.Type.MERGE_PAIR
   }
 
   // If the value associated with a merge key is a single mapping node, each of
