@@ -19,6 +19,8 @@ import {
   YAMLSeq
 } from './types'
 
+import { YAMLError, YAMLSyntaxError, YAMLWarning } from './util'
+
 /**
  * `yaml` defines document-specific options in three places: as an argument of
  * parse, create and stringify calls, in the values of `YAML.defaultOptions`,
@@ -313,28 +315,6 @@ export interface StringifyContext {
   indentAtStart?: number
   inFlow?: boolean
   [key: string]: any
-}
-
-export type YAMLError = YAMLSyntaxError | YAMLSemanticError | YAMLReferenceError
-
-export interface YAMLSyntaxError extends SyntaxError {
-  name: 'YAMLSyntaxError'
-  source: cst.Node
-}
-
-export interface YAMLSemanticError extends SyntaxError {
-  name: 'YAMLSemanticError'
-  source: cst.Node
-}
-
-export interface YAMLReferenceError extends ReferenceError {
-  name: 'YAMLReferenceError'
-  source: cst.Node
-}
-
-export interface YAMLWarning extends Error {
-  name: 'YAMLReferenceError'
-  source: cst.Node
 }
 
 export namespace cst {
