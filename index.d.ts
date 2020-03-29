@@ -59,17 +59,14 @@ export function stringify(value: any, options?: Options): string
  * Parses a single YAML.Document from the input str; used internally by YAML.parse.
  * Will include an error if str contains more than one document.
  */
-export function parseDocument(str: string, options?: Options): ast.Document
+export function parseDocument(str: string, options?: Options): Document
 
 /**
  * When parsing YAML, the input string str may consist of a stream of documents
  * separated from each other by `...` document end marker lines.
  * @returns An array of Document objects that allow these documents to be parsed and manipulated with more control.
  */
-export function parseAllDocuments(
-  str: string,
-  options?: Options
-): ast.Document[]
+export function parseAllDocuments(str: string, options?: Options): Document[]
 
 /**
  * Recursively turns objects into collections. Generic objects as well as `Map`
@@ -113,8 +110,6 @@ export function parseCST(str: string): ParsedCST
 export interface ParsedCST extends Array<cst.Document> {
   setOrigRanges(): boolean
 }
-
-export const Document: ast.DocumentConstructor
 
 export interface Options {
   /**
@@ -288,7 +283,7 @@ export interface CustomTag extends BaseTag {
    * Turns a CST node into an AST node. If returning a non-`Node` value, the
    * output will be wrapped as a `Scalar`.
    */
-  resolve(doc: ast.Document, cstNode: cst.Node): AST.Node | any
+  resolve(doc: Document, cstNode: cst.Node): AST.Node | any
 }
 
 export interface DefaultTag extends BaseTag {
@@ -522,84 +517,84 @@ export namespace cst {
   }
 }
 
-export namespace ast {
-  type DocumentConstructor = new (options?: Options) => Document
-  interface Document {
-    type: 'DOCUMENT'
-    /**
-     * Anchors associated with the document's nodes;
-     * also provides alias & merge node creators.
-     */
-    anchors: Anchors
-    /**
-     * A comment at the very beginning of the document.
-     */
-    commentBefore: null | string
-    /**
-     * A comment at the end of the document.
-     */
-    comment: null | string
-    /**
-     * only available when `keepCstNodes` is set to `true`
-     */
-    cstNode?: cst.Document
-    /**
-     * The document contents.
-     */
-    contents: AST.AstNode | null
-    /**
-     * Errors encountered during parsing.
-     */
-    errors: YAMLError[]
-    /**
-     * The schema used with the document.
-     */
-    schema: Schema
-    /**
-     * the [start, end] range of characters of the source parsed
-     * into this node (undefined if not parsed)
-     */
-    range: null | [number, number]
-    /**
-     * a blank line before this node and its commentBefore
-     */
-    spaceBefore?: boolean
-    /**
-     * Array of prefixes; each will have a string `handle` that
-     * starts and ends with `!` and a string `prefix` that the handle will be replaced by.
-     */
-    tagPrefixes: TagPrefix[]
-    /**
-     * The parsed version of the source document;
-     * if true-ish, stringified output will include a `%YAML` directive.
-     */
-    version?: string
-    /**
-     * Warnings encountered during parsing.
-     */
-    warnings: YAMLWarning[]
-    /**
-     * List the tags used in the document that are not in the default `tag:yaml.org,2002:` namespace.
-     */
-    listNonDefaultTags(): string[]
-    /**
-     * Parse a CST into this document
-     */
-    parse(cst: cst.Document): this
-    /**
-     * Set `handle` as a shorthand string for the `prefix` tag namespace.
-     */
-    setTagPrefix(handle: string, prefix: string): void
-    /**
-     * A plain JavaScript representation of the document `contents`.
-     */
-    toJSON(): any
-    /**
-     * A YAML representation of the document.
-     */
-    toString(): string
-  }
+export class Document {
+  constructor(options?: Options)
+  type: 'DOCUMENT'
+  /**
+   * Anchors associated with the document's nodes;
+   * also provides alias & merge node creators.
+   */
+  anchors: Document.Anchors
+  /**
+   * A comment at the very beginning of the document.
+   */
+  commentBefore: null | string
+  /**
+   * A comment at the end of the document.
+   */
+  comment: null | string
+  /**
+   * only available when `keepCstNodes` is set to `true`
+   */
+  cstNode?: cst.Document
+  /**
+   * The document contents.
+   */
+  contents: AST.AstNode | null
+  /**
+   * Errors encountered during parsing.
+   */
+  errors: YAMLError[]
+  /**
+   * The schema used with the document.
+   */
+  schema: Schema
+  /**
+   * the [start, end] range of characters of the source parsed
+   * into this node (undefined if not parsed)
+   */
+  range: null | [number, number]
+  /**
+   * a blank line before this node and its commentBefore
+   */
+  spaceBefore?: boolean
+  /**
+   * Array of prefixes; each will have a string `handle` that
+   * starts and ends with `!` and a string `prefix` that the handle will be replaced by.
+   */
+  tagPrefixes: Document.TagPrefix[]
+  /**
+   * The parsed version of the source document;
+   * if true-ish, stringified output will include a `%YAML` directive.
+   */
+  version?: string
+  /**
+   * Warnings encountered during parsing.
+   */
+  warnings: YAMLWarning[]
+  /**
+   * List the tags used in the document that are not in the default `tag:yaml.org,2002:` namespace.
+   */
+  listNonDefaultTags(): string[]
+  /**
+   * Parse a CST into this document
+   */
+  parse(cst: cst.Document): this
+  /**
+   * Set `handle` as a shorthand string for the `prefix` tag namespace.
+   */
+  setTagPrefix(handle: string, prefix: string): void
+  /**
+   * A plain JavaScript representation of the document `contents`.
+   */
+  toJSON(): any
+  /**
+   * A YAML representation of the document.
+   */
+  toString(): string
+}
 
+export namespace Document {
   interface Anchors {
     /**
      * Create a new `Alias` node, adding the required anchor for `node`.

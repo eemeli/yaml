@@ -1,4 +1,4 @@
-import { ast, cst, Options, Tag } from './index'
+import { cst, Document, Options, Tag } from './index'
 
 export interface BinaryOptions {
   /**
@@ -224,7 +224,7 @@ export namespace AST {
 
   interface NodeToJsonContext {
     anchors?: any[]
-    doc: ast.Document
+    doc: Document
     keep?: boolean
     mapAsMap?: boolean
     maxAliasCount?: number
