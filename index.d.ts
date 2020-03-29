@@ -5,7 +5,7 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.2
 
-export const defaultOptions: ParseOptions
+export const defaultOptions: Options
 
 /**
  * May throw on error, and it may log warnings using `console.warn`.
@@ -15,18 +15,18 @@ export const defaultOptions: ParseOptions
  * @returns The value will match the type of the root value of the parsed YAML document,
  *          so Maps become objects, Sequences arrays, and scalars result in nulls, booleans, numbers and strings.
  */
-export function parse(str: string, options?: ParseOptions): any
+export function parse(str: string, options?: Options): any
 
 /**
  * @returns Will always include \n as the last character, as is expected of YAML documents.
  */
-export function stringify(value: any, options?: ParseOptions): string
+export function stringify(value: any, options?: Options): string
 
 /**
  * Parses a single YAML.Document from the input str; used internally by YAML.parse.
  * Will include an error if str contains more than one document.
  */
-export function parseDocument(str: string, options?: ParseOptions): ast.Document
+export function parseDocument(str: string, options?: Options): ast.Document
 
 /**
  * When parsing YAML, the input string str may consist of a stream of documents
@@ -35,7 +35,7 @@ export function parseDocument(str: string, options?: ParseOptions): ast.Document
  */
 export function parseAllDocuments(
   str: string,
-  options?: ParseOptions
+  options?: Options
 ): ast.Document[]
 
 /**
@@ -72,45 +72,95 @@ export interface ParsedCST extends Array<cst.Document> {
 
 export const Document: ast.DocumentConstructor
 
-export interface ParseOptions {
+export interface Options {
+  /**
+   * Default prefix for anchors.
+   *
+   * Default: `'a'`, resulting in anchors `a1`, `a2`, etc.
+   */
+  anchorPrefix?: string
+  /**
+   * Array of additional tags to include in the schema.
+   */
+  customTags?: Tag[] | ((tags: Tag[]) => Tag[])
   /**
    * Allow non-JSON JavaScript objects to remain in the `toJSON` output.
-   * Relevant with the YAML 1.1 `!!timestamp` and `!!binary` tags. By default `true`.
+   * Relevant with the YAML 1.1 `!!timestamp` and `!!binary` tags as well as BigInts.
+   *
+   * Default: `true`
    */
   keepBlobsInJSON?: boolean
   /**
-   * Include references in the AST to each node's corresponding CST node. By default `false`.
+   * Include references in the AST to each node's corresponding CST node.
+   *
+   * Default: `false`
    */
   keepCstNodes?: boolean
   /**
-   * Store the original node type when parsing documents. By default `true`.
+   * Store the original node type when parsing documents.
+   *
+   * Default: `true`
    */
   keepNodeTypes?: boolean
   /**
-   * When outputting JS, use Map rather than Object to represent mappings. By default `false`.
+   * When outputting JS, use Map rather than Object to represent mappings.
+   *
+   * Default: `false`
    */
   mapAsMap?: boolean
   /**
+   * Prevent exponential entity expansion attacks by limiting data aliasing count;
+   * set to `-1` to disable checks; `0` disallows all alias nodes.
+   *
+   * Default: `100`
+   */
+  maxAliasCount?: number
+  /**
    * Enable support for `<<` merge keys.
+   *
+   * Default: `false` for YAML 1.2, `true` for earlier versions
    */
   merge?: boolean
   /**
-   * The base schema to use. By default `"core"` for YAML 1.2 and `"yaml-1.1"` for earlier versions.
+   * Include line position & node type directly in errors; drop their verbose source and context.
+   *
+   * Default: `false`
+   */
+  prettyErrors?: boolean
+  /**
+   * The base schema to use.
+   *
+   * Default: `"core"` for YAML 1.2, `"yaml-1.1"` for earlier versions
    */
   schema?: 'core' | 'failsafe' | 'json' | 'yaml-1.1'
+  /**
+   * When stringifying, require keys to be scalars and to use implicit rather than explicit notation.
+   *
+   * Default: `false`
+   */
+  simpleKeys?: boolean
+  /**
+   * When stringifying, sort map entries. If `true`, sort by comparing key values with `<`.
+   *
+   * Default: `false`
+   */
+  sortMapEntries?: boolean | ((a: ast.Pair, b: ast.Pair) => number)
   /**
    * @deprecated Use `customTags` instead.
    */
   tags?: Tag[] | ((tags: Tag[]) => Tag[])
   /**
-   * Array of additional (custom) tags to include in the schema.
+   * The YAML version used by documents without a `%YAML` directive.
+   *
+   * Default: `"1.2"`
    */
-  customTags?: Tag[] | ((tags: Tag[]) => Tag[])
-  /**
-   * The YAML version used by documents without a `%YAML` directive. By default `"1.2"`.
-   */
-  version?: string
+  version?: '1.0' | '1.1' | '1.2'
 }
+
+/**
+ * @deprecated Use `Options` instead
+ */
+export type ParseOptions = Options
 
 export interface Tag {
   /**
@@ -373,7 +423,7 @@ export namespace cst {
 export namespace ast {
   type AstNode = ScalarNode | MapNode | SeqNode | Alias
 
-  type DocumentConstructor = new (options?: ParseOptions) => Document
+  type DocumentConstructor = new (options?: Options) => Document
   interface Document {
     type: 'DOCUMENT'
     /**
