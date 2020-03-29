@@ -5,7 +5,26 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.2
 
+/**
+ * `yaml` defines document-specific options in three places: as an argument of
+ * parse, create and stringify calls, in the values of `YAML.defaultOptions`,
+ * and in the version-dependent `YAML.Document.defaults` object. Values set in
+ * `YAML.defaultOptions` override version-dependent defaults, and argument
+ * options override both.
+ */
 export const defaultOptions: Options
+
+/**
+ * Some customization options are availabe to control the parsing and
+ * stringification of scalars. Note that these values are used by all documents.
+ */
+export const scalarOptions: {
+  binary: ast.BinaryOptions
+  bool: ast.BoolOptions
+  int: ast.IntOptions
+  null: ast.NullOptions
+  str: ast.StrOptions
+}
 
 /**
  * May throw on error, and it may log warnings using `console.warn`.
@@ -573,17 +592,17 @@ export namespace ast {
     toJSON(): any
   }
 
+  type ScalarType =
+    | 'BLOCK_FOLDED'
+    | 'BLOCK_LITERAL'
+    | 'PLAIN'
+    | 'QUOTE_DOUBLE'
+    | 'QUOTE_SINGLE'
   type ScalarConstructor = new (
     value: null | boolean | number | string
   ) => Scalar
   interface Scalar extends Node {
-    type:
-      | 'BLOCK_FOLDED'
-      | 'BLOCK_LITERAL'
-      | 'PLAIN'
-      | 'QUOTE_DOUBLE'
-      | 'QUOTE_SINGLE'
-      | undefined
+    type: ScalarType | undefined
     /**
      * By default (undefined), numbers use decimal notation.
      * The YAML 1.2 core schema only supports 'HEX' and 'OCT'.
@@ -699,5 +718,90 @@ export namespace ast {
      */
     value: SeqBase
     cstNode?: cst.PlainValue
+  }
+
+  interface BinaryOptions {
+    /**
+     * The type of string literal used to stringify `!!binary` values.
+     *
+     * Default: `'BLOCK_LITERAL'`
+     */
+    defaultType: ScalarType
+    /**
+     * Maximum line width for `!!binary`.
+     *
+     * Default: `76`
+     */
+    lineWidth: number
+  }
+
+  interface BoolOptions {
+    /**
+     * String representation for `true`. With the core schema, use `'true' | 'True' | 'TRUE'`.
+     *
+     * Default: `'true'`
+     */
+    trueStr: string
+    /**
+     * String representation for `false`. With the core schema, use `'false' | 'False' | 'FALSE'`.
+     *
+     * Default: `'false'`
+     */
+    falseStr: string
+  }
+
+  interface IntOptions {
+    /**
+     * Whether integers should be parsed into BigInt values.
+     *
+     * Default: `false`
+     */
+    asBigInt: false
+  }
+
+  interface NullOptions {
+    /**
+     * String representation for `null`. With the core schema, use `'null' | 'Null' | 'NULL' | '~' | ''`.
+     *
+     * Default: `'null'`
+     */
+    nullStr: string
+  }
+
+  interface StrOptions {
+    /**
+     * The default type of string literal used to stringify values
+     *
+     * Default: `'PLAIN'`
+     */
+    defaultType: ScalarType
+    doubleQuoted: {
+      /**
+       * Whether to restrict double-quoted strings to use JSON-compatible syntax.
+       *
+       * Default: `false`
+       */
+      jsonEncoding: boolean
+      /**
+       * Minimum length to use multiple lines to represent the value.
+       *
+       * Default: `40`
+       */
+      minMultiLineLength: number
+    }
+    fold: {
+      /**
+       * Maximum line width (set to `0` to disable folding).
+       *
+       * Default: `80`
+       */
+      lineWidth: number
+      /**
+       * Minimum width for highly-indented content.
+       *
+       * Default: `20`
+       */
+      minContentWidth: number
+    }
   }
 }
