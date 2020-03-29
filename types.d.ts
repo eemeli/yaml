@@ -1,4 +1,6 @@
-import { cst, Document, Options, Tag } from './index'
+import { Document, Options, Tag } from './index'
+import { CST } from './parse-cst'
+import { Type } from './util'
 
 export interface BinaryOptions {
   /**
@@ -142,30 +144,35 @@ export class Scalar implements AST.Node {
   format?: 'BIN' | 'HEX' | 'OCT' | 'TIME'
   value: any
 }
-
 export namespace Scalar {
   type Type =
-    | 'BLOCK_FOLDED'
-    | 'BLOCK_LITERAL'
-    | 'PLAIN'
-    | 'QUOTE_DOUBLE'
-    | 'QUOTE_SINGLE'
+    | Type.BLOCK_FOLDED
+    | Type.BLOCK_LITERAL
+    | Type.PLAIN
+    | Type.QUOTE_DOUBLE
+    | Type.QUOTE_SINGLE
 }
 
 export class Pair implements AST.Node {
   constructor(key: any, value?: any)
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
-  type: 'PAIR' | 'MERGE_PAIR'
+  type: Pair.Type.PAIR | Pair.Type.MERGE_PAIR
   /** Always Node or null when parsed, but can be set to anything. */
   key: any
   /** Always Node or null when parsed, but can be set to anything. */
   value: any
   cstNode?: never // no corresponding cstNode
 }
+export namespace Pair {
+  enum Type {
+    PAIR = 'PAIR',
+    MERGE_PAIR = 'MERGE_PAIR'
+  }
+}
 
 export class YAMLMap implements AST.Node {
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
-  type?: 'FLOW_MAP' | 'MAP'
+  type?: Type.FLOW_MAP | Type.MAP
   /** Array of Pair when parsed, but can be set to anything. */
   items: Array<Pair | AST.Merge>
   schema?: Schema
@@ -173,7 +180,7 @@ export class YAMLMap implements AST.Node {
 
 export class YAMLSeq implements AST.Node {
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any[]
-  type?: 'FLOW_SEQ' | 'SEQ'
+  type?: Type.FLOW_SEQ | Type.SEQ
   /** Array of Nodes or nulls when parsed, but can be set to anything. */
   items: any[]
 }
@@ -191,35 +198,25 @@ export namespace AST {
   type CollectionNode = FlowMap | BlockMap | FlowSeq | BlockSeq
 
   interface Node {
-    /**
-     * a comment on or immediately after this
-     */
+    /** A comment on or immediately after this */
     comment?: string
-    /**
-     * a comment before this
-     */
+    /** A comment before this */
     commentBefore?: string
+    /** Only available when `keepCstNodes` is set to `true` */
+    cstNode?: CST.Node
     /**
-     * only available when `keepCstNodes` is set to `true`
-     */
-    cstNode?: cst.Node
-    /**
-     * the [start, end] range of characters of the source parsed
+     * The [start, end] range of characters of the source parsed
      * into this node (undefined for pairs or if not parsed)
      */
     range?: [number, number]
-    /**
-     * a blank line before this node and its commentBefore
-     */
+    /** A blank line before this node and its commentBefore */
     spaceBefore?: boolean
-    /**
-     * a fully qualified tag, if required
-     */
+    /** A fully qualified tag, if required */
     tag?: string
-    /**
-     * a plain JS representation of this node
-     */
+    /** A plain JS representation of this node */
     toJSON(arg?: any, ctx?: NodeToJsonContext): any
+    /** The type of this node */
+    type?: Type | Pair.Type
   }
 
   interface NodeToJsonContext {
@@ -233,38 +230,38 @@ export namespace AST {
   }
 
   interface BlockFolded extends Scalar {
-    type: 'BLOCK_FOLDED'
-    cstNode?: cst.BlockFolded
+    type: Type.BLOCK_FOLDED
+    cstNode?: CST.BlockFolded
   }
 
   interface BlockLiteral extends Scalar {
-    type: 'BLOCK_LITERAL'
-    cstNode?: cst.BlockLiteral
+    type: Type.BLOCK_LITERAL
+    cstNode?: CST.BlockLiteral
   }
 
   interface PlainValue extends Scalar {
-    type: 'PLAIN'
-    cstNode?: cst.PlainValue
+    type: Type.PLAIN
+    cstNode?: CST.PlainValue
   }
 
   interface QuoteDouble extends Scalar {
-    type: 'QUOTE_DOUBLE'
-    cstNode?: cst.QuoteDouble
+    type: Type.QUOTE_DOUBLE
+    cstNode?: CST.QuoteDouble
   }
 
   interface QuoteSingle extends Scalar {
-    type: 'QUOTE_SINGLE'
-    cstNode?: cst.QuoteSingle
+    type: Type.QUOTE_SINGLE
+    cstNode?: CST.QuoteSingle
   }
 
   interface Alias extends Node {
-    type: 'ALIAS'
+    type: Type.ALIAS
     source: AstNode
-    cstNode?: cst.Alias
+    cstNode?: CST.Alias
   }
 
   interface Merge extends Pair {
-    type: 'MERGE_PAIR'
+    type: Pair.Type.MERGE_PAIR
     /** Always Scalar('<<'), defined by the type specification */
     key: PlainValue
     /** Always YAMLSeq<Alias(Map)>, stringified as *A if length = 1 */
@@ -272,24 +269,24 @@ export namespace AST {
   }
 
   interface FlowMap extends YAMLMap {
-    type: 'FLOW_MAP'
-    cstNode?: cst.FlowMap
+    type: Type.FLOW_MAP
+    cstNode?: CST.FlowMap
   }
 
   interface BlockMap extends YAMLMap {
-    type: 'MAP'
-    cstNode?: cst.Map
+    type: Type.MAP
+    cstNode?: CST.Map
   }
 
   interface FlowSeq extends YAMLSeq {
-    type: 'FLOW_SEQ'
+    type: Type.FLOW_SEQ
     items: Array<AstNode | Pair>
-    cstNode?: cst.FlowSeq
+    cstNode?: CST.FlowSeq
   }
 
   interface BlockSeq extends YAMLSeq {
-    type: 'SEQ'
+    type: Type.SEQ
     items: Array<AstNode | null>
-    cstNode?: cst.Seq
+    cstNode?: CST.Seq
   }
 }

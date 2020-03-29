@@ -5,6 +5,7 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.2
 
+import { CST } from './parse-cst'
 import {
   AST,
   BinaryOptions,
@@ -18,8 +19,9 @@ import {
   YAMLMap,
   YAMLSeq
 } from './types'
+import { Type, YAMLError, YAMLWarning } from './util'
 
-import { YAMLError, YAMLSyntaxError, YAMLWarning } from './util'
+export { default as parseCST } from './parse-cst'
 
 /**
  * `yaml` defines document-specific options in three places: as an argument of
@@ -106,12 +108,6 @@ export function createNode(
   wrapScalars: false,
   tag?: string
 ): YAMLMap | YAMLSeq | string | number | boolean | null
-
-export function parseCST(str: string): ParsedCST
-
-export interface ParsedCST extends Array<cst.Document> {
-  setOrigRanges(): boolean
-}
 
 export interface Options {
   /**
@@ -285,7 +281,7 @@ export interface CustomTag extends BaseTag {
    * Turns a CST node into an AST node. If returning a non-`Node` value, the
    * output will be wrapped as a `Scalar`.
    */
-  resolve(doc: Document, cstNode: cst.Node): AST.Node | any
+  resolve(doc: Document, cstNode: CST.Node): AST.Node | any
 }
 
 export interface DefaultTag extends BaseTag {
@@ -317,189 +313,9 @@ export interface StringifyContext {
   [key: string]: any
 }
 
-export namespace cst {
-  interface Range {
-    start: number
-    end: number
-    origStart?: number
-    origEnd?: number
-    isEmpty(): boolean
-  }
-
-  interface ParseContext {
-    /** Node starts at beginning of line */
-    atLineStart: boolean
-    /** true if currently in a collection context */
-    inCollection: boolean
-    /** true if currently in a flow context */
-    inFlow: boolean
-    /** Current level of indentation */
-    indent: number
-    /** Start of the current line */
-    lineStart: number
-    /** The parent of the node */
-    parent: Node
-    /** Source of the YAML document */
-    src: string
-  }
-
-  interface Node {
-    context: ParseContext | null
-    /** if not null, indicates a parser failure */
-    error: YAMLSyntaxError | null
-    /** span of context.src parsed into this node */
-    range: Range | null
-    valueRange: Range | null
-    /** anchors, tags and comments */
-    props: Range[]
-    /** specific node type */
-    type: string
-    /** if non-null, overrides source value */
-    value: string | null
-
-    readonly anchor: string | null
-    readonly comment: string | null
-    readonly hasComment: boolean
-    readonly hasProps: boolean
-    readonly jsonLike: boolean
-    readonly rawValue: string | null
-    readonly tag:
-      | null
-      | { verbatim: string }
-      | { handle: string; suffix: string }
-    readonly valueRangeContainsNewline: boolean
-  }
-
-  interface Alias extends Node {
-    type: 'ALIAS'
-    /** contain the anchor without the * prefix */
-    readonly rawValue: string
-  }
-
-  type Scalar = BlockValue | PlainValue | QuoteValue
-
-  interface BlockValue extends Node {
-    type: 'BLOCK_FOLDED' | 'BLOCK_LITERAL'
-    chomping: 'CLIP' | 'KEEP' | 'STRIP'
-    blockIndent: number | null
-    header: Range
-    readonly strValue: string | null
-  }
-
-  interface BlockFolded extends BlockValue {
-    type: 'BLOCK_FOLDED'
-  }
-
-  interface BlockLiteral extends BlockValue {
-    type: 'BLOCK_LITERAL'
-  }
-
-  interface PlainValue extends Node {
-    type: 'PLAIN'
-    readonly strValue: string | null
-  }
-
-  interface QuoteValue extends Node {
-    type: 'QUOTE_DOUBLE' | 'QUOTE_SINGLE'
-    readonly strValue:
-      | null
-      | string
-      | { str: string; errors: YAMLSyntaxError[] }
-  }
-
-  interface QuoteDouble extends QuoteValue {
-    type: 'QUOTE_DOUBLE'
-  }
-
-  interface QuoteSingle extends QuoteValue {
-    type: 'QUOTE_SINGLE'
-  }
-
-  interface Comment extends Node {
-    type: 'COMMENT'
-    readonly anchor: null
-    readonly comment: string
-    readonly rawValue: null
-    readonly tag: null
-  }
-
-  interface BlankLine extends Node {
-    type: 'BLANK_LINE'
-  }
-
-  interface MapItem extends Node {
-    type: 'MAP_KEY' | 'MAP_VALUE'
-    node: ContentNode | null
-  }
-
-  interface MapKey extends MapItem {
-    type: 'MAP_KEY'
-  }
-
-  interface MapValue extends MapItem {
-    type: 'MAP_VALUE'
-  }
-
-  interface Map extends Node {
-    type: 'MAP'
-    /** implicit keys are not wrapped */
-    items: Array<BlankLine | Comment | Alias | Scalar | MapItem>
-  }
-
-  interface SeqItem extends Node {
-    type: 'SEQ_ITEM'
-    node: ContentNode | null
-  }
-
-  interface Seq extends Node {
-    type: 'SEQ'
-    items: Array<BlankLine | Comment | SeqItem>
-  }
-
-  interface FlowChar {
-    char: '{' | '}' | '[' | ']' | ',' | '?' | ':'
-    offset: number
-    origOffset?: number
-  }
-
-  interface FlowCollection extends Node {
-    type: 'FLOW_MAP' | 'FLOW_SEQ'
-    items: Array<
-      FlowChar | BlankLine | Comment | Alias | Scalar | FlowCollection
-    >
-  }
-
-  interface FlowMap extends FlowCollection {
-    type: 'FLOW_MAP'
-  }
-
-  interface FlowSeq extends FlowCollection {
-    type: 'FLOW_SEQ'
-  }
-
-  type ContentNode = Alias | Scalar | Map | Seq | FlowCollection
-
-  interface Directive extends Node {
-    type: 'DIRECTIVE'
-    name: string
-    readonly anchor: null
-    readonly parameters: string[]
-    readonly tag: null
-  }
-
-  interface Document extends Node {
-    type: 'DOCUMENT'
-    directives: Array<BlankLine | Comment | Directive>
-    contents: Array<BlankLine | Comment | ContentNode>
-    readonly anchor: null
-    readonly comment: null
-    readonly tag: null
-  }
-}
-
 export class Document {
   constructor(options?: Options)
-  type: 'DOCUMENT'
+  type: Type.DOCUMENT
   /**
    * Anchors associated with the document's nodes;
    * also provides alias & merge node creators.
@@ -516,7 +332,7 @@ export class Document {
   /**
    * only available when `keepCstNodes` is set to `true`
    */
-  cstNode?: cst.Document
+  cstNode?: CST.Document
   /**
    * The document contents.
    */
@@ -559,7 +375,7 @@ export class Document {
   /**
    * Parse a CST into this document
    */
-  parse(cst: cst.Document): this
+  parse(cst: CST.Document): this
   /**
    * Set `handle` as a shorthand string for the `prefix` tag namespace.
    */

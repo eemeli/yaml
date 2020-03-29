@@ -1,12 +1,13 @@
-import { cst, Document, StringifyContext } from './index'
+import { Document, StringifyContext } from './index'
+import { CST } from './parse-cst'
 import { AST, Pair, Scalar, Schema } from './types'
 
 export function findPair(items: any[], key: Scalar | any): Pair | undefined
 
-export function parseMap(doc: Document, cst: cst.Map): AST.BlockMap
-export function parseMap(doc: Document, cst: cst.FlowMap): AST.FlowMap
-export function parseSeq(doc: Document, cst: cst.Seq): AST.BlockSeq
-export function parseSeq(doc: Document, cst: cst.FlowSeq): AST.FlowSeq
+export function parseMap(doc: Document, cst: CST.Map): AST.BlockMap
+export function parseMap(doc: Document, cst: CST.FlowMap): AST.FlowMap
+export function parseSeq(doc: Document, cst: CST.Seq): AST.BlockSeq
+export function parseSeq(doc: Document, cst: CST.FlowSeq): AST.FlowSeq
 
 export function stringifyNumber(item: Scalar): string
 export function stringifyString(
@@ -54,10 +55,10 @@ export class YAMLError extends Error {
     | 'YAMLSyntaxError'
     | 'YAMLWarning'
   message: string
-  source?: cst.Node
+  source?: CST.Node
 
   nodeType?: Type
-  range?: cst.Range
+  range?: CST.Range
   linePos?: { start: LinePos; end: LinePos }
 
   /**
