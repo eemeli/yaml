@@ -9,6 +9,7 @@ exports.toJSON = require('./dist/toJSON').toJSON
 exports.Type = require('./dist/constants').Type
 
 const err = require('./dist/errors')
+exports.YAMLError = err.YAMLError
 exports.YAMLReferenceError = err.YAMLReferenceError
 exports.YAMLSemanticError = err.YAMLSemanticError
 exports.YAMLSyntaxError = err.YAMLSyntaxError

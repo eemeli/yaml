@@ -18,6 +18,7 @@ import constants from './dist/constants.js'
 export const Type = constants.Type
 
 import err from './dist/errors.js'
+export const YAMLError = err.YAMLError
 export const YAMLReferenceError = err.YAMLReferenceError
 export const YAMLSemanticError = err.YAMLSemanticError
 export const YAMLSyntaxError = err.YAMLSyntaxError

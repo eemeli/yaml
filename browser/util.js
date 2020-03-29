@@ -10,6 +10,7 @@ export {
 } from './dist/stringify'
 
 export {
+  YAMLError,
   YAMLReferenceError,
   YAMLSemanticError,
   YAMLSyntaxError,
