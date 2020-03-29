@@ -1,96 +1,12 @@
-import { Document, Options, Tag } from './index'
+import { Document, scalarOptions } from './index'
 import { CST } from './parse-cst'
 import { Type } from './util'
 
-export interface BinaryOptions {
-  /**
-   * The type of string literal used to stringify `!!binary` values.
-   *
-   * Default: `'BLOCK_LITERAL'`
-   */
-  defaultType: Scalar.Type
-  /**
-   * Maximum line width for `!!binary`.
-   *
-   * Default: `76`
-   */
-  lineWidth: number
-}
-export const binaryOptions: BinaryOptions
-
-export interface BoolOptions {
-  /**
-   * String representation for `true`. With the core schema, use `'true' | 'True' | 'TRUE'`.
-   *
-   * Default: `'true'`
-   */
-  trueStr: string
-  /**
-   * String representation for `false`. With the core schema, use `'false' | 'False' | 'FALSE'`.
-   *
-   * Default: `'false'`
-   */
-  falseStr: string
-}
-export const boolOptions: BoolOptions
-
-export interface IntOptions {
-  /**
-   * Whether integers should be parsed into BigInt values.
-   *
-   * Default: `false`
-   */
-  asBigInt: false
-}
-export const intOptions: IntOptions
-
-export interface NullOptions {
-  /**
-   * String representation for `null`. With the core schema, use `'null' | 'Null' | 'NULL' | '~' | ''`.
-   *
-   * Default: `'null'`
-   */
-  nullStr: string
-}
-export const nullOptions: NullOptions
-
-export interface StrOptions {
-  /**
-   * The default type of string literal used to stringify values
-   *
-   * Default: `'PLAIN'`
-   */
-  defaultType: Scalar.Type
-  doubleQuoted: {
-    /**
-     * Whether to restrict double-quoted strings to use JSON-compatible syntax.
-     *
-     * Default: `false`
-     */
-    jsonEncoding: boolean
-    /**
-     * Minimum length to use multiple lines to represent the value.
-     *
-     * Default: `40`
-     */
-    minMultiLineLength: number
-  }
-  fold: {
-    /**
-     * Maximum line width (set to `0` to disable folding).
-     *
-     * Default: `80`
-     */
-    lineWidth: number
-    /**
-     * Minimum width for highly-indented content.
-     *
-     * Default: `20`
-     */
-    minContentWidth: number
-  }
-}
-export const strOptions: StrOptions
+export const binaryOptions: scalarOptions.Binary
+export const boolOptions: scalarOptions.Bool
+export const intOptions: scalarOptions.Int
+export const nullOptions: scalarOptions.Null
+export const strOptions: scalarOptions.Str
 
 export class Schema {
   /** Default: `'tag:yaml.org,2002:'` */
@@ -103,7 +19,7 @@ export class Schema {
     /** Default: `'tag:yaml.org,2002:str'` */
     STR: string
   }
-  constructor(options: Options)
+  constructor(options: Schema.Options)
   /**
    * Convert any value into a `Node` using this schema, recursively turning
    * objects into collectsions.
@@ -121,15 +37,160 @@ export class Schema {
     ctx?: Schema.CreateNodeContext
   ): AST.Node
   merge: boolean
-  name: 'core' | 'failsafe' | 'json' | 'yaml-1.1'
+  name: Schema.Name
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
-  tags: Tag[]
+  tags: Schema.Tag[]
 }
 
 export namespace Schema {
+  type Name = 'core' | 'failsafe' | 'json' | 'yaml-1.1'
+
+  interface Options {
+    /**
+     * Array of additional tags to include in the schema, or a function that may
+     * modify the schema's base tag array.
+     */
+    customTags?: (TagId | Tag)[] | ((tags: Tag[]) => Tag[])
+    /**
+     * Enable support for `<<` merge keys.
+     *
+     * Default: `false` for YAML 1.2, `true` for earlier versions
+     */
+    merge?: boolean
+    /**
+     * The base schema to use.
+     *
+     * Default: `"core"` for YAML 1.2, `"yaml-1.1"` for earlier versions
+     */
+    schema?: Name
+    /**
+     * When stringifying, sort map entries. If `true`, sort by comparing key values with `<`.
+     *
+     * Default: `false`
+     */
+    sortMapEntries?: boolean | ((a: Pair, b: Pair) => number)
+    /**
+     * @deprecated Use `customTags` instead.
+     */
+    tags?: (TagId | Tag)[] | ((tags: Tag[]) => Tag[])
+  }
+
   interface CreateNodeContext {
     wrapScalars?: boolean
     [key: string]: any
+  }
+
+  interface StringifyContext {
+    forceBlockIndent?: boolean
+    implicitKey?: boolean
+    indent?: string
+    indentAtStart?: number
+    inFlow?: boolean
+    [key: string]: any
+  }
+
+  type TagId =
+    | 'binary'
+    | 'bool'
+    | 'float'
+    | 'floatExp'
+    | 'floatNaN'
+    | 'floatTime'
+    | 'int'
+    | 'intHex'
+    | 'intOct'
+    | 'intTime'
+    | 'null'
+    | 'omap'
+    | 'pairs'
+    | 'set'
+    | 'timestamp'
+
+  type Tag = CustomTag | DefaultTag
+
+  interface BaseTag {
+    /**
+     * An optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.
+     */
+    createNode?: (
+      schema: Schema,
+      value: any,
+      ctx: Schema.CreateNodeContext
+    ) => YAMLMap | YAMLSeq | Scalar
+    /**
+     * If a tag has multiple forms that should be parsed and/or stringified differently, use `format` to identify them.
+     */
+    format?: string
+    /**
+     * Used by `YAML.createNode` to detect your data type, e.g. using `typeof` or
+     * `instanceof`.
+     */
+    identify(value: any): boolean
+    /**
+     * The `Node` child class that implements this tag. Required for collections and tags that have overlapping JS representations.
+     */
+    nodeClass?: new () => any
+    /**
+     * Used by some tags to configure their stringification, where applicable.
+     */
+    options?: object
+    /**
+     * Optional function stringifying the AST node in the current context. If your
+     * data includes a suitable `.toString()` method, you can probably leave this
+     * undefined and use the default stringifier.
+     *
+     * @param item The node being stringified.
+     * @param ctx Contains the stringifying context variables.
+     * @param onComment Callback to signal that the stringifier includes the
+     *   item's comment in its output.
+     * @param onChompKeep Callback to signal that the output uses a block scalar
+     *   type with the `+` chomping indicator.
+     */
+    stringify?: (
+      item: AST.Node,
+      ctx: Schema.StringifyContext,
+      onComment?: () => void,
+      onChompKeep?: () => void
+    ) => string
+    /**
+     * The identifier for your data type, with which its stringified form will be
+     * prefixed. Should either be a !-prefixed local `!tag`, or a fully qualified
+     * `tag:domain,date:foo`.
+     */
+    tag: string
+  }
+
+  interface CustomTag extends BaseTag {
+    /**
+     * A JavaScript class that should be matched to this tag, e.g. `Date` for `!!timestamp`.
+     * @deprecated Use `Tag.identify` instead
+     */
+    class?: new () => any
+    /**
+     * Turns a CST node into an AST node. If returning a non-`Node` value, the
+     * output will be wrapped as a `Scalar`.
+     */
+    resolve(doc: Document, cstNode: CST.Node): AST.Node | any
+  }
+
+  interface DefaultTag extends BaseTag {
+    /**
+     * If `true`, together with `test` allows for values to be stringified without
+     * an explicit tag. For most cases, it's unlikely that you'll actually want to
+     * use this, even if you first think you do.
+     */
+    default: true
+    /**
+     * Alternative form used by default tags; called with `test` match results.
+     */
+    resolve(...match: string[]): AST.Node | any
+    /**
+     * Together with `default` allows for values to be stringified without an
+     * explicit tag and detected using a regular expression. For most cases, it's
+     * unlikely that you'll actually want to use these, even if you first think
+     * you do.
+     */
+    test: RegExp
   }
 }
 

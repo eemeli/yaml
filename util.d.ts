@@ -1,4 +1,4 @@
-import { Document, StringifyContext } from './index'
+import { Document } from './index'
 import { CST } from './parse-cst'
 import { AST, Pair, Scalar, Schema } from './types'
 
@@ -12,7 +12,7 @@ export function parseSeq(doc: Document, cst: CST.FlowSeq): AST.FlowSeq
 export function stringifyNumber(item: Scalar): string
 export function stringifyString(
   item: Scalar,
-  ctx: StringifyContext,
+  ctx: Schema.StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
 ): string
