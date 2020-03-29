@@ -5,6 +5,20 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.2
 
+import {
+  AST,
+  BinaryOptions,
+  BoolOptions,
+  IntOptions,
+  NullOptions,
+  Pair,
+  Scalar,
+  Schema,
+  StrOptions,
+  YAMLMap,
+  YAMLSeq
+} from './types'
+
 /**
  * `yaml` defines document-specific options in three places: as an argument of
  * parse, create and stringify calls, in the values of `YAML.defaultOptions`,
@@ -19,11 +33,11 @@ export const defaultOptions: Options
  * stringification of scalars. Note that these values are used by all documents.
  */
 export const scalarOptions: {
-  binary: ast.BinaryOptions
-  bool: ast.BoolOptions
-  int: ast.IntOptions
-  null: ast.NullOptions
-  str: ast.StrOptions
+  binary: BinaryOptions
+  bool: BoolOptions
+  int: IntOptions
+  null: NullOptions
+  str: StrOptions
 }
 
 /**
@@ -79,7 +93,7 @@ export function createNode(
   value: any,
   wrapScalars?: true,
   tag?: string
-): ast.MapBase | ast.SeqBase | ast.Scalar
+): YAMLMap | YAMLSeq | Scalar
 
 /**
  * YAML.createNode recursively turns objects into Map and arrays to Seq collections.
@@ -92,7 +106,7 @@ export function createNode(
   value: any,
   wrapScalars: false,
   tag?: string
-): ast.MapBase | ast.SeqBase | string | number | boolean | null
+): YAMLMap | YAMLSeq | string | number | boolean | null
 
 export function parseCST(str: string): ParsedCST
 
@@ -175,7 +189,7 @@ export interface Options {
    *
    * Default: `false`
    */
-  sortMapEntries?: boolean | ((a: ast.Pair, b: ast.Pair) => number)
+  sortMapEntries?: boolean | ((a: Pair, b: Pair) => number)
   /**
    * @deprecated Use `customTags` instead.
    */
@@ -217,10 +231,10 @@ interface BaseTag {
    * An optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.
    */
   createNode?: (
-    schema: ast.Schema,
+    schema: Schema,
     value: any,
-    ctx: CreateNodeContext
-  ) => ast.MapBase | ast.SeqBase | ast.Scalar
+    ctx: Schema.CreateNodeContext
+  ) => YAMLMap | YAMLSeq | Scalar
   /**
    * If a tag has multiple forms that should be parsed and/or stringified differently, use `format` to identify them.
    */
@@ -251,7 +265,7 @@ interface BaseTag {
    *   type with the `+` chomping indicator.
    */
   stringify?: (
-    item: ast.Node,
+    item: AST.Node,
     ctx: StringifyContext,
     onComment?: () => void,
     onChompKeep?: () => void
@@ -274,7 +288,7 @@ export interface CustomTag extends BaseTag {
    * Turns a CST node into an AST node. If returning a non-`Node` value, the
    * output will be wrapped as a `Scalar`.
    */
-  resolve(doc: ast.Document, cstNode: cst.Node): ast.Node | any
+  resolve(doc: ast.Document, cstNode: cst.Node): AST.Node | any
 }
 
 export interface DefaultTag extends BaseTag {
@@ -287,7 +301,7 @@ export interface DefaultTag extends BaseTag {
   /**
    * Alternative form used by default tags; called with `test` match results.
    */
-  resolve(...match: string[]): ast.Node | any
+  resolve(...match: string[]): AST.Node | any
   /**
    * Together with `default` allows for values to be stringified without an
    * explicit tag and detected using a regular expression. For most cases, it's
@@ -295,11 +309,6 @@ export interface DefaultTag extends BaseTag {
    * you do.
    */
   test: RegExp
-}
-
-export interface CreateNodeContext {
-  wrapScalars?: boolean
-  [key: string]: any
 }
 
 export interface StringifyContext {
@@ -514,8 +523,6 @@ export namespace cst {
 }
 
 export namespace ast {
-  type AstNode = ScalarNode | MapNode | SeqNode | Alias
-
   type DocumentConstructor = new (options?: Options) => Document
   interface Document {
     type: 'DOCUMENT'
@@ -539,7 +546,7 @@ export namespace ast {
     /**
      * The document contents.
      */
-    contents: AstNode | null
+    contents: AST.AstNode | null
     /**
      * Errors encountered during parsing.
      */
@@ -561,7 +568,7 @@ export namespace ast {
      * Array of prefixes; each will have a string `handle` that
      * starts and ends with `!` and a string `prefix` that the handle will be replaced by.
      */
-    tagPrefixes: Prefix[]
+    tagPrefixes: TagPrefix[]
     /**
      * The parsed version of the source document;
      * if true-ish, stringified output will include a `%YAML` directive.
@@ -598,20 +605,20 @@ export namespace ast {
      * Create a new `Alias` node, adding the required anchor for `node`.
      * If `name` is empty, a new anchor name will be generated.
      */
-    createAlias(node: Node, name?: string): Alias
+    createAlias(node: AST.Node, name?: string): AST.Alias
     /**
      * Create a new `Merge` node with the given source nodes.
      * Non-`Alias` sources will be automatically wrapped.
      */
-    createMergePair(...nodes: Node[]): Merge
+    createMergePair(...nodes: AST.Node[]): AST.Merge
     /**
      * The anchor name associated with `node`, if set.
      */
-    getName(node: Node): undefined | string
+    getName(node: AST.Node): undefined | string
     /**
      * The node associated with the anchor `name`, if set.
      */
-    getNode(name: string): undefined | Node
+    getNode(name: string): undefined | AST.Node
     /**
      * Find an available anchor name with the given `prefix` and a numerical suffix.
      */
@@ -620,290 +627,11 @@ export namespace ast {
      * Associate an anchor with `node`. If `name` is empty, a new name will be generated.
      * To remove an anchor, use `setAnchor(null, name)`.
      */
-    setAnchor(node: Node | null, name?: string): void | string
+    setAnchor(node: AST.Node | null, name?: string): void | string
   }
 
-  class Schema {
-    /** Default: `'tag:yaml.org,2002:'` */
-    static defaultPrefix: string
-    static defaultTags: {
-      /** Default: `'tag:yaml.org,2002:map'` */
-      MAP: string
-      /** Default: `'tag:yaml.org,2002:seq'` */
-      SEQ: string
-      /** Default: `'tag:yaml.org,2002:str'` */
-      STR: string
-    }
-    constructor(options: Options)
-    /**
-     * Convert any value into a `Node` using this schema, recursively turning
-     * objects into collectsions.
-     *
-     * @param wrapScalars If undefined or `true`, also wraps plain values in
-     *   `Scalar` objects; if `false` and `value` is not an object, it will be
-     *   returned directly.
-     * @param tag Use to specify the collection type, e.g. `"!!omap"`. Note that
-     *   this requires the corresponding tag to be available in this schema.
-     */
-    createNode(
-      value: any,
-      wrapScalars: boolean,
-      tag?: string,
-      ctx?: CreateNodeContext
-    ): Node
-    merge: boolean
-    name: 'core' | 'failsafe' | 'json' | 'yaml-1.1'
-    sortMapEntries: ((a: Pair, b: Pair) => number) | null
-    tags: Tag[]
-  }
-
-  interface Prefix {
+  interface TagPrefix {
     handle: string
     prefix: string
-  }
-
-  interface Node {
-    /**
-     * a comment on or immediately after this
-     */
-    comment: null | string
-    /**
-     * a comment before this
-     */
-    commentBefore: null | string
-    /**
-     * only available when `keepCstNodes` is set to `true`
-     */
-    cstNode?: cst.Node
-    /**
-     * the [start, end] range of characters of the source parsed
-     * into this node (undefined for pairs or if not parsed)
-     */
-    range: null | [number, number]
-    /**
-     * a blank line before this node and its commentBefore
-     */
-    spaceBefore?: boolean
-    /**
-     * a fully qualified tag, if required
-     */
-    tag: null | string
-    /**
-     * a plain JS representation of this node
-     */
-    toJSON(): any
-  }
-
-  type ScalarType =
-    | 'BLOCK_FOLDED'
-    | 'BLOCK_LITERAL'
-    | 'PLAIN'
-    | 'QUOTE_DOUBLE'
-    | 'QUOTE_SINGLE'
-  type ScalarConstructor = new (
-    value: null | boolean | number | string
-  ) => Scalar
-  interface Scalar extends Node {
-    type: ScalarType | undefined
-    /**
-     * By default (undefined), numbers use decimal notation.
-     * The YAML 1.2 core schema only supports 'HEX' and 'OCT'.
-     */
-    format: 'BIN' | 'HEX' | 'OCT' | 'TIME' | undefined
-    value: null | boolean | number | string
-  }
-
-  type ScalarNode =
-    | BlockFolded
-    | BlockLiteral
-    | PlainValue
-    | QuoteDouble
-    | QuoteSingle
-
-  interface BlockFolded extends Scalar {
-    type: 'BLOCK_FOLDED'
-    cstNode?: cst.BlockFolded
-  }
-
-  interface BlockLiteral extends Scalar {
-    type: 'BLOCK_LITERAL'
-    cstNode?: cst.BlockLiteral
-  }
-
-  interface PlainValue extends Scalar {
-    type: 'PLAIN'
-    cstNode?: cst.PlainValue
-  }
-
-  interface QuoteDouble extends Scalar {
-    type: 'QUOTE_DOUBLE'
-    cstNode?: cst.QuoteDouble
-  }
-
-  interface QuoteSingle extends Scalar {
-    type: 'QUOTE_SINGLE'
-    cstNode?: cst.QuoteSingle
-  }
-
-  type PairConstructor = new (
-    key: AstNode | null,
-    value?: AstNode | null
-  ) => Pair
-  interface Pair extends Node {
-    type: 'PAIR'
-    /**
-     * key is always Node or null when parsed, but can be set to anything.
-     */
-    key: AstNode | null
-    /**
-     * value is always Node or null when parsed, but can be set to anything.
-     */
-    value: AstNode | null
-    cstNode?: never // no corresponding cstNode
-  }
-
-  type MapConstructor = new () => MapBase
-  interface MapBase extends Node {
-    type: 'FLOW_MAP' | 'MAP' | undefined
-    items: Array<Pair | Merge>
-  }
-
-  type MapNode = FlowMap | Map
-
-  interface FlowMap extends MapBase {
-    type: 'FLOW_MAP'
-    cstNode?: cst.FlowMap
-  }
-
-  interface Map extends MapBase {
-    type: 'MAP'
-    cstNode?: cst.Map
-  }
-
-  type SeqConstructor = new () => SeqBase
-  interface SeqBase extends Node {
-    type: 'FLOW_SEQ' | 'SEQ' | undefined
-    /**
-     * item is always Node or null when parsed, but can be set to anything.
-     */
-    items: Array<AstNode | Pair | null>
-  }
-
-  type SeqNode = FlowSeq | Seq
-
-  interface FlowSeq extends SeqBase {
-    type: 'FLOW_SEQ'
-    items: Array<AstNode | Pair>
-    cstNode?: cst.FlowSeq
-  }
-
-  interface Seq extends SeqBase {
-    type: 'SEQ'
-    items: Array<AstNode | null>
-    cstNode?: cst.Seq
-  }
-
-  interface Alias extends Node {
-    type: 'ALIAS'
-    source: AstNode
-    cstNode?: cst.Alias
-  }
-
-  interface Merge extends Node {
-    type: 'MERGE_PAIR'
-    /**
-     * key is always Scalar('<<'), defined by the type specification
-     */
-    key: PlainValue
-    /**
-     * value is always Seq<Alias(Map)>, stringified as *A if length = 1
-     */
-    value: SeqBase
-    cstNode?: cst.PlainValue
-  }
-
-  interface BinaryOptions {
-    /**
-     * The type of string literal used to stringify `!!binary` values.
-     *
-     * Default: `'BLOCK_LITERAL'`
-     */
-    defaultType: ScalarType
-    /**
-     * Maximum line width for `!!binary`.
-     *
-     * Default: `76`
-     */
-    lineWidth: number
-  }
-
-  interface BoolOptions {
-    /**
-     * String representation for `true`. With the core schema, use `'true' | 'True' | 'TRUE'`.
-     *
-     * Default: `'true'`
-     */
-    trueStr: string
-    /**
-     * String representation for `false`. With the core schema, use `'false' | 'False' | 'FALSE'`.
-     *
-     * Default: `'false'`
-     */
-    falseStr: string
-  }
-
-  interface IntOptions {
-    /**
-     * Whether integers should be parsed into BigInt values.
-     *
-     * Default: `false`
-     */
-    asBigInt: false
-  }
-
-  interface NullOptions {
-    /**
-     * String representation for `null`. With the core schema, use `'null' | 'Null' | 'NULL' | '~' | ''`.
-     *
-     * Default: `'null'`
-     */
-    nullStr: string
-  }
-
-  interface StrOptions {
-    /**
-     * The default type of string literal used to stringify values
-     *
-     * Default: `'PLAIN'`
-     */
-    defaultType: ScalarType
-    doubleQuoted: {
-      /**
-       * Whether to restrict double-quoted strings to use JSON-compatible syntax.
-       *
-       * Default: `false`
-       */
-      jsonEncoding: boolean
-      /**
-       * Minimum length to use multiple lines to represent the value.
-       *
-       * Default: `40`
-       */
-      minMultiLineLength: number
-    }
-    fold: {
-      /**
-       * Maximum line width (set to `0` to disable folding).
-       *
-       * Default: `80`
-       */
-      lineWidth: number
-      /**
-       * Minimum width for highly-indented content.
-       *
-       * Default: `20`
-       */
-      minContentWidth: number
-    }
   }
 }
