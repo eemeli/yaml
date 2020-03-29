@@ -189,14 +189,15 @@ export class Document {
   commentBefore: null | string
   /** A comment at the end of the document. */
   comment: null | string
-  /** Only available when `keepCstNodes` is set to `true` */
-  cstNode?: CST.Document
   /** The document contents. */
   contents: AST.AstNode | null
   /** Errors encountered during parsing. */
   errors: YAMLError[]
-  /** The schema used with the document. */
-  schema: Schema
+  /**
+   * The schema used with the document. Use `setSchema()` to change or
+   * initialise.
+   */
+  schema?: Schema
   /**
    * The [start, end] range of characters of the source parsed
    * into this node (undefined if not parsed)
@@ -223,6 +224,16 @@ export class Document {
   listNonDefaultTags(): string[]
   /** Parse a CST into this document */
   parse(cst: CST.Document): this
+  /**
+   * When a document is created with `new YAML.Document()`, the schema object is
+   * not set as it may be influenced by parsed directives; call this with no
+   * arguments to set it manually, or with arguments to change the schema used
+   * by the document.
+   **/
+  setSchema(
+    id?: Options['version'] | Schema.Name,
+    customTags?: (Schema.TagId | Schema.Tag)[]
+  ): void
   /** Set `handle` as a shorthand string for the `prefix` tag namespace. */
   setTagPrefix(handle: string, prefix: string): void
   /** A plain JavaScript representation of the document `contents`. */
@@ -232,6 +243,13 @@ export class Document {
 }
 
 export namespace Document {
+  interface Parsed extends Document {
+    /** Only available when `keepCstNodes` is set to `true` */
+    cstNode?: CST.Document
+    /** The schema used with the document. */
+    schema: Schema
+  }
+
   interface Anchors {
     /**
      * Create a new `Alias` node, adding the required anchor for `node`.
@@ -305,14 +323,17 @@ export function createNode(
 /**
  * Parse an input string into a single YAML.Document.
  */
-export function parseDocument(str: string, options?: Options): Document
+export function parseDocument(str: string, options?: Options): Document.Parsed
 
 /**
  * Parse the input as a stream of YAML documents.
  *
  * Documents should be separated from each other by `...` or `---` marker lines.
  */
-export function parseAllDocuments(str: string, options?: Options): Document[]
+export function parseAllDocuments(
+  str: string,
+  options?: Options
+): Document.Parsed[]
 
 /**
  * Parse an input string into JavaScript.

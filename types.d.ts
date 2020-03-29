@@ -72,7 +72,7 @@ export namespace Schema {
     /**
      * @deprecated Use `customTags` instead.
      */
-    tags?: (TagId | Tag)[] | ((tags: Tag[]) => Tag[])
+    tags?: Options["customTags"]
   }
 
   interface CreateNodeContext {
