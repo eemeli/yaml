@@ -72,7 +72,7 @@ export namespace Schema {
     /**
      * @deprecated Use `customTags` instead.
      */
-    tags?: Options["customTags"]
+    tags?: Options['customTags']
   }
 
   interface CreateNodeContext {
@@ -194,9 +194,8 @@ export namespace Schema {
   }
 }
 
-export class Scalar implements AST.Node {
-  constructor(value: null | boolean | number | string)
-  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any
+export class Scalar extends AST.Node {
+  constructor(value: any)
   type?: Scalar.Type
   /**
    * By default (undefined), numbers use decimal notation.
@@ -214,7 +213,7 @@ export namespace Scalar {
     | Type.QUOTE_SINGLE
 }
 
-export class Pair implements AST.Node {
+export class Pair extends AST.Node {
   constructor(key: any, value?: any)
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
   type: Pair.Type.PAIR | Pair.Type.MERGE_PAIR
@@ -231,19 +230,21 @@ export namespace Pair {
   }
 }
 
-export class YAMLMap implements AST.Node {
-  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
+export class YAMLMap extends AST.Collection {
   type?: Type.FLOW_MAP | Type.MAP
-  /** Array of Pair when parsed, but can be set to anything. */
   items: Array<Pair | AST.Merge>
-  schema?: Schema
+  hasAllNullValues(): boolean
+  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
 }
 
-export class YAMLSeq implements AST.Node {
-  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any[]
+export class YAMLSeq extends AST.Collection {
   type?: Type.FLOW_SEQ | Type.SEQ
-  /** Array of Nodes or nulls when parsed, but can be set to anything. */
-  items: any[]
+  delete(key: number | string | Scalar): boolean
+  get(key: number | string | Scalar, keepScalar?: boolean): any
+  has(key: number | string | Scalar): boolean
+  set(key: number | string | Scalar, value: any): void
+  hasAllNullValues(): boolean
+  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any[]
 }
 
 export namespace AST {
@@ -258,18 +259,18 @@ export namespace AST {
 
   type CollectionNode = FlowMap | BlockMap | FlowSeq | BlockSeq
 
-  interface Node {
+  class Node {
     /** A comment on or immediately after this */
-    comment?: string
+    comment?: string | null
     /** A comment before this */
-    commentBefore?: string
+    commentBefore?: string | null
     /** Only available when `keepCstNodes` is set to `true` */
     cstNode?: CST.Node
     /**
      * The [start, end] range of characters of the source parsed
      * into this node (undefined for pairs or if not parsed)
      */
-    range?: [number, number]
+    range?: [number, number] | null
     /** A blank line before this node and its commentBefore */
     spaceBefore?: boolean
     /** A fully qualified tag, if required */
@@ -280,13 +281,51 @@ export namespace AST {
     type?: Type | Pair.Type
   }
 
+  class Collection extends Node {
+    type?: Type.MAP | Type.FLOW_MAP | Type.SEQ | Type.FLOW_SEQ | Type.DOCUMENT
+    items: any[]
+    schema?: Schema
+
+    /**
+     * Adds a value to the collection. For `!!map` and `!!omap` the value must
+     * be a Pair instance or a `{ key, value }` object, which may not have a key
+     * that already exists in the map.
+     */
+    add(value: any): void
+    addIn(path: Iterable<any>, value: any): void
+    /**
+     * Removes a value from the collection.
+     * @returns `true` if the item was found and removed.
+     */
+    delete(key: any): boolean
+    deleteIn(path: Iterable<any>): boolean
+    /**
+     * Returns item at `key`, or `undefined` if not found. By default unwraps
+     * scalar values from their surrounding node; to disable set `keepScalar` to
+     * `true` (collections are always returned intact).
+     */
+    get(key: any, keepScalar?: boolean): any
+    getIn(path: Iterable<any>, keepScalar?: boolean): any
+    /**
+     * Checks if the collection includes a value with the key `key`.
+     */
+    has(key: any): boolean
+    hasIn(path: Iterable<any>): boolean
+    /**
+     * Sets a value in this collection. For `!!set`, `value` needs to be a
+     * boolean to add/remove the item from the set.
+     */
+    set(key: any, value: any): void
+    setIn(path: Iterable<any>, value: any): void
+  }
+
   interface NodeToJsonContext {
     anchors?: any[]
     doc: Document
     keep?: boolean
     mapAsMap?: boolean
     maxAliasCount?: number
-    onCreate?: (node: AST.Node) => void
+    onCreate?: (node: Node) => void
     [key: string]: any
   }
 

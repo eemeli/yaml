@@ -170,18 +170,15 @@ export namespace scalarOptions {
   }
 }
 
-export class Document {
+export class Document extends AST.Collection {
   constructor(options?: Options)
+  tag: never
   type: Type.DOCUMENT
   /**
    * Anchors associated with the document's nodes;
    * also provides alias & merge node creators.
    */
   anchors: Document.Anchors
-  /** A comment at the very beginning of the document. */
-  commentBefore: null | string
-  /** A comment at the end of the document. */
-  comment: null | string
   /** The document contents. */
   contents: AST.AstNode | null
   /** Errors encountered during parsing. */
@@ -191,13 +188,6 @@ export class Document {
    * initialise.
    */
   schema?: Schema
-  /**
-   * The [start, end] range of characters of the source parsed
-   * into this node (undefined if not parsed)
-   */
-  range: null | [number, number]
-  /** A blank line before this node and its commentBefore */
-  spaceBefore?: boolean
   /**
    * Array of prefixes; each will have a string `handle` that
    * starts and ends with `!` and a string `prefix` that the handle will be replaced by.
@@ -230,15 +220,13 @@ export class Document {
   /** Set `handle` as a shorthand string for the `prefix` tag namespace. */
   setTagPrefix(handle: string, prefix: string): void
   /** A plain JavaScript representation of the document `contents`. */
-  toJSON(): any
+  toJSON(arg: any): any
   /** A YAML representation of the document. */
   toString(): string
 }
 
 export namespace Document {
   interface Parsed extends Document {
-    /** Only available when `keepCstNodes` is set to `true` */
-    cstNode?: CST.Document
     /** The schema used with the document. */
     schema: Schema
   }
