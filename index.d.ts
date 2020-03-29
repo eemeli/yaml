@@ -58,11 +58,22 @@ export function parseAllDocuments(
 ): ast.Document[]
 
 /**
- * YAML.createNode recursively turns objects into Map and arrays to Seq collections.
- * Its primary use is to enable attaching comments or other metadata to a value,
- * or to otherwise exert more fine-grained control over the stringified output.
+ * Recursively turns objects into collections. Generic objects as well as `Map`
+ * and its descendants become mappings, while arrays and other iterable objects
+ * result in sequences.
  *
- * Wraps plain values in Scalar objects.
+ * The primary purpose of this function is to enable attaching comments or other
+ * metadata to a value, or to otherwise exert more fine-grained control over the
+ * stringified output. To that end, you'll need to assign its return value to
+ * the `contents` of a Document (or somewhere within said contents), as the
+ * document's schema is required for YAML string output.
+ *
+ * @param wrapScalars If undefined or `true`, also wraps plain values in
+ *   `Scalar` objects; if `false` and `value` is not an object, it will be
+ *   returned directly.
+ * @param tag Use to specify the collection type, e.g. `"!!omap"`. Note that
+ *   this requires the corresponding tag to be available based on the default
+ *   options. To use a specific document's schema, use `doc.schema.createNode`.
  */
 export function createNode(
   value: any,
@@ -612,10 +623,38 @@ export namespace ast {
     setAnchor(node: Node | null, name?: string): void | string
   }
 
-  interface Schema {
+  class Schema {
+    /** Default: `'tag:yaml.org,2002:'` */
+    static defaultPrefix: string
+    static defaultTags: {
+      /** Default: `'tag:yaml.org,2002:map'` */
+      MAP: string
+      /** Default: `'tag:yaml.org,2002:seq'` */
+      SEQ: string
+      /** Default: `'tag:yaml.org,2002:str'` */
+      STR: string
+    }
+    constructor(options: Options)
+    /**
+     * Convert any value into a `Node` using this schema, recursively turning
+     * objects into collectsions.
+     *
+     * @param wrapScalars If undefined or `true`, also wraps plain values in
+     *   `Scalar` objects; if `false` and `value` is not an object, it will be
+     *   returned directly.
+     * @param tag Use to specify the collection type, e.g. `"!!omap"`. Note that
+     *   this requires the corresponding tag to be available in this schema.
+     */
+    createNode(
+      value: any,
+      wrapScalars: boolean,
+      tag?: string,
+      ctx?: CreateNodeContext
+    ): Node
     merge: boolean
-    name: string
-    schema: Tag[]
+    name: 'core' | 'failsafe' | 'json' | 'yaml-1.1'
+    sortMapEntries: ((a: Pair, b: Pair) => number) | null
+    tags: Tag[]
   }
 
   interface Prefix {
