@@ -99,9 +99,10 @@ export interface Options {
    */
   anchorPrefix?: string
   /**
-   * Array of additional tags to include in the schema.
+   * Array of additional tags to include in the schema, or a function that may
+   * modify the schema's base tag array.
    */
-  customTags?: Tag[] | ((tags: Tag[]) => Tag[])
+  customTags?: (TagId | Tag)[] | ((tags: Tag[]) => Tag[])
   /**
    * Allow non-JSON JavaScript objects to remain in the `toJSON` output.
    * Relevant with the YAML 1.1 `!!timestamp` and `!!binary` tags as well as BigInts.
@@ -167,7 +168,7 @@ export interface Options {
   /**
    * @deprecated Use `customTags` instead.
    */
-  tags?: Tag[] | ((tags: Tag[]) => Tag[])
+  tags?: (TagId | Tag)[] | ((tags: Tag[]) => Tag[])
   /**
    * The YAML version used by documents without a `%YAML` directive.
    *
@@ -181,23 +182,43 @@ export interface Options {
  */
 export type ParseOptions = Options
 
-export interface Tag {
-  /**
-   * A JavaScript class that should be matched to this tag, e.g. `Date` for `!!timestamp`.
-   */
-  class?: new () => any
+export type TagId =
+  | 'binary'
+  | 'bool'
+  | 'float'
+  | 'floatExp'
+  | 'floatNaN'
+  | 'floatTime'
+  | 'int'
+  | 'intHex'
+  | 'intOct'
+  | 'intTime'
+  | 'null'
+  | 'omap'
+  | 'pairs'
+  | 'set'
+  | 'timestamp'
+
+export type Tag = CustomTag | DefaultTag
+
+interface BaseTag {
   /**
    * An optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.
    */
-  createNode?: (value: any) => ast.MapBase | ast.SeqBase | ast.Scalar
-  /**
-   * If `true`, the tag should not be explicitly included when stringifying.
-   */
-  default?: boolean
+  createNode?: (
+    schema: ast.Schema,
+    value: any,
+    ctx: CreateNodeContext
+  ) => ast.MapBase | ast.SeqBase | ast.Scalar
   /**
    * If a tag has multiple forms that should be parsed and/or stringified differently, use `format` to identify them.
    */
   format?: string
+  /**
+   * Used by `YAML.createNode` to detect your data type, e.g. using `typeof` or
+   * `instanceof`.
+   */
+  identify(value: any): boolean
   /**
    * The `Node` child class that implements this tag. Required for collections and tags that have overlapping JS representations.
    */
@@ -207,33 +228,75 @@ export interface Tag {
    */
   options?: object
   /**
-   * Should return an instance of a class extending `Node`.
-   * If test is set, will be called with the resulting match as arguments.
-   * Otherwise, will be called as `resolve(doc, cstNode)`.
+   * Optional function stringifying the AST node in the current context. If your
+   * data includes a suitable `.toString()` method, you can probably leave this
+   * undefined and use the default stringifier.
+   *
+   * @param item The node being stringified.
+   * @param ctx Contains the stringifying context variables.
+   * @param onComment Callback to signal that the stringifier includes the
+   *   item's comment in its output.
+   * @param onChompKeep Callback to signal that the output uses a block scalar
+   *   type with the `+` chomping indicator.
    */
-  resolve(doc: ast.Document, cstNode: cst.Node): ast.Node
-  resolve(...match: string[]): ast.Node
-  /**
-   * @param item the node being stringified.
-   * @param ctx contains the stringifying context variables.
-   * @param onComment a function that should be called if the stringifier includes the item's comment in its output.
-   */
-  stringify(
+  stringify?: (
     item: ast.Node,
     ctx: StringifyContext,
-    onComment: () => void
-  ): string
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ) => string
   /**
-   * The fully qualified name of the tag.
+   * The identifier for your data type, with which its stringified form will be
+   * prefixed. Should either be a !-prefixed local `!tag`, or a fully qualified
+   * `tag:domain,date:foo`.
    */
   tag: string
+}
+
+export interface CustomTag extends BaseTag {
   /**
-   * Used to match string values of scalar nodes; captured parts will be passed as arguments of `resolve()`.
+   * A JavaScript class that should be matched to this tag, e.g. `Date` for `!!timestamp`.
+   * @deprecated Use `Tag.identify` instead
    */
-  test?: RegExp
+  class?: new () => any
+  /**
+   * Turns a CST node into an AST node. If returning a non-`Node` value, the
+   * output will be wrapped as a `Scalar`.
+   */
+  resolve(doc: ast.Document, cstNode: cst.Node): ast.Node | any
+}
+
+export interface DefaultTag extends BaseTag {
+  /**
+   * If `true`, together with `test` allows for values to be stringified without
+   * an explicit tag. For most cases, it's unlikely that you'll actually want to
+   * use this, even if you first think you do.
+   */
+  default: true
+  /**
+   * Alternative form used by default tags; called with `test` match results.
+   */
+  resolve(...match: string[]): ast.Node | any
+  /**
+   * Together with `default` allows for values to be stringified without an
+   * explicit tag and detected using a regular expression. For most cases, it's
+   * unlikely that you'll actually want to use these, even if you first think
+   * you do.
+   */
+  test: RegExp
+}
+
+export interface CreateNodeContext {
+  wrapScalars?: boolean
+  [key: string]: any
 }
 
 export interface StringifyContext {
+  forceBlockIndent?: boolean
+  implicitKey?: boolean
+  indent?: string
+  indentAtStart?: number
+  inFlow?: boolean
   [key: string]: any
 }
 
