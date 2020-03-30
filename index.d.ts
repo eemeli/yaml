@@ -171,6 +171,7 @@ export namespace scalarOptions {
 }
 
 export class Document extends AST.Collection {
+  cstNode?: CST.Document;
   constructor(options?: Options)
   tag: never
   type: Type.DOCUMENT
