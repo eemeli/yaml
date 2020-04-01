@@ -2,6 +2,7 @@ import { CST } from './parse-cst'
 import { AST, Scalar, Schema, YAMLMap, YAMLSeq } from './types'
 import { Type, YAMLError, YAMLWarning } from './util'
 
+export { AST, CST }
 export { default as parseCST } from './parse-cst'
 
 /**
@@ -171,7 +172,7 @@ export namespace scalarOptions {
 }
 
 export class Document extends AST.Collection {
-  cstNode?: CST.Document;
+  cstNode?: CST.Document
   constructor(options?: Options)
   tag: never
   type: Type.DOCUMENT
