@@ -96,22 +96,26 @@ function addEvents(events, doc, e, node) {
       events.push('-MAP')
       break
     case 'FLOW_SEQ':
-    case 'SEQ':
-      events.push(`+SEQ${props}`)
+    case 'SEQ': {
+      const ev = node.type === 'FLOW_SEQ' ? '+SEQ []' : '+SEQ'
+      events.push(`${ev}${props}`)
       node.items.forEach(item => {
         addEvents(events, doc, e, item)
       })
       events.push('-SEQ')
       break
+    }
     case 'FLOW_MAP':
-    case 'MAP':
-      events.push(`+MAP${props}`)
+    case 'MAP': {
+      const ev = node.type === 'FLOW_SEQ' ? '+MAP {}' : '+MAP'
+      events.push(`${ev}${props}`)
       node.items.forEach(({ key, value }) => {
         addEvents(events, doc, e, key)
         addEvents(events, doc, e, value)
       })
       events.push('-MAP')
       break
+    }
     default:
       throw new Error(`Unexpected node type ${node.type}`)
   }
