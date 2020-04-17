@@ -197,7 +197,9 @@
 <p>As values may be wrapped within objects and arrays, <code>YAML.createNode()</code> uses each tag&#39;s <code>identify(value): boolean</code> function to detect custom data types. For the same reason, collections need to define their own <code>createNode(schema, value, ctx): Collection</code> functions that may recursively construct their equivalent collection class instances.</p>
 
 <p>Finally, <code>stringify(item, ctx, ...): string</code> defines how your data should be represented as a YAML string, in case the default stringifiers aren&#39;t enough. For collections in particular, the default stringifier should be perfectly sufficient. <code>&#39;yaml/util&#39;</code> exports <code>stringifyNumber(item)</code> and <code>stringifyString(item, ctx, ...)</code>, which may be of use for custom scalar data.</p>
-<h3 id='custom-tag-api'>Custom Tag API</h3><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span>
+<h3 id='custom-tag-api'>Custom Tag API</h3>
+<!-- prettier-ignore -->
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span>
   <span class="nx">findPair</span><span class="p">,</span> <span class="c1">// (items, key) =&gt; Pair? -- Given a key, find a matching Pair</span>
   <span class="nx">parseMap</span><span class="p">,</span> <span class="c1">// (doc, cstNode) =&gt; new YAMLMap</span>
   <span class="nx">parseSeq</span><span class="p">,</span> <span class="c1">// (doc, cstNode) =&gt; new YAMLSeq</span>

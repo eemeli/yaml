@@ -83,6 +83,8 @@
 <td>Sets a value in this collection. For <code>!!set</code>, <code>value</code> needs to be a boolean to add/remove the item from the set.</td>
 </tr>
 </tbody></table>
+
+<!-- prettier-ignore -->
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">map</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">createNode</span><span class="p">({</span> <span class="na">a</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="p">})</span>
 <span class="nx">map</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span> <span class="na">key</span><span class="p">:</span> <span class="s1">'c'</span><span class="p">,</span> <span class="na">value</span><span class="p">:</span> <span class="mi">4</span> <span class="p">})</span>
   <span class="c1">// =&gt; map.get('c') === 4 &amp;&amp; map.has('c') === true</span>

@@ -1,0 +1,17 @@
+<h2 id='yaml-docs'>YAML Docs</h2>
+<p>These documentation source files are compiled into <a href="https://eemeli.org/yaml">eemeli.org/yaml</a> using a <a href="https://github.com/slatedocs/slate">Slate</a> instance that&#39;s a git submodule of this repo at <code>docs-slate/</code>.</p>
+<h3 id='how-to-preview-changes'>How to Preview Changes</h3>
+<ol>
+<li>Modify these source files, noting that sections are defined in <code>index.html.md</code></li>
+<li>Make sure that the Slate submodule is properly initialised. If you&#39;ve just cloned the repo, the command you&#39;ll want is <code>git submodule update --init</code></li>
+<li>Note that <code>docs-slate/source</code> contains symlinks to this folder, which may need extra configuration to work in Windows environments</li>
+<li>See <a href="../docs-slate/README.md">docs-slate/README.md</a> for its install instructions</li>
+<li>Use <code>npm run docs</code> from this repo&#39;s root to preview the site at http://localhost:4567</li>
+</ol>
+<h3 id='how-to-publish-changes'>How to Publish Changes</h3>
+<p>In addition to the preview steps:</p>
+
+<ol>
+<li>Add this repo as the &quot;yaml&quot; remote for the <code>docs-slate</code> submodule repo: <code>git remote add yaml git@github.com:eemeli/yaml.git</code></li>
+<li>Run the <code>deploy.sh</code> script from the <code>docs-slate</code> folder</li>
+</ol>

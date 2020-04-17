@@ -31,10 +31,10 @@
 <span class="na">octal</span><span class="pi">:</span> <span class="s">014</span>
 <span class="na">sexagesimal</span><span class="pi">:</span> <span class="s">3:25:45</span>
 <span class="na">picture</span><span class="pi">:</span> <span class="kt">!!binary</span> <span class="pi">|</span>
- <span class="no">R0lGODlhDAAMAIQAAP//9/X</span>
- <span class="no">17unp5WZmZgAAAOfn515eXv</span>
- <span class="no">Pz7Y6OjuDg4J+fn5OTk6enp</span>
- <span class="no">56enmleECcgggoBADs=</span>
+  <span class="no">R0lGODlhDAAMAIQAAP//9/X</span>
+  <span class="no">17unp5WZmZgAAAOfn515eXv</span>
+  <span class="no">Pz7Y6OjuDg4J+fn5OTk6enp</span>
+  <span class="no">56enmleECcgggoBADs=</span>
 </code></pre><pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">true</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
   <span class="nx">octal</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
   <span class="nx">sexagesimal</span><span class="p">:</span> <span class="mi">12345</span><span class="p">,</span>

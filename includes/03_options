@@ -8,7 +8,7 @@
 <span class="c1">//   '1.1': { merge: true, schema: 'yaml-1.1' },</span>
 <span class="c1">//   '1.2': { merge: false, schema: 'core' } }</span>
 </code></pre><h4 id='yaml-defaultoptions'><code>YAML.defaultOptions</code></h4><h4 id='yaml-document-defaults'><code>YAML.Document.defaults</code></h4>
-<p><code>yaml</code> defines options in three places: as an argument of parse, create and stringify calls, in the values of <code>YAML.defaultOptions</code>, and in the version-dependent <code>YAML.Document.defaults</code> object. Values set in <code>YAML.defaultOptions</code> override version-dependent defaults, and argument options override both.</p>
+<p><code>yaml</code> defines document-specific options in three places: as an argument of parse, create and stringify calls, in the values of <code>YAML.defaultOptions</code>, and in the version-dependent <code>YAML.Document.defaults</code> object. Values set in <code>YAML.defaultOptions</code> override version-dependent defaults, and argument options override both.</p>
 
 <p>The <code>version</code> option value (<code>&#39;1.2&#39;</code> by default) may be overridden by any document-specific <code>%YAML</code> directive.</p>
 
@@ -26,13 +26,23 @@
 </tr>
 <tr>
 <td>customTags</td>
-<td><a href="#custom-data-types"><code>Tag[]</code></a> &vert; <code>function</code></td>
-<td>Array of additional (custom) tags to include in the schema</td>
+<td><code>Tag[] ⎮ function</code></td>
+<td>Array of <a href="#custom-data-types">additional tags</a> to include in the schema</td>
+</tr>
+<tr>
+<td>indent</td>
+<td><code>number</code></td>
+<td>The number of spaces to use when indenting code. By default <code>2</code>.</td>
+</tr>
+<tr>
+<td>indentSeq</td>
+<td><code>boolean</code></td>
+<td>Whether block sequences should be indented. By default <code>true</code>.</td>
 </tr>
 <tr>
 <td>keepBlobsInJSON</td>
 <td><code>boolean</code></td>
-<td>Allow non-JSON JavaScript objects to remain in the <code>toJSON</code> output. Relevant with the YAML 1.1 <code>!!timestamp</code> and <code>!!binary</code> tags. By default <code>true</code>.</td>
+<td>Allow non-JSON JavaScript objects to remain in the <code>toJSON</code> output. Relevant with the YAML 1.1 <code>!!timestamp</code> and <code>!!binary</code> tags as well as BigInts. By default <code>true</code>.</td>
 </tr>
 <tr>
 <td>keepCstNodes</td>
@@ -66,7 +76,7 @@
 </tr>
 <tr>
 <td>schema</td>
-<td><code>&#39;core&#39;</code> &vert; <code>&#39;failsafe&#39;</code> &vert; <code>&#39;json&#39;</code> &vert; <code>&#39;yaml-1.1&#39;</code></td>
+<td><code>&#39;core&#39; ⎮ &#39;failsafe&#39; ⎮</code> <code>&#39;json&#39; ⎮ &#39;yaml-1.1&#39;</code></td>
 <td>The base schema to use. By default <code>&#39;core&#39;</code> for YAML 1.2 and <code>&#39;yaml-1.1&#39;</code> for earlier versions.</td>
 </tr>
 <tr>
@@ -76,12 +86,12 @@
 </tr>
 <tr>
 <td>sortMapEntries</td>
-<td><code>boolean</code> &vert; <code>(a, b: Pair) =&gt; number</code></td>
+<td><code>boolean ⎮</code> <code>(a, b: Pair) =&gt; number</code></td>
 <td>When stringifying, sort map entries. If <code>true</code>, sort by comparing key values with <code>&lt;</code>. By default <code>false</code>.</td>
 </tr>
 <tr>
 <td>version</td>
-<td><code>string</code></td>
+<td><code>&#39;1.0&#39; ⎮ &#39;1.1&#39; ⎮ &#39;1.2&#39;</code></td>
 <td>The YAML version used by documents without a <code>%YAML</code> directive. By default <code>&#39;1.2&#39;</code>.</td>
 </tr>
 </tbody></table>
@@ -112,28 +122,80 @@ target:
 <span class="c1">// { a: 1, b: 'base' }</span>
 </code></pre>
 <p><strong>Merge</strong> keys are a <a href="http://yaml.org/type/merge.html">YAML 1.1 feature</a> that is not a part of the 1.2 spec. To use a merge key, assign an alias node or an array of alias nodes as the value of a <code>&lt;&lt;</code> key in a mapping.</p>
-<h2 id='tag-stringifier-options'>Tag Stringifier Options</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">binaryOptions</span><span class="p">,</span> <span class="nx">boolOptions</span><span class="p">,</span> <span class="nx">nullOptions</span><span class="p">,</span> <span class="nx">strOptions</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types'</span>
-
-<span class="nx">binaryOptions</span> <span class="c1">// Used by !!binary, part of the yaml-1.1 schema</span>
-<span class="c1">// { defaultType: 'BLOCK_LITERAL', lineWidth: 76 }</span>
-
-<span class="nx">boolOptions</span>
-<span class="c1">// { trueStr: 'true', falseStr: 'false' }</span>
-
-<span class="nx">nullOptions</span>
-<span class="c1">// { nullStr: 'null' }</span>
-
-<span class="nx">strOptions</span>
-<span class="c1">// { defaultType: 'PLAIN',</span>
-<span class="c1">//   doubleQuoted: { jsonEncoding: false, minMultiLineLength: 40 },</span>
-<span class="c1">//   fold: { lineWidth: 80, minContentWidth: 20 } }</span>
-
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
+<h2 id='scalar-options'>Scalar Options</h2><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
 <span class="c1">// this is: null</span>
 
-<span class="nx">nullOptions</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="s1">'~'</span>
-<span class="nx">strOptions</span><span class="p">.</span><span class="nx">defaultType</span> <span class="o">=</span> <span class="s1">'QUOTE_SINGLE'</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="kc">null</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="s1">'~'</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="nx">str</span><span class="p">.</span><span class="nx">defaultType</span> <span class="o">=</span> <span class="s1">'QUOTE_SINGLE'</span>
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
 <span class="c1">// 'this is': ~</span>
-</code></pre>
-<p>To customise the YAML stringification, some options objects are exported from <code>&#39;yaml/types&#39;</code>. Note that these values are used by all documents. For example, to disable the automatic line wrapping, set <code>strOptions.fold.lineWidth</code> to <code>0</code>.</p>
+</code></pre><h4 id='yaml-scalaroptions'><code>YAML.scalarOptions</code></h4>
+<p>Some customization options are availabe to control the parsing and stringification of scalars. Note that these values are used by all documents.</p>
+
+<p>These options objects are also exported individually from <code>&#39;yaml/types&#39;</code>.</p>
+
+<table><thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>binary.defaultType</td>
+<td><code>Type</code></td>
+<td><code>&#39;BLOCK_LITERAL&#39;</code></td>
+<td>The type of string literal used to stringify <code>!!binary</code> values</td>
+</tr>
+<tr>
+<td>binary.lineWidth</td>
+<td><code>number</code></td>
+<td><code>76</code></td>
+<td>Maximum line width for <code>!!binary</code> values</td>
+</tr>
+<tr>
+<td>bool.trueStr</td>
+<td><code>string</code></td>
+<td><code>&#39;true&#39;</code></td>
+<td>String representation for <code>true</code> values</td>
+</tr>
+<tr>
+<td>bool.falseStr</td>
+<td><code>string</code></td>
+<td><code>&#39;false&#39;</code></td>
+<td>String representation for <code>false</code> values</td>
+</tr>
+<tr>
+<td>int.asBigInt</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Whether integers should be parsed into <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a> values</td>
+</tr>
+<tr>
+<td>null.nullStr</td>
+<td><code>string</code></td>
+<td><code>&#39;null&#39;</code></td>
+<td>String representation for <code>null</code> values</td>
+</tr>
+<tr>
+<td>str.defaultType</td>
+<td><code>Type</code></td>
+<td><code>&#39;PLAIN&#39;</code></td>
+<td>The default type of string literal used to stringify values</td>
+</tr>
+<tr>
+<td>str.doubleQuoted</td>
+<td><code>object</code></td>
+<td><code>{ jsonEncoding: false,</code> <code>minMultiLineLength: 40 }</code></td>
+<td><code>jsonEncoding</code>: Whether to restrict double-quoted strings to use JSON-compatible syntax; <code>minMultiLineLength</code>: Minimum length to use multiple lines to represent the value</td>
+</tr>
+<tr>
+<td>str.fold</td>
+<td><code>object</code></td>
+<td><code>{ lineWidth: 80,</code> <code>minContentWidth: 20 }</code></td>
+<td><code>lineWidth</code>: Maximum line width (set to <code>0</code> to disable folding); <code>minContentWidth</code>: Minimum width for highly-indented content</td>
+</tr>
+</tbody></table>
+<h2 id='silencing-warnings'>Silencing Warnings</h2>
+<p>By default, the library will emit warnings for uses of deprecated APIs and as required by the YAML spec during parsing. If you&#39;d like to silence these, define a global variable <code>YAML_SILENCE_WARNINGS</code> with a true-ish value. To silence only deprecation warnings, use <code>YAML_SILENCE_DEPRECATION_WARNINGS</code>. These values may also be set in <code>process.env</code>.</p>
