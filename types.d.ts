@@ -24,15 +24,15 @@ export class Schema {
    * Convert any value into a `Node` using this schema, recursively turning
    * objects into collectsions.
    *
-   * @param wrapScalars If undefined or `true`, also wraps plain values in
-   *   `Scalar` objects; if `false` and `value` is not an object, it will be
-   *   returned directly.
+   * @param wrapScalars If `true`, also wraps plain values in `Scalar` objects;
+   *   if undefined or `false` and `value` is not an object, it will be returned
+   *   directly.
    * @param tag Use to specify the collection type, e.g. `"!!omap"`. Note that
    *   this requires the corresponding tag to be available in this schema.
    */
   createNode(
     value: any,
-    wrapScalars: boolean,
+    wrapScalars?: boolean,
     tag?: string,
     ctx?: Schema.CreateNodeContext
   ): AST.Node

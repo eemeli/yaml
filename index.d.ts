@@ -222,7 +222,7 @@ export class Document extends AST.Collection {
   /** Set `handle` as a shorthand string for the `prefix` tag namespace. */
   setTagPrefix(handle: string, prefix: string): void
   /** A plain JavaScript representation of the document `contents`. */
-  toJSON(arg: any): any
+  toJSON(arg?: any): any
   /** A YAML representation of the document. */
   toString(): string
 }
