@@ -22,6 +22,18 @@ export interface Options extends Schema.Options {
    */
   anchorPrefix?: string
   /**
+   * The number of spaces to use when indenting code.
+   *
+   * Default: `2`
+   */
+  indent?: number
+  /**
+   * Whether block sequences should be indented.
+   *
+   * Default: `true`
+   */
+  indentSeq?: boolean
+  /**
    * Allow non-JSON JavaScript objects to remain in the `toJSON` output.
    * Relevant with the YAML 1.1 `!!timestamp` and `!!binary` tags as well as BigInts.
    *
