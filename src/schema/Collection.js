@@ -1,6 +1,6 @@
 import { addComment } from '../addComment'
+import { Type } from '../constants'
 import { Node } from './Node'
-import { Pair } from './Pair'
 import { Scalar } from './Scalar'
 
 function collectionFromPath(schema, path, value) {
@@ -66,7 +66,7 @@ export class Collection extends Node {
 
   hasAllNullValues() {
     return this.items.every(node => {
-      if (!(node instanceof Pair)) return false
+      if (!node || node.type !== 'PAIR') return false
       const n = node.value
       return (
         n == null ||
@@ -112,10 +112,10 @@ export class Collection extends Node {
     onComment,
     onChompKeep
   ) {
-    const { doc, indent } = ctx
+    const { doc, indent, indentStep } = ctx
     const inFlow =
-      (this.type && this.type.substr(0, 4) === 'FLOW') || ctx.inFlow
-    if (inFlow) itemIndent += '  '
+      this.type === Type.FLOW_MAP || this.type === Type.FLOW_SEQ || ctx.inFlow
+    if (inFlow) itemIndent += indentStep
     const allNullValues = isMap && this.hasAllNullValues()
     ctx = Object.assign({}, ctx, {
       allNullValues,
@@ -176,7 +176,7 @@ export class Collection extends Node {
       ) {
         str = start
         for (const s of strings) {
-          str += s ? `\n  ${indent}${s}` : '\n'
+          str += s ? `\n${indentStep}${indent}${s}` : '\n'
         }
         str += `\n${indent}${end}`
       } else {
