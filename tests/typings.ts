@@ -1,5 +1,7 @@
-import * as YAML from 'yaml'
-import { YAMLMap, YAMLSeq } from 'yaml/types'
+// To test types, compile this file with tsc
+
+import * as YAML from '../index'
+import { YAMLMap, YAMLSeq } from '../types'
 
 YAML.parse('3.14159')
 // 3.14159
