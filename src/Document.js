@@ -538,7 +538,7 @@ export class Document {
     }
   }
 
-  toJSON(arg) {
+  toJSON(arg, onAnchor) {
     const { keepBlobsInJSON, mapAsMap, maxAliasCount } = this.options
     const keep =
       keepBlobsInJSON &&
@@ -558,7 +558,10 @@ export class Document {
           { alias: [], aliasCount: 0, count: 1 }
         ])
       )
-    return toJSON(this.contents, arg, ctx)
+    const res = toJSON(this.contents, arg, ctx)
+    if (typeof onAnchor === 'function' && ctx.anchors)
+      for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
+    return res
   }
 
   toString() {

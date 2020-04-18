@@ -233,8 +233,16 @@ export class Document extends AST.Collection {
   ): void
   /** Set `handle` as a shorthand string for the `prefix` tag namespace. */
   setTagPrefix(handle: string, prefix: string): void
-  /** A plain JavaScript representation of the document `contents`. */
-  toJSON(arg?: any): any
+  /**
+   * A plain JavaScript representation of the document `contents`.
+   *
+   * @param arg Used by `JSON.stringify` to indicate the array index or property
+   *   name. If its value is a `string` and the document `contents` has a scalar
+   *   value, the `keepBlobsInJSON` option has no effect.
+   * @param onAnchor If defined, called with the resolved `value` and reference
+   *   `count` for each anchor in the document.
+   * */
+  toJSON(arg?: string, onAnchor?: (value: any, count: number) => void): any
   /** A YAML representation of the document. */
   toString(): string
 }

@@ -16,7 +16,7 @@ YAML:
 yaml:
   - A complete JavaScript implementation
   - https://www.npmjs.com/package/yaml`
-YAML.parse(file);
+YAML.parse(file)
 // { YAML:
 //   [ 'A human-readable data serialization language',
 //     'https://en.wikipedia.org/wiki/YAML' ],
@@ -59,10 +59,13 @@ String(doc)
 
 const alias = anchors.createAlias(a, 'AA')
 contents.items.push(alias)
-doc.toJSON()
+const refs = new Map()
+doc.toJSON(null, (value, count) => refs.set(value, count))
 // [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]
 String(doc)
 // [ &AA { a: A }, { b: &a2 B }, *AA ]
+refs
+// Map(3) { undefined => 1, 'B' => 1, { a: 'A' } => 2 }
 
 const merge = anchors.createMergePair(alias)
 b.items.push(merge)

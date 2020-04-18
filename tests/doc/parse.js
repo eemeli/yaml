@@ -601,3 +601,14 @@ describe('handling complex keys', () => {
     expect(process.emitWarning).toHaveBeenCalled()
   })
 })
+
+test('Document.toJSON(null, onAnchor)', () => {
+  const src = 'foo: &a [&v foo]\nbar: *a\nbaz: *a\n'
+  const doc = YAML.parseDocument(src)
+  const onAnchor = jest.fn()
+  const res = doc.toJSON(null, onAnchor)
+  expect(onAnchor.mock.calls).toMatchObject([
+    [res.foo, 3],
+    ['foo', 1]
+  ])
+})
