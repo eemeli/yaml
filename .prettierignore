@@ -1,5 +1,5 @@
-/browser/dist/
-/dist/
+coverage/
+dist/
+node_modules/
 /docs-slate/
-/package*.json
 /tests/yaml-test-suite/
