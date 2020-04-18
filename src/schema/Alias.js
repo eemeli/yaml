@@ -7,7 +7,7 @@ import { Pair } from './Pair'
 
 const getAliasCount = (node, anchors) => {
   if (node instanceof Alias) {
-    const anchor = anchors.find(a => a.node === node.source)
+    const anchor = anchors.get(node.source)
     return anchor.count * anchor.aliasCount
   } else if (node instanceof Collection) {
     let count = 0
@@ -54,7 +54,7 @@ export class Alias extends Node {
   toJSON(arg, ctx) {
     if (!ctx) return toJSON(this.source, arg, ctx)
     const { anchors, maxAliasCount } = ctx
-    const anchor = anchors.find(a => a.node === this.source)
+    const anchor = anchors.get(this.source)
     /* istanbul ignore if */
     if (!anchor || anchor.res === undefined) {
       const msg = 'This should not happen: Alias anchor was not resolved?'

@@ -552,12 +552,12 @@ export class Document {
     }
     const anchorNames = Object.keys(this.anchors.map)
     if (anchorNames.length > 0)
-      ctx.anchors = anchorNames.map(name => ({
-        alias: [],
-        aliasCount: 0,
-        count: 1,
-        node: this.anchors.map[name]
-      }))
+      ctx.anchors = new Map(
+        anchorNames.map(name => [
+          this.anchors.map[name],
+          { alias: [], aliasCount: 0, count: 1 }
+        ])
+      )
     return toJSON(this.contents, arg, ctx)
   }
 
