@@ -196,6 +196,7 @@ export namespace Schema {
 
 export class Scalar extends AST.Node {
   constructor(value: any)
+  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any
   type?: Scalar.Type
   /**
    * By default (undefined), numbers use decimal notation.
@@ -276,7 +277,7 @@ export namespace AST {
     /** A fully qualified tag, if required */
     tag?: string
     /** A plain JS representation of this node */
-    toJSON(arg?: any, ctx?: NodeToJsonContext): any
+    toJSON(arg?: any): any
     /** The type of this node */
     type?: Type | Pair.Type
   }
