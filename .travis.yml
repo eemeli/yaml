@@ -11,12 +11,13 @@ addons:
 
 jobs:
   include:
-    - stage: lint
+    - stage: Lint & TypeScript
       node_js: node
       script:
         - npm run lint
+        - npm run test:types
 
-    - stage: browser tests
+    - stage: Browser tests
       node_js: node
       script:
         - npm run build
