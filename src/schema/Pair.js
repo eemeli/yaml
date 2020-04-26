@@ -37,12 +37,17 @@ export class Pair extends Node {
   }
 
   get commentBefore() {
-    return this.key && this.key.commentBefore
+    return this.key instanceof Node ? this.key.commentBefore : undefined
   }
 
   set commentBefore(cb) {
     if (this.key == null) this.key = new Scalar(null)
-    this.key.commentBefore = cb
+    if (this.key instanceof Node) this.key.commentBefore = cb
+    else {
+      const msg =
+        'Pair.commentBefore is an alias for Pair.key.commentBefore. To set it, the key must be a Node.'
+      throw new Error(msg)
+    }
   }
 
   addToJSMap(ctx, map) {
