@@ -1,5 +1,6 @@
 import { source } from 'common-tags'
 import { YAML } from '../../src/index'
+import { Pair } from '../../src/schema/Pair'
 
 describe('parse comments', () => {
   describe('body', () => {
@@ -838,5 +839,36 @@ a:
       ]
     })
     expect(String(doc)).toBe(src)
+  })
+})
+
+describe('Pair.commentBefore', () => {
+  test('Should get key comment', () => {
+    const key = YAML.createNode('foo', true)
+    const pair = new Pair(key, 42)
+    key.commentBefore = 'cc'
+    expect(pair.commentBefore).toBe('cc')
+  })
+
+  test('Should set key comment', () => {
+    const key = YAML.createNode('foo', true)
+    const pair = new Pair(key, 42)
+    pair.commentBefore = 'cc'
+    expect(key.commentBefore).toBe('cc')
+  })
+
+  test('Should create a key from a null value', () => {
+    const pair = new Pair(null, 42)
+    expect(pair.key).toBeNull()
+    pair.commentBefore = 'cc'
+    expect(pair.key).not.toBeNull()
+    expect(pair.key.commentBefore).toBe('cc')
+  })
+
+  test('Should throw for non-Node key', () => {
+    const pair = new Pair({ foo: 'bar' }, 42)
+    expect(() => {
+      pair.commentBefore = 'cc'
+    }).toThrow(/commentBefore is an alias/)
   })
 })
