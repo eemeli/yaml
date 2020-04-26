@@ -194,7 +194,7 @@ export class Document extends AST.Collection {
    */
   anchors: Document.Anchors
   /** The document contents. */
-  contents: AST.AstNode | null
+  contents: any
   /** Errors encountered during parsing. */
   errors: YAMLError[]
   /**
@@ -249,6 +249,7 @@ export class Document extends AST.Collection {
 
 export namespace Document {
   interface Parsed extends Document {
+    contents: AST.Node | null
     /** The schema used with the document. */
     schema: Schema
   }
