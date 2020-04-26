@@ -122,6 +122,7 @@ export class Schema {
   }
 
   createPair(key, value, ctx) {
+    if (!ctx) ctx = { wrapScalars: true }
     const k = this.createNode(key, ctx.wrapScalars, null, ctx)
     const v = this.createNode(value, ctx.wrapScalars, null, ctx)
     return new Pair(k, v)

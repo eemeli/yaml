@@ -194,7 +194,7 @@ doc.toString()
 
 To construct a `YAMLSeq` or `YAMLMap`, use [`YAML.createNode()`](#yaml-createnode) with array, object or iterable input, or create the collections directly by importing the classes from `yaml/types`.
 
-Once created, normal array operations may be used to modify the `items` array. New `Pair` objects may created by importing the class from `yaml/types` and using its `new Pair(key, value)` constructor.
+Once created, normal array operations may be used to modify the `items` array. New `Pair` objects may created either by importing the class from `yaml/types` and using its `new Pair(key, value)` constructor, or by using the `doc.schema.createPair(key, value)` method. The latter will recursively wrap the `key` and `value` as nodes.
 
 ## Comments
 

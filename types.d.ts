@@ -22,7 +22,7 @@ export class Schema {
   constructor(options: Schema.Options)
   /**
    * Convert any value into a `Node` using this schema, recursively turning
-   * objects into collectsions.
+   * objects into collections.
    *
    * @param wrapScalars If `true`, also wraps plain values in `Scalar` objects;
    *   if undefined or `false` and `value` is not an object, it will be returned
@@ -36,6 +36,13 @@ export class Schema {
     tag?: string,
     ctx?: Schema.CreateNodeContext
   ): AST.Node
+  /**
+   * Convert a key and a value into a `Pair` using this schema, recursively
+   * wrapping all values as `Scalar` or `Collection` nodes.
+   *
+   * @param ctx To not wrap scalars, use a context `{ wrapScalars: false }`
+   */
+  createPair(key: any, value: any, ctx?: Schema.CreateNodeContext): Pair
   merge: boolean
   name: Schema.Name
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
