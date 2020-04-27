@@ -158,7 +158,7 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
   if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
     return doubleQuotedString(value, ctx)
   }
-  const indent = ctx.indent || (ctx.forceBlockIndent ? ' ' : '')
+  const indent = ctx.indent || (ctx.forceBlockIndent ? '  ' : '')
   const indentSize = indent ? '2' : '1' // root is at -1
   const literal =
     type === Type.BLOCK_FOLDED
