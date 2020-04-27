@@ -249,17 +249,6 @@ export class YAMLSeq extends AST.Collection {
 }
 
 export namespace AST {
-  type AstNode = ScalarNode | CollectionNode | Alias
-
-  type ScalarNode =
-    | BlockFolded
-    | BlockLiteral
-    | PlainValue
-    | QuoteDouble
-    | QuoteSingle
-
-  type CollectionNode = FlowMap | BlockMap | FlowSeq | BlockSeq
-
   class Node {
     /** A comment on or immediately after this */
     comment?: string | null
@@ -357,7 +346,7 @@ export namespace AST {
 
   interface Alias extends Node {
     type: Type.ALIAS
-    source: AstNode
+    source: Node
     cstNode?: CST.Alias
   }
 
@@ -381,13 +370,13 @@ export namespace AST {
 
   interface FlowSeq extends YAMLSeq {
     type: Type.FLOW_SEQ
-    items: Array<AstNode | Pair>
+    items: Array<Node>
     cstNode?: CST.FlowSeq
   }
 
   interface BlockSeq extends YAMLSeq {
     type: Type.SEQ
-    items: Array<AstNode | null>
+    items: Array<Node | null>
     cstNode?: CST.Seq
   }
 }

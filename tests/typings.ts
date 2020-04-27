@@ -1,7 +1,7 @@
 // To test types, compile this file with tsc
 
 import * as YAML from '../index'
-import { YAMLMap, YAMLSeq } from '../types'
+import { YAMLMap, YAMLSeq, Pair } from '../types'
 
 YAML.parse('3.14159')
 // 3.14159
@@ -45,9 +45,9 @@ YAML.stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
 
 const src = '[{ a: A }, { b: B }]'
 const doc = YAML.parseDocument(src)
-const contents = doc.contents as YAMLSeq
+const seq = doc.contents as YAMLSeq
 const { anchors } = doc
-const [a, b] = contents.items as YAMLMap[]
+const [a, b] = seq.items as YAMLMap[]
 anchors.setAnchor(a.items[0].value) // 'a1'
 anchors.setAnchor(b.items[0].value) // 'a2'
 anchors.setAnchor(null, 'a1') // 'a1'
@@ -58,7 +58,7 @@ String(doc)
 // [ { a: A }, { b: &a2 B } ]
 
 const alias = anchors.createAlias(a, 'AA')
-contents.items.push(alias)
+seq.items.push(alias)
 const refs = new Map()
 doc.toJSON(null, (value, count) => refs.set(value, count))
 // [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]
@@ -87,3 +87,7 @@ String(doc)
 //     },
 //   *AA
 // ]
+
+const map = new YAMLMap()
+map.items.push(new Pair('foo', 'bar'))
+doc.contents = map
