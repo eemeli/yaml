@@ -622,3 +622,53 @@ describe('indentSeq: false', () => {
     )
   })
 })
+
+describe('Document markers in top-level scalars', () => {
+  let origDoubleQuotedOptions
+  beforeAll(() => {
+    origDoubleQuotedOptions = YAML.scalarOptions.str.doubleQuoted
+    YAML.scalarOptions.str.doubleQuoted = {
+      jsonEncoding: false,
+      minMultiLineLength: 0
+    }
+  })
+  afterAll(() => {
+    YAML.scalarOptions.str.doubleQuoted = origDoubleQuotedOptions
+  })
+
+  test('---', () => {
+    const str = YAML.stringify('---')
+    expect(str).toBe('|-\n  ---\n')
+    expect(YAML.parse(str)).toBe('---')
+  })
+
+  test('...', () => {
+    const str = YAML.stringify('...')
+    expect(str).toBe('|-\n  ...\n')
+    expect(YAML.parse(str)).toBe('...')
+  })
+
+  test('foo\\n...\\n', () => {
+    const str = YAML.stringify('foo\n...\n')
+    expect(str).toBe('|\n  foo\n  ...\n')
+    expect(YAML.parse(str)).toBe('foo\n...\n')
+  })
+
+  test("'foo\\n...'", () => {
+    const doc = new YAML.Document()
+    doc.contents = YAML.createNode('foo\n...', true)
+    doc.contents.type = Type.QUOTE_SINGLE
+    const str = String(doc)
+    expect(str).toBe("'foo\n\n  ...'\n")
+    expect(YAML.parse(str)).toBe('foo\n...')
+  })
+
+  test('"foo\\n..."', () => {
+    const doc = new YAML.Document()
+    doc.contents = YAML.createNode('foo\n...', true)
+    doc.contents.type = Type.QUOTE_DOUBLE
+    const str = String(doc)
+    expect(str).toBe('"foo\n\n  ..."\n')
+    expect(YAML.parse(str)).toBe('foo\n...')
+  })
+})
