@@ -1,4 +1,2 @@
-export { YAMLSeq as default } from './dist/schema/Seq'
-
-import { warnFileDeprecation } from './dist/warnings'
-warnFileDeprecation(__filename)
+module.exports = require('./dist/schema/Seq').YAMLSeq
+require('./dist/warnings').warnFileDeprecation(__filename)

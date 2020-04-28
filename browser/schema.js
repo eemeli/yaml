@@ -1,12 +1,7 @@
-import { Schema } from './dist/schema'
-import { nullOptions, strOptions } from './dist/tags/options'
-import { stringifyString } from './dist/stringify'
+module.exports = require('./dist/schema').Schema
+const opt = require('./dist/tags/options')
+module.exports.nullOptions = opt.nullOptions
+module.exports.strOptions = opt.strOptions
+module.exports.stringify = require('./dist/stringify').stringifyString
 
-Schema.nullOptions = nullOptions
-Schema.strOptions = strOptions
-Schema.stringify = stringifyString
-export { Schema as default }
-export { nullOptions, strOptions, stringifyString as stringify }
-
-import { warnFileDeprecation } from './dist/warnings'
-warnFileDeprecation(__filename)
+require('./dist/warnings').warnFileDeprecation(__filename)

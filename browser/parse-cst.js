@@ -1,1 +1,1 @@
-export { parse as default } from './dist/cst/parse'
+module.exports = require('./dist/cst/parse').parse

@@ -1,6 +1,10 @@
-import { floatTime, intTime, timestamp } from '../dist/tags/yaml-1.1/timestamp'
-export { floatTime, intTime, timestamp }
-export default [intTime, floatTime, timestamp]
+'use strict'
+Object.defineProperty(exports, '__esModule', { value: true })
 
-import { warnFileDeprecation } from './dist/warnings'
-warnFileDeprecation(__filename)
+const ts = require('../dist/tags/yaml-1.1/timestamp')
+exports.default = [ts.intTime, ts.floatTime, ts.timestamp]
+exports.floatTime = ts.floatTime
+exports.intTime = ts.intTime
+exports.timestamp = ts.timestamp
+
+require('../dist/warnings').warnFileDeprecation(__filename)

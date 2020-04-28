@@ -1,1 +1,1 @@
-export { YAML as default } from './dist'
+module.exports = require('./dist').YAML

@@ -1,4 +1,2 @@
-export { Scalar as default } from './dist/schema/Scalar'
-
-import { warnFileDeprecation } from './dist/warnings'
-warnFileDeprecation(__filename)
+module.exports = require('./dist/schema/Scalar').Scalar
+require('./dist/warnings').warnFileDeprecation(__filename)
