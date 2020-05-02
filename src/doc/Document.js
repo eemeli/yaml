@@ -18,6 +18,7 @@ import { Anchors } from './Anchors'
 import { listTagNames } from './listTagNames'
 import { parseContents } from './parseContents'
 import { parseDirectives } from './parseDirectives'
+import { resolveTagName } from './resolveTagName'
 
 const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
@@ -162,68 +163,6 @@ export class Document {
     return this
   }
 
-  resolveTagName(node) {
-    const { tag, type } = node
-    let nonSpecific = false
-    if (tag) {
-      const { handle, suffix, verbatim } = tag
-      if (verbatim) {
-        if (verbatim !== '!' && verbatim !== '!!') return verbatim
-        const msg = `Verbatim tags aren't resolved, so ${verbatim} is invalid.`
-        this.errors.push(new YAMLSemanticError(node, msg))
-      } else if (handle === '!' && !suffix) {
-        nonSpecific = true
-      } else {
-        let prefix = this.tagPrefixes.find(p => p.handle === handle)
-        if (!prefix) {
-          const dtp = this.getDefaults().tagPrefixes
-          if (dtp) prefix = dtp.find(p => p.handle === handle)
-        }
-        if (prefix) {
-          if (suffix) {
-            if (
-              handle === '!' &&
-              (this.version || this.options.version) === '1.0'
-            ) {
-              if (suffix[0] === '^') return suffix
-              if (/[:/]/.test(suffix)) {
-                // word/foo -> tag:word.yaml.org,2002:foo
-                const vocab = suffix.match(/^([a-z0-9-]+)\/(.*)/i)
-                return vocab
-                  ? `tag:${vocab[1]}.yaml.org,2002:${vocab[2]}`
-                  : `tag:${suffix}`
-              }
-            }
-            return prefix.prefix + decodeURIComponent(suffix)
-          }
-          this.errors.push(
-            new YAMLSemanticError(node, `The ${handle} tag has no suffix.`)
-          )
-        } else {
-          const msg = `The ${handle} tag handle is non-default and was not declared.`
-          this.errors.push(new YAMLSemanticError(node, msg))
-        }
-      }
-    }
-    switch (type) {
-      case Type.BLOCK_FOLDED:
-      case Type.BLOCK_LITERAL:
-      case Type.QUOTE_DOUBLE:
-      case Type.QUOTE_SINGLE:
-        return Schema.defaultTags.STR
-      case Type.FLOW_MAP:
-      case Type.MAP:
-        return Schema.defaultTags.MAP
-      case Type.FLOW_SEQ:
-      case Type.SEQ:
-        return Schema.defaultTags.SEQ
-      case Type.PLAIN:
-        return nonSpecific ? Schema.defaultTags.STR : null
-      default:
-        return null
-    }
-  }
-
   resolveNode(node) {
     if (!node) return null
     const { anchors, errors, schema } = this
@@ -298,7 +237,7 @@ export class Document {
       res = new Alias(src)
       anchors._cstAliases.push(res)
     } else {
-      const tagName = this.resolveTagName(node)
+      const tagName = resolveTagName(this, node)
       if (tagName) {
         res = schema.resolveNodeWithFallback(this, node, tagName)
       } else {
