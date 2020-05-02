@@ -1,7 +1,7 @@
-import { YAMLMap } from './Map'
 import { Pair } from './Pair'
 import { Scalar } from './Scalar'
-import { YAMLSeq } from './Seq'
+import { YAMLMap } from './YAMLMap'
+import { YAMLSeq } from './YAMLSeq'
 
 export const MERGE_KEY = '<<'
 

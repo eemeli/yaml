@@ -1,9 +1,9 @@
 import { YAMLSemanticError } from '../../errors'
 import { toJSON } from '../../toJSON'
-import { YAMLMap } from '../../schema/Map'
 import { Pair } from '../../schema/Pair'
 import { Scalar } from '../../schema/Scalar'
-import { YAMLSeq } from '../../schema/Seq'
+import { YAMLMap } from '../../schema/YAMLMap'
+import { YAMLSeq } from '../../schema/YAMLSeq'
 import { createPairs, parsePairs } from './pairs'
 
 export class YAMLOMap extends YAMLSeq {

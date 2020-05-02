@@ -6,7 +6,7 @@ import { toJSON } from '../toJSON'
 import { Collection } from './Collection'
 import { Node } from './Node'
 import { Scalar } from './Scalar'
-import { YAMLSeq } from './Seq'
+import { YAMLSeq } from './YAMLSeq'
 
 const stringifyKey = (key, jsKey, ctx) => {
   if (jsKey === null) return ''

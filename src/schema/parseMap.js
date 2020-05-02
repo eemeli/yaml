@@ -2,16 +2,17 @@ import { Char, Type } from '../constants'
 import { PlainValue } from '../cst/PlainValue'
 import { resolveNode } from '../doc/resolveNode'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
-import { YAMLMap } from './Map'
+
+import { Alias } from './Alias'
+import { Collection } from './Collection'
 import { Merge, MERGE_KEY } from './Merge'
 import { Pair } from './Pair'
+import { YAMLMap } from './YAMLMap'
 import {
   checkFlowCollectionEnd,
   checkKeyLength,
   resolveComments
 } from './parseUtils'
-import { Alias } from './Alias'
-import { Collection } from './Collection'
 
 export function parseMap(doc, cst) {
   if (cst.type !== Type.MAP && cst.type !== Type.FLOW_MAP) {

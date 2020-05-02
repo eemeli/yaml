@@ -1,14 +1,15 @@
 import { Type } from '../constants'
 import { resolveNode } from '../doc/resolveNode'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
+
+import { Collection } from './Collection'
 import { Pair } from './Pair'
+import { YAMLSeq } from './YAMLSeq'
 import {
   checkFlowCollectionEnd,
   checkKeyLength,
   resolveComments
 } from './parseUtils'
-import { YAMLSeq } from './Seq'
-import { Collection } from './Collection'
 
 export function parseSeq(doc, cst) {
   if (cst.type !== Type.SEQ && cst.type !== Type.FLOW_SEQ) {

@@ -1,4 +1,4 @@
-import { YAMLMap } from '../../schema/Map'
+import { YAMLMap } from '../../schema/YAMLMap'
 import { parseMap } from '../../schema/parseMap'
 
 function createMap(schema, obj, ctx) {
