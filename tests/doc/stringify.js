@@ -2,7 +2,7 @@
 
 import { source } from 'common-tags'
 import { YAML } from '../../src/index'
-import { Pair } from '../../src/schema/Pair'
+import { Pair } from '../../src/schema'
 import { Type } from '../../src/constants'
 import { stringifyString } from '../../src/stringify/stringifyString'
 

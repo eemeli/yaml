@@ -1,6 +1,4 @@
-export { findPair } from './dist/schema/Map'
-export { parseMap } from './dist/schema/parseMap'
-export { parseSeq } from './dist/schema/parseSeq'
+export { findPair, parseMap, parseSeq } from './dist/schema'
 
 export { stringifyNumber } from './dist/stringify/stringifyNumber'
 export { stringifyString } from './dist/stringify/stringifyString'

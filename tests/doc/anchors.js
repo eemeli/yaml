@@ -1,6 +1,5 @@
 import { YAML } from '../../src/index'
-import { YAMLMap } from '../../src/schema/Map'
-import { Merge } from '../../src/schema/Merge'
+import { Merge, YAMLMap } from '../../src/schema'
 
 test('basic', () => {
   const src = `- &a 1\n- *a\n`

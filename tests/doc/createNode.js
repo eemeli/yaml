@@ -1,8 +1,5 @@
 import { YAML } from '../../src/index'
-import { YAMLMap } from '../../src/schema/Map'
-import { Pair } from '../../src/schema/Pair'
-import { Scalar } from '../../src/schema/Scalar'
-import { YAMLSeq } from '../../src/schema/Seq'
+import { Pair, Scalar, YAMLMap, YAMLSeq } from '../../src/schema'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set'
 
 describe('scalars', () => {

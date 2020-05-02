@@ -1,6 +1,6 @@
 import { Type } from '../constants'
 import { YAMLSyntaxError } from '../errors'
-import { Collection } from '../schema/Collection'
+import { Collection } from '../schema'
 import { resolveNode } from './resolveNode'
 
 export function parseContents(doc, contents) {

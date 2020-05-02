@@ -1,2 +1,2 @@
-module.exports = require('./dist/schema/Map').YAMLMap
+module.exports = require('./dist/schema').YAMLMap
 require('./dist/warnings').warnFileDeprecation(__filename)

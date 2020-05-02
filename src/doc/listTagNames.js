@@ -1,6 +1,4 @@
-import { Collection } from '../schema/Collection'
-import { Pair } from '../schema/Pair'
-import { Scalar } from '../schema/Scalar'
+import { Collection, Pair, Scalar } from '../schema'
 
 const visit = (node, tags) => {
   if (node && typeof node === 'object') {

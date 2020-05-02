@@ -1,6 +1,7 @@
-exports.findPair = require('./dist/schema/Map').findPair
-exports.parseMap = require('./dist/schema/parseMap').parseMap
-exports.parseSeq = require('./dist/schema/parseSeq').parseSeq
+const schema = require('./dist/schema')
+exports.findPair = schema.findPair
+exports.parseMap = schema.parseMap
+exports.parseSeq = schema.parseSeq
 
 exports.stringifyNumber = require('./dist/stringify/stringifyNumber').stringifyNumber
 exports.stringifyString = require('./dist/stringify/stringifyString').stringifyString

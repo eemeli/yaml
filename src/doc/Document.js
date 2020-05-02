@@ -1,10 +1,7 @@
 import { addComment } from '../stringify/addComment'
 import { YAMLError } from '../errors'
 import { documentOptions } from '../options'
-import { Schema } from '../schema/Schema'
-import { Collection, isEmptyPath } from '../schema/Collection'
-import { Node } from '../schema/Node'
-import { Scalar } from '../schema/Scalar'
+import { Collection, Node, Scalar, Schema, isEmptyPath } from '../schema'
 import { toJSON } from '../toJSON'
 
 import { Anchors } from './Anchors'

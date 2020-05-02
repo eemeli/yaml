@@ -1,11 +1,7 @@
-import map from './dist/schema/Map.js'
-export const findPair = map.findPair
-
-import parseMapPkg from './dist/schema/parseMap.js'
-export const parseMap = parseMapPkg.parseMap
-
-import parseSeqPkg from './dist/schema/parseSeq.js'
-export const parseSeq = parseSeqPkg.parseSeq
+import schema from './dist/schema/index.js'
+export const findPair = schema.findPair
+export const parseMap = schema.parseMap
+export const parseSeq = schema.parseSeq
 
 import strNumPkg from './dist/stringify/stringifyNumber.js'
 export const stringifyNumber = strNumPkg.stringifyNumber

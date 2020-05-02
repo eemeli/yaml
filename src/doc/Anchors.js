@@ -1,8 +1,4 @@
-import { Alias } from '../schema/Alias'
-import { YAMLMap } from '../schema/Map'
-import { Merge } from '../schema/Merge'
-import { Scalar } from '../schema/Scalar'
-import { YAMLSeq } from '../schema/Seq'
+import { Alias, Merge, Scalar, YAMLMap, YAMLSeq } from '../schema'
 
 export class Anchors {
   static validAnchorNode(node) {
