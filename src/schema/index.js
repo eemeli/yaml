@@ -1,5 +1,5 @@
 import { warnOptionDeprecation } from '../warnings'
-import { Type } from '../constants'
+import { Type, defaultTagPrefix, defaultTags } from '../constants'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify'
 import { schemas, tags } from '../tags'
@@ -15,13 +15,8 @@ const isMap = ({ type }) => type === Type.FLOW_MAP || type === Type.MAP
 const isSeq = ({ type }) => type === Type.FLOW_SEQ || type === Type.SEQ
 
 export class Schema {
-  static defaultPrefix = 'tag:yaml.org,2002:'
-
-  static defaultTags = {
-    MAP: 'tag:yaml.org,2002:map',
-    SEQ: 'tag:yaml.org,2002:seq',
-    STR: 'tag:yaml.org,2002:str'
-  }
+  static defaultPrefix = defaultTagPrefix // TODO: remove in v2
+  static defaultTags = defaultTags // TODO: remove in v2
 
   constructor({
     customTags,

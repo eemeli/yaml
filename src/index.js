@@ -2,62 +2,8 @@ import { parse as parseCST } from './cst/parse'
 import { Document as YAMLDocument } from './Document'
 import { YAMLSemanticError } from './errors'
 import { Schema } from './schema'
-import {
-  binaryOptions,
-  boolOptions,
-  intOptions,
-  nullOptions,
-  strOptions
-} from './tags/options'
+import { defaultOptions, scalarOptions } from './options'
 import { warn } from './warnings'
-
-const defaultOptions = {
-  anchorPrefix: 'a',
-  customTags: null,
-  indent: 2,
-  indentSeq: true,
-  keepCstNodes: false,
-  keepNodeTypes: true,
-  keepBlobsInJSON: true,
-  mapAsMap: false,
-  maxAliasCount: 100,
-  prettyErrors: false, // TODO Set true in v2
-  simpleKeys: false,
-  version: '1.2'
-}
-
-const scalarOptions = {
-  get binary() {
-    return binaryOptions
-  },
-  set binary(opt) {
-    Object.assign(binaryOptions, opt)
-  },
-  get bool() {
-    return boolOptions
-  },
-  set bool(opt) {
-    Object.assign(boolOptions, opt)
-  },
-  get int() {
-    return intOptions
-  },
-  set int(opt) {
-    Object.assign(intOptions, opt)
-  },
-  get null() {
-    return nullOptions
-  },
-  set null(opt) {
-    Object.assign(nullOptions, opt)
-  },
-  get str() {
-    return strOptions
-  },
-  set str(opt) {
-    Object.assign(strOptions, opt)
-  }
-}
 
 function createNode(value, wrapScalars = true, tag) {
   if (tag === undefined && typeof wrapScalars === 'string') {

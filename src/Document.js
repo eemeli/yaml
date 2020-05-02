@@ -9,6 +9,7 @@ import {
   YAMLWarning
 } from './errors'
 import { listTagNames } from './listTagNames'
+import { documentOptions } from './options'
 import { Schema } from './schema'
 import { Alias } from './schema/Alias'
 import { Collection, isEmptyPath } from './schema/Collection'
@@ -20,32 +21,7 @@ const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
 export class Document {
-  static defaults = {
-    '1.0': {
-      schema: 'yaml-1.1',
-      merge: true,
-      tagPrefixes: [
-        { handle: '!', prefix: Schema.defaultPrefix },
-        { handle: '!!', prefix: 'tag:private.yaml.org,2002:' }
-      ]
-    },
-    '1.1': {
-      schema: 'yaml-1.1',
-      merge: true,
-      tagPrefixes: [
-        { handle: '!', prefix: '!' },
-        { handle: '!!', prefix: Schema.defaultPrefix }
-      ]
-    },
-    '1.2': {
-      schema: 'core',
-      merge: false,
-      tagPrefixes: [
-        { handle: '!', prefix: '!' },
-        { handle: '!!', prefix: Schema.defaultPrefix }
-      ]
-    }
-  }
+  static defaults = documentOptions
 
   constructor(options) {
     this.anchors = new Anchors(options.anchorPrefix)
