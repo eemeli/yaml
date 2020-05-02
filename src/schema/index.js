@@ -1,5 +1,6 @@
 import { warnOptionDeprecation } from '../warnings'
 import { Type, defaultTagPrefix, defaultTags } from '../constants'
+import { stringifyTag } from '../doc/stringifyTag'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify'
 import { schemas, tags } from '../tags'
@@ -233,9 +234,9 @@ export class Schema {
       props.push(`&${anchor}`)
     }
     if (node.tag) {
-      props.push(doc.stringifyTag(node.tag))
+      props.push(stringifyTag(doc, node.tag))
     } else if (!tagObj.default) {
-      props.push(doc.stringifyTag(tagObj.tag))
+      props.push(stringifyTag(doc, tagObj.tag))
     }
     return props.join(' ')
   }
