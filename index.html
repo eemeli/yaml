@@ -1148,7 +1148,7 @@ target:
 </code></pre>
 <p>To construct a <code>YAMLSeq</code> or <code>YAMLMap</code>, use <a href="#yaml-createnode"><code>YAML.createNode()</code></a> with array, object or iterable input, or create the collections directly by importing the classes from <code>yaml/types</code>.</p>
 
-<p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created by importing the class from <code>yaml/types</code> and using its <code>new Pair(key, value)</code> constructor.</p>
+<p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created either by importing the class from <code>yaml/types</code> and using its <code>new Pair(key, value)</code> constructor, or by using the <code>doc.schema.createPair(key, value)</code> method. The latter will recursively wrap the <code>key</code> and <code>value</code> as nodes.</p>
 <h2 id='comments'>Comments</h2><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---
