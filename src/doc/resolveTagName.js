@@ -1,6 +1,6 @@
 import { YAMLSemanticError, YAMLWarning } from '../errors'
 import { Type } from '../constants'
-import { Schema } from '../schema'
+import { Schema } from '../schema/Schema'
 
 function resolveTagHandle(doc, node) {
   const { handle, suffix } = node.tag

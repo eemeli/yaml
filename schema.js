@@ -1,4 +1,4 @@
-module.exports = require('./dist/schema').Schema
+module.exports = require('./dist/schema/Schema').Schema
 const opt = require('./dist/tags/options')
 module.exports.nullOptions = opt.nullOptions
 module.exports.strOptions = opt.strOptions

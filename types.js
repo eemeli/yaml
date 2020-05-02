@@ -5,7 +5,7 @@ exports.intOptions = opt.intOptions
 exports.nullOptions = opt.nullOptions
 exports.strOptions = opt.strOptions
 
-exports.Schema = require('./dist/schema').Schema
+exports.Schema = require('./dist/schema/Schema').Schema
 exports.YAMLMap = require('./dist/schema/Map').YAMLMap
 exports.YAMLSeq = require('./dist/schema/Seq').YAMLSeq
 exports.Pair = require('./dist/schema/Pair').Pair

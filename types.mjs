@@ -5,7 +5,7 @@ export const intOptions = opt.intOptions
 export const nullOptions = opt.nullOptions
 export const strOptions = opt.strOptions
 
-import schema from './dist/schema/index.js'
+import schema from './dist/schema/Schema.js'
 export const Schema = schema.Schema
 
 import map from './dist/schema/Map.js'

@@ -6,7 +6,7 @@ export {
   strOptions
 } from './dist/tags/options'
 
-export { Schema } from './dist/schema'
+export { Schema } from './dist/schema/Schema'
 export { YAMLMap } from './dist/schema/Map'
 export { YAMLSeq } from './dist/schema/Seq'
 export { Pair } from './dist/schema/Pair'
