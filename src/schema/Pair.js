@@ -1,6 +1,6 @@
 // Published as 'yaml/pair'
 
-import { addComment } from '../addComment'
+import { addComment } from '../stringify/addComment'
 import { Type } from '../constants'
 import { toJSON } from '../toJSON'
 import { Collection } from './Collection'

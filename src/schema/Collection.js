@@ -1,4 +1,4 @@
-import { addComment } from '../addComment'
+import { addComment } from '../stringify/addComment'
 import { Type } from '../constants'
 import { Node } from './Node'
 import { Scalar } from './Scalar'

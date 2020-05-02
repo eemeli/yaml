@@ -1,4 +1,4 @@
-import { addComment } from '../addComment'
+import { addComment } from '../stringify/addComment'
 import { YAMLError } from '../errors'
 import { documentOptions } from '../options'
 import { Schema } from '../schema'

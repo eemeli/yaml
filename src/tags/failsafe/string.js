@@ -1,4 +1,4 @@
-import { stringifyString } from '../../stringify'
+import { stringifyString } from '../../stringify/stringifyString'
 import { strOptions } from '../options'
 
 export const resolveString = (doc, node) => {

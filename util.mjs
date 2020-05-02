@@ -7,9 +7,11 @@ export const parseMap = parseMapPkg.parseMap
 import parseSeqPkg from './dist/schema/parseSeq.js'
 export const parseSeq = parseSeqPkg.parseSeq
 
-import str from './dist/stringify.js'
-export const stringifyNumber = str.stringifyNumber
-export const stringifyString = str.stringifyString
+import strNumPkg from './dist/stringify/stringifyNumber.js'
+export const stringifyNumber = strNumPkg.stringifyNumber
+
+import strStrPkg from './dist/stringify/stringifyString.js'
+export const stringifyString = strStrPkg.stringifyString
 
 import toJsonPkg from './dist/toJSON.js'
 export const toJSON = toJsonPkg.toJSON

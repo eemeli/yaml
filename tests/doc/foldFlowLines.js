@@ -2,7 +2,7 @@ import {
   foldFlowLines as fold,
   FOLD_FLOW,
   FOLD_QUOTED
-} from '../../src/foldFlowLines'
+} from '../../src/stringify/foldFlowLines'
 import { YAML } from '../../src/index'
 
 describe('plain', () => {

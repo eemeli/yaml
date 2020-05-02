@@ -4,7 +4,7 @@ import { source } from 'common-tags'
 import { YAML } from '../../src/index'
 import { Pair } from '../../src/schema/Pair'
 import { Type } from '../../src/constants'
-import { stringifyString } from '../../src/stringify'
+import { stringifyString } from '../../src/stringify/stringifyString'
 
 for (const [name, version] of [
   ['YAML 1.1', '1.1'],

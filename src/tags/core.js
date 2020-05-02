@@ -1,7 +1,7 @@
 /* global BigInt */
 
 import { Scalar } from '../schema/Scalar'
-import { stringifyNumber } from '../stringify'
+import { stringifyNumber } from '../stringify/stringifyNumber'
 import { failsafe } from './failsafe'
 import { boolOptions, intOptions, nullOptions } from './options'
 

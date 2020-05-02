@@ -2,7 +2,7 @@
 
 import { Type } from '../../constants'
 import { YAMLReferenceError } from '../../errors'
-import { stringifyString } from '../../stringify'
+import { stringifyString } from '../../stringify/stringifyString'
 import { resolveString } from '../failsafe/string'
 import { binaryOptions as options } from '../options'
 
