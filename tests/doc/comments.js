@@ -513,7 +513,7 @@ describe('blank lines', () => {
     }
 
     test('as contents', () => {
-      const src = '|+\n a\n\n#c\n'
+      const src = '|+\n  a\n\n#c\n'
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
         comment: 'c',

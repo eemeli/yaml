@@ -13,6 +13,8 @@ const getFoldOptions = ({ indentAtStart }) =>
     ? Object.assign({ indentAtStart }, strOptions.fold)
     : strOptions.fold
 
+const containsDocumentMarker = str => /^(---|\.\.\.)/m.test(str)
+
 export function stringifyNumber({ format, minFractionDigits, tag, value }) {
   if (typeof value === 'bigint') return String(value)
   if (!isFinite(value))
@@ -49,10 +51,11 @@ function lineLengthOverLimit(str, limit) {
 }
 
 function doubleQuotedString(value, ctx) {
-  const { implicitKey, indent } = ctx
+  const { implicitKey } = ctx
   const { jsonEncoding, minMultiLineLength } = strOptions.doubleQuoted
   const json = JSON.stringify(value)
   if (jsonEncoding) return json
+  const indent = ctx.indent || (containsDocumentMarker(value) ? '  ' : '')
   let str = ''
   let start = 0
   for (let i = 0, ch = json[i]; ch; ch = json[++i]) {
@@ -138,16 +141,16 @@ function doubleQuotedString(value, ctx) {
 }
 
 function singleQuotedString(value, ctx) {
-  const { indent, implicitKey } = ctx
-  if (implicitKey) {
+  if (ctx.implicitKey) {
     if (/\n/.test(value)) return doubleQuotedString(value, ctx)
   } else {
     // single quoted string can't have leading or trailing whitespace around newline
     if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, ctx)
   }
+  const indent = ctx.indent || (containsDocumentMarker(value) ? '  ' : '')
   const res =
     "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'"
-  return implicitKey
+  return ctx.implicitKey
     ? res
     : foldFlowLines(res, indent, FOLD_FLOW, getFoldOptions(ctx))
 }
@@ -158,7 +161,9 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
   if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
     return doubleQuotedString(value, ctx)
   }
-  const indent = ctx.indent || (ctx.forceBlockIndent ? ' ' : '')
+  const indent =
+    ctx.indent ||
+    (ctx.forceBlockIndent || containsDocumentMarker(value) ? '  ' : '')
   const indentSize = indent ? '2' : '1' // root is at -1
   const literal =
     type === Type.BLOCK_FOLDED
@@ -252,6 +257,10 @@ function plainString(item, ctx, onComment, onChompKeep) {
     value.indexOf('\n') !== -1
   ) {
     // Where allowed & type not set explicitly, prefer block style for multiline strings
+    return blockString(item, ctx, onComment, onChompKeep)
+  }
+  if (indent === '' && containsDocumentMarker(value)) {
+    ctx.forceBlockIndent = true
     return blockString(item, ctx, onComment, onChompKeep)
   }
   const str = value.replace(/\n+/g, `$&\n${indent}`)
