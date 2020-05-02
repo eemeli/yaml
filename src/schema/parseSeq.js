@@ -1,4 +1,5 @@
 import { Type } from '../constants'
+import { resolveNode } from '../doc/resolveNode'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
 import { Pair } from './Pair'
 import {
@@ -48,7 +49,7 @@ function resolveBlockSeqItems(doc, cst) {
         break
       case Type.SEQ_ITEM:
         if (item.error) doc.errors.push(item.error)
-        items.push(doc.resolveNode(item.node))
+        items.push(resolveNode(doc, item.node))
         if (item.hasProps) {
           const msg =
             'Sequence items cannot have tags or anchors before the - indicator'
@@ -118,7 +119,7 @@ function resolveFlowSeqItems(doc, cst) {
         const msg = `Expected a ${next} in flow sequence`
         doc.errors.push(new YAMLSemanticError(item, msg))
       }
-      const value = doc.resolveNode(item)
+      const value = resolveNode(doc, item)
       if (key === undefined) {
         items.push(value)
       } else {

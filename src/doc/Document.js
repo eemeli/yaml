@@ -1,14 +1,7 @@
 import { addComment } from '../addComment'
-import { Char, Type } from '../constants'
-import {
-  YAMLError,
-  YAMLReferenceError,
-  YAMLSemanticError,
-  YAMLSyntaxError
-} from '../errors'
+import { YAMLError } from '../errors'
 import { documentOptions } from '../options'
 import { Schema } from '../schema'
-import { Alias } from '../schema/Alias'
 import { Collection, isEmptyPath } from '../schema/Collection'
 import { Node } from '../schema/Node'
 import { Scalar } from '../schema/Scalar'
@@ -18,10 +11,6 @@ import { Anchors } from './Anchors'
 import { listTagNames } from './listTagNames'
 import { parseContents } from './parseContents'
 import { parseDirectives } from './parseDirectives'
-import { resolveTagName } from './resolveTagName'
-
-const isCollectionItem = node =>
-  node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
 
 export class Document {
   static defaults = documentOptions
@@ -161,114 +150,6 @@ export class Document {
         if (warn instanceof YAMLError) warn.makePretty()
     }
     return this
-  }
-
-  resolveNode(node) {
-    if (!node) return null
-    const { anchors, errors, schema } = this
-    let hasAnchor = false
-    let hasTag = false
-    const comments = { before: [], after: [] }
-    const props = isCollectionItem(node.context.parent)
-      ? node.context.parent.props.concat(node.props)
-      : node.props
-    for (const { start, end } of props) {
-      switch (node.context.src[start]) {
-        case Char.COMMENT:
-          {
-            if (!node.commentHasRequiredWhitespace(start)) {
-              const msg =
-                'Comments must be separated from other tokens by white space characters'
-              errors.push(new YAMLSemanticError(node, msg))
-            }
-            const c = node.context.src.slice(start + 1, end)
-            const { header, valueRange } = node
-            if (
-              valueRange &&
-              (start > valueRange.start || (header && start > header.start))
-            ) {
-              comments.after.push(c)
-            } else {
-              comments.before.push(c)
-            }
-          }
-          break
-        case Char.ANCHOR:
-          if (hasAnchor) {
-            const msg = 'A node can have at most one anchor'
-            errors.push(new YAMLSemanticError(node, msg))
-          }
-          hasAnchor = true
-          break
-        case Char.TAG:
-          if (hasTag) {
-            const msg = 'A node can have at most one tag'
-            errors.push(new YAMLSemanticError(node, msg))
-          }
-          hasTag = true
-          break
-      }
-    }
-    if (hasAnchor) {
-      const name = node.anchor
-      const prev = anchors.getNode(name)
-      // At this point, aliases for any preceding node with the same anchor
-      // name have already been resolved, so it may safely be renamed.
-      if (prev) anchors.map[anchors.newName(name)] = prev
-      // During parsing, we need to store the CST node in anchors.map as
-      // anchors need to be available during resolution to allow for
-      // circular references.
-      anchors.map[name] = node
-    }
-    let res
-    if (node.type === Type.ALIAS) {
-      if (hasAnchor || hasTag) {
-        const msg = 'An alias node must not specify any properties'
-        errors.push(new YAMLSemanticError(node, msg))
-      }
-      const name = node.rawValue
-      const src = anchors.getNode(name)
-      if (!src) {
-        const msg = `Aliased anchor not found: ${name}`
-        errors.push(new YAMLReferenceError(node, msg))
-        return null
-      }
-      // Lazy resolution for circular references
-      res = new Alias(src)
-      anchors._cstAliases.push(res)
-    } else {
-      const tagName = resolveTagName(this, node)
-      if (tagName) {
-        res = schema.resolveNodeWithFallback(this, node, tagName)
-      } else {
-        if (node.type !== Type.PLAIN) {
-          const msg = `Failed to resolve ${node.type} node here`
-          errors.push(new YAMLSyntaxError(node, msg))
-          return null
-        }
-        try {
-          res = schema.resolveScalar(node.strValue || '')
-        } catch (error) {
-          if (!error.source) error.source = node
-          errors.push(error)
-          return null
-        }
-      }
-    }
-    if (res) {
-      res.range = [node.range.start, node.range.end]
-      if (this.options.keepCstNodes) res.cstNode = node
-      if (this.options.keepNodeTypes) res.type = node.type
-      const cb = comments.before.join('\n')
-      if (cb) {
-        res.commentBefore = res.commentBefore
-          ? `${res.commentBefore}\n${cb}`
-          : cb
-      }
-      const ca = comments.after.join('\n')
-      if (ca) res.comment = res.comment ? `${res.comment}\n${ca}` : ca
-    }
-    return (node.resolved = res)
   }
 
   listNonDefaultTags() {

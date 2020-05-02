@@ -1,6 +1,7 @@
 import { Type } from '../constants'
 import { YAMLSyntaxError } from '../errors'
 import { Collection } from '../schema/Collection'
+import { resolveNode } from './resolveNode'
 
 export function parseContents(doc, contents) {
   const comments = { before: [], after: [] }
@@ -12,7 +13,7 @@ export function parseContents(doc, contents) {
         const msg = 'Document is not valid YAML (bad indentation?)'
         doc.errors.push(new YAMLSyntaxError(node, msg))
       }
-      const res = doc.resolveNode(node)
+      const res = resolveNode(doc, node)
       if (spaceBefore) {
         res.spaceBefore = true
         spaceBefore = false

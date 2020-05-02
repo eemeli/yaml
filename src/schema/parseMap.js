@@ -1,5 +1,6 @@
 import { Char, Type } from '../constants'
 import { PlainValue } from '../cst/PlainValue'
+import { resolveNode } from '../doc/resolveNode'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
 import { YAMLMap } from './Map'
 import { Merge, MERGE_KEY } from './Merge'
@@ -118,7 +119,7 @@ function resolveBlockMapItems(doc, cst) {
       case Type.MAP_KEY:
         if (key !== undefined) items.push(new Pair(key))
         if (item.error) doc.errors.push(item.error)
-        key = doc.resolveNode(item.node)
+        key = resolveNode(doc, item.node)
         keyStart = null
         break
       case Type.MAP_VALUE:
@@ -150,7 +151,7 @@ function resolveBlockMapItems(doc, cst) {
               valueNode.valueRange.origStart = valueNode.valueRange.origEnd = origPos
             }
           }
-          const pair = new Pair(key, doc.resolveNode(valueNode))
+          const pair = new Pair(key, resolveNode(doc, valueNode))
           resolvePairComment(item, pair)
           items.push(pair)
           checkKeyLength(doc.errors, cst, i, key, keyStart)
@@ -160,7 +161,7 @@ function resolveBlockMapItems(doc, cst) {
         break
       default:
         if (key !== undefined) items.push(new Pair(key))
-        key = doc.resolveNode(item)
+        key = resolveNode(doc, item)
         keyStart = item.range.start
         if (item.error) doc.errors.push(item.error)
         next: for (let j = i + 1; ; ++j) {
@@ -252,7 +253,7 @@ function resolveFlowMapItems(doc, cst) {
         doc.errors.push(
           new YAMLSemanticError(item, 'Separator , missing in flow map')
         )
-      key = doc.resolveNode(item)
+      key = resolveNode(doc, item)
       keyStart = explicitKey ? null : item.range.start
       // TODO: add error for non-explicit multiline plain key
     } else {
@@ -260,7 +261,7 @@ function resolveFlowMapItems(doc, cst) {
         doc.errors.push(
           new YAMLSemanticError(item, 'Indicator : missing in flow map entry')
         )
-      items.push(new Pair(key, doc.resolveNode(item)))
+      items.push(new Pair(key, resolveNode(doc, item)))
       key = undefined
       explicitKey = false
     }
