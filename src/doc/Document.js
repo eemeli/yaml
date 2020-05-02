@@ -1,21 +1,23 @@
-import { addComment } from './addComment'
-import { Anchors } from './Anchors'
-import { Char, Type } from './constants'
+import { addComment } from '../addComment'
+import { Char, Type } from '../constants'
 import {
   YAMLError,
   YAMLReferenceError,
   YAMLSemanticError,
-  YAMLSyntaxError,
-  YAMLWarning
-} from './errors'
+  YAMLSyntaxError
+} from '../errors'
+import { documentOptions } from '../options'
+import { Schema } from '../schema'
+import { Alias } from '../schema/Alias'
+import { Collection, isEmptyPath } from '../schema/Collection'
+import { Node } from '../schema/Node'
+import { Scalar } from '../schema/Scalar'
+import { toJSON } from '../toJSON'
+
+import { Anchors } from './Anchors'
 import { listTagNames } from './listTagNames'
-import { documentOptions } from './options'
-import { Schema } from './schema'
-import { Alias } from './schema/Alias'
-import { Collection, isEmptyPath } from './schema/Collection'
-import { Node } from './schema/Node'
-import { Scalar } from './schema/Scalar'
-import { toJSON } from './toJSON'
+import { parseContents } from './parseContents'
+import { parseDirectives } from './parseDirectives'
 
 const isCollectionItem = node =>
   node && [Type.MAP_KEY, Type.MAP_VALUE, Type.SEQ_ITEM].includes(node.type)
@@ -144,12 +146,12 @@ export class Document {
       if (!error.source) error.source = this
       this.errors.push(error)
     }
-    this.parseDirectives(directives, prevDoc)
+    parseDirectives(this, directives, prevDoc)
     if (directivesEndMarker) this.directivesEndMarker = true
     this.range = valueRange ? [valueRange.start, valueRange.end] : null
     this.setSchema()
     this.anchors._cstAliases = []
-    this.parseContents(contents)
+    parseContents(this, contents)
     this.anchors.resolveNodes()
     if (this.options.prettyErrors) {
       for (const error of this.errors)
@@ -158,143 +160,6 @@ export class Document {
         if (warn instanceof YAMLError) warn.makePretty()
     }
     return this
-  }
-
-  parseDirectives(directives, prevDoc) {
-    const directiveComments = []
-    let hasDirectives = false
-    directives.forEach(directive => {
-      const { comment, name } = directive
-      switch (name) {
-        case 'TAG':
-          this.resolveTagDirective(directive)
-          hasDirectives = true
-          break
-        case 'YAML':
-        case 'YAML:1.0':
-          this.resolveYamlDirective(directive)
-          hasDirectives = true
-          break
-        default:
-          if (name) {
-            const msg = `YAML only supports %TAG and %YAML directives, and not %${name}`
-            this.warnings.push(new YAMLWarning(directive, msg))
-          }
-      }
-      if (comment) directiveComments.push(comment)
-    })
-    if (
-      prevDoc &&
-      !hasDirectives &&
-      '1.1' === (this.version || prevDoc.version || this.options.version)
-    ) {
-      const copyTagPrefix = ({ handle, prefix }) => ({ handle, prefix })
-      this.tagPrefixes = prevDoc.tagPrefixes.map(copyTagPrefix)
-      this.version = prevDoc.version
-    }
-    this.commentBefore = directiveComments.join('\n') || null
-  }
-
-  parseContents(contents) {
-    const comments = { before: [], after: [] }
-    const contentNodes = []
-    let spaceBefore = false
-    contents.forEach(node => {
-      if (node.valueRange) {
-        if (contentNodes.length === 1) {
-          const msg = 'Document is not valid YAML (bad indentation?)'
-          this.errors.push(new YAMLSyntaxError(node, msg))
-        }
-        const res = this.resolveNode(node)
-        if (spaceBefore) {
-          res.spaceBefore = true
-          spaceBefore = false
-        }
-        contentNodes.push(res)
-      } else if (node.comment !== null) {
-        const cc = contentNodes.length === 0 ? comments.before : comments.after
-        cc.push(node.comment)
-      } else if (node.type === Type.BLANK_LINE) {
-        spaceBefore = true
-        if (
-          contentNodes.length === 0 &&
-          comments.before.length > 0 &&
-          !this.commentBefore
-        ) {
-          // space-separated comments at start are parsed as document comments
-          this.commentBefore = comments.before.join('\n')
-          comments.before = []
-        }
-      }
-    })
-    switch (contentNodes.length) {
-      case 0:
-        this.contents = null
-        comments.after = comments.before
-        break
-      case 1:
-        this.contents = contentNodes[0]
-        if (this.contents) {
-          const cb = comments.before.join('\n') || null
-          if (cb) {
-            const cbNode =
-              this.contents instanceof Collection && this.contents.items[0]
-                ? this.contents.items[0]
-                : this.contents
-            cbNode.commentBefore = cbNode.commentBefore
-              ? `${cb}\n${cbNode.commentBefore}`
-              : cb
-          }
-        } else {
-          comments.after = comments.before.concat(comments.after)
-        }
-        break
-      default:
-        this.contents = contentNodes
-        if (this.contents[0]) {
-          this.contents[0].commentBefore = comments.before.join('\n') || null
-        } else {
-          comments.after = comments.before.concat(comments.after)
-        }
-    }
-    this.comment = comments.after.join('\n') || null
-  }
-
-  resolveTagDirective(directive) {
-    const [handle, prefix] = directive.parameters
-    if (handle && prefix) {
-      if (this.tagPrefixes.every(p => p.handle !== handle)) {
-        this.tagPrefixes.push({ handle, prefix })
-      } else {
-        const msg =
-          'The %TAG directive must only be given at most once per handle in the same document.'
-        this.errors.push(new YAMLSemanticError(directive, msg))
-      }
-    } else {
-      const msg = 'Insufficient parameters given for %TAG directive'
-      this.errors.push(new YAMLSemanticError(directive, msg))
-    }
-  }
-
-  resolveYamlDirective(directive) {
-    let [version] = directive.parameters
-    if (directive.name === 'YAML:1.0') version = '1.0'
-    if (this.version) {
-      const msg =
-        'The %YAML directive must only be given at most once per document.'
-      this.errors.push(new YAMLSemanticError(directive, msg))
-    }
-    if (!version) {
-      const msg = 'Insufficient parameters given for %YAML directive'
-      this.errors.push(new YAMLSemanticError(directive, msg))
-    } else {
-      if (!Document.defaults[version]) {
-        const v0 = this.version || this.options.version
-        const msg = `Document will be parsed as YAML ${v0} rather than YAML ${version}`
-        this.warnings.push(new YAMLWarning(directive, msg))
-      }
-      this.version = version
-    }
   }
 
   resolveTagName(node) {
