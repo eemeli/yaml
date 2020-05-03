@@ -1,6 +1,5 @@
-import { Type } from '../constants'
+import { Type, defaultTags } from '../constants'
 import { YAMLSemanticError, YAMLWarning } from '../errors'
-import { Schema } from '../doc/Schema'
 
 function resolveTagHandle(doc, node) {
   const { handle, suffix } = node.tag
@@ -61,15 +60,15 @@ export function resolveTagName(doc, node) {
     case Type.BLOCK_LITERAL:
     case Type.QUOTE_DOUBLE:
     case Type.QUOTE_SINGLE:
-      return Schema.defaultTags.STR
+      return defaultTags.STR
     case Type.FLOW_MAP:
     case Type.MAP:
-      return Schema.defaultTags.MAP
+      return defaultTags.MAP
     case Type.FLOW_SEQ:
     case Type.SEQ:
-      return Schema.defaultTags.SEQ
+      return defaultTags.SEQ
     case Type.PLAIN:
-      return nonSpecific ? Schema.defaultTags.STR : null
+      return nonSpecific ? defaultTags.STR : null
     default:
       return null
   }
