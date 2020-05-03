@@ -11,6 +11,11 @@ import { listTagNames } from './listTagNames'
 import { parseContents } from './parseContents'
 import { parseDirectives } from './parseDirectives'
 
+function assertCollection(contents) {
+  if (contents instanceof Collection) return true
+  throw new Error('Expected a YAML collection as document contents')
+}
+
 export class Document {
   static defaults = documentOptions
 
@@ -28,23 +33,18 @@ export class Document {
     this.warnings = []
   }
 
-  assertCollectionContents() {
-    if (this.contents instanceof Collection) return true
-    throw new Error('Expected a YAML collection as document contents')
-  }
-
   add(value) {
-    this.assertCollectionContents()
+    assertCollection(this.contents)
     return this.contents.add(value)
   }
 
   addIn(path, value) {
-    this.assertCollectionContents()
+    assertCollection(this.contents)
     this.contents.addIn(path, value)
   }
 
   delete(key) {
-    this.assertCollectionContents()
+    assertCollection(this.contents)
     return this.contents.delete(key)
   }
 
@@ -54,7 +54,7 @@ export class Document {
       this.contents = null
       return true
     }
-    this.assertCollectionContents()
+    assertCollection(this.contents)
     return this.contents.deleteIn(path)
   }
 
@@ -94,14 +94,14 @@ export class Document {
   }
 
   set(key, value) {
-    this.assertCollectionContents()
+    assertCollection(this.contents)
     this.contents.set(key, value)
   }
 
   setIn(path, value) {
     if (isEmptyPath(path)) this.contents = value
     else {
-      this.assertCollectionContents()
+      assertCollection(this.contents)
       this.contents.setIn(path, value)
     }
   }
