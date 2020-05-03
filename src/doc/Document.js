@@ -1,11 +1,12 @@
 import { YAMLError } from '../errors'
 import { documentOptions } from '../options'
-import { Collection, Node, Scalar, Schema, isEmptyPath } from '../schema'
+import { Collection, Node, Scalar, isEmptyPath } from '../schema'
 import { addComment } from '../stringify/addComment'
 import { stringify } from '../stringify/stringify'
 import { toJSON } from '../toJSON'
 
 import { Anchors } from './Anchors'
+import { Schema } from './Schema'
 import { listTagNames } from './listTagNames'
 import { parseContents } from './parseContents'
 import { parseDirectives } from './parseDirectives'

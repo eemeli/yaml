@@ -1,4 +1,4 @@
-export { Schema } from './Schema'
+export { Schema } from '../doc/Schema'
 
 export { Alias } from './Alias'
 export { Collection, isEmptyPath } from './Collection'
