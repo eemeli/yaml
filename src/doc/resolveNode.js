@@ -8,6 +8,7 @@ import { Alias } from '../schema/Alias'
 
 import { resolveScalar } from './resolveScalar'
 import { resolveTagName } from './resolveTagName'
+import { resolveTag } from './resolveTag'
 
 const isCollectionItem = node => {
   if (!node) return false
@@ -82,7 +83,7 @@ function resolveNodeValue(doc, node) {
   }
 
   const tagName = resolveTagName(doc, node)
-  if (tagName) return schema.resolveNodeWithFallback(doc, node, tagName)
+  if (tagName) return resolveTag(doc, node, tagName)
 
   if (node.type !== Type.PLAIN) {
     const msg = `Failed to resolve ${node.type} node here`
@@ -103,8 +104,10 @@ function resolveNodeValue(doc, node) {
   }
 }
 
+// sets node.resolved on success
 export function resolveNode(doc, node) {
   if (!node) return null
+  if (node.error) doc.errors.push(node.error)
 
   const { comments, hasAnchor, hasTag } = resolveNodeProps(doc.errors, node)
   if (hasAnchor) {

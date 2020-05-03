@@ -1,8 +1,6 @@
 import { warnOptionDeprecation } from '../warnings'
-import { Type, defaultTagPrefix, defaultTags } from '../constants'
-import { resolveTag } from '../doc/resolveTag'
+import { defaultTagPrefix, defaultTags } from '../constants'
 import { stringifyTag } from '../stringify/stringifyTag'
-import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify/stringifyString'
 import { schemas, tags } from '../tags'
 import { Alias } from './Alias'
@@ -10,10 +8,6 @@ import { Collection } from './Collection'
 import { Node } from './Node'
 import { Pair } from './Pair'
 import { Scalar } from './Scalar'
-
-const isMap = ({ type }) => type === Type.FLOW_MAP || type === Type.MAP
-
-const isSeq = ({ type }) => type === Type.FLOW_SEQ || type === Type.SEQ
 
 export class Schema {
   static defaultPrefix = defaultTagPrefix // TODO: remove in v2
@@ -122,33 +116,6 @@ export class Schema {
     const k = this.createNode(key, ctx.wrapScalars, null, ctx)
     const v = this.createNode(value, ctx.wrapScalars, null, ctx)
     return new Pair(k, v)
-  }
-
-  resolveNodeWithFallback(doc, node, tagName) {
-    const res = resolveTag(doc, node, tagName)
-    if (Object.prototype.hasOwnProperty.call(node, 'resolved')) return res
-    const fallback = isMap(node)
-      ? Schema.defaultTags.MAP
-      : isSeq(node)
-      ? Schema.defaultTags.SEQ
-      : Schema.defaultTags.STR
-    /* istanbul ignore else */
-    if (fallback) {
-      doc.warnings.push(
-        new YAMLWarning(
-          node,
-          `The tag ${tagName} is unavailable, falling back to ${fallback}`
-        )
-      )
-      const res = resolveTag(doc, node, fallback)
-      res.tag = tagName
-      return res
-    } else {
-      doc.errors.push(
-        new YAMLReferenceError(node, `The tag ${tagName} is unavailable`)
-      )
-      return null
-    }
   }
 
   getTagObject(item) {
