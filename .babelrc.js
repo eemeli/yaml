@@ -4,9 +4,7 @@ const plugins = [
 ]
 const envOptions = { modules: false, useBuiltIns: false }
 
-if (process.env.BABEL_ENV === 'browser') {
-  plugins.push('@babel/plugin-transform-runtime')
-} else {
+if (process.env.BABEL_ENV !== 'browser') {
   plugins.push(['@babel/plugin-transform-modules-commonjs', { strict: true }])
   envOptions.targets = { node: '6.5' }
 }

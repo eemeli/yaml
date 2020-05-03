@@ -9,5 +9,5 @@ export default {
     util: 'src/util.js'
   },
   output: { dir: 'browser/dist', format: 'esm' },
-  plugins: [babel({ babelHelpers: 'runtime' })]
+  plugins: [babel({ babelHelpers: 'bundled' })]
 }
