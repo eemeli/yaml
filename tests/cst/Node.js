@@ -1,6 +1,6 @@
-import { Type } from '../../src/constants'
-import { Node } from '../../src/cst/Node'
-import { Range } from '../../src/cst/Range'
+import { Type } from '../../src/constants.js'
+import { Node } from '../../src/cst/Node.js'
+import { Range } from '../../src/cst/Range.js'
 
 describe('internals', () => {
   test('constructor', () => {

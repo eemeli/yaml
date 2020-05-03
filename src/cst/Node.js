@@ -1,6 +1,6 @@
-import { Char, Type } from '../constants'
-import { getLinePos } from './source-utils'
-import { Range } from './Range'
+import { Char, Type } from '../constants.js'
+import { getLinePos } from './source-utils.js'
+import { Range } from './Range.js'
 
 /** Root class of all nodes */
 export class Node {

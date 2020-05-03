@@ -1,9 +1,9 @@
-import { Type } from '../constants'
-import { YAMLSemanticError } from '../errors'
-import { BlankLine } from './BlankLine'
-import { Comment } from './Comment'
-import { Node } from './Node'
-import { Range } from './Range'
+import { Type } from '../constants.js'
+import { YAMLSemanticError } from '../errors.js'
+import { BlankLine } from './BlankLine.js'
+import { Comment } from './Comment.js'
+import { Node } from './Node.js'
+import { Range } from './Range.js'
 
 export class FlowCollection extends Node {
   constructor(type, props) {

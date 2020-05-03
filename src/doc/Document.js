@@ -1,14 +1,14 @@
-import { Collection, Node, Scalar, isEmptyPath, toJSON } from '../ast'
-import { YAMLError } from '../errors'
-import { documentOptions } from '../options'
-import { addComment } from '../stringify/addComment'
-import { stringify } from '../stringify/stringify'
+import { Collection, Node, Scalar, isEmptyPath, toJSON } from '../ast/index.js'
+import { YAMLError } from '../errors.js'
+import { documentOptions } from '../options.js'
+import { addComment } from '../stringify/addComment.js'
+import { stringify } from '../stringify/stringify.js'
 
-import { Anchors } from './Anchors'
-import { Schema } from './Schema'
-import { listTagNames } from './listTagNames'
-import { parseContents } from './parseContents'
-import { parseDirectives } from './parseDirectives'
+import { Anchors } from './Anchors.js'
+import { Schema } from './Schema.js'
+import { listTagNames } from './listTagNames.js'
+import { parseContents } from './parseContents.js'
+import { parseDirectives } from './parseDirectives.js'
 
 function assertCollection(contents) {
   if (contents instanceof Collection) return true

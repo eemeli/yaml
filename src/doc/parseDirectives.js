@@ -1,5 +1,5 @@
-import { YAMLSemanticError, YAMLWarning } from '../errors'
-import { documentOptions } from '../options'
+import { YAMLSemanticError, YAMLWarning } from '../errors.js'
+import { documentOptions } from '../options.js'
 
 function resolveTagDirective({ tagPrefixes }, directive) {
   const [handle, prefix] = directive.parameters

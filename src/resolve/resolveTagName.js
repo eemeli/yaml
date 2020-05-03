@@ -1,5 +1,5 @@
-import { Type, defaultTags } from '../constants'
-import { YAMLSemanticError, YAMLWarning } from '../errors'
+import { Type, defaultTags } from '../constants.js'
+import { YAMLSemanticError, YAMLWarning } from '../errors.js'
 
 function resolveTagHandle(doc, node) {
   const { handle, suffix } = node.tag

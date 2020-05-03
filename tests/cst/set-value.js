@@ -1,6 +1,6 @@
-import { Type } from '../../src/constants'
-import { parse } from '../../src/cst/parse'
-import { CollectionItem } from '../../src/cst/CollectionItem'
+import { Type } from '../../src/constants.js'
+import { parse } from '../../src/cst/parse.js'
+import { CollectionItem } from '../../src/cst/CollectionItem.js'
 
 test('set value in collection', () => {
   const src = `- Mark McGwire

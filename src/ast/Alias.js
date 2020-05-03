@@ -1,9 +1,9 @@
-import { Type } from '../constants'
-import { YAMLReferenceError } from '../errors'
-import { Collection } from './Collection'
-import { Node } from './Node'
-import { Pair } from './Pair'
-import { toJSON } from './toJSON'
+import { Type } from '../constants.js'
+import { YAMLReferenceError } from '../errors.js'
+import { Collection } from './Collection.js'
+import { Node } from './Node.js'
+import { Pair } from './Pair.js'
+import { toJSON } from './toJSON.js'
 
 const getAliasCount = (node, anchors) => {
   if (node instanceof Alias) {

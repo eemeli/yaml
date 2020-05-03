@@ -2,8 +2,8 @@ import {
   foldFlowLines as fold,
   FOLD_FLOW,
   FOLD_QUOTED
-} from '../../src/stringify/foldFlowLines'
-import { YAML } from '../../src/index'
+} from '../../src/stringify/foldFlowLines.js'
+import { YAML } from '../../src/index.js'
 
 describe('plain', () => {
   const src = 'abc def ghi jkl mno pqr stu vwx yz\n'

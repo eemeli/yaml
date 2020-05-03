@@ -1,9 +1,9 @@
-import { Pair } from '../ast/Pair'
-import { defaultTagPrefix, defaultTags } from '../constants'
-import { schemas, tags } from '../tags'
-import { warnOptionDeprecation } from '../warnings'
-import { createNode } from './createNode'
-import { getSchemaTags } from './getSchemaTags'
+import { Pair } from '../ast/Pair.js'
+import { defaultTagPrefix, defaultTags } from '../constants.js'
+import { schemas, tags } from '../tags/index.js'
+import { warnOptionDeprecation } from '../warnings.js'
+import { createNode } from './createNode.js'
+import { getSchemaTags } from './getSchemaTags.js'
 
 const sortMapEntriesByKey = (a, b) =>
   a.key < b.key ? -1 : a.key > b.key ? 1 : 0

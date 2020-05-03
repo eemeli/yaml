@@ -1,13 +1,13 @@
-import { addCommentBefore } from './addComment'
-import { Type } from '../constants'
-import { resolveScalar } from '../resolve/resolveScalar'
+import { addCommentBefore } from './addComment.js'
+import { Type } from '../constants.js'
+import { resolveScalar } from '../resolve/resolveScalar.js'
 import {
   foldFlowLines,
   FOLD_BLOCK,
   FOLD_FLOW,
   FOLD_QUOTED
-} from './foldFlowLines'
-import { strOptions } from '../tags/options'
+} from './foldFlowLines.js'
+import { strOptions } from '../tags/options.js'
 
 const getFoldOptions = ({ indentAtStart }) =>
   indentAtStart

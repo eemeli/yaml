@@ -1,8 +1,8 @@
-import { YAMLSemanticError } from '../../errors'
-import { Pair } from '../../ast/Pair'
-import { YAMLMap } from '../../ast/YAMLMap'
-import { YAMLSeq } from '../../ast/YAMLSeq'
-import { resolveSeq } from '../../resolve/resolveSeq'
+import { YAMLSemanticError } from '../../errors.js'
+import { Pair } from '../../ast/Pair.js'
+import { YAMLMap } from '../../ast/YAMLMap.js'
+import { YAMLSeq } from '../../ast/YAMLSeq.js'
+import { resolveSeq } from '../../resolve/resolveSeq.js'
 
 export function parsePairs(doc, cst) {
   const seq = resolveSeq(doc, cst)

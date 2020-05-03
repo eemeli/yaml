@@ -1,9 +1,9 @@
-import { Type } from '../constants'
-import { BlankLine } from './BlankLine'
-import { CollectionItem } from './CollectionItem'
-import { Comment } from './Comment'
-import { Node } from './Node'
-import { Range } from './Range'
+import { Type } from '../constants.js'
+import { BlankLine } from './BlankLine.js'
+import { CollectionItem } from './CollectionItem.js'
+import { Comment } from './Comment.js'
+import { Node } from './Node.js'
+import { Range } from './Range.js'
 
 export function grabCollectionEndComments(node) {
   let cnode = node

@@ -1,4 +1,4 @@
-import { Scalar } from '../ast/Scalar'
+import { Scalar } from '../ast/Scalar.js'
 
 // falls back to string on no match
 export function resolveScalar(str, tags, scalarFallback) {

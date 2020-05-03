@@ -8,18 +8,18 @@ import {
   nanObj,
   expObj,
   floatObj
-} from './core'
-import { failsafe } from './failsafe'
-import { json } from './json'
-import { yaml11 } from './yaml-1.1'
+} from './core.js'
+import { failsafe } from './failsafe/index.js'
+import { json } from './json.js'
+import { yaml11 } from './yaml-1.1/index.js'
 
-import { map } from './failsafe/map'
-import { seq } from './failsafe/seq'
-import { binary } from './yaml-1.1/binary'
-import { omap } from './yaml-1.1/omap'
-import { pairs } from './yaml-1.1/pairs'
-import { set } from './yaml-1.1/set'
-import { floatTime, intTime, timestamp } from './yaml-1.1/timestamp'
+import { map } from './failsafe/map.js'
+import { seq } from './failsafe/seq.js'
+import { binary } from './yaml-1.1/binary.js'
+import { omap } from './yaml-1.1/omap.js'
+import { pairs } from './yaml-1.1/pairs.js'
+import { set } from './yaml-1.1/set.js'
+import { floatTime, intTime, timestamp } from './yaml-1.1/timestamp.js'
 
 export const schemas = { core, failsafe, json, yaml11 }
 export const tags = {

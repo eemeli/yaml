@@ -1,5 +1,5 @@
-import { Node } from './Node'
-import { toJSON } from './toJSON'
+import { Node } from './Node.js'
+import { toJSON } from './toJSON.js'
 
 export class Scalar extends Node {
   constructor(value) {

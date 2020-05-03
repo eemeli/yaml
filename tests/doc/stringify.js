@@ -1,10 +1,10 @@
 /* global BigInt */
 
 import { source } from 'common-tags'
-import { YAML } from '../../src/index'
-import { Pair } from '../../src/ast/index'
-import { Type } from '../../src/constants'
-import { stringifyString } from '../../src/stringify/stringifyString'
+import { YAML } from '../../src/index.js'
+import { Pair } from '../../src/ast/index.js'
+import { Type } from '../../src/constants.js'
+import { stringifyString } from '../../src/stringify/stringifyString.js'
 
 for (const [name, version] of [
   ['YAML 1.1', '1.1'],

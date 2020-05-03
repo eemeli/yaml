@@ -1,5 +1,5 @@
-import { YAMLSemanticError } from '../errors'
-import { Type } from '../constants'
+import { YAMLSemanticError } from '../errors.js'
+import { Type } from '../constants.js'
 
 export function checkFlowCollectionEnd(errors, cst) {
   let char, name

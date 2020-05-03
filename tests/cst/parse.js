@@ -1,4 +1,4 @@
-import { parse } from '../../src/cst/parse'
+import { parse } from '../../src/cst/parse.js'
 
 test('return value', () => {
   const src = '---\n- foo\n- bar\n'

@@ -1,6 +1,6 @@
-import { resolveString } from '../../resolve/resolveString'
-import { stringifyString } from '../../stringify/stringifyString'
-import { strOptions } from '../options'
+import { resolveString } from '../../resolve/resolveString.js'
+import { stringifyString } from '../../stringify/stringifyString.js'
+import { strOptions } from '../options.js'
 
 export const string = {
   identify: value => typeof value === 'string',

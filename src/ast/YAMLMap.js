@@ -1,6 +1,6 @@
-import { Collection } from './Collection'
-import { Pair } from './Pair'
-import { Scalar } from './Scalar'
+import { Collection } from './Collection.js'
+import { Pair } from './Pair.js'
+import { Scalar } from './Scalar.js'
 
 export function findPair(items, key) {
   const k = key instanceof Scalar ? key.value : key

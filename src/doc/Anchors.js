@@ -1,4 +1,4 @@
-import { Alias, Merge, Scalar, YAMLMap, YAMLSeq } from '../ast'
+import { Alias, Merge, Scalar, YAMLMap, YAMLSeq } from '../ast/index.js'
 
 export class Anchors {
   static validAnchorNode(node) {

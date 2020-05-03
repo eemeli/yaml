@@ -1,4 +1,4 @@
-import { stringifyNumber } from '../../stringify/stringifyNumber'
+import { stringifyNumber } from '../../stringify/stringifyNumber.js'
 
 const parseSexagesimal = (sign, parts) => {
   const n = parts.split(':').reduce((n, p) => n * 60 + Number(p), 0)

@@ -1,6 +1,6 @@
-import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
-import { Node } from './Node'
-import { Range } from './Range'
+import { YAMLSemanticError, YAMLSyntaxError } from '../errors.js'
+import { Node } from './Node.js'
+import { Range } from './Range.js'
 
 export class QuoteDouble extends Node {
   static endOfQuote(src, offset) {

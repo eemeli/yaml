@@ -1,7 +1,7 @@
-import { Collection } from '../ast'
-import { Type } from '../constants'
-import { YAMLSyntaxError } from '../errors'
-import { resolveNode } from '../resolve/resolveNode'
+import { Collection } from '../ast/index.js'
+import { Type } from '../constants.js'
+import { YAMLSyntaxError } from '../errors.js'
+import { resolveNode } from '../resolve/resolveNode.js'
 
 export function parseContents(doc, contents) {
   const comments = { before: [], after: [] }

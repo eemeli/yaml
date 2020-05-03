@@ -1,6 +1,6 @@
-import { Node } from './cst/Node'
-import { getLinePos, getPrettyContext } from './cst/source-utils'
-import { Range } from './cst/Range'
+import { Node } from './cst/Node.js'
+import { getLinePos, getPrettyContext } from './cst/source-utils.js'
+import { Range } from './cst/Range.js'
 
 export class YAMLError extends Error {
   constructor(name, source, message) {

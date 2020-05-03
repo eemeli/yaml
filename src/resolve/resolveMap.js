@@ -1,18 +1,18 @@
-import { Alias } from '../ast/Alias'
-import { Collection } from '../ast/Collection'
-import { Merge, MERGE_KEY } from '../ast/Merge'
-import { Pair } from '../ast/Pair'
-import { YAMLMap } from '../ast/YAMLMap'
-import { Char, Type } from '../constants'
-import { PlainValue } from '../cst/PlainValue'
-import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
+import { Alias } from '../ast/Alias.js'
+import { Collection } from '../ast/Collection.js'
+import { Merge, MERGE_KEY } from '../ast/Merge.js'
+import { Pair } from '../ast/Pair.js'
+import { YAMLMap } from '../ast/YAMLMap.js'
+import { Char, Type } from '../constants.js'
+import { PlainValue } from '../cst/PlainValue.js'
+import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors.js'
 
 import {
   checkFlowCollectionEnd,
   checkKeyLength,
   resolveComments
-} from './collection-utils'
-import { resolveNode } from './resolveNode'
+} from './collection-utils.js'
+import { resolveNode } from './resolveNode.js'
 
 export function resolveMap(doc, cst) {
   if (cst.type !== Type.MAP && cst.type !== Type.FLOW_MAP) {

@@ -1,6 +1,6 @@
-import { Type } from '../constants'
-import { Node } from './Node'
-import { Range } from './Range'
+import { Type } from '../constants.js'
+import { Node } from './Node.js'
+import { Range } from './Range.js'
 
 export const Chomp = {
   CLIP: 'CLIP',

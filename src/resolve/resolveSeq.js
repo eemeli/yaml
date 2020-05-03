@@ -1,15 +1,15 @@
-import { Collection } from '../ast/Collection'
-import { Pair } from '../ast/Pair'
-import { YAMLSeq } from '../ast/YAMLSeq'
-import { Type } from '../constants'
-import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
+import { Collection } from '../ast/Collection.js'
+import { Pair } from '../ast/Pair.js'
+import { YAMLSeq } from '../ast/YAMLSeq.js'
+import { Type } from '../constants.js'
+import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors.js'
 
 import {
   checkFlowCollectionEnd,
   checkKeyLength,
   resolveComments
-} from './collection-utils'
-import { resolveNode } from './resolveNode'
+} from './collection-utils.js'
+import { resolveNode } from './resolveNode.js'
 
 export function resolveSeq(doc, cst) {
   if (cst.type !== Type.SEQ && cst.type !== Type.FLOW_SEQ) {

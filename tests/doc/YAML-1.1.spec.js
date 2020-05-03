@@ -1,4 +1,4 @@
-import { YAML } from '../../src/index'
+import { YAML } from '../../src/index.js'
 import { source } from 'common-tags'
 
 const orig = {}

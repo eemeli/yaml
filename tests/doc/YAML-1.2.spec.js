@@ -1,4 +1,4 @@
-import { YAML } from '../../src/index'
+import { YAML } from '../../src/index.js'
 
 const collectionKeyWarning =
   'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'

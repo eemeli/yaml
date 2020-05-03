@@ -1,5 +1,5 @@
-import { YAMLSeq } from '../../ast/YAMLSeq'
-import { resolveSeq } from '../../resolve/resolveSeq'
+import { YAMLSeq } from '../../ast/YAMLSeq.js'
+import { resolveSeq } from '../../resolve/resolveSeq.js'
 
 function createSeq(schema, obj, ctx) {
   const seq = new YAMLSeq(schema)

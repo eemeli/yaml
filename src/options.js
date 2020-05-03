@@ -1,11 +1,11 @@
-import { defaultTagPrefix } from './constants'
+import { defaultTagPrefix } from './constants.js'
 import {
   binaryOptions,
   boolOptions,
   intOptions,
   nullOptions,
   strOptions
-} from './tags/options'
+} from './tags/options.js'
 
 export const defaultOptions = {
   anchorPrefix: 'a',

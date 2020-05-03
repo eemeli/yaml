@@ -1,6 +1,6 @@
-import { Type } from '../../src/constants'
-import { parse } from '../../src/cst/parse'
-import { pretty, testSpec } from './common'
+import { Type } from '../../src/constants.js'
+import { parse } from '../../src/cst/parse.js'
+import { pretty, testSpec } from './common.js'
 
 const spec = {
   '2.1. Collections': {

@@ -1,9 +1,9 @@
 /* global BigInt */
 
-import { Scalar } from '../ast/Scalar'
-import { stringifyNumber } from '../stringify/stringifyNumber'
-import { failsafe } from './failsafe'
-import { boolOptions, intOptions, nullOptions } from './options'
+import { Scalar } from '../ast/Scalar.js'
+import { stringifyNumber } from '../stringify/stringifyNumber.js'
+import { failsafe } from './failsafe/index.js'
+import { boolOptions, intOptions, nullOptions } from './options.js'
 
 const intIdentify = value =>
   typeof value === 'bigint' || Number.isInteger(value)

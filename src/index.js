@@ -1,9 +1,9 @@
-import { parse as parseCST } from './cst/parse'
-import { Document as YAMLDocument } from './doc/Document'
-import { Schema } from './doc/Schema'
-import { YAMLSemanticError } from './errors'
-import { defaultOptions, scalarOptions } from './options'
-import { warn } from './warnings'
+import { parse as parseCST } from './cst/parse.js'
+import { Document as YAMLDocument } from './doc/Document.js'
+import { Schema } from './doc/Schema.js'
+import { YAMLSemanticError } from './errors.js'
+import { defaultOptions, scalarOptions } from './options.js'
+import { warn } from './warnings.js'
 
 function createNode(value, wrapScalars = true, tag) {
   if (tag === undefined && typeof wrapScalars === 'string') {

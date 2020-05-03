@@ -1,6 +1,6 @@
 import { source } from 'common-tags'
-import { YAML } from '../../src/index'
-import { Pair } from '../../src/ast/index'
+import { YAML } from '../../src/index.js'
+import { Pair } from '../../src/ast/index.js'
 
 describe('parse comments', () => {
   describe('body', () => {

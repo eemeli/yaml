@@ -1,6 +1,6 @@
-import { Collection } from './Collection'
-import { Scalar } from './Scalar'
-import { toJSON } from './toJSON'
+import { Collection } from './Collection.js'
+import { Scalar } from './Scalar.js'
+import { toJSON } from './toJSON.js'
 
 function asItemIndex(key) {
   let idx = key instanceof Scalar ? key.value : key

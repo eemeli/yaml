@@ -1,5 +1,5 @@
-import { Node } from './Node'
-import { Range } from './Range'
+import { Node } from './Node.js'
+import { Range } from './Range.js'
 
 export class Alias extends Node {
   /**

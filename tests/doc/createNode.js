@@ -1,6 +1,6 @@
-import { YAML } from '../../src/index'
-import { Pair, Scalar, YAMLMap, YAMLSeq } from '../../src/ast/index'
-import { YAMLSet } from '../../src/tags/yaml-1.1/set'
+import { YAML } from '../../src/index.js'
+import { Pair, Scalar, YAMLMap, YAMLSeq } from '../../src/ast/index.js'
+import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
 describe('scalars', () => {
   describe('createNode(value, false)', () => {

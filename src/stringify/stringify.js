@@ -1,9 +1,9 @@
-import { Alias } from '../ast/Alias'
-import { Node } from '../ast/Node'
-import { Pair } from '../ast/Pair'
-import { Scalar } from '../ast/Scalar'
-import { stringifyString } from './stringifyString'
-import { stringifyTag } from './stringifyTag'
+import { Alias } from '../ast/Alias.js'
+import { Node } from '../ast/Node.js'
+import { Pair } from '../ast/Pair.js'
+import { Scalar } from '../ast/Scalar.js'
+import { stringifyString } from './stringifyString.js'
+import { stringifyTag } from './stringifyTag.js'
 
 function getTagObject(tags, item) {
   if (item instanceof Alias) return Alias

@@ -1,10 +1,10 @@
 /* global atob, btoa, Buffer */
 
-import { Type } from '../../constants'
-import { YAMLReferenceError } from '../../errors'
-import { resolveString } from '../../resolve/resolveString'
-import { stringifyString } from '../../stringify/stringifyString'
-import { binaryOptions as options } from '../options'
+import { Type } from '../../constants.js'
+import { YAMLReferenceError } from '../../errors.js'
+import { resolveString } from '../../resolve/resolveString.js'
+import { stringifyString } from '../../stringify/stringifyString.js'
+import { binaryOptions as options } from '../options.js'
 
 export const binary = {
   identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array

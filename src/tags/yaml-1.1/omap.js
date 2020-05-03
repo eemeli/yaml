@@ -1,10 +1,10 @@
-import { YAMLSemanticError } from '../../errors'
-import { Pair } from '../../ast/Pair'
-import { Scalar } from '../../ast/Scalar'
-import { YAMLMap } from '../../ast/YAMLMap'
-import { YAMLSeq } from '../../ast/YAMLSeq'
-import { toJSON } from '../../ast/toJSON'
-import { createPairs, parsePairs } from './pairs'
+import { YAMLSemanticError } from '../../errors.js'
+import { Pair } from '../../ast/Pair.js'
+import { Scalar } from '../../ast/Scalar.js'
+import { YAMLMap } from '../../ast/YAMLMap.js'
+import { YAMLSeq } from '../../ast/YAMLSeq.js'
+import { toJSON } from '../../ast/toJSON.js'
+import { createPairs, parsePairs } from './pairs.js'
 
 export class YAMLOMap extends YAMLSeq {
   static tag = 'tag:yaml.org,2002:omap'

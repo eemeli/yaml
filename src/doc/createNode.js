@@ -1,8 +1,8 @@
-import { Alias } from '../ast/Alias'
-import { Node } from '../ast/Node'
-import { Scalar } from '../ast/Scalar'
-import { map } from '../tags/failsafe/map'
-import { seq } from '../tags/failsafe/seq'
+import { Alias } from '../ast/Alias.js'
+import { Node } from '../ast/Node.js'
+import { Scalar } from '../ast/Scalar.js'
+import { map } from '../tags/failsafe/map.js'
+import { seq } from '../tags/failsafe/seq.js'
 
 function findTagObject(value, tagName, tags) {
   if (tagName) {

@@ -1,9 +1,9 @@
-import { Collection } from '../ast/Collection'
-import { Scalar } from '../ast/Scalar'
-import { Type, defaultTags } from '../constants'
-import { YAMLReferenceError, YAMLWarning } from '../errors'
-import { resolveScalar } from './resolveScalar'
-import { resolveString } from './resolveString'
+import { Collection } from '../ast/Collection.js'
+import { Scalar } from '../ast/Scalar.js'
+import { Type, defaultTags } from '../constants.js'
+import { YAMLReferenceError, YAMLWarning } from '../errors.js'
+import { resolveScalar } from './resolveScalar.js'
+import { resolveString } from './resolveString.js'
 
 function resolveByTagName(doc, node, tagName) {
   const { tags } = doc.schema

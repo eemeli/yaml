@@ -1,5 +1,5 @@
-import { parse } from './cst/parse'
-import { Document } from './doc/Document'
+import { parse } from './cst/parse.js'
+import { Document } from './doc/Document.js'
 
 // test harness for yaml-test-suite event tests
 export function testEvents(src, options) {

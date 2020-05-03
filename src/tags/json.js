@@ -1,10 +1,10 @@
 /* global BigInt */
 
-import { Scalar } from '../ast/Scalar'
-import { resolveString } from '../resolve/resolveString'
-import { map } from './failsafe/map'
-import { seq } from './failsafe/seq'
-import { intOptions } from './options'
+import { Scalar } from '../ast/Scalar.js'
+import { resolveString } from '../resolve/resolveString.js'
+import { map } from './failsafe/map.js'
+import { seq } from './failsafe/seq.js'
+import { intOptions } from './options.js'
 
 const intIdentify = value =>
   typeof value === 'bigint' || Number.isInteger(value)

@@ -1,8 +1,8 @@
-import { YAMLSemanticError } from '../../errors'
-import { Pair } from '../../ast/Pair'
-import { Scalar } from '../../ast/Scalar'
-import { YAMLMap, findPair } from '../../ast/YAMLMap'
-import { resolveMap } from '../../resolve/resolveMap'
+import { YAMLSemanticError } from '../../errors.js'
+import { Pair } from '../../ast/Pair.js'
+import { Scalar } from '../../ast/Scalar.js'
+import { YAMLMap, findPair } from '../../ast/YAMLMap.js'
+import { resolveMap } from '../../resolve/resolveMap.js'
 
 export class YAMLSet extends YAMLMap {
   static tag = 'tag:yaml.org,2002:set'

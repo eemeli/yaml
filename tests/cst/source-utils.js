@@ -1,5 +1,5 @@
-import { getLinePos } from '../../src/cst/source-utils'
-import { parse } from '../../src/cst/parse'
+import { getLinePos } from '../../src/cst/source-utils.js'
+import { parse } from '../../src/cst/parse.js'
 
 test('lineStarts for empty document', () => {
   const src = ''

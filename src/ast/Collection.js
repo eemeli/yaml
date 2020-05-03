@@ -1,7 +1,7 @@
-import { addComment } from '../stringify/addComment'
-import { Type } from '../constants'
-import { Node } from './Node'
-import { Scalar } from './Scalar'
+import { addComment } from '../stringify/addComment.js'
+import { Type } from '../constants.js'
+import { Node } from './Node.js'
+import { Scalar } from './Scalar.js'
 
 function collectionFromPath(schema, path, value) {
   let v = value

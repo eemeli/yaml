@@ -1,11 +1,11 @@
-import { Char, Type } from '../constants'
-import { YAMLSemanticError, YAMLSyntaxError } from '../errors'
-import { BlankLine } from './BlankLine'
-import { grabCollectionEndComments } from './Collection'
-import { Comment } from './Comment'
-import { Directive } from './Directive'
-import { Node } from './Node'
-import { Range } from './Range'
+import { Char, Type } from '../constants.js'
+import { YAMLSemanticError, YAMLSyntaxError } from '../errors.js'
+import { BlankLine } from './BlankLine.js'
+import { grabCollectionEndComments } from './Collection.js'
+import { Comment } from './Comment.js'
+import { Directive } from './Directive.js'
+import { Node } from './Node.js'
+import { Range } from './Range.js'
 
 export class Document extends Node {
   static startCommentOrEndBlankLine(src, start) {

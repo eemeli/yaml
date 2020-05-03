@@ -1,5 +1,5 @@
-import { YAMLMap } from '../../ast/YAMLMap'
-import { resolveMap } from '../../resolve/resolveMap'
+import { YAMLMap } from '../../ast/YAMLMap.js'
+import { resolveMap } from '../../resolve/resolveMap.js'
 
 function createMap(schema, obj, ctx) {
   const map = new YAMLMap(schema)

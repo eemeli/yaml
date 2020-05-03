@@ -1,9 +1,9 @@
 import fs from 'fs'
 import path from 'path'
-import { Node } from '../../src/cst/Node'
-import { YAMLError } from '../../src/errors'
-import { warnFileDeprecation, warnOptionDeprecation } from '../../src/warnings'
-import { YAML } from '../../src/index'
+import { Node } from '../../src/cst/Node.js'
+import { YAMLError } from '../../src/errors.js'
+import { warnFileDeprecation, warnOptionDeprecation } from '../../src/warnings.js'
+import { YAML } from '../../src/index.js'
 
 test('require a message and source for all errors', () => {
   const exp = /Invalid arguments/

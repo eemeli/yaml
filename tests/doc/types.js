@@ -1,8 +1,8 @@
-import { YAML } from '../../src/index'
-import { Scalar, YAMLSeq } from '../../src/ast/index'
-import { binary } from '../../src/tags/yaml-1.1/binary'
-import { YAMLOMap } from '../../src/tags/yaml-1.1/omap'
-import { YAMLSet } from '../../src/tags/yaml-1.1/set'
+import { YAML } from '../../src/index.js'
+import { Scalar, YAMLSeq } from '../../src/ast/index.js'
+import { binary } from '../../src/tags/yaml-1.1/binary.js'
+import { YAMLOMap } from '../../src/tags/yaml-1.1/omap.js'
+import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
 let origFoldOptions
 

@@ -1,14 +1,14 @@
 /* global BigInt */
 
-import { Scalar } from '../../ast/Scalar'
-import { stringifyNumber } from '../../stringify/stringifyNumber'
-import { failsafe } from '../failsafe'
-import { boolOptions, intOptions, nullOptions } from '../options'
-import { binary } from './binary'
-import { omap } from './omap'
-import { pairs } from './pairs'
-import { set } from './set'
-import { intTime, floatTime, timestamp } from './timestamp'
+import { Scalar } from '../../ast/Scalar.js'
+import { stringifyNumber } from '../../stringify/stringifyNumber.js'
+import { failsafe } from '../failsafe/index.js'
+import { boolOptions, intOptions, nullOptions } from '../options.js'
+import { binary } from './binary.js'
+import { omap } from './omap.js'
+import { pairs } from './pairs.js'
+import { set } from './set.js'
+import { intTime, floatTime, timestamp } from './timestamp.js'
 
 const boolStringify = ({ value }) =>
   value ? boolOptions.trueStr : boolOptions.falseStr

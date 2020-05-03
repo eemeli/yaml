@@ -1,14 +1,14 @@
-import { Alias } from '../ast/Alias'
-import { Char, Type } from '../constants'
+import { Alias } from '../ast/Alias.js'
+import { Char, Type } from '../constants.js'
 import {
   YAMLReferenceError,
   YAMLSemanticError,
   YAMLSyntaxError
-} from '../errors'
+} from '../errors.js'
 
-import { resolveScalar } from './resolveScalar'
-import { resolveTagName } from './resolveTagName'
-import { resolveTag } from './resolveTag'
+import { resolveScalar } from './resolveScalar.js'
+import { resolveTagName } from './resolveTagName.js'
+import { resolveTag } from './resolveTag.js'
 
 const isCollectionItem = node => {
   if (!node) return false
