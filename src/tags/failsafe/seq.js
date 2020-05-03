@@ -1,5 +1,5 @@
 import { YAMLSeq } from '../../ast/YAMLSeq'
-import { parseSeq } from '../../ast/parseSeq'
+import { resolveSeq } from '../../resolve/resolveSeq'
 
 function createSeq(schema, obj, ctx) {
   const seq = new YAMLSeq(schema)
@@ -17,5 +17,5 @@ export const seq = {
   default: true,
   nodeClass: YAMLSeq,
   tag: 'tag:yaml.org,2002:seq',
-  resolve: parseSeq
+  resolve: resolveSeq
 }

@@ -1,4 +1,6 @@
-export { findPair, parseMap, parseSeq } from './dist/ast'
+export { findPair } from './dist/ast'
+export { resolveMap as parseMap } from './dist/resolve/resolveMap'
+export { resolveSeq as parseSeq } from './dist/resolve/resolveSeq'
 
 export { stringifyNumber } from './dist/stringify/stringifyNumber'
 export { stringifyString } from './dist/stringify/stringifyString'

@@ -2,10 +2,10 @@ import { YAMLSemanticError } from '../../errors'
 import { Pair } from '../../ast/Pair'
 import { YAMLMap } from '../../ast/YAMLMap'
 import { YAMLSeq } from '../../ast/YAMLSeq'
-import { parseSeq } from '../../ast/parseSeq'
+import { resolveSeq } from '../../resolve/resolveSeq'
 
 export function parsePairs(doc, cst) {
-  const seq = parseSeq(doc, cst)
+  const seq = resolveSeq(doc, cst)
   for (let i = 0; i < seq.items.length; ++i) {
     let item = seq.items[i]
     if (item instanceof Pair) continue

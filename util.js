@@ -1,7 +1,11 @@
 const ast = require('./dist/ast')
 exports.findPair = ast.findPair
-exports.parseMap = ast.parseMap
-exports.parseSeq = ast.parseSeq
+
+const resolveMapPkg = require('./dist/resolve/resolveMap')
+exports.parseMap = resolveMapPkg.resolveMap
+
+const resolveSeqPkg = require('./dist/resolve/resolveSeq')
+exports.parseSeq = resolveSeqPkg.resolveSeq
 
 exports.stringifyNumber = require('./dist/stringify/stringifyNumber').stringifyNumber
 exports.stringifyString = require('./dist/stringify/stringifyString').stringifyString

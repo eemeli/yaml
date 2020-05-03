@@ -1,20 +1,20 @@
+import { Alias } from '../ast/Alias'
+import { Collection } from '../ast/Collection'
+import { Merge, MERGE_KEY } from '../ast/Merge'
+import { Pair } from '../ast/Pair'
+import { YAMLMap } from '../ast/YAMLMap'
 import { Char, Type } from '../constants'
 import { PlainValue } from '../cst/PlainValue'
-import { resolveNode } from '../resolve/resolveNode'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
 
-import { Alias } from './Alias'
-import { Collection } from './Collection'
-import { Merge, MERGE_KEY } from './Merge'
-import { Pair } from './Pair'
-import { YAMLMap } from './YAMLMap'
 import {
   checkFlowCollectionEnd,
   checkKeyLength,
   resolveComments
-} from './parseUtils'
+} from './collection-utils'
+import { resolveNode } from './resolveNode'
 
-export function parseMap(doc, cst) {
+export function resolveMap(doc, cst) {
   if (cst.type !== Type.MAP && cst.type !== Type.FLOW_MAP) {
     const msg = `A ${cst.type} node cannot be resolved as a mapping`
     doc.errors.push(new YAMLSyntaxError(cst, msg))

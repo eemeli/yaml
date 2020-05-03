@@ -1,7 +1,11 @@
 import ast from './dist/ast/index.js'
 export const findPair = ast.findPair
-export const parseMap = ast.parseMap
-export const parseSeq = ast.parseSeq
+
+import resolveMapPkg from './dist/resolve/resolveMap.js'
+export const parseMap = resolveMapPkg.resolveMap
+
+import resolveSeqPkg from './dist/resolve/resolveSeq.js'
+export const parseSeq = resolveSeqPkg.resolveSeq
 
 import strNumPkg from './dist/stringify/stringifyNumber.js'
 export const stringifyNumber = strNumPkg.stringifyNumber

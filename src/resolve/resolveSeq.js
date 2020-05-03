@@ -1,17 +1,17 @@
+import { Collection } from '../ast/Collection'
+import { Pair } from '../ast/Pair'
+import { YAMLSeq } from '../ast/YAMLSeq'
 import { Type } from '../constants'
-import { resolveNode } from '../resolve/resolveNode'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
 
-import { Collection } from './Collection'
-import { Pair } from './Pair'
-import { YAMLSeq } from './YAMLSeq'
 import {
   checkFlowCollectionEnd,
   checkKeyLength,
   resolveComments
-} from './parseUtils'
+} from './collection-utils'
+import { resolveNode } from './resolveNode'
 
-export function parseSeq(doc, cst) {
+export function resolveSeq(doc, cst) {
   if (cst.type !== Type.SEQ && cst.type !== Type.FLOW_SEQ) {
     const msg = `A ${cst.type} node cannot be resolved as a sequence`
     doc.errors.push(new YAMLSyntaxError(cst, msg))

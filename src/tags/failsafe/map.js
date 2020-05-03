@@ -1,5 +1,5 @@
 import { YAMLMap } from '../../ast/YAMLMap'
-import { parseMap } from '../../ast/parseMap'
+import { resolveMap } from '../../resolve/resolveMap'
 
 function createMap(schema, obj, ctx) {
   const map = new YAMLMap(schema)
@@ -21,5 +21,5 @@ export const map = {
   default: true,
   nodeClass: YAMLMap,
   tag: 'tag:yaml.org,2002:map',
-  resolve: parseMap
+  resolve: resolveMap
 }

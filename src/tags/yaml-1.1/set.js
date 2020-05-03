@@ -2,7 +2,7 @@ import { YAMLSemanticError } from '../../errors'
 import { Pair } from '../../ast/Pair'
 import { Scalar } from '../../ast/Scalar'
 import { YAMLMap, findPair } from '../../ast/YAMLMap'
-import { parseMap } from '../../ast/parseMap'
+import { resolveMap } from '../../resolve/resolveMap'
 
 export class YAMLSet extends YAMLMap {
   static tag = 'tag:yaml.org,2002:set'
@@ -53,7 +53,7 @@ export class YAMLSet extends YAMLMap {
 }
 
 function parseSet(doc, cst) {
-  const map = parseMap(doc, cst)
+  const map = resolveMap(doc, cst)
   if (!map.hasAllNullValues())
     throw new YAMLSemanticError(cst, 'Set items must all have null values')
   return Object.assign(new YAMLSet(), map)
