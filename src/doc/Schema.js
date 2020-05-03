@@ -1,10 +1,8 @@
-import { Alias } from '../ast/Alias'
-import { Node } from '../ast/Node'
 import { Pair } from '../ast/Pair'
-import { Scalar } from '../ast/Scalar'
 import { defaultTagPrefix, defaultTags } from '../constants'
 import { schemas, tags } from '../tags'
 import { warnOptionDeprecation } from '../warnings'
+import { createNode } from './createNode'
 
 export class Schema {
   static defaultPrefix = defaultTagPrefix // TODO: remove in v2
@@ -54,58 +52,14 @@ export class Schema {
     }
   }
 
-  createNode(value, wrapScalars, tag, ctx) {
-    if (value instanceof Node) return value
-    let tagObj
-    if (tag) {
-      if (tag.startsWith('!!')) tag = Schema.defaultPrefix + tag.slice(2)
-      const match = this.tags.filter(t => t.tag === tag)
-      tagObj = match.find(t => !t.format) || match[0]
-      if (!tagObj) throw new Error(`Tag ${tag} not found`)
-    } else {
-      // TODO: deprecate/remove class check
-      tagObj = this.tags.find(
-        t =>
-          ((t.identify && t.identify(value)) ||
-            (t.class && value instanceof t.class)) &&
-          !t.format
-      )
-      if (!tagObj) {
-        if (typeof value.toJSON === 'function') value = value.toJSON()
-        if (typeof value !== 'object')
-          return wrapScalars ? new Scalar(value) : value
-        tagObj =
-          value instanceof Map
-            ? tags.map
-            : value[Symbol.iterator]
-            ? tags.seq
-            : tags.map
-      }
+  createNode(value, wrapScalars, tagName, ctx) {
+    const baseCtx = {
+      defaultPrefix: Schema.defaultPrefix,
+      schema: this,
+      wrapScalars
     }
-    if (!ctx) ctx = { wrapScalars }
-    else ctx.wrapScalars = wrapScalars
-    if (ctx.onTagObj) {
-      ctx.onTagObj(tagObj)
-      delete ctx.onTagObj
-    }
-    const obj = {}
-    if (value && typeof value === 'object' && ctx.prevObjects) {
-      const prev = ctx.prevObjects.get(value)
-      if (prev) {
-        const alias = new Alias(prev) // leaves source dirty; must be cleaned by caller
-        ctx.aliasNodes.push(alias)
-        return alias
-      }
-      obj.value = value
-      ctx.prevObjects.set(value, obj)
-    }
-    obj.node = tagObj.createNode
-      ? tagObj.createNode(this, value, ctx)
-      : wrapScalars
-      ? new Scalar(value)
-      : value
-    if (tag && obj.node instanceof Node) obj.node.tag = tag
-    return obj.node
+    const createCtx = ctx ? Object.assign(ctx, baseCtx) : baseCtx
+    return createNode(value, tagName, createCtx)
   }
 
   createPair(key, value, ctx) {
