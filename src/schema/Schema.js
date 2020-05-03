@@ -1,11 +1,10 @@
 import { warnOptionDeprecation } from '../warnings'
 import { Type, defaultTagPrefix, defaultTags } from '../constants'
-import { resolveScalar } from '../doc/resolveScalar'
+import { resolveTag } from '../doc/resolveTag'
 import { stringifyTag } from '../stringify/stringifyTag'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify/stringifyString'
 import { schemas, tags } from '../tags'
-import { resolveString } from '../tags/failsafe/string'
 import { Alias } from './Alias'
 import { Collection } from './Collection'
 import { Node } from './Node'
@@ -125,35 +124,8 @@ export class Schema {
     return new Pair(k, v)
   }
 
-  // sets node.resolved on success
-  resolveNode(doc, node, tagName) {
-    const tags = this.tags.filter(({ tag }) => tag === tagName)
-    const generic = tags.find(({ test }) => !test)
-    if (node.error) doc.errors.push(node.error)
-    try {
-      if (generic) {
-        let res = generic.resolve(doc, node)
-        if (!(res instanceof Collection)) res = new Scalar(res)
-        node.resolved = res
-      } else {
-        const str = resolveString(doc, node)
-        if (typeof str === 'string' && tags.length > 0) {
-          node.resolved = resolveScalar(str, tags, this.tags.scalarFallback)
-        }
-      }
-    } catch (error) {
-      /* istanbul ignore if */
-      if (!error.source) error.source = node
-      doc.errors.push(error)
-      node.resolved = null
-    }
-    if (!node.resolved) return null
-    if (tagName && node.tag) node.resolved.tag = tagName
-    return node.resolved
-  }
-
   resolveNodeWithFallback(doc, node, tagName) {
-    const res = this.resolveNode(doc, node, tagName)
+    const res = resolveTag(doc, node, tagName)
     if (Object.prototype.hasOwnProperty.call(node, 'resolved')) return res
     const fallback = isMap(node)
       ? Schema.defaultTags.MAP
@@ -168,7 +140,7 @@ export class Schema {
           `The tag ${tagName} is unavailable, falling back to ${fallback}`
         )
       )
-      const res = this.resolveNode(doc, node, fallback)
+      const res = resolveTag(doc, node, fallback)
       res.tag = tagName
       return res
     } else {
