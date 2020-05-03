@@ -112,7 +112,7 @@ export class Collection extends Node {
     onComment,
     onChompKeep
   ) {
-    const { doc, indent, indentStep } = ctx
+    const { indent, indentStep, stringify } = ctx
     const inFlow =
       this.type === Type.FLOW_MAP || this.type === Type.FLOW_SEQ || ctx.inFlow
     if (inFlow) itemIndent += indentStep
@@ -149,7 +149,7 @@ export class Collection extends Node {
           hasItemWithNewLine = true
       }
       chompKeep = false
-      let str = doc.schema.stringify(
+      let str = stringify(
         item,
         ctx,
         () => (comment = null),

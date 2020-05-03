@@ -1,7 +1,8 @@
-import { addComment } from '../stringify/addComment'
 import { YAMLError } from '../errors'
 import { documentOptions } from '../options'
 import { Collection, Node, Scalar, Schema, isEmptyPath } from '../schema'
+import { addComment } from '../stringify/addComment'
+import { stringify } from '../stringify/stringify'
 import { toJSON } from '../toJSON'
 
 import { Anchors } from './Anchors'
@@ -229,7 +230,8 @@ export class Document {
       anchors: {},
       doc: this,
       indent: '',
-      indentStep: ' '.repeat(indentSize)
+      indentStep: ' '.repeat(indentSize),
+      stringify // Requiring directly in nodes would create circular dependencies
     }
     let chompKeep = false
     let contentComment = null
@@ -247,7 +249,7 @@ export class Document {
         contentComment = this.contents.comment
       }
       const onChompKeep = contentComment ? null : () => (chompKeep = true)
-      const body = this.schema.stringify(
+      const body = stringify(
         this.contents,
         ctx,
         () => (contentComment = null),
@@ -255,7 +257,7 @@ export class Document {
       )
       lines.push(addComment(body, '', contentComment))
     } else if (this.contents !== undefined) {
-      lines.push(this.schema.stringify(this.contents, ctx))
+      lines.push(stringify(this.contents, ctx))
     }
     if (this.comment) {
       if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')

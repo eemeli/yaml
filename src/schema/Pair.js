@@ -1,7 +1,6 @@
-// Published as 'yaml/pair'
-
-import { addComment } from '../stringify/addComment'
 import { Type } from '../constants'
+import { addComment } from '../stringify/addComment'
+import { stringify } from '../stringify/stringify'
 import { toJSON } from '../toJSON'
 import { Collection } from './Collection'
 import { Node } from './Node'
@@ -18,7 +17,8 @@ const stringifyKey = (key, jsKey, ctx) => {
       indent: '',
       indentStep: ctx.indentStep,
       inFlow: true,
-      inStringifyKey: true
+      inStringifyKey: true,
+      stringify
     })
   return JSON.stringify(jsKey)
 }
@@ -90,13 +90,13 @@ export class Pair extends Node {
         key instanceof Collection ||
         key.type === Type.BLOCK_FOLDED ||
         key.type === Type.BLOCK_LITERAL)
-    const { doc, indent, indentStep } = ctx
+    const { doc, indent, indentStep, stringify } = ctx
     ctx = Object.assign({}, ctx, {
       implicitKey: !explicitKey,
       indent: indent + indentStep
     })
     let chompKeep = false
-    let str = doc.schema.stringify(
+    let str = stringify(
       key,
       ctx,
       () => (keyComment = null),
@@ -145,7 +145,7 @@ export class Pair extends Node {
       // If indentSeq === false, consider '- ' as part of indentation where possible
       ctx.indent = ctx.indent.substr(2)
     }
-    const valueStr = doc.schema.stringify(
+    const valueStr = stringify(
       value,
       ctx,
       () => (valueComment = null),
