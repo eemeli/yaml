@@ -1,6 +1,6 @@
 import { warnOptionDeprecation } from '../warnings'
 import { Type, defaultTagPrefix, defaultTags } from '../constants'
-import { stringifyTag } from '../doc/stringifyTag'
+import { stringifyTag } from '../stringify/stringifyTag'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify/stringifyString'
 import { schemas, tags } from '../tags'
