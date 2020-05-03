@@ -1,5 +1,6 @@
 import ast from './dist/ast/index.js'
 export const findPair = ast.findPair
+export const toJSON = ast.toJSON
 
 import resolveMapPkg from './dist/resolve/resolveMap.js'
 export const parseMap = resolveMapPkg.resolveMap
@@ -12,9 +13,6 @@ export const stringifyNumber = strNumPkg.stringifyNumber
 
 import strStrPkg from './dist/stringify/stringifyString.js'
 export const stringifyString = strStrPkg.stringifyString
-
-import toJsonPkg from './dist/toJSON.js'
-export const toJSON = toJsonPkg.toJSON
 
 import constants from './dist/constants.js'
 export const Type = constants.Type

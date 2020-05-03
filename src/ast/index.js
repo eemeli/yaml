@@ -6,3 +6,5 @@ export { Pair } from './Pair'
 export { Scalar } from './Scalar'
 export { YAMLMap, findPair } from './YAMLMap'
 export { YAMLSeq } from './YAMLSeq'
+
+export { toJSON } from './toJSON'

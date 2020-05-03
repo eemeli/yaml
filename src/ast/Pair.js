@@ -1,11 +1,11 @@
 import { Type } from '../constants'
 import { addComment } from '../stringify/addComment'
 import { stringify } from '../stringify/stringify'
-import { toJSON } from '../toJSON'
 import { Collection } from './Collection'
 import { Node } from './Node'
 import { Scalar } from './Scalar'
 import { YAMLSeq } from './YAMLSeq'
+import { toJSON } from './toJSON'
 
 const stringifyKey = (key, jsKey, ctx) => {
   if (jsKey === null) return ''
