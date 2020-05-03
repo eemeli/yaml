@@ -203,7 +203,7 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
 
 function plainString(item, ctx, onComment, onChompKeep) {
   const { comment, type, value } = item
-  const { actualString, implicitKey, indent, inFlow, tags } = ctx
+  const { actualString, doc, implicitKey, indent, inFlow } = ctx
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
@@ -245,7 +245,7 @@ function plainString(item, ctx, onComment, onChompKeep) {
   // Verify that output will be parsed as a string, as e.g. plain numbers and
   // booleans get parsed with those types in v1.2 (e.g. '42', 'true' & '0.9e-3'),
   // and others in v1.1.
-  if (actualString && typeof tags.resolveScalar(str).value !== 'string') {
+  if (actualString && typeof doc.schema.resolveScalar(str).value !== 'string') {
     return doubleQuotedString(value, ctx)
   }
   const body = implicitKey

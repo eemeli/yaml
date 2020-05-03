@@ -260,7 +260,6 @@ export class Schema {
         }
       }
     }
-    ctx.tags = this
     if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
     if (!tagObj) tagObj = this.getTagObject(item)
     const props = this.stringifyProps(item, tagObj, ctx)
