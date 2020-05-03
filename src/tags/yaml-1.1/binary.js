@@ -2,8 +2,8 @@
 
 import { Type } from '../../constants'
 import { YAMLReferenceError } from '../../errors'
+import { resolveString } from '../../resolve/resolveString'
 import { stringifyString } from '../../stringify/stringifyString'
-import { resolveString } from '../failsafe/string'
 import { binaryOptions as options } from '../options'
 
 export const binary = {

@@ -1,9 +1,9 @@
 /* global BigInt */
 
+import { Scalar } from '../ast/Scalar'
+import { resolveString } from '../resolve/resolveString'
 import { map } from './failsafe/map'
 import { seq } from './failsafe/seq'
-import { Scalar } from '../ast/Scalar'
-import { resolveString } from './failsafe/string'
 import { intOptions } from './options'
 
 const intIdentify = value =>

@@ -1,17 +1,6 @@
+import { resolveString } from '../../resolve/resolveString'
 import { stringifyString } from '../../stringify/stringifyString'
 import { strOptions } from '../options'
-
-export const resolveString = (doc, node) => {
-  // on error, will return { str: string, errors: Error[] }
-  const res = node.strValue
-  if (!res) return ''
-  if (typeof res === 'string') return res
-  res.errors.forEach(error => {
-    if (!error.source) error.source = node
-    doc.errors.push(error)
-  })
-  return res.str
-}
 
 export const string = {
   identify: value => typeof value === 'string',
