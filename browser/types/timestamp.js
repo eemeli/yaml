@@ -1,10 +1,10 @@
 'use strict'
 Object.defineProperty(exports, '__esModule', { value: true })
 
-const ts = require('../dist/tags/yaml-1.1/timestamp')
-exports.default = [ts.intTime, ts.floatTime, ts.timestamp]
-exports.floatTime = ts.floatTime
-exports.intTime = ts.intTime
-exports.timestamp = ts.timestamp
+const legacy = require('../dist/legacy-exports')
+exports.default = [legacy.intTime, legacy.floatTime, legacy.timestamp]
+exports.floatTime = legacy.floatTime
+exports.intTime = legacy.intTime
+exports.timestamp = legacy.timestamp
 
-require('../dist/warnings').warnFileDeprecation(__filename)
+legacy.warnFileDeprecation(__filename)

@@ -1,2 +1,3 @@
-module.exports = require('../dist/tags/yaml-1.1/omap').omap
-require('../dist/warnings').warnFileDeprecation(__filename)
+const legacy = require('../dist/legacy-exports')
+module.exports = legacy.omap
+legacy.warnFileDeprecation(__filename)

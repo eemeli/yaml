@@ -1,2 +1,2 @@
-module.exports = require('./dist/ast').YAMLMap
-require('./dist/warnings').warnFileDeprecation(__filename)
+module.exports = require('./dist/types').YAMLMap
+require('./dist/legacy-exports').warnFileDeprecation(__filename)

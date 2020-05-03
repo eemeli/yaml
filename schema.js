@@ -1,7 +1,9 @@
-module.exports = require('./dist/doc/Schema').Schema
-const opt = require('./dist/tags/options')
-module.exports.nullOptions = opt.nullOptions
-module.exports.strOptions = opt.strOptions
-module.exports.stringify = require('./dist/stringify/stringifyString').stringifyString
+const types = require('./dist/types')
+const util = require('./dist/util')
 
-require('./dist/warnings').warnFileDeprecation(__filename)
+module.exports = types.Schema
+module.exports.nullOptions = types.nullOptions
+module.exports.strOptions = types.strOptions
+module.exports.stringify = util.stringifyString
+
+require('./dist/legacy-exports').warnFileDeprecation(__filename)

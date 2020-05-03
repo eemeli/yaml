@@ -1,2 +1,3 @@
-module.exports = require('../dist/tags/yaml-1.1/pairs').pairs
-require('../dist/warnings').warnFileDeprecation(__filename)
+const legacy = require('../dist/legacy-exports')
+module.exports = legacy.pairs
+legacy.warnFileDeprecation(__filename)
