@@ -58,7 +58,7 @@
     "./": "./"
   },
   "scripts": {
-    "browser:build": "cross-env BABEL_ENV=browser babel src/ --out-dir browser/dist/",
+    "browser:build": "cross-env BABEL_ENV=browser rollup -c",
     "clean": "git clean -fdxe node_modules",
     "dist:build": "babel src/ --out-dir dist/",
     "build": "npm run dist:build && npm run browser:build",

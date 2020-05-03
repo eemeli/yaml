@@ -1,0 +1,13 @@
+import babel from '@rollup/plugin-babel'
+
+export default {
+  input: {
+    index: 'src/index.js',
+    'legacy-exports': 'src/legacy-exports.js',
+    'parse-cst': 'src/cst/parse.js',
+    types: 'src/types.js',
+    util: 'src/util.js'
+  },
+  output: { dir: 'browser/dist', format: 'esm' },
+  plugins: [babel({ babelHelpers: 'runtime' })]
+}
