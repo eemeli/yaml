@@ -1,5 +1,5 @@
-import { YAMLMap } from '../../schema/YAMLMap'
-import { parseMap } from '../../schema/parseMap'
+import { YAMLMap } from '../../ast/YAMLMap'
+import { parseMap } from '../../ast/parseMap'
 
 function createMap(schema, obj, ctx) {
   const map = new YAMLMap(schema)

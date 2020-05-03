@@ -1,7 +1,7 @@
+import { Collection } from '../ast/Collection'
+import { Scalar } from '../ast/Scalar'
 import { Type, defaultTags } from '../constants'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
-import { Collection } from '../schema/Collection'
-import { Scalar } from '../schema/Scalar'
 import { resolveString } from '../tags/failsafe/string'
 import { resolveScalar } from './resolveScalar'
 

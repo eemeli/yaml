@@ -1,7 +1,7 @@
-import schema from './dist/schema/index.js'
-export const findPair = schema.findPair
-export const parseMap = schema.parseMap
-export const parseSeq = schema.parseSeq
+import ast from './dist/ast/index.js'
+export const findPair = ast.findPair
+export const parseMap = ast.parseMap
+export const parseSeq = ast.parseSeq
 
 import strNumPkg from './dist/stringify/stringifyNumber.js'
 export const stringifyNumber = strNumPkg.stringifyNumber

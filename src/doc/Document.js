@@ -1,6 +1,6 @@
+import { Collection, Node, Scalar, isEmptyPath } from '../ast'
 import { YAMLError } from '../errors'
 import { documentOptions } from '../options'
-import { Collection, Node, Scalar, isEmptyPath } from '../schema'
 import { addComment } from '../stringify/addComment'
 import { stringify } from '../stringify/stringify'
 import { toJSON } from '../toJSON'

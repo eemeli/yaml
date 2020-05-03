@@ -1,2 +1,2 @@
-module.exports = require('./dist/schema').YAMLSeq
+module.exports = require('./dist/ast').YAMLSeq
 require('./dist/warnings').warnFileDeprecation(__filename)

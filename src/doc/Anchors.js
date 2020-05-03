@@ -1,4 +1,4 @@
-import { Alias, Merge, Scalar, YAMLMap, YAMLSeq } from '../schema'
+import { Alias, Merge, Scalar, YAMLMap, YAMLSeq } from '../ast'
 
 export class Anchors {
   static validAnchorNode(node) {

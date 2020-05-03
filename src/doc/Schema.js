@@ -1,10 +1,10 @@
-import { warnOptionDeprecation } from '../warnings'
+import { Alias } from '../ast/Alias'
+import { Node } from '../ast/Node'
+import { Pair } from '../ast/Pair'
+import { Scalar } from '../ast/Scalar'
 import { defaultTagPrefix, defaultTags } from '../constants'
 import { schemas, tags } from '../tags'
-import { Alias } from '../schema/Alias'
-import { Node } from '../schema/Node'
-import { Pair } from '../schema/Pair'
-import { Scalar } from '../schema/Scalar'
+import { warnOptionDeprecation } from '../warnings'
 
 export class Schema {
   static defaultPrefix = defaultTagPrefix // TODO: remove in v2

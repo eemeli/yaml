@@ -2,7 +2,7 @@
 
 import { map } from './failsafe/map'
 import { seq } from './failsafe/seq'
-import { Scalar } from '../schema/Scalar'
+import { Scalar } from '../ast/Scalar'
 import { resolveString } from './failsafe/string'
 import { intOptions } from './options'
 

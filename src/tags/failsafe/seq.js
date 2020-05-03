@@ -1,5 +1,5 @@
-import { YAMLSeq } from '../../schema/YAMLSeq'
-import { parseSeq } from '../../schema/parseSeq'
+import { YAMLSeq } from '../../ast/YAMLSeq'
+import { parseSeq } from '../../ast/parseSeq'
 
 function createSeq(schema, obj, ctx) {
   const seq = new YAMLSeq(schema)

@@ -1,7 +1,7 @@
-import { Alias } from '../schema/Alias'
-import { Node } from '../schema/Node'
-import { Pair } from '../schema/Pair'
-import { Scalar } from '../schema/Scalar'
+import { Alias } from '../ast/Alias'
+import { Node } from '../ast/Node'
+import { Pair } from '../ast/Pair'
+import { Scalar } from '../ast/Scalar'
 import { stringifyString } from './stringifyString'
 import { stringifyTag } from './stringifyTag'
 

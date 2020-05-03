@@ -5,9 +5,11 @@ export const intOptions = opt.intOptions
 export const nullOptions = opt.nullOptions
 export const strOptions = opt.strOptions
 
-import schema from './dist/schema/index.js'
+import schema from './dist/doc/Schema.js'
 export const Schema = schema.Schema
-export const YAMLMap = schema.YAMLMap
-export const YAMLSeq = schema.YAMLSeq
-export const Pair = schema.Pair
-export const Scalar = schema.Scalar
+
+import ast from './dist/ast/index.js'
+export const Pair = ast.Pair
+export const Scalar = ast.Scalar
+export const YAMLMap = ast.YAMLMap
+export const YAMLSeq = ast.YAMLSeq

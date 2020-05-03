@@ -1,7 +1,7 @@
 import { parse as parseCST } from './cst/parse'
 import { Document as YAMLDocument } from './doc/Document'
+import { Schema } from './doc/Schema'
 import { YAMLSemanticError } from './errors'
-import { Schema } from './schema'
 import { defaultOptions, scalarOptions } from './options'
 import { warn } from './warnings'
 

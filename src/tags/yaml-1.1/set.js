@@ -1,8 +1,8 @@
 import { YAMLSemanticError } from '../../errors'
-import { Pair } from '../../schema/Pair'
-import { Scalar } from '../../schema/Scalar'
-import { YAMLMap, findPair } from '../../schema/YAMLMap'
-import { parseMap } from '../../schema/parseMap'
+import { Pair } from '../../ast/Pair'
+import { Scalar } from '../../ast/Scalar'
+import { YAMLMap, findPair } from '../../ast/YAMLMap'
+import { parseMap } from '../../ast/parseMap'
 
 export class YAMLSet extends YAMLMap {
   static tag = 'tag:yaml.org,2002:set'

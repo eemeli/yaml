@@ -1,4 +1,4 @@
-import { Collection, Pair, Scalar } from '../schema'
+import { Collection, Pair, Scalar } from '../ast'
 
 const visit = (node, tags) => {
   if (node && typeof node === 'object') {

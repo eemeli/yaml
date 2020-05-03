@@ -5,9 +5,11 @@ exports.intOptions = opt.intOptions
 exports.nullOptions = opt.nullOptions
 exports.strOptions = opt.strOptions
 
-const schema = require('./dist/schema')
+const schema = require('./dist/doc/Schema')
 exports.Schema = schema.Schema
-exports.YAMLMap = schema.YAMLMap
-exports.YAMLSeq = schema.YAMLSeq
-exports.Pair = schema.Pair
-exports.Scalar = schema.Scalar
+
+const ast = require('./dist/ast')
+exports.Pair = ast.Pair
+exports.Scalar = ast.Scalar
+exports.YAMLMap = ast.YAMLMap
+exports.YAMLSeq = ast.YAMLSeq

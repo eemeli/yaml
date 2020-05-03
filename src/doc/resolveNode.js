@@ -1,10 +1,10 @@
+import { Alias } from '../ast/Alias'
 import { Char, Type } from '../constants'
 import {
   YAMLReferenceError,
   YAMLSemanticError,
   YAMLSyntaxError
 } from '../errors'
-import { Alias } from '../schema/Alias'
 
 import { resolveScalar } from './resolveScalar'
 import { resolveTagName } from './resolveTagName'

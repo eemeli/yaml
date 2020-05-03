@@ -1,4 +1,4 @@
-import { Scalar } from '../schema/Scalar'
+import { Scalar } from '../ast/Scalar'
 
 // falls back to string on no match
 export function resolveScalar(str, tags, scalarFallback) {

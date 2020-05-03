@@ -1,7 +1,7 @@
-const schema = require('./dist/schema')
-exports.findPair = schema.findPair
-exports.parseMap = schema.parseMap
-exports.parseSeq = schema.parseSeq
+const ast = require('./dist/ast')
+exports.findPair = ast.findPair
+exports.parseMap = ast.parseMap
+exports.parseSeq = ast.parseSeq
 
 exports.stringifyNumber = require('./dist/stringify/stringifyNumber').stringifyNumber
 exports.stringifyString = require('./dist/stringify/stringifyString').stringifyString

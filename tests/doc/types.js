@@ -1,5 +1,5 @@
 import { YAML } from '../../src/index'
-import { Scalar, YAMLSeq } from '../../src/schema'
+import { Scalar, YAMLSeq } from '../../src/ast/index'
 import { binary } from '../../src/tags/yaml-1.1/binary'
 import { YAMLOMap } from '../../src/tags/yaml-1.1/omap'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set'
