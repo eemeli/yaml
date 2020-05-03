@@ -1,5 +1,6 @@
 import { warnOptionDeprecation } from '../warnings'
 import { Type, defaultTagPrefix, defaultTags } from '../constants'
+import { resolveScalar } from '../doc/resolveScalar'
 import { stringifyTag } from '../stringify/stringifyTag'
 import { YAMLReferenceError, YAMLWarning } from '../errors'
 import { stringifyString } from '../stringify/stringifyString'
@@ -124,25 +125,6 @@ export class Schema {
     return new Pair(k, v)
   }
 
-  // falls back to string on no match
-  resolveScalar(str, tags) {
-    if (!tags) tags = this.tags
-    for (let i = 0; i < tags.length; ++i) {
-      const { format, test, resolve } = tags[i]
-      if (test) {
-        const match = str.match(test)
-        if (match) {
-          let res = resolve.apply(null, match)
-          if (!(res instanceof Scalar)) res = new Scalar(res)
-          if (format) res.format = format
-          return res
-        }
-      }
-    }
-    if (this.tags.scalarFallback) str = this.tags.scalarFallback(str)
-    return new Scalar(str)
-  }
-
   // sets node.resolved on success
   resolveNode(doc, node, tagName) {
     const tags = this.tags.filter(({ tag }) => tag === tagName)
@@ -156,7 +138,7 @@ export class Schema {
       } else {
         const str = resolveString(doc, node)
         if (typeof str === 'string' && tags.length > 0) {
-          node.resolved = this.resolveScalar(str, tags)
+          node.resolved = resolveScalar(str, tags, this.tags.scalarFallback)
         }
       }
     } catch (error) {

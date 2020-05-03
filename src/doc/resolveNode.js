@@ -6,6 +6,7 @@ import {
 } from '../errors'
 import { Alias } from '../schema/Alias'
 
+import { resolveScalar } from './resolveScalar'
 import { resolveTagName } from './resolveTagName'
 
 const isCollectionItem = node => {
@@ -90,7 +91,11 @@ function resolveNodeValue(doc, node) {
   }
 
   try {
-    return schema.resolveScalar(node.strValue || '')
+    return resolveScalar(
+      node.strValue || '',
+      schema.tags,
+      schema.tags.scalarFallback
+    )
   } catch (error) {
     if (!error.source) error.source = node
     errors.push(error)
