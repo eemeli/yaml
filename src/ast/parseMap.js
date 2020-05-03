@@ -1,6 +1,6 @@
 import { Char, Type } from '../constants'
 import { PlainValue } from '../cst/PlainValue'
-import { resolveNode } from '../doc/resolveNode'
+import { resolveNode } from '../resolve/resolveNode'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
 
 import { Alias } from './Alias'

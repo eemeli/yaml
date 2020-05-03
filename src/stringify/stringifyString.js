@@ -1,6 +1,6 @@
 import { addCommentBefore } from './addComment'
 import { Type } from '../constants'
-import { resolveScalar } from '../doc/resolveScalar'
+import { resolveScalar } from '../resolve/resolveScalar'
 import {
   foldFlowLines,
   FOLD_BLOCK,

@@ -1,5 +1,5 @@
 import { Type } from '../constants'
-import { resolveNode } from '../doc/resolveNode'
+import { resolveNode } from '../resolve/resolveNode'
 import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors'
 
 import { Collection } from './Collection'
