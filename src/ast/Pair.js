@@ -1,6 +1,5 @@
 import { Type } from '../constants.js'
 import { addComment } from '../stringify/addComment.js'
-import { stringify } from '../stringify/stringify.js'
 import { Collection } from './Collection.js'
 import { Node } from './Node.js'
 import { Scalar } from './Scalar.js'
@@ -18,7 +17,7 @@ const stringifyKey = (key, jsKey, ctx) => {
       indentStep: ctx.indentStep,
       inFlow: true,
       inStringifyKey: true,
-      stringify
+      stringify: ctx.stringify
     })
   return JSON.stringify(jsKey)
 }

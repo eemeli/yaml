@@ -178,7 +178,8 @@ export class Document {
       indentStep: '  ',
       keep,
       mapAsMap: keep && !!mapAsMap,
-      maxAliasCount
+      maxAliasCount,
+      stringify // Requiring directly in Pair would create circular dependencies
     }
     const anchorNames = Object.keys(this.anchors.map)
     if (anchorNames.length > 0)
