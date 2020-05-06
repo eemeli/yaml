@@ -59,6 +59,7 @@ describe('create', () => {
     expect(() => doc.anchors.setAnchor(a, 'A A')).toThrow(
       'Anchor names must not contain whitespace or control characters'
     )
+    expect(doc.anchors.getNames()).toMatchObject(['AA', 'a1', 'a2'])
   })
 
   test('doc.anchors.createAlias', () => {

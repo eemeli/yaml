@@ -38,6 +38,10 @@ export class Anchors {
     return Object.keys(map).find(a => map[a] === node)
   }
 
+  getNames() {
+    return Object.keys(this.map)
+  }
+
   getNode(name) {
     return this.map[name]
   }

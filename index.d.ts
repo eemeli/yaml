@@ -267,6 +267,8 @@ export namespace Document {
     createMergePair(...nodes: AST.Node[]): AST.Merge
     /** The anchor name associated with `node`, if set. */
     getName(node: AST.Node): undefined | string
+    /** List of all defined anchor names. */
+    getNames(): string[]
     /** The node associated with the anchor `name`, if set. */
     getNode(name: string): undefined | AST.Node
     /**

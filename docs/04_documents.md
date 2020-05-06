@@ -147,14 +147,15 @@ A description of [alias and merge nodes](#alias-nodes) is included in the next s
 
 #### `YAML.Document#anchors`
 
-| Method                                 | Returns   | Description                                                                                                                |
-| -------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- |
-| createAlias(node: Node, name?: string) | `Alias`   | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated. |
-| createMergePair(...Node)               | `Merge`   | Create a new `Merge` node with the given source nodes. Non-`Alias` sources will be automatically wrapped.                  |
-| getName(node: Node)                    | `string?` | The anchor name associated with `node`, if set.                                                                            |
-| getNode(name: string)                  | `Node?`   | The node associated with the anchor `name`, if set.                                                                        |
-| newName(prefix: string)                | `string`  | Find an available anchor name with the given `prefix` and a numerical suffix.                                              |
-| setAnchor(node: Node, name?: string)   | `string?` | Associate an anchor with `node`. If `name` is empty, a new name will be generated.                                         |
+| Method                                 | Returns    | Description                                                                                                                |
+| -------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+| createAlias(node: Node, name?: string) | `Alias`    | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated. |
+| createMergePair(...Node)               | `Merge`    | Create a new `Merge` node with the given source nodes. Non-`Alias` sources will be automatically wrapped.                  |
+| getName(node: Node)                    | `string?`  | The anchor name associated with `node`, if set.                                                                            |
+| getNames()                             | `string[]` | List of all defined anchor names.                                                                                          |
+| getNode(name: string)                  | `Node?`    | The node associated with the anchor `name`, if set.                                                                        |
+| newName(prefix: string)                | `string`   | Find an available anchor name with the given `prefix` and a numerical suffix.                                              |
+| setAnchor(node: Node, name?: string)   | `string?`  | Associate an anchor with `node`. If `name` is empty, a new name will be generated.                                         |
 
 ```js
 const src = '[{ a: A }, { b: B }]'
