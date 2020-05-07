@@ -187,6 +187,7 @@ export class Document extends AST.Collection {
   cstNode?: CST.Document
   constructor(options?: Options)
   tag: never
+  directivesEndMarker?: boolean
   type: Type.DOCUMENT
   /**
    * Anchors associated with the document's nodes;
