@@ -40,6 +40,14 @@ export function checkFlowCollectionEnd(errors, cst) {
     errors.push(err)
   }
 }
+export function checkFlowCommentSpace(errors, comment) {
+  const prev = comment.context.src[comment.range.start - 1]
+  if (prev !== '\n' && prev !== '\t' && prev !== ' ') {
+    const msg =
+      'Comments must be separated from other tokens by white space characters'
+    errors.push(new YAMLSemanticError(comment, msg))
+  }
+}
 
 export function checkKeyLength(errors, node, itemIdx, key, keyStart) {
   if (!key || typeof keyStart !== 'number') return

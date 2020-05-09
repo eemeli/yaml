@@ -6,6 +6,7 @@ import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors.js'
 
 import {
   checkFlowCollectionEnd,
+  checkFlowCommentSpace,
   checkKeyLength,
   resolveComments
 } from './collection-utils.js'
@@ -114,6 +115,7 @@ function resolveFlowSeqItems(doc, cst) {
     } else if (item.type === Type.BLANK_LINE) {
       comments.push({ before: items.length })
     } else if (item.type === Type.COMMENT) {
+      checkFlowCommentSpace(doc.errors, item)
       comments.push({ comment: item.comment, before: items.length })
     } else {
       if (next) {
