@@ -64,7 +64,7 @@
     "build": "npm run dist:build && npm run browser:build",
     "prettier": "prettier --write .",
     "lint": "eslint src/",
-    "start": "npm run dist:build && node -i -e 'YAML=require(\".\")'",
+    "start": "cross-env TRACE_LEVEL=log npm run dist:build && node -i -e 'YAML=require(\".\")'",
     "test": "cross-env TRACE_LEVEL=log jest",
     "test:trace": "cross-env TRACE_LEVEL=trace,log jest --no-cache",
     "test:types": "tsc --lib ES2017 --noEmit tests/typings.ts",
