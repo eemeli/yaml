@@ -1,5 +1,15 @@
 import { CST } from './parse-cst'
-import { AST, Scalar, Schema, YAMLMap, YAMLSeq } from './types'
+import {
+  AST,
+  Alias,
+  Collection,
+  Merge,
+  Node,
+  Scalar,
+  Schema,
+  YAMLMap,
+  YAMLSeq
+} from './types'
 import { Type, YAMLError, YAMLWarning } from './util'
 
 export { AST, CST }
@@ -183,7 +193,7 @@ export namespace scalarOptions {
   }
 }
 
-export class Document extends AST.Collection {
+export class Document extends Collection {
   cstNode?: CST.Document
   constructor(options?: Options)
   tag: never
@@ -250,7 +260,7 @@ export class Document extends AST.Collection {
 
 export namespace Document {
   interface Parsed extends Document {
-    contents: AST.Node | null
+    contents: Node | null
     /** The schema used with the document. */
     schema: Schema
   }
@@ -260,18 +270,18 @@ export namespace Document {
      * Create a new `Alias` node, adding the required anchor for `node`.
      * If `name` is empty, a new anchor name will be generated.
      */
-    createAlias(node: AST.Node, name?: string): AST.Alias
+    createAlias(node: Node, name?: string): Alias
     /**
      * Create a new `Merge` node with the given source nodes.
      * Non-`Alias` sources will be automatically wrapped.
      */
-    createMergePair(...nodes: AST.Node[]): AST.Merge
+    createMergePair(...nodes: Node[]): Merge
     /** The anchor name associated with `node`, if set. */
-    getName(node: AST.Node): undefined | string
+    getName(node: Node): undefined | string
     /** List of all defined anchor names. */
     getNames(): string[]
     /** The node associated with the anchor `name`, if set. */
-    getNode(name: string): undefined | AST.Node
+    getNode(name: string): undefined | Node
     /**
      * Find an available anchor name with the given `prefix` and a
      * numerical suffix.
@@ -281,7 +291,7 @@ export namespace Document {
      * Associate an anchor with `node`. If `name` is empty, a new name will be generated.
      * To remove an anchor, use `setAnchor(null, name)`.
      */
-    setAnchor(node: AST.Node | null, name?: string): void | string
+    setAnchor(node: Node | null, name?: string): void | string
   }
 
   interface TagPrefix {

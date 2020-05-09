@@ -35,7 +35,7 @@ export class Schema {
     wrapScalars?: boolean,
     tag?: string,
     ctx?: Schema.CreateNodeContext
-  ): AST.Node
+  ): Node
   /**
    * Convert a key and a value into a `Pair` using this schema, recursively
    * wrapping all values as `Scalar` or `Collection` nodes.
@@ -154,7 +154,7 @@ export namespace Schema {
      *   type with the `+` chomping indicator.
      */
     stringify?: (
-      item: AST.Node,
+      item: Node,
       ctx: Schema.StringifyContext,
       onComment?: () => void,
       onChompKeep?: () => void
@@ -177,7 +177,7 @@ export namespace Schema {
      * Turns a CST node into an AST node. If returning a non-`Node` value, the
      * output will be wrapped as a `Scalar`.
      */
-    resolve(doc: Document, cstNode: CST.Node): AST.Node | any
+    resolve(doc: Document, cstNode: CST.Node): Node | any
   }
 
   interface DefaultTag extends BaseTag {
@@ -190,7 +190,7 @@ export namespace Schema {
     /**
      * Alternative form used by default tags; called with `test` match results.
      */
-    resolve(...match: string[]): AST.Node | any
+    resolve(...match: string[]): Node | any
     /**
      * Together with `default` allows for values to be stringified without an
      * explicit tag and detected using a regular expression. For most cases, it's
@@ -201,7 +201,29 @@ export namespace Schema {
   }
 }
 
-export class Scalar extends AST.Node {
+export class Node {
+  /** A comment on or immediately after this */
+  comment?: string | null
+  /** A comment before this */
+  commentBefore?: string | null
+  /** Only available when `keepCstNodes` is set to `true` */
+  cstNode?: CST.Node
+  /**
+   * The [start, end] range of characters of the source parsed
+   * into this node (undefined for pairs or if not parsed)
+   */
+  range?: [number, number] | null
+  /** A blank line before this node and its commentBefore */
+  spaceBefore?: boolean
+  /** A fully qualified tag, if required */
+  tag?: string
+  /** A plain JS representation of this node */
+  toJSON(arg?: any): any
+  /** The type of this node */
+  type?: Type | Pair.Type
+}
+
+export class Scalar extends Node {
   constructor(value: any)
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any
   type?: Scalar.Type
@@ -221,7 +243,13 @@ export namespace Scalar {
     | Type.QUOTE_SINGLE
 }
 
-export class Pair extends AST.Node {
+export class Alias extends Node {
+  type: Type.ALIAS
+  source: Node
+  cstNode?: CST.Alias
+}
+
+export class Pair extends Node {
   constructor(key: any, value?: any)
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
   type: Pair.Type.PAIR | Pair.Type.MERGE_PAIR
@@ -238,14 +266,60 @@ export namespace Pair {
   }
 }
 
-export class YAMLMap extends AST.Collection {
+export class Merge extends Pair {
+  type: Pair.Type.MERGE_PAIR
+  /** Always Scalar('<<'), defined by the type specification */
+  key: AST.PlainValue
+  /** Always YAMLSeq<Alias(Map)>, stringified as *A if length = 1 */
+  value: YAMLSeq
+}
+
+export class Collection extends Node {
+  type?: Type.MAP | Type.FLOW_MAP | Type.SEQ | Type.FLOW_SEQ | Type.DOCUMENT
+  items: any[]
+  schema?: Schema
+
+  /**
+   * Adds a value to the collection. For `!!map` and `!!omap` the value must
+   * be a Pair instance or a `{ key, value }` object, which may not have a key
+   * that already exists in the map.
+   */
+  add(value: any): void
+  addIn(path: Iterable<any>, value: any): void
+  /**
+   * Removes a value from the collection.
+   * @returns `true` if the item was found and removed.
+   */
+  delete(key: any): boolean
+  deleteIn(path: Iterable<any>): boolean
+  /**
+   * Returns item at `key`, or `undefined` if not found. By default unwraps
+   * scalar values from their surrounding node; to disable set `keepScalar` to
+   * `true` (collections are always returned intact).
+   */
+  get(key: any, keepScalar?: boolean): any
+  getIn(path: Iterable<any>, keepScalar?: boolean): any
+  /**
+   * Checks if the collection includes a value with the key `key`.
+   */
+  has(key: any): boolean
+  hasIn(path: Iterable<any>): boolean
+  /**
+   * Sets a value in this collection. For `!!set`, `value` needs to be a
+   * boolean to add/remove the item from the set.
+   */
+  set(key: any, value: any): void
+  setIn(path: Iterable<any>, value: any): void
+}
+
+export class YAMLMap extends Collection {
   type?: Type.FLOW_MAP | Type.MAP
-  items: Array<Pair | AST.Merge>
+  items: Array<Pair>
   hasAllNullValues(): boolean
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
 }
 
-export class YAMLSeq extends AST.Collection {
+export class YAMLSeq extends Collection {
   type?: Type.FLOW_SEQ | Type.SEQ
   delete(key: number | string | Scalar): boolean
   get(key: number | string | Scalar, keepScalar?: boolean): any
@@ -256,66 +330,6 @@ export class YAMLSeq extends AST.Collection {
 }
 
 export namespace AST {
-  class Node {
-    /** A comment on or immediately after this */
-    comment?: string | null
-    /** A comment before this */
-    commentBefore?: string | null
-    /** Only available when `keepCstNodes` is set to `true` */
-    cstNode?: CST.Node
-    /**
-     * The [start, end] range of characters of the source parsed
-     * into this node (undefined for pairs or if not parsed)
-     */
-    range?: [number, number] | null
-    /** A blank line before this node and its commentBefore */
-    spaceBefore?: boolean
-    /** A fully qualified tag, if required */
-    tag?: string
-    /** A plain JS representation of this node */
-    toJSON(arg?: any): any
-    /** The type of this node */
-    type?: Type | Pair.Type
-  }
-
-  class Collection extends Node {
-    type?: Type.MAP | Type.FLOW_MAP | Type.SEQ | Type.FLOW_SEQ | Type.DOCUMENT
-    items: any[]
-    schema?: Schema
-
-    /**
-     * Adds a value to the collection. For `!!map` and `!!omap` the value must
-     * be a Pair instance or a `{ key, value }` object, which may not have a key
-     * that already exists in the map.
-     */
-    add(value: any): void
-    addIn(path: Iterable<any>, value: any): void
-    /**
-     * Removes a value from the collection.
-     * @returns `true` if the item was found and removed.
-     */
-    delete(key: any): boolean
-    deleteIn(path: Iterable<any>): boolean
-    /**
-     * Returns item at `key`, or `undefined` if not found. By default unwraps
-     * scalar values from their surrounding node; to disable set `keepScalar` to
-     * `true` (collections are always returned intact).
-     */
-    get(key: any, keepScalar?: boolean): any
-    getIn(path: Iterable<any>, keepScalar?: boolean): any
-    /**
-     * Checks if the collection includes a value with the key `key`.
-     */
-    has(key: any): boolean
-    hasIn(path: Iterable<any>): boolean
-    /**
-     * Sets a value in this collection. For `!!set`, `value` needs to be a
-     * boolean to add/remove the item from the set.
-     */
-    set(key: any, value: any): void
-    setIn(path: Iterable<any>, value: any): void
-  }
-
   interface NodeToJsonContext {
     anchors?: any[]
     doc: Document
@@ -349,20 +363,6 @@ export namespace AST {
   interface QuoteSingle extends Scalar {
     type: Type.QUOTE_SINGLE
     cstNode?: CST.QuoteSingle
-  }
-
-  interface Alias extends Node {
-    type: Type.ALIAS
-    source: Node
-    cstNode?: CST.Alias
-  }
-
-  interface Merge extends Pair {
-    type: Pair.Type.MERGE_PAIR
-    /** Always Scalar('<<'), defined by the type specification */
-    key: PlainValue
-    /** Always YAMLSeq<Alias(Map)>, stringified as *A if length = 1 */
-    value: YAMLSeq
   }
 
   interface FlowMap extends YAMLMap {

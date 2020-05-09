@@ -7,4 +7,13 @@ export {
 } from './tags/options.js'
 
 export { Schema } from './doc/Schema.js'
-export { Pair, Scalar, YAMLMap, YAMLSeq } from './ast/index.js'
+export {
+  Alias,
+  Collection,
+  Merge,
+  Node,
+  Pair,
+  Scalar,
+  YAMLMap,
+  YAMLSeq
+} from './ast/index.js'
