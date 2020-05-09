@@ -14,7 +14,9 @@ const getFoldOptions = ({ indentAtStart }) =>
     ? Object.assign({ indentAtStart }, strOptions.fold)
     : strOptions.fold
 
-const containsDocumentMarker = str => /^(---|\.\.\.)/m.test(str)
+// Also checks for lines starting with %, as parsing the output as YAML 1.1 will
+// presume that's starting a new document.
+const containsDocumentMarker = str => /^(%|---|\.\.\.)/m.test(str)
 
 function lineLengthOverLimit(str, limit) {
   const strLen = str.length

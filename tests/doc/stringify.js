@@ -671,4 +671,10 @@ describe('Document markers in top-level scalars', () => {
     expect(str).toBe('"foo\n\n  ..."\n')
     expect(YAML.parse(str)).toBe('foo\n...')
   })
+
+  test('foo\\n%bar\\n', () => {
+    const str = YAML.stringify('foo\n%bar\n')
+    expect(str).toBe('|\n  foo\n  %bar\n')
+    expect(YAML.parse(str)).toBe('foo\n%bar\n')
+  })
 })
