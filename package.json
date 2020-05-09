@@ -58,13 +58,13 @@
     "./": "./"
   },
   "scripts": {
-    "browser:build": "cross-env BABEL_ENV=browser rollup -c",
+    "build": "npm run build:node && npm run build:browser",
+    "build:browser": "rollup -c rollup.browser-config.js",
+    "build:node": "rollup -c rollup.node-config.js",
     "clean": "git clean -fdxe node_modules",
-    "dist:build": "babel src/ --out-dir dist/",
-    "build": "npm run dist:build && npm run browser:build",
-    "prettier": "prettier --write .",
     "lint": "eslint src/",
-    "start": "cross-env TRACE_LEVEL=log npm run dist:build && node -i -e 'YAML=require(\".\")'",
+    "prettier": "prettier --write .",
+    "start": "cross-env TRACE_LEVEL=log npm run build:node && node -i -e 'YAML=require(\".\")'",
     "test": "cross-env TRACE_LEVEL=log jest",
     "test:trace": "cross-env TRACE_LEVEL=trace,log jest --no-cache",
     "test:types": "tsc --lib ES2017 --noEmit tests/typings.ts",

@@ -9,5 +9,10 @@ export default {
     util: 'src/util.js'
   },
   output: { dir: 'browser/dist', format: 'esm' },
-  plugins: [babel({ babelHelpers: 'bundled' })]
+  plugins: [
+    babel({
+      babelHelpers: 'bundled',
+      presets: [['@babel/env', { modules: false }]]
+    })
+  ]
 }
