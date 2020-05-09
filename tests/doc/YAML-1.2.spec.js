@@ -1530,7 +1530,9 @@ foo: bar
         [[''], 'text']
       ],
       errors: [
-        ['Document is not valid YAML (bad indentation?)'],
+        [
+          'Block scalars with more-indented leading empty lines must use an explicit indentation indicator'
+        ],
         ['Document is not valid YAML (bad indentation?)'],
         ['Document is not valid YAML (bad indentation?)']
       ]

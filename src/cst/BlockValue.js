@@ -1,4 +1,5 @@
 import { Type } from '../constants.js'
+import { YAMLSemanticError } from '../errors.js'
 import { Node } from './Node.js'
 import { Range } from './Range.js'
 
@@ -132,6 +133,9 @@ export class BlockValue extends Node {
         if (src[end] !== '\n') {
           // first line with non-whitespace content
           if (lineIndent < minBlockIndent) {
+            const msg =
+              'Block scalars with more-indented leading empty lines must use an explicit indentation indicator'
+            this.error = new YAMLSemanticError(this, msg)
             offset -= 1
             break
           }
