@@ -1415,9 +1415,9 @@ grave-accent: \`text`,
             {
               items: [
                 'commercial-at',
-                { type: Type.MAP_VALUE, node: '@text' },
+                { type: Type.MAP_VALUE, node: { strValue: { str: '@text' } } },
                 'grave-accent',
-                { type: Type.MAP_VALUE, node: '`text' }
+                { type: Type.MAP_VALUE, node: { strValue: { str: '`text' } } }
               ]
             }
           ]

@@ -56,12 +56,22 @@ export class PlainValue extends Node {
         str += ch
       }
     }
-    if (src[start] === '\t') {
-      const msg = 'Plain value cannot start with a tab character'
-      const errors = [new YAMLSemanticError(this, msg)]
-      return { errors, str }
+    const ch0 = src[start]
+    switch (ch0) {
+      case '\t': {
+        const msg = 'Plain value cannot start with a tab character'
+        const errors = [new YAMLSemanticError(this, msg)]
+        return { errors, str }
+      }
+      case '@':
+      case '`': {
+        const msg = `Plain value cannot start with reserved character ${ch0}`
+        const errors = [new YAMLSemanticError(this, msg)]
+        return { errors, str }
+      }
+      default:
+        return str
     }
-    return str
   }
 
   parseBlockValue(start) {

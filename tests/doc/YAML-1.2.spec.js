@@ -1,4 +1,5 @@
 import { YAML } from '../../src/index.js'
+import { YAMLError } from '../../src/errors.js'
 
 const collectionKeyWarning =
   'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
@@ -727,7 +728,8 @@ grave-accent: \`text`,
       tgt: [{ 'commercial-at': '@text', 'grave-accent': '`text' }],
       errors: [
         [
-          // ERROR: Reserved indicators can't start a plain scalar.
+          'Plain value cannot start with reserved character @',
+          'Plain value cannot start with reserved character `'
         ]
       ]
     }
@@ -766,12 +768,7 @@ block:\t|
   "\\c
   \\xq-"`,
       tgt: [{ 'Bad escapes': '\\c \\xq-' }],
-      errors: [
-        [
-          'Invalid escape sequence \\c'
-          // ERROR: q and - are invalid hex digits.
-        ]
-      ]
+      errors: [['Invalid escape sequence \\c', 'Invalid escape sequence \\xq-']]
     }
   },
 
@@ -1676,7 +1673,7 @@ last line
   - two # block value\n`,
       tgt: [
         {
-          'explicit key': null, // FIXME: maybe ''?
+          'explicit key': null,
           'block key\n': ['one', 'two']
         }
       ]
@@ -1867,9 +1864,10 @@ for (const section in spec) {
         documents.forEach((doc, i) => {
           if (!errors || !errors[i]) expect(doc.errors).toHaveLength(0)
           else
-            errors[i].forEach((err, j) =>
+            errors[i].forEach((err, j) => {
+              expect(doc.errors[j]).toBeInstanceOf(YAMLError)
               expect(doc.errors[j].message).toBe(err)
-            )
+            })
           if (!warnings || !warnings[i]) expect(doc.warnings).toHaveLength(0)
           else
             warnings[i].forEach((err, j) =>
