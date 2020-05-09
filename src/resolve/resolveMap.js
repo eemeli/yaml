@@ -198,11 +198,9 @@ function resolveFlowMapItems(doc, cst) {
   const comments = []
   const items = []
   let key = undefined
-  let keyStart = null
   let explicitKey = false
   let next = '{'
   for (let i = 0; i < cst.items.length; ++i) {
-    checkKeyLength(doc.errors, cst, i, key, keyStart)
     const item = cst.items[i]
     if (typeof item.char === 'string') {
       const { char, offset } = item
@@ -225,7 +223,6 @@ function resolveFlowMapItems(doc, cst) {
         if (key !== undefined) {
           items.push(new Pair(key))
           key = undefined
-          keyStart = null
           if (char === ',') {
             next = ':'
             continue
@@ -257,8 +254,6 @@ function resolveFlowMapItems(doc, cst) {
           new YAMLSemanticError(item, 'Separator , missing in flow map')
         )
       key = resolveNode(doc, item)
-      keyStart = explicitKey ? null : item.range.start
-      // TODO: add error for non-explicit multiline plain key
     } else {
       if (next !== ',')
         doc.errors.push(
