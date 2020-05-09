@@ -1,2 +1,2 @@
-module.exports = require('./dist/ast').Scalar
-require('./dist/warnings').warnFileDeprecation(__filename)
+module.exports = require('./dist/types').Scalar
+require('./dist/legacy-exports').warnFileDeprecation(__filename)

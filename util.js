@@ -1,20 +1,16 @@
-const ast = require('./dist/ast')
-exports.findPair = ast.findPair
-exports.toJSON = ast.toJSON
+const util = require('./dist/util')
 
-const resolveMapPkg = require('./dist/resolve/resolveMap')
-exports.parseMap = resolveMapPkg.resolveMap
+exports.findPair = util.findPair
+exports.toJSON = util.toJSON
+exports.parseMap = util.parseMap
+exports.parseSeq = util.parseSeq
 
-const resolveSeqPkg = require('./dist/resolve/resolveSeq')
-exports.parseSeq = resolveSeqPkg.resolveSeq
+exports.stringifyNumber = util.stringifyNumber
+exports.stringifyString = util.stringifyString
+exports.Type = util.Type
 
-exports.stringifyNumber = require('./dist/stringify/stringifyNumber').stringifyNumber
-exports.stringifyString = require('./dist/stringify/stringifyString').stringifyString
-exports.Type = require('./dist/constants').Type
-
-const err = require('./dist/errors')
-exports.YAMLError = err.YAMLError
-exports.YAMLReferenceError = err.YAMLReferenceError
-exports.YAMLSemanticError = err.YAMLSemanticError
-exports.YAMLSyntaxError = err.YAMLSyntaxError
-exports.YAMLWarning = err.YAMLWarning
+exports.YAMLError = util.YAMLError
+exports.YAMLReferenceError = util.YAMLReferenceError
+exports.YAMLSemanticError = util.YAMLSemanticError
+exports.YAMLSyntaxError = util.YAMLSyntaxError
+exports.YAMLWarning = util.YAMLWarning

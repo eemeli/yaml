@@ -1,7 +1,8 @@
 'use strict'
 Object.defineProperty(exports, '__esModule', { value: true })
 
-exports.binary = require('../dist/tags/yaml-1.1/binary').binary
+const legacy = require('../dist/legacy-exports')
+exports.binary = legacy.binary
 exports.default = [exports.binary]
 
-require('../dist/warnings').warnFileDeprecation(__filename)
+legacy.warnFileDeprecation(__filename)
