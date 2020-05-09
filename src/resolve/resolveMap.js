@@ -10,7 +10,7 @@ import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors.js'
 import {
   checkFlowCollectionEnd,
   checkFlowCommentSpace,
-  checkKeyLength,
+  getLongKeyError,
   resolveComments
 } from './collection-utils.js'
 import { resolveNode } from './resolveNode.js'
@@ -156,7 +156,10 @@ function resolveBlockMapItems(doc, cst) {
           const pair = new Pair(key, resolveNode(doc, valueNode))
           resolvePairComment(item, pair)
           items.push(pair)
-          checkKeyLength(doc.errors, cst, i, key, keyStart)
+          if (key && typeof keyStart === 'number') {
+            if (item.range.start > keyStart + 1024)
+              doc.errors.push(getLongKeyError(cst, key))
+          }
           key = undefined
           keyStart = null
         }
@@ -174,14 +177,11 @@ function resolveBlockMapItems(doc, cst) {
               continue next
             case Type.MAP_VALUE:
               break next
-            default:
-              doc.errors.push(
-                new YAMLSemanticError(
-                  item,
-                  'Implicit map keys need to be followed by map values'
-                )
-              )
+            default: {
+              const msg = 'Implicit map keys need to be followed by map values'
+              doc.errors.push(new YAMLSemanticError(item, msg))
               break next
+            }
           }
         }
         if (item.valueRangeContainsNewline) {

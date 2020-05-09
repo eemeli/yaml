@@ -7,7 +7,7 @@ import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors.js'
 import {
   checkFlowCollectionEnd,
   checkFlowCommentSpace,
-  checkKeyLength,
+  getLongKeyError,
   resolveComments
 } from './collection-utils.js'
 import { resolveNode } from './resolveNode.js'
@@ -75,6 +75,7 @@ function resolveFlowSeqItems(doc, cst) {
   let key = undefined
   let keyStart = null
   let next = '['
+  let prevItem = null
   for (let i = 0; i < cst.items.length; ++i) {
     const item = cst.items[i]
     if (typeof item.char === 'string') {
@@ -99,12 +100,24 @@ function resolveFlowSeqItems(doc, cst) {
             err.offset = offset
             doc.errors.push(err)
           }
-          if (!explicitKey) checkKeyLength(doc.errors, cst, i, key, keyStart)
+          if (!explicitKey && typeof keyStart === 'number') {
+            const keyEnd = item.range ? item.range.start : item.offset
+            if (keyEnd > keyStart + 1024)
+              doc.errors.push(getLongKeyError(cst, key))
+            const { src } = prevItem.context
+            for (let i = keyStart; i < keyEnd; ++i)
+              if (src[i] === '\n') {
+                const msg =
+                  'Implicit keys of flow sequence pairs need to be on a single line'
+                doc.errors.push(new YAMLSemanticError(prevItem, msg))
+                break
+              }
+          }
         } else {
           key = null
         }
         keyStart = null
-        explicitKey = false // TODO: add error for non-explicit multiline plain key
+        explicitKey = false
         next = null
       } else if (next === '[' || char !== ']' || i < cst.items.length - 1) {
         const msg = `Flow sequence contains an unexpected ${char}`
@@ -125,6 +138,7 @@ function resolveFlowSeqItems(doc, cst) {
       const value = resolveNode(doc, item)
       if (key === undefined) {
         items.push(value)
+        prevItem = item
       } else {
         items.push(new Pair(key, value))
         key = undefined

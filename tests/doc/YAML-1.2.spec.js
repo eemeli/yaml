@@ -1457,8 +1457,8 @@ foo: bar
       ],
       errors: [
         [
+          'Implicit keys of flow sequence pairs need to be on a single line',
           'The "foo xxxx...xxxx bar" key is too long'
-          // ERROR: The foo bar key spans multiple lines
         ]
       ]
     }

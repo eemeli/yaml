@@ -49,23 +49,10 @@ export function checkFlowCommentSpace(errors, comment) {
   }
 }
 
-export function checkKeyLength(errors, node, itemIdx, key, keyStart) {
-  if (!key || typeof keyStart !== 'number') return
-  const item = node.items[itemIdx]
-  let keyEnd = item && item.range && item.range.start
-  if (!keyEnd) {
-    for (let i = itemIdx - 1; i >= 0; --i) {
-      const it = node.items[i]
-      if (it && it.range) {
-        keyEnd = it.range.end + 2 * (itemIdx - i)
-        break
-      }
-    }
-  }
-  if (keyEnd > keyStart + 1024) {
-    const k = String(key).substr(0, 8) + '...' + String(key).substr(-8)
-    errors.push(new YAMLSemanticError(node, `The "${k}" key is too long`))
-  }
+export function getLongKeyError(source, key) {
+  const sk = String(key)
+  const k = sk.substr(0, 8) + '...' + sk.substr(-8)
+  return new YAMLSemanticError(source, `The "${k}" key is too long`)
 }
 
 export function resolveComments(collection, comments) {
