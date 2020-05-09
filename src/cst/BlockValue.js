@@ -118,32 +118,37 @@ export class BlockValue extends Node {
 
   parseBlockValue(start) {
     const { indent, src } = this.context
+    const explicit = !!this.blockIndent
     let offset = start
     let valueEnd = start
-    let bi = this.blockIndent ? indent + this.blockIndent - 1 : indent
     let minBlockIndent = 1
     for (let ch = src[offset]; ch === '\n'; ch = src[offset]) {
       offset += 1
       if (Node.atDocumentBoundary(src, offset)) break
-      const end = Node.endOfBlockIndent(src, bi, offset) // should not include tab?
+      const end = Node.endOfBlockIndent(src, indent, offset) // should not include tab?
       if (end === null) break
+      const ch = src[end]
+      const lineIndent = end - (offset + indent)
       if (!this.blockIndent) {
         // no explicit block indent, none yet detected
-        const lineIndent = end - (offset + indent)
         if (src[end] !== '\n') {
           // first line with non-whitespace content
           if (lineIndent < minBlockIndent) {
             const msg =
               'Block scalars with more-indented leading empty lines must use an explicit indentation indicator'
             this.error = new YAMLSemanticError(this, msg)
-            offset -= 1
-            break
           }
           this.blockIndent = lineIndent
-          bi = indent + this.blockIndent - 1
         } else if (lineIndent > minBlockIndent) {
           // empty line with more whitespace
           minBlockIndent = lineIndent
+        }
+      } else if (ch && ch !== '\n' && lineIndent < this.blockIndent) {
+        if (src[end] === '#') break
+        if (!this.error) {
+          const src = explicit ? 'explicit indentation indicator' : 'first line'
+          const msg = `Block scalars must not be less indented than their ${src}`
+          this.error = new YAMLSemanticError(this, msg)
         }
       }
       if (src[end] === '\n') {

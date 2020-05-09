@@ -2895,13 +2895,13 @@ foo: bar
 ·text`.replace(/·/g, ' '),
       tgt: [
         {
-          contents: [{ items: [{ node: '' }] }, { type: 'BLANK_LINE' }, 'text']
+          contents: [{ items: [{ node: ' \ntext\n' }] }]
         },
         {
-          contents: [{ items: [{ node: 'text\n' }] }, 'text']
+          contents: [{ items: [{ node: 'text text\n' }] }]
         },
         {
-          contents: [{ items: [{ node: '' }] }, 'text']
+          contents: [{ items: [{ node: 'text\n' }] }]
         }
       ]
       // ERROR: A leading all-space line must not have too many spaces.

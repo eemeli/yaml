@@ -1524,17 +1524,15 @@ foo: bar
 ---
 - |2
 ·text`.replace(/·/g, ' '),
-      tgt: [
-        [[''], 'text'],
-        [['text\n'], 'text'],
-        [[''], 'text']
-      ],
+      tgt: [[' \ntext\n'], ['text text\n'], ['text\n']],
       errors: [
         [
           'Block scalars with more-indented leading empty lines must use an explicit indentation indicator'
         ],
-        ['Document is not valid YAML (bad indentation?)'],
-        ['Document is not valid YAML (bad indentation?)']
+        ['Block scalars must not be less indented than their first line'],
+        [
+          'Block scalars must not be less indented than their explicit indentation indicator'
+        ]
       ]
     },
 
