@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { YAML } from '../../src/index.js'
+import YAML from '../../index.js'
 
 describe('tags', () => {
   describe('implicit tags', () => {

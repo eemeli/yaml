@@ -1,5 +1,5 @@
-import { YAML } from '../../src/index.js'
 import { source } from 'common-tags'
+import YAML from '../../index.js'
 
 const orig = {}
 beforeAll(() => {

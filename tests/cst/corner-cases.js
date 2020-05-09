@@ -1,5 +1,5 @@
 import { source } from 'common-tags'
-import { parse } from '../../src/cst/parse.js'
+import parse from '../../parse-cst.js'
 
 describe('folded block with chomp: keep', () => {
   test('nl + nl', () => {

@@ -65,8 +65,8 @@
     "lint": "eslint src/",
     "prettier": "prettier --write .",
     "start": "cross-env TRACE_LEVEL=log npm run build:node && node -i -e 'YAML=require(\".\")'",
-    "test": "cross-env TRACE_LEVEL=log jest",
-    "test:trace": "cross-env TRACE_LEVEL=trace,log jest --no-cache",
+    "test": "jest",
+    "test:dist": "npm run build:node && jest",
     "test:types": "tsc --lib ES2017 --noEmit tests/typings.ts",
     "docs:install": "cd docs-slate && bundle install",
     "docs:deploy": "cd docs-slate && ./deploy.sh",
@@ -75,19 +75,6 @@
     "prepublishOnly": "npm run clean && npm test && npm run build"
   },
   "browserslist": "> 0.5%, not dead",
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.js"
-    ],
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/tests/**/*.js"
-    ],
-    "testPathIgnorePatterns": [
-      "tests/common",
-      "tests/cst/common"
-    ]
-  },
   "prettier": {
     "arrowParens": "avoid",
     "semi": false,

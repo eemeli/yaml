@@ -3,6 +3,10 @@ node_js:
   - 'node'
   - 'lts/*'
 
+script:
+  - npm test
+  - npm run test:dist
+
 addons:
   browserstack:
     username: eemeliaro2
