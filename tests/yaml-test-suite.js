@@ -97,11 +97,14 @@ testDirs.forEach(dir => {
         '\n\nOUT\n' + src2,
         '\nOUT-JSON\n' + JSON.stringify(src2),
         '\nRE-JSON\n' + JSON.stringify(docs2[0], null, '  ')
+
       if (json) test('stringfy+re-parse', () => matchJson(docs2, json))
+
       if (outYaml) {
         test('out.yaml', () => {
-          const expDocs = YAML.parseAllDocuments(outYaml)
-          const resJson = docs.map(doc => doc.toJSON())
+          const resDocs = YAML.parseAllDocuments(yaml, { mapAsMap: true })
+          const resJson = resDocs.map(doc => doc.toJSON())
+          const expDocs = YAML.parseAllDocuments(outYaml, { mapAsMap: true })
           const expJson = expDocs.map(doc => doc.toJSON())
           expect(resJson).toMatchObject(expJson)
         })
