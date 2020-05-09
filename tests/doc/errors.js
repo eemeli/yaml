@@ -2,7 +2,10 @@ import fs from 'fs'
 import path from 'path'
 import { Node } from '../../src/cst/Node.js'
 import { YAMLError } from '../../src/errors.js'
-import { warnFileDeprecation, warnOptionDeprecation } from '../../src/warnings.js'
+import {
+  warnFileDeprecation,
+  warnOptionDeprecation
+} from '../../src/warnings.js'
 import { YAML } from '../../src/index.js'
 
 test('require a message and source for all errors', () => {
@@ -19,6 +22,8 @@ test('fail on map value indented with tab', () => {
   const src = 'a:\n\t1\nb:\n\t2\n'
   const doc = YAML.parseDocument(src)
   expect(doc.errors).toMatchObject([
+    { name: 'YAMLSemanticError' },
+    { name: 'YAMLSemanticError' },
     { name: 'YAMLSemanticError' },
     { name: 'YAMLSemanticError' }
   ])

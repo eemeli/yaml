@@ -1,3 +1,4 @@
+import { YAMLSemanticError } from '../errors.js'
 import { Node } from './Node.js'
 import { Range } from './Range.js'
 
@@ -35,9 +36,6 @@ export class PlainValue extends Node {
     let ch = src[end - 1]
     while (start < end && (ch === '\n' || ch === '\t' || ch === ' '))
       ch = src[--end - 1]
-    ch = src[start]
-    while (start < end && (ch === '\n' || ch === '\t' || ch === ' '))
-      ch = src[++start]
     let str = ''
     for (let i = start; i < end; ++i) {
       const ch = src[i]
@@ -57,6 +55,11 @@ export class PlainValue extends Node {
       } else {
         str += ch
       }
+    }
+    if (src[start] === '\t') {
+      const msg = 'Plain value cannot start with a tab character'
+      const errors = [new YAMLSemanticError(this, msg)]
+      return { errors, str }
     }
     return str
   }

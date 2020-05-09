@@ -114,7 +114,9 @@ export class ParseContext {
     const { inFlow, parent, src } = this
     const props = []
     let lineHasProps = false
-    offset = Node.endOfWhiteSpace(src, offset)
+    offset = this.atLineStart
+      ? Node.endOfIndent(src, offset)
+      : Node.endOfWhiteSpace(src, offset)
     let ch = src[offset]
     while (
       ch === Char.ANCHOR ||
@@ -180,7 +182,7 @@ export class ParseContext {
     const context = new ParseContext(this, overlay)
     const { props, type, valueStart } = context.parseProps(start)
     trace: 'START',
-      { valueStart, type, props },
+      { start, valueStart, type, props },
       {
         start: `${context.lineStart} + ${context.indent}`,
         atLineStart: context.atLineStart,
