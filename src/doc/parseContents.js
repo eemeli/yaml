@@ -5,27 +5,29 @@ import { resolveNode } from '../resolve/resolveNode.js'
 
 export function parseContents(doc, contents) {
   const comments = { before: [], after: [] }
-  const contentNodes = []
+  let body = undefined
   let spaceBefore = false
   for (const node of contents) {
     if (node.valueRange) {
-      if (contentNodes.length === 1) {
-        const msg = 'Document is not valid YAML (bad indentation?)'
+      if (body !== undefined) {
+        const msg =
+          'Document contains trailing content not separated by a ... or --- line'
         doc.errors.push(new YAMLSyntaxError(node, msg))
+        break
       }
       const res = resolveNode(doc, node)
       if (spaceBefore) {
         res.spaceBefore = true
         spaceBefore = false
       }
-      contentNodes.push(res)
+      body = res
     } else if (node.comment !== null) {
-      const cc = contentNodes.length === 0 ? comments.before : comments.after
+      const cc = body === undefined ? comments.before : comments.after
       cc.push(node.comment)
     } else if (node.type === Type.BLANK_LINE) {
       spaceBefore = true
       if (
-        contentNodes.length === 0 &&
+        body === undefined &&
         comments.before.length > 0 &&
         !doc.commentBefore
       ) {
@@ -36,39 +38,18 @@ export function parseContents(doc, contents) {
     }
   }
 
-  switch (contentNodes.length) {
-    // empty document
-    case 0:
-      doc.contents = null
-      comments.after = comments.before
-      break
-
-    case 1:
-      doc.contents = contentNodes[0]
-      if (doc.contents) {
-        const cb = comments.before.join('\n') || null
-        if (cb) {
-          const cbNode =
-            doc.contents instanceof Collection && doc.contents.items[0]
-              ? doc.contents.items[0]
-              : doc.contents
-          cbNode.commentBefore = cbNode.commentBefore
-            ? `${cb}\n${cbNode.commentBefore}`
-            : cb
-        }
-      } else {
-        comments.after = comments.before.concat(comments.after)
-      }
-      break
-
-    // invalid source
-    default:
-      doc.contents = contentNodes
-      if (doc.contents[0]) {
-        doc.contents[0].commentBefore = comments.before.join('\n') || null
-      } else {
-        comments.after = comments.before.concat(comments.after)
-      }
+  doc.contents = body || null
+  if (!body) {
+    doc.comment = comments.before.concat(comments.after).join('\n') || null
+  } else {
+    const cb = comments.before.join('\n')
+    if (cb) {
+      const cbNode =
+        body instanceof Collection && body.items[0] ? body.items[0] : body
+      cbNode.commentBefore = cbNode.commentBefore
+        ? `${cb}\n${cbNode.commentBefore}`
+        : cb
+    }
+    doc.comment = comments.after.join('\n') || null
   }
-  doc.comment = comments.after.join('\n') || null
 }

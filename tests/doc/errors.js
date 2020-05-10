@@ -243,10 +243,14 @@ describe('invalid options', () => {
 
 test('broken document with comment before first node', () => {
   const doc = YAML.parseDocument('#c\n*x\nfoo\n')
-  expect(doc.contents).toMatchObject([null, { type: 'PLAIN' }])
+  expect(doc.contents).toBeNull()
   expect(doc.errors).toMatchObject([
-    { name: 'YAMLReferenceError' },
-    { name: 'YAMLSyntaxError' }
+    { name: 'YAMLReferenceError', message: 'Aliased anchor not found: x' },
+    {
+      name: 'YAMLSyntaxError',
+      message:
+        'Document contains trailing content not separated by a ... or --- line'
+    }
   ])
 })
 
