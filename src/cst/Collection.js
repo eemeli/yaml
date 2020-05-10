@@ -1,4 +1,5 @@
 import { Type } from '../constants.js'
+import { YAMLSyntaxError } from '../errors.js'
 import { BlankLine } from './BlankLine.js'
 import { CollectionItem } from './CollectionItem.js'
 import { Comment } from './Comment.js'
@@ -138,23 +139,29 @@ export class Collection extends Node {
         break
       }
       if (offset !== lineStart + indent && (atLineStart || ch !== ':')) {
-        trace: 'end:unindent',
-          { offset, lineStart, indent, ch: JSON.stringify(ch) }
-        if (lineStart > start) offset = lineStart
-        break
-      }
-      if ((firstItem.type === Type.SEQ_ITEM) !== (ch === '-')) {
-        let typeswitch = true
-        if (ch === '-') {
-          // map key may start with -, as long as it's followed by a non-whitespace char
-          const next = src[offset + 1]
-          typeswitch = !next || next === '\n' || next === '\t' || next === ' '
+        if (offset < lineStart + indent) {
+          trace: 'end:unindent',
+            { offset, lineStart, indent, ch: JSON.stringify(ch) }
+          if (lineStart > start) offset = lineStart
+          break
+        } else if (!this.error) {
+          const msg = 'All collection items must start at the same column'
+          this.error = new YAMLSyntaxError(this, msg)
         }
-        if (typeswitch) {
+      }
+      if (firstItem.type === Type.SEQ_ITEM) {
+        if (ch !== '-') {
           trace: 'end:typeswitch',
             { offset, lineStart, indent, ch: JSON.stringify(ch) }
           if (lineStart > start) offset = lineStart
           break
+        }
+      } else if (ch === '-' && !this.error) {
+        // map key may start with -, as long as it's followed by a non-whitespace char
+        const next = src[offset + 1]
+        if (!next || next === '\n' || next === '\t' || next === ' ') {
+          const msg = 'A collection cannot be both a mapping and a sequence'
+          this.error = new YAMLSyntaxError(this, msg)
         }
       }
       trace: 'item-start', this.items.length, { ch: JSON.stringify(ch) }

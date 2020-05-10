@@ -77,6 +77,52 @@ describe('eemeli/yaml#7', () => {
   })
 })
 
+describe('block collections', () => {
+  test('mapping with bad indentation', () => {
+    const src = 'foo: "1"\n bar: 2\n'
+    const doc = YAML.parseDocument(src)
+    expect(doc.errors).toMatchObject([
+      { message: 'All collection items must start at the same column' }
+    ])
+    expect(doc.contents).toMatchObject({
+      type: 'MAP',
+      items: [
+        { key: { value: 'foo' }, value: { value: '1' } },
+        { key: { value: 'bar' }, value: { value: 2 } }
+      ]
+    })
+  })
+
+  test('sequence with bad indentation', () => {
+    const src = '- "foo"\n - bar\n'
+    const doc = YAML.parseDocument(src)
+    expect(doc.errors).toMatchObject([
+      { message: 'All collection items must start at the same column' }
+    ])
+    expect(doc.contents).toMatchObject({
+      type: 'SEQ',
+      items: [{ value: 'foo' }, { value: 'bar' }]
+    })
+  })
+
+  test('seq item in mapping', () => {
+    const src = 'foo: "1"\n- bar\n'
+    const doc = YAML.parseDocument(src)
+    expect(doc.errors).toMatchObject([
+      { message: 'A collection cannot be both a mapping and a sequence' },
+      { message: 'Failed to resolve SEQ_ITEM node here' },
+      { message: 'Implicit map keys need to be followed by map values' }
+    ])
+    expect(doc.contents).toMatchObject({
+      type: 'MAP',
+      items: [
+        { key: { value: 'foo' }, value: { value: '1' } },
+        { key: null, value: null }
+      ]
+    })
+  })
+})
+
 describe('missing flow collection terminator', () => {
   test('start only of flow map (eemeli/yaml#8)', () => {
     const doc = YAML.parseDocument('{', { prettyErrors: true })
