@@ -706,11 +706,8 @@ invoice:
     })
 
     test('no custom tag object', () => {
-      const doc = YAML.parseDocument(src)
-      const message =
-        'The tag tag:yaml.org,2002:binary is unavailable, falling back to tag:yaml.org,2002:str'
-      expect(doc.warnings).toMatchObject([{ message }])
-      expect(typeof doc.contents.value).toBe('string')
+      const bin = YAML.parse(src)
+      expect(bin).toBeInstanceOf(Uint8Array)
     })
   })
 })

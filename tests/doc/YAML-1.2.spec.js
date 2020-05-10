@@ -403,15 +403,79 @@ application specific tag: !something |
       tgt: [
         {
           'not-date': '2002-04-28',
-          picture:
-            'R0lGODlhDAAMAIQAAP//9/X\n17unp5WZmZgAAAOfn515eXv\nPz7Y6OjuDg4J+fn5OTk6enp\n56enmleECcgggoBADs=\n',
+          picture: Buffer.from([
+            71,
+            73,
+            70,
+            56,
+            57,
+            97,
+            12,
+            0,
+            12,
+            0,
+            132,
+            0,
+            0,
+            255,
+            255,
+            247,
+            245,
+            245,
+            238,
+            233,
+            233,
+            229,
+            102,
+            102,
+            102,
+            0,
+            0,
+            0,
+            231,
+            231,
+            231,
+            94,
+            94,
+            94,
+            243,
+            243,
+            237,
+            142,
+            142,
+            142,
+            224,
+            224,
+            224,
+            159,
+            159,
+            159,
+            147,
+            147,
+            147,
+            167,
+            167,
+            167,
+            158,
+            158,
+            158,
+            105,
+            94,
+            16,
+            39,
+            32,
+            130,
+            10,
+            1,
+            0,
+            59
+          ]),
           'application specific tag':
             'The semantics of the tag\nabove may be different for\ndifferent documents.\n'
         }
       ],
       warnings: [
         [
-          'The tag tag:yaml.org,2002:binary is unavailable, falling back to tag:yaml.org,2002:str',
           'The tag !something is unavailable, falling back to tag:yaml.org,2002:str'
         ]
       ],
@@ -467,18 +531,7 @@ application specific tag: !something |
 ? Mark McGwire
 ? Sammy Sosa
 ? Ken Griff`,
-      tgt: [
-        {
-          'Mark McGwire': null,
-          'Sammy Sosa': null,
-          'Ken Griff': null
-        }
-      ],
-      warnings: [
-        [
-          'The tag tag:yaml.org,2002:set is unavailable, falling back to tag:yaml.org,2002:map'
-        ]
-      ]
+      tgt: [new Set(['Mark McGwire', 'Sammy Sosa', 'Ken Griff'])]
     },
 
     'Example 2.26. Ordered Mappings': {
@@ -490,12 +543,11 @@ application specific tag: !something |
 - Sammy Sosa: 63
 - Ken Griffy: 58\n\n`,
       tgt: [
-        [{ 'Mark McGwire': 65 }, { 'Sammy Sosa': 63 }, { 'Ken Griffy': 58 }]
-      ],
-      warnings: [
-        [
-          'The tag tag:yaml.org,2002:omap is unavailable, falling back to tag:yaml.org,2002:seq'
-        ]
+        new Map([
+          ['Mark McGwire', 65],
+          ['Sammy Sosa', 63],
+          ['Ken Griffy', 58]
+        ])
       ]
     }
   },
