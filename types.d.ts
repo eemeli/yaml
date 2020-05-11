@@ -225,7 +225,6 @@ export class Node {
 
 export class Scalar extends Node {
   constructor(value: any)
-  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any
   type?: Scalar.Type
   /**
    * By default (undefined), numbers use decimal notation.
@@ -233,6 +232,8 @@ export class Scalar extends Node {
    */
   format?: 'BIN' | 'HEX' | 'OCT' | 'TIME'
   value: any
+  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any
+  toString(): string
 }
 export namespace Scalar {
   type Type =
@@ -247,17 +248,23 @@ export class Alias extends Node {
   type: Type.ALIAS
   source: Node
   cstNode?: CST.Alias
+  toString(ctx: Schema.StringifyContext): string
 }
 
 export class Pair extends Node {
   constructor(key: any, value?: any)
-  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
   type: Pair.Type.PAIR | Pair.Type.MERGE_PAIR
   /** Always Node or null when parsed, but can be set to anything. */
   key: any
   /** Always Node or null when parsed, but can be set to anything. */
   value: any
   cstNode?: never // no corresponding cstNode
+  toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
+  toString(
+    ctx?: Schema.StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ): string
 }
 export namespace Pair {
   enum Type {
@@ -272,6 +279,7 @@ export class Merge extends Pair {
   key: AST.PlainValue
   /** Always YAMLSeq<Alias(Map)>, stringified as *A if length = 1 */
   value: YAMLSeq
+  toString(ctx?: Schema.StringifyContext, onComment?: () => void): string
 }
 
 export class Collection extends Node {
@@ -317,6 +325,11 @@ export class YAMLMap extends Collection {
   items: Array<Pair>
   hasAllNullValues(): boolean
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
+  toString(
+    ctx?: Schema.StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ): string
 }
 
 export class YAMLSeq extends Collection {
@@ -327,6 +340,11 @@ export class YAMLSeq extends Collection {
   set(key: number | string | Scalar, value: any): void
   hasAllNullValues(): boolean
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any[]
+  toString(
+    ctx?: Schema.StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ): string
 }
 
 export namespace AST {
