@@ -1,10 +1,10 @@
 <h1 id='documents'>Documents</h1>
 <p>In order to work with YAML features not directly supported by native JavaScript data types, such as comments, anchors and aliases, <code>yaml</code> provides the <code>YAML.Document</code> API.</p>
-<h2 id='parsing-documents'>Parsing Documents</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">fs</span> <span class="nx">from</span> <span class="s1">'fs'</span>
-<span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
+<h2 id='parsing-documents'>Parsing Documents</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">fs</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">fs</span><span class="dl">'</span>
+<span class="k">import</span> <span class="nx">YAML</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 
-<span class="kr">const</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="s1">'./file.yml'</span><span class="p">,</span> <span class="s1">'utf8'</span><span class="p">)</span>
-<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="dl">'</span><span class="s1">./file.yml</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">utf8</span><span class="dl">'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span>
 <span class="c1">// YAMLMap {</span>
 <span class="c1">//   items:</span>
@@ -36,7 +36,7 @@
 <span class="c1">//           range: [ 102, 180 ] } } ],</span>
 <span class="c1">//   tag: 'tag:yaml.org,2002:map',</span>
 <span class="c1">//   range: [ 0, 180 ] }</span>
-</code></pre><h4 id='yaml-parsedocument-str-options-yaml-document'><code>YAML.parseDocument(str, options = {}): YAML.Document</code></h4>
+</code></pre></div><h4 id='yaml-parsedocument-str-options-yaml-document'><code>YAML.parseDocument(str, options = {}): YAML.Document</code></h4>
 <p>Parses a single <code>YAML.Document</code> from the input <code>str</code>; used internally by <code>YAML.parse</code>. Will include an error if <code>str</code> contains more than one document. See <a href="#options">Options</a> for more information on the second parameter.</p>
 
 <p><br/></p>
@@ -107,10 +107,10 @@
 <td>Warnings encountered during parsing.</td>
 </tr>
 </tbody></table>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">version</span> <span class="o">=</span> <span class="kc">true</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span> <span class="o">=</span> <span class="s1">' A commented document'</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'some'</span><span class="p">,</span> <span class="s1">'values'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}]</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> A commented document</span><span class="dl">'</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">some</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">values</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}]</span>
 
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// # A commented document</span>
@@ -119,7 +119,7 @@
 <span class="c1">// - some</span>
 <span class="c1">// - values</span>
 <span class="c1">// - balloons: 99</span>
-</code></pre>
+</code></pre></div>
 <p>The Document members are all modifiable, though it&#39;s unlikely that you&#39;ll have reason to change <code>errors</code>, <code>schema</code> or <code>warnings</code>. In particular you may be interested in both reading and writing <strong><code>contents</code></strong>. Although <code>YAML.parseDocument()</code> and <code>YAML.parseAllDocuments()</code> will leave it with <code>Map</code>, <code>Seq</code>, <code>Scalar</code> or <code>null</code> contents, it can be set to anything.</p>
 
 <p>During stringification, a document with a true-ish <code>version</code> value will include a <code>%YAML</code> directive; the version number will be set to <code>1.2</code> unless the <code>yaml-1.1</code> schema is in use.</p>
@@ -162,19 +162,19 @@
 <td>A YAML representation of the document.</td>
 </tr>
 </tbody></table>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s1">'a: 1\nb: [2, 3]\n'</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span> <span class="c1">// 1</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="dl">'</span><span class="s1">a: 1</span><span class="se">\n</span><span class="s1">b: [2, 3]</span><span class="se">\n</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 1</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([])</span> <span class="c1">// YAMLMap { items: [Pair, Pair], ... }</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">hasIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="c1">// true</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span> <span class="c1">// -&gt; doc.get('b').items.length === 3</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">deleteIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// true</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// 4</span>
-</code></pre>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">hasIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="c1">// true</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span> <span class="c1">// -&gt; doc.get('b').items.length === 3</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">deleteIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// true</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// 4</span>
+</code></pre></div>
 <p>In addition to the above, the document object also provides the same <strong>accessor methods</strong> as <a href="#collections">collections</a>, based on the top-level collection: <code>add</code>, <code>delete</code>, <code>get</code>, <code>has</code>, and <code>set</code>, along with their deeper variants <code>addIn</code>, <code>deleteIn</code>, <code>getIn</code>, <code>hasIn</code>, and <code>setIn</code>. For the <code>*In</code> methods using an empty <code>path</code> value (i.e. <code>null</code>, <code>undefined</code>, or <code>[]</code>) will refer to the document&#39;s top-level <code>contents</code>.</p>
 
 <p>To define a tag prefix to use when stringifying, use <strong><code>setTagPrefix(handle, prefix)</code></strong> rather than setting a value directly in <code>tagPrefixes</code>. This will guarantee that the <code>handle</code> is valid (by throwing an error), and will overwrite any previous definition for the <code>handle</code>. Use an empty <code>prefix</code> value to remove a prefix.</p>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="s1">'1969-07-21T02:56:15Z'</span>
-<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="s1">'timestamp'</span><span class="p">]</span> <span class="p">})</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">1969-07-21T02:56:15Z</span><span class="dl">'</span>
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">timestamp</span><span class="dl">'</span><span class="p">]</span> <span class="p">})</span>
 
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// Date { 1969-07-21T02:56:15.000Z }</span>
@@ -185,7 +185,7 @@
 
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// '1969-07-21T02:56:15\n'</span>
-</code></pre>
+</code></pre></div>
 <p>For a plain JavaScript representation of the document, <strong><code>toJSON()</code></strong> is your friend. By default the values wrapped in scalar nodes will not be forced to JSON, so e.g. a <code>!!timestamp</code> will remain a <code>Date</code> in the output. To change this behaviour and enforce JSON values only, set the <a href="#options"><code>keepBlobsInJSON</code> option</a> to <code>false</code>.</p>
 
 <p>Conversely, to stringify a document as YAML, use <strong><code>toString()</code></strong>. This will also be called by <code>String(doc)</code>. This method will throw if the <code>errors</code> array is not empty.</p>
@@ -217,6 +217,11 @@
 <td>The anchor name associated with <code>node</code>, if set.</td>
 </tr>
 <tr>
+<td>getNames()</td>
+<td><code>string[]</code></td>
+<td>List of all defined anchor names.</td>
+</tr>
+<tr>
 <td>getNode(name: string)</td>
 <td><code>Node?</code></td>
 <td>The node associated with the anchor <code>name</code>, if set.</td>
@@ -232,27 +237,27 @@
 <td>Associate an anchor with <code>node</code>. If <code>name</code> is empty, a new name will be generated.</td>
 </tr>
 </tbody></table>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="s1">'[{ a: A }, { b: B }]'</span>
-<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
-<span class="kr">const</span> <span class="p">{</span> <span class="nx">anchors</span><span class="p">,</span> <span class="nx">contents</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">doc</span>
-<span class="kr">const</span> <span class="p">[</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">]</span> <span class="o">=</span> <span class="nx">contents</span><span class="p">.</span><span class="nx">items</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">[{ a: A }, { b: B }]</span><span class="dl">'</span>
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">anchors</span><span class="p">,</span> <span class="nx">contents</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">doc</span>
+<span class="kd">const</span> <span class="p">[</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">]</span> <span class="o">=</span> <span class="nx">contents</span><span class="p">.</span><span class="nx">items</span>
 <span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">)</span> <span class="c1">// 'a1'</span>
 <span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">)</span> <span class="c1">// 'a2'</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">'a1'</span><span class="p">)</span> <span class="c1">// 'a1'</span>
+<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a1</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 'a1'</span>
 <span class="nx">anchors</span><span class="p">.</span><span class="nx">getName</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="c1">// undefined</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">getNode</span><span class="p">(</span><span class="s1">'a2'</span><span class="p">)</span>
+<span class="nx">anchors</span><span class="p">.</span><span class="nx">getNode</span><span class="p">(</span><span class="dl">'</span><span class="s1">a2</span><span class="dl">'</span><span class="p">)</span>
 <span class="c1">// { value: 'B', range: [ 16, 18 ], type: 'PLAIN' }</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ { a: A }, { b: &amp;a2 B } ]</span>
 
-<span class="kr">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="s1">'AA'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="dl">'</span><span class="s1">AA</span><span class="dl">'</span><span class="p">)</span>
 <span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B }, *AA ]</span>
 
-<span class="kr">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createMergePair</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createMergePair</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
 <span class="nx">b</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">merge</span><span class="p">)</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]</span>
@@ -272,7 +277,7 @@
 <span class="c1">//     },</span>
 <span class="c1">//   *AA</span>
 <span class="c1">// ]</span>
-</code></pre>
+</code></pre></div>
 <p>The constructors for <code>Alias</code> and <code>Merge</code> are not directly exported by the library, as they depend on the document&#39;s anchors; instead you&#39;ll need to use <strong><code>createAlias(node, name)</code></strong> and <strong><code>createMergePair(...sources)</code></strong>. You should make sure to only add alias and merge nodes to the document after the nodes to which they refer, or the document&#39;s YAML stringification will fail.</p>
 
 <p>It is valid to have an anchor associated with a node even if it has no aliases. <code>yaml</code> will not allow you to associate the same name with more than one node, even though this is allowed by the YAML spec (all but the last instance will have numerical suffixes added). To add or reassign an anchor, use <strong><code>setAnchor(node, name)</code></strong>. The second parameter is optional, and if left out either the pre-existing anchor name of the node will be used, or a new one generated. To remove an anchor, use <code>setAnchor(null, name)</code>. The function will return the new anchor&#39;s name, or <code>null</code> if both of its arguments are <code>null</code>.</p>

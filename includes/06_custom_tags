@@ -1,32 +1,32 @@
-<h1 id='custom-data-types'>Custom Data Types</h1><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'!!timestamp 2001-12-15 2:59:43'</span><span class="p">)</span>
+<h1 id='custom-data-types'>Custom Data Types</h1><div class="highlight"><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">!!timestamp 2001-12-15 2:59:43</span><span class="dl">'</span><span class="p">)</span>
 <span class="c1">// YAMLWarning:</span>
 <span class="c1">//   The tag tag:yaml.org,2002:timestamp is unavailable,</span>
 <span class="c1">//   falling back to tag:yaml.org,2002:str</span>
 <span class="c1">// '2001-12-15 2:59:43'</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">customTags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'timestamp'</span><span class="p">]</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">customTags</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">timestamp</span><span class="dl">'</span><span class="p">]</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'2001-12-15 2:59:43'</span><span class="p">)</span> <span class="c1">// returns a Date instance</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">2001-12-15 2:59:43</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// returns a Date instance</span>
 <span class="c1">// 2001-12-15T02:59:43.000Z</span>
 
-<span class="kr">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s1">'2001-12-15 2:59:43'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="dl">'</span><span class="s1">2001-12-15 2:59:43</span><span class="dl">'</span><span class="p">)</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">toDateString</span><span class="p">()</span>
 <span class="c1">// 'Sat Dec 15 2001'</span>
-</code></pre>
+</code></pre></div>
 <p>The easiest way to extend a <a href="#data-schemas">schema</a> is by defining the additional <strong>tags</strong> that you wish to support. To do that, the <code>customTags</code> option allows you to provide an array of custom tag objects or tag identifiers. In particular, the built-in tags that are a part of the <code>core</code> and <code>yaml-1.1</code> schemas may be referred to by their string identifiers. For those tags that are available in both, only the <code>core</code> variant is provided as a custom tag.</p>
 
 <p>For further customisation, <code>customTags</code> may also be a function <code>(Tag[]) =&gt; (Tag[])</code> that may modify the schema&#39;s base tag array.</p>
-<h2 id='built-in-custom-tags'>Built-in Custom Tags</h2><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'[ one, true, 42 ]'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">v</span><span class="p">)</span>
+<h2 id='built-in-custom-tags'>Built-in Custom Tags</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">[ one, true, 42 ]</span><span class="dl">'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">v</span><span class="p">)</span>
 <span class="c1">// [ 'string', 'boolean', 'number' ]</span>
 
-<span class="kd">let</span> <span class="nx">opt</span> <span class="o">=</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'failsafe'</span> <span class="p">}</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'[ one, true, 42 ]'</span><span class="p">,</span> <span class="nx">opt</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">v</span><span class="p">)</span>
+<span class="kd">let</span> <span class="nx">opt</span> <span class="o">=</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="dl">'</span><span class="s1">failsafe</span><span class="dl">'</span> <span class="p">}</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">[ one, true, 42 ]</span><span class="dl">'</span><span class="p">,</span> <span class="nx">opt</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">v</span><span class="p">)</span>
 <span class="c1">// [ 'string', 'string', 'string' ]</span>
 
-<span class="nx">opt</span> <span class="o">=</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'failsafe'</span><span class="p">,</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="s1">'int'</span><span class="p">]</span> <span class="p">}</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'[ one, true, 42 ]'</span><span class="p">,</span> <span class="nx">opt</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">v</span><span class="p">)</span>
+<span class="nx">opt</span> <span class="o">=</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="dl">'</span><span class="s1">failsafe</span><span class="dl">'</span><span class="p">,</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">int</span><span class="dl">'</span><span class="p">]</span> <span class="p">}</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">[ one, true, 42 ]</span><span class="dl">'</span><span class="p">,</span> <span class="nx">opt</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">v</span><span class="p">)</span>
 <span class="c1">// [ 'string', 'string', 'number' ]</span>
-</code></pre><h3 id='yaml-1-2-core-schema'>YAML 1.2 Core Schema</h3>
+</code></pre></div><h3 id='yaml-1-2-core-schema'>YAML 1.2 Core Schema</h3>
 <p>These tags are a part of the YAML 1.2 <a href="https://yaml.org/spec/1.2/spec.html#id2804923">Core Schema</a>, and may be useful when constructing a parser or stringifier for a more limited set of types, based on the <code>failsafe</code> schema. Some of these define a <code>format</code> value; this will be added to the parsed nodes and affects the node&#39;s stringification.</p>
 
 <p>If including more than one custom tag from this set, make sure that the <code>&#39;float&#39;</code> and <code>&#39;int&#39;</code> tags precede any of the other <code>!!float</code> and <code>!!int</code> tags.</p>
@@ -151,24 +151,24 @@
 <td>A point in time, e.g. <code>2001-12-15T02:59:43</code>.</td>
 </tr>
 </tbody></table>
-<h2 id='writing-custom-tags'>Writing Custom Tags</h2><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">stringifyString</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/util'</span>
+<h2 id='writing-custom-tags'>Writing Custom Tags</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">stringifyString</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/util</span><span class="dl">'</span>
 
-<span class="kr">const</span> <span class="nx">regexp</span> <span class="o">=</span> <span class="p">{</span>
+<span class="kd">const</span> <span class="nx">regexp</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">identify</span><span class="p">:</span> <span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">value</span> <span class="k">instanceof</span> <span class="nb">RegExp</span><span class="p">,</span>
-  <span class="na">tag</span><span class="p">:</span> <span class="s1">'!re'</span><span class="p">,</span>
+  <span class="na">tag</span><span class="p">:</span> <span class="dl">'</span><span class="s1">!re</span><span class="dl">'</span><span class="p">,</span>
   <span class="nx">resolve</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">cst</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">cst</span><span class="p">.</span><span class="nx">strValue</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^</span><span class="se">\/([\s\S]</span><span class="sr">+</span><span class="se">)\/([</span><span class="sr">gimuy</span><span class="se">]</span><span class="sr">*</span><span class="se">)</span><span class="sr">$/</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">cst</span><span class="p">.</span><span class="nx">strValue</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^</span><span class="se">\/([\s\S]</span><span class="sr">+</span><span class="se">)\/([</span><span class="sr">gimuy</span><span class="se">]</span><span class="sr">*</span><span class="se">)</span><span class="sr">$/</span><span class="p">)</span>
     <span class="k">return</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">match</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="kr">const</span> <span class="nx">sharedSymbol</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">identify</span><span class="p">:</span> <span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">value</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nx">Symbol</span><span class="p">,</span>
-  <span class="na">tag</span><span class="p">:</span> <span class="s1">'!symbol/shared'</span><span class="p">,</span>
-  <span class="na">resolve</span><span class="p">:</span> <span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">cst</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="nx">cst</span><span class="p">.</span><span class="nx">strValue</span><span class="p">),</span>
+<span class="kd">const</span> <span class="nx">sharedSymbol</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">identify</span><span class="p">:</span> <span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">value</span><span class="p">.</span><span class="kd">constructor</span> <span class="o">===</span> <span class="nb">Symbol</span><span class="p">,</span>
+  <span class="na">tag</span><span class="p">:</span> <span class="dl">'</span><span class="s1">!symbol/shared</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">resolve</span><span class="p">:</span> <span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">cst</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nb">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="nx">cst</span><span class="p">.</span><span class="nx">strValue</span><span class="p">),</span>
   <span class="nx">stringify</span><span class="p">(</span><span class="nx">item</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">onComment</span><span class="p">,</span> <span class="nx">onChompKeep</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">.</span><span class="nx">keyFor</span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Only shared symbols are supported'</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">key</span> <span class="o">=</span> <span class="nb">Symbol</span><span class="p">.</span><span class="nx">keyFor</span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Only shared symbols are supported</span><span class="dl">'</span><span class="p">)</span>
     <span class="k">return</span> <span class="nx">stringifyString</span><span class="p">({</span> <span class="na">value</span><span class="p">:</span> <span class="nx">key</span> <span class="p">},</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">onComment</span><span class="p">,</span> <span class="nx">onChompKeep</span><span class="p">)</span>
   <span class="p">}</span>
 <span class="p">}</span>
@@ -177,11 +177,11 @@
 
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
   <span class="na">regexp</span><span class="p">:</span> <span class="sr">/foo/gi</span><span class="p">,</span>
-  <span class="na">symbol</span><span class="p">:</span> <span class="nx">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">)</span>
+  <span class="na">symbol</span><span class="p">:</span> <span class="nb">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">)</span>
 <span class="p">})</span>
 <span class="c1">// regexp: !re /foo/gi</span>
 <span class="c1">// symbol: !symbol/shared bar</span>
-</code></pre>
+</code></pre></div>
 <p>In YAML-speak, a custom data type is represented by a <em>tag</em>. To define your own tag, you need to account for the ways that your data is both parsed and stringified. Furthermore, both of those processes are split into two stages by the intermediate AST node structure.</p>
 
 <p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/master/src/tags/yaml-1.1/binary.js"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/master/src/tags/yaml-1.1/set.js"><code>!!set</code></a> tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.</p>
@@ -199,7 +199,7 @@
 <p>Finally, <code>stringify(item, ctx, ...): string</code> defines how your data should be represented as a YAML string, in case the default stringifiers aren&#39;t enough. For collections in particular, the default stringifier should be perfectly sufficient. <code>&#39;yaml/util&#39;</code> exports <code>stringifyNumber(item)</code> and <code>stringifyString(item, ctx, ...)</code>, which may be of use for custom scalar data.</p>
 <h3 id='custom-tag-api'>Custom Tag API</h3>
 <!-- prettier-ignore -->
-<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
   <span class="nx">findPair</span><span class="p">,</span> <span class="c1">// (items, key) =&gt; Pair? -- Given a key, find a matching Pair</span>
   <span class="nx">parseMap</span><span class="p">,</span> <span class="c1">// (doc, cstNode) =&gt; new YAMLMap</span>
   <span class="nx">parseSeq</span><span class="p">,</span> <span class="c1">// (doc, cstNode) =&gt; new YAMLSeq</span>
@@ -208,8 +208,8 @@
   <span class="nx">toJSON</span><span class="p">,</span> <span class="c1">// (value, arg, ctx) =&gt; any -- Recursively convert to plain JS</span>
   <span class="nx">Type</span><span class="p">,</span> <span class="c1">// { [string]: string } -- Used as enum for node types</span>
   <span class="nx">YAMLReferenceError</span><span class="p">,</span> <span class="nx">YAMLSemanticError</span><span class="p">,</span> <span class="nx">YAMLSyntaxError</span><span class="p">,</span> <span class="nx">YAMLWarning</span>
-<span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/util'</span>
-</code></pre>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/util</span><span class="dl">'</span>
+</code></pre></div>
 <p>To define your own tag, you&#39;ll need to define an object comprising of some of the following fields. Those in bold are required:</p>
 
 <ul>

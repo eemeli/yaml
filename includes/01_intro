@@ -2,10 +2,10 @@
 <blockquote>
 <p>To install:</p>
 </blockquote>
-<pre class="highlight sh tab-shell"><code>npm install yaml
+<div class="highlight"><pre class="highlight sh tab-shell"><code>npm <span class="nb">install </span>yaml
 <span class="c"># or</span>
 yarn add yaml
-</code></pre>
+</code></pre></div>
 <p><code>yaml</code> is a new definitive library for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. This library:</p>
 
 <ul>
@@ -15,17 +15,17 @@ yarn add yaml
 <li>Supports parsing, modifying, and writing YAML comments.</li>
 </ul>
 
-<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It runs on Node.js 6 and later with no external dependencies, and in browsers from IE 11 upwards (Note: <code>@babel/runtime</code> is used only by the <code>&quot;browser&quot;</code> entry point).</p>
+<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies and runs on Node.js 6 and later, and in browsers from IE 11 upwards.</p>
 
 <p>For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes. Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).</p>
 <h2 id='api-overview'>API Overview</h2>
 <p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the <a href="#cst-parser">CST Parser</a>. The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library along with a decent <a href="#content-nodes">AST</a>, and the third is the closest to YAML source, making it fast, raw, and crude.</p>
 
 <h3>Parse & Stringify</h3>
-<pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">YAML</span> <span class="nx">from</span> <span class="s1">'yaml'</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">YAML</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 <span class="c1">// or</span>
-<span class="kr">const</span> <span class="nx">YAML</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'yaml'</span><span class="p">)</span>
-</code></pre>
+<span class="kd">const</span> <span class="nx">YAML</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span><span class="p">)</span>
+</code></pre></div>
 <ul>
 <li><a href="#yaml-parse"><code>YAML.parse(str, options): value</code></a></li>
 <li><a href="#yaml-stringify"><code>YAML.stringify(value, options): string</code></a></li>
@@ -48,8 +48,8 @@ yarn add yaml
 <li><a href="#parsing-documents"><code>YAML.parseAllDocuments(str, options): YAML.Document[]</code></a></li>
 <li><a href="#parsing-documents"><code>YAML.parseDocument(str, options): YAML.Document</code></a></li>
 </ul>
-<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">Pair</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'yaml/types'</span>
-</code></pre>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Pair</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/types</span><span class="dl">'</span>
+</code></pre></div>
 <ul>
 <li><a href="#creating-nodes"><code>new Pair(key, value)</code></a></li>
 <li><a href="#creating-nodes"><code>new YAMLMap()</code></a></li>
@@ -57,8 +57,8 @@ yarn add yaml
 </ul>
 
 <h3>CST Parser</h3>
-<pre class="highlight javascript"><code><span class="kr">import</span> <span class="nx">parseCST</span> <span class="nx">from</span> <span class="s1">'yaml/parse-cst'</span>
-</code></pre>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">parseCST</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/parse-cst</span><span class="dl">'</span>
+</code></pre></div>
 <ul>
 <li><a href="#parsecst"><code>parseCST(str): CSTDocument[]</code></a></li>
 <li><a href="#parsecst"><code>YAML.parseCST(str): CSTDocument[]</code></a></li>

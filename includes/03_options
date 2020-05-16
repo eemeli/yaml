@@ -1,4 +1,4 @@
-<h1 id='options'>Options</h1><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span>
+<h1 id='options'>Options</h1><div class="highlight"><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span>
 <span class="c1">// { keepBlobsInJSON: true,</span>
 <span class="c1">//   keepNodeTypes: true,</span>
 <span class="c1">//   version: '1.2' }</span>
@@ -7,7 +7,7 @@
 <span class="c1">// { '1.0': { merge: true, schema: 'yaml-1.1' },</span>
 <span class="c1">//   '1.1': { merge: true, schema: 'yaml-1.1' },</span>
 <span class="c1">//   '1.2': { merge: false, schema: 'core' } }</span>
-</code></pre><h4 id='yaml-defaultoptions'><code>YAML.defaultOptions</code></h4><h4 id='yaml-document-defaults'><code>YAML.Document.defaults</code></h4>
+</code></pre></div><h4 id='yaml-defaultoptions'><code>YAML.defaultOptions</code></h4><h4 id='yaml-document-defaults'><code>YAML.Document.defaults</code></h4>
 <p><code>yaml</code> defines document-specific options in three places: as an argument of parse, create and stringify calls, in the values of <code>YAML.defaultOptions</code>, and in the version-dependent <code>YAML.Document.defaults</code> object. Values set in <code>YAML.defaultOptions</code> override version-dependent defaults, and argument options override both.</p>
 
 <p>The <code>version</code> option value (<code>&#39;1.2&#39;</code> by default) may be overridden by any document-specific <code>%YAML</code> directive.</p>
@@ -95,23 +95,23 @@
 <td>The YAML version used by documents without a <code>%YAML</code> directive. By default <code>&#39;1.2&#39;</code>.</td>
 </tr>
 </tbody></table>
-<h2 id='data-schemas'>Data Schemas</h2><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'3'</span><span class="p">)</span> <span class="c1">// 3</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'3'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'failsafe'</span> <span class="p">})</span> <span class="c1">// '3'</span>
+<h2 id='data-schemas'>Data Schemas</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">3</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 3</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">3</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="dl">'</span><span class="s1">failsafe</span><span class="dl">'</span> <span class="p">})</span> <span class="c1">// '3'</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">)</span> <span class="c1">// 'No'</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'json'</span> <span class="p">})</span> <span class="c1">// SyntaxError: Unresolved plain scalar "No"</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="s1">'yaml-1.1'</span> <span class="p">})</span> <span class="c1">// false</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'No'</span><span class="p">,</span> <span class="p">{</span> <span class="na">version</span><span class="p">:</span> <span class="s1">'1.1'</span> <span class="p">})</span> <span class="c1">// false</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">No</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 'No'</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">No</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="dl">'</span><span class="s1">json</span><span class="dl">'</span> <span class="p">})</span> <span class="c1">// SyntaxError: Unresolved plain scalar "No"</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">No</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="dl">'</span><span class="s1">yaml-1.1</span><span class="dl">'</span> <span class="p">})</span> <span class="c1">// false</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">No</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">version</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1.1</span><span class="dl">'</span> <span class="p">})</span> <span class="c1">// false</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'{[1, 2]: many}'</span><span class="p">)</span> <span class="c1">// { '[1,2]': 'many' }</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">'{[1, 2]: many}'</span><span class="p">,</span> <span class="p">{</span> <span class="na">mapAsMap</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span> <span class="c1">// Map { [ 1, 2 ] =&gt; 'many' }</span>
-</code></pre>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// { '[1,2]': 'many' }</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">mapAsMap</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span> <span class="c1">// Map { [ 1, 2 ] =&gt; 'many' }</span>
+</code></pre></div>
 <p>Aside from defining the language structure, the YAML 1.2 spec defines a number of different <em>schemas</em> that may be used. The default is the <a href="http://yaml.org/spec/1.2/spec.html#id2804923"><code>core</code></a> schema, which is the most common one. The <a href="http://yaml.org/spec/1.2/spec.html#id2803231"><code>json</code></a> schema is effectively the minimum schema required to parse JSON; both it and the core schema are supersets of the minimal <a href="http://yaml.org/spec/1.2/spec.html#id2802346"><code>failsafe</code></a> schema.</p>
 
 <p>The <code>yaml-1.1</code> schema matches the more liberal <a href="http://yaml.org/type/">YAML 1.1 types</a> (also used by YAML 1.0), including binary data and timestamps as distinct tags as well as accepting greater variance in scalar values (with e.g. <code>&#39;No&#39;</code> being parsed as <code>false</code> rather than a string value). The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
-<pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">merge</span> <span class="o">=</span> <span class="kc">true</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span><span class="p">.</span><span class="nx">merge</span> <span class="o">=</span> <span class="kc">true</span>
 
-<span class="kr">const</span> <span class="nx">mergeResult</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s2">`
+<span class="kd">const</span> <span class="nx">mergeResult</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s2">`
 source: &amp;base { a: 1, b: 2 }
 target:
   &lt;&lt;: *base
@@ -120,16 +120,17 @@ target:
 
 <span class="nx">mergeResult</span><span class="p">.</span><span class="nx">target</span>
 <span class="c1">// { a: 1, b: 'base' }</span>
-</code></pre>
+</code></pre></div>
 <p><strong>Merge</strong> keys are a <a href="http://yaml.org/type/merge.html">YAML 1.1 feature</a> that is not a part of the 1.2 spec. To use a merge key, assign an alias node or an array of alias nodes as the value of a <code>&lt;&lt;</code> key in a mapping.</p>
-<h2 id='scalar-options'>Scalar Options</h2><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
+<h2 id='scalar-options'>Scalar Options</h2><div class="highlight"><pre class="highlight javascript"><code><span class="c1">// Without simpleKeys, an all-null-values object uses explicit keys &amp; no values</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="dl">'</span><span class="s1">this is</span><span class="dl">'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">},</span> <span class="p">{</span> <span class="na">simpleKeys</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
 <span class="c1">// this is: null</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="kc">null</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="s1">'~'</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="nx">str</span><span class="p">.</span><span class="nx">defaultType</span> <span class="o">=</span> <span class="s1">'QUOTE_SINGLE'</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="s1">'this is'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="kc">null</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">~</span><span class="dl">'</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="nx">str</span><span class="p">.</span><span class="nx">defaultType</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">QUOTE_SINGLE</span><span class="dl">'</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="dl">'</span><span class="s1">this is</span><span class="dl">'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">},</span> <span class="p">{</span> <span class="na">simpleKeys</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
 <span class="c1">// 'this is': ~</span>
-</code></pre><h4 id='yaml-scalaroptions'><code>YAML.scalarOptions</code></h4>
+</code></pre></div><h4 id='yaml-scalaroptions'><code>YAML.scalarOptions</code></h4>
 <p>Some customization options are availabe to control the parsing and stringification of scalars. Note that these values are used by all documents.</p>
 
 <p>These options objects are also exported individually from <code>&#39;yaml/types&#39;</code>.</p>
