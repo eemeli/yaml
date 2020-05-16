@@ -1,0 +1,39 @@
+name: Lint & browser tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  run:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Test types
+        run: npm run test:types
+      - name: Playground setup
+        working-directory: ./playground
+        run: |
+          npm install
+          npm start &
+          sleep 10
+      - name: Run Browserstack tests
+        uses: ianwalter/bsl@v2.1.0
+        with:
+          args: cd playground && npm test
+        env:
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
