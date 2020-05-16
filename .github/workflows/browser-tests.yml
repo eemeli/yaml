@@ -35,7 +35,7 @@ jobs:
       - name: Run tests on BrowserStack
         uses: ianwalter/bsl@3.0.0
         with:
-          args: cd playground && npm test
+          args: npm run test:browsers
         env:
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}

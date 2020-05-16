@@ -66,6 +66,7 @@
     "prettier": "prettier --write .",
     "start": "cross-env TRACE_LEVEL=log npm run build:node && node -i -e 'YAML=require(\".\")'",
     "test": "jest",
+    "test:browsers": "cd playground && npm test",
     "test:dist": "npm run build:node && jest",
     "test:types": "tsc --lib ES2017 --noEmit tests/typings.ts",
     "docs:install": "cd docs-slate && bundle install",
