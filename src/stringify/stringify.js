@@ -16,11 +16,7 @@ function getTagObject(tags, item) {
   let tagObj, obj
   if (item instanceof Scalar) {
     obj = item.value
-    // TODO: deprecate/remove class check
-    const match = tags.filter(
-      t =>
-        (t.identify && t.identify(obj)) || (t.class && obj instanceof t.class)
-    )
+    const match = tags.filter(t => t.identify && t.identify(obj))
     tagObj =
       match.find(t => t.format === item.format) || match.find(t => !t.format)
   } else {

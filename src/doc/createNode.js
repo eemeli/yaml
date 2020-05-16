@@ -12,14 +12,7 @@ function findTagObject(value, tagName, tags) {
     if (!tagObj) throw new Error(`Tag ${tagName} not found`)
     return tagObj
   }
-
-  // TODO: deprecate/remove class check
-  return tags.find(
-    t =>
-      ((t.identify && t.identify(value)) ||
-        (t.class && value instanceof t.class)) &&
-      !t.format
-  )
+  return tags.find(t => t.identify && t.identify(value) && !t.format)
 }
 
 export function createNode(value, tagName, ctx) {
