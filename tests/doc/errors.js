@@ -2,6 +2,15 @@ import { Node } from '../../src/cst/Node.js'
 import { YAMLError } from '../../src/errors.js'
 import { YAML } from '../../src/index.js'
 
+let origPrettyErrors
+beforeAll(() => {
+  origPrettyErrors = YAML.defaultOptions.prettyErrors
+  YAML.defaultOptions.prettyErrors = false
+})
+afterAll(() => {
+  YAML.defaultOptions.prettyErrors = origPrettyErrors
+})
+
 test('require a message and source for all errors', () => {
   const exp = /Invalid arguments/
   expect(() => new YAMLError()).toThrow(exp)
