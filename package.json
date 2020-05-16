@@ -97,8 +97,8 @@
     "fast-check": "^1.24.2",
     "jest": "^26.0.1",
     "prettier": "^2.0.5",
-    "rollup": "^2.8.2",
-    "typescript": "^3.8.3"
+    "rollup": "^2.10.2",
+    "typescript": "^3.9.2"
   },
   "engines": {
     "node": ">= 6"
