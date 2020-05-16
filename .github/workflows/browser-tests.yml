@@ -24,14 +24,16 @@ jobs:
         run: npm run lint
       - name: Test types
         run: npm run test:types
+      - name: Build
+        run: npm run build
       - name: Playground setup
         working-directory: ./playground
         run: |
           npm install
           npm start &
           sleep 10
-      - name: Run Browserstack tests
-        uses: ianwalter/bsl@v2.1.0
+      - name: Run tests on BrowserStack
+        uses: ianwalter/bsl@3.0.0
         with:
           args: cd playground && npm test
         env:
