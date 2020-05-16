@@ -328,10 +328,4 @@ describe('deprecations', () => {
       cMock.mockRestore()
     }
   })
-
-  test('tags option', () => {
-    const doc = new YAML.Document({ tags: [] })
-    doc.setSchema()
-    expect(mock).toHaveBeenCalledTimes(1)
-  })
 })

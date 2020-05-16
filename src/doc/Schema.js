@@ -1,7 +1,6 @@
 import { Pair } from '../ast/Pair.js'
 import { defaultTagPrefix, defaultTags } from '../constants.js'
 import { schemas, tags } from '../tags/index.js'
-import { warnOptionDeprecation } from '../warnings.js'
 import { createNode } from './createNode.js'
 import { getSchemaTags } from './getSchemaTags.js'
 
@@ -12,25 +11,12 @@ export class Schema {
   static defaultPrefix = defaultTagPrefix // TODO: remove in v2
   static defaultTags = defaultTags // TODO: remove in v2
 
-  constructor({
-    customTags,
-    merge,
-    schema,
-    sortMapEntries,
-    tags: deprecatedCustomTags
-  }) {
+  constructor({ customTags, merge, schema, sortMapEntries }) {
     this.merge = !!merge
     this.name = schema
     this.sortMapEntries =
       sortMapEntries === true ? sortMapEntriesByKey : sortMapEntries || null
-    if (!customTags && deprecatedCustomTags)
-      warnOptionDeprecation('tags', 'customTags')
-    this.tags = getSchemaTags(
-      schemas,
-      tags,
-      customTags || deprecatedCustomTags,
-      schema
-    )
+    this.tags = getSchemaTags(schemas, tags, customTags, schema)
   }
 
   createNode(value, wrapScalars, tagName, ctx) {
