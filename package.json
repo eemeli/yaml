@@ -42,6 +42,7 @@
   },
   "exports": {
     ".": "./index.js",
+    "./package.json": "./package.json",
     "./parse-cst": "./parse-cst.js",
     "./types": [
       {
@@ -54,8 +55,7 @@
         "import": "./util.mjs"
       },
       "./util.js"
-    ],
-    "./": "./"
+    ]
   },
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
