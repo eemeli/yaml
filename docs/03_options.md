@@ -78,12 +78,13 @@ mergeResult.target
 ## Scalar Options
 
 ```js
-YAML.stringify({ 'this is': null })
+// Without simpleKeys, an all-null-values object uses explicit keys & no values
+YAML.stringify({ 'this is': null }, { simpleKeys: true })
 // this is: null
 
 YAML.scalarOptions.null.nullStr = '~'
 YAML.scalarOptions.str.defaultType = 'QUOTE_SINGLE'
-YAML.stringify({ 'this is': null })
+YAML.stringify({ 'this is': null }, { simpleKeys: true })
 // 'this is': ~
 ```
 
