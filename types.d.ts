@@ -9,16 +9,6 @@ export const nullOptions: scalarOptions.Null
 export const strOptions: scalarOptions.Str
 
 export class Schema {
-  /** Default: `'tag:yaml.org,2002:'` */
-  static defaultPrefix: string
-  static defaultTags: {
-    /** Default: `'tag:yaml.org,2002:map'` */
-    MAP: string
-    /** Default: `'tag:yaml.org,2002:seq'` */
-    SEQ: string
-    /** Default: `'tag:yaml.org,2002:str'` */
-    STR: string
-  }
   constructor(options: Schema.Options)
   /**
    * Convert any value into a `Node` using this schema, recursively turning

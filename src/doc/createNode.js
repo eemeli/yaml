@@ -1,6 +1,7 @@
 import { Alias } from '../ast/Alias.js'
 import { Node } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
+import { defaultTagPrefix } from '../constants.js'
 import { map } from '../tags/failsafe/map.js'
 import { seq } from '../tags/failsafe/seq.js'
 
@@ -23,9 +24,9 @@ function findTagObject(value, tagName, tags) {
 
 export function createNode(value, tagName, ctx) {
   if (value instanceof Node) return value
-  const { defaultPrefix, onTagObj, prevObjects, schema, wrapScalars } = ctx
+  const { onTagObj, prevObjects, schema, wrapScalars } = ctx
   if (tagName && tagName.startsWith('!!'))
-    tagName = defaultPrefix + tagName.slice(2)
+    tagName = defaultTagPrefix + tagName.slice(2)
 
   let tagObj = findTagObject(value, tagName, schema.tags)
   if (!tagObj) {

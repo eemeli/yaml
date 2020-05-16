@@ -1,5 +1,4 @@
 import { Pair } from '../ast/Pair.js'
-import { defaultTagPrefix, defaultTags } from '../constants.js'
 import { schemas, tags } from '../tags/index.js'
 import { createNode } from './createNode.js'
 import { getSchemaTags } from './getSchemaTags.js'
@@ -8,9 +7,6 @@ const sortMapEntriesByKey = (a, b) =>
   a.key < b.key ? -1 : a.key > b.key ? 1 : 0
 
 export class Schema {
-  static defaultPrefix = defaultTagPrefix // TODO: remove in v2
-  static defaultTags = defaultTags // TODO: remove in v2
-
   constructor({ customTags, merge, schema, sortMapEntries }) {
     this.merge = !!merge
     this.name = schema
@@ -20,11 +16,7 @@ export class Schema {
   }
 
   createNode(value, wrapScalars, tagName, ctx) {
-    const baseCtx = {
-      defaultPrefix: Schema.defaultPrefix,
-      schema: this,
-      wrapScalars
-    }
+    const baseCtx = { schema: this, wrapScalars }
     const createCtx = ctx ? Object.assign(ctx, baseCtx) : baseCtx
     return createNode(value, tagName, createCtx)
   }
