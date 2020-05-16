@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  run:
+  test:
 
     runs-on: ubuntu-latest
 
@@ -20,22 +20,15 @@ jobs:
         with:
           node-version: 14.x
       - run: npm ci
-      - name: Lint
-        run: npm run lint
-      - name: Test types
-        run: npm run test:types
-      - name: Build
-        run: npm run build
+      - run: npm run lint
+      - run: npm run test:types
+      - run: npm run build:browser
       - name: Playground setup
         working-directory: ./playground
-        run: |
-          npm install
-          npm start &
-          sleep 10
+        run: npm install
       - name: Run tests on BrowserStack
-        uses: ianwalter/bsl@3.0.0
-        with:
-          args: npm run test:browsers
+        working-directory: ./playground
+        run: npm test
         env:
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
