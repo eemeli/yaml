@@ -1,4 +1,4 @@
-name: Lint & browser tests
+name: Browsers
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -20,8 +19,6 @@ jobs:
         with:
           node-version: 14.x
       - run: npm ci
-      - run: npm run lint
-      - run: npm run test:types
       - run: npm run build:browser
       - name: Playground setup
         working-directory: ./playground

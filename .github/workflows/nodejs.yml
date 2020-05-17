@@ -1,4 +1,4 @@
-name: Build & test
+name: Node.js
 
 on:
   push:
@@ -7,8 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
     strategy:
@@ -26,4 +25,16 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run test:dist
-      - run: npm run build:browser
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:types
