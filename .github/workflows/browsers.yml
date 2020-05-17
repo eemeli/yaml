@@ -18,11 +18,20 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
+      - name: Cache BrowserStackLocal
+        uses: actions/cache@v1
+        with:
+          path: ~/.browserstack
+          key: bsl-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            bsl-${{ runner.os }}-
+
       - run: npm ci
       - run: npm run build:browser
       - name: Playground setup
         working-directory: ./playground
-        run: npm install
+        run: npm ci
+
       - name: Run tests on BrowserStack
         working-directory: ./playground
         run: npm test
