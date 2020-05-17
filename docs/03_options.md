@@ -110,4 +110,4 @@ These options objects are also exported individually from `'yaml/types'`.
 
 ## Silencing Warnings
 
-By default, the library will emit warnings for uses of deprecated APIs and as required by the YAML spec during parsing. If you'd like to silence these, define a global variable `YAML_SILENCE_WARNINGS` with a true-ish value. To silence only deprecation warnings, use `YAML_SILENCE_DEPRECATION_WARNINGS`. These values may also be set in `process.env`.
+By default, the library will emit warnings as required by the YAML spec during parsing. If you'd like to silence these, define a global or `process.env` variable `YAML_SILENCE_WARNINGS` with a true-ish value.

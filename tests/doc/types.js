@@ -4,7 +4,7 @@ import { binary } from '../../src/tags/yaml-1.1/binary.js'
 import { YAMLOMap } from '../../src/tags/yaml-1.1/omap.js'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
-let origFoldOptions
+let origFoldOptions, origPrettyErrors
 
 beforeAll(() => {
   origFoldOptions = YAML.scalarOptions.str.fold
@@ -12,10 +12,13 @@ beforeAll(() => {
     lineWidth: 20,
     minContentWidth: 0
   }
+  origPrettyErrors = YAML.defaultOptions.prettyErrors
+  YAML.defaultOptions.prettyErrors = false
 })
 
 afterAll(() => {
   YAML.scalarOptions.str.fold = origFoldOptions
+  YAML.defaultOptions.prettyErrors = origPrettyErrors
 })
 
 describe('json schema', () => {

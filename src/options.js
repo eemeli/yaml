@@ -17,7 +17,7 @@ export const defaultOptions = {
   keepBlobsInJSON: true,
   mapAsMap: false,
   maxAliasCount: 100,
-  prettyErrors: false, // TODO Set true in v2
+  prettyErrors: true,
   simpleKeys: false,
   version: '1.2'
 }

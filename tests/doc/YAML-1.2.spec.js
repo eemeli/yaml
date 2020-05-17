@@ -1833,7 +1833,7 @@ matches %: 20`,
   }
 }
 
-let origFoldOptions
+let origFoldOptions, origPrettyErrors
 
 beforeAll(() => {
   origFoldOptions = YAML.scalarOptions.str.fold
@@ -1841,10 +1841,13 @@ beforeAll(() => {
     lineWidth: 20,
     minContentWidth: 0
   }
+  origPrettyErrors = YAML.defaultOptions.prettyErrors
+  YAML.defaultOptions.prettyErrors = false
 })
 
 afterAll(() => {
   YAML.scalarOptions.str.fold = origFoldOptions
+  YAML.defaultOptions.prettyErrors = origPrettyErrors
 })
 
 for (const section in spec) {

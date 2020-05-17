@@ -1,4 +1,5 @@
 import { Collection, Node, Scalar, isEmptyPath, toJSON } from '../ast/index.js'
+import { defaultTagPrefix } from '../constants.js'
 import { YAMLError } from '../errors.js'
 import { documentOptions } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
@@ -152,7 +153,7 @@ export class Document {
 
   listNonDefaultTags() {
     return listTagNames(this.contents).filter(
-      t => t.indexOf(Schema.defaultPrefix) !== 0
+      t => t.indexOf(defaultTagPrefix) !== 0
     )
   }
 

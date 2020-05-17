@@ -576,7 +576,7 @@ describe('handling complex keys', () => {
   })
 
   test('add warning to doc when casting key in collection to string', () => {
-    const doc = YAML.parseDocument('[foo]: bar')
+    const doc = YAML.parseDocument('[foo]: bar', { prettyErrors: false })
     const message =
       'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
     expect(doc.warnings).toMatchObject([{ message }])

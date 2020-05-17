@@ -1,12 +1,15 @@
-import fs from 'fs'
-import path from 'path'
 import { Node } from '../../src/cst/Node.js'
 import { YAMLError } from '../../src/errors.js'
-import {
-  warnFileDeprecation,
-  warnOptionDeprecation
-} from '../../src/warnings.js'
 import { YAML } from '../../src/index.js'
+
+let origPrettyErrors
+beforeAll(() => {
+  origPrettyErrors = YAML.defaultOptions.prettyErrors
+  YAML.defaultOptions.prettyErrors = false
+})
+afterAll(() => {
+  YAML.defaultOptions.prettyErrors = origPrettyErrors
+})
 
 test('require a message and source for all errors', () => {
   const exp = /Invalid arguments/
@@ -278,83 +281,28 @@ test('multiple tags on one node', () => {
   expect(doc.warnings).toMatchObject([{}])
 })
 
-describe('deprecations', () => {
+describe('warnings', () => {
   let mock
   beforeEach(() => {
     mock = jest.spyOn(global.process, 'emitWarning').mockImplementation()
   })
   afterEach(() => mock.mockRestore())
 
-  describe('env vars', () => {
-    let prevAll, prevDeprecations
-    beforeEach(() => {
-      prevAll = global.YAML_SILENCE_WARNINGS
-      prevDeprecations = global.YAML_SILENCE_DEPRECATION_WARNINGS
-    })
-    afterEach(() => {
-      global.YAML_SILENCE_WARNINGS = prevAll
-      global.YAML_SILENCE_DEPRECATION_WARNINGS = prevDeprecations
-    })
-
-    test('YAML_SILENCE_WARNINGS', () => {
-      global.YAML_SILENCE_WARNINGS = true
-      warnFileDeprecation('foo')
-      warnOptionDeprecation('bar1', 'baz')
-      expect(mock).toHaveBeenCalledTimes(0)
-    })
-
-    test('YAML_SILENCE_DEPRECATION_WARNINGS', () => {
-      global.YAML_SILENCE_DEPRECATION_WARNINGS = true
-      warnFileDeprecation('foo')
-      warnOptionDeprecation('bar2', 'baz')
-      expect(mock).toHaveBeenCalledTimes(0)
-    })
+  test('warn for tag fallback', () => {
+    YAML.parse('!foo bar')
+    const message =
+      'The tag !foo is unavailable, falling back to tag:yaml.org,2002:str'
+    expect(mock.mock.calls).toMatchObject([[{ message }, undefined]])
   })
 
-  test('only warn once', () => {
-    warnOptionDeprecation('bar3')
-    warnOptionDeprecation('bar3')
-    expect(mock).toHaveBeenCalledTimes(1)
-  })
-
-  test('without process.emitWarning', () => {
-    global.process.emitWarning = null
-    const cMock = jest.spyOn(console, 'warn').mockImplementation()
+  test('silence with env var', () => {
+    const prev = global.YAML_SILENCE_WARNINGS
     try {
-      warnFileDeprecation('foo')
-      warnOptionDeprecation('bar4', 'baz')
-      expect(cMock).toHaveBeenCalledTimes(2)
+      global.YAML_SILENCE_WARNINGS = true
+      YAML.parse('!foo bar')
+      expect(mock).toHaveBeenCalledTimes(0)
     } finally {
-      cMock.mockRestore()
+      global.YAML_SILENCE_WARNINGS = prev
     }
   })
-
-  test('tags option', () => {
-    const doc = new YAML.Document({ tags: [] })
-    doc.setSchema()
-    expect(mock).toHaveBeenCalledTimes(1)
-  })
-
-  const files = [
-    'map',
-    'pair',
-    'scalar',
-    'schema',
-    'seq',
-    'types/binary',
-    'types/omap',
-    'types/pairs',
-    'types/set',
-    'types/timestamp'
-  ]
-  const root = path.resolve(__dirname, '../..')
-  const fileTest = fs.existsSync(path.resolve(root, 'dist')) ? test : test.skip
-  for (const file of files)
-    fileTest(`file: ${file}`, () => {
-      const fp = path.resolve(root, file)
-      // await import() may fail with ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING due
-      // to https://github.com/facebook/jest/issues/9430
-      require(fp)
-      expect(mock).toHaveBeenCalledTimes(1)
-    })
 })

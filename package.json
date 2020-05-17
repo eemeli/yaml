@@ -1,6 +1,6 @@
 {
   "name": "yaml",
-  "version": "1.10.0",
+  "version": "2.0.0-alpha",
   "license": "ISC",
   "author": "Eemeli Aro <eemeli@gmail.com>",
   "repository": "github:eemeli/yaml",
@@ -42,6 +42,7 @@
   },
   "exports": {
     ".": "./index.js",
+    "./package.json": "./package.json",
     "./parse-cst": "./parse-cst.js",
     "./types": [
       {
@@ -54,8 +55,7 @@
         "import": "./util.mjs"
       },
       "./util.js"
-    ],
-    "./": "./"
+    ]
   },
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
