@@ -162,6 +162,12 @@ export namespace scalarOptions {
      * Default: `'PLAIN'`
      */
     defaultType: Scalar.Type
+    /**
+     * The default quoting style of strings
+     *
+     * Default: `'QUOTE_DOUBLE'`
+     */
+    defaultQuote: Scalar.Type
     doubleQuoted: {
       /**
        * Whether to restrict double-quoted strings to use JSON-compatible syntax.

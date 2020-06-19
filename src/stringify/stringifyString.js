@@ -204,7 +204,7 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
   return `${header}\n${indent}${body}`
 }
 
-function plainString(item, ctx, onComment, onChompKeep) {
+function plainString(item, ctx, onComment, onChompKeep, defaultQuote) {
   const { comment, type, value } = item
   const { actualString, implicitKey, indent, inFlow } = ctx
   if (
@@ -219,6 +219,15 @@ function plainString(item, ctx, onComment, onChompKeep) {
       value
     )
   ) {
+    // prettier-ignore
+    const defaultQuotedString =
+      value.indexOf('"') !== -1 && value.indexOf("'") === -1
+        ? singleQuotedString
+        : value.indexOf("'") !== -1 && value.indexOf('"') === -1
+          ? doubleQuotedString
+          : defaultQuote === Type.QUOTE_SINGLE
+            ? singleQuotedString
+            : doubleQuotedString
     // not allowed:
     // - empty string, '-' or '?'
     // - start with an indicator character (except [?:-]) or /[?-] /
@@ -226,9 +235,7 @@ function plainString(item, ctx, onComment, onChompKeep) {
     // - '#' not preceded by a non-space char
     // - end with ' ' or ':'
     return implicitKey || inFlow || value.indexOf('\n') === -1
-      ? value.indexOf('"') !== -1 && value.indexOf("'") === -1
-        ? singleQuotedString(value, ctx)
-        : doubleQuotedString(value, ctx)
+      ? defaultQuotedString(value, ctx)
       : blockString(item, ctx, onComment, onChompKeep)
   }
   if (
@@ -268,7 +275,7 @@ function plainString(item, ctx, onComment, onChompKeep) {
 }
 
 export function stringifyString(item, ctx, onComment, onChompKeep) {
-  const { defaultType } = strOptions
+  const { defaultType, defaultQuote } = strOptions
   const { implicitKey, inFlow } = ctx
   let { type, value } = item
   if (typeof value !== 'string') {
@@ -285,7 +292,7 @@ export function stringifyString(item, ctx, onComment, onChompKeep) {
       case Type.QUOTE_SINGLE:
         return singleQuotedString(value, ctx)
       case Type.PLAIN:
-        return plainString(item, ctx, onComment, onChompKeep)
+        return plainString(item, ctx, onComment, onChompKeep, defaultQuote)
       default:
         return null
     }

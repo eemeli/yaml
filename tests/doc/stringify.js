@@ -622,6 +622,61 @@ describe('indentSeq: false', () => {
   })
 })
 
+describe('default quote option', () => {
+  let origDefaultQuoteOption
+  beforeAll(() => {
+    origDefaultQuoteOption = YAML.scalarOptions.str.defaultQuote
+  })
+  afterAll(() => {
+    YAML.scalarOptions.str.defaultQuote = origDefaultQuoteOption
+  })
+
+  const testSingleQuote = () => {
+    const str = 'foo #bar',
+      expected = "'foo #bar'\n"
+    const actual = YAML.stringify(str)
+    expect(actual).toBe(expected)
+    expect(YAML.parse(actual)).toBe(str)
+  }
+  const testDoubleQuote = () => {
+    const str = 'foo #bar',
+      expected = '"foo #bar"\n'
+    const actual = YAML.stringify(str)
+    expect(actual).toBe(expected)
+    expect(YAML.parse(actual)).toBe(str)
+  }
+
+  const testPlainStyle = () => {
+    const str = YAML.stringify('foo bar')
+    expect(str).toBe('foo bar\n')
+  }
+  const testForcedQuotes = () => {
+    let str = YAML.stringify('foo: "bar"')
+    expect(str).toBe(`'foo: "bar"'\n`)
+    str = YAML.stringify("foo: 'bar'")
+    expect(str).toBe(`"foo: 'bar'"\n`)
+  }
+
+  test('default', () => {
+    YAML.scalarOptions.str.defaultQuote = origDefaultQuoteOption
+    testPlainStyle()
+    testForcedQuotes()
+    testDoubleQuote()
+  })
+  test("'", () => {
+    YAML.scalarOptions.str.defaultQuote = Type.QUOTE_SINGLE
+    testPlainStyle()
+    testForcedQuotes()
+    testSingleQuote()
+  })
+  test('"', () => {
+    YAML.scalarOptions.str.defaultQuote = Type.QUOTE_DOUBLE
+    testPlainStyle()
+    testForcedQuotes()
+    testDoubleQuote()
+  })
+})
+
 describe('Document markers in top-level scalars', () => {
   let origDoubleQuotedOptions
   beforeAll(() => {
