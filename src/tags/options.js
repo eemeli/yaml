@@ -13,7 +13,7 @@ export const nullOptions = { nullStr: 'null' }
 
 export const strOptions = {
   defaultType: Type.PLAIN,
-  defaultQuote: Type.QUOTE_DOUBLE,
+  defaultQuoteSingle: false,
   doubleQuoted: {
     jsonEncoding: false,
     minMultiLineLength: 40

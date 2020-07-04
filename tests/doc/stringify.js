@@ -625,10 +625,10 @@ describe('indentSeq: false', () => {
 describe('default quote option', () => {
   let origDefaultQuoteOption
   beforeAll(() => {
-    origDefaultQuoteOption = YAML.scalarOptions.str.defaultQuote
+    origDefaultQuoteOption = YAML.scalarOptions.str.defaultQuoteSingle
   })
   afterAll(() => {
-    YAML.scalarOptions.str.defaultQuote = origDefaultQuoteOption
+    YAML.scalarOptions.str.defaultQuoteSingle = origDefaultQuoteOption
   })
 
   const testSingleQuote = () => {
@@ -658,19 +658,19 @@ describe('default quote option', () => {
   }
 
   test('default', () => {
-    YAML.scalarOptions.str.defaultQuote = origDefaultQuoteOption
+    YAML.scalarOptions.str.defaultQuoteSingle = origDefaultQuoteOption
     testPlainStyle()
     testForcedQuotes()
     testDoubleQuote()
   })
   test("'", () => {
-    YAML.scalarOptions.str.defaultQuote = Type.QUOTE_SINGLE
+    YAML.scalarOptions.str.defaultQuoteSingle = true
     testPlainStyle()
     testForcedQuotes()
     testSingleQuote()
   })
   test('"', () => {
-    YAML.scalarOptions.str.defaultQuote = Type.QUOTE_DOUBLE
+    YAML.scalarOptions.str.defaultQuoteSingle = false
     testPlainStyle()
     testForcedQuotes()
     testDoubleQuote()
