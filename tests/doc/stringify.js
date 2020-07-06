@@ -631,16 +631,14 @@ describe('default quote option', () => {
     YAML.scalarOptions.str.defaultQuoteSingle = origDefaultQuoteOption
   })
 
-  const testSingleQuote = () => {
-    const str = 'foo #bar',
-      expected = "'foo #bar'\n"
+  const testSingleQuote = str => {
+    const expected = `'${str}'\n`
     const actual = YAML.stringify(str)
     expect(actual).toBe(expected)
     expect(YAML.parse(actual)).toBe(str)
   }
-  const testDoubleQuote = () => {
-    const str = 'foo #bar',
-      expected = '"foo #bar"\n'
+  const testDoubleQuote = str => {
+    const expected = `"${str}"\n`
     const actual = YAML.stringify(str)
     expect(actual).toBe(expected)
     expect(YAML.parse(actual)).toBe(str)
@@ -661,19 +659,22 @@ describe('default quote option', () => {
     YAML.scalarOptions.str.defaultQuoteSingle = origDefaultQuoteOption
     testPlainStyle()
     testForcedQuotes()
-    testDoubleQuote()
+    testDoubleQuote('123')
+    testDoubleQuote('foo #bar')
   })
   test("'", () => {
     YAML.scalarOptions.str.defaultQuoteSingle = true
     testPlainStyle()
     testForcedQuotes()
-    testSingleQuote()
+    testDoubleQuote('123') // number-as-string is double-quoted
+    testSingleQuote('foo #bar')
   })
   test('"', () => {
     YAML.scalarOptions.str.defaultQuoteSingle = false
     testPlainStyle()
     testForcedQuotes()
-    testDoubleQuote()
+    testDoubleQuote('123')
+    testDoubleQuote('foo #bar')
   })
 })
 
