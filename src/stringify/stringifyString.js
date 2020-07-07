@@ -219,10 +219,12 @@ function plainString(item, ctx, onComment, onChompKeep) {
       value
     )
   ) {
+    const hasDouble = value.indexOf('"') !== -1
+    const hasSingle = value.indexOf("'") !== -1
     let quotedString
-    if (value.indexOf('"') !== -1 && value.indexOf("'") === -1) {
+    if (hasDouble && !hasSingle) {
       quotedString = singleQuotedString
-    } else if (value.indexOf("'") !== -1 && value.indexOf('"') === -1) {
+    } else if (hasSingle && !hasDouble) {
       quotedString = doubleQuotedString
     } else if (strOptions.defaultQuoteSingle) {
       quotedString = singleQuotedString

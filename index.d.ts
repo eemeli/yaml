@@ -163,7 +163,7 @@ export namespace scalarOptions {
      */
     defaultType: Scalar.Type
     /**
-     * Use single quote (') as a default quoting style of strings
+     * Use 'single quote' rather than "double quote" by default
      *
      * Default: `false`
      */
