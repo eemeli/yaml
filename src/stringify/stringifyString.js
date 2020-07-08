@@ -219,6 +219,18 @@ function plainString(item, ctx, onComment, onChompKeep) {
       value
     )
   ) {
+    const hasDouble = value.indexOf('"') !== -1
+    const hasSingle = value.indexOf("'") !== -1
+    let quotedString
+    if (hasDouble && !hasSingle) {
+      quotedString = singleQuotedString
+    } else if (hasSingle && !hasDouble) {
+      quotedString = doubleQuotedString
+    } else if (strOptions.defaultQuoteSingle) {
+      quotedString = singleQuotedString
+    } else {
+      quotedString = doubleQuotedString
+    }
     // not allowed:
     // - empty string, '-' or '?'
     // - start with an indicator character (except [?:-]) or /[?-] /
@@ -226,9 +238,7 @@ function plainString(item, ctx, onComment, onChompKeep) {
     // - '#' not preceded by a non-space char
     // - end with ' ' or ':'
     return implicitKey || inFlow || value.indexOf('\n') === -1
-      ? value.indexOf('"') !== -1 && value.indexOf("'") === -1
-        ? singleQuotedString(value, ctx)
-        : doubleQuotedString(value, ctx)
+      ? quotedString(value, ctx)
       : blockString(item, ctx, onComment, onChompKeep)
   }
   if (
