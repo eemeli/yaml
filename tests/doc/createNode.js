@@ -107,7 +107,8 @@ describe('arrays', () => {
     })
     test('set doc contents', () => {
       const res = '- 3\n- - four\n  - 5\n'
-      const doc = new YAML.Document()
+      const doc = new YAML.Document(array)
+      expect(String(doc)).toBe(res)
       doc.contents = array
       expect(String(doc)).toBe(res)
       doc.contents = YAML.createNode(array, false)
@@ -176,7 +177,8 @@ y:
 z:
   w: five
   v: 6\n`
-      const doc = new YAML.Document()
+      const doc = new YAML.Document(object)
+      expect(String(doc)).toBe(res)
       doc.contents = object
       expect(String(doc)).toBe(res)
       doc.contents = YAML.createNode(object, false)
@@ -220,7 +222,8 @@ describe('Set', () => {
     })
     test('set doc contents', () => {
       const res = '- 3\n- - four\n  - 5\n'
-      const doc = new YAML.Document()
+      const doc = new YAML.Document(set)
+      expect(String(doc)).toBe(res)
       doc.contents = set
       expect(String(doc)).toBe(res)
       doc.contents = YAML.createNode(set, false)
@@ -229,8 +232,7 @@ describe('Set', () => {
       expect(String(doc)).toBe(res)
     })
     test('Schema#createNode() - YAML 1.2', () => {
-      const doc = new YAML.Document()
-      doc.setSchema()
+      const doc = new YAML.Document(null)
       const s = doc.schema.createNode(set, true)
       expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toMatchObject([
@@ -239,8 +241,7 @@ describe('Set', () => {
       ])
     })
     test('Schema#createNode() - YAML 1.1', () => {
-      const doc = new YAML.Document({ version: '1.1' })
-      doc.setSchema()
+      const doc = new YAML.Document(null, { version: '1.1' })
       const s = doc.schema.createNode(set, true)
       expect(s).toBeInstanceOf(YAMLSet)
       expect(s.items).toMatchObject([
@@ -319,7 +320,8 @@ y:
 ? w: five
   v: 6
 : z\n`
-      const doc = new YAML.Document()
+      const doc = new YAML.Document(map)
+      expect(String(doc)).toBe(res)
       doc.contents = map
       expect(String(doc)).toBe(res)
       doc.contents = YAML.createNode(map, false)
@@ -339,15 +341,10 @@ describe('toJSON()', () => {
 })
 
 describe('circular references', () => {
-  let doc
-  beforeEach(() => {
-    doc = new YAML.Document()
-    doc.setSchema()
-  })
-
   test('parent at root', () => {
     const map = { foo: 'bar' }
     map.map = map
+    const doc = new YAML.Document(null)
     expect(doc.schema.createNode(map)).toMatchObject({
       items: [
         { key: 'foo', value: 'bar' },
@@ -372,6 +369,7 @@ describe('circular references', () => {
     const baz = {}
     const map = { foo: { bar: { baz } } }
     baz.map = map
+    const doc = new YAML.Document(null)
     const node = doc.schema.createNode(map)
     expect(node.getIn(['foo', 'bar', 'baz', 'map'])).toMatchObject({
       type: 'ALIAS',
@@ -389,6 +387,7 @@ describe('circular references', () => {
     const one = ['one']
     const two = ['two']
     const seq = [one, two, one, one, two]
+    const doc = new YAML.Document(null)
     expect(doc.schema.createNode(seq)).toMatchObject({
       items: [
         { items: ['one'] },
@@ -410,6 +409,7 @@ describe('circular references', () => {
   test('further relatives', () => {
     const baz = { a: 1 }
     const seq = [{ foo: { bar: { baz } } }, { fe: { fi: { fo: { baz } } } }]
+    const doc = new YAML.Document(null)
     const node = doc.schema.createNode(seq)
     const source = node.getIn([0, 'foo', 'bar', 'baz'])
     const alias = node.getIn([1, 'fe', 'fi', 'fo', 'baz'])

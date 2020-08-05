@@ -434,8 +434,7 @@ date (00:00:00Z): 2002-12-14\n`)
       })
 
     test('stringify', () => {
-      const doc = new YAML.Document({ version: '1.1' })
-      doc.setSchema()
+      const doc = new YAML.Document(null, { version: '1.1' })
       doc.contents = doc.schema.createNode(
         [
           ['a', 1],
@@ -493,8 +492,7 @@ date (00:00:00Z): 2002-12-14\n`)
     })
 
     test('stringify Array', () => {
-      const doc = new YAML.Document({ version: '1.1' })
-      doc.setSchema()
+      const doc = new YAML.Document(null, { version: '1.1' })
       doc.contents = doc.schema.createNode(
         [
           ['a', 1],

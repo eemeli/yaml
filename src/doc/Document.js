@@ -1,4 +1,5 @@
 import { Collection, Node, Scalar, isEmptyPath, toJSON } from '../ast/index.js'
+import { Document as CSTDocument } from '../cst/Document'
 import { defaultTagPrefix } from '../constants.js'
 import { YAMLError } from '../errors.js'
 import { documentOptions } from '../options.js'
@@ -19,18 +20,26 @@ function assertCollection(contents) {
 export class Document {
   static defaults = documentOptions
 
-  constructor(options) {
+  constructor(contents, options) {
     this.anchors = new Anchors(options.anchorPrefix)
     this.commentBefore = null
     this.comment = null
-    this.contents = null
     this.directivesEndMarker = null
     this.errors = []
     this.options = options
-    this.schema = null
     this.tagPrefixes = []
     this.version = null
     this.warnings = []
+
+    if (contents === undefined) {
+      this.schema = null
+      this.contents = null
+    } else if (contents instanceof CSTDocument) {
+      this.parse(contents)
+    } else {
+      this.setSchema()
+      this.contents = this.schema.createNode(contents, true)
+    }
   }
 
   add(value) {
@@ -258,7 +267,7 @@ export class Document {
         onChompKeep
       )
       lines.push(addComment(body, '', contentComment))
-    } else if (this.contents !== undefined) {
+    } else {
       lines.push(stringify(this.contents, ctx))
     }
     if (this.comment) {

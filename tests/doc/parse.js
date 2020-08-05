@@ -430,7 +430,7 @@ test('empty node should respect setOrigRanges()', () => {
   const cst = YAML.parseCST('\r\na: # 123\r\n')
   expect(cst).toHaveLength(1)
   expect(cst.setOrigRanges()).toBe(true)
-  const doc = new YAML.Document({ keepCstNodes: true }).parse(cst[0])
+  const doc = new YAML.Document(undefined, { keepCstNodes: true }).parse(cst[0])
   const empty = doc.contents.items[0].value.cstNode
   expect(empty.range).toEqual({ start: 3, end: 3, origStart: 4, origEnd: 4 })
 })

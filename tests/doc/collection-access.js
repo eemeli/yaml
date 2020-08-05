@@ -171,8 +171,7 @@ describe('Seq', () => {
 describe('Set', () => {
   let doc
   beforeAll(() => {
-    doc = new YAML.Document({ version: '1.1' })
-    doc.setSchema()
+    doc = new YAML.Document(null, { version: '1.1' })
   })
 
   let set
@@ -223,8 +222,7 @@ describe('Set', () => {
 describe('OMap', () => {
   let doc
   beforeAll(() => {
-    doc = new YAML.Document({ version: '1.1' })
-    doc.setSchema()
+    doc = new YAML.Document(null, { version: '1.1' })
   })
 
   let omap
@@ -361,8 +359,7 @@ describe('Collection', () => {
 describe('Document', () => {
   let doc
   beforeEach(() => {
-    doc = new YAML.Document()
-    doc.contents = YAML.createNode({ a: 1, b: [2, 3] })
+    doc = new YAML.Document({ a: 1, b: [2, 3] })
     expect(doc.contents.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {

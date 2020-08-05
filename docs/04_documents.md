@@ -61,7 +61,9 @@ The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq
 
 ## Creating Documents
 
-#### `new YAML.Document(options = {})`
+#### `new YAML.Document(value, options = {})`
+
+Creates a new document. If `value` is defined, the document `contents` are initialised with that value, wrapped recursively in appropriate [content nodes](#content-nodes). If `value` is `undefined`, the document's `contents` and `schema` are initialised as `null`. See [Options](#options) for more information on the second parameter.
 
 | Member              | Type                                | Description                                                                                                                                                              |
 | ------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -77,10 +79,9 @@ The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq
 | warnings            | `Error[]`                           | Warnings encountered during parsing.                                                                                                                                     |
 
 ```js
-const doc = new YAML.Document()
+const doc = new YAML.Document(['some', 'values', { balloons: 99 }])
 doc.version = true
 doc.commentBefore = ' A commented document'
-doc.contents = ['some', 'values', { balloons: 99 }]
 
 String(doc)
 // # A commented document
