@@ -6,7 +6,7 @@ import { resolveScalar } from './resolveScalar.js'
 import { resolveString } from './resolveString.js'
 
 function resolveByTagName(doc, node, tagName) {
-  const { tags } = doc.schema
+  const { knownTags, tags } = doc.schema
   const matchWithTest = []
   for (const tag of tags) {
     if (tag.tag === tagName) {
@@ -21,6 +21,13 @@ function resolveByTagName(doc, node, tagName) {
   const str = resolveString(doc, node)
   if (typeof str === 'string' && matchWithTest.length > 0)
     return resolveScalar(str, matchWithTest, tags.scalarFallback)
+
+  const kt = knownTags[tagName]
+  if (kt) {
+    tags.push(Object.assign({}, kt, { default: false, test: undefined }))
+    const res = kt.resolve(doc, node)
+    return res instanceof Collection ? res : new Scalar(res)
+  }
 
   return null
 }

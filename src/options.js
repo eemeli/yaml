@@ -75,6 +75,7 @@ export const documentOptions = {
   '1.2': {
     schema: 'core',
     merge: false,
+    resolveKnownTags: true,
     tagPrefixes: [
       { handle: '!', prefix: '!' },
       { handle: '!!', prefix: defaultTagPrefix }

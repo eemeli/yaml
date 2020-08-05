@@ -68,7 +68,7 @@ testDirs.forEach(dir => {
   }
 
   describe(`${dir}: ${name}`, () => {
-    const docs = YAML.parseAllDocuments(yaml)
+    const docs = YAML.parseAllDocuments(yaml, { resolveKnownTags: false })
     if (events) {
       test('test.event', () => {
         const res = testEvents(yaml)
@@ -90,7 +90,7 @@ testDirs.forEach(dir => {
     if (!error) {
       const src2 =
         docs.map(doc => String(doc).replace(/\n$/, '')).join('\n...\n') + '\n'
-      const docs2 = YAML.parseAllDocuments(src2)
+      const docs2 = YAML.parseAllDocuments(src2, { resolveKnownTags: false })
       trace: name,
         '\nIN\n' + yaml,
         '\nJSON\n' + JSON.stringify(docs[0], null, '  '),
