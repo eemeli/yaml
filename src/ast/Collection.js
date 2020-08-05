@@ -13,6 +13,9 @@ function collectionFromPath(schema, path, value) {
     v = o
   }
   return createNode(v, null, {
+    onAlias() {
+      throw new Error('Repeated objects are not supported here')
+    },
     prevObjects: new Map(),
     schema,
     wrapScalars: false

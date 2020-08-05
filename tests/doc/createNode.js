@@ -361,7 +361,7 @@ describe('circular references', () => {
       a1: { items: [{ key: 'foo' }, { key: 'map' }] }
     })
     expect(() => YAML.createNode(map)).toThrow(
-      /Circular references are not supported here/
+      'Repeated objects are not supported here'
     )
   })
 
@@ -379,7 +379,7 @@ describe('circular references', () => {
       a1: { items: [{ key: 'foo' }] }
     })
     expect(() => YAML.createNode(map)).toThrow(
-      /Circular references are not supported here/
+      'Repeated objects are not supported here'
     )
   })
 
@@ -402,7 +402,7 @@ describe('circular references', () => {
       a2: { items: ['two'] }
     })
     expect(() => YAML.createNode(seq)).toThrow(
-      /Circular references are not supported here/
+      'Repeated objects are not supported here'
     )
   })
 
@@ -417,7 +417,7 @@ describe('circular references', () => {
     expect(alias).toMatchObject({ type: 'ALIAS' })
     expect(alias.source).toBe(source)
     expect(() => YAML.createNode(seq)).toThrow(
-      /Circular references are not supported here/
+      'Repeated objects are not supported here'
     )
   })
 })

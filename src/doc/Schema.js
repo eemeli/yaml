@@ -16,9 +16,15 @@ export class Schema {
   constructor({ customTags, merge, resolveKnownTags, schema, sortMapEntries }) {
     this.merge = !!merge
     this.name = schema
+    this.knownTags = resolveKnownTags ? coreKnownTags : {}
+    this.tags = getSchemaTags(schemas, tags, customTags, schema)
+
+    // Used by createNode(), to avoid circular dependencies
+    this.map = tags.map
+    this.seq = tags.seq
+
+    // Used by createMap()
     this.sortMapEntries =
       sortMapEntries === true ? sortMapEntriesByKey : sortMapEntries || null
-    this.tags = getSchemaTags(schemas, tags, customTags, schema)
-    this.knownTags = resolveKnownTags ? coreKnownTags : {}
   }
 }

@@ -1,4 +1,5 @@
 import {
+  Alias,
   Collection,
   Node,
   Pair,
@@ -62,15 +63,20 @@ export class Document {
 
   createNode(value, { onTagObj, tag, wrapScalars } = {}) {
     this.setSchema()
+    const aliasNodes = []
     const ctx = {
-      aliasNodes: [],
+      onAlias(source) {
+        const alias = new Alias(source)
+        aliasNodes.push(alias)
+        return alias
+      },
       onTagObj,
       prevObjects: new Map(),
       schema: this.schema,
       wrapScalars: wrapScalars !== false
     }
     const node = createNode(value, tag, ctx)
-    for (const alias of ctx.aliasNodes) {
+    for (const alias of aliasNodes) {
       // With circular references, the source node is only resolved after all of
       // its child nodes are. This is why anchors are set only after all of the
       // nodes have been created.

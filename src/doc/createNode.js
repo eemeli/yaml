@@ -1,9 +1,6 @@
-import { Alias } from '../ast/Alias.js'
 import { Node } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
 import { defaultTagPrefix } from '../constants.js'
-import { map } from '../tags/failsafe/map.js'
-import { seq } from '../tags/failsafe/seq.js'
 
 function findTagObject(value, tagName, tags) {
   if (tagName) {
@@ -17,11 +14,12 @@ function findTagObject(value, tagName, tags) {
 
 export function createNode(value, tagName, ctx) {
   if (value instanceof Node) return value
-  const { aliasNodes, onTagObj, prevObjects, schema, wrapScalars } = ctx
+  const { onAlias, onTagObj, prevObjects, wrapScalars } = ctx
+  const { map, seq, tags } = ctx.schema
   if (tagName && tagName.startsWith('!!'))
     tagName = defaultTagPrefix + tagName.slice(2)
 
-  let tagObj = findTagObject(value, tagName, schema.tags)
+  let tagObj = findTagObject(value, tagName, tags)
   if (!tagObj) {
     if (typeof value.toJSON === 'function') value = value.toJSON()
     if (typeof value !== 'object')
@@ -36,15 +34,9 @@ export function createNode(value, tagName, ctx) {
   // Detect duplicate references to the same object & use Alias nodes for all
   // after first. The `obj` wrapper allows for circular references to resolve.
   const obj = {}
-  if (value && typeof value === 'object' && prevObjects) {
+  if (value && typeof value === 'object') {
     const prev = prevObjects.get(value)
-    if (prev) {
-      if (!aliasNodes)
-        throw new Error('Circular references are not supported here')
-      const alias = new Alias(prev) // leaves source dirty; must be cleaned by caller
-      aliasNodes.push(alias)
-      return alias
-    }
+    if (prev) return onAlias(prev)
     obj.value = value
     prevObjects.set(value, obj)
   }
