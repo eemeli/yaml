@@ -2,9 +2,10 @@ import YAML from '../../index.js'
 import { Pair } from '../../types.js'
 
 describe('Map', () => {
-  let map
+  let doc, map
   beforeEach(() => {
-    map = YAML.createNode({ a: 1, b: { c: 3, d: 4 } })
+    doc = new YAML.Document()
+    map = doc.createNode({ a: 1, b: { c: 3, d: 4 } })
     expect(map.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
@@ -43,10 +44,10 @@ describe('Map', () => {
   })
 
   test('get with node', () => {
-    expect(map.get(YAML.createNode('a'))).toBe(1)
-    expect(map.get(YAML.createNode('a'), true)).toMatchObject({ value: 1 })
-    expect(map.get(YAML.createNode('b')).toJSON()).toMatchObject({ c: 3, d: 4 })
-    expect(map.get(YAML.createNode('c'))).toBeUndefined()
+    expect(map.get(doc.createNode('a'))).toBe(1)
+    expect(map.get(doc.createNode('a'), true)).toMatchObject({ value: 1 })
+    expect(map.get(doc.createNode('b')).toJSON()).toMatchObject({ c: 3, d: 4 })
+    expect(map.get(doc.createNode('c'))).toBeUndefined()
   })
 
   test('has with value', () => {
@@ -58,10 +59,10 @@ describe('Map', () => {
   })
 
   test('has with node', () => {
-    expect(map.has(YAML.createNode('a'))).toBe(true)
-    expect(map.has(YAML.createNode('b'))).toBe(true)
-    expect(map.has(YAML.createNode('c'))).toBe(false)
-    expect(map.has(YAML.createNode())).toBe(false)
+    expect(map.has(doc.createNode('a'))).toBe(true)
+    expect(map.has(doc.createNode('b'))).toBe(true)
+    expect(map.has(doc.createNode('c'))).toBe(false)
+    expect(map.has(doc.createNode())).toBe(false)
   })
 
   test('set with value', () => {
@@ -76,21 +77,22 @@ describe('Map', () => {
   })
 
   test('set with node', () => {
-    map.set(YAML.createNode('a'), 2)
+    map.set(doc.createNode('a'), 2)
     expect(map.get('a')).toBe(2)
     expect(map.get('a', true)).toBe(2)
-    map.set(YAML.createNode('b'), 5)
+    map.set(doc.createNode('b'), 5)
     expect(map.get('b')).toBe(5)
-    map.set(YAML.createNode('c'), 6)
+    map.set(doc.createNode('c'), 6)
     expect(map.get('c')).toBe(6)
     expect(map.items).toHaveLength(3)
   })
 })
 
 describe('Seq', () => {
-  let seq
+  let doc, seq
   beforeEach(() => {
-    seq = YAML.createNode([1, [2, 3]])
+    doc = new YAML.Document()
+    seq = doc.createNode([1, [2, 3]])
     expect(seq.items).toMatchObject([
       { value: 1 },
       { items: [{ value: 2 }, { value: 3 }] }
@@ -121,11 +123,11 @@ describe('Seq', () => {
   })
 
   test('get with node', () => {
-    expect(seq.get(YAML.createNode(0))).toBe(1)
-    expect(seq.get(YAML.createNode('0'))).toBe(1)
-    expect(seq.get(YAML.createNode(0), true)).toMatchObject({ value: 1 })
-    expect(seq.get(YAML.createNode(1)).toJSON()).toMatchObject([2, 3])
-    expect(seq.get(YAML.createNode(2))).toBeUndefined()
+    expect(seq.get(doc.createNode(0))).toBe(1)
+    expect(seq.get(doc.createNode('0'))).toBe(1)
+    expect(seq.get(doc.createNode(0), true)).toMatchObject({ value: 1 })
+    expect(seq.get(doc.createNode(1)).toJSON()).toMatchObject([2, 3])
+    expect(seq.get(doc.createNode(2))).toBeUndefined()
   })
 
   test('has with value', () => {
@@ -138,11 +140,11 @@ describe('Seq', () => {
   })
 
   test('has with node', () => {
-    expect(seq.has(YAML.createNode(0))).toBe(true)
-    expect(seq.has(YAML.createNode('0'))).toBe(true)
-    expect(seq.has(YAML.createNode(2))).toBe(false)
-    expect(seq.has(YAML.createNode(''))).toBe(false)
-    expect(seq.has(YAML.createNode())).toBe(false)
+    expect(seq.has(doc.createNode(0))).toBe(true)
+    expect(seq.has(doc.createNode('0'))).toBe(true)
+    expect(seq.has(doc.createNode(2))).toBe(false)
+    expect(seq.has(doc.createNode(''))).toBe(false)
+    expect(seq.has(doc.createNode())).toBe(false)
   })
 
   test('set with value', () => {
@@ -157,12 +159,12 @@ describe('Seq', () => {
   })
 
   test('set with node', () => {
-    seq.set(YAML.createNode(0), 2)
+    seq.set(doc.createNode(0), 2)
     expect(seq.get(0)).toBe(2)
     expect(seq.get(0, true)).toBe(2)
-    seq.set(YAML.createNode('1'), 5)
+    seq.set(doc.createNode('1'), 5)
     expect(seq.get(1)).toBe(5)
-    seq.set(YAML.createNode(2), 6)
+    seq.set(doc.createNode(2), 6)
     expect(seq.get(2)).toBe(6)
     expect(seq.items).toHaveLength(3)
   })
@@ -286,9 +288,10 @@ describe('OMap', () => {
 })
 
 describe('Collection', () => {
-  let map
+  let doc, map
   beforeEach(() => {
-    map = YAML.createNode({ a: 1, b: [2, 3] })
+    doc = new YAML.Document()
+    map = doc.createNode({ a: 1, b: [2, 3] })
   })
 
   test('addIn', () => {
@@ -390,7 +393,7 @@ describe('Document', () => {
     expect(doc.get('a')).toBeUndefined()
     expect(doc.contents.items).toHaveLength(1)
 
-    doc.contents = YAML.createNode('s')
+    doc.contents = doc.createNode('s')
     expect(() => doc.set('a', 1)).toThrow(/document contents/)
   })
 
@@ -413,7 +416,7 @@ describe('Document', () => {
     expect(doc.get('a', true)).toMatchObject({ value: 1 })
     expect(doc.get('c')).toBeUndefined()
 
-    doc.contents = YAML.createNode('s')
+    doc.contents = doc.createNode('s')
     expect(doc.get('a')).toBeUndefined()
   })
 
@@ -428,7 +431,7 @@ describe('Document', () => {
   })
 
   test('getIn scalar', () => {
-    doc.contents = YAML.createNode('s')
+    doc.contents = doc.createNode('s')
     expect(doc.getIn([])).toBe('s')
     expect(doc.getIn(null, true)).toMatchObject({ value: 's' })
     expect(doc.getIn([0])).toBeUndefined()
@@ -438,7 +441,7 @@ describe('Document', () => {
     expect(doc.has('a')).toBe(true)
     expect(doc.has('c')).toBe(false)
 
-    doc.contents = YAML.createNode('s')
+    doc.contents = doc.createNode('s')
     expect(doc.has('a')).toBe(false)
   })
 
@@ -458,7 +461,7 @@ describe('Document', () => {
     expect(doc.get('c')).toBe(6)
     expect(doc.contents.items).toHaveLength(3)
 
-    doc.contents = YAML.createNode('s')
+    doc.contents = doc.createNode('s')
     expect(() => doc.set('a', 1)).toThrow(/document contents/)
   })
 
@@ -479,7 +482,7 @@ describe('Document', () => {
       'a: 2\nb:\n  - 2\n  - 5\nc: 6\ne:\n  - null\n  - e: 7\n'
     )
 
-    doc.contents = YAML.createNode('s')
+    doc.contents = doc.createNode('s')
     expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
   })
 })

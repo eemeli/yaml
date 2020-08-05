@@ -844,14 +844,14 @@ a:
 
 describe('Pair.commentBefore', () => {
   test('Should get key comment', () => {
-    const key = YAML.createNode('foo', true)
+    const key = new YAML.Document().createNode('foo')
     const pair = new Pair(key, 42)
     key.commentBefore = 'cc'
     expect(pair.commentBefore).toBe('cc')
   })
 
   test('Should set key comment', () => {
-    const key = YAML.createNode('foo', true)
+    const key = new YAML.Document().createNode('foo')
     const pair = new Pair(key, 42)
     pair.commentBefore = 'cc'
     expect(key.commentBefore).toBe('cc')

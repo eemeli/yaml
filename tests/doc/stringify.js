@@ -313,7 +313,7 @@ test('eemeli/yaml#52: Quoting item markers', () => {
   const str = String(doc)
   expect(() => YAML.parse(str)).not.toThrow()
   expect(str).toBe('key: "-"\n')
-  doc.contents = YAML.createNode({ key: '?' })
+  doc.contents = doc.createNode({ key: '?' })
   const str2 = String(doc)
   expect(() => YAML.parse(str2)).not.toThrow()
   expect(str2).toBe('key: "?"\n')
@@ -458,9 +458,10 @@ describe('simple keys', () => {
 })
 
 test('eemeli/yaml#128: YAML node inside object', () => {
-  const seq = YAML.createNode(['a'])
+  const doc = new YAML.Document()
+  const seq = doc.createNode(['a'])
   seq.commentBefore = 'sc'
-  const map = YAML.createNode({ foo: 'bar', seq })
+  const map = doc.createNode({ foo: 'bar', seq })
   map.commentBefore = 'mc'
   const obj = { array: [1], map }
   expect(YAML.stringify(obj)).toBe(
@@ -507,9 +508,10 @@ describe('sortMapEntries', () => {
 describe('custom indent', () => {
   let obj
   beforeEach(() => {
-    const seq = YAML.createNode(['a'])
+    const doc = new YAML.Document()
+    const seq = doc.createNode(['a'])
     seq.commentBefore = 'sc'
-    const map = YAML.createNode({ foo: 'bar', seq })
+    const map = doc.createNode({ foo: 'bar', seq })
     map.commentBefore = 'mc'
     obj = { array: [{ a: 1, b: 2 }], map }
   })
@@ -556,7 +558,7 @@ describe('custom indent', () => {
 describe('indentSeq: false', () => {
   let obj
   beforeEach(() => {
-    const seq = YAML.createNode(['a'])
+    const seq = new YAML.Document().createNode(['a'])
     seq.commentBefore = 'sc'
     obj = { array: [{ a: 1, b: 2 }], map: { seq } }
   })

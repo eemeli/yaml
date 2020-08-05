@@ -1,31 +1,8 @@
 import { parse as parseCST } from './cst/parse.js'
-import { createNode } from './doc/createNode.js'
 import { Document as YAMLDocument } from './doc/Document.js'
-import { Schema } from './doc/Schema.js'
 import { YAMLSemanticError } from './errors.js'
 import { defaultOptions, scalarOptions } from './options.js'
 import { warn } from './warnings.js'
-
-function _createNode(value, wrapScalars = true, tag) {
-  if (tag === undefined && typeof wrapScalars === 'string') {
-    tag = wrapScalars
-    wrapScalars = true
-  }
-  const options = Object.assign(
-    {},
-    YAMLDocument.defaults[defaultOptions.version],
-    defaultOptions
-  )
-  const ctx = {
-    onAlias() {
-      throw new Error('Repeated objects are not supported here')
-    },
-    prevObjects: new Map(),
-    schema: new Schema(options),
-    wrapScalars
-  }
-  return createNode(value, tag, ctx)
-}
 
 class Document extends YAMLDocument {
   constructor(contents, options) {
@@ -69,7 +46,6 @@ function stringify(value, options) {
 }
 
 export const YAML = {
-  createNode: _createNode,
   defaultOptions,
   Document,
   parse,
