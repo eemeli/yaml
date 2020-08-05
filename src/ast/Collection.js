@@ -1,5 +1,6 @@
 import { addComment } from '../stringify/addComment.js'
 import { Type } from '../constants.js'
+import { createNode } from '../doc/createNode.js'
 import { Node } from './Node.js'
 import { Scalar } from './Scalar.js'
 
@@ -11,7 +12,11 @@ function collectionFromPath(schema, path, value) {
     o[k] = v
     v = o
   }
-  return schema.createNode(v, false)
+  return createNode(v, null, {
+    prevObjects: new Map(),
+    schema,
+    wrapScalars: false
+  })
 }
 
 // null, undefined, or an empty non-string iterable (e.g. [])

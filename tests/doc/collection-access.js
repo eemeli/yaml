@@ -176,7 +176,7 @@ describe('Set', () => {
 
   let set
   beforeEach(() => {
-    set = doc.schema.createNode([1, 2, 3], true, '!!set')
+    set = doc.createNode([1, 2, 3], { tag: '!!set' })
     expect(set.items).toMatchObject([
       { key: { value: 1 }, value: { value: null } },
       { key: { value: 2 }, value: { value: null } },
@@ -227,11 +227,7 @@ describe('OMap', () => {
 
   let omap
   beforeEach(() => {
-    omap = doc.schema.createNode(
-      [{ a: 1 }, { b: { c: 3, d: 4 } }],
-      true,
-      '!!omap'
-    )
+    omap = doc.createNode([{ a: 1 }, { b: { c: 3, d: 4 } }], { tag: '!!omap' })
     expect(omap.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {

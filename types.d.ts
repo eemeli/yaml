@@ -10,30 +10,6 @@ export const strOptions: scalarOptions.Str
 
 export class Schema {
   constructor(options: Schema.Options)
-  /**
-   * Convert any value into a `Node` using this schema, recursively turning
-   * objects into collections.
-   *
-   * @param wrapScalars If `true`, also wraps plain values in `Scalar` objects;
-   *   if undefined or `false` and `value` is not an object, it will be returned
-   *   directly.
-   * @param tag Use to specify the collection type, e.g. `"!!omap"`. Note that
-   *   this requires the corresponding tag to be available in this schema.
-   */
-  createNode(
-    value: any,
-    wrapScalars?: boolean,
-    tag?: string,
-    ctx?: Schema.CreateNodeContext
-  ): Node
-  /**
-   * Convert a key and a value into a `Pair` using this schema, recursively
-   * wrapping all values as `Scalar` or `Collection` nodes.
-   *
-   * @param wrapScalars If `true`, also wraps plain values in `Scalar` objects
-   */
-  createPair(key: any, value: any, wrapScalars?: boolean): Pair
-  createPair(key: any, value: any, ctx: Schema.CreateNodeContext): Pair
   merge: boolean
   name: Schema.Name
   sortMapEntries: ((a: Pair, b: Pair) => number) | null

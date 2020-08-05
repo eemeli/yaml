@@ -52,8 +52,10 @@ export function stringify(item, ctx, onComment, onChompKeep) {
 
   let tagObj
   if (!(item instanceof Node)) {
-    const onTagObj = o => (tagObj = o)
-    item = schema.createNode(item, true, null, onTagObj)
+    item = ctx.doc.createNode(item, {
+      onTagObj: o => (tagObj = o),
+      wrapScalars: true
+    })
   }
 
   if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)

@@ -17,7 +17,7 @@ function findTagObject(value, tagName, tags) {
 
 export function createNode(value, tagName, ctx) {
   if (value instanceof Node) return value
-  const { onTagObj, prevObjects, schema, wrapScalars } = ctx
+  const { aliasNodes, onTagObj, prevObjects, schema, wrapScalars } = ctx
   if (tagName && tagName.startsWith('!!'))
     tagName = defaultTagPrefix + tagName.slice(2)
 
@@ -39,8 +39,10 @@ export function createNode(value, tagName, ctx) {
   if (value && typeof value === 'object' && prevObjects) {
     const prev = prevObjects.get(value)
     if (prev) {
+      if (!aliasNodes)
+        throw new Error('Circular references are not supported here')
       const alias = new Alias(prev) // leaves source dirty; must be cleaned by caller
-      ctx.aliasNodes.push(alias) // defined along with prevObjects
+      aliasNodes.push(alias)
       return alias
     }
     obj.value = value

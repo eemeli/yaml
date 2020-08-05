@@ -1,4 +1,5 @@
 import { parse as parseCST } from './cst/parse.js'
+import { createNode as _createNode } from './doc/createNode.js'
 import { Document as YAMLDocument } from './doc/Document.js'
 import { Schema } from './doc/Schema.js'
 import { YAMLSemanticError } from './errors.js'
@@ -15,8 +16,12 @@ function createNode(value, wrapScalars = true, tag) {
     YAMLDocument.defaults[defaultOptions.version],
     defaultOptions
   )
-  const schema = new Schema(options, null)
-  return schema.createNode(value, wrapScalars, tag)
+  const ctx = {
+    prevObjects: new Map(),
+    schema: new Schema(options),
+    wrapScalars
+  }
+  return _createNode(value, tag, ctx)
 }
 
 class Document extends YAMLDocument {

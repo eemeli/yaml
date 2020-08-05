@@ -1,5 +1,5 @@
 import { YAMLSemanticError } from '../../errors.js'
-import { Pair } from '../../ast/Pair.js'
+import { createPair, Pair } from '../../ast/Pair.js'
 import { Scalar } from '../../ast/Scalar.js'
 import { YAMLMap, findPair } from '../../ast/YAMLMap.js'
 import { resolveMap } from '../../resolve/resolveMap.js'
@@ -61,8 +61,7 @@ function parseSet(doc, cst) {
 
 function createSet(schema, iterable, ctx) {
   const set = new YAMLSet()
-  for (const value of iterable)
-    set.items.push(schema.createPair(value, null, ctx))
+  for (const value of iterable) set.items.push(createPair(value, null, ctx))
   return set
 }
 

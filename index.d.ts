@@ -5,10 +5,11 @@ import {
   Collection,
   Merge,
   Node,
+  Pair,
   Scalar,
   Schema,
   YAMLMap,
-  YAMLSeq
+  YAMLSeq,
 } from './types'
 import { Type, YAMLError, YAMLWarning } from './util'
 
@@ -231,6 +232,28 @@ export class Document extends Collection {
   version?: string
   /** Warnings encountered during parsing. */
   warnings: YAMLWarning[]
+
+  /**
+   * Convert any value into a `Node` using the current schema, recursively
+   * turning objects into collections.
+   *
+   * @param options Use `tag` to specify the collection type, e.g. `"!!omap"`.
+   *   Note that this requires the corresponding tag to be available in this
+   *   schema. If `wrapScalars` is not `false`, also wraps plain values in
+   *   `Scalar` objects.
+   */
+  createNode(
+    value: any,
+    options?: { tag?: string; wrapScalars?: boolean }
+  ): Node
+  /**
+   * Convert a key and a value into a `Pair` using the current schema,
+   * recursively wrapping all values as `Scalar` or `Collection` nodes.
+   *
+   * @param options If `wrapScalars` is not `false`, wraps plain values in
+   *   `Scalar` objects.
+   */
+  createPair(key: any, value: any, options?: { wrapScalars?: boolean }): Pair
   /**
    * List the tags used in the document that are not in the default
    * `tag:yaml.org,2002:` namespace.

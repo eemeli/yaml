@@ -91,3 +91,6 @@ String(doc)
 const map = new YAMLMap()
 map.items.push(new Pair('foo', 'bar'))
 doc.contents = map
+
+doc.contents = doc.createNode({ bizz: 'fuzz' })
+doc.add(doc.createPair('baz', 42))

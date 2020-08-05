@@ -165,7 +165,7 @@ String(doc)
 
 `YAML.createNode` recursively turns objects into [collections](#collections). Generic objects as well as `Map` and its descendants become mappings, while arrays and other iterable objects result in sequences. If `wrapScalars` is undefined or `true`, it also wraps plain values in `Scalar` objects; if it is false and `value` is not an object, it will be returned directly.
 
-To specify the collection type, set `tag` to its identifying string, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available based on the default options. To use a specific document's schema, use the wrapped method `doc.schema.createNode(value, wrapScalars, tag)`.
+To specify the collection type, set `tag` to its identifying string, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available based on the default options. To use a specific document's schema, use the Document method `createNode(value, options?)`.
 
 The primary purpose of this function is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output. To that end, you'll need to assign its return value to the `contents` of a Document (or somewhere within said contents), as the document's schema is required for YAML string output.
 
@@ -194,7 +194,7 @@ doc.toString()
 
 To construct a `YAMLSeq` or `YAMLMap`, use [`YAML.createNode()`](#yaml-createnode) with array, object or iterable input, or create the collections directly by importing the classes from `yaml/types`.
 
-Once created, normal array operations may be used to modify the `items` array. New `Pair` objects may created either by importing the class from `yaml/types` and using its `new Pair(key, value)` constructor, or by using the `doc.schema.createPair(key, value)` method. The latter will recursively wrap the `key` and `value` as nodes.
+Once created, normal array operations may be used to modify the `items` array. New `Pair` objects may created either by importing the class from `yaml/types` and using its `new Pair(key, value)` constructor, or by using the `doc.createPair(key, value)` method. The latter will recursively wrap the `key` and `value` as nodes.
 
 ## Comments
 

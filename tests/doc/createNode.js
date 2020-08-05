@@ -233,7 +233,7 @@ describe('Set', () => {
     })
     test('Schema#createNode() - YAML 1.2', () => {
       const doc = new YAML.Document(null)
-      const s = doc.schema.createNode(set, true)
+      const s = doc.createNode(set)
       expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toMatchObject([
         { value: 3 },
@@ -242,7 +242,7 @@ describe('Set', () => {
     })
     test('Schema#createNode() - YAML 1.1', () => {
       const doc = new YAML.Document(null, { version: '1.1' })
-      const s = doc.schema.createNode(set, true)
+      const s = doc.createNode(set)
       expect(s).toBeInstanceOf(YAMLSet)
       expect(s.items).toMatchObject([
         { key: { value: 3 } },
@@ -345,7 +345,7 @@ describe('circular references', () => {
     const map = { foo: 'bar' }
     map.map = map
     const doc = new YAML.Document(null)
-    expect(doc.schema.createNode(map)).toMatchObject({
+    expect(doc.createNode(map, { wrapScalars: false })).toMatchObject({
       items: [
         { key: 'foo', value: 'bar' },
         {
@@ -361,7 +361,7 @@ describe('circular references', () => {
       a1: { items: [{ key: 'foo' }, { key: 'map' }] }
     })
     expect(() => YAML.createNode(map)).toThrow(
-      /Circular references require a document/
+      /Circular references are not supported here/
     )
   })
 
@@ -370,7 +370,7 @@ describe('circular references', () => {
     const map = { foo: { bar: { baz } } }
     baz.map = map
     const doc = new YAML.Document(null)
-    const node = doc.schema.createNode(map)
+    const node = doc.createNode(map, { wrapScalars: false })
     expect(node.getIn(['foo', 'bar', 'baz', 'map'])).toMatchObject({
       type: 'ALIAS',
       source: { items: [{ key: 'foo' }] }
@@ -379,7 +379,7 @@ describe('circular references', () => {
       a1: { items: [{ key: 'foo' }] }
     })
     expect(() => YAML.createNode(map)).toThrow(
-      /Circular references require a document/
+      /Circular references are not supported here/
     )
   })
 
@@ -388,7 +388,7 @@ describe('circular references', () => {
     const two = ['two']
     const seq = [one, two, one, one, two]
     const doc = new YAML.Document(null)
-    expect(doc.schema.createNode(seq)).toMatchObject({
+    expect(doc.createNode(seq, { wrapScalars: false })).toMatchObject({
       items: [
         { items: ['one'] },
         { items: ['two'] },
@@ -402,7 +402,7 @@ describe('circular references', () => {
       a2: { items: ['two'] }
     })
     expect(() => YAML.createNode(seq)).toThrow(
-      /Circular references require a document/
+      /Circular references are not supported here/
     )
   })
 
@@ -410,14 +410,14 @@ describe('circular references', () => {
     const baz = { a: 1 }
     const seq = [{ foo: { bar: { baz } } }, { fe: { fi: { fo: { baz } } } }]
     const doc = new YAML.Document(null)
-    const node = doc.schema.createNode(seq)
+    const node = doc.createNode(seq, { wrapScalars: false })
     const source = node.getIn([0, 'foo', 'bar', 'baz'])
     const alias = node.getIn([1, 'fe', 'fi', 'fo', 'baz'])
     expect(source).toMatchObject({ items: [{ key: 'a', value: 1 }] })
     expect(alias).toMatchObject({ type: 'ALIAS' })
     expect(alias.source).toBe(source)
     expect(() => YAML.createNode(seq)).toThrow(
-      /Circular references require a document/
+      /Circular references are not supported here/
     )
   })
 })

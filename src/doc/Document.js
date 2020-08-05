@@ -1,4 +1,11 @@
-import { Collection, Node, Scalar, isEmptyPath, toJSON } from '../ast/index.js'
+import {
+  Collection,
+  Node,
+  Pair,
+  Scalar,
+  isEmptyPath,
+  toJSON
+} from '../ast/index.js'
 import { Document as CSTDocument } from '../cst/Document'
 import { defaultTagPrefix } from '../constants.js'
 import { YAMLError } from '../errors.js'
@@ -8,6 +15,7 @@ import { stringify } from '../stringify/stringify.js'
 
 import { Anchors } from './Anchors.js'
 import { Schema } from './Schema.js'
+import { createNode } from './createNode.js'
 import { listTagNames } from './listTagNames.js'
 import { parseContents } from './parseContents.js'
 import { parseDirectives } from './parseDirectives.js'
@@ -20,25 +28,25 @@ function assertCollection(contents) {
 export class Document {
   static defaults = documentOptions
 
-  constructor(contents, options) {
+  constructor(value, options) {
     this.anchors = new Anchors(options.anchorPrefix)
     this.commentBefore = null
     this.comment = null
     this.directivesEndMarker = null
     this.errors = []
     this.options = options
+    this.schema = null
     this.tagPrefixes = []
     this.version = null
     this.warnings = []
 
-    if (contents === undefined) {
-      this.schema = null
+    if (value === undefined) {
+      // note that this.schema is left as null here
       this.contents = null
-    } else if (contents instanceof CSTDocument) {
-      this.parse(contents)
+    } else if (value instanceof CSTDocument) {
+      this.parse(value)
     } else {
-      this.setSchema()
-      this.contents = this.schema.createNode(contents, true)
+      this.contents = this.createNode(value)
     }
   }
 
@@ -50,6 +58,36 @@ export class Document {
   addIn(path, value) {
     assertCollection(this.contents)
     this.contents.addIn(path, value)
+  }
+
+  createNode(value, { onTagObj, tag, wrapScalars } = {}) {
+    this.setSchema()
+    const ctx = {
+      aliasNodes: [],
+      onTagObj,
+      prevObjects: new Map(),
+      schema: this.schema,
+      wrapScalars: wrapScalars !== false
+    }
+    const node = createNode(value, tag, ctx)
+    for (const alias of ctx.aliasNodes) {
+      // With circular references, the source node is only resolved after all of
+      // its child nodes are. This is why anchors are set only after all of the
+      // nodes have been created.
+      alias.source = alias.source.node
+      let name = this.anchors.getName(alias.source)
+      if (!name) {
+        name = this.anchors.newName()
+        this.anchors.map[name] = alias.source
+      }
+    }
+    return node
+  }
+
+  createPair(key, value, options = {}) {
+    const k = this.createNode(key, options)
+    const v = this.createNode(value, options)
+    return new Pair(k, v)
   }
 
   delete(key) {
@@ -127,7 +165,7 @@ export class Document {
     }
     if (Array.isArray(customTags)) this.options.customTags = customTags
     const opt = Object.assign({}, this.getDefaults(), this.options)
-    this.schema = new Schema(opt, this.anchors)
+    this.schema = new Schema(opt)
   }
 
   parse(node, prevDoc) {
