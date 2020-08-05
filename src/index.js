@@ -15,7 +15,7 @@ function createNode(value, wrapScalars = true, tag) {
     YAMLDocument.defaults[defaultOptions.version],
     defaultOptions
   )
-  const schema = new Schema(options)
+  const schema = new Schema(options, null)
   return schema.createNode(value, wrapScalars, tag)
 }
 

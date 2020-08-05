@@ -48,24 +48,12 @@ function stringifyProps(node, tagObj, { anchors, doc }) {
 }
 
 export function stringify(item, ctx, onComment, onChompKeep) {
-  const { anchors, schema } = ctx.doc
+  const { schema } = ctx.doc
 
   let tagObj
   if (!(item instanceof Node)) {
-    const createCtx = {
-      aliasNodes: [],
-      onTagObj: o => (tagObj = o),
-      prevObjects: new Map()
-    }
-    item = schema.createNode(item, true, null, createCtx)
-    for (const alias of createCtx.aliasNodes) {
-      alias.source = alias.source.node
-      let name = anchors.getName(alias.source)
-      if (!name) {
-        name = anchors.newName()
-        anchors.map[name] = alias.source
-      }
-    }
+    const onTagObj = o => (tagObj = o)
+    item = schema.createNode(item, true, null, onTagObj)
   }
 
   if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)

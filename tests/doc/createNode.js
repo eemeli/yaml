@@ -337,3 +337,87 @@ describe('toJSON()', () => {
     expect(node.value).toBe(date.toJSON())
   })
 })
+
+describe('circular references', () => {
+  let doc
+  beforeEach(() => {
+    doc = new YAML.Document()
+    doc.setSchema()
+  })
+
+  test('parent at root', () => {
+    const map = { foo: 'bar' }
+    map.map = map
+    expect(doc.schema.createNode(map)).toMatchObject({
+      items: [
+        { key: 'foo', value: 'bar' },
+        {
+          key: 'map',
+          value: {
+            type: 'ALIAS',
+            source: { items: [{ key: 'foo' }, { key: 'map' }] }
+          }
+        }
+      ]
+    })
+    expect(doc.anchors.map).toMatchObject({
+      a1: { items: [{ key: 'foo' }, { key: 'map' }] }
+    })
+    expect(() => YAML.createNode(map)).toThrow(
+      /Circular references require a document/
+    )
+  })
+
+  test('ancestor at root', () => {
+    const baz = {}
+    const map = { foo: { bar: { baz } } }
+    baz.map = map
+    const node = doc.schema.createNode(map)
+    expect(node.getIn(['foo', 'bar', 'baz', 'map'])).toMatchObject({
+      type: 'ALIAS',
+      source: { items: [{ key: 'foo' }] }
+    })
+    expect(doc.anchors.map).toMatchObject({
+      a1: { items: [{ key: 'foo' }] }
+    })
+    expect(() => YAML.createNode(map)).toThrow(
+      /Circular references require a document/
+    )
+  })
+
+  test('sibling sequences', () => {
+    const one = ['one']
+    const two = ['two']
+    const seq = [one, two, one, one, two]
+    expect(doc.schema.createNode(seq)).toMatchObject({
+      items: [
+        { items: ['one'] },
+        { items: ['two'] },
+        { type: 'ALIAS', source: { items: ['one'] } },
+        { type: 'ALIAS', source: { items: ['one'] } },
+        { type: 'ALIAS', source: { items: ['two'] } }
+      ]
+    })
+    expect(doc.anchors.map).toMatchObject({
+      a1: { items: ['one'] },
+      a2: { items: ['two'] }
+    })
+    expect(() => YAML.createNode(seq)).toThrow(
+      /Circular references require a document/
+    )
+  })
+
+  test('further relatives', () => {
+    const baz = { a: 1 }
+    const seq = [{ foo: { bar: { baz } } }, { fe: { fi: { fo: { baz } } } }]
+    const node = doc.schema.createNode(seq)
+    const source = node.getIn([0, 'foo', 'bar', 'baz'])
+    const alias = node.getIn([1, 'fe', 'fi', 'fo', 'baz'])
+    expect(source).toMatchObject({ items: [{ key: 'a', value: 1 }] })
+    expect(alias).toMatchObject({ type: 'ALIAS' })
+    expect(alias.source).toBe(source)
+    expect(() => YAML.createNode(seq)).toThrow(
+      /Circular references require a document/
+    )
+  })
+})

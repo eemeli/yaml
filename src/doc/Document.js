@@ -118,7 +118,7 @@ export class Document {
     }
     if (Array.isArray(customTags)) this.options.customTags = customTags
     const opt = Object.assign({}, this.getDefaults(), this.options)
-    this.schema = new Schema(opt)
+    this.schema = new Schema(opt, this.anchors)
   }
 
   parse(node, prevDoc) {

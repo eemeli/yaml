@@ -30,9 +30,10 @@ export class Schema {
    * Convert a key and a value into a `Pair` using this schema, recursively
    * wrapping all values as `Scalar` or `Collection` nodes.
    *
-   * @param ctx To not wrap scalars, use a context `{ wrapScalars: false }`
+   * @param wrapScalars If `true`, also wraps plain values in `Scalar` objects
    */
-  createPair(key: any, value: any, ctx?: Schema.CreateNodeContext): Pair
+  createPair(key: any, value: any, wrapScalars?: boolean): Pair
+  createPair(key: any, value: any, ctx: Schema.CreateNodeContext): Pair
   merge: boolean
   name: Schema.Name
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
