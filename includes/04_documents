@@ -48,7 +48,9 @@
 <p>These functions should never throw; errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays. In particular, if <code>errors</code> is not empty it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
 
 <p>The <code>contents</code> of a parsed document will always consist of <code>Scalar</code>, <code>Map</code>, <code>Seq</code> or <code>null</code> values.</p>
-<h2 id='creating-documents'>Creating Documents</h2><h4 id='new-yaml-document-options'><code>new YAML.Document(options = {})</code></h4>
+<h2 id='creating-documents'>Creating Documents</h2><h4 id='new-yaml-document-value-options'><code>new YAML.Document(value, options = {})</code></h4>
+<p>Creates a new document. If <code>value</code> is defined, the document <code>contents</code> are initialised with that value, wrapped recursively in appropriate <a href="#content-nodes">content nodes</a>. If <code>value</code> is <code>undefined</code>, the document&#39;s <code>contents</code> and <code>schema</code> are initialised as <code>null</code>. See <a href="#options">Options</a> for more information on the second parameter.</p>
+
 <table><thead>
 <tr>
 <th>Member</th>
@@ -107,10 +109,9 @@
 <td>Warnings encountered during parsing.</td>
 </tr>
 </tbody></table>
-<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">([</span><span class="dl">'</span><span class="s1">some</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">values</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}])</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">version</span> <span class="o">=</span> <span class="kc">true</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> A commented document</span><span class="dl">'</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">some</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">values</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}]</span>
 
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// # A commented document</span>
@@ -132,6 +133,16 @@
 </tr>
 </thead><tbody>
 <tr>
+<td>createNode(value,&nbsp;options?)</td>
+<td><code>Node</code></td>
+<td>Recursively wrap any input with appropriate <code>Node</code> containers. See <a href="#creating-nodes">Creating Nodes</a> for more information.</td>
+</tr>
+<tr>
+<td>createPair(key,&nbsp;value,&nbsp;options?)</td>
+<td><code>Pair</code></td>
+<td>Recursively wrap <code>key</code> and <code>value</code> into a <code>Pair</code> object. See <a href="#creating-nodes">Creating Nodes</a> for more information.</td>
+</tr>
+<tr>
 <td>listNonDefaultTags()</td>
 <td><code>string[]</code></td>
 <td>List the tags used in the document that are not in the default <code>tag:yaml.org,2002:</code> namespace.</td>
@@ -142,9 +153,9 @@
 <td>Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed <code>cst</code>. Calling this multiple times on a Document is not recommended.</td>
 </tr>
 <tr>
-<td>setSchema(id, customTags)</td>
+<td>setSchema(id?, customTags?)</td>
 <td><code>void</code></td>
-<td>When a document is created with <code>new YAML.Document()</code>, the schema object is not set as it may be influenced by parsed directives; call this with no arguments to set it manually, or with arguments to change the schema used by the document. <code>id</code> may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, <code>customTags</code> should have the same shape as the similarly-named option.</td>
+<td>Set the schema used by the document. <code>id</code> may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, <code>customTags</code> should have the same shape as the similarly-named option.</td>
 </tr>
 <tr>
 <td>setTagPrefix(handle, prefix)</td>
@@ -239,33 +250,34 @@
 </tbody></table>
 <div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">[{ a: A }, { b: B }]</span><span class="dl">'</span>
 <span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
-<span class="kd">const</span> <span class="p">{</span> <span class="nx">anchors</span><span class="p">,</span> <span class="nx">contents</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">doc</span>
-<span class="kd">const</span> <span class="p">[</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">]</span> <span class="o">=</span> <span class="nx">contents</span><span class="p">.</span><span class="nx">items</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">)</span> <span class="c1">// 'a1'</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">)</span> <span class="c1">// 'a2'</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a1</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 'a1'</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">getName</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="c1">// undefined</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">getNode</span><span class="p">(</span><span class="dl">'</span><span class="s1">a2</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">],</span> <span class="kc">true</span><span class="p">))</span> <span class="c1">// 'a1'</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">],</span> <span class="kc">true</span><span class="p">))</span> <span class="c1">// 'a2'</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a1</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 'a1'</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">getNode</span><span class="p">(</span><span class="dl">'</span><span class="s1">a2</span><span class="dl">'</span><span class="p">)</span>
 <span class="c1">// { value: 'B', range: [ 16, 18 ], type: 'PLAIN' }</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ { a: A }, { b: &amp;a2 B } ]</span>
 
-<span class="kd">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="dl">'</span><span class="s1">AA</span><span class="dl">'</span><span class="p">)</span>
-<span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">true</span><span class="p">),</span> <span class="dl">'</span><span class="s1">AA</span><span class="dl">'</span><span class="p">)</span>
+<span class="c1">// Alias { source: YAMLMap { items: [ [Pair] ] } }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B }, *AA ]</span>
 
-<span class="kd">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createMergePair</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
-<span class="nx">b</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">merge</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createMergePair</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
+<span class="c1">// Merge {</span>
+<span class="c1">//   key: Scalar { value: '&lt;&lt;' },</span>
+<span class="c1">//   value: YAMLSeq { items: [ [Alias] ] } }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="nx">merge</span><span class="p">)</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B, &lt;&lt;: *AA }, *AA ]</span>
 
 <span class="c1">// This creates a circular reference</span>
-<span class="nx">merge</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
+<span class="nx">merge</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">true</span><span class="p">)))</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span> <span class="c1">// [RangeError: Maximum call stack size exceeded]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [</span>

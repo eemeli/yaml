@@ -2,9 +2,9 @@
 <blockquote>
 <p>To install:</p>
 </blockquote>
-<div class="highlight"><pre class="highlight sh tab-shell"><code>npm <span class="nb">install </span>yaml
+<div class="highlight"><pre class="highlight sh tab-shell"><code>npm <span class="nb">install </span>yaml@next
 <span class="c"># or</span>
-yarn add yaml
+yarn add yaml@next
 </code></pre></div>
 <p><code>yaml</code> is a new definitive library for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. This library:</p>
 
@@ -18,6 +18,8 @@ yarn add yaml
 <p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies and runs on Node.js 6 and later, and in browsers from IE 11 upwards.</p>
 
 <p>For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes. Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).</p>
+
+<p><strong>Note:</strong> These docs are for <code>yaml@2</code>. For v1, see the <a href="https://github.com/eemeli/yaml/tree/v1.10.0">v1.10.0 tag</a> for the source and <a href="https://eemeli.org/yaml/v1/">eemeli.org/yaml/v1</a> for the documentation.</p>
 <h2 id='api-overview'>API Overview</h2>
 <p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the <a href="#cst-parser">CST Parser</a>. The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library along with a decent <a href="#content-nodes">AST</a>, and the third is the closest to YAML source, making it fast, raw, and crude.</p>
 
@@ -34,13 +36,13 @@ yarn add yaml
 <h3>Documents</h3>
 
 <ul>
-<li><a href="#creating-nodes"><code>YAML.createNode(value, wrapScalars, tag): Node</code></a></li>
 <li><a href="#options"><code>YAML.defaultOptions</code></a></li>
 <li><a href="#documents"><code>YAML.Document</code></a>
 
 <ul>
-<li><a href="#creating-documents"><code>constructor(options)</code></a></li>
+<li><a href="#creating-documents"><code>constructor(value, options)</code></a></li>
 <li><a href="#options"><code>defaults</code></a></li>
+<li><a href="#creating-nodes"><code>#createNode(value, options): Node</code></a></li>
 <li><a href="#working-with-anchors"><code>#anchors</code></a></li>
 <li><a href="#content-nodes"><code>#contents</code></a></li>
 <li><a href="#errors"><code>#errors</code></a></li>

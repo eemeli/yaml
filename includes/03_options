@@ -75,6 +75,11 @@
 <td>Include line position &amp; node type directly in errors; drop their verbose source and context. By default <code>false</code>.</td>
 </tr>
 <tr>
+<td>resolveKnownTags</td>
+<td><code>boolean</code></td>
+<td>When using the <code>&#39;core&#39;</code> schema, support parsing values with these explicit <a href="https://yaml.org/type/">YAML 1.1 tags</a>: <code>!!binary</code>, <code>!!omap</code>, <code>!!pairs</code>, <code>!!set</code>, <code>!!timestamp</code>. By default <code>true</code>.</td>
+</tr>
+<tr>
 <td>schema</td>
 <td><code>&#39;core&#39; ⎮ &#39;failsafe&#39; ⎮</code> <code>&#39;json&#39; ⎮ &#39;yaml-1.1&#39;</code></td>
 <td>The base schema to use. By default <code>&#39;core&#39;</code> for YAML 1.2 and <code>&#39;yaml-1.1&#39;</code> for earlier versions.</td>
@@ -128,8 +133,9 @@ target:
 
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="kc">null</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">~</span><span class="dl">'</span>
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="nx">str</span><span class="p">.</span><span class="nx">defaultType</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">QUOTE_SINGLE</span><span class="dl">'</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="dl">'</span><span class="s1">this is</span><span class="dl">'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">},</span> <span class="p">{</span> <span class="na">simpleKeys</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
-<span class="c1">// 'this is': ~</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="na">this</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> <span class="na">that</span><span class="p">:</span> <span class="dl">'</span><span class="s1">value</span><span class="dl">'</span> <span class="p">})</span>
+<span class="c1">// this: ~</span>
+<span class="c1">// that: 'value'</span>
 </code></pre></div><h4 id='yaml-scalaroptions'><code>YAML.scalarOptions</code></h4>
 <p>Some customization options are availabe to control the parsing and stringification of scalars. Note that these values are used by all documents.</p>
 
@@ -183,7 +189,13 @@ target:
 <td>str.defaultType</td>
 <td><code>Type</code></td>
 <td><code>&#39;PLAIN&#39;</code></td>
-<td>The default type of string literal used to stringify values</td>
+<td>The default type of string literal used to stringify values in general</td>
+</tr>
+<tr>
+<td>str.defaultKeyType</td>
+<td><code>Type</code></td>
+<td><code>&#39;PLAIN&#39;</code></td>
+<td>The default type of string literal used to stringify implicit key values</td>
 </tr>
 <tr>
 <td>str.doubleQuoted</td>
@@ -199,4 +211,4 @@ target:
 </tr>
 </tbody></table>
 <h2 id='silencing-warnings'>Silencing Warnings</h2>
-<p>By default, the library will emit warnings for uses of deprecated APIs and as required by the YAML spec during parsing. If you&#39;d like to silence these, define a global variable <code>YAML_SILENCE_WARNINGS</code> with a true-ish value. To silence only deprecation warnings, use <code>YAML_SILENCE_DEPRECATION_WARNINGS</code>. These values may also be set in <code>process.env</code>.</p>
+<p>By default, the library will emit warnings as required by the YAML spec during parsing. If you&#39;d like to silence these, define a global or <code>process.env</code> variable <code>YAML_SILENCE_WARNINGS</code> with a true-ish value.</p>

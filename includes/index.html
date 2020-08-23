@@ -359,7 +359,7 @@
           </li>
       </ul>
         <ul class="toc-footer">
-            <li><a href='https://github.com/eemeli/yaml/releases'>Version <span id='version'>1.x.y</span> (changelog)</a></li>
+            <li><a href='https://github.com/eemeli/yaml/releases'>Version <span id='version'>2.x.y</span> (changelog)</a></li>
             <li><a href='https://github.com/eemeli/yaml'>github.com/eemeli/yaml</a></li>
             <li><a href='https://www.npmjs.com/package/yaml'><code>npm install yaml</code></a></li>
         </ul>
@@ -371,9 +371,9 @@
 <blockquote>
 <p>To install:</p>
 </blockquote>
-<div class="highlight"><pre class="highlight sh tab-shell"><code>npm <span class="nb">install </span>yaml
+<div class="highlight"><pre class="highlight sh tab-shell"><code>npm <span class="nb">install </span>yaml@next
 <span class="c"># or</span>
-yarn add yaml
+yarn add yaml@next
 </code></pre></div>
 <p><code>yaml</code> is a new definitive library for <a href="http://yaml.org/">YAML</a>, a human friendly data serialization standard. This library:</p>
 
@@ -387,6 +387,8 @@ yarn add yaml
 <p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies and runs on Node.js 6 and later, and in browsers from IE 11 upwards.</p>
 
 <p>For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes. Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).</p>
+
+<p><strong>Note:</strong> These docs are for <code>yaml@2</code>. For v1, see the <a href="https://github.com/eemeli/yaml/tree/v1.10.0">v1.10.0 tag</a> for the source and <a href="https://eemeli.org/yaml/v1/">eemeli.org/yaml/v1</a> for the documentation.</p>
 <h2 id='api-overview'>API Overview</h2>
 <p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the <a href="#cst-parser">CST Parser</a>. The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library along with a decent <a href="#content-nodes">AST</a>, and the third is the closest to YAML source, making it fast, raw, and crude.</p>
 
@@ -403,13 +405,13 @@ yarn add yaml
 <h3>Documents</h3>
 
 <ul>
-<li><a href="#creating-nodes"><code>YAML.createNode(value, wrapScalars, tag): Node</code></a></li>
 <li><a href="#options"><code>YAML.defaultOptions</code></a></li>
 <li><a href="#documents"><code>YAML.Document</code></a>
 
 <ul>
-<li><a href="#creating-documents"><code>constructor(options)</code></a></li>
+<li><a href="#creating-documents"><code>constructor(value, options)</code></a></li>
 <li><a href="#options"><code>defaults</code></a></li>
+<li><a href="#creating-nodes"><code>#createNode(value, options): Node</code></a></li>
 <li><a href="#working-with-anchors"><code>#anchors</code></a></li>
 <li><a href="#content-nodes"><code>#contents</code></a></li>
 <li><a href="#errors"><code>#errors</code></a></li>
@@ -565,6 +567,11 @@ yarn add yaml
 <td>Include line position &amp; node type directly in errors; drop their verbose source and context. By default <code>false</code>.</td>
 </tr>
 <tr>
+<td>resolveKnownTags</td>
+<td><code>boolean</code></td>
+<td>When using the <code>&#39;core&#39;</code> schema, support parsing values with these explicit <a href="https://yaml.org/type/">YAML 1.1 tags</a>: <code>!!binary</code>, <code>!!omap</code>, <code>!!pairs</code>, <code>!!set</code>, <code>!!timestamp</code>. By default <code>true</code>.</td>
+</tr>
+<tr>
 <td>schema</td>
 <td><code>&#39;core&#39; ⎮ &#39;failsafe&#39; ⎮</code> <code>&#39;json&#39; ⎮ &#39;yaml-1.1&#39;</code></td>
 <td>The base schema to use. By default <code>&#39;core&#39;</code> for YAML 1.2 and <code>&#39;yaml-1.1&#39;</code> for earlier versions.</td>
@@ -618,8 +625,9 @@ target:
 
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="kc">null</span><span class="p">.</span><span class="nx">nullStr</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">~</span><span class="dl">'</span>
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">scalarOptions</span><span class="p">.</span><span class="nx">str</span><span class="p">.</span><span class="nx">defaultType</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">QUOTE_SINGLE</span><span class="dl">'</span>
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="dl">'</span><span class="s1">this is</span><span class="dl">'</span><span class="p">:</span> <span class="kc">null</span> <span class="p">},</span> <span class="p">{</span> <span class="na">simpleKeys</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
-<span class="c1">// 'this is': ~</span>
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="na">this</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> <span class="na">that</span><span class="p">:</span> <span class="dl">'</span><span class="s1">value</span><span class="dl">'</span> <span class="p">})</span>
+<span class="c1">// this: ~</span>
+<span class="c1">// that: 'value'</span>
 </code></pre></div><h4 id='yaml-scalaroptions'><code>YAML.scalarOptions</code></h4>
 <p>Some customization options are availabe to control the parsing and stringification of scalars. Note that these values are used by all documents.</p>
 
@@ -673,7 +681,13 @@ target:
 <td>str.defaultType</td>
 <td><code>Type</code></td>
 <td><code>&#39;PLAIN&#39;</code></td>
-<td>The default type of string literal used to stringify values</td>
+<td>The default type of string literal used to stringify values in general</td>
+</tr>
+<tr>
+<td>str.defaultKeyType</td>
+<td><code>Type</code></td>
+<td><code>&#39;PLAIN&#39;</code></td>
+<td>The default type of string literal used to stringify implicit key values</td>
 </tr>
 <tr>
 <td>str.doubleQuoted</td>
@@ -689,7 +703,7 @@ target:
 </tr>
 </tbody></table>
 <h2 id='silencing-warnings'>Silencing Warnings</h2>
-<p>By default, the library will emit warnings for uses of deprecated APIs and as required by the YAML spec during parsing. If you&#39;d like to silence these, define a global variable <code>YAML_SILENCE_WARNINGS</code> with a true-ish value. To silence only deprecation warnings, use <code>YAML_SILENCE_DEPRECATION_WARNINGS</code>. These values may also be set in <code>process.env</code>.</p>
+<p>By default, the library will emit warnings as required by the YAML spec during parsing. If you&#39;d like to silence these, define a global or <code>process.env</code> variable <code>YAML_SILENCE_WARNINGS</code> with a true-ish value.</p>
 <h1 id='documents'>Documents</h1>
 <p>In order to work with YAML features not directly supported by native JavaScript data types, such as comments, anchors and aliases, <code>yaml</code> provides the <code>YAML.Document</code> API.</p>
 <h2 id='parsing-documents'>Parsing Documents</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">fs</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">fs</span><span class="dl">'</span>
@@ -740,7 +754,9 @@ target:
 <p>These functions should never throw; errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays. In particular, if <code>errors</code> is not empty it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
 
 <p>The <code>contents</code> of a parsed document will always consist of <code>Scalar</code>, <code>Map</code>, <code>Seq</code> or <code>null</code> values.</p>
-<h2 id='creating-documents'>Creating Documents</h2><h4 id='new-yaml-document-options'><code>new YAML.Document(options = {})</code></h4>
+<h2 id='creating-documents'>Creating Documents</h2><h4 id='new-yaml-document-value-options'><code>new YAML.Document(value, options = {})</code></h4>
+<p>Creates a new document. If <code>value</code> is defined, the document <code>contents</code> are initialised with that value, wrapped recursively in appropriate <a href="#content-nodes">content nodes</a>. If <code>value</code> is <code>undefined</code>, the document&#39;s <code>contents</code> and <code>schema</code> are initialised as <code>null</code>. See <a href="#options">Options</a> for more information on the second parameter.</p>
+
 <table><thead>
 <tr>
 <th>Member</th>
@@ -799,10 +815,9 @@ target:
 <td>Warnings encountered during parsing.</td>
 </tr>
 </tbody></table>
-<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">([</span><span class="dl">'</span><span class="s1">some</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">values</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}])</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">version</span> <span class="o">=</span> <span class="kc">true</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> A commented document</span><span class="dl">'</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">some</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">values</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}]</span>
 
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// # A commented document</span>
@@ -824,6 +839,16 @@ target:
 </tr>
 </thead><tbody>
 <tr>
+<td>createNode(value,&nbsp;options?)</td>
+<td><code>Node</code></td>
+<td>Recursively wrap any input with appropriate <code>Node</code> containers. See <a href="#creating-nodes">Creating Nodes</a> for more information.</td>
+</tr>
+<tr>
+<td>createPair(key,&nbsp;value,&nbsp;options?)</td>
+<td><code>Pair</code></td>
+<td>Recursively wrap <code>key</code> and <code>value</code> into a <code>Pair</code> object. See <a href="#creating-nodes">Creating Nodes</a> for more information.</td>
+</tr>
+<tr>
 <td>listNonDefaultTags()</td>
 <td><code>string[]</code></td>
 <td>List the tags used in the document that are not in the default <code>tag:yaml.org,2002:</code> namespace.</td>
@@ -834,9 +859,9 @@ target:
 <td>Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed <code>cst</code>. Calling this multiple times on a Document is not recommended.</td>
 </tr>
 <tr>
-<td>setSchema(id, customTags)</td>
+<td>setSchema(id?, customTags?)</td>
 <td><code>void</code></td>
-<td>When a document is created with <code>new YAML.Document()</code>, the schema object is not set as it may be influenced by parsed directives; call this with no arguments to set it manually, or with arguments to change the schema used by the document. <code>id</code> may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, <code>customTags</code> should have the same shape as the similarly-named option.</td>
+<td>Set the schema used by the document. <code>id</code> may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, <code>customTags</code> should have the same shape as the similarly-named option.</td>
 </tr>
 <tr>
 <td>setTagPrefix(handle, prefix)</td>
@@ -931,33 +956,34 @@ target:
 </tbody></table>
 <div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">[{ a: A }, { b: B }]</span><span class="dl">'</span>
 <span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
-<span class="kd">const</span> <span class="p">{</span> <span class="nx">anchors</span><span class="p">,</span> <span class="nx">contents</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">doc</span>
-<span class="kd">const</span> <span class="p">[</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">]</span> <span class="o">=</span> <span class="nx">contents</span><span class="p">.</span><span class="nx">items</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">)</span> <span class="c1">// 'a1'</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">)</span> <span class="c1">// 'a2'</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a1</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 'a1'</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">getName</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="c1">// undefined</span>
-<span class="nx">anchors</span><span class="p">.</span><span class="nx">getNode</span><span class="p">(</span><span class="dl">'</span><span class="s1">a2</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">],</span> <span class="kc">true</span><span class="p">))</span> <span class="c1">// 'a1'</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">],</span> <span class="kc">true</span><span class="p">))</span> <span class="c1">// 'a2'</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a1</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 'a1'</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">getNode</span><span class="p">(</span><span class="dl">'</span><span class="s1">a2</span><span class="dl">'</span><span class="p">)</span>
 <span class="c1">// { value: 'B', range: [ 16, 18 ], type: 'PLAIN' }</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ { a: A }, { b: &amp;a2 B } ]</span>
 
-<span class="kd">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="dl">'</span><span class="s1">AA</span><span class="dl">'</span><span class="p">)</span>
-<span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">true</span><span class="p">),</span> <span class="dl">'</span><span class="s1">AA</span><span class="dl">'</span><span class="p">)</span>
+<span class="c1">// Alias { source: YAMLMap { items: [ [Pair] ] } }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B }, *AA ]</span>
 
-<span class="kd">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">anchors</span><span class="p">.</span><span class="nx">createMergePair</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
-<span class="nx">b</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">merge</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createMergePair</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
+<span class="c1">// Merge {</span>
+<span class="c1">//   key: Scalar { value: '&lt;&lt;' },</span>
+<span class="c1">//   value: YAMLSeq { items: [ [Alias] ] } }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="nx">merge</span><span class="p">)</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B, &lt;&lt;: *AA }, *AA ]</span>
 
 <span class="c1">// This creates a circular reference</span>
-<span class="nx">merge</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">b</span><span class="p">))</span>
+<span class="nx">merge</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">true</span><span class="p">)))</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span> <span class="c1">// [RangeError: Maximum call stack size exceeded]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [</span>
@@ -1000,7 +1026,7 @@ target:
   <span class="nx">value</span><span class="p">:</span> <span class="nx">any</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>A parsed document&#39;s contents will have all of its non-object values wrapped in <code>Scalar</code> objects, which themselves may be in some hierarchy of <code>Map</code> and <code>Seq</code> collections. However, this is not a requirement for the document&#39;s stringification, which is rather tolerant regarding its input values, and will use <a href="#yaml-createnode"><code>YAML.createNode</code></a> when encountering an unwrapped value.</p>
+<p>A parsed document&#39;s contents will have all of its non-object values wrapped in <code>Scalar</code> objects, which themselves may be in some hierarchy of <code>Map</code> and <code>Seq</code> collections. However, this is not a requirement for the document&#39;s stringification, which is rather tolerant regarding its input values, and will use <a href="#creating-nodes"><code>doc.createNode()</code></a> when encountering an unwrapped value.</p>
 
 <p>When stringifying, the node <code>type</code> will be taken into account by <code>!!str</code> and <code>!!binary</code> values, and ignored by other scalars. On the other hand, <code>!!int</code> and <code>!!float</code> stringifiers will take <code>format</code> into account.</p>
 <h2 id='collections'>Collections</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">class</span> <span class="nx">Pair</span> <span class="kd">extends</span> <span class="nx">Node</span> <span class="p">{</span>
@@ -1035,53 +1061,51 @@ target:
 </tr>
 </thead><tbody>
 <tr>
-<td>add(value)</td>
+<td>add(value), addIn(path, value)</td>
 <td><code>void</code></td>
 <td>Adds a value to the collection. For <code>!!map</code> and <code>!!omap</code> the value must be a Pair instance or a <code>{ key, value }</code> object, which may not have a key that already exists in the map.</td>
 </tr>
 <tr>
-<td>delete(key)</td>
+<td>delete(key), deleteIn(path)</td>
 <td><code>boolean</code></td>
 <td>Removes a value from the collection. Returns <code>true</code> if the item was found and removed.</td>
 </tr>
 <tr>
-<td>get(key,&nbsp;[keepScalar])</td>
+<td>get(key,&nbsp;[keep]), getIn(path,&nbsp;[keep])</td>
 <td><code>any</code></td>
-<td>Returns item at <code>key</code>, or <code>undefined</code> if not found. By default unwraps scalar values from their surrounding node; to disable set <code>keepScalar</code> to <code>true</code> (collections are always returned intact).</td>
+<td>Returns value at <code>key</code>, or <code>undefined</code> if not found. By default unwraps scalar values from their surrounding node; to disable set <code>keep</code> to <code>true</code> (collections are always returned intact).</td>
 </tr>
 <tr>
-<td>has(key)</td>
+<td>has(key), hasIn(path)</td>
 <td><code>boolean</code></td>
 <td>Checks if the collection includes a value with the key <code>key</code>.</td>
 </tr>
 <tr>
-<td>set(key, value)</td>
+<td>set(key, value), setIn(path, value)</td>
 <td><code>any</code></td>
-<td>Sets a value in this collection. For <code>!!set</code>, <code>value</code> needs to be a boolean to add/remove the item from the set.</td>
+<td>Sets a value in this collection. For <code>!!set</code>, <code>value</code> needs to be a boolean to add/remove the item from the set. When overwriting a <code>Scalar</code> value with a scalar, the original node is retained.</td>
 </tr>
 </tbody></table>
 
 <!-- prettier-ignore -->
-<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">map</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">createNode</span><span class="p">({</span> <span class="na">a</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="p">})</span>
-<span class="nx">map</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span> <span class="na">key</span><span class="p">:</span> <span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">,</span> <span class="na">value</span><span class="p">:</span> <span class="mi">4</span> <span class="p">})</span>
-  <span class="c1">// =&gt; map.get('c') === 4 &amp;&amp; map.has('c') === true</span>
-<span class="nx">map</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">],</span> <span class="mi">5</span><span class="p">)</span> <span class="c1">// -&gt; map.getIn(['b', 2]) === 5</span>
-<span class="nx">map</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// true</span>
-<span class="nx">map</span><span class="p">.</span><span class="nx">deleteIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">f</span><span class="dl">'</span><span class="p">])</span> <span class="c1">// false</span>
-<span class="nx">map</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 1</span>
-<span class="nx">map</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">YAML</span><span class="p">.</span><span class="nx">createNode</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">),</span> <span class="kc">true</span><span class="p">)</span> <span class="c1">// Scalar { value: 1 }</span>
-<span class="nx">map</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// 3</span>
-<span class="nx">map</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// false</span>
-<span class="nx">map</span><span class="p">.</span><span class="nx">hasIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">0</span><span class="dl">'</span><span class="p">])</span> <span class="c1">// true</span>
-<span class="nx">map</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">,</span> <span class="kc">null</span><span class="p">)</span>
-  <span class="c1">// =&gt; map.get('c') === null &amp;&amp; map.has('c') === true</span>
-<span class="nx">map</span><span class="p">.</span><span class="nx">setIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">])</span>
-  <span class="c1">// throws Error:</span>
-  <span class="c1">// Expected YAML collection at c. Remaining path: x</span>
-</code></pre></div>
-<p>For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. <code>42</code> will match <code>Scalar { value: 42 }</code>) . Keys for <code>!!seq</code> should be positive integers, or their string representations. <code>add()</code> and <code>set()</code> do not automatically call <code>createNode()</code> to wrap the value.</p>
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">({</span> <span class="na">a</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="p">})</span> <span class="c1">// { a: 1, b: [ 2, 3 ] }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span> <span class="na">key</span><span class="p">:</span> <span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">,</span> <span class="na">value</span><span class="p">:</span> <span class="mi">4</span> <span class="p">})</span> <span class="c1">// { a: 1, b: [ 2, 3 ], c: 4 }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">],</span> <span class="mi">5</span><span class="p">)</span>             <span class="c1">// { a: 1, b: [ 2, 3, 5 ], c: 4 }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>                <span class="c1">// { a: 1, b: [ 2, 3, 5 ], c: 42 }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">setIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">])</span> <span class="c1">// Error: Expected YAML collection at c. Remaining path: x</span>
+<span class="nx">doc</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">)</span>                 <span class="c1">// { a: 1, b: [ 2, 3, 5 ] }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">deleteIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>          <span class="c1">// { a: 1, b: [ 2, 5 ] }</span>
 
-<p>Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections: <code>addIn(path, value)</code>, <code>deleteIn(path)</code>, <code>getIn(path, keepScalar)</code>, <code>hasIn(path)</code>, <code>setIn(path, value)</code>. If any intermediate node in <code>path</code> is a scalar rather than a collection, an error will be thrown. If any of the intermediate collections is not found:</p>
+<span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 1</span>
+<span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="c1">// Scalar { value: 1 }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// 5</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">createNode</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">))</span> <span class="c1">// true</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// false</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">hasIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">0</span><span class="dl">'</span><span class="p">])</span> <span class="c1">// true</span>
+</code></pre></div>
+<p>For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. <code>42</code> will match <code>Scalar { value: 42 }</code>) . Keys for <code>!!seq</code> should be positive integers, or their string representations. <code>add()</code> and <code>set()</code> do not automatically call <code>doc.createNode()</code> to wrap the value.</p>
+
+<p>Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections. If any intermediate node in <code>path</code> is a scalar rather than a collection, an error will be thrown. If any of the intermediate collections is not found:</p>
 
 <ul>
 <li><code>getIn</code> and <code>hasIn</code> will return <code>undefined</code> or <code>false</code> (respectively)</li>
@@ -1108,7 +1132,7 @@ target:
 </code></pre></div>
 <p><code>Alias</code> nodes provide a way to include a single node in multiple places in a document; the <code>source</code> of an alias node must be a preceding node in the document. Circular references are fully supported, and where possible the JS representation of alias nodes will be the actual source object.</p>
 
-<p>When directly stringifying JS structures with <code>YAML.stringify()</code>, multiple references to the same object will result in including an autogenerated anchor at its first instance, and alias nodes to that anchor at later references. Directly calling <code>YAML.createNode()</code> will not create anchors or alias nodes, allowing for greater manual control.</p>
+<p>When nodes are constructed from JS structures (e.g. during <code>YAML.stringify()</code>), multiple references to the same object will result in including an autogenerated anchor at its first instance, and alias nodes to that anchor at later references.</p>
 <div class="highlight"><pre class="highlight javascript"><code><span class="kd">class</span> <span class="nx">Merge</span> <span class="kd">extends</span> <span class="nx">Pair</span> <span class="p">{</span>
   <span class="nl">key</span><span class="p">:</span> <span class="nx">Scalar</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;&lt;</span><span class="dl">'</span><span class="p">),</span>      <span class="c1">// defined by the type specification</span>
   <span class="nx">value</span><span class="p">:</span> <span class="nx">Seq</span><span class="o">&lt;</span><span class="nx">Alias</span><span class="p">(</span><span class="nb">Map</span><span class="p">)</span><span class="o">&gt;</span><span class="p">,</span> <span class="c1">// stringified as *A if length = 1</span>
@@ -1118,43 +1142,47 @@ target:
 <p><code>Merge</code> nodes are not a core YAML 1.2 feature, but are defined as a <a href="http://yaml.org/type/merge.html">YAML 1.1 type</a>. They are only valid directly within a <code>Map#items</code> array and must contain one or more <code>Alias</code> nodes that themselves refer to <code>Map</code> nodes. When the surrounding map is resolved as a plain JS object, the key-value pairs of the aliased maps will be included in the object. Earlier <code>Alias</code> nodes override later ones, as do values set in the object directly.</p>
 
 <p>To create and work with alias and merge nodes, you should use the <a href="#working-with-anchors"><code>YAML.Document#anchors</code></a> object.</p>
-<h2 id='creating-nodes'>Creating Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">seq</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">createNode</span><span class="p">([</span><span class="dl">'</span><span class="s1">some</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">values</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}])</span>
-<span class="c1">// YAMLSeq {</span>
-<span class="c1">//   items:</span>
-<span class="c1">//    [ Scalar { value: 'some' },</span>
-<span class="c1">//      Scalar { value: 'values' },</span>
-<span class="c1">//      YAMLMap {</span>
-<span class="c1">//        items:</span>
-<span class="c1">//         [ Pair {</span>
-<span class="c1">//             key: Scalar { value: 'balloons' },</span>
-<span class="c1">//             value: Scalar { value: 99 } } ] } ] }</span>
+<h2 id='creating-nodes'>Creating Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">([</span><span class="dl">'</span><span class="s1">some</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">values</span><span class="dl">'</span><span class="p">])</span>
+<span class="c1">// Document {</span>
+<span class="c1">//   contents:</span>
+<span class="c1">//     YAMLSeq {</span>
+<span class="c1">//       items:</span>
+<span class="c1">//        [ Scalar { value: 'some' },</span>
+<span class="c1">//          Scalar { value: 'values' } ] } }</span>
 
-<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="nx">seq</span>
-<span class="nx">seq</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">comment</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> A commented item</span><span class="dl">'</span>
+<span class="kd">const</span> <span class="nx">map</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">createNode</span><span class="p">({</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">})</span>
+<span class="c1">// YAMLMap {</span>
+<span class="c1">//   items:</span>
+<span class="c1">//    [ Pair {</span>
+<span class="c1">//        key: Scalar { value: 'balloons' },</span>
+<span class="c1">//        value: Scalar { value: 99 } } ] }</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">map</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">comment</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> A commented item</span><span class="dl">'</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// - some # A commented item</span>
 <span class="c1">// - values</span>
 <span class="c1">// - balloons: 99</span>
-</code></pre></div><h4 id='yaml-createnode-value-wrapscalars-tag-node'><code>YAML.createNode(value, wrapScalars?, tag?): Node</code></h4>
-<p><code>YAML.createNode</code> recursively turns objects into <a href="#collections">collections</a>. Generic objects as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences. If <code>wrapScalars</code> is undefined or <code>true</code>, it also wraps plain values in <code>Scalar</code> objects; if it is false and <code>value</code> is not an object, it will be returned directly.</p>
+</code></pre></div><h4 id='yaml-document-createnode-value-options-node'><code>YAML.Document#createNode(value, options?): Node</code></h4>
+<p>To create a new node, use the <code>createNode(value, options?)</code> document method. This will recursively wrap any input with appropriate <code>Node</code> containers. Generic JS <code>Object</code> values as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences. With <code>Object</code>, entries that have an <code>undefined</code> value are dropped.</p>
 
-<p>To specify the collection type, set <code>tag</code> to its identifying string, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available based on the default options. To use a specific document&#39;s schema, use the wrapped method <code>doc.schema.createNode(value, wrapScalars, tag)</code>.</p>
+<p>To specify the collection type, set <code>options.tag</code> to its identifying string, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available in the document&#39;s schema. If <code>options.wrapScalars</code> is undefined or <code>true</code>, plain values are wrapped in <code>Scalar</code> objects.</p>
 
-<p>The primary purpose of this function is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output. To that end, you&#39;ll need to assign its return value to the <code>contents</code> of a Document (or somewhere within said contents), as the document&#39;s schema is required for YAML string output.</p>
+<p>As a possible side effect, this method may add entries to the document&#39;s <a href="#working-with-anchors"><code>anchors</code></a></p>
 
-<h4 style="clear:both"><code>new Map(), new Seq(), new Pair(key, value)</code></h4>
+<p>The primary purpose of this method is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output. To that end, you&#39;ll need to assign its return value to the <code>contents</code> of a document (or somewhere within said contents), as the document&#39;s schema is required for YAML string output. If you&#39;re not interested in working with such metadata, document <code>contents</code> may also include non-<code>Node</code> values at any level.</p>
+
+<h4 style="clear:both"><code>new YAMLMap(), new YAMLSeq(), doc.createPair(key, value)</code></h4>
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">YAML</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">Pair</span><span class="p">,</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/types</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/types</span><span class="dl">'</span>
 
-<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">()</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAMLSeq</span><span class="p">()</span>
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">(</span><span class="k">new</span> <span class="nx">YAMLSeq</span><span class="p">())</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span> <span class="o">=</span> <span class="p">[</span>
   <span class="dl">'</span><span class="s1">some values</span><span class="dl">'</span><span class="p">,</span>
   <span class="mi">42</span><span class="p">,</span>
   <span class="p">{</span> <span class="na">including</span><span class="p">:</span> <span class="dl">'</span><span class="s1">objects</span><span class="dl">'</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="dl">'</span><span class="s1">a string</span><span class="dl">'</span> <span class="p">}</span>
 <span class="p">]</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="k">new</span> <span class="nx">Pair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a number</span><span class="dl">'</span><span class="p">))</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">createPair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a number</span><span class="dl">'</span><span class="p">))</span>
 
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
 <span class="c1">// - some values</span>
@@ -1163,9 +1191,9 @@ target:
 <span class="c1">//   including: objects</span>
 <span class="c1">// - 1: a number</span>
 </code></pre></div>
-<p>To construct a <code>YAMLSeq</code> or <code>YAMLMap</code>, use <a href="#yaml-createnode"><code>YAML.createNode()</code></a> with array, object or iterable input, or create the collections directly by importing the classes from <code>yaml/types</code>.</p>
+<p>To construct a <code>YAMLSeq</code> or <code>YAMLMap</code>, use <code>doc.createNode()</code> with array, object or iterable input, or create the collections directly by importing the classes from <code>yaml/types</code>.</p>
 
-<p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created either by importing the class from <code>yaml/types</code> and using its <code>new Pair(key, value)</code> constructor, or by using the <code>doc.schema.createPair(key, value)</code> method. The latter will recursively wrap the <code>key</code> and <code>value</code> as nodes.</p>
+<p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created either by importing the class from <code>yaml/types</code> and using its <code>new Pair(key, value)</code> constructor, or by using the <code>doc.createPair(key, value, options?)</code> method. The latter will recursively wrap the <code>key</code> and <code>value</code> as nodes, and accepts the same options as <code>doc.createNode()</code></p>
 <h2 id='comments'>Comments</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---
@@ -1356,7 +1384,7 @@ it has:
 <td><code>&#39;pairs&#39;</code></td>
 <td><a href="https://yaml.org/type/pairs.html"><code>!!pairs</code></a></td>
 <td><code>Array</code></td>
-<td>Ordered sequence of key: value pairs allowing duplicates. To create from JS, you&#39;ll need to explicitly use <code>&#39;!!pairs&#39;</code> as the third argument of <a href="#creating-nodes"><code>createNode()</code></a>.</td>
+<td>Ordered sequence of key: value pairs allowing duplicates. To create from JS, use <code>doc.createNode(array, { tag: &#39;!!pairs&#39; })</code>.</td>
 </tr>
 <tr>
 <td><code>&#39;set&#39;</code></td>
@@ -1414,7 +1442,7 @@ it has:
 <h3 id='creating-nodes-and-stringifying-custom-data'>Creating Nodes and Stringifying Custom Data</h3>
 <p>As with parsing, turning input data into its YAML string representation is a two-stage process as the input is first turned into an AST tree before stringifying it. This allows for metadata and comments to be attached to each node, and for e.g. circular references to be resolved. For scalar values, this means just wrapping the value within a <code>Scalar</code> class while keeping it unchanged.</p>
 
-<p>As values may be wrapped within objects and arrays, <code>YAML.createNode()</code> uses each tag&#39;s <code>identify(value): boolean</code> function to detect custom data types. For the same reason, collections need to define their own <code>createNode(schema, value, ctx): Collection</code> functions that may recursively construct their equivalent collection class instances.</p>
+<p>As values may be wrapped within objects and arrays, <code>doc.createNode()</code> uses each tag&#39;s <code>identify(value): boolean</code> function to detect custom data types. For the same reason, collections need to define their own <code>createNode(schema, value, ctx): Collection</code> functions that may recursively construct their equivalent collection class instances.</p>
 
 <p>Finally, <code>stringify(item, ctx, ...): string</code> defines how your data should be represented as a YAML string, in case the default stringifiers aren&#39;t enough. For collections in particular, the default stringifier should be perfectly sufficient. <code>&#39;yaml/util&#39;</code> exports <code>stringifyNumber(item)</code> and <code>stringifyString(item, ctx, ...)</code>, which may be of use for custom scalar data.</p>
 <h3 id='custom-tag-api'>Custom Tag API</h3>
@@ -1435,7 +1463,7 @@ it has:
 <ul>
 <li><code>createNode(schema, value, ctx): Node</code> is an optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.</li>
 <li><code>format: string</code> If a tag has multiple forms that should be parsed and/or stringified differently, use <code>format</code> to identify them. Used by <code>!!int</code> and <code>!!float</code>.</li>
-<li><strong><code>identify(value): boolean</code></strong> is used by <code>YAML.createNode</code> to detect your data type, e.g. using <code>typeof</code> or <code>instanceof</code>. Required.</li>
+<li><strong><code>identify(value): boolean</code></strong> is used by <code>doc.createNode()</code> to detect your data type, e.g. using <code>typeof</code> or <code>instanceof</code>. Required.</li>
 <li><code>nodeClass: Node</code> is the <code>Node</code> child class that implements this tag. Required for collections and tags that have overlapping JS representations.</li>
 <li><code>options: Object</code> is used by some tags to configure their stringification.</li>
 <li><strong><code>resolve(doc, cstNode): Node | any</code></strong> turns a CST node into an AST node; <code>doc</code> is the resulting <code>YAML.Document</code> instance. If returning a non-<code>Node</code> value, the output will be wrapped as a <code>Scalar</code>. Required.</li>
