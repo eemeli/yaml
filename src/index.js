@@ -1,14 +1,8 @@
 import { parse as parseCST } from './cst/parse.js'
-import { Document as YAMLDocument } from './doc/Document.js'
+import { Document } from './doc/Document.js'
 import { YAMLSemanticError } from './errors.js'
 import { defaultOptions, scalarOptions } from './options.js'
 import { warn } from './warnings.js'
-
-class Document extends YAMLDocument {
-  constructor(contents, options) {
-    super(contents, Object.assign({}, defaultOptions, options))
-  }
-}
 
 function parseAllDocuments(src, options) {
   const stream = []

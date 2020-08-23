@@ -7,8 +7,8 @@ import { resolveMap } from '../../resolve/resolveMap.js'
 export class YAMLSet extends YAMLMap {
   static tag = 'tag:yaml.org,2002:set'
 
-  constructor() {
-    super()
+  constructor(schema) {
+    super(schema)
     this.tag = YAMLSet.tag
   }
 
@@ -60,7 +60,7 @@ function parseSet(doc, cst) {
 }
 
 function createSet(schema, iterable, ctx) {
-  const set = new YAMLSet()
+  const set = new YAMLSet(schema)
   for (const value of iterable) set.items.push(createPair(value, null, ctx))
   return set
 }

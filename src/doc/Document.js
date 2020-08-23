@@ -11,7 +11,7 @@ import {
 import { Document as CSTDocument } from '../cst/Document'
 import { defaultTagPrefix } from '../constants.js'
 import { YAMLError } from '../errors.js'
-import { documentOptions } from '../options.js'
+import { defaultOptions, documentOptions } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
 import { stringify } from '../stringify/stringify.js'
 
@@ -31,12 +31,12 @@ export class Document {
   static defaults = documentOptions
 
   constructor(value, options) {
-    this.anchors = new Anchors(options.anchorPrefix)
+    this.options = Object.assign({}, defaultOptions, options)
+    this.anchors = new Anchors(this.options.anchorPrefix)
     this.commentBefore = null
     this.comment = null
     this.directivesEndMarker = null
     this.errors = []
-    this.options = options
     this.schema = null
     this.tagPrefixes = []
     this.version = null
