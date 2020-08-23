@@ -4,6 +4,7 @@ import {
   Node,
   Pair,
   Scalar,
+  collectionFromPath,
   isEmptyPath,
   toJSON
 } from '../ast/index.js'
@@ -147,13 +148,21 @@ export class Document {
   }
 
   set(key, value) {
-    assertCollection(this.contents)
-    this.contents.set(key, value)
+    if (this.contents == null) {
+      this.setSchema()
+      this.contents = collectionFromPath(this.schema, [key], value)
+    } else {
+      assertCollection(this.contents)
+      this.contents.set(key, value)
+    }
   }
 
   setIn(path, value) {
     if (isEmptyPath(path)) this.contents = value
-    else {
+    else if (this.contents == null) {
+      this.setSchema()
+      this.contents = collectionFromPath(this.schema, path, value)
+    } else {
       assertCollection(this.contents)
       this.contents.setIn(path, value)
     }

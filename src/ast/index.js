@@ -1,5 +1,5 @@
 export { Alias } from './Alias.js'
-export { Collection, isEmptyPath } from './Collection.js'
+export { Collection, collectionFromPath, isEmptyPath } from './Collection.js'
 export { Merge } from './Merge.js'
 export { Node } from './Node.js'
 export { Pair } from './Pair.js'

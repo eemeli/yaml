@@ -64,13 +64,13 @@ The `yaml-1.1` schema includes [additional collections](https://yaml.org/type/in
 
 All of the collections provide the following accessor methods:
 
-| Method                      | Returns   | Description                                                                                                                                                                                       |
-| --------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| add(value)                  | `void`    | Adds a value to the collection. For `!!map` and `!!omap` the value must be a Pair instance or a `{ key, value }` object, which may not have a key that already exists in the map.                 |
-| delete(key)                 | `boolean` | Removes a value from the collection. Returns `true` if the item was found and removed.                                                                                                            |
-| get(key,&nbsp;[keepScalar]) | `any`     | Returns item at `key`, or `undefined` if not found. By default unwraps scalar values from their surrounding node; to disable set `keepScalar` to `true` (collections are always returned intact). |
-| has(key)                    | `boolean` | Checks if the collection includes a value with the key `key`.                                                                                                                                     |
-| set(key, value)             | `any`     | Sets a value in this collection. For `!!set`, `value` needs to be a boolean to add/remove the item from the set. When overwriting a `Scalar` value with a scalar, the original node is retained.  |
+| Method                                          | Returns   | Description                                                                                                                                                                                      |
+| ----------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| add(value), addIn(path, value)                  | `void`    | Adds a value to the collection. For `!!map` and `!!omap` the value must be a Pair instance or a `{ key, value }` object, which may not have a key that already exists in the map.                |
+| delete(key), deleteIn(path)                     | `boolean` | Removes a value from the collection. Returns `true` if the item was found and removed.                                                                                                           |
+| get(key,&nbsp;[keep]), getIn(path,&nbsp;[keep]) | `any`     | Returns value at `key`, or `undefined` if not found. By default unwraps scalar values from their surrounding node; to disable set `keep` to `true` (collections are always returned intact).     |
+| has(key), hasIn(path)                           | `boolean` | Checks if the collection includes a value with the key `key`.                                                                                                                                    |
+| set(key, value), setIn(path, value)             | `any`     | Sets a value in this collection. For `!!set`, `value` needs to be a boolean to add/remove the item from the set. When overwriting a `Scalar` value with a scalar, the original node is retained. |
 
 <!-- prettier-ignore -->
 ```js
@@ -92,7 +92,7 @@ doc.hasIn(['b', '0']) // true
 
 For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. `42` will match `Scalar { value: 42 }`) . Keys for `!!seq` should be positive integers, or their string representations. `add()` and `set()` do not automatically call `doc.createNode()` to wrap the value.
 
-Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections: `addIn(path, value)`, `deleteIn(path)`, `getIn(path, keepScalar)`, `hasIn(path)`, `setIn(path, value)`. If any intermediate node in `path` is a scalar rather than a collection, an error will be thrown. If any of the intermediate collections is not found:
+Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections. If any intermediate node in `path` is a scalar rather than a collection, an error will be thrown. If any of the intermediate collections is not found:
 
 - `getIn` and `hasIn` will return `undefined` or `false` (respectively)
 - `addIn` and `setIn` will create missing collections; non-negative integer keys will create sequences, all other keys create maps

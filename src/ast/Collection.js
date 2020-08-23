@@ -4,7 +4,7 @@ import { createNode } from '../doc/createNode.js'
 import { Node } from './Node.js'
 import { Scalar } from './Scalar.js'
 
-function collectionFromPath(schema, path, value) {
+export function collectionFromPath(schema, path, value) {
   let v = value
   for (let i = path.length - 1; i >= 0; --i) {
     const k = path[i]

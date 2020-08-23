@@ -90,7 +90,7 @@ describe('Map', () => {
   test('set scalar node with anchor', () => {
     doc = YAML.parseDocument('a: &A value\nb: *A\n')
     doc.set('a', 'foo')
-    expect(doc.get('a',true)).toMatchObject({ value: 'foo' })
+    expect(doc.get('a', true)).toMatchObject({ value: 'foo' })
     expect(String(doc)).toBe('a: &A foo\nb: *A\n')
   })
 })
@@ -464,6 +464,10 @@ describe('Document', () => {
 
     doc.contents = doc.createNode('s')
     expect(() => doc.set('a', 1)).toThrow(/document contents/)
+
+    doc.contents = null
+    doc.set('a', 1)
+    expect(doc.get('a')).toBe(1)
   })
 
   test('setIn', () => {
@@ -485,5 +489,9 @@ describe('Document', () => {
 
     doc.contents = doc.createNode('s')
     expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
+
+    doc.contents = null
+    doc.setIn(['a', 2], 1)
+    expect(doc.get('a')).toMatchObject({ items: [null, null, 1] })
   })
 })
