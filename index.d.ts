@@ -9,7 +9,7 @@ import {
   Scalar,
   Schema,
   YAMLMap,
-  YAMLSeq,
+  YAMLSeq
 } from './types'
 import { Type, YAMLError, YAMLWarning } from './util'
 
@@ -79,7 +79,7 @@ export interface Options extends Schema.Options {
   /**
    * Include line position & node type directly in errors; drop their verbose source and context.
    *
-   * Default: `false`
+   * Default: `true`
    */
   prettyErrors?: boolean
   /**
@@ -158,11 +158,17 @@ export namespace scalarOptions {
 
   interface Str {
     /**
-     * The default type of string literal used to stringify values
+     * The default type of string literal used to stringify values in general
      *
      * Default: `'PLAIN'`
      */
     defaultType: Scalar.Type
+    /**
+     * The default type of string literal used to stringify implicit key values
+     *
+     * Default: `'PLAIN'`
+     */
+    defaultKeyType: Scalar.Type
     /**
      * Use 'single quote' rather than "double quote" by default
      *
@@ -202,7 +208,11 @@ export namespace scalarOptions {
 
 export class Document extends Collection {
   cstNode?: CST.Document
-  constructor(options?: Options)
+  /**
+   * @param value - The initial value for the document, which will be wrapped
+   *   in a Node container.
+   */
+  constructor(value?: any, options?: Options)
   tag: never
   directivesEndMarker?: boolean
   type: Type.DOCUMENT
@@ -239,8 +249,8 @@ export class Document extends Collection {
    *
    * @param options Use `tag` to specify the collection type, e.g. `"!!omap"`.
    *   Note that this requires the corresponding tag to be available in this
-   *   schema. If `wrapScalars` is not `false`, also wraps plain values in
-   *   `Scalar` objects.
+   *   document's schema. If `wrapScalars` is not `false`, also wraps plain
+   *   values in `Scalar` objects.
    */
   createNode(
     value: any,

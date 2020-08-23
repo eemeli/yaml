@@ -10,6 +10,7 @@ export const strOptions: scalarOptions.Str
 
 export class Schema {
   constructor(options: Schema.Options)
+  knownTags: { [key: string]: Schema.CustomTag }
   merge: boolean
   name: Schema.Name
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
@@ -31,6 +32,15 @@ export namespace Schema {
      * Default: `false` for YAML 1.2, `true` for earlier versions
      */
     merge?: boolean
+    /**
+     * When using the `'core'` schema, support parsing values with these
+     * explicit YAML 1.1 tags:
+     *
+     * `!!binary`, `!!omap`, `!!pairs`, `!!set`, `!!timestamp`.
+     *
+     * Default `true`
+     */
+    resolveKnownTags?: boolean
     /**
      * The base schema to use.
      *
@@ -135,11 +145,6 @@ export namespace Schema {
   }
 
   interface CustomTag extends BaseTag {
-    /**
-     * A JavaScript class that should be matched to this tag, e.g. `Date` for `!!timestamp`.
-     * @deprecated Use `Tag.identify` instead
-     */
-    class?: new () => any
     /**
      * Turns a CST node into an AST node. If returning a non-`Node` value, the
      * output will be wrapped as a `Scalar`.
