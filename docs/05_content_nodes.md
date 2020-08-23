@@ -167,7 +167,7 @@ String(doc)
 
 #### `YAML.Document#createNode(value, options?): Node`
 
-To create a new node, use the `createNode(value, options?)` document method. This will recursively wrap any input with appropriate `Node` containers. Generic objects as well as `Map` and its descendants become mappings, while arrays and other iterable objects result in sequences.
+To create a new node, use the `createNode(value, options?)` document method. This will recursively wrap any input with appropriate `Node` containers. Generic JS `Object` values as well as `Map` and its descendants become mappings, while arrays and other iterable objects result in sequences. With `Object`, entries that have an `undefined` value are dropped.
 
 To specify the collection type, set `options.tag` to its identifying string, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available in the document's schema. If `options.wrapScalars` is undefined or `true`, plain values are wrapped in `Scalar` objects.
 

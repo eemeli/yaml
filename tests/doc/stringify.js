@@ -727,7 +727,13 @@ describe('undefined values', () => {
 
   test("{ a: 'A', b: undefined, c: 'C' }", () => {
     expect(YAML.stringify({ a: 'A', b: undefined, c: 'C' })).toBe(
-      'a: A\nc: C\n'
+      'a: A\nc: C\n' // note: No `b` key
+    )
+  })
+
+  test("{ a: 'A', b: null, c: 'C' }", () => {
+    expect(YAML.stringify({ a: 'A', b: null, c: 'C' })).toBe(
+      'a: A\nb: null\nc: C\n'
     )
   })
 
