@@ -25,7 +25,7 @@ export function resolveMap(doc, cst) {
     cst.type === Type.FLOW_MAP
       ? resolveFlowMapItems(doc, cst)
       : resolveBlockMapItems(doc, cst)
-  const map = new YAMLMap()
+  const map = new YAMLMap(doc.schema)
   map.items = items
   resolveComments(map, comments)
   let hasCollectionKey = false

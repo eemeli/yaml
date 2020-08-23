@@ -22,7 +22,7 @@ export function resolveSeq(doc, cst) {
     cst.type === Type.FLOW_SEQ
       ? resolveFlowSeqItems(doc, cst)
       : resolveBlockSeqItems(doc, cst)
-  const seq = new YAMLSeq()
+  const seq = new YAMLSeq(doc.schema)
   seq.items = items
   resolveComments(seq, comments)
   if (

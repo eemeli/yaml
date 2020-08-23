@@ -393,7 +393,9 @@ describe('Document', () => {
     expect(doc.delete('a')).toBe(false)
     expect(doc.get('a')).toBeUndefined()
     expect(doc.contents.items).toHaveLength(1)
+  })
 
+  test('delete on scalar contents', () => {
     doc.contents = doc.createNode('s')
     expect(() => doc.set('a', 1)).toThrow(/document contents/)
   })
@@ -416,7 +418,9 @@ describe('Document', () => {
     expect(doc.get('a')).toBe(1)
     expect(doc.get('a', true)).toMatchObject({ value: 1 })
     expect(doc.get('c')).toBeUndefined()
+  })
 
+  test('get on scalar contents', () => {
     doc.contents = doc.createNode('s')
     expect(doc.get('a')).toBeUndefined()
   })
@@ -441,7 +445,9 @@ describe('Document', () => {
   test('has', () => {
     expect(doc.has('a')).toBe(true)
     expect(doc.has('c')).toBe(false)
+  })
 
+  test('has on scalar contents', () => {
     doc.contents = doc.createNode('s')
     expect(doc.has('a')).toBe(false)
   })
@@ -461,10 +467,14 @@ describe('Document', () => {
     doc.set('c', 6)
     expect(doc.get('c')).toBe(6)
     expect(doc.contents.items).toHaveLength(3)
+  })
 
+  test('set on scalar contents', () => {
     doc.contents = doc.createNode('s')
     expect(() => doc.set('a', 1)).toThrow(/document contents/)
+  })
 
+  test('set on empty document', () => {
     doc.contents = null
     doc.set('a', 1)
     expect(doc.get('a')).toBe(1)
@@ -486,12 +496,22 @@ describe('Document', () => {
     expect(String(doc)).toBe(
       'a: 2\nb:\n  - 2\n  - 5\nc: 6\ne:\n  - null\n  - e: 7\n'
     )
+  })
 
+  test('setIn on scalar contents', () => {
     doc.contents = doc.createNode('s')
     expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
+  })
 
+  test('setIn on empty document', () => {
     doc.contents = null
     doc.setIn(['a', 2], 1)
     expect(doc.get('a')).toMatchObject({ items: [null, null, 1] })
+  })
+
+  test('setIn on parsed document', () => {
+    doc = YAML.parseDocument('{ a: 1, b: [2, 3] }')
+    doc.setIn(['c', 1], 9)
+    expect(String(doc)).toBe('{ a: 1, b: [ 2, 3 ], c: [ null, 9 ] }\n')
   })
 })
