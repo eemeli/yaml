@@ -2,7 +2,7 @@
 
 import { source } from 'common-tags'
 import YAML from '../../index.js'
-import { Pair } from '../../types.js'
+import { Pair, Scalar } from '../../types.js'
 import { Type, stringifyString } from '../../util.js'
 
 for (const [name, version] of [
@@ -713,5 +713,35 @@ describe('Document markers in top-level scalars', () => {
     const str = YAML.stringify('foo\n%bar\n')
     expect(str).toBe('|\n  foo\n  %bar\n')
     expect(YAML.parse(str)).toBe('foo\n%bar\n')
+  })
+})
+
+describe('undefined values', () => {
+  test('undefined', () => {
+    expect(YAML.stringify(undefined)).toBe('\n')
+  })
+
+  test('[1, undefined, 2]', () => {
+    expect(YAML.stringify([1, undefined, 2])).toBe('- 1\n- null\n- 2\n')
+  })
+
+  test("{ a: 'A', b: undefined, c: 'C' }", () => {
+    expect(YAML.stringify({ a: 'A', b: undefined, c: 'C' })).toBe(
+      'a: A\nc: C\n'
+    )
+  })
+
+  test("{ a: 'A', b: Scalar(undefined), c: 'C' }", () => {
+    const obj = { a: 'A', b: new Scalar(undefined), c: 'C' }
+    expect(YAML.stringify(obj)).toBe('a: A\nb: null\nc: C\n')
+  })
+
+  test("Map { 'a' => 'A', 'b' => undefined, 'c' => 'C' }", () => {
+    const map = new Map([
+      ['a', 'A'],
+      ['b', undefined],
+      ['c', 'C']
+    ])
+    expect(YAML.stringify(map)).toBe('a: A\nb: null\nc: C\n')
   })
 })

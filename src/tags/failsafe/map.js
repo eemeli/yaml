@@ -7,8 +7,10 @@ function createMap(schema, obj, ctx) {
   if (obj instanceof Map) {
     for (const [key, value] of obj) map.items.push(createPair(key, value, ctx))
   } else if (obj && typeof obj === 'object') {
-    for (const key of Object.keys(obj))
-      map.items.push(createPair(key, obj[key], ctx))
+    for (const key of Object.keys(obj)) {
+      const value = obj[key]
+      if (value !== undefined) map.items.push(createPair(key, value, ctx))
+    }
   }
   if (typeof schema.sortMapEntries === 'function') {
     map.items.sort(schema.sortMapEntries)
