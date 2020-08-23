@@ -1,6 +1,4 @@
-import { Pair } from '../ast/Pair.js'
 import { schemas, tags } from '../tags/index.js'
-import { createNode } from './createNode.js'
 import { getSchemaTags } from './getSchemaTags.js'
 
 const sortMapEntriesByKey = (a, b) =>
@@ -18,22 +16,15 @@ export class Schema {
   constructor({ customTags, merge, resolveKnownTags, schema, sortMapEntries }) {
     this.merge = !!merge
     this.name = schema
+    this.knownTags = resolveKnownTags ? coreKnownTags : {}
+    this.tags = getSchemaTags(schemas, tags, customTags, schema)
+
+    // Used by createNode(), to avoid circular dependencies
+    this.map = tags.map
+    this.seq = tags.seq
+
+    // Used by createMap()
     this.sortMapEntries =
       sortMapEntries === true ? sortMapEntriesByKey : sortMapEntries || null
-    this.tags = getSchemaTags(schemas, tags, customTags, schema)
-    this.knownTags = resolveKnownTags ? coreKnownTags : {}
-  }
-
-  createNode(value, wrapScalars, tagName, ctx) {
-    const baseCtx = { schema: this, wrapScalars }
-    const createCtx = ctx ? Object.assign(ctx, baseCtx) : baseCtx
-    return createNode(value, tagName, createCtx)
-  }
-
-  createPair(key, value, ctx) {
-    if (!ctx) ctx = { wrapScalars: true }
-    const k = this.createNode(key, ctx.wrapScalars, null, ctx)
-    const v = this.createNode(value, ctx.wrapScalars, null, ctx)
-    return new Pair(k, v)
   }
 }

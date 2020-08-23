@@ -1,5 +1,5 @@
 import { YAMLSemanticError } from '../../errors.js'
-import { Pair } from '../../ast/Pair.js'
+import { createPair, Pair } from '../../ast/Pair.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
 import { YAMLSeq } from '../../ast/YAMLSeq.js'
 import { resolveSeq } from '../../resolve/resolveSeq.js'
@@ -49,8 +49,7 @@ export function createPairs(schema, iterable, ctx) {
     } else {
       key = it
     }
-    const pair = schema.createPair(key, value, ctx)
-    pairs.items.push(pair)
+    pairs.items.push(createPair(key, value, ctx))
   }
   return pairs
 }

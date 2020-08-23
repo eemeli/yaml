@@ -57,15 +57,15 @@ If including more than one custom tag from this set, make sure that the `'float'
 
 These tags are a part of the YAML 1.1 [language-independent types](https://yaml.org/type/), but are not a part of any default YAML 1.2 schema.
 
-| Identifier    | YAML Type                                             | JS Type      | Description                                                                                                                                                                        |
-| ------------- | ----------------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `'binary'`    | [`!!binary`](https://yaml.org/type/binary.html)       | `Uint8Array` | Binary data, represented in YAML as base64 encoded characters.                                                                                                                     |
-| `'floatTime'` | [`!!float`](https://yaml.org/type/float.html)         | `Number`     | Sexagesimal floating-point number format, e.g. `190:20:30.15`. To stringify with this tag, the node `format` must be `'TIME'`.                                                     |
-| `'intTime'`   | [`!!int`](https://yaml.org/type/int.html)             | `Number`     | Sexagesimal integer number format, e.g. `190:20:30`. To stringify with this tag, the node `format` must be `'TIME'`.                                                               |
-| `'omap'`      | [`!!omap`](https://yaml.org/type/omap.html)           | `Map`        | Ordered sequence of key: value pairs without duplicates. Using `mapAsMap: true` together with this tag is not recommended, as it makes the parse → stringify loop non-idempotent.  |
-| `'pairs'`     | [`!!pairs`](https://yaml.org/type/pairs.html)         | `Array`      | Ordered sequence of key: value pairs allowing duplicates. To create from JS, you'll need to explicitly use `'!!pairs'` as the third argument of [`createNode()`](#creating-nodes). |
-| `'set'`       | [`!!set`](https://yaml.org/type/set.html)             | `Set`        | Unordered set of non-equal values.                                                                                                                                                 |
-| `'timestamp'` | [`!!timestamp`](https://yaml.org/type/timestamp.html) | `Date`       | A point in time, e.g. `2001-12-15T02:59:43`.                                                                                                                                       |
+| Identifier    | YAML Type                                             | JS Type      | Description                                                                                                                                                                       |
+| ------------- | ----------------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `'binary'`    | [`!!binary`](https://yaml.org/type/binary.html)       | `Uint8Array` | Binary data, represented in YAML as base64 encoded characters.                                                                                                                    |
+| `'floatTime'` | [`!!float`](https://yaml.org/type/float.html)         | `Number`     | Sexagesimal floating-point number format, e.g. `190:20:30.15`. To stringify with this tag, the node `format` must be `'TIME'`.                                                    |
+| `'intTime'`   | [`!!int`](https://yaml.org/type/int.html)             | `Number`     | Sexagesimal integer number format, e.g. `190:20:30`. To stringify with this tag, the node `format` must be `'TIME'`.                                                              |
+| `'omap'`      | [`!!omap`](https://yaml.org/type/omap.html)           | `Map`        | Ordered sequence of key: value pairs without duplicates. Using `mapAsMap: true` together with this tag is not recommended, as it makes the parse → stringify loop non-idempotent. |
+| `'pairs'`     | [`!!pairs`](https://yaml.org/type/pairs.html)         | `Array`      | Ordered sequence of key: value pairs allowing duplicates. To create from JS, use `doc.createNode(array, { tag: '!!pairs' })`.                                                     |
+| `'set'`       | [`!!set`](https://yaml.org/type/set.html)             | `Set`        | Unordered set of non-equal values.                                                                                                                                                |
+| `'timestamp'` | [`!!timestamp`](https://yaml.org/type/timestamp.html) | `Date`       | A point in time, e.g. `2001-12-15T02:59:43`.                                                                                                                                      |
 
 ## Writing Custom Tags
 
@@ -118,7 +118,7 @@ Note that during the CST -> AST parsing, the anchors and comments attached to ea
 
 As with parsing, turning input data into its YAML string representation is a two-stage process as the input is first turned into an AST tree before stringifying it. This allows for metadata and comments to be attached to each node, and for e.g. circular references to be resolved. For scalar values, this means just wrapping the value within a `Scalar` class while keeping it unchanged.
 
-As values may be wrapped within objects and arrays, `YAML.createNode()` uses each tag's `identify(value): boolean` function to detect custom data types. For the same reason, collections need to define their own `createNode(schema, value, ctx): Collection` functions that may recursively construct their equivalent collection class instances.
+As values may be wrapped within objects and arrays, `doc.createNode()` uses each tag's `identify(value): boolean` function to detect custom data types. For the same reason, collections need to define their own `createNode(schema, value, ctx): Collection` functions that may recursively construct their equivalent collection class instances.
 
 Finally, `stringify(item, ctx, ...): string` defines how your data should be represented as a YAML string, in case the default stringifiers aren't enough. For collections in particular, the default stringifier should be perfectly sufficient. `'yaml/util'` exports `stringifyNumber(item)` and `stringifyString(item, ctx, ...)`, which may be of use for custom scalar data.
 
@@ -142,7 +142,7 @@ To define your own tag, you'll need to define an object comprising of some of th
 
 - `createNode(schema, value, ctx): Node` is an optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.
 - `format: string` If a tag has multiple forms that should be parsed and/or stringified differently, use `format` to identify them. Used by `!!int` and `!!float`.
-- **`identify(value): boolean`** is used by `YAML.createNode` to detect your data type, e.g. using `typeof` or `instanceof`. Required.
+- **`identify(value): boolean`** is used by `doc.createNode()` to detect your data type, e.g. using `typeof` or `instanceof`. Required.
 - `nodeClass: Node` is the `Node` child class that implements this tag. Required for collections and tags that have overlapping JS representations.
 - `options: Object` is used by some tags to configure their stringification.
 - **`resolve(doc, cstNode): Node | any`** turns a CST node into an AST node; `doc` is the resulting `YAML.Document` instance. If returning a non-`Node` value, the output will be wrapped as a `Scalar`. Required.

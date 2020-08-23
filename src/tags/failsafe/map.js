@@ -1,14 +1,14 @@
+import { createPair } from '../../ast/Pair.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
 import { resolveMap } from '../../resolve/resolveMap.js'
 
 function createMap(schema, obj, ctx) {
   const map = new YAMLMap(schema)
   if (obj instanceof Map) {
-    for (const [key, value] of obj)
-      map.items.push(schema.createPair(key, value, ctx))
+    for (const [key, value] of obj) map.items.push(createPair(key, value, ctx))
   } else if (obj && typeof obj === 'object') {
     for (const key of Object.keys(obj))
-      map.items.push(schema.createPair(key, obj[key], ctx))
+      map.items.push(createPair(key, obj[key], ctx))
   }
   if (typeof schema.sortMapEntries === 'function') {
     map.items.sort(schema.sortMapEntries)

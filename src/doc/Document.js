@@ -1,4 +1,13 @@
-import { Collection, Node, Scalar, isEmptyPath, toJSON } from '../ast/index.js'
+import {
+  Alias,
+  Collection,
+  Node,
+  Pair,
+  Scalar,
+  isEmptyPath,
+  toJSON
+} from '../ast/index.js'
+import { Document as CSTDocument } from '../cst/Document'
 import { defaultTagPrefix } from '../constants.js'
 import { YAMLError } from '../errors.js'
 import { documentOptions } from '../options.js'
@@ -7,6 +16,7 @@ import { stringify } from '../stringify/stringify.js'
 
 import { Anchors } from './Anchors.js'
 import { Schema } from './Schema.js'
+import { createNode } from './createNode.js'
 import { listTagNames } from './listTagNames.js'
 import { parseContents } from './parseContents.js'
 import { parseDirectives } from './parseDirectives.js'
@@ -19,11 +29,10 @@ function assertCollection(contents) {
 export class Document {
   static defaults = documentOptions
 
-  constructor(options) {
+  constructor(value, options) {
     this.anchors = new Anchors(options.anchorPrefix)
     this.commentBefore = null
     this.comment = null
-    this.contents = null
     this.directivesEndMarker = null
     this.errors = []
     this.options = options
@@ -31,6 +40,15 @@ export class Document {
     this.tagPrefixes = []
     this.version = null
     this.warnings = []
+
+    if (value === undefined) {
+      // note that this.schema is left as null here
+      this.contents = null
+    } else if (value instanceof CSTDocument) {
+      this.parse(value)
+    } else {
+      this.contents = this.createNode(value)
+    }
   }
 
   add(value) {
@@ -41,6 +59,41 @@ export class Document {
   addIn(path, value) {
     assertCollection(this.contents)
     this.contents.addIn(path, value)
+  }
+
+  createNode(value, { onTagObj, tag, wrapScalars } = {}) {
+    this.setSchema()
+    const aliasNodes = []
+    const ctx = {
+      onAlias(source) {
+        const alias = new Alias(source)
+        aliasNodes.push(alias)
+        return alias
+      },
+      onTagObj,
+      prevObjects: new Map(),
+      schema: this.schema,
+      wrapScalars: wrapScalars !== false
+    }
+    const node = createNode(value, tag, ctx)
+    for (const alias of aliasNodes) {
+      // With circular references, the source node is only resolved after all of
+      // its child nodes are. This is why anchors are set only after all of the
+      // nodes have been created.
+      alias.source = alias.source.node
+      let name = this.anchors.getName(alias.source)
+      if (!name) {
+        name = this.anchors.newName()
+        this.anchors.map[name] = alias.source
+      }
+    }
+    return node
+  }
+
+  createPair(key, value, options = {}) {
+    const k = this.createNode(key, options)
+    const v = this.createNode(value, options)
+    return new Pair(k, v)
   }
 
   delete(key) {
@@ -258,7 +311,7 @@ export class Document {
         onChompKeep
       )
       lines.push(addComment(body, '', contentComment))
-    } else if (this.contents !== undefined) {
+    } else {
       lines.push(stringify(this.contents, ctx))
     }
     if (this.comment) {

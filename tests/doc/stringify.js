@@ -51,34 +51,29 @@ for (const [name, version] of [
       })
 
       test('float with trailing zeros', () => {
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode(3, true)
+        const doc = new YAML.Document(3)
         doc.contents.minFractionDigits = 2
         expect(String(doc)).toBe('3.00\n')
       })
       test('scientific float ignores minFractionDigits', () => {
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode(3, true)
+        const doc = new YAML.Document(3)
         doc.contents.format = 'EXP'
         doc.contents.minFractionDigits = 2
         expect(String(doc)).toBe('3e+0\n')
       })
 
       test('integer with HEX format', () => {
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode(42, true)
+        const doc = new YAML.Document(42)
         doc.contents.format = 'HEX'
         expect(String(doc)).toBe('0x2a\n')
       })
       test('float with HEX format', () => {
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode(4.2, true)
+        const doc = new YAML.Document(4.2)
         doc.contents.format = 'HEX'
         expect(String(doc)).toBe('4.2\n')
       })
       test('negative integer with HEX format', () => {
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode(-42, true)
+        const doc = new YAML.Document(-42)
         doc.contents.format = 'HEX'
         const exp = version === '1.2' ? '-42\n' : '-0x2a\n'
         expect(String(doc)).toBe(exp)
@@ -88,21 +83,18 @@ for (const [name, version] of [
         expect(YAML.stringify(BigInt('-42'))).toBe('-42\n')
       })
       test('BigInt with HEX format', () => {
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode(BigInt('42'), true)
+        const doc = new YAML.Document(BigInt('42'))
         doc.contents.format = 'HEX'
         expect(String(doc)).toBe('0x2a\n')
       })
       test('BigInt with OCT format', () => {
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode(BigInt('42'), true)
+        const doc = new YAML.Document(BigInt('42'))
         doc.contents.format = 'OCT'
         const exp = version === '1.2' ? '0o52\n' : '052\n'
         expect(String(doc)).toBe(exp)
       })
       test('negative BigInt with OCT format', () => {
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode(BigInt('-42'), true)
+        const doc = new YAML.Document(BigInt('-42'))
         doc.contents.format = 'OCT'
         const exp = version === '1.2' ? '-42\n' : '-052\n'
         expect(String(doc)).toBe(exp)
@@ -154,8 +146,7 @@ blah blah\n`)
 
       test('long line in map', () => {
         const foo = 'fuzz'.repeat(16)
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode({ foo })
+        const doc = new YAML.Document({ foo })
         for (const node of doc.contents.items)
           node.value.type = Type.QUOTE_DOUBLE
         expect(
@@ -167,8 +158,7 @@ blah blah\n`)
 
       test('long line in sequence', () => {
         const foo = 'fuzz'.repeat(16)
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode([foo])
+        const doc = new YAML.Document([foo])
         for (const node of doc.contents.items) node.type = Type.QUOTE_DOUBLE
         expect(
           String(doc)
@@ -179,8 +169,7 @@ blah blah\n`)
 
       test('long line in sequence in map', () => {
         const foo = 'fuzz'.repeat(16)
-        const doc = new YAML.Document()
-        doc.contents = YAML.createNode({ foo: [foo] })
+        const doc = new YAML.Document({ foo: [foo] })
         const seq = doc.contents.items[0].value
         for (const node of seq.items) node.type = Type.QUOTE_DOUBLE
         expect(
@@ -300,8 +289,7 @@ z:
   })
 
   test('Map with non-Pair item', () => {
-    const doc = new YAML.Document()
-    doc.contents = YAML.createNode({ x: 3, y: 4 })
+    const doc = new YAML.Document({ x: 3, y: 4 })
     expect(String(doc)).toBe('x: 3\ny: 4\n')
     doc.contents.items.push('TEST')
     expect(() => String(doc)).toThrow(/^Map items must all be pairs.*TEST/)
@@ -314,20 +302,18 @@ z:
 })
 
 test('eemeli/yaml#43: Quoting colons', () => {
-  const doc = new YAML.Document()
-  doc.contents = YAML.createNode({ key: ':' })
+  const doc = new YAML.Document({ key: ':' })
   const str = String(doc)
   expect(() => YAML.parse(str)).not.toThrow()
   expect(str).toBe('key: ":"\n')
 })
 
 test('eemeli/yaml#52: Quoting item markers', () => {
-  const doc = new YAML.Document()
-  doc.contents = YAML.createNode({ key: '-' })
+  const doc = new YAML.Document({ key: '-' })
   const str = String(doc)
   expect(() => YAML.parse(str)).not.toThrow()
   expect(str).toBe('key: "-"\n')
-  doc.contents = YAML.createNode({ key: '?' })
+  doc.contents = doc.createNode({ key: '?' })
   const str2 = String(doc)
   expect(() => YAML.parse(str2)).not.toThrow()
   expect(str2).toBe('key: "?"\n')
@@ -472,9 +458,10 @@ describe('simple keys', () => {
 })
 
 test('eemeli/yaml#128: YAML node inside object', () => {
-  const seq = YAML.createNode(['a'])
+  const doc = new YAML.Document()
+  const seq = doc.createNode(['a'])
   seq.commentBefore = 'sc'
-  const map = YAML.createNode({ foo: 'bar', seq })
+  const map = doc.createNode({ foo: 'bar', seq })
   map.commentBefore = 'mc'
   const obj = { array: [1], map }
   expect(YAML.stringify(obj)).toBe(
@@ -507,16 +494,12 @@ describe('sortMapEntries', () => {
     expect(YAML.stringify(obj, { sortMapEntries })).toBe('c: 3\nb: 2\na: 1\n')
   })
   test('doc.add', () => {
-    const doc = new YAML.Document({ sortMapEntries: true })
-    doc.setSchema()
-    doc.contents = doc.schema.createNode(obj)
+    const doc = new YAML.Document(obj, { sortMapEntries: true })
     doc.add(new Pair('bb', 4))
     expect(String(doc)).toBe('a: 1\nb: 2\nbb: 4\nc: 3\n')
   })
   test('doc.set', () => {
-    const doc = new YAML.Document({ sortMapEntries: true })
-    doc.setSchema()
-    doc.contents = doc.schema.createNode(obj)
+    const doc = new YAML.Document(obj, { sortMapEntries: true })
     doc.set('bb', 4)
     expect(String(doc)).toBe('a: 1\nb: 2\nbb: 4\nc: 3\n')
   })
@@ -525,9 +508,10 @@ describe('sortMapEntries', () => {
 describe('custom indent', () => {
   let obj
   beforeEach(() => {
-    const seq = YAML.createNode(['a'])
+    const doc = new YAML.Document()
+    const seq = doc.createNode(['a'])
     seq.commentBefore = 'sc'
-    const map = YAML.createNode({ foo: 'bar', seq })
+    const map = doc.createNode({ foo: 'bar', seq })
     map.commentBefore = 'mc'
     obj = { array: [{ a: 1, b: 2 }], map }
   })
@@ -574,7 +558,7 @@ describe('custom indent', () => {
 describe('indentSeq: false', () => {
   let obj
   beforeEach(() => {
-    const seq = YAML.createNode(['a'])
+    const seq = new YAML.Document().createNode(['a'])
     seq.commentBefore = 'sc'
     obj = { array: [{ a: 1, b: 2 }], map: { seq } }
   })
@@ -710,8 +694,7 @@ describe('Document markers in top-level scalars', () => {
   })
 
   test("'foo\\n...'", () => {
-    const doc = new YAML.Document()
-    doc.contents = YAML.createNode('foo\n...', true)
+    const doc = new YAML.Document('foo\n...')
     doc.contents.type = Type.QUOTE_SINGLE
     const str = String(doc)
     expect(str).toBe("'foo\n\n  ...'\n")
@@ -719,8 +702,7 @@ describe('Document markers in top-level scalars', () => {
   })
 
   test('"foo\\n..."', () => {
-    const doc = new YAML.Document()
-    doc.contents = YAML.createNode('foo\n...', true)
+    const doc = new YAML.Document('foo\n...')
     doc.contents.type = Type.QUOTE_DOUBLE
     const str = String(doc)
     expect(str).toBe('"foo\n\n  ..."\n')

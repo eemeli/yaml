@@ -1,4 +1,5 @@
 import { Type } from '../constants.js'
+import { createNode } from '../doc/createNode.js'
 import { addComment } from '../stringify/addComment.js'
 import { Collection } from './Collection.js'
 import { Node } from './Node.js'
@@ -20,6 +21,12 @@ const stringifyKey = (key, jsKey, ctx) => {
       stringify: ctx.stringify
     })
   return JSON.stringify(jsKey)
+}
+
+export function createPair(key, value, ctx) {
+  const k = createNode(key, null, ctx)
+  const v = createNode(value, null, ctx)
+  return new Pair(k, v)
 }
 
 export class Pair extends Node {
@@ -125,7 +132,7 @@ export class Pair extends Node {
       }
       valueComment = value.comment
     } else if (value && typeof value === 'object') {
-      value = doc.schema.createNode(value, true)
+      value = doc.createNode(value)
     }
     ctx.implicitKey = false
     if (!explicitKey && !this.comment && value instanceof Scalar)

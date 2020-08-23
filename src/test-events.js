@@ -7,7 +7,7 @@ export function testEvents(src, options) {
     { keepCstNodes: true, keepNodeTypes: true, version: '1.2' },
     options
   )
-  const docs = parse(src).map(cstDoc => new Document(opt).parse(cstDoc))
+  const docs = parse(src).map(cstDoc => new Document(null, opt).parse(cstDoc))
   const errDoc = docs.find(doc => doc.errors.length > 0)
   const error = errDoc ? errDoc.errors[0].message : null
   const events = ['+STR']

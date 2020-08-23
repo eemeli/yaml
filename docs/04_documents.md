@@ -61,7 +61,9 @@ The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq
 
 ## Creating Documents
 
-#### `new YAML.Document(options = {})`
+#### `new YAML.Document(value, options = {})`
+
+Creates a new document. If `value` is defined, the document `contents` are initialised with that value, wrapped recursively in appropriate [content nodes](#content-nodes). If `value` is `undefined`, the document's `contents` and `schema` are initialised as `null`. See [Options](#options) for more information on the second parameter.
 
 | Member              | Type                                | Description                                                                                                                                                              |
 | ------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -77,10 +79,9 @@ The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq
 | warnings            | `Error[]`                           | Warnings encountered during parsing.                                                                                                                                     |
 
 ```js
-const doc = new YAML.Document()
+const doc = new YAML.Document(['some', 'values', { balloons: 99 }])
 doc.version = true
 doc.commentBefore = ' A commented document'
-doc.contents = ['some', 'values', { balloons: 99 }]
 
 String(doc)
 // # A commented document
@@ -97,14 +98,16 @@ During stringification, a document with a true-ish `version` value will include 
 
 ## Document Methods
 
-| Method                       | Returns    | Description                                                                                                                                                                                                                                                                                                                                                                                              |
-| ---------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| listNonDefaultTags()         | `string[]` | List the tags used in the document that are not in the default `tag:yaml.org,2002:` namespace.                                                                                                                                                                                                                                                                                                           |
-| parse(cst)                   | `Document` | Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed `cst`. Calling this multiple times on a Document is not recommended.                                                                                                                                                                                                           |
-| setSchema(id, customTags)    | `void`     | When a document is created with `new YAML.Document()`, the schema object is not set as it may be influenced by parsed directives; call this with no arguments to set it manually, or with arguments to change the schema used by the document. `id` may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, `customTags` should have the same shape as the similarly-named option. |
-| setTagPrefix(handle, prefix) | `void`     | Set `handle` as a shorthand string for the `prefix` tag namespace.                                                                                                                                                                                                                                                                                                                                       |
-| toJSON()                     | `any`      | A plain JavaScript representation of the document `contents`.                                                                                                                                                                                                                                                                                                                                            |
-| toString()                   | `string`   | A YAML representation of the document.                                                                                                                                                                                                                                                                                                                                                                   |
+| Method                                     | Returns    | Description                                                                                                                                                                                    |
+| ------------------------------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| createNode(value,&nbsp;options?)           | `Node`     | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.                                                                     |
+| createPair(key,&nbsp;value,&nbsp;options?) | `Pair`     | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.                                                                           |
+| listNonDefaultTags()                       | `string[]` | List the tags used in the document that are not in the default `tag:yaml.org,2002:` namespace.                                                                                                 |
+| parse(cst)                                 | `Document` | Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed `cst`. Calling this multiple times on a Document is not recommended. |
+| setSchema(id?, customTags?)                | `void`     | Set the schema used by the document. `id` may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, `customTags` should have the same shape as the similarly-named option. |
+| setTagPrefix(handle, prefix)               | `void`     | Set `handle` as a shorthand string for the `prefix` tag namespace.                                                                                                                             |
+| toJSON()                                   | `any`      | A plain JavaScript representation of the document `contents`.                                                                                                                                  |
+| toString()                                 | `string`   | A YAML representation of the document.                                                                                                                                                         |
 
 ```js
 const doc = YAML.parseDocument('a: 1\nb: [2, 3]\n')
@@ -160,33 +163,34 @@ A description of [alias and merge nodes](#alias-nodes) is included in the next s
 ```js
 const src = '[{ a: A }, { b: B }]'
 const doc = YAML.parseDocument(src)
-const { anchors, contents } = doc
-const [a, b] = contents.items
-anchors.setAnchor(a.items[0].value) // 'a1'
-anchors.setAnchor(b.items[0].value) // 'a2'
-anchors.setAnchor(null, 'a1') // 'a1'
-anchors.getName(a) // undefined
-anchors.getNode('a2')
+doc.anchors.setAnchor(doc.getIn([0, 'a'], true)) // 'a1'
+doc.anchors.setAnchor(doc.getIn([1, 'b'], true)) // 'a2'
+doc.anchors.setAnchor(null, 'a1') // 'a1'
+doc.anchors.getNode('a2')
 // { value: 'B', range: [ 16, 18 ], type: 'PLAIN' }
 String(doc)
 // [ { a: A }, { b: &a2 B } ]
 
-const alias = anchors.createAlias(a, 'AA')
-contents.items.push(alias)
+const alias = doc.anchors.createAlias(doc.get(0, true), 'AA')
+// Alias { source: YAMLMap { items: [ [Pair] ] } }
+doc.add(alias)
 doc.toJSON()
 // [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]
 String(doc)
 // [ &AA { a: A }, { b: &a2 B }, *AA ]
 
-const merge = anchors.createMergePair(alias)
-b.items.push(merge)
+const merge = doc.anchors.createMergePair(alias)
+// Merge {
+//   key: Scalar { value: '<<' },
+//   value: YAMLSeq { items: [ [Alias] ] } }
+doc.addIn([1], merge)
 doc.toJSON()
 // [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]
 String(doc)
 // [ &AA { a: A }, { b: &a2 B, <<: *AA }, *AA ]
 
 // This creates a circular reference
-merge.value.items.push(anchors.createAlias(b))
+merge.value.add(doc.anchors.createAlias(doc.get(1, true)))
 doc.toJSON() // [RangeError: Maximum call stack size exceeded]
 String(doc)
 // [

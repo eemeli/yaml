@@ -1,13 +1,11 @@
 import { YAMLSeq } from '../../ast/YAMLSeq.js'
+import { createNode } from '../../doc/createNode.js'
 import { resolveSeq } from '../../resolve/resolveSeq.js'
 
 function createSeq(schema, obj, ctx) {
   const seq = new YAMLSeq(schema)
   if (obj && obj[Symbol.iterator]) {
-    for (const it of obj) {
-      const v = schema.createNode(it, ctx.wrapScalars, null, ctx)
-      seq.items.push(v)
-    }
+    for (const it of obj) seq.items.push(createNode(it, null, ctx))
   }
   return seq
 }
