@@ -1,6 +1,6 @@
 import { Collection } from './Collection.js'
 import { Pair } from './Pair.js'
-import { Scalar } from './Scalar.js'
+import { Scalar, isScalarValue } from './Scalar.js'
 
 export function findPair(items, key) {
   const k = key instanceof Scalar ? key.value : key
@@ -21,8 +21,11 @@ export class YAMLMap extends Collection {
     const prev = findPair(this.items, pair.key)
     const sortEntries = this.schema && this.schema.sortMapEntries
     if (prev) {
-      if (overwrite) prev.value = pair.value
-      else throw new Error(`Key ${pair.key} already set`)
+      if (!overwrite) throw new Error(`Key ${pair.key} already set`)
+      // For scalars, keep the old node & its comments and anchors
+      if (prev.value instanceof Scalar && isScalarValue(pair.value))
+        prev.value.value = pair.value
+      else prev.value = pair.value
     } else if (sortEntries) {
       const i = this.items.findIndex(item => sortEntries(pair, item) < 0)
       if (i === -1) this.items.push(pair)

@@ -1,5 +1,5 @@
 import { Collection } from './Collection.js'
-import { Scalar } from './Scalar.js'
+import { Scalar, isScalarValue } from './Scalar.js'
 import { toJSON } from './toJSON.js'
 
 function asItemIndex(key) {
@@ -36,7 +36,9 @@ export class YAMLSeq extends Collection {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number')
       throw new Error(`Expected a valid index, not ${key}.`)
-    this.items[idx] = value
+    const prev = this.items[idx]
+    if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
+    else this.items[idx] = value
   }
 
   toJSON(_, ctx) {

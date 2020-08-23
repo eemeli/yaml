@@ -4,8 +4,8 @@ import { Pair } from '../../types.js'
 describe('Map', () => {
   let doc, map
   beforeEach(() => {
-    doc = new YAML.Document()
-    map = doc.createNode({ a: 1, b: { c: 3, d: 4 } })
+    doc = new YAML.Document({ a: 1, b: { c: 3, d: 4 } })
+    map = doc.contents
     expect(map.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
@@ -68,7 +68,7 @@ describe('Map', () => {
   test('set with value', () => {
     map.set('a', 2)
     expect(map.get('a')).toBe(2)
-    expect(map.get('a', true)).toBe(2)
+    expect(map.get('a', true)).toMatchObject({ value: 2 })
     map.set('b', 5)
     expect(map.get('b')).toBe(5)
     map.set('c', 6)
@@ -79,20 +79,27 @@ describe('Map', () => {
   test('set with node', () => {
     map.set(doc.createNode('a'), 2)
     expect(map.get('a')).toBe(2)
-    expect(map.get('a', true)).toBe(2)
+    expect(map.get('a', true)).toMatchObject({ value: 2 })
     map.set(doc.createNode('b'), 5)
     expect(map.get('b')).toBe(5)
     map.set(doc.createNode('c'), 6)
     expect(map.get('c')).toBe(6)
     expect(map.items).toHaveLength(3)
   })
+
+  test('set scalar node with anchor', () => {
+    doc = YAML.parseDocument('a: &A value\nb: *A\n')
+    doc.set('a', 'foo')
+    expect(doc.get('a',true)).toMatchObject({ value: 'foo' })
+    expect(String(doc)).toBe('a: &A foo\nb: *A\n')
+  })
 })
 
 describe('Seq', () => {
   let doc, seq
   beforeEach(() => {
-    doc = new YAML.Document()
-    seq = doc.createNode([1, [2, 3]])
+    doc = new YAML.Document([1, [2, 3]])
+    seq = doc.contents
     expect(seq.items).toMatchObject([
       { value: 1 },
       { items: [{ value: 2 }, { value: 3 }] }
@@ -150,7 +157,7 @@ describe('Seq', () => {
   test('set with value', () => {
     seq.set(0, 2)
     expect(seq.get(0)).toBe(2)
-    expect(seq.get(0, true)).toBe(2)
+    expect(seq.get(0, true)).toMatchObject({ value: 2 })
     seq.set('1', 5)
     expect(seq.get(1)).toBe(5)
     seq.set(2, 6)
@@ -161,7 +168,7 @@ describe('Seq', () => {
   test('set with node', () => {
     seq.set(doc.createNode(0), 2)
     expect(seq.get(0)).toBe(2)
-    expect(seq.get(0, true)).toBe(2)
+    expect(seq.get(0, true)).toMatchObject({ value: 2 })
     seq.set(doc.createNode('1'), 5)
     expect(seq.get(1)).toBe(5)
     seq.set(doc.createNode(2), 6)
@@ -171,14 +178,11 @@ describe('Seq', () => {
 })
 
 describe('Set', () => {
-  let doc
-  beforeAll(() => {
-    doc = new YAML.Document(null, { version: '1.1' })
-  })
-
-  let set
+  let doc, set
   beforeEach(() => {
+    doc = new YAML.Document(null, { version: '1.1' })
     set = doc.createNode([1, 2, 3], { tag: '!!set' })
+    doc.contents = set
     expect(set.items).toMatchObject([
       { key: { value: 1 }, value: { value: null } },
       { key: { value: 2 }, value: { value: null } },
@@ -222,14 +226,11 @@ describe('Set', () => {
 })
 
 describe('OMap', () => {
-  let doc
-  beforeAll(() => {
-    doc = new YAML.Document(null, { version: '1.1' })
-  })
-
-  let omap
+  let doc, omap
   beforeEach(() => {
+    doc = new YAML.Document(null, { version: '1.1' })
     omap = doc.createNode([{ a: 1 }, { b: { c: 3, d: 4 } }], { tag: '!!omap' })
+    doc.contents = omap
     expect(omap.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
@@ -278,7 +279,7 @@ describe('OMap', () => {
   test('set', () => {
     omap.set('a', 2)
     expect(omap.get('a')).toBe(2)
-    expect(omap.get('a', true)).toBe(2)
+    expect(omap.get('a', true)).toMatchObject({ value: 2 })
     omap.set('b', 5)
     expect(omap.get('b')).toBe(5)
     omap.set('c', 6)
@@ -290,8 +291,8 @@ describe('OMap', () => {
 describe('Collection', () => {
   let doc, map
   beforeEach(() => {
-    doc = new YAML.Document()
-    map = doc.createNode({ a: 1, b: [2, 3] })
+    doc = new YAML.Document({ a: 1, b: [2, 3] })
+    map = doc.contents
   })
 
   test('addIn', () => {
@@ -340,7 +341,7 @@ describe('Collection', () => {
   test('setIn', () => {
     map.setIn(['a'], 2)
     expect(map.get('a')).toBe(2)
-    expect(map.get('a', true)).toBe(2)
+    expect(map.get('a', true)).toMatchObject({ value: 2 })
     map.setIn(['b', 1], 5)
     expect(map.getIn(['b', 1])).toBe(5)
     map.setIn([1], 6)
@@ -456,7 +457,7 @@ describe('Document', () => {
   test('set', () => {
     doc.set('a', 2)
     expect(doc.get('a')).toBe(2)
-    expect(doc.get('a', true)).toBe(2)
+    expect(doc.get('a', true)).toMatchObject({ value: 2 })
     doc.set('c', 6)
     expect(doc.get('c')).toBe(6)
     expect(doc.contents.items).toHaveLength(3)
@@ -468,7 +469,7 @@ describe('Document', () => {
   test('setIn', () => {
     doc.setIn(['a'], 2)
     expect(doc.getIn(['a'])).toBe(2)
-    expect(doc.getIn(['a'], true)).toBe(2)
+    expect(doc.getIn(['a'], true)).toMatchObject({ value: 2 })
     doc.setIn(['b', 1], 5)
     expect(doc.getIn(['b', 1])).toBe(5)
     doc.setIn(['c'], 6)

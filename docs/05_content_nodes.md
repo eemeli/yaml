@@ -70,27 +70,24 @@ All of the collections provide the following accessor methods:
 | delete(key)                 | `boolean` | Removes a value from the collection. Returns `true` if the item was found and removed.                                                                                                            |
 | get(key,&nbsp;[keepScalar]) | `any`     | Returns item at `key`, or `undefined` if not found. By default unwraps scalar values from their surrounding node; to disable set `keepScalar` to `true` (collections are always returned intact). |
 | has(key)                    | `boolean` | Checks if the collection includes a value with the key `key`.                                                                                                                                     |
-| set(key, value)             | `any`     | Sets a value in this collection. For `!!set`, `value` needs to be a boolean to add/remove the item from the set.                                                                                  |
+| set(key, value)             | `any`     | Sets a value in this collection. For `!!set`, `value` needs to be a boolean to add/remove the item from the set. When overwriting a `Scalar` value with a scalar, the original node is retained.  |
 
 <!-- prettier-ignore -->
 ```js
-const doc = new YAML.Document()
-const map = doc.createNode({ a: 1, b: [2, 3] })
-map.add({ key: 'c', value: 4 })
-  // => map.get('c') === 4 && map.has('c') === true
-map.addIn(['b'], 5) // -> map.getIn(['b', 2]) === 5
-map.delete('c') // true
-map.deleteIn(['c', 'f']) // false
-map.get('a') // 1
-map.get(doc.createNode('a'), true) // Scalar { value: 1 }
-map.getIn(['b', 1]) // 3
-map.has('c') // false
-map.hasIn(['b', '0']) // true
-map.set('c', null)
-  // => map.get('c') === null && map.has('c') === true
-map.setIn(['c', 'x'])
-  // throws Error:
-  // Expected YAML collection at c. Remaining path: x
+const doc = new YAML.Document({ a: 1, b: [2, 3] }) // { a: 1, b: [ 2, 3 ] }
+doc.add({ key: 'c', value: 4 }) // { a: 1, b: [ 2, 3 ], c: 4 }
+doc.addIn(['b'], 5)             // { a: 1, b: [ 2, 3, 5 ], c: 4 }
+doc.set('c', 42)                // { a: 1, b: [ 2, 3, 5 ], c: 42 }
+doc.setIn(['c', 'x']) // Error: Expected YAML collection at c. Remaining path: x
+doc.delete('c')                 // { a: 1, b: [ 2, 3, 5 ] }
+doc.deleteIn(['b', 1])          // { a: 1, b: [ 2, 5 ] }
+
+doc.get('a') // 1
+doc.get('a', true) // Scalar { value: 1 }
+doc.getIn(['b', 1]) // 5
+doc.has(doc.createNode('a')) // true
+doc.has('c') // false
+doc.hasIn(['b', '0']) // true
 ```
 
 For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. `42` will match `Scalar { value: 42 }`) . Keys for `!!seq` should be positive integers, or their string representations. `add()` and `set()` do not automatically call `doc.createNode()` to wrap the value.
