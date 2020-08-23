@@ -86,8 +86,9 @@ YAML.stringify({ 'this is': null }, { simpleKeys: true })
 
 YAML.scalarOptions.null.nullStr = '~'
 YAML.scalarOptions.str.defaultType = 'QUOTE_SINGLE'
-YAML.stringify({ 'this is': null }, { simpleKeys: true })
-// 'this is': ~
+YAML.stringify({ this: null, that: 'value' })
+// this: ~
+// that: 'value'
 ```
 
 #### `YAML.scalarOptions`
@@ -104,7 +105,8 @@ These options objects are also exported individually from `'yaml/types'`.
 | bool.falseStr      | `string`  | `'false'`                                           | String representation for `false` values                                                                                                                                   |
 | int.asBigInt       | `boolean` | `false`                                             | Whether integers should be parsed into [BigInt] values                                                                                                                     |
 | null.nullStr       | `string`  | `'null'`                                            | String representation for `null` values                                                                                                                                    |
-| str.defaultType    | `Type`    | `'PLAIN'`                                           | The default type of string literal used to stringify values                                                                                                                |
+| str.defaultType    | `Type`    | `'PLAIN'`                                           | The default type of string literal used to stringify values in general                                                                                                     |
+| str.defaultKeyType | `Type`    | `'PLAIN'`                                           | The default type of string literal used to stringify implicit key values                                                                                                   |
 | str.doubleQuoted   | `object`  | `{ jsonEncoding: false,` `minMultiLineLength: 40 }` | `jsonEncoding`: Whether to restrict double-quoted strings to use JSON-compatible syntax; `minMultiLineLength`: Minimum length to use multiple lines to represent the value |
 | str.fold           | `object`  | `{ lineWidth: 80,` `minContentWidth: 20 }`          | `lineWidth`: Maximum line width (set to `0` to disable folding); `minContentWidth`: Minimum width for highly-indented content                                              |
 

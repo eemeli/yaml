@@ -278,18 +278,25 @@ function plainString(item, ctx, onComment, onChompKeep) {
 }
 
 export function stringifyString(item, ctx, onComment, onChompKeep) {
-  const { defaultType } = strOptions
+  const { defaultKeyType, defaultType } = strOptions
   const { implicitKey, inFlow } = ctx
   let { type, value } = item
   if (typeof value !== 'string') {
     value = String(value)
     item = Object.assign({}, item, { value })
   }
+  if (type !== Type.QUOTE_DOUBLE) {
+    // force double quotes on control characters
+    if (/[\x00-\x08\x0b-\x1f\x7f-\x9f]/.test(value)) type = Type.QUOTE_DOUBLE
+  }
+
   const _stringify = _type => {
     switch (_type) {
       case Type.BLOCK_FOLDED:
       case Type.BLOCK_LITERAL:
-        return blockString(item, ctx, onComment, onChompKeep)
+        return implicitKey || inFlow
+          ? doubleQuotedString(value, ctx) // blocks are not valid inside flow containers
+          : blockString(item, ctx, onComment, onChompKeep)
       case Type.QUOTE_DOUBLE:
         return doubleQuotedString(value, ctx)
       case Type.QUOTE_SINGLE:
@@ -300,24 +307,12 @@ export function stringifyString(item, ctx, onComment, onChompKeep) {
         return null
     }
   }
-  if (
-    type !== Type.QUOTE_DOUBLE &&
-    /[\x00-\x08\x0b-\x1f\x7f-\x9f]/.test(value)
-  ) {
-    // force double quotes on control characters
-    type = Type.QUOTE_DOUBLE
-  } else if (
-    (implicitKey || inFlow) &&
-    (type === Type.BLOCK_FOLDED || type === Type.BLOCK_LITERAL)
-  ) {
-    // should not happen; blocks are not valid inside flow containers
-    type = Type.QUOTE_DOUBLE
-  }
+
   let res = _stringify(type)
   if (res === null) {
-    res = _stringify(defaultType)
-    if (res === null)
-      throw new Error(`Unsupported default string type ${defaultType}`)
+    const t = implicitKey ? defaultKeyType : defaultType
+    res = _stringify(t)
+    if (res === null) throw new Error(`Unsupported default string type ${t}`)
   }
   return res
 }

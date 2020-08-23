@@ -96,9 +96,9 @@ export class Pair extends Node {
         key instanceof Collection ||
         key.type === Type.BLOCK_FOLDED ||
         key.type === Type.BLOCK_LITERAL)
-    const { doc, indent, indentStep, stringify } = ctx
+    const { allNullValues, doc, indent, indentStep, stringify } = ctx
     ctx = Object.assign({}, ctx, {
-      implicitKey: !explicitKey,
+      implicitKey: !explicitKey && (simpleKeys || !allNullValues),
       indent: indent + indentStep
     })
     let chompKeep = false
@@ -109,7 +109,7 @@ export class Pair extends Node {
       () => (chompKeep = true)
     )
     str = addComment(str, ctx.indent, keyComment)
-    if (ctx.allNullValues && !simpleKeys) {
+    if (allNullValues && !simpleKeys) {
       if (this.comment) {
         str = addComment(str, ctx.indent, this.comment)
         if (onComment) onComment()
