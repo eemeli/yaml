@@ -11,10 +11,10 @@ For more information, see the project's documentation site: [**eemeli.org/yaml**
 To install:
 
 ```sh
-npm install yaml
+npm install yaml@next
 ```
 
-Note: `yaml` 0.x and 1.x are rather different implementations. For the earlier `yaml`, see [tj/js-yaml](https://github.com/tj/js-yaml).
+**Note:** These docs are for `yaml@2`. For v1, see the [v1.10.0 tag](https://github.com/eemeli/yaml/tree/v1.10.0) for the source and [eemeli.org/yaml/v1](https://eemeli.org/yaml/v1/) for the documentation.
 
 ## API Overview
 
@@ -33,11 +33,11 @@ const YAML = require('yaml')
 
 ### YAML Documents
 
-- [`YAML.createNode(value, wrapScalars, tag): Node`](https://eemeli.org/yaml/#creating-nodes)
 - [`YAML.defaultOptions`](https://eemeli.org/yaml/#options)
 - [`YAML.Document`](https://eemeli.org/yaml/#yaml-documents)
-  - [`constructor(options)`](https://eemeli.org/yaml/#creating-documents)
+  - [`constructor(value, options)`](https://eemeli.org/yaml/#creating-documents)
   - [`defaults`](https://eemeli.org/yaml/#options)
+  - [`#createNode(value, options): Node`](https://eemeli.org/yaml/#creating-nodes)
   - [`#anchors`](https://eemeli.org/yaml/#working-with-anchors)
   - [`#contents`](https://eemeli.org/yaml/#content-nodes)
   - [`#errors`](https://eemeli.org/yaml/#errors)
