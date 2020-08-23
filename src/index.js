@@ -8,7 +8,7 @@ function parseAllDocuments(src, options) {
   const stream = []
   let prev
   for (const cstDoc of parseCST(src)) {
-    const doc = new Document(undefined, options)
+    const doc = new Document(undefined, null, options)
     doc.parse(cstDoc, prev)
     stream.push(doc)
     prev = doc
@@ -18,7 +18,7 @@ function parseAllDocuments(src, options) {
 
 function parseDocument(src, options) {
   const cst = parseCST(src)
-  const doc = new Document(cst[0], options)
+  const doc = new Document(cst[0], null, options)
   if (cst.length > 1) {
     const errMsg =
       'Source contains multiple documents; please use YAML.parseAllDocuments()'
@@ -34,9 +34,9 @@ function parse(src, options) {
   return doc.toJSON()
 }
 
-function stringify(value, options) {
+function stringify(value, replacer, options) {
   if (value === undefined) return '\n'
-  return new Document(value, options).toString()
+  return new Document(value, replacer, options).toString()
 }
 
 export const YAML = {

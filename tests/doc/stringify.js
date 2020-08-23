@@ -792,6 +792,112 @@ describe('undefined values', () => {
       ['b', undefined],
       ['c', 'C']
     ])
-    expect(YAML.stringify(map)).toBe('a: A\nb: null\nc: C\n')
+    expect(YAML.stringify(map)).toBe('a: A\nc: C\n')
+  })
+})
+
+describe('replacer', () => {
+  test('empty array', () => {
+    const arr = [
+      { a: 1, b: 2 },
+      { a: 4, b: 5 }
+    ]
+    expect(YAML.stringify(arr, [])).toBe('- {}\n- {}\n')
+  })
+
+  test('Object, array of string', () => {
+    const arr = [
+      { a: 1, b: 2 },
+      { a: 4, b: 5 }
+    ]
+    expect(YAML.stringify(arr, ['a'])).toBe('- a: 1\n- a: 4\n')
+  })
+
+  test('Map, array of string', () => {
+    const map = new Map([
+      ['a', 1],
+      ['b', 2],
+      [3, 4]
+    ])
+    expect(YAML.stringify(map, ['a', '3'])).toBe('a: 1\n')
+  })
+
+  test('Object, array of number', () => {
+    const obj = { a: 1, b: 2, 3: 4, 5: 6 }
+    expect(YAML.stringify(obj, [3, 5])).toBe('"3": 4\n"5": 6\n')
+  })
+
+  test('Map, array of number', () => {
+    const map = new Map([
+      ['a', 1],
+      ['3', 2],
+      [3, 4]
+    ])
+    expect(YAML.stringify(map, [3])).toBe('"3": 2\n3: 4\n')
+  })
+
+  test('function as logger', () => {
+    const spy = jest.fn((key, value) => value)
+    const obj = { 1: 1, b: 2, c: [4] }
+    YAML.stringify(obj, spy)
+    expect(spy.mock.calls).toMatchObject([
+      ['', obj],
+      ['1', 1],
+      ['b', 2],
+      ['c', [4]],
+      ['0', 4]
+    ])
+  })
+
+  test('function as filter of Object entries', () => {
+    const obj = { 1: 1, b: 2, c: [4] }
+    const fn = (key, value) => (typeof value === 'number' ? undefined : value)
+    expect(YAML.stringify(obj, fn)).toBe('c:\n  - null\n')
+  })
+
+  test('function as filter of Map entries', () => {
+    const map = new Map([
+      [1, 1],
+      ['b', 2],
+      ['c', [4]]
+    ])
+    const fn = (key, value) => (typeof value === 'number' ? undefined : value)
+    expect(YAML.stringify(map, fn)).toBe('c:\n  - null\n')
+  })
+
+  test('function as transformer', () => {
+    const obj = { a: 1, b: 2, c: [3, 4] }
+    const fn = (key, value) => (typeof value === 'number' ? 2 * value : value)
+    expect(YAML.stringify(obj, fn)).toBe('a: 2\nb: 4\nc:\n  - 6\n  - 8\n')
+  })
+
+  test('createNode, !!set', () => {
+    const replacer = jest.fn((key, value) => value)
+    const doc = new YAML.Document(null, { customTags: ['set'] })
+    const set = new Set(['a', 'b', 1, [2]])
+    doc.createNode(set, { replacer })
+    expect(replacer.mock.calls).toMatchObject([
+      ['', set],
+      ['0', 'a'],
+      ['1', 'b'],
+      ['2', 1],
+      ['3', [2]],
+      ['0', 2]
+    ])
+  })
+
+  test('createNode, !!omap', () => {
+    const replacer = jest.fn((key, value) => value)
+    const doc = new YAML.Document(null, { customTags: ['omap'] })
+    const omap = [
+      ['a', 1],
+      [1, 'a']
+    ]
+    doc.createNode(omap, { replacer, tag: '!!omap' })
+    expect(replacer.mock.calls).toMatchObject([
+      ['', omap],
+      ['0', omap[0]],
+      ['1', omap[1]]
+    ])
   })
 })

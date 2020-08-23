@@ -30,7 +30,17 @@ function assertCollection(contents) {
 export class Document {
   static defaults = documentOptions
 
-  constructor(value, options) {
+  constructor(value, replacer, options) {
+    if (
+      options === undefined &&
+      replacer &&
+      typeof replacer === 'object' &&
+      !Array.isArray(replacer)
+    ) {
+      options = replacer
+      replacer = undefined
+    }
+
     this.options = Object.assign({}, defaultOptions, options)
     this.anchors = new Anchors(this.options.anchorPrefix)
     this.commentBefore = null
@@ -48,7 +58,7 @@ export class Document {
     } else if (value instanceof CSTDocument) {
       this.parse(value)
     } else {
-      this.contents = this.createNode(value)
+      this.contents = this.createNode(value, { replacer })
     }
   }
 
@@ -62,8 +72,15 @@ export class Document {
     this.contents.addIn(path, value)
   }
 
-  createNode(value, { onTagObj, tag, wrapScalars } = {}) {
+  createNode(value, { onTagObj, replacer, tag, wrapScalars } = {}) {
     this.setSchema()
+    if (typeof replacer === 'function') value = replacer('', value)
+    else if (Array.isArray(replacer)) {
+      const keyToStr = v =>
+        typeof v === 'number' || v instanceof String || v instanceof Number
+      const asStr = replacer.filter(keyToStr).map(String)
+      if (asStr.length > 0) replacer = replacer.concat(asStr)
+    }
     const aliasNodes = []
     const ctx = {
       onAlias(source) {
@@ -73,6 +90,7 @@ export class Document {
       },
       onTagObj,
       prevObjects: new Map(),
+      replacer,
       schema: this.schema,
       wrapScalars: wrapScalars !== false
     }

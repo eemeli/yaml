@@ -3,9 +3,14 @@ import { createNode } from '../../doc/createNode.js'
 import { resolveSeq } from '../../resolve/resolveSeq.js'
 
 function createSeq(schema, obj, ctx) {
+  const { replacer } = ctx
   const seq = new YAMLSeq(schema)
   if (obj && obj[Symbol.iterator]) {
-    for (const it of obj) seq.items.push(createNode(it, null, ctx))
+    let i = 0
+    for (let it of obj) {
+      if (typeof replacer === 'function') it = replacer(String(i++), it)
+      seq.items.push(createNode(it, null, ctx))
+    }
   }
   return seq
 }
