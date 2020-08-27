@@ -111,9 +111,8 @@ YAML.stringify([true, false, 'maybe', null])
 YAML.stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
 // `number: 3
 // plain: string
-// block: >
+// block: |
 //   two
-//
 //   lines
 // `
 ```
