@@ -61,9 +61,9 @@ The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq
 
 ## Creating Documents
 
-#### `new YAML.Document(value, options = {})`
+#### `new YAML.Document(value, replacer?, options = {})`
 
-Creates a new document. If `value` is defined, the document `contents` are initialised with that value, wrapped recursively in appropriate [content nodes](#content-nodes). If `value` is `undefined`, the document's `contents` and `schema` are initialised as `null`. See [Options](#options) for more information on the second parameter.
+Creates a new document. If `value` is defined, the document `contents` are initialised with that value, wrapped recursively in appropriate [content nodes](#content-nodes). If `value` is `undefined`, the document's `contents` and `schema` are initialised as `null`. If defined, a `replacer` may filter or modify the initial document contents, following the same algorithm as the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter). See [Options](#options) for more information on the last argument.
 
 | Member              | Type                                | Description                                                                                                                                                              |
 | ------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -142,7 +142,7 @@ String(doc)
 
 For a plain JavaScript representation of the document, **`toJS()`** is your friend. Its output may include `Map` and `Set` collections (e.g. if the `mapAsMap` option is true) and complex scalar values like `Date` for `!!timestamp`, but all YAML nodes will be resolved. For a representation consisting only of JSON values, use **`toJSON()`**.
 
-Use `toJS({ mapAsMap, onAnchor })` to explicitly set the `mapAsMap` option, or to define a callback `(value: any, count: number) => void` for each aliased anchor in the document.
+Use `toJS({ mapAsMap, onAnchor, reviver })` to explicitly set the `mapAsMap` option, define an `onAnchor` callback `(value: any, count: number) => void` for each aliased anchor in the document, or to apply a [reviver function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter) to the output.
 
 Conversely, to stringify a document as YAML, use **`toString()`**. This will also be called by `String(doc)`. This method will throw if the `errors` array is not empty.
 

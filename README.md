@@ -28,21 +28,21 @@ const YAML = require('yaml')
 
 ### Parse & Stringify
 
-- [`YAML.parse(str, options): value`](https://eemeli.org/yaml/#yaml-parse)
-- [`YAML.stringify(value, options): string`](https://eemeli.org/yaml/#yaml-stringify)
+- [`YAML.parse(str, reviver?, options?): value`](https://eemeli.org/yaml/#yaml-parse)
+- [`YAML.stringify(value, replacer?, options?): string`](https://eemeli.org/yaml/#yaml-stringify)
 
 ### YAML Documents
 
 - [`YAML.defaultOptions`](https://eemeli.org/yaml/#options)
 - [`YAML.Document`](https://eemeli.org/yaml/#yaml-documents)
-  - [`constructor(value, options)`](https://eemeli.org/yaml/#creating-documents)
+  - [`constructor(value, replacer?, options?)`](https://eemeli.org/yaml/#creating-documents)
   - [`defaults`](https://eemeli.org/yaml/#options)
-  - [`#createNode(value, options): Node`](https://eemeli.org/yaml/#creating-nodes)
+  - [`#createNode(value, options?): Node`](https://eemeli.org/yaml/#creating-nodes)
   - [`#anchors`](https://eemeli.org/yaml/#working-with-anchors)
   - [`#contents`](https://eemeli.org/yaml/#content-nodes)
   - [`#errors`](https://eemeli.org/yaml/#errors)
-- [`YAML.parseAllDocuments(str, options): YAML.Document[]`](https://eemeli.org/yaml/#parsing-documents)
-- [`YAML.parseDocument(str, options): YAML.Document`](https://eemeli.org/yaml/#parsing-documents)
+- [`YAML.parseAllDocuments(str, options?): YAML.Document[]`](https://eemeli.org/yaml/#parsing-documents)
+- [`YAML.parseDocument(str, options?): YAML.Document`](https://eemeli.org/yaml/#parsing-documents)
 
 ```js
 import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'

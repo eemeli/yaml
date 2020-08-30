@@ -166,7 +166,7 @@ String(doc)
 
 To create a new node, use the `createNode(value, options?)` document method. This will recursively wrap any input with appropriate `Node` containers. Generic JS `Object` values as well as `Map` and its descendants become mappings, while arrays and other iterable objects result in sequences. With `Object`, entries that have an `undefined` value are dropped.
 
-To specify the collection type, set `options.tag` to its identifying string, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available in the document's schema. If `options.wrapScalars` is undefined or `true`, plain values are wrapped in `Scalar` objects.
+Use `options.replacer` to apply a replacer array or function, following the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter). To specify the collection type, set `options.tag` to its identifying string, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available in the document's schema. If `options.wrapScalars` is undefined or `true`, plain values are wrapped in `Scalar` objects.
 
 As a possible side effect, this method may add entries to the document's [`anchors`](#working-with-anchors)
 
