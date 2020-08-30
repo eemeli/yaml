@@ -241,7 +241,7 @@ aliases:
       'utf8'
     )
     const doc = YAML.parseDocument(src)
-    expect(doc.toJSON()).toMatchObject({
+    expect(doc.toJS()).toMatchObject({
       aliases: [
         { restore_cache: { keys: ['v1-yarn-cache'] } },
         { save_cache: { key: 'v1-yarn-cache', paths: ['~/.cache/yarn'] } },
@@ -344,7 +344,7 @@ aliases:
   - d`
     const docs = YAML.parseAllDocuments(src)
     expect(docs[0].errors).toHaveLength(0)
-    expect(docs[0].toJSON()).toMatchObject(['a', { b: ['c'] }, 'd'])
+    expect(docs[0].toJS()).toMatchObject(['a', { b: ['c'] }, 'd'])
   })
 })
 
@@ -602,11 +602,11 @@ describe('handling complex keys', () => {
   })
 })
 
-test('Document.toJSON(null, onAnchor)', () => {
+test('Document.toJS({ onAnchor })', () => {
   const src = 'foo: &a [&v foo]\nbar: *a\nbaz: *a\n'
   const doc = YAML.parseDocument(src)
   const onAnchor = jest.fn()
-  const res = doc.toJSON(null, onAnchor)
+  const res = doc.toJS({ onAnchor })
   expect(onAnchor.mock.calls).toMatchObject([
     [res.foo, 3],
     ['foo', 1]

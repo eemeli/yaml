@@ -57,10 +57,9 @@ export class YAMLMap extends Collection {
   }
 
   /**
-   * @param {*} arg ignored
-   * @param {*} ctx Conversion context, originally set in Document#toJSON()
-   * @param {Class} Type If set, forces the returned collection type
-   * @returns {*} Instance of Type, Map, or Object
+   * @param ctx - Conversion context, originally set in Document#toJS()
+   * @param {Class} Type - If set, forces the returned collection type
+   * @returns Instance of Type, Map, or Object
    */
   toJSON(_, ctx, Type) {
     const map = Type ? new Type() : ctx && ctx.mapAsMap ? new Map() : {}

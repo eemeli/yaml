@@ -4,7 +4,7 @@
  * @param value - The input value
  * @param {string|null} arg - If `value` defines a `toJSON()` method, use this
  *   as its first argument
- * @param ctx - Conversion context, originally set in Document#toJSON(). If
+ * @param ctx - Conversion context, originally set in Document#toJS(). If
  *   `{ keep: true }` is not set, output should be suitable for JSON
  *   stringification.
  */

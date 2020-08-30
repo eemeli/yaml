@@ -60,7 +60,7 @@ String(doc)
 const alias = anchors.createAlias(a, 'AA')
 seq.items.push(alias)
 const refs = new Map()
-doc.toJSON(null, (value, count) => refs.set(value, count))
+doc.toJS({ onAnchor: (value, count) => refs.set(value, count) })
 // [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]
 String(doc)
 // [ &AA { a: A }, { b: &a2 B }, *AA ]
@@ -69,14 +69,14 @@ refs
 
 const merge = anchors.createMergePair(alias)
 b.items.push(merge)
-doc.toJSON()
+doc.toJS()
 // [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]
 String(doc)
 // [ &AA { a: A }, { b: &a2 B, <<: *AA }, *AA ]
 
 // This creates a circular reference
 merge.value.items.push(anchors.createAlias(b))
-doc.toJSON() // [RangeError: Maximum call stack size exceeded]
+doc.toJS() // [RangeError: Maximum call stack size exceeded]
 String(doc)
 // [
 //   &AA { a: A },

@@ -250,31 +250,30 @@ export class Document {
     }
   }
 
-  toJSON(arg, onAnchor) {
-    const { keepBlobsInJSON, mapAsMap, maxAliasCount } = this.options
-    const keep =
-      keepBlobsInJSON &&
-      (typeof arg !== 'string' || !(this.contents instanceof Scalar))
+  toJS({ json, jsonArg, mapAsMap, onAnchor } = {}) {
+    const anchorNodes = Object.values(this.anchors.map).map(node => [
+      node,
+      { alias: [], aliasCount: 0, count: 1 }
+    ])
+    const anchors = anchorNodes.length > 0 ? new Map(anchorNodes) : null
     const ctx = {
+      anchors,
       doc: this,
       indentStep: '  ',
-      keep,
-      mapAsMap: keep && !!mapAsMap,
-      maxAliasCount,
+      keep: !json,
+      mapAsMap:
+        typeof mapAsMap === 'boolean' ? mapAsMap : !!this.options.mapAsMap,
+      maxAliasCount: this.options.maxAliasCount,
       stringify // Requiring directly in Pair would create circular dependencies
     }
-    const anchorNames = Object.keys(this.anchors.map)
-    if (anchorNames.length > 0)
-      ctx.anchors = new Map(
-        anchorNames.map(name => [
-          this.anchors.map[name],
-          { alias: [], aliasCount: 0, count: 1 }
-        ])
-      )
-    const res = toJS(this.contents, arg, ctx)
-    if (typeof onAnchor === 'function' && ctx.anchors)
-      for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
+    const res = toJS(this.contents, jsonArg || '', ctx)
+    if (typeof onAnchor === 'function' && anchors)
+      for (const { count, res } of anchors.values()) onAnchor(res, count)
     return res
+  }
+
+  toJSON(jsonArg, onAnchor) {
+    return this.toJS({ json: true, jsonArg, mapAsMap: false, onAnchor })
   }
 
   toString() {

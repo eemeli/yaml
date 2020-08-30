@@ -1059,7 +1059,7 @@ bar`,
           }
         ]
         const docs = YAML.parseAllDocuments(src, { customTags })
-        expect(docs.map(d => d.toJSON())).toMatchObject(['private', 'global'])
+        expect(docs.map(d => d.toJS())).toMatchObject(['private', 'global'])
       }
     },
 
@@ -1126,7 +1126,7 @@ bar`,
           resolve: (doc, node) => 'light:' + node.strValue
         }
         const docs = YAML.parseAllDocuments(src, { customTags: [tag] })
-        expect(docs.map(d => d.toJSON())).toMatchObject([
+        expect(docs.map(d => d.toJS())).toMatchObject([
           'light:fluorescent',
           'light:green'
         ])
@@ -1908,7 +1908,7 @@ for (const section in spec) {
       test(name, () => {
         const { src, tgt, errors, special, warnings } = spec[section][name]
         const documents = YAML.parseAllDocuments(src)
-        const json = documents.map(doc => doc.toJSON())
+        const json = documents.map(doc => doc.toJS())
         const docErrors = documents.map(doc =>
           doc.errors.map(err => err.message)
         )
@@ -1933,7 +1933,7 @@ for (const section in spec) {
         if (!errors) {
           const src2 = documents.map(doc => String(doc)).join('\n...\n')
           const documents2 = YAML.parseAllDocuments(src2)
-          const json2 = documents2.map(doc => doc.toJSON())
+          const json2 = documents2.map(doc => doc.toJS())
           trace: name,
             '\nIN\n' + src,
             '\nJSON\n' + JSON.stringify(json, null, '  '),

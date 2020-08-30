@@ -45,13 +45,6 @@ export interface Options extends Schema.Options {
    */
   indentSeq?: boolean
   /**
-   * Allow non-JSON JavaScript objects to remain in the `toJSON` output.
-   * Relevant with the YAML 1.1 `!!timestamp` and `!!binary` tags as well as BigInts.
-   *
-   * Default: `true`
-   */
-  keepBlobsInJSON?: boolean
-  /**
    * Include references in the AST to each node's corresponding CST node.
    *
    * Default: `false`
@@ -276,7 +269,7 @@ export class Document extends Collection {
    * not set as it may be influenced by parsed directives; call this with no
    * arguments to set it manually, or with arguments to change the schema used
    * by the document.
-   **/
+   */
   setSchema(
     id?: Options['version'] | Schema.Name,
     customTags?: (Schema.TagId | Schema.Tag)[]
@@ -286,13 +279,22 @@ export class Document extends Collection {
   /**
    * A plain JavaScript representation of the document `contents`.
    *
+   * @param mapAsMap - Use Map rather than Object to represent mappings.
+   *   Overrides values set in Document or global options.
+   * @param onAnchor - If defined, called with the resolved `value` and
+   *   reference `count` for each anchor in the document.
+   */
+  toJS(opt?: {
+    mapAsMap?: boolean
+    onAnchor?: (value: any, count: number) => void
+  }): any
+  /**
+   * A JSON representation of the document `contents`.
+   *
    * @param arg Used by `JSON.stringify` to indicate the array index or property
-   *   name. If its value is a `string` and the document `contents` has a scalar
-   *   value, the `keepBlobsInJSON` option has no effect.
-   * @param onAnchor If defined, called with the resolved `value` and reference
-   *   `count` for each anchor in the document.
-   * */
-  toJSON(arg?: string, onAnchor?: (value: any, count: number) => void): any
+   *   name.
+   */
+  toJSON(arg?: string): any
   /** A YAML representation of the document. */
   toString(): string
 }

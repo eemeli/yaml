@@ -33,7 +33,7 @@ test('circular reference', () => {
   const { items } = doc.contents
   expect(items).toHaveLength(2)
   expect(items[1].source).toBe(doc.contents)
-  const res = doc.toJSON()
+  const res = doc.toJS()
   expect(res[1]).toBe(res)
   expect(String(doc)).toBe(src)
 })
@@ -66,7 +66,7 @@ describe('create', () => {
     const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
     const alias = doc.anchors.createAlias(doc.contents.items[0], 'AA')
     doc.contents.items.push(alias)
-    expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
+    expect(doc.toJS()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
     expect(String(doc)).toMatch('[ &AA { a: A }, { b: B }, *AA ]\n')
   })
 
@@ -151,7 +151,7 @@ describe('merge <<', () => {
       const [a, b] = doc.contents.items
       const merge = doc.anchors.createMergePair(a)
       b.items.push(merge)
-      expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
+      expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
     })
 
@@ -161,7 +161,7 @@ describe('merge <<', () => {
       const alias = doc.anchors.createAlias(a, 'AA')
       const merge = doc.anchors.createMergePair(alias)
       b.items.push(merge)
-      expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
+      expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &AA { a: A }, { b: B, <<: *AA } ]\n')
     })
 
@@ -280,7 +280,7 @@ y:
       const doc = YAML.parseDocument(src, { merge: true })
       expect(doc.errors).toHaveLength(0)
       expect(doc.warnings).toHaveLength(0)
-      expect(() => doc.toJSON()).toThrow('Maximum call stack size exceeded')
+      expect(() => doc.toJS()).toThrow('Maximum call stack size exceeded')
       expect(String(doc)).toBe(src)
     })
   })

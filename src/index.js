@@ -31,7 +31,7 @@ function parse(src, options) {
   const doc = parseDocument(src, options)
   doc.warnings.forEach(warning => warn(warning))
   if (doc.errors.length > 0) throw doc.errors[0]
-  return doc.toJSON()
+  return doc.toJS()
 }
 
 function stringify(value, replacer, options) {

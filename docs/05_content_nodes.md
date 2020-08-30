@@ -14,7 +14,7 @@ class Node {
   spaceBefore: ?boolean,
       // a blank line before this node and its commentBefore
   tag: ?string,       // a fully qualified tag, if required
-  toJSON(): any       // a plain JS representation of this node
+  toJSON(): any       // a plain JS or JSON representation of this node
 }
 ```
 
@@ -209,7 +209,7 @@ it has:
   - of values
 `)
 
-doc.toJSON()
+doc.toJS()
 // { 'it has': [ 'an array', 'of values' ] }
 
 doc.commentBefore

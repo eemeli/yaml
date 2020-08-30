@@ -616,7 +616,7 @@ map:
     key3: value3`
     const doc = YAML.parseDocument(src)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.toJSON()).toMatchObject({
+    expect(doc.toJS()).toMatchObject({
       map: { foo0: { key2: 'value2' }, foo2: { key3: 'value3' } }
     })
   })

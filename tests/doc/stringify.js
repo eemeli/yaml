@@ -411,7 +411,7 @@ describe('eemeli/yaml#85', () => {
     const doc = YAML.parseDocument(str)
     const str2 = String(doc)
     expect(str2).toMatch(/^foo:\n {2}\[\n {4}bar/)
-    expect(YAML.parse(str2)).toMatchObject(doc.toJSON())
+    expect(YAML.parse(str2)).toMatchObject(doc.toJS())
   })
 })
 
