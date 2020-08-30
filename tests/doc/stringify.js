@@ -198,7 +198,7 @@ describe('timestamp-like string (YAML 1.1)', () => {
 })
 
 // https://github.com/tc39/proposal-well-formed-stringify
-describe('unpaired surrogate pairs', () => {
+describe('unpaired surrogate pairs of Unicode code points', () => {
   test('𝌆', () => {
     expect(YAML.stringify('𝌆')).toBe('𝌆\n')
   })
@@ -211,10 +211,12 @@ describe('unpaired surrogate pairs', () => {
   test('\uD83D\uDE00', () => {
     expect(YAML.stringify('\uD83D\uDE00')).toBe('😀\n')
   })
-  test('\uDF06\uD834', () => {
+
+  const maybe = process.version < 'v12' ? test.skip : test
+  maybe('\uDF06\uD834', () => {
     expect(YAML.stringify('\uDF06\uD834')).toBe('"\\udf06\\ud834"\n')
   })
-  test('\uDEAD', () => {
+  maybe('\uDEAD', () => {
     expect(YAML.stringify('\uDEAD')).toBe('"\\udead"\n')
   })
 })
