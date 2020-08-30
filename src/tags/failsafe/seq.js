@@ -8,7 +8,8 @@ function createSeq(schema, obj, ctx) {
   if (obj && obj[Symbol.iterator]) {
     let i = 0
     for (let it of obj) {
-      if (typeof replacer === 'function') it = replacer(String(i++), it)
+      if (typeof replacer === 'function')
+        it = replacer.call(obj, String(i++), it)
       seq.items.push(createNode(it, null, ctx))
     }
   }

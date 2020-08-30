@@ -847,6 +847,13 @@ describe('replacer', () => {
       ['c', [4]],
       ['0', 4]
     ])
+    expect(spy.mock.instances).toMatchObject([
+      { '': obj },
+      obj,
+      obj,
+      obj,
+      obj.c
+    ])
   })
 
   test('function as filter of Object entries', () => {
@@ -884,6 +891,14 @@ describe('replacer', () => {
       ['3', [2]],
       ['0', 2]
     ])
+    expect(replacer.mock.instances).toMatchObject([
+      { '': set },
+      set,
+      set,
+      set,
+      set,
+      [2]
+    ])
   })
 
   test('createNode, !!omap', () => {
@@ -899,5 +914,6 @@ describe('replacer', () => {
       ['0', omap[0]],
       ['1', omap[1]]
     ])
+    expect(replacer.mock.instances).toMatchObject([{ '': omap }, omap, omap])
   })
 })

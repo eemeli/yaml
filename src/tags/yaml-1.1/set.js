@@ -64,7 +64,8 @@ function createSet(schema, iterable, ctx) {
   const set = new YAMLSet(schema)
   let i = 0
   for (let value of iterable) {
-    if (typeof replacer === 'function') value = replacer(String(i++), value)
+    if (typeof replacer === 'function')
+      value = replacer.call(iterable, String(i++), value)
     set.items.push(createPair(value, null, ctx))
   }
   return set

@@ -6,7 +6,7 @@ function createMap(schema, obj, ctx) {
   const { replacer } = ctx
   const map = new YAMLMap(schema)
   const add = (key, value) => {
-    if (typeof replacer === 'function') value = replacer(key, value)
+    if (typeof replacer === 'function') value = replacer.call(obj, key, value)
     else if (Array.isArray(replacer) && !replacer.includes(key)) return
     if (value !== undefined) map.items.push(createPair(key, value, ctx))
   }

@@ -74,7 +74,8 @@ export class Document {
 
   createNode(value, { onTagObj, replacer, tag, wrapScalars } = {}) {
     this.setSchema()
-    if (typeof replacer === 'function') value = replacer('', value)
+    if (typeof replacer === 'function')
+      value = replacer.call({ '': value }, '', value)
     else if (Array.isArray(replacer)) {
       const keyToStr = v =>
         typeof v === 'number' || v instanceof String || v instanceof Number

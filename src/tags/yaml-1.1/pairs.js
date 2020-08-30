@@ -36,7 +36,8 @@ export function createPairs(schema, iterable, ctx) {
   pairs.tag = 'tag:yaml.org,2002:pairs'
   let i = 0
   for (let it of iterable) {
-    if (typeof replacer === 'function') it = replacer(String(i++), it)
+    if (typeof replacer === 'function')
+      it = replacer.call(iterable, String(i++), it)
     let key, value
     if (Array.isArray(it)) {
       if (it.length === 2) {
