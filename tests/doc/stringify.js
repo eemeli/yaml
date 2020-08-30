@@ -197,6 +197,28 @@ describe('timestamp-like string (YAML 1.1)', () => {
   }
 })
 
+// https://github.com/tc39/proposal-well-formed-stringify
+describe('unpaired surrogate pairs', () => {
+  test('𝌆', () => {
+    expect(YAML.stringify('𝌆')).toBe('𝌆\n')
+  })
+  test('\uD834\uDF06', () => {
+    expect(YAML.stringify('\uD834\uDF06')).toBe('𝌆\n')
+  })
+  test('😀', () => {
+    expect(YAML.stringify('😀')).toBe('😀\n')
+  })
+  test('\uD83D\uDE00', () => {
+    expect(YAML.stringify('\uD83D\uDE00')).toBe('😀\n')
+  })
+  test('\uDF06\uD834', () => {
+    expect(YAML.stringify('\uDF06\uD834')).toBe('"\\udf06\\ud834"\n')
+  })
+  test('\uDEAD', () => {
+    expect(YAML.stringify('\uDEAD')).toBe('"\\udead"\n')
+  })
+})
+
 describe('circular references', () => {
   test('parent at root', () => {
     const map = { foo: 'bar' }
