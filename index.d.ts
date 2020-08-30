@@ -25,6 +25,9 @@ export { default as parseCST } from './parse-cst'
  */
 export const defaultOptions: Options
 
+type Replacer = any[] | ((key: any, value: any) => boolean)
+type Reviver = (key: any, value: any) => any
+
 export interface Options extends Schema.Options {
   /**
    * Default prefix for anchors.
@@ -199,6 +202,26 @@ export namespace scalarOptions {
   }
 }
 
+export interface CreateNodeOptions {
+  /**
+   * Filter or modify values while creating a node.
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter
+   */
+  replacer?: Replacer
+  /**
+   * Specify the collection type, e.g. `"!!omap"`. Note that this requires the
+   * corresponding tag to be available in this document's schema.
+   */
+  tag?: string
+  /**
+   * Wrap plain values in `Scalar` objects.
+   *
+   * Default: `true`
+   */
+  wrapScalars?: boolean
+}
+
 export class Document extends Collection {
   cstNode?: CST.Document
   /**
@@ -206,6 +229,7 @@ export class Document extends Collection {
    *   in a Node container.
    */
   constructor(value?: any, options?: Options)
+  constructor(value: any, replacer: null | Replacer, options?: Options)
   tag: never
   directivesEndMarker?: boolean
   type: Type.DOCUMENT
@@ -239,15 +263,10 @@ export class Document extends Collection {
   /**
    * Convert any value into a `Node` using the current schema, recursively
    * turning objects into collections.
-   *
-   * @param options Use `tag` to specify the collection type, e.g. `"!!omap"`.
-   *   Note that this requires the corresponding tag to be available in this
-   *   document's schema. If `wrapScalars` is not `false`, also wraps plain
-   *   values in `Scalar` objects.
    */
   createNode(
     value: any,
-    options?: { tag?: string; wrapScalars?: boolean }
+    { replacer, tag, wrapScalars }?: CreateNodeOptions
   ): Node
   /**
    * Convert a key and a value into a `Pair` using the current schema,
@@ -283,10 +302,12 @@ export class Document extends Collection {
    *   Overrides values set in Document or global options.
    * @param onAnchor - If defined, called with the resolved `value` and
    *   reference `count` for each anchor in the document.
+   * @param reviver - A function that may filter or modify the output JS value
    */
   toJS(opt?: {
     mapAsMap?: boolean
     onAnchor?: (value: any, count: number) => void
+    reviver?: Reviver
   }): any
   /**
    * A JSON representation of the document `contents`.
@@ -400,14 +421,28 @@ export function parseAllDocuments(
  * support you should use `YAML.parseAllDocuments`. May throw on error, and may
  * log warnings using `console.warn`.
  *
- * @param str A string with YAML formatting.
+ * @param str - A string with YAML formatting.
+ * @param reviver - A reviver function, as in `JSON.parse()`
  * @returns The value will match the type of the root value of the parsed YAML
  *   document, so Maps become objects, Sequences arrays, and scalars result in
  *   nulls, booleans, numbers and strings.
  */
 export function parse(str: string, options?: Options): any
+export function parse(
+  str: string,
+  reviver: null | Reviver,
+  options?: Options
+): any
 
 /**
- * @returns Will always include \n as the last character, as is expected of YAML documents.
+ * Stringify a value as a YAML document.
+ *
+ * @param replacer - A replacer array or function, as in `JSON.stringify()`
+ * @returns Will always include `\n` as the last character, as is expected of YAML documents.
  */
 export function stringify(value: any, options?: Options): string
+export function stringify(
+  value: any,
+  replacer: null | Replacer,
+  options?: Options
+): string

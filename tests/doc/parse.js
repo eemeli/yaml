@@ -612,3 +612,149 @@ test('Document.toJS({ onAnchor })', () => {
     ['foo', 1]
   ])
 })
+
+describe('reviver', () => {
+  test('MDN exemple', () => {
+    const reviver = jest.fn((key, value) => value)
+    const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
+    const obj = JSON.parse(src)
+    YAML.parse(src, reviver)
+    expect(reviver.mock.calls).toMatchObject([
+      ['1', 1],
+      ['2', 2],
+      ['4', 4],
+      ['6', 6],
+      ['5', { 6: 6 }],
+      ['3', obj[3]],
+      ['', obj]
+    ])
+    expect(reviver.mock.instances).toMatchObject([
+      obj,
+      obj,
+      obj[3],
+      obj[3][5],
+      obj[3],
+      obj,
+      { '': obj }
+    ])
+  })
+
+  test('modify values', () => {
+    const reviver = jest.fn((key, value) =>
+      typeof value === 'number' ? 2 * value : value
+    )
+    const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
+    expect(YAML.parse(src, reviver)).toMatchObject({
+      1: 2,
+      2: 4,
+      3: { 4: 8, 5: { 6: 12 } }
+    })
+  })
+
+  test('remove values', () => {
+    const reviver = jest.fn((key, value) =>
+      key !== '' && key % 2 === 0 ? undefined : value
+    )
+    const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
+    expect(YAML.parse(src, reviver)).toMatchObject({
+      1: 1,
+      3: { 5: {} }
+    })
+  })
+
+  test('add values to this', () => {
+    const reviver = jest.fn(function (key, value) {
+      expect(key).not.toBe('9')
+      this[9] = 9
+      return value
+    })
+    const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
+    expect(YAML.parse(src, reviver)).toMatchObject({
+      1: 1,
+      2: 2,
+      3: { 4: 4, 5: { 6: 6, 9: 9 }, 9: 9 },
+      9: 9
+    })
+  })
+
+  test('!!set', () => {
+    const these = []
+    const reviver = jest.fn(function (key, value) {
+      these.push(Array.from(key === '' ? this[''] : this))
+      if (key === 2) return undefined
+      if (key === 8) return 10
+      return value
+    })
+    const src = '!!set { 2, 4, 6, 8 }'
+    const set = YAML.parse(src, reviver)
+    expect(set).toBeInstanceOf(Set)
+    expect(Array.from(set)).toMatchObject([4, 6, 10])
+    expect(reviver.mock.calls).toMatchObject([
+      [2, 2],
+      [4, 4],
+      [6, 6],
+      [8, 8],
+      ['', {}]
+    ])
+    expect(these).toMatchObject([
+      [2, 4, 6, 8],
+      [4, 6, 8],
+      [4, 6, 8],
+      [4, 6, 8],
+      [4, 6, 10]
+    ])
+  })
+
+  test('!!omap', () => {
+    const these = []
+    const reviver = jest.fn(function (key, value) {
+      these.push(Array.from(key === '' ? this[''] : this))
+      if (key === 2) return undefined
+      if (key === 8) return 10
+      return value
+    })
+    const src = '!!omap [ 2: 3, 4: 5, 6: 7, 8: 9 ]'
+    const map = YAML.parse(src, reviver)
+    expect(map).toBeInstanceOf(Map)
+    expect(Array.from(map)).toMatchObject([
+      [4, 5],
+      [6, 7],
+      [8, 10]
+    ])
+    expect(reviver.mock.calls).toMatchObject([
+      [2, 3],
+      [4, 5],
+      [6, 7],
+      [8, 9],
+      ['', map]
+    ])
+    expect(these).toMatchObject([
+      [
+        [2, 3],
+        [4, 5],
+        [6, 7],
+        [8, 9]
+      ],
+      [
+        [4, 5],
+        [6, 7],
+        [8, 9]
+      ],
+      [
+        [4, 5],
+        [6, 7],
+        [8, 9]
+      ],
+      [
+        [4, 5],
+        [6, 7],
+        [8, 9]
+      ],
+      [
+        [4, 5],
+        [6, 7],
+        [8, 10]
+      ]
+    ])
+  })
+})

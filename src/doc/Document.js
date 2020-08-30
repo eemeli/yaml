@@ -17,6 +17,7 @@ import { stringify } from '../stringify/stringify.js'
 
 import { Anchors } from './Anchors.js'
 import { Schema } from './Schema.js'
+import { applyReviver } from './applyReviver.js'
 import { createNode } from './createNode.js'
 import { listTagNames } from './listTagNames.js'
 import { parseContents } from './parseContents.js'
@@ -250,7 +251,7 @@ export class Document {
     }
   }
 
-  toJS({ json, jsonArg, mapAsMap, onAnchor } = {}) {
+  toJS({ json, jsonArg, mapAsMap, onAnchor, reviver } = {}) {
     const anchorNodes = Object.values(this.anchors.map).map(node => [
       node,
       { alias: [], aliasCount: 0, count: 1 }
@@ -269,7 +270,9 @@ export class Document {
     const res = toJS(this.contents, jsonArg || '', ctx)
     if (typeof onAnchor === 'function' && anchors)
       for (const { count, res } of anchors.values()) onAnchor(res, count)
-    return res
+    return typeof reviver === 'function'
+      ? applyReviver(reviver, { '': res }, '', res)
+      : res
   }
 
   toJSON(jsonArg, onAnchor) {

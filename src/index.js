@@ -27,11 +27,16 @@ function parseDocument(src, options) {
   return doc
 }
 
-function parse(src, options) {
+function parse(src, reviver, options) {
+  if (options === undefined && reviver && typeof reviver === 'object') {
+    options = reviver
+    reviver = undefined
+  }
+
   const doc = parseDocument(src, options)
   doc.warnings.forEach(warning => warn(warning))
   if (doc.errors.length > 0) throw doc.errors[0]
-  return doc.toJS()
+  return doc.toJS({ reviver })
 }
 
 function stringify(value, replacer, options) {
