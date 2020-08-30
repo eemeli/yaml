@@ -3,7 +3,7 @@ import { YAMLReferenceError } from '../errors.js'
 import { Collection } from './Collection.js'
 import { Node } from './Node.js'
 import { Pair } from './Pair.js'
-import { toJSON } from './toJSON.js'
+import { toJS } from './toJS.js'
 
 const getAliasCount = (node, anchors) => {
   if (node instanceof Alias) {
@@ -52,7 +52,7 @@ export class Alias extends Node {
   }
 
   toJSON(arg, ctx) {
-    if (!ctx) return toJSON(this.source, arg, ctx)
+    if (!ctx) return toJS(this.source, arg, ctx)
     const { anchors, maxAliasCount } = ctx
     const anchor = anchors.get(this.source)
     /* istanbul ignore if */

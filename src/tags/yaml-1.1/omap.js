@@ -3,7 +3,7 @@ import { Pair } from '../../ast/Pair.js'
 import { Scalar } from '../../ast/Scalar.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
 import { YAMLSeq } from '../../ast/YAMLSeq.js'
-import { toJSON } from '../../ast/toJSON.js'
+import { toJS } from '../../ast/toJS.js'
 import { createPairs, parsePairs } from './pairs.js'
 
 export class YAMLOMap extends YAMLSeq {
@@ -26,10 +26,10 @@ export class YAMLOMap extends YAMLSeq {
     for (const pair of this.items) {
       let key, value
       if (pair instanceof Pair) {
-        key = toJSON(pair.key, '', ctx)
-        value = toJSON(pair.value, key, ctx)
+        key = toJS(pair.key, '', ctx)
+        value = toJS(pair.value, key, ctx)
       } else {
-        key = toJSON(pair, '', ctx)
+        key = toJS(pair, '', ctx)
       }
       if (map.has(key))
         throw new Error('Ordered maps must not include duplicate keys')

@@ -5,7 +5,7 @@ import { Collection } from './Collection.js'
 import { Node } from './Node.js'
 import { Scalar } from './Scalar.js'
 import { YAMLSeq } from './YAMLSeq.js'
-import { toJSON } from './toJSON.js'
+import { toJS } from './toJS.js'
 
 const stringifyKey = (key, jsKey, ctx) => {
   if (jsKey === null) return ''
@@ -57,15 +57,15 @@ export class Pair extends Node {
   }
 
   addToJSMap(ctx, map) {
-    const key = toJSON(this.key, '', ctx)
+    const key = toJS(this.key, '', ctx)
     if (map instanceof Map) {
-      const value = toJSON(this.value, key, ctx)
+      const value = toJS(this.value, key, ctx)
       map.set(key, value)
     } else if (map instanceof Set) {
       map.add(key)
     } else {
       const stringKey = stringifyKey(this.key, key, ctx)
-      map[stringKey] = toJSON(this.value, stringKey, ctx)
+      map[stringKey] = toJS(this.value, stringKey, ctx)
     }
     return map
   }

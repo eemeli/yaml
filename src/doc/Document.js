@@ -6,7 +6,7 @@ import {
   Scalar,
   collectionFromPath,
   isEmptyPath,
-  toJSON
+  toJS
 } from '../ast/index.js'
 import { Document as CSTDocument } from '../cst/Document'
 import { defaultTagPrefix } from '../constants.js'
@@ -271,7 +271,7 @@ export class Document {
           { alias: [], aliasCount: 0, count: 1 }
         ])
       )
-    const res = toJSON(this.contents, arg, ctx)
+    const res = toJS(this.contents, arg, ctx)
     if (typeof onAnchor === 'function' && ctx.anchors)
       for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
     return res

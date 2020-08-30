@@ -17,11 +17,7 @@ export function stringifyString(
   onChompKeep?: () => void
 ): string
 
-export function toJSON(
-  value: any,
-  arg?: any,
-  ctx?: Schema.CreateNodeContext
-): any
+export function toJS(value: any, arg?: any, ctx?: Schema.CreateNodeContext): any
 
 export enum Type {
   ALIAS = 'ALIAS',

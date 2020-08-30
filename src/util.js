@@ -1,4 +1,4 @@
-export { findPair, toJSON } from './ast/index.js'
+export { findPair, toJS } from './ast/index.js'
 export { resolveMap as parseMap } from './resolve/resolveMap.js'
 export { resolveSeq as parseSeq } from './resolve/resolveSeq.js'
 
