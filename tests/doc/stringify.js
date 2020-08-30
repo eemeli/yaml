@@ -907,10 +907,10 @@ describe('replacer', () => {
     doc.createNode(set, { replacer })
     expect(replacer.mock.calls).toMatchObject([
       ['', set],
-      ['0', 'a'],
-      ['1', 'b'],
-      ['2', 1],
-      ['3', [2]],
+      ['a', 'a'],
+      ['b', 'b'],
+      [1, 1],
+      [[2], [2]],
       ['0', 2]
     ])
     expect(replacer.mock.instances).toMatchObject([
