@@ -41,6 +41,11 @@ function parse(src, reviver, options) {
 
 function stringify(value, replacer, options) {
   if (value === undefined) return '\n'
+  if (typeof options === 'string') options = options.length
+  if (typeof options === 'number') {
+    const indent = Math.round(options)
+    options = indent < 1 ? undefined : indent > 8 ? { indent: 8 } : { indent }
+  }
   return new Document(value, replacer, options).toString()
 }
 

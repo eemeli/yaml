@@ -444,5 +444,5 @@ export function stringify(value: any, options?: Options): string
 export function stringify(
   value: any,
   replacer: null | Replacer,
-  options?: Options
+  options?: number | string | Options
 ): string

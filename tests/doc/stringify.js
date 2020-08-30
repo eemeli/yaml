@@ -939,3 +939,16 @@ describe('replacer', () => {
     expect(replacer.mock.instances).toMatchObject([{ '': omap }, omap, omap])
   })
 })
+
+describe('YAML.stringify options as scalar', () => {
+  test('number', () => {
+    expect(YAML.stringify({ foo: 'bar\nfuzz' }, null, 1)).toBe(
+      'foo: |-\n bar\n fuzz\n'
+    )
+  })
+  test('string', () => {
+    expect(YAML.stringify({ foo: 'bar\nfuzz' }, null, '123')).toBe(
+      'foo: |-\n   bar\n   fuzz\n'
+    )
+  })
+})

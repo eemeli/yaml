@@ -67,7 +67,7 @@ YAML.stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
 
 #### `YAML.stringify(value, replacer?, options = {}): string`
 
-`value` can be of any type. The returned string will always include `\n` as the last character, as is expected of YAML documents. If defined, the `replacer` array or function follows the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter). See [Options](#options) for more information on the last argument, an optional configuration object.
+`value` can be of any type. The returned string will always include `\n` as the last character, as is expected of YAML documents. If defined, the `replacer` array or function follows the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter). See [Options](#options) for more information on the last argument, an optional configuration object. For JSON compatibility, using a number or a string as the `options` value will set the `indent` option accordingly.
 
 As strings in particular may be represented in a number of different styles, the simplest option for the value in question will always be chosen, depending mostly on the presence of escaped or control characters and leading & trailing whitespace.
 
