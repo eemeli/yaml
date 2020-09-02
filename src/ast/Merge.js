@@ -39,8 +39,13 @@ export class Merge extends Pair {
           if (!map.has(key)) map.set(key, value)
         } else if (map instanceof Set) {
           map.add(key)
-        } else {
-          if (!Object.prototype.hasOwnProperty.call(map, key)) map[key] = value
+        } else if (!Object.prototype.hasOwnProperty.call(map, key)) {
+          Object.defineProperty(map, key, {
+            value,
+            writable: true,
+            enumerable: true,
+            configurable: true
+          })
         }
       }
     }

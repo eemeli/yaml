@@ -65,7 +65,15 @@ export class Pair extends Node {
       map.add(key)
     } else {
       const stringKey = stringifyKey(this.key, key, ctx)
-      map[stringKey] = toJSON(this.value, stringKey, ctx)
+      const value = toJSON(this.value, stringKey, ctx)
+      if (stringKey in map)
+        Object.defineProperty(map, stringKey, {
+          value,
+          writable: true,
+          enumerable: true,
+          configurable: true
+        })
+      else map[stringKey] = value
     }
     return map
   }
