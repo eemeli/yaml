@@ -12,7 +12,7 @@ const stringifyKey = (key, jsKey, ctx) => {
   if (typeof jsKey !== 'object') return String(jsKey)
   if (key instanceof Node && ctx && ctx.doc)
     return key.toString({
-      anchors: {},
+      anchors: Object.create(null),
       doc: ctx.doc,
       indent: '',
       indentStep: ctx.indentStep,
