@@ -396,10 +396,7 @@ test('eemeli/yaml#38', () => {
   expect(YAML.parse(src)).toEqual({
     content: {
       arrayOfArray: [
-        [
-          { first: 'John', last: 'Black' },
-          { first: 'Brian', last: 'Green' }
-        ],
+        [{ first: 'John', last: 'Black' }, { first: 'Brian', last: 'Green' }],
         [{ first: 'Mark', last: 'Orange' }],
         [{ first: 'Adam', last: 'Grey' }]
       ]
@@ -611,6 +608,25 @@ test('Document.toJS({ onAnchor })', () => {
     [res.foo, 3],
     ['foo', 1]
   ])
+})
+
+describe('__proto__ as mapping key', () => {
+  test('plain object', () => {
+    const src = '{ __proto__: [42] }'
+    const obj = YAML.parse(src)
+    expect(Array.isArray(obj)).toBe(false)
+    expect(obj.hasOwnProperty('__proto__')).toBe(true)
+    expect(obj).not.toHaveProperty('length')
+    expect(JSON.stringify(obj)).toBe('{"__proto__":[42]}')
+  })
+
+  test('with merge key', () => {
+    const src = '- &A { __proto__: [42] }\n- { <<: *A }\n'
+    const obj = YAML.parse(src, { merge: true })
+    expect(obj[0].hasOwnProperty('__proto__')).toBe(true)
+    expect(obj[1].hasOwnProperty('__proto__')).toBe(true)
+    expect(JSON.stringify(obj)).toBe('[{"__proto__":[42]},{"__proto__":[42]}]')
+  })
 })
 
 describe('reviver', () => {

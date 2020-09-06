@@ -312,7 +312,7 @@ export class Document {
       lines.unshift(this.commentBefore.replace(/^/gm, '#'))
     }
     const ctx = {
-      anchors: {},
+      anchors: Object.create(null),
       doc: this,
       indent: '',
       indentStep: ' '.repeat(indentSize),
