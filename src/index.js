@@ -8,7 +8,7 @@ function parseAllDocuments(src, options) {
   const stream = []
   let prev
   for (const cstDoc of parseCST(src)) {
-    const doc = new Document(undefined, options)
+    const doc = new Document(undefined, null, options)
     doc.parse(cstDoc, prev)
     stream.push(doc)
     prev = doc
@@ -18,7 +18,7 @@ function parseAllDocuments(src, options) {
 
 function parseDocument(src, options) {
   const cst = parseCST(src)
-  const doc = new Document(cst[0], options)
+  const doc = new Document(cst[0], null, options)
   if (cst.length > 1) {
     const errMsg =
       'Source contains multiple documents; please use YAML.parseAllDocuments()'
@@ -27,16 +27,26 @@ function parseDocument(src, options) {
   return doc
 }
 
-function parse(src, options) {
+function parse(src, reviver, options) {
+  if (options === undefined && reviver && typeof reviver === 'object') {
+    options = reviver
+    reviver = undefined
+  }
+
   const doc = parseDocument(src, options)
   doc.warnings.forEach(warning => warn(warning))
   if (doc.errors.length > 0) throw doc.errors[0]
-  return doc.toJSON()
+  return doc.toJS({ reviver })
 }
 
-function stringify(value, options) {
+function stringify(value, replacer, options) {
   if (value === undefined) return '\n'
-  return new Document(value, options).toString()
+  if (typeof options === 'string') options = options.length
+  if (typeof options === 'number') {
+    const indent = Math.round(options)
+    options = indent < 1 ? undefined : indent > 8 ? { indent: 8 } : { indent }
+  }
+  return new Document(value, replacer, options).toString()
 }
 
 export const YAML = {

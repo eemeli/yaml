@@ -31,9 +31,13 @@ export function parsePairs(doc, cst) {
 }
 
 export function createPairs(schema, iterable, ctx) {
+  const { replacer } = ctx
   const pairs = new YAMLSeq(schema)
   pairs.tag = 'tag:yaml.org,2002:pairs'
-  for (const it of iterable) {
+  let i = 0
+  for (let it of iterable) {
+    if (typeof replacer === 'function')
+      it = replacer.call(iterable, String(i++), it)
     let key, value
     if (Array.isArray(it)) {
       if (it.length === 2) {

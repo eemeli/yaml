@@ -6,7 +6,7 @@ import {
   Scalar,
   collectionFromPath,
   isEmptyPath,
-  toJSON
+  toJS
 } from '../ast/index.js'
 import { Document as CSTDocument } from '../cst/Document'
 import { defaultTagPrefix } from '../constants.js'
@@ -17,6 +17,7 @@ import { stringify } from '../stringify/stringify.js'
 
 import { Anchors } from './Anchors.js'
 import { Schema } from './Schema.js'
+import { applyReviver } from './applyReviver.js'
 import { createNode } from './createNode.js'
 import { listTagNames } from './listTagNames.js'
 import { parseContents } from './parseContents.js'
@@ -30,7 +31,17 @@ function assertCollection(contents) {
 export class Document {
   static defaults = documentOptions
 
-  constructor(value, options) {
+  constructor(value, replacer, options) {
+    if (
+      options === undefined &&
+      replacer &&
+      typeof replacer === 'object' &&
+      !Array.isArray(replacer)
+    ) {
+      options = replacer
+      replacer = undefined
+    }
+
     this.options = Object.assign({}, defaultOptions, options)
     this.anchors = new Anchors(this.options.anchorPrefix)
     this.commentBefore = null
@@ -48,7 +59,7 @@ export class Document {
     } else if (value instanceof CSTDocument) {
       this.parse(value)
     } else {
-      this.contents = this.createNode(value)
+      this.contents = this.createNode(value, { replacer })
     }
   }
 
@@ -62,8 +73,16 @@ export class Document {
     this.contents.addIn(path, value)
   }
 
-  createNode(value, { onTagObj, tag, wrapScalars } = {}) {
+  createNode(value, { onTagObj, replacer, tag, wrapScalars } = {}) {
     this.setSchema()
+    if (typeof replacer === 'function')
+      value = replacer.call({ '': value }, '', value)
+    else if (Array.isArray(replacer)) {
+      const keyToStr = v =>
+        typeof v === 'number' || v instanceof String || v instanceof Number
+      const asStr = replacer.filter(keyToStr).map(String)
+      if (asStr.length > 0) replacer = replacer.concat(asStr)
+    }
     const aliasNodes = []
     const ctx = {
       onAlias(source) {
@@ -73,6 +92,7 @@ export class Document {
       },
       onTagObj,
       prevObjects: new Map(),
+      replacer,
       schema: this.schema,
       wrapScalars: wrapScalars !== false
     }
@@ -231,31 +251,32 @@ export class Document {
     }
   }
 
-  toJSON(arg, onAnchor) {
-    const { keepBlobsInJSON, mapAsMap, maxAliasCount } = this.options
-    const keep =
-      keepBlobsInJSON &&
-      (typeof arg !== 'string' || !(this.contents instanceof Scalar))
+  toJS({ json, jsonArg, mapAsMap, onAnchor, reviver } = {}) {
+    const anchorNodes = Object.values(this.anchors.map).map(node => [
+      node,
+      { alias: [], aliasCount: 0, count: 1 }
+    ])
+    const anchors = anchorNodes.length > 0 ? new Map(anchorNodes) : null
     const ctx = {
+      anchors,
       doc: this,
       indentStep: '  ',
-      keep,
-      mapAsMap: keep && !!mapAsMap,
-      maxAliasCount,
+      keep: !json,
+      mapAsMap:
+        typeof mapAsMap === 'boolean' ? mapAsMap : !!this.options.mapAsMap,
+      maxAliasCount: this.options.maxAliasCount,
       stringify // Requiring directly in Pair would create circular dependencies
     }
-    const anchorNames = Object.keys(this.anchors.map)
-    if (anchorNames.length > 0)
-      ctx.anchors = new Map(
-        anchorNames.map(name => [
-          this.anchors.map[name],
-          { alias: [], aliasCount: 0, count: 1 }
-        ])
-      )
-    const res = toJSON(this.contents, arg, ctx)
-    if (typeof onAnchor === 'function' && ctx.anchors)
-      for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
-    return res
+    const res = toJS(this.contents, jsonArg || '', ctx)
+    if (typeof onAnchor === 'function' && anchors)
+      for (const { count, res } of anchors.values()) onAnchor(res, count)
+    return typeof reviver === 'function'
+      ? applyReviver(reviver, { '': res }, '', res)
+      : res
+  }
+
+  toJSON(jsonArg, onAnchor) {
+    return this.toJS({ json: true, jsonArg, mapAsMap: false, onAnchor })
   }
 
   toString() {

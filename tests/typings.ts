@@ -6,7 +6,7 @@ import { YAMLMap, YAMLSeq, Pair } from '../types'
 YAML.parse('3.14159')
 // 3.14159
 
-YAML.parse('[ true, false, maybe, null ]\n')
+YAML.parse('[ true, false, maybe, null ]\n', { version: '1.2' })
 // [ true, false, 'maybe', null ]
 
 const file = `# file.yml
@@ -16,7 +16,7 @@ YAML:
 yaml:
   - A complete JavaScript implementation
   - https://www.npmjs.com/package/yaml`
-YAML.parse(file)
+YAML.parse(file, (key, value) => value)
 // { YAML:
 //   [ 'A human-readable data serialization language',
 //     'https://en.wikipedia.org/wiki/YAML' ],
@@ -27,14 +27,17 @@ YAML.parse(file)
 YAML.stringify(3.14159)
 // '3.14159\n'
 
-YAML.stringify([true, false, 'maybe', null])
+YAML.stringify([true, false, 'maybe', null], { version: '1.2' })
 // `- true
 // - false
 // - maybe
 // - null
 // `
 
-YAML.stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
+YAML.stringify(
+  { number: 3, plain: 'string', block: 'two\nlines\n' },
+  (key, value) => value
+)
 // `number: 3
 // plain: string
 // block: >
@@ -60,7 +63,7 @@ String(doc)
 const alias = anchors.createAlias(a, 'AA')
 seq.items.push(alias)
 const refs = new Map()
-doc.toJSON(null, (value, count) => refs.set(value, count))
+doc.toJS({ onAnchor: (value, count) => refs.set(value, count) })
 // [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]
 String(doc)
 // [ &AA { a: A }, { b: &a2 B }, *AA ]
@@ -69,14 +72,14 @@ refs
 
 const merge = anchors.createMergePair(alias)
 b.items.push(merge)
-doc.toJSON()
+doc.toJS()
 // [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]
 String(doc)
 // [ &AA { a: A }, { b: &a2 B, <<: *AA }, *AA ]
 
 // This creates a circular reference
 merge.value.items.push(anchors.createAlias(b))
-doc.toJSON() // [RangeError: Maximum call stack size exceeded]
+doc.toJS() // [RangeError: Maximum call stack size exceeded]
 String(doc)
 // [
 //   &AA { a: A },

@@ -1,6 +1,6 @@
 import { Collection } from './Collection.js'
 import { Scalar, isScalarValue } from './Scalar.js'
-import { toJSON } from './toJSON.js'
+import { toJS } from './toJS.js'
 
 function asItemIndex(key) {
   let idx = key instanceof Scalar ? key.value : key
@@ -45,7 +45,7 @@ export class YAMLSeq extends Collection {
     const seq = []
     if (ctx && ctx.onCreate) ctx.onCreate(seq)
     let i = 0
-    for (const item of this.items) seq.push(toJSON(item, String(i++), ctx))
+    for (const item of this.items) seq.push(toJS(item, String(i++), ctx))
     return seq
   }
 

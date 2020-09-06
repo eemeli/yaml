@@ -16,7 +16,6 @@ describe('properties', () => {
     const yamlArbitrary = fc.anything({ key: key, values: values })
     const optionsArbitrary = fc.record(
       {
-        keepBlobsInJSON: fc.boolean(),
         keepCstNodes: fc.boolean(),
         keepNodeTypes: fc.boolean(),
         mapAsMap: fc.constant(false),

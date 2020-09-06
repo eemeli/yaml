@@ -2,8 +2,9 @@
 
 ```js
 YAML.defaultOptions
-// { keepBlobsInJSON: true,
+// { indent: 2,
 //   keepNodeTypes: true,
+//   mapAsMap: false,
 //   version: '1.2' }
 
 YAML.Document.defaults
@@ -26,7 +27,6 @@ The `version` option value (`'1.2'` by default) may be overridden by any documen
 | customTags       | `Tag[] ⎮ function`                            | Array of [additional tags](#custom-data-types) to include in the schema                                                                                                 |
 | indent           | `number`                                      | The number of spaces to use when indenting code. By default `2`.                                                                                                        |
 | indentSeq        | `boolean`                                     | Whether block sequences should be indented. By default `true`.                                                                                                          |
-| keepBlobsInJSON  | `boolean`                                     | Allow non-JSON JavaScript objects to remain in the `toJSON` output. Relevant with the YAML 1.1 `!!timestamp` and `!!binary` tags as well as BigInts. By default `true`. |
 | keepCstNodes     | `boolean`                                     | Include references in the AST to each node's corresponding CST node. By default `false`.                                                                                |
 | keepNodeTypes    | `boolean`                                     | Store the original node type when parsing documents. By default `true`.                                                                                                 |
 | mapAsMap         | `boolean`                                     | When outputting JS, use Map rather than Object to represent mappings. By default `false`.                                                                               |

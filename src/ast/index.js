@@ -7,4 +7,4 @@ export { Scalar } from './Scalar.js'
 export { YAMLMap, findPair } from './YAMLMap.js'
 export { YAMLSeq } from './YAMLSeq.js'
 
-export { toJSON } from './toJSON.js'
+export { toJS } from './toJS.js'

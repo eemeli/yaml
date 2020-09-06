@@ -60,8 +60,13 @@ function parseSet(doc, cst) {
 }
 
 function createSet(schema, iterable, ctx) {
+  const { replacer } = ctx
   const set = new YAMLSet(schema)
-  for (const value of iterable) set.items.push(createPair(value, null, ctx))
+  for (let value of iterable) {
+    if (typeof replacer === 'function')
+      value = replacer.call(iterable, value, value)
+    set.items.push(createPair(value, null, ctx))
+  }
   return set
 }
 

@@ -1,5 +1,5 @@
 import { Node } from './Node.js'
-import { toJSON } from './toJSON.js'
+import { toJS } from './toJS.js'
 
 export const isScalarValue = value =>
   !value || (typeof value !== 'function' && typeof value !== 'object')
@@ -11,7 +11,7 @@ export class Scalar extends Node {
   }
 
   toJSON(arg, ctx) {
-    return ctx && ctx.keep ? this.value : toJSON(this.value, arg, ctx)
+    return ctx && ctx.keep ? this.value : toJS(this.value, arg, ctx)
   }
 
   toString() {

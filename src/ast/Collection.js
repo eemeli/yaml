@@ -119,8 +119,7 @@ export class Collection extends Node {
     }
   }
 
-  // overridden in implementations
-  /* istanbul ignore next */
+  /* istanbul ignore next: overridden in implementations */
   toJSON() {
     return null
   }

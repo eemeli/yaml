@@ -33,21 +33,21 @@ import YAML from 'yaml'
 const YAML = require('yaml')
 ```
 
-- [`YAML.parse(str, options): value`](#yaml-parse)
-- [`YAML.stringify(value, options): string`](#yaml-stringify)
+- [`YAML.parse(str, reviver?, options?): value`](#yaml-parse)
+- [`YAML.stringify(value, replacer?, options?): string`](#yaml-stringify)
 
 <h3>Documents</h3>
 
 - [`YAML.defaultOptions`](#options)
 - [`YAML.Document`](#documents)
-  - [`constructor(value, options)`](#creating-documents)
+  - [`constructor(value, replacer?, options?)`](#creating-documents)
   - [`defaults`](#options)
-  - [`#createNode(value, options): Node`](#creating-nodes)
+  - [`#createNode(value, options?): Node`](#creating-nodes)
   - [`#anchors`](#working-with-anchors)
   - [`#contents`](#content-nodes)
   - [`#errors`](#errors)
-- [`YAML.parseAllDocuments(str, options): YAML.Document[]`](#parsing-documents)
-- [`YAML.parseDocument(str, options): YAML.Document`](#parsing-documents)
+- [`YAML.parseAllDocuments(str, options?): YAML.Document[]`](#parsing-documents)
+- [`YAML.parseDocument(str, options?): YAML.Document`](#parsing-documents)
 
 ```js
 import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'

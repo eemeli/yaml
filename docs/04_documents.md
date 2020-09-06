@@ -61,9 +61,9 @@ The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq
 
 ## Creating Documents
 
-#### `new YAML.Document(value, options = {})`
+#### `new YAML.Document(value, replacer?, options = {})`
 
-Creates a new document. If `value` is defined, the document `contents` are initialised with that value, wrapped recursively in appropriate [content nodes](#content-nodes). If `value` is `undefined`, the document's `contents` and `schema` are initialised as `null`. See [Options](#options) for more information on the second parameter.
+Creates a new document. If `value` is defined, the document `contents` are initialised with that value, wrapped recursively in appropriate [content nodes](#content-nodes). If `value` is `undefined`, the document's `contents` and `schema` are initialised as `null`. If defined, a `replacer` may filter or modify the initial document contents, following the same algorithm as the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter). See [Options](#options) for more information on the last argument.
 
 | Member              | Type                                | Description                                                                                                                                                              |
 | ------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -106,7 +106,8 @@ During stringification, a document with a true-ish `version` value will include 
 | parse(cst)                                 | `Document` | Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed `cst`. Calling this multiple times on a Document is not recommended. |
 | setSchema(id?, customTags?)                | `void`     | Set the schema used by the document. `id` may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, `customTags` should have the same shape as the similarly-named option. |
 | setTagPrefix(handle, prefix)               | `void`     | Set `handle` as a shorthand string for the `prefix` tag namespace.                                                                                                                             |
-| toJSON()                                   | `any`      | A plain JavaScript representation of the document `contents`.                                                                                                                                  |
+| toJS(options?)                             | `any`      | A plain JavaScript representation of the document `contents`.                                                                                                                                  |
+| toJSON()                                   | `any`      | A JSON representation of the document `contents`.                                                                                                                                              |
 | toString()                                 | `string`   | A YAML representation of the document.                                                                                                                                                         |
 
 ```js
@@ -123,14 +124,15 @@ In addition to the above, the document object also provides the same **accessor 
 
 To define a tag prefix to use when stringifying, use **`setTagPrefix(handle, prefix)`** rather than setting a value directly in `tagPrefixes`. This will guarantee that the `handle` is valid (by throwing an error), and will overwrite any previous definition for the `handle`. Use an empty `prefix` value to remove a prefix.
 
+#### `Document#toJS()`, `Document#toJSON()` and `Document#toString()`
+
 ```js
 const src = '1969-07-21T02:56:15Z'
 const doc = YAML.parseDocument(src, { customTags: ['timestamp'] })
 
-doc.toJSON()
+doc.toJS()
 // Date { 1969-07-21T02:56:15.000Z }
 
-doc.options.keepBlobsInJSON = false
 doc.toJSON()
 // '1969-07-21T02:56:15.000Z'
 
@@ -138,7 +140,9 @@ String(doc)
 // '1969-07-21T02:56:15\n'
 ```
 
-For a plain JavaScript representation of the document, **`toJSON()`** is your friend. By default the values wrapped in scalar nodes will not be forced to JSON, so e.g. a `!!timestamp` will remain a `Date` in the output. To change this behaviour and enforce JSON values only, set the [`keepBlobsInJSON` option](#options) to `false`.
+For a plain JavaScript representation of the document, **`toJS()`** is your friend. Its output may include `Map` and `Set` collections (e.g. if the `mapAsMap` option is true) and complex scalar values like `Date` for `!!timestamp`, but all YAML nodes will be resolved. For a representation consisting only of JSON values, use **`toJSON()`**.
+
+Use `toJS({ mapAsMap, onAnchor, reviver })` to explicitly set the `mapAsMap` option, define an `onAnchor` callback `(value: any, count: number) => void` for each aliased anchor in the document, or to apply a [reviver function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter) to the output.
 
 Conversely, to stringify a document as YAML, use **`toString()`**. This will also be called by `String(doc)`. This method will throw if the `errors` array is not empty.
 
@@ -174,7 +178,7 @@ String(doc)
 const alias = doc.anchors.createAlias(doc.get(0, true), 'AA')
 // Alias { source: YAMLMap { items: [ [Pair] ] } }
 doc.add(alias)
-doc.toJSON()
+doc.toJS()
 // [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]
 String(doc)
 // [ &AA { a: A }, { b: &a2 B }, *AA ]
@@ -184,14 +188,14 @@ const merge = doc.anchors.createMergePair(alias)
 //   key: Scalar { value: '<<' },
 //   value: YAMLSeq { items: [ [Alias] ] } }
 doc.addIn([1], merge)
-doc.toJSON()
+doc.toJS()
 // [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]
 String(doc)
 // [ &AA { a: A }, { b: &a2 B, <<: *AA }, *AA ]
 
 // This creates a circular reference
 merge.value.add(doc.anchors.createAlias(doc.get(1, true)))
-doc.toJSON() // [RangeError: Maximum call stack size exceeded]
+doc.toJS() // [RangeError: Maximum call stack size exceeded]
 String(doc)
 // [
 //   &AA { a: A },

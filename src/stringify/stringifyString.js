@@ -286,8 +286,9 @@ export function stringifyString(item, ctx, onComment, onChompKeep) {
     item = Object.assign({}, item, { value })
   }
   if (type !== Type.QUOTE_DOUBLE) {
-    // force double quotes on control characters
-    if (/[\x00-\x08\x0b-\x1f\x7f-\x9f]/.test(value)) type = Type.QUOTE_DOUBLE
+    // force double quotes on control characters & unpaired surrogates
+    if (/[\x00-\x08\x0b-\x1f\x7f-\x9f\u{D800}-\u{DFFF}]/u.test(value))
+      type = Type.QUOTE_DOUBLE
   }
 
   const _stringify = _type => {

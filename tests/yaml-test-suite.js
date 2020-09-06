@@ -10,7 +10,7 @@ const testDirs = fs
 
 const matchJson = (docs, json) => {
   if (!json) return
-  const received = docs[0] ? docs.map(doc => doc.toJSON()) : null
+  const received = docs[0] ? docs.map(doc => doc.toJS()) : null
   const expected =
     docs.length > 1
       ? json
@@ -103,9 +103,9 @@ testDirs.forEach(dir => {
       if (outYaml) {
         test('out.yaml', () => {
           const resDocs = YAML.parseAllDocuments(yaml, { mapAsMap: true })
-          const resJson = resDocs.map(doc => doc.toJSON())
+          const resJson = resDocs.map(doc => doc.toJS())
           const expDocs = YAML.parseAllDocuments(outYaml, { mapAsMap: true })
-          const expJson = expDocs.map(doc => doc.toJSON())
+          const expJson = expDocs.map(doc => doc.toJS())
           expect(resJson).toMatchObject(expJson)
         })
       }

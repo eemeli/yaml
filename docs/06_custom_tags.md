@@ -132,7 +132,7 @@ import {
   parseSeq, // (doc, cstNode) => new YAMLSeq
   stringifyNumber, // (node) => string
   stringifyString, // (node, ctx, ...) => string
-  toJSON, // (value, arg, ctx) => any -- Recursively convert to plain JS
+  toJS, // (value, arg, ctx) => any -- Recursively convert to plain JS
   Type, // { [string]: string } -- Used as enum for node types
   YAMLReferenceError, YAMLSemanticError, YAMLSyntaxError, YAMLWarning
 } from 'yaml/util'
