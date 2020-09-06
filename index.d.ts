@@ -143,7 +143,7 @@ export namespace scalarOptions {
      *
      * Default: `false`
      */
-    asBigInt: false
+    asBigInt: boolean
   }
 
   interface Null {
