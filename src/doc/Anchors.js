@@ -9,7 +9,7 @@ export class Anchors {
     )
   }
 
-  map = {}
+  map = Object.create(null)
 
   constructor(prefix) {
     this.prefix = prefix

@@ -82,6 +82,28 @@ describe('create', () => {
   })
 })
 
+describe('__proto__ as anchor name', () => {
+  test('parse', () => {
+    const src = `- &__proto__ 1\n- *__proto__\n`
+    const doc = YAML.parseDocument(src)
+    expect(doc.errors).toHaveLength(0)
+    const { items } = doc.contents
+    expect(items).toMatchObject([{ value: 1 }, { source: { value: 1 } }])
+    expect(items[1].source).toBe(items[0])
+    expect(String(doc)).toBe(src)
+  })
+
+  test('create/stringify', () => {
+    const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+    const alias = doc.anchors.createAlias(doc.contents.items[0], '__proto__')
+    doc.contents.items.push(alias)
+    expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
+    expect(String(doc)).toMatch(
+      '[ &__proto__ { a: A }, { b: B }, *__proto__ ]\n'
+    )
+  })
+})
+
 describe('merge <<', () => {
   const src = `---
 - &CENTER { x: 1, y: 2 }
@@ -203,10 +225,7 @@ y:
   <<: [ *a, *b ]`
 
     const expObj = {
-      x: [
-        { k0: 'v1', k1: 'v1' },
-        { k1: 'v2', k2: 'v2' }
-      ],
+      x: [{ k0: 'v1', k1: 'v1' }, { k1: 'v2', k2: 'v2' }],
       y: { k0: 'v0', k1: 'v1', k2: 'v2' }
     }
 
@@ -214,24 +233,11 @@ y:
       [
         'x',
         [
-          new Map([
-            ['k0', 'v1'],
-            ['k1', 'v1']
-          ]),
-          new Map([
-            ['k1', 'v2'],
-            ['k2', 'v2']
-          ])
+          new Map([['k0', 'v1'], ['k1', 'v1']]),
+          new Map([['k1', 'v2'], ['k2', 'v2']])
         ]
       ],
-      [
-        'y',
-        new Map([
-          ['k0', 'v0'],
-          ['k1', 'v1'],
-          ['k2', 'v2']
-        ])
-      ]
+      ['y', new Map([['k0', 'v0'], ['k1', 'v1'], ['k2', 'v2']])]
     ])
 
     test('multiple merge keys, masAsMap: false', () => {
