@@ -489,4 +489,11 @@ describe('Document', () => {
     doc.contents = YAML.createNode('s')
     expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
   })
+
+  test('setIn with __proto__ as key', () => {
+    doc.setIn(['c', '__proto__'], 9)
+    expect(String(doc)).toBe(
+      'a: 1\nb:\n  - 2\n  - 3\nc:\n  __proto__: 9\n'
+    )
+  })
 })

@@ -11,7 +11,7 @@ const stringifyKey = (key, jsKey, ctx) => {
   if (typeof jsKey !== 'object') return String(jsKey)
   if (key instanceof Node && ctx && ctx.doc)
     return key.toString({
-      anchors: {},
+      anchors: Object.create(null),
       doc: ctx.doc,
       indent: '',
       indentStep: ctx.indentStep,
@@ -58,7 +58,15 @@ export class Pair extends Node {
       map.add(key)
     } else {
       const stringKey = stringifyKey(this.key, key, ctx)
-      map[stringKey] = toJSON(this.value, stringKey, ctx)
+      const value = toJSON(this.value, stringKey, ctx)
+      if (stringKey in map)
+        Object.defineProperty(map, stringKey, {
+          value,
+          writable: true,
+          enumerable: true,
+          configurable: true
+        })
+      else map[stringKey] = value
     }
     return map
   }

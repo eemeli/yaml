@@ -7,9 +7,20 @@ function collectionFromPath(schema, path, value) {
   let v = value
   for (let i = path.length - 1; i >= 0; --i) {
     const k = path[i]
-    const o = Number.isInteger(k) && k >= 0 ? [] : {}
-    o[k] = v
-    v = o
+    if (Number.isInteger(k) && k >= 0) {
+      const a = []
+      a[k] = v
+      v = a
+    } else {
+      const o = {}
+      Object.defineProperty(o, k, {
+        value: v,
+        writable: true,
+        enumerable: true,
+        configurable: true
+      })
+      v = o
+    }
   }
   return schema.createNode(v, false)
 }

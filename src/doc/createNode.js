@@ -41,7 +41,7 @@ export function createNode(value, tagName, ctx) {
 
   // Detect duplicate references to the same object & use Alias nodes for all
   // after first. The `obj` wrapper allows for circular references to resolve.
-  const obj = {}
+  const obj = { value: undefined, node: undefined }
   if (value && typeof value === 'object' && prevObjects) {
     const prev = prevObjects.get(value)
     if (prev) {
