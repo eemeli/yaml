@@ -100,8 +100,11 @@ describe('json schema', () => {
     })
     expect(doc.errors).toHaveLength(2)
     doc.errors = []
-    expect(String(doc)).toBe(
-      '"empty": null\n"canonical": null\n"english": null\n? null\n: "null key"\n'
+    expect(String(doc)).toBe(`"empty": null
+"canonical": null
+"english": null
+? null
+: "null key"\n`
     )
   })
 })
@@ -178,9 +181,9 @@ english: null
       '': 'null key'
     })
     expect(String(doc)).toBe(`empty: null
-canonical: null
+canonical: ~
 english: null
-null: null key\n`)
+~: null key\n`)
   })
 
   describe('!!map', () => {
@@ -371,9 +374,9 @@ english: null
     expect(String(doc)).toBe(`%YAML 1.1
 ---
 empty: null
-canonical: null
+canonical: ~
 english: null
-null: null key\n`)
+~: null key\n`)
   })
 
   describe('!!timestamp', () => {
