@@ -20,7 +20,7 @@ for (const [name, version] of [
     })
 
     test('undefined', () => {
-      expect(YAML.stringify()).toBe('\n')
+      expect(YAML.stringify()).toBeUndefined()
     })
 
     test('null', () => {
@@ -786,7 +786,7 @@ describe('Document markers in top-level scalars', () => {
 
 describe('undefined values', () => {
   test('undefined', () => {
-    expect(YAML.stringify(undefined)).toBe('\n')
+    expect(YAML.stringify(undefined)).toBeUndefined()
   })
 
   test('[1, undefined, 2]', () => {
@@ -817,6 +817,21 @@ describe('undefined values', () => {
       ['c', 'C']
     ])
     expect(YAML.stringify(map)).toBe('a: A\nc: C\n')
+  })
+
+  describe('keepUndefined: true', () => {
+    test('undefined', () => {
+      expect(YAML.stringify(undefined, { keepUndefined: true })).toBe('null\n')
+    })
+
+    test("{ a: 'A', b: undefined, c: 'C' }", () => {
+      expect(
+        YAML.stringify(
+          { a: 'A', b: undefined, c: 'C' },
+          { keepUndefined: true }
+        )
+      ).toBe('a: A\nb: null\nc: C\n')
+    })
   })
 })
 

@@ -14,6 +14,7 @@ export const defaultOptions = {
   indentSeq: true,
   keepCstNodes: false,
   keepNodeTypes: true,
+  keepUndefined: false,
   mapAsMap: false,
   maxAliasCount: 100,
   prettyErrors: true,

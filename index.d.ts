@@ -60,6 +60,13 @@ export interface Options extends Schema.Options {
    */
   keepNodeTypes?: boolean
   /**
+   * Keep `undefined` object values when creating mappings and return a Scalar
+   * node when calling `YAML.stringify(undefined)`, rather than `undefined`.
+   *
+   * Default: `false`
+   */
+  keepUndefined?: boolean
+  /**
    * When outputting JS, use Map rather than Object to represent mappings.
    *
    * Default: `false`

@@ -140,6 +140,21 @@ describe('objects', () => {
     expect(s.items[0]).toBeInstanceOf(Pair)
     expect(s.items[0]).toMatchObject({ key: 'x', value: true })
   })
+  test('createNode({ x: true, y: undefined })', () => {
+    const s = doc.createNode({ x: true, y: undefined })
+    expect(s).toBeInstanceOf(YAMLMap)
+    expect(s.items).toMatchObject([
+      { type: Pair.Type.PAIR, key: { value: 'x' }, value: { value: true } }
+    ])
+  })
+  test('createNode({ x: true, y: undefined }, { keepUndefined: true })', () => {
+    const s = doc.createNode({ x: true, y: undefined }, { keepUndefined: true })
+    expect(s).toBeInstanceOf(YAMLMap)
+    expect(s.items).toMatchObject([
+      { type: Pair.Type.PAIR, key: { value: 'x' }, value: { value: true } },
+      { type: Pair.Type.PAIR, key: { value: 'y' }, value: { value: null } }
+    ])
+  })
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {
     const object = { x: 3, y: [4], z: { w: 'five', v: 6 } }
     test('createNode(value, { wrapScalars: false })', () => {
