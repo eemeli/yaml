@@ -23,14 +23,10 @@ export const nullObj = {
     ctx.wrapScalars ? new Scalar(null) : null,
   default: true,
   tag: 'tag:yaml.org,2002:null',
-  sourceStr: null,
   test: /^(?:~|[Nn]ull|NULL)?$/,
-  customTest: str => {
-    return str === nullOptions.nullStr ? [str] : null
-  },
   resolve: str => {
     const node = new Scalar(null)
-    if(str) node.sourceStr = str
+    node.sourceStr = str
     return node
   },
   options: nullOptions,
