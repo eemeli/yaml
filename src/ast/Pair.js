@@ -96,6 +96,10 @@ export class Pair extends Node {
         const msg = 'With simple keys, collection cannot be used as a key value'
         throw new Error(msg)
       }
+      if (key instanceof Scalar && key.value?.length > 1024) {
+        const msg = 'With simple keys, single line scalar must not span more than 1024 characters'
+        throw new Error(msg)
+      }
     }
     const explicitKey =
       !simpleKeys &&
@@ -103,7 +107,8 @@ export class Pair extends Node {
         keyComment ||
         key instanceof Collection ||
         key.type === Type.BLOCK_FOLDED ||
-        key.type === Type.BLOCK_LITERAL)
+        key.type === Type.BLOCK_LITERAL ||
+        (key instanceof Scalar && key.value?.length > 1024))
     const { allNullValues, doc, indent, indentStep, stringify } = ctx
     ctx = Object.assign({}, ctx, {
       implicitKey: !explicitKey && (simpleKeys || !allNullValues),

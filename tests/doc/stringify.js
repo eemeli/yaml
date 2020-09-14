@@ -479,6 +479,18 @@ describe('simple keys', () => {
       /With simple keys, collection cannot be used as a key value/
     )
   })
+
+  test('key value lingth > 1024', () => {
+    let str = `
+    ? ${new Array(1026).join('a')}
+    : longkey`
+    const doc = YAML.parseDocument(str)
+    expect(String(doc)).toBe(`? ${new Array(1026).join('a')}\n: longkey\n`)
+    doc.options.simpleKeys = true
+    expect(() => String(doc)).toThrow(
+      /With simple keys, single line scalar must not span more than 1024 characters/
+    )
+  })
 })
 
 test('eemeli/yaml#128: YAML node inside object', () => {
