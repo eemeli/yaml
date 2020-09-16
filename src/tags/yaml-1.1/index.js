@@ -55,9 +55,13 @@ export const yaml11 = failsafe.concat(
       default: true,
       tag: 'tag:yaml.org,2002:null',
       test: /^(?:~|[Nn]ull|NULL)?$/,
-      resolve: () => null,
+      resolve: str => {
+        const node = new Scalar(null)
+        node.sourceStr = str
+        return node
+      },
       options: nullOptions,
-      stringify: () => nullOptions.nullStr
+      stringify: ({ sourceStr }) => sourceStr ?? nullOptions.nullStr
     },
     {
       identify: value => typeof value === 'boolean',

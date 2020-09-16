@@ -445,12 +445,19 @@ test('eemeli/yaml#87', () => {
   expect(String(doc)).toBe('test:\n  a: test\n')
 })
 
+describe('scalar styles', () => {
+    test('null Scalar styles', () => {
+        const doc = YAML.parseDocument('[ null, Null, NULL, ~ ]')
+        expect(String(doc)).toBe('[ null, Null, NULL, ~ ]\n')
+    })
+})
+
 describe('simple keys', () => {
   test('key with null value', () => {
     const doc = YAML.parseDocument('~: ~')
-    expect(String(doc)).toBe('? null\n')
+    expect(String(doc)).toBe('? ~\n')
     doc.options.simpleKeys = true
-    expect(String(doc)).toBe('null: null\n')
+    expect(String(doc)).toBe('~: ~\n')
   })
 
   test('key with block scalar value', () => {
