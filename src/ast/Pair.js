@@ -90,7 +90,7 @@ export class Pair extends Node {
         throw new Error(msg)
       }
     }
-    const explicitKey =
+    let explicitKey =
       !simpleKeys &&
       (!key ||
         keyComment ||
@@ -116,6 +116,14 @@ export class Pair extends Node {
         if (onComment) onComment()
       } else if (chompKeep && !keyComment && onChompKeep) onChompKeep()
       return ctx.inFlow ? str : `? ${str}`
+    }
+    if (!explicitKey && str.length > 1024) {
+      if (!simpleKeys) {
+        explicitKey = true
+      } else {
+        const msg = 'With simple keys, single line scalar must not span more than 1024 characters'
+        throw new Error(msg)
+      }
     }
     str = explicitKey ? `? ${str}\n${indent}:` : `${str}:`
     if (this.comment) {
