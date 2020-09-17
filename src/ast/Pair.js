@@ -96,19 +96,14 @@ export class Pair extends Node {
         const msg = 'With simple keys, collection cannot be used as a key value'
         throw new Error(msg)
       }
-      if (key instanceof Scalar && key.value?.length > 1024) {
-        const msg = 'With simple keys, single line scalar must not span more than 1024 characters'
-        throw new Error(msg)
-      }
     }
-    const explicitKey =
+    let explicitKey =
       !simpleKeys &&
       (!key ||
         keyComment ||
         key instanceof Collection ||
         key.type === Type.BLOCK_FOLDED ||
-        key.type === Type.BLOCK_LITERAL ||
-        (key instanceof Scalar && key.value?.length > 1024))
+        key.type === Type.BLOCK_LITERAL)
     const { allNullValues, doc, indent, indentStep, stringify } = ctx
     ctx = Object.assign({}, ctx, {
       implicitKey: !explicitKey && (simpleKeys || !allNullValues),
@@ -128,6 +123,14 @@ export class Pair extends Node {
         if (onComment) onComment()
       } else if (chompKeep && !keyComment && onChompKeep) onChompKeep()
       return ctx.inFlow ? str : `? ${str}`
+    }
+    if (!explicitKey && str.length > 1024) {
+      if (!simpleKeys) {
+        explicitKey = true
+      } else {
+        const msg = 'With simple keys, single line scalar must not span more than 1024 characters'
+        throw new Error(msg)
+      }
     }
     str = explicitKey ? `? ${str}\n${indent}:` : `${str}:`
     if (this.comment) {
