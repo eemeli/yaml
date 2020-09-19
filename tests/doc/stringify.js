@@ -988,3 +988,10 @@ describe('YAML.stringify options as scalar', () => {
     )
   })
 })
+
+describe('YAML.stringify on ast Document', () => {
+  test('null document', () => {
+    const doc = YAML.parseDocument('null')
+    expect(YAML.stringify(doc)).toBe('null\n')
+  })
+})
