@@ -689,3 +689,10 @@ describe('Document markers in top-level scalars', () => {
     expect(YAML.parse(str)).toBe('foo\n%bar\n')
   })
 })
+
+describe('YAML.stringify on ast Document', () => {
+  test('null document', () => {
+    const doc = YAML.parseDocument('null')
+    expect(YAML.stringify(doc)).toBe('null\n')
+  })
+})

@@ -30,7 +30,7 @@ export function createNode(value, tagName, ctx) {
   let tagObj = findTagObject(value, tagName, schema.tags)
   if (!tagObj) {
     if (typeof value.toJSON === 'function') value = value.toJSON()
-    if (typeof value !== 'object')
+    if (!value || typeof value !== 'object')
       return wrapScalars ? new Scalar(value) : value
     tagObj = value instanceof Map ? map : value[Symbol.iterator] ? seq : map
   }
