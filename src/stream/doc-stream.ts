@@ -1,0 +1,479 @@
+import { Transform, TransformOptions } from 'stream'
+import { prettyToken } from './token-stream'
+import { SourceTokenType, tokenType } from './token-type'
+
+export interface SourceToken {
+  type: SourceTokenType
+  indent: number
+  source: string
+  end?: Token[]
+}
+
+export interface ErrorToken {
+  type: 'error'
+  source: string
+  message: string
+}
+
+export interface Directive {
+  type: 'directive'
+  source: string
+  name: string
+  parameters: string[]
+}
+
+export interface Document {
+  type: 'document'
+  start: Token[]
+  value?: Token
+  end?: Token[]
+}
+
+export interface BlockScalar {
+  type: 'block-scalar'
+  indent: number
+  props: Token[]
+  source?: string
+}
+
+export interface BlockMap {
+  type: 'block-map'
+  indent: number
+  items: Array<
+    | { start: Token[]; key?: never; sep?: never; value?: never }
+    | { start: Token[]; key: Token | null; sep: Token[]; value?: Token }
+  >
+}
+
+export interface BlockSequence {
+  type: 'block-seq'
+  indent: number
+  items: Array<{ start: Token[]; value?: Token }>
+}
+
+export interface FlowCollection {
+  type: 'flow-collection'
+  indent: number
+  start: Token
+  items: Token[]
+  end?: Token
+}
+
+export type Token =
+  | SourceToken
+  | ErrorToken
+  | Directive
+  | Document
+  | BlockScalar
+  | BlockMap
+  | BlockSequence
+  | FlowCollection
+
+export type DocStreamOptions = Omit<
+  TransformOptions,
+  'decodeStrings' | 'emitClose' | 'objectMode'
+>
+
+export class DocStream extends Transform {
+  /** If true, space and sequence indicators count as indentation */
+  atNewLine = true
+
+  /** If true, next token is a scalar value */
+  atScalar = false
+
+  /** Current indentation level */
+  indent = 0
+
+  /** Top indicates the bode that's currently being built */
+  stack: Token[] = []
+
+  /** The source of the current chunk/token, set in _transform() */
+  source = ''
+
+  /** The type of the current chunk/token, set in _transform() */
+  type = '' as SourceTokenType
+
+  constructor(options: DocStreamOptions = {}) {
+    super({
+      ...options,
+      decodeStrings: false,
+      emitClose: true,
+      objectMode: true
+    })
+  }
+
+  _flush(done: (error?: Error) => void) {
+    while (this.stack.length > 0) this.pop()
+    done()
+  }
+
+  _transform(source: string, _: any, done: (error?: Error) => void) {
+    this.source = source
+    console.log('>', prettyToken(source))
+    try {
+      if (this.atScalar) {
+        this.atScalar = false
+        this.handleToken()
+        return done()
+      }
+      const type = tokenType(source)
+      if (!type) throw new Error(`Not a YAML token: ${source}`)
+      if (type === 'scalar') {
+        this.atNewLine = false
+        this.atScalar = true
+        this.type = 'scalar'
+        return done()
+      }
+
+      this.type = type
+      this.handleToken()
+      switch (type) {
+        case 'newline':
+          this.atNewLine = true
+          this.indent = 0
+          break
+        case 'space':
+        case 'seq-item-ind':
+          if (this.atNewLine) this.indent += source.length
+          break
+        case 'doc-mode':
+          break
+        default:
+          this.atNewLine = false
+      }
+      done()
+    } catch (error) {
+      done(error)
+    }
+  }
+
+  get sourceToken() {
+    return {
+      type: this.type,
+      indent: this.indent,
+      source: this.source
+    } as SourceToken
+  }
+
+  handleToken() {
+    const top = this.peek()
+    if (!top) return this.stream()
+    switch (top.type) {
+      case 'document':
+        return this.document(top)
+      case 'alias':
+      case 'scalar':
+      case 'single-quoted-scalar':
+      case 'double-quoted-scalar':
+        return this.scalar(top)
+      case 'block-scalar':
+        return this.blockScalar(top)
+      case 'block-map':
+        return this.blockMap(top)
+      case 'block-seq':
+        return this.blockSequence(top)
+      case 'flow-collection':
+        return this.flowCollection(top)
+      default:
+        throw new Error(`Unexpected ${top.type} token in stack`)
+    }
+  }
+
+  peek() {
+    return this.stack[this.stack.length - 1]
+  }
+
+  pop() {
+    const token = this.stack.pop()
+    if (!token) throw new Error('Tried to pop an empty stack')
+    if (this.stack.length === 0) this.push(token)
+    else {
+      const top = this.peek()
+      switch (top.type) {
+        case 'document':
+          top.value = token
+          break
+        case 'block-map': {
+          const it = top.items[top.items.length - 1]
+          if (it.value) top.items.push({ start: [], key: token, sep: [] })
+          else if (it.sep) it.value = token
+          else Object.assign(it, { key: token, sep: [] })
+          break
+        }
+        case 'block-seq':
+          top.items[top.items.length - 1].value = token
+          break
+        case 'flow-collection':
+          top.items.push(token)
+          break
+        default:
+          throw new Error(`Unexpected ${top.type} top token when popping stack`)
+      }
+    }
+  }
+
+  stream() {
+    switch (this.type) {
+      case 'directive-line': {
+        const parts = this.source.split(/ +/)
+        const name = parts.shift()
+        this.push({
+          type: 'directive',
+          name,
+          parameters: parts,
+          source: this.source
+        })
+        return
+      }
+      case 'doc-end':
+      case 'space':
+      case 'comment':
+      case 'newline':
+        this.push(this.sourceToken)
+        return
+      case 'doc-mode':
+      case 'doc-start': {
+        const doc: Document = { type: 'document', start: [] }
+        if (this.type === 'doc-start') doc.start.push(this.sourceToken)
+        this.stack.push(doc)
+        return
+      }
+    }
+    const message = `Unexpected ${this.type} token in YAML stream`
+    this.push({ type: 'error', message, source: this.source })
+  }
+
+  document(doc: Document) {
+    if (doc.value) return this.lineEnd(doc)
+    switch (this.type) {
+      case 'doc-start':
+      case 'anchor':
+      case 'tag':
+      case 'space':
+      case 'comment':
+      case 'newline':
+        doc.start.push(this.sourceToken)
+        return
+      case 'doc-end':
+        doc.start.push(this.sourceToken)
+        this.pop()
+        return
+    }
+    const bv = this.startBlockValue()
+    if (bv) this.stack.push(bv)
+    else {
+      const message = `Unexpected ${this.type} token in YAML document`
+      this.push({ type: 'error', message, source: this.source })
+    }
+  }
+
+  scalar(scalar: SourceToken) {
+    if (this.type === 'map-value-ind') {
+      let sep: Token[]
+      if (scalar.end) {
+        sep = scalar.end
+        sep.push(this.sourceToken)
+        delete scalar.end
+      } else sep = [this.sourceToken]
+      const map: BlockMap = {
+        type: 'block-map',
+        indent: scalar.indent,
+        items: [{ start: [], key: scalar, sep }]
+      }
+      this.stack[this.stack.length - 1] = map
+    } else this.lineEnd(scalar)
+  }
+
+  blockScalar(scalar: BlockScalar) {
+    switch (this.type) {
+      case 'space':
+      case 'comment':
+      case 'newline':
+        scalar.props.push(this.sourceToken)
+        return
+      case 'scalar':
+        scalar.source = this.source
+        // block-scalar source includes trailing newline
+        this.atNewLine = true
+        this.indent = 0
+        this.pop()
+        break
+      default:
+        this.pop()
+        this.handleToken()
+    }
+  }
+
+  blockMap(map: BlockMap) {
+    const it = map.items[map.items.length - 1]
+    switch (this.type) {
+      case 'space':
+      case 'comment':
+      case 'newline':
+        if (it.value) map.items.push({ start: [this.sourceToken] })
+        else if (it.sep) it.sep.push(this.sourceToken)
+        else it.start.push(this.sourceToken)
+        return
+    }
+    if (this.indent >= map.indent) {
+      switch (this.type) {
+        case 'anchor':
+        case 'tag':
+          if (it.value) map.items.push({ start: [this.sourceToken] })
+          else if (it.sep) it.sep.push(this.sourceToken)
+          else it.start.push(this.sourceToken)
+          return
+
+        case 'explicit-key-ind':
+          if (!it.sep) it.start.push(this.sourceToken)
+          else if (it.value || this.indent === map.indent)
+            map.items.push({ start: [this.sourceToken] })
+          else this.stack.push(this.startBlockValue() as BlockMap)
+          return
+
+        case 'map-value-ind':
+          if (!it.sep) Object.assign(it, { key: null, sep: [this.sourceToken] })
+          else if (it.value)
+            map.items.push({ start: [], key: null, sep: [this.sourceToken] })
+          else if (it.sep.some(tok => tok.type === 'map-value-ind'))
+            this.stack.push(this.startBlockValue() as BlockMap)
+          else it.sep.push(this.sourceToken)
+          return
+
+        case 'alias':
+        case 'scalar':
+        case 'single-quoted-scalar':
+        case 'double-quoted-scalar':
+          if (!it.sep) {
+            Object.assign(it, { key: this.sourceToken, sep: [] })
+            return
+          }
+        // fallthrough
+
+        default: {
+          const bv = this.startBlockValue()
+          if (bv) return this.stack.push(bv)
+        }
+      }
+    }
+    this.pop()
+    this.handleToken()
+  }
+
+  blockSequence(seq: BlockSequence) {
+    const it = seq.items[seq.items.length - 1]
+    switch (this.type) {
+      case 'space':
+      case 'comment':
+      case 'newline':
+        if (it.value) seq.items.push({ start: [this.sourceToken] })
+        else it.start.push(this.sourceToken)
+        return
+      case 'anchor':
+      case 'tag':
+        if (it.value || this.indent <= seq.indent) break
+        it.start.push(this.sourceToken)
+        return
+      case 'seq-item-ind':
+        if (this.indent !== seq.indent) break
+        if (it.value) seq.items.push({ start: [this.sourceToken] })
+        else it.start.push(this.sourceToken)
+        return
+    }
+    if (this.indent > seq.indent) {
+      const bv = this.startBlockValue()
+      if (bv) return this.stack.push(bv)
+    }
+    this.pop()
+    this.handleToken()
+  }
+
+  flowCollection(fc: FlowCollection) {
+    switch (this.type) {
+      case 'space':
+      case 'comment':
+      case 'newline':
+      case 'comma':
+      case 'explicit-key-ind':
+      case 'map-value-ind':
+      case 'anchor':
+      case 'tag':
+      case 'alias':
+      case 'scalar':
+      case 'single-quoted-scalar':
+      case 'double-quoted-scalar':
+        fc.items.push(this.sourceToken)
+        return
+
+      case 'flow-map-end':
+      case 'flow-seq-end':
+        fc.end = this.sourceToken
+        this.pop()
+        return
+    }
+    const bv = this.startBlockValue()
+    if (bv) return this.stack.push(bv)
+    this.pop()
+    this.handleToken()
+  }
+
+  startBlockValue() {
+    const st = this.sourceToken
+    switch (this.type) {
+      case 'alias':
+      case 'scalar':
+      case 'single-quoted-scalar':
+      case 'double-quoted-scalar':
+        return st
+      case 'block-scalar-header':
+        return {
+          type: 'block-scalar',
+          indent: this.indent,
+          props: [st]
+        } as BlockScalar
+      case 'flow-map-start':
+      case 'flow-seq-start':
+        return {
+          type: 'flow-collection',
+          indent: this.indent,
+          start: st,
+          items: []
+        } as FlowCollection
+      case 'seq-item-ind':
+        return {
+          type: 'block-seq',
+          indent: this.indent,
+          items: [{ start: [st] }]
+        } as BlockSequence
+      case 'explicit-key-ind':
+        return {
+          type: 'block-map',
+          indent: this.indent,
+          items: [{ start: [st] }]
+        } as BlockMap
+      case 'map-value-ind':
+        return {
+          type: 'block-map',
+          indent: this.indent,
+          items: [{ start: [], key: null, sep: [st] }]
+        } as BlockMap
+    }
+    return null
+  }
+
+  lineEnd(token: SourceToken | Document) {
+    switch (this.type) {
+      case 'space':
+      case 'comment':
+      case 'newline':
+        if (token.end) token.end.push(this.sourceToken)
+        else token.end = [this.sourceToken]
+        if (this.type === 'newline') this.pop()
+        return
+      default:
+        this.pop()
+        this.handleToken()
+        return
+    }
+  }
+}
