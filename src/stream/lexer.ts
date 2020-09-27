@@ -258,7 +258,10 @@ export class Lexer {
     if (this.indentMore.length > 2) {
       let last = this.indentMore.length - 1
       while (this.indentMore[last] === ' ') last -= 1
-      if (last > 0) this.indent += last
+      if (last > 0) {
+        this.indent += last
+        this.indentMore = this.indentMore.slice(last)
+      }
     }
     return 'doc'
   }
@@ -435,7 +438,10 @@ export class Lexer {
       case '?': // this is an error outside flow collections
       case '-': // this is an error
         if (isEmpty(this.charAt(1))) {
-          this.indentMore += '  '
+          if (this.indentMore) {
+            this.indent += this.indentMore.length
+            this.indentMore = ''
+          }
           return this.pushCount(1) + this.pushSpaces() + this.pushIndicators()
         }
     }
