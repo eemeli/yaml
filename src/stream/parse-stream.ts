@@ -33,7 +33,7 @@ export class ParseStream extends Transform {
       this.parser.parse(src, true)
       done()
     } catch (error) {
-      done(error)
+      done(error) // should never happen
     }
   }
 }

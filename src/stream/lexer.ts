@@ -184,8 +184,6 @@ export class Lexer {
         return this.parseBlockScalar()
       case 'plain-scalar':
         return this.parsePlainScalar()
-      default:
-        throw new Error(`Unknown state ${next}`)
     }
   }
 

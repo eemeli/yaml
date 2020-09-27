@@ -90,10 +90,10 @@ export class Parser {
   /** The type of the current token, set in parse() */
   type = '' as SourceTokenType
 
-/**
- * @param push - Called separately with each parsed token
- * @public
- */
+  /**
+   * @param push - Called separately with each parsed token
+   * @public
+   */
   constructor(push: (token: Token) => void) {
     this.push = push
   }
@@ -103,8 +103,7 @@ export class Parser {
    * directive, document and other structure is completely parsed. If `incomplete`,
    * a part of the last line may be left as a buffer for the next call.
    *
-   * May throw on really unexpected errors.
-   *
+   * Errors are not thrown, but pushed out as `{ type: 'error', message }` tokens.
    * @public
    */
   parse(source: string, incomplete = false) {
@@ -123,29 +122,30 @@ export class Parser {
       return
     }
     const type = tokenType(source)
-    if (!type) throw new Error(`Not a YAML token: ${source}`)
-    if (type === 'scalar') {
+    if (!type) {
+      const message = `Not a YAML token: ${source}`
+      this.pop({ type: 'error', source, message })
+    } else if (type === 'scalar') {
       this.atNewLine = false
       this.atScalar = true
       this.type = 'scalar'
-      return
-    }
-
-    this.type = type
-    this.step()
-    switch (type) {
-      case 'newline':
-        this.atNewLine = true
-        this.indent = 0
-        break
-      case 'space':
-      case 'seq-item-ind':
-        if (this.atNewLine) this.indent += source.length
-        break
-      case 'doc-mode':
-        break
-      default:
-        this.atNewLine = false
+    } else {
+      this.type = type
+      this.step()
+      switch (type) {
+        case 'newline':
+          this.atNewLine = true
+          this.indent = 0
+          break
+        case 'space':
+        case 'seq-item-ind':
+          if (this.atNewLine) this.indent += source.length
+          break
+        case 'doc-mode':
+          break
+        default:
+          this.atNewLine = false
+      }
     }
   }
 
@@ -176,24 +176,29 @@ export class Parser {
         return this.blockSequence(top)
       case 'flow-collection':
         return this.flowCollection(top)
-      default:
-        throw new Error(`Unexpected ${top.type} token in stack`)
     }
+    this.pop() // error
   }
 
   peek() {
     return this.stack[this.stack.length - 1]
   }
 
-  pop() {
-    const token = this.stack.pop()
-    if (!token) throw new Error('Tried to pop an empty stack')
-    if (this.stack.length === 0) this.push(token)
-    else {
+  pop(error?: Token) {
+    const token = error || this.stack.pop()
+    if (!token) {
+      const message = 'Tried to pop an empty stack'
+      this.push({ type: 'error', source: '', message })
+    } else if (this.stack.length === 0) {
+      this.push(token)
+    } else {
       const top = this.peek()
       switch (top.type) {
         case 'document':
           top.value = token
+          break
+        case 'block-scalar':
+          top.props.push(token) // error
           break
         case 'block-map': {
           const it = top.items[top.items.length - 1]
@@ -202,14 +207,18 @@ export class Parser {
           else Object.assign(it, { key: token, sep: [] })
           break
         }
-        case 'block-seq':
-          top.items[top.items.length - 1].value = token
+        case 'block-seq': {
+          const it = top.items[top.items.length - 1]
+          if (it.value) top.items.push({ start: [], value: token })
+          else it.value = token
           break
+        }
         case 'flow-collection':
           top.items.push(token)
           break
         default:
-          throw new Error(`Unexpected ${top.type} top token when popping stack`)
+          this.pop()
+          this.pop(token)
       }
     }
   }
@@ -300,6 +309,7 @@ export class Parser {
 
   blockMap(map: BlockMap) {
     const it = map.items[map.items.length - 1]
+    // it.sep is true-ish if pair already has key or : separator
     switch (this.type) {
       case 'space':
       case 'comment':
@@ -322,7 +332,12 @@ export class Parser {
           if (!it.sep) it.start.push(this.sourceToken)
           else if (it.value || this.indent === map.indent)
             map.items.push({ start: [this.sourceToken] })
-          else this.stack.push(this.startBlockValue() as BlockMap)
+          else
+            this.stack.push({
+              type: 'block-map',
+              indent: this.indent,
+              items: [{ start: [this.sourceToken] }]
+            })
           return
 
         case 'map-value-ind':
@@ -330,7 +345,11 @@ export class Parser {
           else if (it.value)
             map.items.push({ start: [], key: null, sep: [this.sourceToken] })
           else if (it.sep.some(tok => tok.type === 'map-value-ind'))
-            this.stack.push(this.startBlockValue() as BlockMap)
+            this.stack.push({
+              type: 'block-map',
+              indent: this.indent,
+              items: [{ start: [], key: null, sep: [this.sourceToken] }]
+            })
           else it.sep.push(this.sourceToken)
           return
 
@@ -338,11 +357,11 @@ export class Parser {
         case 'scalar':
         case 'single-quoted-scalar':
         case 'double-quoted-scalar':
-          if (!it.sep) {
-            Object.assign(it, { key: this.sourceToken, sep: [] })
-            return
-          }
-        // fallthrough
+          if (it.value)
+            map.items.push({ start: [], key: this.sourceToken, sep: [] })
+          else if (it.sep) this.stack.push(this.sourceToken)
+          else Object.assign(it, { key: this.sourceToken, sep: [] })
+          return
 
         default: {
           const bv = this.startBlockValue()
