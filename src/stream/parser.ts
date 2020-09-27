@@ -1,6 +1,5 @@
-import { Transform, TransformOptions } from 'stream'
-import { prettyToken } from './token-stream'
-import { SourceTokenType, tokenType } from './token-type'
+import { Lexer } from './lexer'
+import { SourceTokenType, prettyToken, tokenType } from './token-type'
 
 export interface SourceToken {
   type: SourceTokenType
@@ -18,8 +17,6 @@ export interface ErrorToken {
 export interface Directive {
   type: 'directive'
   source: string
-  name: string
-  parameters: string[]
 }
 
 export interface Document {
@@ -69,12 +66,12 @@ export type Token =
   | BlockSequence
   | FlowCollection
 
-export type DocStreamOptions = Omit<
-  TransformOptions,
-  'decodeStrings' | 'emitClose' | 'objectMode'
->
+/** A YAML concrete syntax tree parser */
+export class Parser {
+  push: (token: Token) => void
 
-export class DocStream extends Transform {
+  lexer = new Lexer(ts => this.token(ts))
+
   /** If true, space and sequence indicators count as indentation */
   atNewLine = true
 
@@ -87,63 +84,68 @@ export class DocStream extends Transform {
   /** Top indicates the bode that's currently being built */
   stack: Token[] = []
 
-  /** The source of the current chunk/token, set in _transform() */
+  /** The source of the current token, set in parse() */
   source = ''
 
-  /** The type of the current chunk/token, set in _transform() */
+  /** The type of the current token, set in parse() */
   type = '' as SourceTokenType
 
-  constructor(options: DocStreamOptions = {}) {
-    super({
-      ...options,
-      decodeStrings: false,
-      emitClose: true,
-      objectMode: true
-    })
+/**
+ * @param push - Called separately with each parsed token
+ * @public
+ */
+  constructor(push: (token: Token) => void) {
+    this.push = push
   }
 
-  _flush(done: (error?: Error) => void) {
-    while (this.stack.length > 0) this.pop()
-    done()
+  /**
+   * Parse `source` as YAML, calling the constructor's callback once each
+   * directive, document and other structure is completely parsed. If `incomplete`,
+   * a part of the last line may be left as a buffer for the next call.
+   *
+   * May throw on really unexpected errors.
+   *
+   * @public
+   */
+  parse(source: string, incomplete = false) {
+    this.lexer.lex(source, incomplete)
+    if (!incomplete) while (this.stack.length > 0) this.pop()
   }
 
-  _transform(source: string, _: any, done: (error?: Error) => void) {
+  /** Advance the parser by the `source` of one lexical token. */
+  token(source: string) {
     this.source = source
     console.log('>', prettyToken(source))
-    try {
-      if (this.atScalar) {
-        this.atScalar = false
-        this.handleToken()
-        return done()
-      }
-      const type = tokenType(source)
-      if (!type) throw new Error(`Not a YAML token: ${source}`)
-      if (type === 'scalar') {
-        this.atNewLine = false
-        this.atScalar = true
-        this.type = 'scalar'
-        return done()
-      }
 
-      this.type = type
-      this.handleToken()
-      switch (type) {
-        case 'newline':
-          this.atNewLine = true
-          this.indent = 0
-          break
-        case 'space':
-        case 'seq-item-ind':
-          if (this.atNewLine) this.indent += source.length
-          break
-        case 'doc-mode':
-          break
-        default:
-          this.atNewLine = false
-      }
-      done()
-    } catch (error) {
-      done(error)
+    if (this.atScalar) {
+      this.atScalar = false
+      this.step()
+      return
+    }
+    const type = tokenType(source)
+    if (!type) throw new Error(`Not a YAML token: ${source}`)
+    if (type === 'scalar') {
+      this.atNewLine = false
+      this.atScalar = true
+      this.type = 'scalar'
+      return
+    }
+
+    this.type = type
+    this.step()
+    switch (type) {
+      case 'newline':
+        this.atNewLine = true
+        this.indent = 0
+        break
+      case 'space':
+      case 'seq-item-ind':
+        if (this.atNewLine) this.indent += source.length
+        break
+      case 'doc-mode':
+        break
+      default:
+        this.atNewLine = false
     }
   }
 
@@ -155,7 +157,7 @@ export class DocStream extends Transform {
     } as SourceToken
   }
 
-  handleToken() {
+  step() {
     const top = this.peek()
     if (!top) return this.stream()
     switch (top.type) {
@@ -214,17 +216,9 @@ export class DocStream extends Transform {
 
   stream() {
     switch (this.type) {
-      case 'directive-line': {
-        const parts = this.source.split(/ +/)
-        const name = parts.shift()
-        this.push({
-          type: 'directive',
-          name,
-          parameters: parts,
-          source: this.source
-        })
+      case 'directive-line':
+        this.push({ type: 'directive', source: this.source })
         return
-      }
       case 'doc-end':
       case 'space':
       case 'comment':
@@ -300,7 +294,7 @@ export class DocStream extends Transform {
         break
       default:
         this.pop()
-        this.handleToken()
+        this.step()
     }
   }
 
@@ -357,7 +351,7 @@ export class DocStream extends Transform {
       }
     }
     this.pop()
-    this.handleToken()
+    this.step()
   }
 
   blockSequence(seq: BlockSequence) {
@@ -385,7 +379,7 @@ export class DocStream extends Transform {
       if (bv) return this.stack.push(bv)
     }
     this.pop()
-    this.handleToken()
+    this.step()
   }
 
   flowCollection(fc: FlowCollection) {
@@ -414,7 +408,7 @@ export class DocStream extends Transform {
     const bv = this.startBlockValue()
     if (bv) return this.stack.push(bv)
     this.pop()
-    this.handleToken()
+    this.step()
   }
 
   startBlockValue() {
@@ -472,7 +466,7 @@ export class DocStream extends Transform {
         return
       default:
         this.pop()
-        this.handleToken()
+        this.step()
         return
     }
   }

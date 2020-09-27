@@ -1,6 +1,3 @@
-/* eslint-env node */
-/* eslint-disable consistent-return */
-
 /*
 START -> stream
 
@@ -69,9 +66,6 @@ plain-scalar(is-flow, min)
   [else] -> plain-scalar(min)
 */
 
-import { Transform, TransformOptions } from 'stream'
-import { StringDecoder } from 'string_decoder'
-
 import { DOCUMENT, SCALAR } from './token-type.js'
 
 type State =
@@ -102,20 +96,8 @@ const invalidIdentifierChars = [' ', ',', '[', ']', '{', '}', '\n', '\r', '\t']
 const isNotIdentifierChar = (ch: string) =>
   !ch || invalidIdentifierChars.includes(ch)
 
-export function prettyToken(token: string) {
-  if (token === DOCUMENT) return '<DOC>'
-  if (token === SCALAR) return '<SCALAR>'
-  return JSON.stringify(token)
-}
-
-export type TokenStreamOptions = Omit<
-  TransformOptions,
-  'decodeStrings' | 'emitClose' | 'objectMode'
->
-
-/** Consumes string or buffer input, emits token strings */
-export class TokenStream extends Transform {
-  decoder: StringDecoder
+export class Lexer {
+  push: (token: string) => void
 
   atEnd = false
   buffer = ''
@@ -125,33 +107,28 @@ export class TokenStream extends Transform {
   next: State | null = null
   pos = 0
 
-  constructor(options: TokenStreamOptions = {}) {
-    super({
-      ...options,
-      decodeStrings: false,
-      emitClose: true,
-      objectMode: true
-    })
-    this.decoder = new StringDecoder(options.defaultEncoding || 'utf8')
+  /**
+   * Define/initialise a YAML lexer. `push` will be called separately with each
+   * token when `lex()` is passed an input string.
+   *
+   * @public
+   */
+  constructor(push: (token: string) => void) {
+    this.push = push
   }
 
-  _flush(done: (error?: Error) => void) {
-    this.atEnd = true
-    let next: State | null = this.next
-    while (next && this.hasChars(1)) next = this.parseNext(next)
-    done()
-  }
-
-  _transform(chunk: string | Buffer, _: any, done: (error?: Error) => void) {
-    if (Buffer.isBuffer(chunk)) chunk = this.decoder.write(chunk)
-    else if (typeof chunk !== 'string')
-      return done(new Error('Only string and Buffer input is accepted'))
-    // console.log('TS', chunk)
-    this.buffer = this.buffer ? this.buffer + chunk : chunk
-
+  /**
+   * Read YAML tokens from the `source` string, calling the callback
+   * defined in the constructor for each one. If `incomplete`, a part
+   * of the last line may be left as a buffer for the next call.
+   *
+   * @public
+   */
+  lex(source: string, incomplete: boolean) {
+    if (source) this.buffer = this.buffer ? this.buffer + source : source
+    this.atEnd = !incomplete
     let next: State | null = this.next || 'stream'
-    while (next) next = this.parseNext(next)
-    done()
+    while (next && (incomplete || this.hasChars(1))) next = this.parseNext(next)
   }
 
   atLineEnd() {

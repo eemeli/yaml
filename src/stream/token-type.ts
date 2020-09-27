@@ -25,6 +25,12 @@ export type SourceTokenType =
   | 'double-quoted-scalar'
   | 'block-scalar-header'
 
+export function prettyToken(token: string) {
+  if (token === DOCUMENT) return '<DOC>'
+  if (token === SCALAR) return '<SCALAR>'
+  return JSON.stringify(token)
+}
+
 export function tokenType(source: string): SourceTokenType | null {
   switch (source) {
     case DOCUMENT: // start of doc-mode
