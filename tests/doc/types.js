@@ -104,8 +104,7 @@ describe('json schema', () => {
 "canonical": null
 "english": null
 ? null
-: "null key"\n`
-    )
+: "null key"\n`)
   })
 })
 
@@ -354,6 +353,40 @@ octal: 02472256
 hexadecimal: 0xa74ae
 binary: 0b10100111010010101110
 sexagesimal: 190:20:30\n`)
+  })
+
+  test('!!int, asBigInt', () => {
+    const src = `%YAML 1.1
+---
+canonical: 685230
+decimal: +685_230
+octal: 02472256
+hexadecimal: 0x_0A_74_AE
+binary: 0b1010_0111_0100_1010_1110
+sexagesimal: 190:20:30`
+
+    try {
+      YAML.scalarOptions.int.asBigInt = true
+      const doc = YAML.parseDocument(src)
+      expect(doc.toJS()).toMatchObject({
+        canonical: 685230n,
+        decimal: 685230n,
+        octal: 685230n,
+        hexadecimal: 685230n,
+        binary: 685230n,
+        sexagesimal: 685230n
+      })
+      expect(String(doc)).toBe(`%YAML 1.1
+---
+canonical: 685230
+decimal: 685230
+octal: 02472256
+hexadecimal: 0xa74ae
+binary: 0b10100111010010101110
+sexagesimal: 190:20:30\n`)
+    } finally {
+      YAML.scalarOptions.int.asBigInt = false
+    }
   })
 
   test('!!null', () => {

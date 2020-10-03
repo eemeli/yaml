@@ -1,26 +1,36 @@
+import { intOptions } from '../options.js'
 import { stringifyNumber } from '../../stringify/stringifyNumber.js'
 
-const parseSexagesimal = (sign, parts) => {
-  const n = parts.split(':').reduce((n, p) => n * 60 + Number(p), 0)
-  return sign === '-' ? -n : n
+const parseSexagesimal = (str, isInt) => {
+  const sign = str[0]
+  const parts = sign === '-' || sign === '+' ? str.substring(1) : str
+  const num = n => (isInt && intOptions.asBigInt ? BigInt(n) : Number(n))
+  const res = parts
+    .replace(/_/g, '')
+    .split(':')
+    .reduce((res, p) => res * num(60) + num(p), num(0))
+  return sign === '-' ? num(-1) * res : res
 }
 
 // hhhh:mm:ss.sss
 const stringifySexagesimal = ({ value }) => {
-  if (isNaN(value) || !isFinite(value)) return stringifyNumber(value)
+  let num = n => n
+  if (typeof value === 'bigint') num = n => BigInt(n)
+  else if (isNaN(value) || !isFinite(value)) return stringifyNumber(value)
   let sign = ''
   if (value < 0) {
     sign = '-'
-    value = Math.abs(value)
+    value *= num(-1)
   }
-  const parts = [value % 60] // seconds, including ms
+  const _60 = num(60)
+  const parts = [value % _60] // seconds, including ms
   if (value < 60) {
     parts.unshift(0) // at least one : is required
   } else {
-    value = Math.round((value - parts[0]) / 60)
-    parts.unshift(value % 60) // minutes
+    value = (value - parts[0]) / _60
+    parts.unshift(value % _60) // minutes
     if (value >= 60) {
-      value = Math.round((value - parts[0]) / 60)
+      value = (value - parts[0]) / _60
       parts.unshift(value) // hours
     }
   }
@@ -34,13 +44,12 @@ const stringifySexagesimal = ({ value }) => {
 }
 
 export const intTime = {
-  identify: value => typeof value === 'number',
+  identify: value => typeof value === 'bigint' || Number.isInteger(value),
   default: true,
   tag: 'tag:yaml.org,2002:int',
   format: 'TIME',
-  test: /^([-+]?)([0-9][0-9_]*(?::[0-5]?[0-9])+)$/,
-  resolve: (str, sign, parts) =>
-    parseSexagesimal(sign, parts.replace(/_/g, '')),
+  test: /^[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+$/,
+  resolve: str => parseSexagesimal(str, true),
   stringify: stringifySexagesimal
 }
 
@@ -49,9 +58,8 @@ export const floatTime = {
   default: true,
   tag: 'tag:yaml.org,2002:float',
   format: 'TIME',
-  test: /^([-+]?)([0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*)$/,
-  resolve: (str, sign, parts) =>
-    parseSexagesimal(sign, parts.replace(/_/g, '')),
+  test: /^[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*$/,
+  resolve: str => parseSexagesimal(str, false),
   stringify: stringifySexagesimal
 }
 
@@ -83,7 +91,7 @@ export const timestamp = {
       millisec || 0
     )
     if (tz && tz !== 'Z') {
-      let d = parseSexagesimal(tz[0], tz.slice(1))
+      let d = parseSexagesimal(tz, false)
       if (Math.abs(d) < 30) d *= 60
       date -= 60000 * d
     }
