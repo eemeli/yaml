@@ -1,4 +1,4 @@
-import { Alias, Collection, Merge, Pair } from '../ast'
+import { Alias, Collection, Merge, Node, Pair } from '../ast'
 import { Type } from '../constants'
 import { CST } from '../cst'
 import { YAMLError, YAMLWarning } from '../errors'
@@ -134,6 +134,11 @@ export namespace Document {
   }
 
   interface Anchors {
+    /** @private */
+    _cstAliases: any[]
+    /** @private */
+    map: Record<string, Node | CST.Node>
+
     /**
      * Create a new `Alias` node, adding the required anchor for `node`.
      * If `name` is empty, a new anchor name will be generated.

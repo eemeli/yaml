@@ -30,8 +30,9 @@ export class Scalar extends Node {
   /**
    * By default (undefined), numbers use decimal notation.
    * The YAML 1.2 core schema only supports 'HEX' and 'OCT'.
+   * The YAML 1.1 schema also supports 'BIN' and 'TIME'
    */
-  format?: 'BIN' | 'HEX' | 'OCT' | 'TIME'
+  format?: string
   value: any
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any
   toString(): string
@@ -46,6 +47,7 @@ export namespace Scalar {
 }
 
 export class Alias extends Node {
+  constructor(source: Node)
   type: Type.ALIAS
   source: Node
   cstNode?: CST.Alias
@@ -87,6 +89,8 @@ export class Collection extends Node {
   type?: Type.MAP | Type.FLOW_MAP | Type.SEQ | Type.FLOW_SEQ | Type.DOCUMENT
   items: any[]
   schema?: Schema
+
+  constructor(schema?: Schema)
 
   /**
    * Adds a value to the collection. For `!!map` and `!!omap` the value must

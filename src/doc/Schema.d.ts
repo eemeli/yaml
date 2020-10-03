@@ -4,7 +4,7 @@ import { CST } from '../cst'
 
 export class Schema {
   constructor(options: Schema.Options)
-  knownTags: { [key: string]: Schema.CustomTag }
+  knownTags: { [key: string]: Schema.Tag }
   merge: boolean
   name: Schema.Name
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
@@ -84,9 +84,7 @@ export namespace Schema {
     | 'set'
     | 'timestamp'
 
-  type Tag = CustomTag | DefaultTag
-
-  interface BaseTag {
+  interface Tag {
     /**
      * An optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.
      */
@@ -95,6 +93,12 @@ export namespace Schema {
       value: any,
       ctx: Schema.CreateNodeContext
     ) => YAMLMap | YAMLSeq | Scalar
+    /**
+     * If `true`, together with `test` allows for values to be stringified without
+     * an explicit tag. For most cases, it's unlikely that you'll actually want to
+     * use this, even if you first think you do.
+     */
+    default: boolean
     /**
      * If a tag has multiple forms that should be parsed and/or stringified differently, use `format` to identify them.
      */
@@ -113,6 +117,14 @@ export namespace Schema {
      */
     options?: object
     /**
+     * Turns a value into an AST node.
+     * If returning a non-`Node` value, the output will be wrapped as a `Scalar`.
+     */
+    resolve(
+      value: string | YAMLMap | YAMLSeq,
+      onError: (message: string) => void
+    ): Node | any
+    /**
      * Optional function stringifying the AST node in the current context. If your
      * data includes a suitable `.toString()` method, you can probably leave this
      * undefined and use the default stringifier.
@@ -124,14 +136,6 @@ export namespace Schema {
      * @param onChompKeep Callback to signal that the output uses a block scalar
      *   type with the `+` chomping indicator.
      */
-    /**
-     * Turns a value into an AST node.
-     * If returning a non-`Node` value, the output will be wrapped as a `Scalar`.
-     */
-    resolve(
-      value: string | YAMLMap | YAMLSeq,
-      onError: (message: string) => void
-    ): Node | any
     stringify?: (
       item: Node,
       ctx: Schema.StringifyContext,
@@ -144,25 +148,12 @@ export namespace Schema {
      * `tag:domain,date:foo`.
      */
     tag: string
-  }
-
-  interface CustomTag extends BaseTag {
-    default?: false
-  }
-
-  interface DefaultTag extends BaseTag {
-    /**
-     * If `true`, together with `test` allows for values to be stringified without
-     * an explicit tag. For most cases, it's unlikely that you'll actually want to
-     * use this, even if you first think you do.
-     */
-    default: true
     /**
      * Together with `default` allows for values to be stringified without an
      * explicit tag and detected using a regular expression. For most cases, it's
      * unlikely that you'll actually want to use these, even if you first think
      * you do.
      */
-    test: RegExp
+    test?: RegExp
   }
 }
