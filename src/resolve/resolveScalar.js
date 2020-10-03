@@ -1,7 +1,6 @@
 import { Scalar } from '../ast/Scalar.js'
 
-// falls back to string on no match
-export function resolveScalar(str, tags, scalarFallback) {
+export function resolveScalar(str, tags) {
   for (const { format, test, resolve } of tags) {
     if (test && test.test(str)) {
       let res = resolve(str)
@@ -10,6 +9,5 @@ export function resolveScalar(str, tags, scalarFallback) {
       return res
     }
   }
-  if (scalarFallback) str = scalarFallback(str)
-  return new Scalar(str)
+  return new Scalar(str) // fallback to string
 }

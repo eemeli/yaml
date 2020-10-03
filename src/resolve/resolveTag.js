@@ -20,7 +20,7 @@ function resolveByTagName(doc, node, tagName) {
 
   const str = resolveString(node.strValue, error => doc.errors.push(error))
   if (typeof str === 'string' && matchWithTest.length > 0)
-    return resolveScalar(str, matchWithTest, tags.scalarFallback)
+    return resolveScalar(str, matchWithTest)
 
   const kt = knownTags[tagName]
   if (kt) {

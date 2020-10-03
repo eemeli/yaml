@@ -94,7 +94,7 @@ function resolveNodeValue(doc, node) {
 
   try {
     const str = resolveString(node.strValue, error => doc.errors.push(error))
-    return resolveScalar(str, schema.tags, schema.tags.scalarFallback)
+    return resolveScalar(str, schema.tags)
   } catch (error) {
     if (!error.source) error.source = node
     errors.push(error)

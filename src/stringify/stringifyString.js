@@ -260,7 +260,7 @@ function plainString(item, ctx, onComment, onChompKeep) {
   // and others in v1.1.
   if (actualString) {
     const { tags } = ctx.doc.schema
-    const resolved = resolveScalar(str, tags, tags.scalarFallback).value
+    const resolved = resolveScalar(str, tags).value
     if (typeof resolved !== 'string') return doubleQuotedString(value, ctx)
   }
   const body = implicitKey

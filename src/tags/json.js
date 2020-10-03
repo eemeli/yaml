@@ -56,9 +56,12 @@ export const json = [
     test: /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][-+]?[0-9]+)?$/,
     resolve: str => parseFloat(str),
     stringify: stringifyJSON
+  },
+  {
+    default: true,
+    test: /^/,
+    resolve(str) {
+      throw new SyntaxError(`Unresolved plain scalar ${JSON.stringify(str)}`)
+    }
   }
 ]
-
-json.scalarFallback = str => {
-  throw new SyntaxError(`Unresolved plain scalar ${JSON.stringify(str)}`)
-}
