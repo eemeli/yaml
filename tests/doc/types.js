@@ -509,7 +509,7 @@ date (00:00:00Z): 2002-12-14\n`)
       expect(doc.errors).toMatchObject([
         {
           name: 'YAMLSemanticError',
-          message: 'Ordered maps must not include duplicate keys'
+          message: 'Ordered maps must not include duplicate keys: b'
         }
       ])
     })

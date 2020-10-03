@@ -1,7 +1,6 @@
 /* global BigInt */
 
 import { Scalar } from '../ast/Scalar.js'
-import { resolveString } from '../resolve/resolveString.js'
 import { map } from './failsafe/map.js'
 import { seq } from './failsafe/seq.js'
 import { intOptions } from './options.js'
@@ -18,8 +17,7 @@ export const json = [
     identify: value => typeof value === 'string',
     default: true,
     tag: 'tag:yaml.org,2002:str',
-    resolve: (doc, node) =>
-      resolveString(node.strValue, error => doc.errors.push(error)),
+    resolve: str => str,
     stringify: stringifyJSON
   },
   {
@@ -60,8 +58,9 @@ export const json = [
   {
     default: true,
     test: /^/,
-    resolve(str) {
-      throw new SyntaxError(`Unresolved plain scalar ${JSON.stringify(str)}`)
+    resolve(str, onError) {
+      onError(`Unresolved plain scalar ${JSON.stringify(str)}`)
+      return str
     }
   }
 ]

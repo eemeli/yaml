@@ -16,11 +16,6 @@ import {
 import { resolveNode } from './resolveNode.js'
 
 export function resolveMap(doc, cst) {
-  if (cst.type !== Type.MAP && cst.type !== Type.FLOW_MAP) {
-    const msg = `A ${cst.type} node cannot be resolved as a mapping`
-    doc.errors.push(new YAMLSyntaxError(cst, msg))
-    return null
-  }
   const { comments, items } =
     cst.type === Type.FLOW_MAP
       ? resolveFlowMapItems(doc, cst)

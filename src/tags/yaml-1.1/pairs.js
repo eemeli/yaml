@@ -1,32 +1,29 @@
-import { YAMLSemanticError } from '../../errors.js'
 import { createPair, Pair } from '../../ast/Pair.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
 import { YAMLSeq } from '../../ast/YAMLSeq.js'
-import { resolveSeq } from '../../resolve/resolveSeq.js'
 
-export function parsePairs(doc, cst) {
-  const seq = resolveSeq(doc, cst)
-  for (let i = 0; i < seq.items.length; ++i) {
-    let item = seq.items[i]
-    if (item instanceof Pair) continue
-    else if (item instanceof YAMLMap) {
-      if (item.items.length > 1) {
-        const msg = 'Each pair must have its own sequence indicator'
-        throw new YAMLSemanticError(cst, msg)
+export function parsePairs(seq, onError) {
+  if (seq instanceof YAMLSeq) {
+    for (let i = 0; i < seq.items.length; ++i) {
+      let item = seq.items[i]
+      if (item instanceof Pair) continue
+      else if (item instanceof YAMLMap) {
+        if (item.items.length > 1)
+          onError('Each pair must have its own sequence indicator')
+        const pair = item.items[0] || new Pair()
+        if (item.commentBefore)
+          pair.commentBefore = pair.commentBefore
+            ? `${item.commentBefore}\n${pair.commentBefore}`
+            : item.commentBefore
+        if (item.comment)
+          pair.comment = pair.comment
+            ? `${item.comment}\n${pair.comment}`
+            : item.comment
+        item = pair
       }
-      const pair = item.items[0] || new Pair()
-      if (item.commentBefore)
-        pair.commentBefore = pair.commentBefore
-          ? `${item.commentBefore}\n${pair.commentBefore}`
-          : item.commentBefore
-      if (item.comment)
-        pair.comment = pair.comment
-          ? `${item.comment}\n${pair.comment}`
-          : item.comment
-      item = pair
+      seq.items[i] = item instanceof Pair ? item : new Pair(item)
     }
-    seq.items[i] = item instanceof Pair ? item : new Pair(item)
-  }
+  } else onError('Expected a sequence for this tag')
   return seq
 }
 

@@ -347,8 +347,8 @@ describe('eemeli/yaml#80: custom tags', () => {
   const regexp = {
     identify: value => value instanceof RegExp,
     tag: '!re',
-    resolve(doc, cst) {
-      const match = cst.strValue.match(/^\/([\s\S]+)\/([gimuy]*)$/)
+    resolve(str) {
+      const match = str.match(/^\/([\s\S]+)\/([gimuy]*)$/)
       return new RegExp(match[1], match[2])
     }
   }
@@ -356,7 +356,7 @@ describe('eemeli/yaml#80: custom tags', () => {
   const sharedSymbol = {
     identify: value => value.constructor === Symbol,
     tag: '!symbol/shared',
-    resolve: (doc, cst) => Symbol.for(cst.strValue),
+    resolve: (str) => Symbol.for(str),
     stringify(item, ctx, onComment, onChompKeep) {
       const key = Symbol.keyFor(item.value)
       if (key === undefined)

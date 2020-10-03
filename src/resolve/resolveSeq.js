@@ -13,11 +13,6 @@ import {
 import { resolveNode } from './resolveNode.js'
 
 export function resolveSeq(doc, cst) {
-  if (cst.type !== Type.SEQ && cst.type !== Type.FLOW_SEQ) {
-    const msg = `A ${cst.type} node cannot be resolved as a sequence`
-    doc.errors.push(new YAMLSyntaxError(cst, msg))
-    return null
-  }
   const { comments, items } =
     cst.type === Type.FLOW_SEQ
       ? resolveFlowSeqItems(doc, cst)

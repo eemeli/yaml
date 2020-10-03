@@ -1,8 +1,6 @@
 /* global atob, btoa, Buffer */
 
 import { Type } from '../../constants.js'
-import { YAMLReferenceError } from '../../errors.js'
-import { resolveString } from '../../resolve/resolveString.js'
 import { stringifyString } from '../../stringify/stringifyString.js'
 import { binaryOptions as options } from '../options.js'
 
@@ -18,8 +16,7 @@ export const binary = {
    *   const blob = new Blob([buffer], { type: 'image/jpeg' })
    *   document.querySelector('#photo').src = URL.createObjectURL(blob)
    */
-  resolve: (doc, node) => {
-    const src = resolveString(node.strValue, error => doc.errors.push(error))
+  resolve(src, onError) {
     if (typeof Buffer === 'function') {
       return Buffer.from(src, 'base64')
     } else if (typeof atob === 'function') {
@@ -29,10 +26,10 @@ export const binary = {
       for (let i = 0; i < str.length; ++i) buffer[i] = str.charCodeAt(i)
       return buffer
     } else {
-      const msg =
+      onError(
         'This environment does not support reading binary tags; either Buffer or atob is required'
-      doc.errors.push(new YAMLReferenceError(node, msg))
-      return null
+      )
+      return src
     }
   },
   options,
