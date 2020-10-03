@@ -7,7 +7,7 @@ export function stream(source: string) {
   ps.end()
 }
 
-export function sync(source: string) {
+export function test(source: string) {
   const parser = new Parser(t => console.dir(t, { depth: null }))
   parser.parse(source)
 }
