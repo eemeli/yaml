@@ -71,15 +71,17 @@ export const timestamp = {
   // may be omitted altogether, resulting in a date format. In such a case, the time part is
   // assumed to be 00:00:00Z (start of day, UTC).
   test: RegExp(
-    '^(?:' +
-    '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})' + // YYYY-Mm-Dd
-    '(?:(?:t|T|[ \\t]+)' + // t | T | whitespace
+    '^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})' + // YYYY-Mm-Dd
+    '(?:' + // time is optional
+    '(?:t|T|[ \\t]+)' + // t | T | whitespace
     '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2}(\\.[0-9]+)?)' + // Hh:Mm:Ss(.ss)?
     '(?:[ \\t]*(Z|[-+][012]?[0-9](?::[0-9]{2})?))?' + // Z | +5 | -03:30
-      ')?' +
-      ')$'
+      ')?$'
   ),
-  resolve: (str, year, month, day, hour, minute, second, millisec, tz) => {
+  resolve(str) {
+    let [_, year, month, day, hour, minute, second, millisec, tz] = str.match(
+      timestamp.test
+    )
     if (millisec) millisec = (millisec + '00').substr(1, 3)
     let date = Date.UTC(
       year,
