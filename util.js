@@ -2,8 +2,6 @@ const util = require('./dist/util')
 
 exports.findPair = util.findPair
 exports.toJSON = util.toJSON
-exports.parseMap = util.parseMap
-exports.parseSeq = util.parseSeq
 
 exports.stringifyNumber = util.stringifyNumber
 exports.stringifyString = util.stringifyString

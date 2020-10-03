@@ -1,13 +1,7 @@
-import { Document } from './index'
 import { CST } from './parse-cst'
-import { AST, Pair, Scalar, Schema } from './types'
+import { Pair, Scalar, Schema } from './types'
 
 export function findPair(items: any[], key: Scalar | any): Pair | undefined
-
-export function parseMap(doc: Document, cst: CST.Map): AST.BlockMap
-export function parseMap(doc: Document, cst: CST.FlowMap): AST.FlowMap
-export function parseSeq(doc: Document, cst: CST.Seq): AST.BlockSeq
-export function parseSeq(doc: Document, cst: CST.FlowSeq): AST.FlowSeq
 
 export function stringifyNumber(item: Scalar): string
 export function stringifyString(

@@ -128,8 +128,6 @@ Finally, `stringify(item, ctx, ...): string` defines how your data should be rep
 ```js
 import {
   findPair, // (items, key) => Pair? -- Given a key, find a matching Pair
-  parseMap, // (doc, cstNode) => new YAMLMap
-  parseSeq, // (doc, cstNode) => new YAMLSeq
   stringifyNumber, // (node) => string
   stringifyString, // (node, ctx, ...) => string
   toJS, // (value, arg, ctx) => any -- Recursively convert to plain JS
