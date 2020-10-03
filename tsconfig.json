@@ -4,7 +4,7 @@
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "lib/",
+    "outDir": "lib/stream/",
     "strict": true,
     "target": "ES2017"
   },
