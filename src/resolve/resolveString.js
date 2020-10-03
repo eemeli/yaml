@@ -1,11 +1,8 @@
-// on error, will return { str: string, errors: Error[] }
-export function resolveString(doc, node) {
-  const res = node.strValue
+// on error, strValue may be { str: string, errors: Error[] }
+export function resolveString(strValue, onError) {
+  const res = strValue
   if (!res) return ''
   if (typeof res === 'string') return res
-  res.errors.forEach(error => {
-    if (!error.source) error.source = node
-    doc.errors.push(error)
-  })
+  res.errors.forEach(onError)
   return res.str
 }

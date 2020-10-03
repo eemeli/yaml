@@ -18,7 +18,7 @@ function resolveByTagName(doc, node, tagName) {
     }
   }
 
-  const str = resolveString(doc, node)
+  const str = resolveString(node.strValue, error => doc.errors.push(error))
   if (typeof str === 'string' && matchWithTest.length > 0)
     return resolveScalar(str, matchWithTest, tags.scalarFallback)
 

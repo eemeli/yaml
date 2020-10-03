@@ -19,7 +19,7 @@ export const binary = {
    *   document.querySelector('#photo').src = URL.createObjectURL(blob)
    */
   resolve: (doc, node) => {
-    const src = resolveString(doc, node)
+    const src = resolveString(node.strValue, error => doc.errors.push(error))
     if (typeof Buffer === 'function') {
       return Buffer.from(src, 'base64')
     } else if (typeof atob === 'function') {

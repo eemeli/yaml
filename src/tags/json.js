@@ -18,7 +18,8 @@ export const json = [
     identify: value => typeof value === 'string',
     default: true,
     tag: 'tag:yaml.org,2002:str',
-    resolve: resolveString,
+    resolve: (doc, node) =>
+      resolveString(node.strValue, error => doc.errors.push(error)),
     stringify: stringifyJSON
   },
   {
