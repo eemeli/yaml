@@ -1,4 +1,3 @@
-import { YAMLSemanticError } from '../../errors.js'
 import { Pair } from '../../ast/Pair.js'
 import { Scalar } from '../../ast/Scalar.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'

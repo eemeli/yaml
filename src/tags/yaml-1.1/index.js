@@ -17,7 +17,7 @@ const intIdentify = value =>
   typeof value === 'bigint' || Number.isInteger(value)
 
 function intResolve(str, offset, radix) {
-  let sign = str[0]
+  const sign = str[0]
   if (sign === '-' || sign === '+') offset += 1
   str = str.substring(offset).replace(/_/g, '')
   if (intOptions.asBigInt) {

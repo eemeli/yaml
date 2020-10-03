@@ -1,3 +1,5 @@
+/* global BigInt */
+
 import { intOptions } from '../options.js'
 import { stringifyNumber } from '../../stringify/stringifyNumber.js'
 
@@ -79,7 +81,7 @@ export const timestamp = {
       ')?$'
   ),
   resolve(str) {
-    let [_, year, month, day, hour, minute, second, millisec, tz] = str.match(
+    let [, year, month, day, hour, minute, second, millisec, tz] = str.match(
       timestamp.test
     )
     if (millisec) millisec = (millisec + '00').substr(1, 3)
