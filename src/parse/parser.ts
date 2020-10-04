@@ -45,7 +45,7 @@ export interface BlockMap {
 export interface BlockSequence {
   type: 'block-seq'
   indent: number
-  items: Array<{ start: Token[]; value?: Token }>
+  items: Array<{ start: SourceToken[]; value?: Token }>
 }
 
 export interface FlowCollection {
@@ -69,6 +69,7 @@ export type Token =
 /** A YAML concrete syntax tree parser */
 export class Parser {
   push: (token: Token) => void
+  onNewLine?: (offset: number) => void
 
   lexer = new Lexer(ts => this.token(ts))
 
@@ -81,6 +82,8 @@ export class Parser {
   /** Current indentation level */
   indent = 0
 
+  offset = 0
+
   /** Top indicates the bode that's currently being built */
   stack: Token[] = []
 
@@ -92,21 +95,27 @@ export class Parser {
 
   /**
    * @param push - Called separately with each parsed token
+   * @param onNewLine - If defined, called separately with the start position of each new line
    * @public
    */
-  constructor(push: (token: Token) => void) {
+  constructor(
+    push: (token: Token) => void,
+    onNewLine?: (offset: number) => void
+  ) {
     this.push = push
+    this.onNewLine = onNewLine
   }
 
   /**
-   * Parse `source` as YAML, calling the constructor's callback once each
-   * directive, document and other structure is completely parsed. If `incomplete`,
-   * a part of the last line may be left as a buffer for the next call.
+   * Parse `source` as a YAML stream, calling `push` with each
+   * directive, document and other structure as it is completely parsed.
+   * If `incomplete`, a part of the last line may be left as a buffer for the next call.
    *
    * Errors are not thrown, but pushed out as `{ type: 'error', message }` tokens.
    * @public
    */
   parse(source: string, incomplete = false) {
+    if (this.onNewLine && this.offset === 0) this.onNewLine(0)
     this.lexer.lex(source, incomplete)
     if (!incomplete) while (this.stack.length > 0) this.pop()
   }
@@ -119,12 +128,15 @@ export class Parser {
     if (this.atScalar) {
       this.atScalar = false
       this.step()
+      this.offset += source.length
       return
     }
+
     const type = tokenType(source)
     if (!type) {
       const message = `Not a YAML token: ${source}`
       this.pop({ type: 'error', source, message })
+      this.offset += source.length
     } else if (type === 'scalar') {
       this.atNewLine = false
       this.atScalar = true
@@ -136,6 +148,7 @@ export class Parser {
         case 'newline':
           this.atNewLine = true
           this.indent = 0
+          if (this.onNewLine) this.onNewLine(this.offset + source.length)
           break
         case 'space':
         case 'seq-item-ind':
@@ -146,6 +159,7 @@ export class Parser {
         default:
           this.atNewLine = false
       }
+      this.offset += source.length
     }
   }
 
@@ -299,6 +313,13 @@ export class Parser {
         // block-scalar source includes trailing newline
         this.atNewLine = true
         this.indent = 0
+        if (this.onNewLine) {
+          let nl = this.source.indexOf('\n') + 1
+          while (nl !== 0) {
+            this.onNewLine(this.offset + nl)
+            nl = this.source.indexOf('\n', nl) + 1
+          }
+        }
         this.pop()
         break
       default:
@@ -389,7 +410,8 @@ export class Parser {
         return
       case 'seq-item-ind':
         if (this.indent !== seq.indent) break
-        if (it.value) seq.items.push({ start: [this.sourceToken] })
+        if (it.value || it.start.some(tok => tok.type === 'seq-item-ind'))
+          seq.items.push({ start: [this.sourceToken] })
         else it.start.push(this.sourceToken)
         return
     }
@@ -437,6 +459,13 @@ export class Parser {
       case 'scalar':
       case 'single-quoted-scalar':
       case 'double-quoted-scalar':
+        if (this.onNewLine) {
+          let nl = this.source.indexOf('\n') + 1
+          while (nl !== 0) {
+            this.onNewLine(this.offset + nl)
+            nl = this.source.indexOf('\n', nl) + 1
+          }
+        }
         return st
       case 'block-scalar-header':
         return {

@@ -8,6 +8,11 @@ export function stream(source: string) {
 }
 
 export function test(source: string) {
-  const parser = new Parser(t => console.dir(t, { depth: null }))
+  const lines: number[] = []
+  const parser = new Parser(
+    t => console.dir(t, { depth: null }),
+    n => lines.push(n)
+  )
   parser.parse(source)
+  console.log({ lines })
 }
