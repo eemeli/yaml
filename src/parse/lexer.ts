@@ -441,6 +441,8 @@ export class Lexer {
           if (this.indentMore) {
             this.indent += this.indentMore.length
             this.indentMore = ''
+          } else {
+            this.indentMore = ' '
           }
           return this.pushCount(1) + this.pushSpaces() + this.pushIndicators()
         }
