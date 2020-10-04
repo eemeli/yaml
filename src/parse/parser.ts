@@ -2,10 +2,10 @@ import { Lexer } from './lexer.js'
 import { SourceTokenType, prettyToken, tokenType } from './token-type.js'
 
 export interface SourceToken {
-  type: SourceTokenType
+  type: Exclude<SourceTokenType, FlowScalar['type']>
   indent: number
   source: string
-  end?: Token[]
+  end?: SourceToken[]
 }
 
 export interface ErrorToken {
@@ -21,13 +21,23 @@ export interface Directive {
 
 export interface Document {
   type: 'document'
-  start: Token[]
+  offset: number
+  start: SourceToken[]
   value?: Token
-  end?: Token[]
+  end?: SourceToken[]
+}
+
+export interface FlowScalar {
+  type: 'alias' | 'scalar' | 'single-quoted-scalar' | 'double-quoted-scalar'
+  offset: number
+  indent: number
+  source: string
+  end?: SourceToken[]
 }
 
 export interface BlockScalar {
   type: 'block-scalar'
+  offset: number
   indent: number
   props: Token[]
   source?: string
@@ -35,21 +45,29 @@ export interface BlockScalar {
 
 export interface BlockMap {
   type: 'block-map'
+  offset: number
   indent: number
   items: Array<
-    | { start: Token[]; key?: never; sep?: never; value?: never }
-    | { start: Token[]; key: Token | null; sep: Token[]; value?: Token }
+    | { start: SourceToken[]; key?: never; sep?: never; value?: never }
+    | {
+        start: SourceToken[]
+        key: Token | null
+        sep: SourceToken[]
+        value?: Token
+      }
   >
 }
 
 export interface BlockSequence {
   type: 'block-seq'
+  offset: number
   indent: number
   items: Array<{ start: SourceToken[]; value?: Token }>
 }
 
 export interface FlowCollection {
   type: 'flow-collection'
+  offset: number
   indent: number
   start: Token
   items: Token[]
@@ -61,6 +79,7 @@ export type Token =
   | ErrorToken
   | Directive
   | Document
+  | FlowScalar
   | BlockScalar
   | BlockMap
   | BlockSequence
@@ -155,7 +174,7 @@ export class Parser {
           if (this.atNewLine) this.indent += source.length
           break
         case 'doc-mode':
-          break
+          return
         default:
           this.atNewLine = false
       }
@@ -250,7 +269,11 @@ export class Parser {
         return
       case 'doc-mode':
       case 'doc-start': {
-        const doc: Document = { type: 'document', start: [] }
+        const doc: Document = {
+          type: 'document',
+          offset: this.offset,
+          start: []
+        }
         if (this.type === 'doc-start') doc.start.push(this.sourceToken)
         this.stack.push(doc)
         return
@@ -284,9 +307,9 @@ export class Parser {
     }
   }
 
-  scalar(scalar: SourceToken) {
+  scalar(scalar: FlowScalar) {
     if (this.type === 'map-value-ind') {
-      let sep: Token[]
+      let sep: SourceToken[]
       if (scalar.end) {
         sep = scalar.end
         sep.push(this.sourceToken)
@@ -294,6 +317,7 @@ export class Parser {
       } else sep = [this.sourceToken]
       const map: BlockMap = {
         type: 'block-map',
+        offset: scalar.offset,
         indent: scalar.indent,
         items: [{ start: [], key: scalar, sep }]
       }
@@ -356,6 +380,7 @@ export class Parser {
           else
             this.stack.push({
               type: 'block-map',
+              offset: this.offset,
               indent: this.indent,
               items: [{ start: [this.sourceToken] }]
             })
@@ -368,6 +393,7 @@ export class Parser {
           else if (it.sep.some(tok => tok.type === 'map-value-ind'))
             this.stack.push({
               type: 'block-map',
+              offset: this.offset,
               indent: this.indent,
               items: [{ start: [], key: null, sep: [this.sourceToken] }]
             })
@@ -377,12 +403,13 @@ export class Parser {
         case 'alias':
         case 'scalar':
         case 'single-quoted-scalar':
-        case 'double-quoted-scalar':
-          if (it.value)
-            map.items.push({ start: [], key: this.sourceToken, sep: [] })
-          else if (it.sep) this.stack.push(this.sourceToken)
-          else Object.assign(it, { key: this.sourceToken, sep: [] })
+        case 'double-quoted-scalar': {
+          const fs = this.flowScalar(this.type)
+          if (it.value) map.items.push({ start: [], key: fs, sep: [] })
+          else if (it.sep) this.stack.push(fs)
+          else Object.assign(it, { key: fs, sep: [] })
           return
+        }
 
         default: {
           const bv = this.startBlockValue()
@@ -433,11 +460,14 @@ export class Parser {
       case 'map-value-ind':
       case 'anchor':
       case 'tag':
+        fc.items.push(this.sourceToken)
+        return
+
       case 'alias':
       case 'scalar':
       case 'single-quoted-scalar':
       case 'double-quoted-scalar':
-        fc.items.push(this.sourceToken)
+        fc.items.push(this.flowScalar(this.type))
         return
 
       case 'flow-map-end':
@@ -452,58 +482,73 @@ export class Parser {
     this.step()
   }
 
+  flowScalar(
+    type: 'alias' | 'scalar' | 'single-quoted-scalar' | 'double-quoted-scalar'
+  ) {
+    if (this.onNewLine) {
+      let nl = this.source.indexOf('\n') + 1
+      while (nl !== 0) {
+        this.onNewLine(this.offset + nl)
+        nl = this.source.indexOf('\n', nl) + 1
+      }
+    }
+    return {
+      type,
+      offset: this.offset,
+      indent: this.indent,
+      source: this.source
+    } as FlowScalar
+  }
+
   startBlockValue() {
-    const st = this.sourceToken
     switch (this.type) {
       case 'alias':
       case 'scalar':
       case 'single-quoted-scalar':
       case 'double-quoted-scalar':
-        if (this.onNewLine) {
-          let nl = this.source.indexOf('\n') + 1
-          while (nl !== 0) {
-            this.onNewLine(this.offset + nl)
-            nl = this.source.indexOf('\n', nl) + 1
-          }
-        }
-        return st
+        return this.flowScalar(this.type)
       case 'block-scalar-header':
         return {
           type: 'block-scalar',
+          offset: this.offset,
           indent: this.indent,
-          props: [st]
+          props: [this.sourceToken]
         } as BlockScalar
       case 'flow-map-start':
       case 'flow-seq-start':
         return {
           type: 'flow-collection',
+          offset: this.offset,
           indent: this.indent,
-          start: st,
+          start: this.sourceToken,
           items: []
         } as FlowCollection
       case 'seq-item-ind':
         return {
           type: 'block-seq',
+          offset: this.offset,
           indent: this.indent,
-          items: [{ start: [st] }]
+          items: [{ start: [this.sourceToken] }]
         } as BlockSequence
       case 'explicit-key-ind':
         return {
           type: 'block-map',
+          offset: this.offset,
           indent: this.indent,
-          items: [{ start: [st] }]
+          items: [{ start: [this.sourceToken] }]
         } as BlockMap
       case 'map-value-ind':
         return {
           type: 'block-map',
+          offset: this.offset,
           indent: this.indent,
-          items: [{ start: [], key: null, sep: [st] }]
+          items: [{ start: [], key: null, sep: [this.sourceToken] }]
         } as BlockMap
     }
     return null
   }
 
-  lineEnd(token: SourceToken | Document) {
+  lineEnd(token: SourceToken | Document | FlowScalar) {
     switch (this.type) {
       case 'space':
       case 'comment':

@@ -1,8 +1,8 @@
 import { Type } from '../constants.js'
-import type { SourceToken } from '../parse/parser.js'
+import type { FlowScalar } from '../parse/parser.js'
 
 export function flowScalarValue(
-  { type, source }: SourceToken,
+  { type, source }: FlowScalar,
   onError: (offset: number, message: string) => void,
   onType: (type: Type.PLAIN | Type.QUOTE_DOUBLE | Type.QUOTE_SINGLE) => void
 ) {

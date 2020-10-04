@@ -1,14 +1,14 @@
 import { Scalar } from '../ast/index.js'
 import type { Type } from '../constants.js'
 import type { Schema } from '../doc/Schema.js'
-import type { BlockScalar, SourceToken, Token } from '../parse/parser.js'
+import type { BlockScalar, FlowScalar, Token } from '../parse/parser.js'
 import { blockScalarValue } from './block-scalar-value.js'
 import { flowScalarValue } from './flow-scalar-value.js'
 
 export function composeScalar(
   schema: Schema,
   tagName: string | null,
-  token: SourceToken | BlockScalar,
+  token: FlowScalar | BlockScalar,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   let type:
