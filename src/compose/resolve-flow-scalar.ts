@@ -1,8 +1,9 @@
 import { Type } from '../constants.js'
 import type { FlowScalar } from '../parse/parser.js'
+import { resolveEnd } from './resolve-end.js'
 
 export function resolveFlowScalar(
-  { type, source, end }: FlowScalar,
+  { offset, type, source, end }: FlowScalar,
   onError: (offset: number, message: string) => void
 ): {
   value: string
@@ -12,24 +13,25 @@ export function resolveFlowScalar(
 } {
   let _type: Type.PLAIN | Type.QUOTE_DOUBLE | Type.QUOTE_SINGLE
   let value: string
+  const _onError = (rel: number, msg: string) => onError(offset + rel, msg)
   switch (type) {
     case 'scalar':
       _type = Type.PLAIN
-      value = plainValue(source, onError)
+      value = plainValue(source, _onError)
       break
 
     case 'single-quoted-scalar':
       _type = Type.QUOTE_SINGLE
-      value = singleQuotedValue(source, onError)
+      value = singleQuotedValue(source, _onError)
       break
 
     case 'double-quoted-scalar':
       _type = Type.QUOTE_DOUBLE
-      value = doubleQuotedValue(source, onError)
+      value = doubleQuotedValue(source, _onError)
       break
 
     default:
-      onError(0, `Expected a flow scalar value, but found: ${type}`)
+      onError(offset, `Expected a flow scalar value, but found: ${type}`)
       return {
         value: '',
         type: null,
@@ -38,29 +40,13 @@ export function resolveFlowScalar(
       }
   }
 
-  let comment = ''
-  let length = source.length
-  if (end) {
-    let hasComment = false
-    let sep = ''
-    for (const token of end) {
-      if (token.type === 'comment') {
-        const cb = token.source.substring(1)
-        if (!hasComment) comment = cb
-        else comment += sep + cb
-        hasComment = true
-        sep = ''
-      } else if (hasComment && token.type === 'newline') sep += token.source
-      length += token.source.length
-    }
-  }
-
-  return { value, type: _type, comment, length }
+  const { comment, length } = resolveEnd(end)
+  return { value, type: _type, comment, length: source.length + length }
 }
 
 function plainValue(
   source: string,
-  onError: (offset: number, message: string) => void
+  onError: (relOffset: number, message: string) => void
 ) {
   switch (source[0]) {
     case '\t':
@@ -78,7 +64,7 @@ function plainValue(
 
 function singleQuotedValue(
   source: string,
-  onError: (offset: number, message: string) => void
+  onError: (relOffset: number, message: string) => void
 ) {
   if (source[source.length - 1] !== "'")
     onError(source.length, "Missing closing 'quote")
@@ -104,7 +90,7 @@ function foldLines(source: string) {
 
 function doubleQuotedValue(
   source: string,
-  onError: (offset: number, message: string) => void
+  onError: (relOffset: number, message: string) => void
 ) {
   let res = ''
   for (let i = 1; i < source.length - 1; ++i) {

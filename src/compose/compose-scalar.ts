@@ -8,8 +8,9 @@ export function composeScalar(
   schema: Schema,
   tagName: string | null,
   token: FlowScalar | BlockScalar,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (offset: number, message: string) => void
 ) {
+  const { offset } = token
   const { value, type, comment, length } =
     token.type === 'block-scalar'
       ? resolveBlockScalar(token, onError)
@@ -22,13 +23,13 @@ export function composeScalar(
 
   let scalar: Scalar
   try {
-    const res = tag ? tag.resolve(value, message => onError(0, message)) : value
+    const res = tag ? tag.resolve(value, msg => onError(offset, msg)) : value
     scalar = res instanceof Scalar ? res : new Scalar(res)
   } catch (error) {
-    onError(0, error.message)
+    onError(offset, error.message)
     scalar = new Scalar(value)
   }
-  scalar.range = [token.offset, token.offset + length]
+  scalar.range = [offset, offset + length]
   if (type) scalar.type = type
   if (tagName) scalar.tag = tagName
   if (tag?.format) scalar.format = tag.format

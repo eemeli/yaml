@@ -1,5 +1,5 @@
 import { Type } from '../constants.js'
-import type { BlockScalar, Token } from '../parse/parser.js'
+import type { BlockScalar } from '../parse/parser.js'
 
 export function resolveBlockScalar(
   scalar: BlockScalar,
@@ -10,7 +10,7 @@ export function resolveBlockScalar(
   comment: string
   length: number
 } {
-  const header = parseBlockScalarHeader(scalar.props, onError)
+  const header = parseBlockScalarHeader(scalar, onError)
   if (!header) return { value: '', type: null, comment: '', length: 0 }
   const type = header.mode === '>' ? Type.BLOCK_FOLDED : Type.BLOCK_LITERAL
   const lines = scalar.source ? splitLines(scalar.source) : []
@@ -36,7 +36,7 @@ export function resolveBlockScalar(
 
   // find the indentation level to trim from start
   let trimIndent = scalar.indent + header.indent
-  let offset = header.length
+  let offset = scalar.offset + header.length
   let contentStart = 0
   for (let i = 0; i < chompStart; ++i) {
     const [indent, content] = lines[i]
@@ -126,11 +126,11 @@ export function resolveBlockScalar(
 }
 
 function parseBlockScalarHeader(
-  props: Token[],
+  { offset, props }: BlockScalar,
   onError: (offset: number, message: string) => void
 ) {
   if (props[0].type !== 'block-scalar-header') {
-    onError(0, 'Block scalar header not found')
+    onError(offset, 'Block scalar header not found')
     return null
   }
   const { source } = props[0]
@@ -144,7 +144,7 @@ function parseBlockScalarHeader(
     else {
       const n = Number(ch)
       if (!indent && n) indent = n
-      else if (error === -1) error = i
+      else if (error === -1) error = offset + i
     }
   }
   if (error !== -1)
@@ -163,12 +163,12 @@ function parseBlockScalarHeader(
         comment = token.source.substring(1)
         break
       case 'error':
-        onError(length, token.message)
+        onError(offset + length, token.message)
         length += token.source.length
         break
       default: {
         const message = `Unexpected token in block scalar header: ${token.type}`
-        onError(length, message)
+        onError(offset + length, message)
         const ts = (token as any).source
         if (ts && typeof ts === 'string') length += ts.length
       }
