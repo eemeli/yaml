@@ -5,7 +5,6 @@ export interface SourceToken {
   type: Exclude<SourceTokenType, FlowScalar['type']>
   indent: number
   source: string
-  end?: SourceToken[]
 }
 
 export interface ErrorToken {
@@ -548,7 +547,7 @@ export class Parser {
     return null
   }
 
-  lineEnd(token: SourceToken | Document | FlowScalar) {
+  lineEnd(token: Document | FlowScalar) {
     switch (this.type) {
       case 'space':
       case 'comment':
