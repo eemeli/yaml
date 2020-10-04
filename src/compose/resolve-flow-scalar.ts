@@ -1,26 +1,61 @@
 import { Type } from '../constants.js'
 import type { FlowScalar } from '../parse/parser.js'
 
-export function flowScalarValue(
-  { type, source }: FlowScalar,
-  onError: (offset: number, message: string) => void,
-  onType: (type: Type.PLAIN | Type.QUOTE_DOUBLE | Type.QUOTE_SINGLE) => void
-) {
+export function resolveFlowScalar(
+  { type, source, end }: FlowScalar,
+  onError: (offset: number, message: string) => void
+): {
+  value: string
+  type: Type.PLAIN | Type.QUOTE_DOUBLE | Type.QUOTE_SINGLE | null
+  comment: string
+  length: number
+} {
+  let _type: Type.PLAIN | Type.QUOTE_DOUBLE | Type.QUOTE_SINGLE
+  let value: string
   switch (type) {
     case 'scalar':
-      onType(Type.PLAIN)
-      return plainValue(source, onError)
+      _type = Type.PLAIN
+      value = plainValue(source, onError)
+      break
 
     case 'single-quoted-scalar':
-      onType(Type.QUOTE_SINGLE)
-      return singleQuotedValue(source, onError)
+      _type = Type.QUOTE_SINGLE
+      value = singleQuotedValue(source, onError)
+      break
 
     case 'double-quoted-scalar':
-      onType(Type.QUOTE_DOUBLE)
-      return doubleQuotedValue(source, onError)
+      _type = Type.QUOTE_DOUBLE
+      value = doubleQuotedValue(source, onError)
+      break
+
+    default:
+      onError(0, `Expected a flow scalar value, but found: ${type}`)
+      return {
+        value: '',
+        type: null,
+        comment: '',
+        length: source.length
+      }
   }
-  onError(0, `Expected a flow scalar value, but found: ${type}`)
-  return ''
+
+  let comment = ''
+  let length = source.length
+  if (end) {
+    let hasComment = false
+    let sep = ''
+    for (const token of end) {
+      if (token.type === 'comment') {
+        const cb = token.source.substring(1)
+        if (!hasComment) comment = cb
+        else comment += sep + cb
+        hasComment = true
+        sep = ''
+      } else if (hasComment && token.type === 'newline') sep += token.source
+      length += token.source.length
+    }
+  }
+
+  return { value, type: _type, comment, length }
 }
 
 function plainValue(

@@ -1,9 +1,8 @@
 import { Scalar } from '../ast/index.js'
-import type { Type } from '../constants.js'
 import type { Schema } from '../doc/Schema.js'
-import type { BlockScalar, FlowScalar, Token } from '../parse/parser.js'
-import { blockScalarValue } from './block-scalar-value.js'
-import { flowScalarValue } from './flow-scalar-value.js'
+import type { BlockScalar, FlowScalar } from '../parse/parser.js'
+import { resolveBlockScalar } from './resolve-block-scalar.js'
+import { resolveFlowScalar } from './resolve-flow-scalar.js'
 
 export function composeScalar(
   schema: Schema,
@@ -11,20 +10,11 @@ export function composeScalar(
   token: FlowScalar | BlockScalar,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
-  let type:
-    | Type.BLOCK_FOLDED
-    | Type.BLOCK_LITERAL
-    | Type.PLAIN
-    | Type.QUOTE_DOUBLE
-    | Type.QUOTE_SINGLE
-    | null = null
-  const onType = (t: typeof type) => {
-    type = t
-  }
-  const value =
+  const { value, type, comment, length } =
     token.type === 'block-scalar'
-      ? blockScalarValue(token, onError, onType)
-      : flowScalarValue(token, onError, onType)
+      ? resolveBlockScalar(token, onError)
+      : resolveFlowScalar(token, onError)
+
   const tag =
     findScalarTagByName(schema, value, tagName, onError) ||
     findScalarTagByTest(schema, value, token.type === 'scalar') ||
@@ -38,14 +28,11 @@ export function composeScalar(
     onError(0, error.message)
     scalar = new Scalar(value)
   }
+  scalar.range = [token.offset, token.offset + length]
   if (type) scalar.type = type
   if (tagName) scalar.tag = tagName
-  if (tag && tag.format) scalar.format = tag.format
-
-  // attach comments
-  const cs = token.type === 'block-scalar' ? token.props : token.end
-  const cv = cs && commentValue(cs)
-  if (cv) scalar.comment = cv
+  if (tag?.format) scalar.format = tag.format
+  if (comment) scalar.comment = comment
 
   return scalar
 }
@@ -65,8 +52,7 @@ function findScalarTagByName(
       else return tag
     }
   }
-  for (const tag of matchWithTest)
-    if (tag.test && tag.test.test(value)) return tag
+  for (const tag of matchWithTest) if (tag.test?.test(value)) return tag
   const kt = schema.knownTags[tagName]
   if (kt) {
     // Ensure that the known tag is available for stringifying,
@@ -81,24 +67,8 @@ function findScalarTagByName(
 function findScalarTagByTest(schema: Schema, value: string, apply: boolean) {
   if (apply) {
     for (const tag of schema.tags) {
-      if (tag.default && tag.test && tag.test.test(value)) return tag
+      if (tag.default && tag.test?.test(value)) return tag
     }
   }
   return null
-}
-
-function commentValue(tokens: Token[]) {
-  let comment = ''
-  let hasComment = false
-  let sep = ''
-  for (const c of tokens) {
-    if (c.type === 'comment') {
-      const cb = c.source.substring(1)
-      if (!hasComment) comment = cb
-      else comment += sep + cb
-      hasComment = true
-      sep = ''
-    } else if (hasComment && c.type === 'newline') sep += c.source
-  }
-  return comment
 }

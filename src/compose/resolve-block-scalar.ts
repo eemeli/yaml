@@ -1,14 +1,19 @@
 import { Type } from '../constants.js'
 import type { BlockScalar, Token } from '../parse/parser.js'
 
-export function blockScalarValue(
+export function resolveBlockScalar(
   scalar: BlockScalar,
-  onError: (offset: number, message: string) => void,
-  onType: (type: Type.BLOCK_LITERAL | Type.BLOCK_FOLDED) => void
-) {
+  onError: (offset: number, message: string) => void
+): {
+  value: string
+  type: Type.BLOCK_FOLDED | Type.BLOCK_LITERAL | null
+  comment: string
+  length: number
+} {
   const header = parseBlockScalarHeader(scalar.props, onError)
-  if (!header || !scalar.source) return ''
-  const lines = splitLines(scalar.source)
+  if (!header) return { value: '', type: null, comment: '', length: 0 }
+  const type = header.mode === '>' ? Type.BLOCK_FOLDED : Type.BLOCK_LITERAL
+  const lines = scalar.source ? splitLines(scalar.source) : []
 
   // determine the end of content & start of chomping
   let chompStart = lines.length
@@ -17,10 +22,16 @@ export function blockScalarValue(
     else break
 
   // shortcut for empty contents
-  if (chompStart === 0) {
-    if (header.chomp === '+')
-      return lines.map(line => line[0]).join('\n') + '\n'
-    else return header.chomp === '-' ? '' : '\n'
+  if (!scalar.source || chompStart === 0) {
+    const value =
+      header.chomp === '+'
+        ? lines.map(line => line[0]).join('\n') + '\n'
+        : header.chomp === '-'
+        ? ''
+        : '\n'
+    let length = header.length
+    if (scalar.source) length += scalar.source.length
+    return { value, type, comment: header.comment, length }
   }
 
   // find the indentation level to trim from start
@@ -45,16 +56,14 @@ export function blockScalarValue(
     offset += indent.length + content.length + 1
   }
 
-  let res = ''
+  let value = ''
   let sep = ''
   let prevMoreIndented = false
 
   // leading whitespace is kept intact
   for (let i = 0; i < contentStart; ++i)
-    res += lines[i][0].slice(trimIndent) + '\n'
+    value += lines[i][0].slice(trimIndent) + '\n'
 
-  const folded = header.mode === '>'
-  onType(folded ? Type.BLOCK_FOLDED : Type.BLOCK_LITERAL)
   for (let i = contentStart; i < chompStart; ++i) {
     let [indent, content] = lines[i]
     offset += indent.length + content.length + 1
@@ -64,7 +73,7 @@ export function blockScalarValue(
     if (indent.length < trimIndent) {
       if (content === '') {
         // empty line
-        if (sep === '\n') res += '\n'
+        if (sep === '\n') value += '\n'
         else sep = '\n'
         continue
       } else {
@@ -77,35 +86,42 @@ export function blockScalarValue(
       }
     }
 
-    if (folded) {
+    if (type === Type.BLOCK_FOLDED) {
       if (!indent || indent.length === trimIndent) {
-        res += sep + content
+        value += sep + content
         sep = ' '
         prevMoreIndented = false
       } else {
         // more-indented content within a folded block
         if (sep === ' ') sep = '\n'
         else if (!prevMoreIndented && sep === '\n') sep = '\n\n'
-        res += sep + indent.slice(trimIndent) + content
+        value += sep + indent.slice(trimIndent) + content
         sep = '\n'
         prevMoreIndented = true
       }
     } else {
       // literal
-      res += sep + indent.slice(trimIndent) + content
+      value += sep + indent.slice(trimIndent) + content
       sep = '\n'
     }
   }
 
   switch (header.chomp) {
     case '-':
-      return res
+      break
     case '+':
       for (let i = chompStart; i < lines.length; ++i)
-        res += '\n' + lines[i][0].slice(trimIndent)
-      return res[res.length - 1] === '\n' ? res : res + '\n'
+        value += '\n' + lines[i][0].slice(trimIndent)
+      if (value[value.length - 1] !== '\n') value += '\n'
     default:
-      return res + '\n'
+      value += '\n'
+  }
+
+  return {
+    value,
+    type,
+    comment: header.comment,
+    length: header.length + scalar.source.length
   }
 }
 
@@ -133,24 +149,32 @@ function parseBlockScalarHeader(
   }
   if (error !== -1)
     onError(error, `Block scalar header includes extra characters: ${source}`)
+  let comment = ''
   let length = source.length
   for (let i = 1; i < props.length; ++i) {
     const token = props[i]
     switch (token.type) {
       case 'space':
-      case 'comment':
       case 'newline':
+        length += token.source.length
+        break
+      case 'comment':
+        length += token.source.length
+        comment = token.source.substring(1)
+        break
+      case 'error':
+        onError(length, token.message)
         length += token.source.length
         break
       default: {
         const message = `Unexpected token in block scalar header: ${token.type}`
         onError(length, message)
-        const ts = (token as any).source || ''
-        if (typeof ts === 'string') length += ts.length
+        const ts = (token as any).source
+        if (ts && typeof ts === 'string') length += ts.length
       }
     }
   }
-  return { mode, indent, chomp, length }
+  return { mode, indent, chomp, comment, length }
 }
 
 /** @returns Array of lines split up as `[indent, content]` */
