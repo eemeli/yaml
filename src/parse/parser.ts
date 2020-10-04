@@ -1,5 +1,5 @@
-import { Lexer } from './lexer'
-import { SourceTokenType, prettyToken, tokenType } from './token-type'
+import { Lexer } from './lexer.js'
+import { SourceTokenType, prettyToken, tokenType } from './token-type.js'
 
 export interface SourceToken {
   type: SourceTokenType

@@ -1,9 +1,9 @@
-import { Scalar } from '../ast'
-import { Type } from '../constants'
-import { Schema } from '../doc/Schema'
-import { blockScalarValue } from './block-scalar-value'
-import { flowScalarValue } from './flow-scalar-value'
-import { BlockScalar, SourceToken } from './parser'
+import { Scalar } from '../ast/index.js'
+import type { Type } from '../constants.js'
+import type { Schema } from '../doc/Schema.js'
+import type { BlockScalar, SourceToken, Token } from '../parse/parser.js'
+import { blockScalarValue } from './block-scalar-value.js'
+import { flowScalarValue } from './flow-scalar-value.js'
 
 export function composeScalar(
   schema: Schema,
@@ -41,6 +41,12 @@ export function composeScalar(
   if (type) scalar.type = type
   if (tagName) scalar.tag = tagName
   if (tag && tag.format) scalar.format = tag.format
+
+  // attach comments
+  const cs = token.type === 'block-scalar' ? token.props : token.end
+  const cv = cs && commentValue(cs)
+  if (cv) scalar.comment = cv
+
   return scalar
 }
 
@@ -79,4 +85,20 @@ function findScalarTagByTest(schema: Schema, value: string, apply: boolean) {
     }
   }
   return null
+}
+
+function commentValue(tokens: Token[]) {
+  let comment = ''
+  let hasComment = false
+  let sep = ''
+  for (const c of tokens) {
+    if (c.type === 'comment') {
+      const cb = c.source.substring(1)
+      if (!hasComment) comment = cb
+      else comment += sep + cb
+      hasComment = true
+      sep = ''
+    } else if (hasComment && c.type === 'newline') sep += c.source
+  }
+  return comment
 }
