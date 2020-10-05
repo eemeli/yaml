@@ -1,7 +1,7 @@
 /* global BigInt */
 
 import { source } from 'common-tags'
-import YAML from '../../index.js'
+import * as YAML from '../../index.js'
 import { Pair, Scalar } from '../../types.js'
 import { Type, stringifyString } from '../../util.js'
 

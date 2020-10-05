@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import YAML from '../index.js'
+import * as YAML from '../index.js'
 import { testEvents } from '../dist/test-events.js'
 
 const testDirs = fs

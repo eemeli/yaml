@@ -1,4 +1,4 @@
-import { YAML } from '../../src/index.js'
+import * as YAML from '../../src/index.js'
 import { Pair, Scalar, YAMLMap, YAMLSeq } from '../../src/ast/index.js'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 

@@ -1,10 +1,12 @@
 import { parse as parseCST } from './cst/parse.js'
 import { Document } from './doc/Document.js'
 import { YAMLSemanticError } from './errors.js'
-import { defaultOptions, scalarOptions } from './options.js'
 import { warn } from './warnings.js'
 
-function parseAllDocuments(src, options) {
+export { defaultOptions, scalarOptions } from './options.js'
+export { Document, parseCST }
+
+export function parseAllDocuments(src, options) {
   const stream = []
   let prev
   for (const cstDoc of parseCST(src)) {
@@ -16,7 +18,7 @@ function parseAllDocuments(src, options) {
   return stream
 }
 
-function parseDocument(src, options) {
+export function parseDocument(src, options) {
   const cst = parseCST(src)
   const doc = new Document(cst[0], null, options)
   if (cst.length > 1) {
@@ -27,7 +29,7 @@ function parseDocument(src, options) {
   return doc
 }
 
-function parse(src, reviver, options) {
+export function parse(src, reviver, options) {
   if (options === undefined && reviver && typeof reviver === 'object') {
     options = reviver
     reviver = undefined
@@ -39,7 +41,7 @@ function parse(src, reviver, options) {
   return doc.toJS({ reviver })
 }
 
-function stringify(value, replacer, options) {
+export function stringify(value, replacer, options) {
   if (typeof options === 'string') options = options.length
   if (typeof options === 'number') {
     const indent = Math.round(options)
@@ -50,15 +52,4 @@ function stringify(value, replacer, options) {
     if (!keepUndefined) return undefined
   }
   return new Document(value, replacer, options).toString()
-}
-
-export const YAML = {
-  defaultOptions,
-  Document,
-  parse,
-  parseAllDocuments,
-  parseCST,
-  parseDocument,
-  scalarOptions,
-  stringify
 }

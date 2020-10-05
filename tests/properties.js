@@ -1,5 +1,5 @@
-import YAML from '../index.js'
 import * as fc from 'fast-check'
+import * as YAML from '../index.js'
 
 describe('properties', () => {
   test('parse stringified object', () => {

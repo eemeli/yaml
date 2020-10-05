@@ -1,1 +1,1 @@
-module.exports = require('./dist').YAML
+module.exports = require('./dist')

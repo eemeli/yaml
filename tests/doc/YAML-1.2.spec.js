@@ -1,4 +1,4 @@
-import YAML from '../../index.js'
+import * as YAML from '../../index.js'
 import { YAMLError } from '../../util.js'
 
 const collectionKeyWarning =

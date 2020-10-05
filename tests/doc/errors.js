@@ -1,6 +1,6 @@
 import { Node } from '../../src/cst/Node.js'
 import { YAMLError } from '../../src/errors.js'
-import { YAML } from '../../src/index.js'
+import * as YAML from '../../src/index.js'
 
 let origPrettyErrors
 beforeAll(() => {

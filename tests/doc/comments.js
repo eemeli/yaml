@@ -1,5 +1,5 @@
 import { source } from 'common-tags'
-import YAML from '../../index.js'
+import * as YAML from '../../index.js'
 import { Pair } from '../../types.js'
 
 describe('parse comments', () => {
