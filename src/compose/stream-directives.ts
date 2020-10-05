@@ -1,6 +1,6 @@
 export class StreamDirectives {
   tags: Record<string, string> = { '!!': 'tag:yaml.org,2002:' }
-  yaml: { version: '1.1' | '1.2' } = { version: '1.2' }
+  yaml: { version: '1.1' | '1.2' | undefined } = { version: undefined }
 
   static from(src: StreamDirectives) {
     const res = new StreamDirectives()

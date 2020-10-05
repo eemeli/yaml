@@ -13,11 +13,10 @@ export function composeBlockMap(
   const start = offset
   const map = new YAMLMap(doc.schema)
   if (anchor) doc.anchors.setAnchor(map, anchor)
-  const onRelError = (rel: number, msg: string) => onError(offset + rel, msg)
 
   for (const { start, key, sep, value } of items) {
     // key properties
-    const keyProps = resolveProps(start, 'explicit-key-ind', onRelError)
+    const keyProps = resolveProps(start, 'explicit-key-ind', offset, onError)
     if (!keyProps.found) {
       // implicit key
       if (keyProps.anchor || keyProps.tagName || sep) {
@@ -49,7 +48,7 @@ export function composeBlockMap(
     }
 
     // value properties
-    const valueProps = resolveProps(sep || [], 'map-value-ind', onRelError)
+    const valueProps = resolveProps(sep || [], 'map-value-ind', offset, onError)
     offset += valueProps.length
 
     if (valueProps.found) {

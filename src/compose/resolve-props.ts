@@ -11,8 +11,13 @@ export interface Props {
 
 export function resolveProps(
   start: SourceToken[],
-  indicator: 'explicit-key-ind' | 'map-value-ind' | 'seq-item-ind',
-  onError: (relOffset: number, message: string) => void
+  indicator:
+    | 'doc-start'
+    | 'explicit-key-ind'
+    | 'map-value-ind'
+    | 'seq-item-ind',
+  offset: number,
+  onError: (offset: number, message: string) => void
 ) {
   let length = 0
   let spaceBefore = false
@@ -50,7 +55,7 @@ export function resolveProps(
         found = true
         break
       default:
-        onError(length, `Unexpected ${token.type} token`)
+        onError(offset + length, `Unexpected ${token.type} token`)
     }
     if (token.source) length += token.source.length
   }
