@@ -188,6 +188,40 @@ describe('double-quoted', () => {
       expect(doc.contents.items[0].value.items[0].items[0].value).toBe(value)
     })
   })
+
+  describe('Folding input with excessive start indentation - eemeli/yaml#196', () => {
+    test('quoted', () => {
+      options.indentAtStart = 6
+      options.minContentWidth = 6
+      expect(fold('"ab cd ef gh"', ' ', FOLD_QUOTED, options)).toBe('\n "ab cd ef\n gh"')
+    })
+
+    test('plain', () => {
+      options.indentAtStart = 6
+      options.minContentWidth = 6
+      expect(fold('ab cd ef gh', ' ', FOLD_FLOW, options)).toBe('\n ab cd ef\n gh')
+    })
+
+    test('reported', () => {
+      const input = {
+        testgljrisgjsrligjsrligsjrglisrjgrligjsligrjglisjgrlijgsrilgsejrfiwlahflirgjaelfjafil:
+          '&cLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed nibh ac metus elementum venenatis eu vitae diam. Etiam tristique suscipit mauris. Donec pulvinar sed nunc a gravida. Morbi nulla lacus, gravida eu elementum id, ultricies nec ipsum. Cras bibendum tellus ut mollis malesuada. Maecenas eleifend felis at fermentum hendrerit. Nulla porta vitae erat eget faucibus. Sed egestas viverra magna ac vulputate. Suspendisse vel posuere mauris, accumsan dapibus libero. Curabitur bibendum tellus in ex ultricies, quis tempus magna luctus. Maecenas maximus orci est, id fringilla lorem gravida sit amet. Pellentesque a rutrum lorem. Vestibulum ante ipsum primis in faucibus orci.'
+      }
+      expect(YAML.stringify(input)).toBe(
+        `testgljrisgjsrligjsrligsjrglisrjgrligjsligrjglisjgrlijgsrilgsejrfiwlahflirgjaelfjafil:
+  "&cLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed nibh ac
+  metus elementum venenatis eu vitae diam. Etiam tristique suscipit mauris.
+  Donec pulvinar sed nunc a gravida. Morbi nulla lacus, gravida eu elementum id,
+  ultricies nec ipsum. Cras bibendum tellus ut mollis malesuada. Maecenas
+  eleifend felis at fermentum hendrerit. Nulla porta vitae erat eget faucibus.
+  Sed egestas viverra magna ac vulputate. Suspendisse vel posuere mauris,
+  accumsan dapibus libero. Curabitur bibendum tellus in ex ultricies, quis
+  tempus magna luctus. Maecenas maximus orci est, id fringilla lorem gravida sit
+  amet. Pellentesque a rutrum lorem. Vestibulum ante ipsum primis in faucibus
+  orci."\n`
+      )
+    })
+  })
 })
 
 describe('end-to-end', () => {
