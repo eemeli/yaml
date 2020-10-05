@@ -48,8 +48,8 @@
 <p>These functions should never throw; errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays. In particular, if <code>errors</code> is not empty it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
 
 <p>The <code>contents</code> of a parsed document will always consist of <code>Scalar</code>, <code>Map</code>, <code>Seq</code> or <code>null</code> values.</p>
-<h2 id='creating-documents'>Creating Documents</h2><h4 id='new-yaml-document-value-options'><code>new YAML.Document(value, options = {})</code></h4>
-<p>Creates a new document. If <code>value</code> is defined, the document <code>contents</code> are initialised with that value, wrapped recursively in appropriate <a href="#content-nodes">content nodes</a>. If <code>value</code> is <code>undefined</code>, the document&#39;s <code>contents</code> and <code>schema</code> are initialised as <code>null</code>. See <a href="#options">Options</a> for more information on the second parameter.</p>
+<h2 id='creating-documents'>Creating Documents</h2><h4 id='new-yaml-document-value-replacer-options'><code>new YAML.Document(value, replacer?, options = {})</code></h4>
+<p>Creates a new document. If <code>value</code> is defined, the document <code>contents</code> are initialised with that value, wrapped recursively in appropriate <a href="#content-nodes">content nodes</a>. If <code>value</code> is <code>undefined</code>, the document&#39;s <code>contents</code> and <code>schema</code> are initialised as <code>null</code>. If defined, a <code>replacer</code> may filter or modify the initial document contents, following the same algorithm as the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>. See <a href="#options">Options</a> for more information on the last argument.</p>
 
 <table><thead>
 <tr>
@@ -163,9 +163,14 @@
 <td>Set <code>handle</code> as a shorthand string for the <code>prefix</code> tag namespace.</td>
 </tr>
 <tr>
-<td>toJSON()</td>
+<td>toJS(options?)</td>
 <td><code>any</code></td>
 <td>A plain JavaScript representation of the document <code>contents</code>.</td>
+</tr>
+<tr>
+<td>toJSON()</td>
+<td><code>any</code></td>
+<td>A JSON representation of the document <code>contents</code>.</td>
 </tr>
 <tr>
 <td>toString()</td>
@@ -184,20 +189,21 @@
 <p>In addition to the above, the document object also provides the same <strong>accessor methods</strong> as <a href="#collections">collections</a>, based on the top-level collection: <code>add</code>, <code>delete</code>, <code>get</code>, <code>has</code>, and <code>set</code>, along with their deeper variants <code>addIn</code>, <code>deleteIn</code>, <code>getIn</code>, <code>hasIn</code>, and <code>setIn</code>. For the <code>*In</code> methods using an empty <code>path</code> value (i.e. <code>null</code>, <code>undefined</code>, or <code>[]</code>) will refer to the document&#39;s top-level <code>contents</code>.</p>
 
 <p>To define a tag prefix to use when stringifying, use <strong><code>setTagPrefix(handle, prefix)</code></strong> rather than setting a value directly in <code>tagPrefixes</code>. This will guarantee that the <code>handle</code> is valid (by throwing an error), and will overwrite any previous definition for the <code>handle</code>. Use an empty <code>prefix</code> value to remove a prefix.</p>
-<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">1969-07-21T02:56:15Z</span><span class="dl">'</span>
+<h4 id='document-tojs-document-tojson-and-document-tostring'><code>Document#toJS()</code>, <code>Document#toJSON()</code> and <code>Document#toString()</code></h4><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">1969-07-21T02:56:15Z</span><span class="dl">'</span>
 <span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">timestamp</span><span class="dl">'</span><span class="p">]</span> <span class="p">})</span>
 
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
 <span class="c1">// Date { 1969-07-21T02:56:15.000Z }</span>
 
-<span class="nx">doc</span><span class="p">.</span><span class="nx">options</span><span class="p">.</span><span class="nx">keepBlobsInJSON</span> <span class="o">=</span> <span class="kc">false</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// '1969-07-21T02:56:15.000Z'</span>
 
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// '1969-07-21T02:56:15\n'</span>
 </code></pre></div>
-<p>For a plain JavaScript representation of the document, <strong><code>toJSON()</code></strong> is your friend. By default the values wrapped in scalar nodes will not be forced to JSON, so e.g. a <code>!!timestamp</code> will remain a <code>Date</code> in the output. To change this behaviour and enforce JSON values only, set the <a href="#options"><code>keepBlobsInJSON</code> option</a> to <code>false</code>.</p>
+<p>For a plain JavaScript representation of the document, <strong><code>toJS()</code></strong> is your friend. Its output may include <code>Map</code> and <code>Set</code> collections (e.g. if the <code>mapAsMap</code> option is true) and complex scalar values like <code>Date</code> for <code>!!timestamp</code>, but all YAML nodes will be resolved. For a representation consisting only of JSON values, use <strong><code>toJSON()</code></strong>.</p>
+
+<p>Use <code>toJS({ mapAsMap, onAnchor, reviver })</code> to explicitly set the <code>mapAsMap</code> option, define an <code>onAnchor</code> callback <code>(value: any, count: number) =&gt; void</code> for each aliased anchor in the document, or to apply a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter">reviver function</a> to the output.</p>
 
 <p>Conversely, to stringify a document as YAML, use <strong><code>toString()</code></strong>. This will also be called by <code>String(doc)</code>. This method will throw if the <code>errors</code> array is not empty.</p>
 <h2 id='working-with-anchors'>Working with Anchors</h2>
@@ -261,7 +267,7 @@
 <span class="kd">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">true</span><span class="p">),</span> <span class="dl">'</span><span class="s1">AA</span><span class="dl">'</span><span class="p">)</span>
 <span class="c1">// Alias { source: YAMLMap { items: [ [Pair] ] } }</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B }, *AA ]</span>
@@ -271,14 +277,14 @@
 <span class="c1">//   key: Scalar { value: '&lt;&lt;' },</span>
 <span class="c1">//   value: YAMLSeq { items: [ [Alias] ] } }</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="nx">merge</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B, &lt;&lt;: *AA }, *AA ]</span>
 
 <span class="c1">// This creates a circular reference</span>
 <span class="nx">merge</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">true</span><span class="p">)))</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span> <span class="c1">// [RangeError: Maximum call stack size exceeded]</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span> <span class="c1">// [RangeError: Maximum call stack size exceeded]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [</span>
 <span class="c1">//   &amp;AA { a: A },</span>

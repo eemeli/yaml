@@ -1,6 +1,7 @@
 <h1 id='options'>Options</h1><div class="highlight"><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span>
-<span class="c1">// { keepBlobsInJSON: true,</span>
+<span class="c1">// { indent: 2,</span>
 <span class="c1">//   keepNodeTypes: true,</span>
+<span class="c1">//   mapAsMap: false,</span>
 <span class="c1">//   version: '1.2' }</span>
 
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">.</span><span class="nx">defaults</span>
@@ -40,11 +41,6 @@
 <td>Whether block sequences should be indented. By default <code>true</code>.</td>
 </tr>
 <tr>
-<td>keepBlobsInJSON</td>
-<td><code>boolean</code></td>
-<td>Allow non-JSON JavaScript objects to remain in the <code>toJSON</code> output. Relevant with the YAML 1.1 <code>!!timestamp</code> and <code>!!binary</code> tags as well as BigInts. By default <code>true</code>.</td>
-</tr>
-<tr>
 <td>keepCstNodes</td>
 <td><code>boolean</code></td>
 <td>Include references in the AST to each node&#39;s corresponding CST node. By default <code>false</code>.</td>
@@ -53,6 +49,11 @@
 <td>keepNodeTypes</td>
 <td><code>boolean</code></td>
 <td>Store the original node type when parsing documents. By default <code>true</code>.</td>
+</tr>
+<tr>
+<td>keepUndefined</td>
+<td><code>boolean</code></td>
+<td>Keep <code>undefined</code> object values when creating mappings and return a Scalar node when stringifying <code>undefined</code>. By default <code>false</code>.</td>
 </tr>
 <tr>
 <td>mapAsMap</td>

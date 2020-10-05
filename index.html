@@ -398,8 +398,8 @@ yarn add yaml@next
 <span class="kd">const</span> <span class="nx">YAML</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span><span class="p">)</span>
 </code></pre></div>
 <ul>
-<li><a href="#yaml-parse"><code>YAML.parse(str, options): value</code></a></li>
-<li><a href="#yaml-stringify"><code>YAML.stringify(value, options): string</code></a></li>
+<li><a href="#yaml-parse"><code>YAML.parse(str, reviver?, options?): value</code></a></li>
+<li><a href="#yaml-stringify"><code>YAML.stringify(value, replacer?, options?): string</code></a></li>
 </ul>
 
 <h3>Documents</h3>
@@ -409,15 +409,15 @@ yarn add yaml@next
 <li><a href="#documents"><code>YAML.Document</code></a>
 
 <ul>
-<li><a href="#creating-documents"><code>constructor(value, options)</code></a></li>
+<li><a href="#creating-documents"><code>constructor(value, replacer?, options?)</code></a></li>
 <li><a href="#options"><code>defaults</code></a></li>
-<li><a href="#creating-nodes"><code>#createNode(value, options): Node</code></a></li>
+<li><a href="#creating-nodes"><code>#createNode(value, options?): Node</code></a></li>
 <li><a href="#working-with-anchors"><code>#anchors</code></a></li>
 <li><a href="#content-nodes"><code>#contents</code></a></li>
 <li><a href="#errors"><code>#errors</code></a></li>
 </ul></li>
-<li><a href="#parsing-documents"><code>YAML.parseAllDocuments(str, options): YAML.Document[]</code></a></li>
-<li><a href="#parsing-documents"><code>YAML.parseDocument(str, options): YAML.Document</code></a></li>
+<li><a href="#parsing-documents"><code>YAML.parseAllDocuments(str, options?): YAML.Document[]</code></a></li>
+<li><a href="#parsing-documents"><code>YAML.parseDocument(str, options?): YAML.Document</code></a></li>
 </ul>
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Pair</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/types</span><span class="dl">'</span>
 </code></pre></div>
@@ -460,8 +460,8 @@ yarn add yaml@next
 <span class="c1">//   yaml:</span>
 <span class="c1">//   [ 'A complete JavaScript implementation',</span>
 <span class="c1">//     'https://www.npmjs.com/package/yaml' ] }</span>
-</code></pre></div><h4 id='yaml-parse-str-options-any'><code>YAML.parse(str, options = {}): any</code></h4>
-<p><code>str</code> should be a string with YAML formatting. See <a href="#options">Options</a> for more information on the second parameter, an optional configuration object.</p>
+</code></pre></div><h4 id='yaml-parse-str-reviver-options-any'><code>YAML.parse(str, reviver?, options = {}): any</code></h4>
+<p><code>str</code> should be a string with YAML formatting. If defined, the <code>reviver</code> function follows the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter">JSON implementation</a>. See <a href="#options">Options</a> for more information on the last argument, an optional configuration object.</p>
 
 <p>The returned value will match the type of the root value of the parsed YAML document, so Maps become objects, Sequences arrays, and scalars result in nulls, booleans, numbers and strings.</p>
 
@@ -484,15 +484,16 @@ yarn add yaml@next
 <span class="c1">//</span>
 <span class="c1">//   lines</span>
 <span class="c1">// `</span>
-</code></pre></div><h4 id='yaml-stringify-value-options-string'><code>YAML.stringify(value, options = {}): string</code></h4>
-<p><code>value</code> can be of any type. The returned string will always include <code>\n</code> as the last character, as is expected of YAML documents. See <a href="#options">Options</a> for more information on the second parameter, an optional configuration object.</p>
+</code></pre></div><h4 id='yaml-stringify-value-replacer-options-string'><code>YAML.stringify(value, replacer?, options = {}): string</code></h4>
+<p><code>value</code> can be of any type. The returned string will always include <code>\n</code> as the last character, as is expected of YAML documents. If defined, the <code>replacer</code> array or function follows the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>. See <a href="#options">Options</a> for more information on the last argument, an optional configuration object. For JSON compatibility, using a number or a string as the <code>options</code> value will set the <code>indent</code> option accordingly.</p>
 
 <p>As strings in particular may be represented in a number of different styles, the simplest option for the value in question will always be chosen, depending mostly on the presence of escaped or control characters and leading &amp; trailing whitespace.</p>
 
 <p>To create a stream of documents, you may call <code>YAML.stringify</code> separately for each document&#39;s <code>value</code>, and concatenate the documents with the string <code>...\n</code> as a separator.</p>
 <h1 id='options'>Options</h1><div class="highlight"><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">defaultOptions</span>
-<span class="c1">// { keepBlobsInJSON: true,</span>
+<span class="c1">// { indent: 2,</span>
 <span class="c1">//   keepNodeTypes: true,</span>
+<span class="c1">//   mapAsMap: false,</span>
 <span class="c1">//   version: '1.2' }</span>
 
 <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">.</span><span class="nx">defaults</span>
@@ -532,11 +533,6 @@ yarn add yaml@next
 <td>Whether block sequences should be indented. By default <code>true</code>.</td>
 </tr>
 <tr>
-<td>keepBlobsInJSON</td>
-<td><code>boolean</code></td>
-<td>Allow non-JSON JavaScript objects to remain in the <code>toJSON</code> output. Relevant with the YAML 1.1 <code>!!timestamp</code> and <code>!!binary</code> tags as well as BigInts. By default <code>true</code>.</td>
-</tr>
-<tr>
 <td>keepCstNodes</td>
 <td><code>boolean</code></td>
 <td>Include references in the AST to each node&#39;s corresponding CST node. By default <code>false</code>.</td>
@@ -545,6 +541,11 @@ yarn add yaml@next
 <td>keepNodeTypes</td>
 <td><code>boolean</code></td>
 <td>Store the original node type when parsing documents. By default <code>true</code>.</td>
+</tr>
+<tr>
+<td>keepUndefined</td>
+<td><code>boolean</code></td>
+<td>Keep <code>undefined</code> object values when creating mappings and return a Scalar node when stringifying <code>undefined</code>. By default <code>false</code>.</td>
 </tr>
 <tr>
 <td>mapAsMap</td>
@@ -754,8 +755,8 @@ target:
 <p>These functions should never throw; errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays. In particular, if <code>errors</code> is not empty it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
 
 <p>The <code>contents</code> of a parsed document will always consist of <code>Scalar</code>, <code>Map</code>, <code>Seq</code> or <code>null</code> values.</p>
-<h2 id='creating-documents'>Creating Documents</h2><h4 id='new-yaml-document-value-options'><code>new YAML.Document(value, options = {})</code></h4>
-<p>Creates a new document. If <code>value</code> is defined, the document <code>contents</code> are initialised with that value, wrapped recursively in appropriate <a href="#content-nodes">content nodes</a>. If <code>value</code> is <code>undefined</code>, the document&#39;s <code>contents</code> and <code>schema</code> are initialised as <code>null</code>. See <a href="#options">Options</a> for more information on the second parameter.</p>
+<h2 id='creating-documents'>Creating Documents</h2><h4 id='new-yaml-document-value-replacer-options'><code>new YAML.Document(value, replacer?, options = {})</code></h4>
+<p>Creates a new document. If <code>value</code> is defined, the document <code>contents</code> are initialised with that value, wrapped recursively in appropriate <a href="#content-nodes">content nodes</a>. If <code>value</code> is <code>undefined</code>, the document&#39;s <code>contents</code> and <code>schema</code> are initialised as <code>null</code>. If defined, a <code>replacer</code> may filter or modify the initial document contents, following the same algorithm as the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>. See <a href="#options">Options</a> for more information on the last argument.</p>
 
 <table><thead>
 <tr>
@@ -869,9 +870,14 @@ target:
 <td>Set <code>handle</code> as a shorthand string for the <code>prefix</code> tag namespace.</td>
 </tr>
 <tr>
-<td>toJSON()</td>
+<td>toJS(options?)</td>
 <td><code>any</code></td>
 <td>A plain JavaScript representation of the document <code>contents</code>.</td>
+</tr>
+<tr>
+<td>toJSON()</td>
+<td><code>any</code></td>
+<td>A JSON representation of the document <code>contents</code>.</td>
 </tr>
 <tr>
 <td>toString()</td>
@@ -890,20 +896,21 @@ target:
 <p>In addition to the above, the document object also provides the same <strong>accessor methods</strong> as <a href="#collections">collections</a>, based on the top-level collection: <code>add</code>, <code>delete</code>, <code>get</code>, <code>has</code>, and <code>set</code>, along with their deeper variants <code>addIn</code>, <code>deleteIn</code>, <code>getIn</code>, <code>hasIn</code>, and <code>setIn</code>. For the <code>*In</code> methods using an empty <code>path</code> value (i.e. <code>null</code>, <code>undefined</code>, or <code>[]</code>) will refer to the document&#39;s top-level <code>contents</code>.</p>
 
 <p>To define a tag prefix to use when stringifying, use <strong><code>setTagPrefix(handle, prefix)</code></strong> rather than setting a value directly in <code>tagPrefixes</code>. This will guarantee that the <code>handle</code> is valid (by throwing an error), and will overwrite any previous definition for the <code>handle</code>. Use an empty <code>prefix</code> value to remove a prefix.</p>
-<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">1969-07-21T02:56:15Z</span><span class="dl">'</span>
+<h4 id='document-tojs-document-tojson-and-document-tostring'><code>Document#toJS()</code>, <code>Document#toJSON()</code> and <code>Document#toString()</code></h4><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">1969-07-21T02:56:15Z</span><span class="dl">'</span>
 <span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">timestamp</span><span class="dl">'</span><span class="p">]</span> <span class="p">})</span>
 
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
 <span class="c1">// Date { 1969-07-21T02:56:15.000Z }</span>
 
-<span class="nx">doc</span><span class="p">.</span><span class="nx">options</span><span class="p">.</span><span class="nx">keepBlobsInJSON</span> <span class="o">=</span> <span class="kc">false</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
 <span class="c1">// '1969-07-21T02:56:15.000Z'</span>
 
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// '1969-07-21T02:56:15\n'</span>
 </code></pre></div>
-<p>For a plain JavaScript representation of the document, <strong><code>toJSON()</code></strong> is your friend. By default the values wrapped in scalar nodes will not be forced to JSON, so e.g. a <code>!!timestamp</code> will remain a <code>Date</code> in the output. To change this behaviour and enforce JSON values only, set the <a href="#options"><code>keepBlobsInJSON</code> option</a> to <code>false</code>.</p>
+<p>For a plain JavaScript representation of the document, <strong><code>toJS()</code></strong> is your friend. Its output may include <code>Map</code> and <code>Set</code> collections (e.g. if the <code>mapAsMap</code> option is true) and complex scalar values like <code>Date</code> for <code>!!timestamp</code>, but all YAML nodes will be resolved. For a representation consisting only of JSON values, use <strong><code>toJSON()</code></strong>.</p>
+
+<p>Use <code>toJS({ mapAsMap, onAnchor, reviver })</code> to explicitly set the <code>mapAsMap</code> option, define an <code>onAnchor</code> callback <code>(value: any, count: number) =&gt; void</code> for each aliased anchor in the document, or to apply a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter">reviver function</a> to the output.</p>
 
 <p>Conversely, to stringify a document as YAML, use <strong><code>toString()</code></strong>. This will also be called by <code>String(doc)</code>. This method will throw if the <code>errors</code> array is not empty.</p>
 <h2 id='working-with-anchors'>Working with Anchors</h2>
@@ -967,7 +974,7 @@ target:
 <span class="kd">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">true</span><span class="p">),</span> <span class="dl">'</span><span class="s1">AA</span><span class="dl">'</span><span class="p">)</span>
 <span class="c1">// Alias { source: YAMLMap { items: [ [Pair] ] } }</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B }, *AA ]</span>
@@ -977,14 +984,14 @@ target:
 <span class="c1">//   key: Scalar { value: '&lt;&lt;' },</span>
 <span class="c1">//   value: YAMLSeq { items: [ [Alias] ] } }</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="nx">merge</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
 <span class="c1">// [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B, &lt;&lt;: *AA }, *AA ]</span>
 
 <span class="c1">// This creates a circular reference</span>
 <span class="nx">merge</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">true</span><span class="p">)))</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span> <span class="c1">// [RangeError: Maximum call stack size exceeded]</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span> <span class="c1">// [RangeError: Maximum call stack size exceeded]</span>
 <span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="c1">// [</span>
 <span class="c1">//   &amp;AA { a: A },</span>
@@ -1012,7 +1019,7 @@ target:
   <span class="nx">spaceBefore</span><span class="p">:</span> <span class="p">?</span><span class="nx">boolean</span><span class="p">,</span>
       <span class="c1">// a blank line before this node and its commentBefore</span>
   <span class="nx">tag</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>       <span class="c1">// a fully qualified tag, if required</span>
-  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>       <span class="c1">// a plain JS representation of this node</span>
+  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>       <span class="c1">// a plain JS or JSON representation of this node</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>For scalar values, the <code>tag</code> will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, <code>Map</code>, or <code>Seq</code>).</p>
@@ -1166,7 +1173,7 @@ target:
 </code></pre></div><h4 id='yaml-document-createnode-value-options-node'><code>YAML.Document#createNode(value, options?): Node</code></h4>
 <p>To create a new node, use the <code>createNode(value, options?)</code> document method. This will recursively wrap any input with appropriate <code>Node</code> containers. Generic JS <code>Object</code> values as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences. With <code>Object</code>, entries that have an <code>undefined</code> value are dropped.</p>
 
-<p>To specify the collection type, set <code>options.tag</code> to its identifying string, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available in the document&#39;s schema. If <code>options.wrapScalars</code> is undefined or <code>true</code>, plain values are wrapped in <code>Scalar</code> objects.</p>
+<p>Use <code>options.replacer</code> to apply a replacer array or function, following the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>. To specify the collection type, set <code>options.tag</code> to its identifying string, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available in the document&#39;s schema. If <code>options.wrapScalars</code> is undefined or <code>true</code>, plain values are wrapped in <code>Scalar</code> objects.</p>
 
 <p>As a possible side effect, this method may add entries to the document&#39;s <a href="#working-with-anchors"><code>anchors</code></a></p>
 
@@ -1202,7 +1209,7 @@ it has:
   - of values
 `</span><span class="p">)</span>
 
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
 <span class="c1">// { 'it has': [ 'an array', 'of values' ] }</span>
 
 <span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span>
@@ -1436,7 +1443,7 @@ it has:
 <h3 id='parsing-custom-data'>Parsing Custom Data</h3>
 <p>At the lowest level, <a href="#cst-parser"><code>YAML.parseCST()</code></a> will take care of turning string input into a concrete syntax tree (CST). In the CST all scalar values are available as strings, and maps &amp; sequences as collections of nodes. Each schema includes a set of default data types, which handle converting at least strings, maps and sequences into their AST nodes. These are considered to have <em>implicit</em> tags, and are autodetected. Custom tags, on the other hand, should almost always define an <em>explicit</em> <code>tag</code> with which their value will be prefixed. This may be application-specific local <code>!tag</code>, a shorthand <code>!ns!tag</code>, or a verbatim <code>!&lt;tag:example.com,2019:tag&gt;</code>.</p>
 
-<p>Once identified by matching the <code>tag</code>, the <code>resolve(doc, cstNode): Node | any</code> function will turn a CST node into an AST node. For scalars, this is relatively simple, as the stringified node value is directly available, and should be converted to its actual value. Collections are trickier, and it&#39;s almost certain that it&#39;ll make sense to use the <code>parseMap(doc, cstNode)</code> and <code>parseSeq(doc, cstNode)</code> functions exported from <code>&#39;yaml/util&#39;</code> to initially resolve the CST collection into a <code>YAMLMap</code> or <code>YAMLSeq</code> object, and to work with that instead -- this is for instance what the YAML 1.1 collections do.</p>
+<p>Once identified by matching the <code>tag</code>, the <code>resolve(value, onError): Node | any</code> function will turn a parsed value into an AST node. <code>value</code> may be either a <code>string</code>, a <code>YAMLMap</code> or a <code>YAMLSeq</code>, depending on the node&#39;s shape. A custom tag should verify that value is of its expected type.</p>
 
 <p>Note that during the CST -&gt; AST parsing, the anchors and comments attached to each node are also resolved for each node. This metadata will unfortunately be lost when converting the values to JS objects, so collections should have values that extend one of the existing collection classes. Collections should therefore either fall back to their parent classes&#39; <code>toJSON()</code> methods, or define their own in order to allow their contents to be expressed as the appropriate JS object.</p>
 <h3 id='creating-nodes-and-stringifying-custom-data'>Creating Nodes and Stringifying Custom Data</h3>
@@ -1449,11 +1456,9 @@ it has:
 <!-- prettier-ignore -->
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
   <span class="nx">findPair</span><span class="p">,</span> <span class="c1">// (items, key) =&gt; Pair? -- Given a key, find a matching Pair</span>
-  <span class="nx">parseMap</span><span class="p">,</span> <span class="c1">// (doc, cstNode) =&gt; new YAMLMap</span>
-  <span class="nx">parseSeq</span><span class="p">,</span> <span class="c1">// (doc, cstNode) =&gt; new YAMLSeq</span>
   <span class="nx">stringifyNumber</span><span class="p">,</span> <span class="c1">// (node) =&gt; string</span>
   <span class="nx">stringifyString</span><span class="p">,</span> <span class="c1">// (node, ctx, ...) =&gt; string</span>
-  <span class="nx">toJSON</span><span class="p">,</span> <span class="c1">// (value, arg, ctx) =&gt; any -- Recursively convert to plain JS</span>
+  <span class="nx">toJS</span><span class="p">,</span> <span class="c1">// (value, arg, ctx) =&gt; any -- Recursively convert to plain JS</span>
   <span class="nx">Type</span><span class="p">,</span> <span class="c1">// { [string]: string } -- Used as enum for node types</span>
   <span class="nx">YAMLReferenceError</span><span class="p">,</span> <span class="nx">YAMLSemanticError</span><span class="p">,</span> <span class="nx">YAMLSyntaxError</span><span class="p">,</span> <span class="nx">YAMLWarning</span>
 <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/util</span><span class="dl">'</span>
@@ -1466,7 +1471,7 @@ it has:
 <li><strong><code>identify(value): boolean</code></strong> is used by <code>doc.createNode()</code> to detect your data type, e.g. using <code>typeof</code> or <code>instanceof</code>. Required.</li>
 <li><code>nodeClass: Node</code> is the <code>Node</code> child class that implements this tag. Required for collections and tags that have overlapping JS representations.</li>
 <li><code>options: Object</code> is used by some tags to configure their stringification.</li>
-<li><strong><code>resolve(doc, cstNode): Node | any</code></strong> turns a CST node into an AST node; <code>doc</code> is the resulting <code>YAML.Document</code> instance. If returning a non-<code>Node</code> value, the output will be wrapped as a <code>Scalar</code>. Required.</li>
+<li><strong><code>resolve(value, onError): Node | any</code></strong> turns a parsed value into an AST node; <code>value</code> is either a <code>string</code>, a <code>YAMLMap</code> or a <code>YAMLSeq</code>. <code>onError(msg)</code> should be called with an error message string when encountering errors, as it&#39;ll allow you to still return some value for the node. If returning a non-<code>Node</code> value, the output will be wrapped as a <code>Scalar</code>. Required.</li>
 <li><code>stringify(item, ctx, onComment, onChompKeep): string</code> is an optional function stringifying the <code>item</code> AST node in the current context <code>ctx</code>. <code>onComment</code> and <code>onChompKeep</code> are callback functions for a couple of special cases. If your data includes a suitable <code>.toString()</code> method, you can probably leave this undefined and use the default stringifier.</li>
 <li><strong><code>tag: string</code></strong> is the identifier for your data type, with which its stringified form will be prefixed. Should either be a !-prefixed local <code>!tag</code>, or a fully qualified <code>tag:domain,date:foo</code>. Required.</li>
 <li><code>test: RegExp</code> and <code>default: boolean</code> allow for values to be stringified without an explicit tag and detected using a regular expression. For most cases, it&#39;s unlikely that you&#39;ll actually want to use these, even if you first think you do.</li>

@@ -9,7 +9,7 @@
   <span class="nx">spaceBefore</span><span class="p">:</span> <span class="p">?</span><span class="nx">boolean</span><span class="p">,</span>
       <span class="c1">// a blank line before this node and its commentBefore</span>
   <span class="nx">tag</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">,</span>       <span class="c1">// a fully qualified tag, if required</span>
-  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>       <span class="c1">// a plain JS representation of this node</span>
+  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>       <span class="c1">// a plain JS or JSON representation of this node</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>For scalar values, the <code>tag</code> will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, <code>Map</code>, or <code>Seq</code>).</p>
@@ -163,7 +163,7 @@
 </code></pre></div><h4 id='yaml-document-createnode-value-options-node'><code>YAML.Document#createNode(value, options?): Node</code></h4>
 <p>To create a new node, use the <code>createNode(value, options?)</code> document method. This will recursively wrap any input with appropriate <code>Node</code> containers. Generic JS <code>Object</code> values as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences. With <code>Object</code>, entries that have an <code>undefined</code> value are dropped.</p>
 
-<p>To specify the collection type, set <code>options.tag</code> to its identifying string, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available in the document&#39;s schema. If <code>options.wrapScalars</code> is undefined or <code>true</code>, plain values are wrapped in <code>Scalar</code> objects.</p>
+<p>Use <code>options.replacer</code> to apply a replacer array or function, following the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>. To specify the collection type, set <code>options.tag</code> to its identifying string, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available in the document&#39;s schema. If <code>options.wrapScalars</code> is undefined or <code>true</code>, plain values are wrapped in <code>Scalar</code> objects.</p>
 
 <p>As a possible side effect, this method may add entries to the document&#39;s <a href="#working-with-anchors"><code>anchors</code></a></p>
 
@@ -199,7 +199,7 @@ it has:
   - of values
 `</span><span class="p">)</span>
 
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
 <span class="c1">// { 'it has': [ 'an array', 'of values' ] }</span>
 
 <span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span>

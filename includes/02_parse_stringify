@@ -24,8 +24,8 @@
 <span class="c1">//   yaml:</span>
 <span class="c1">//   [ 'A complete JavaScript implementation',</span>
 <span class="c1">//     'https://www.npmjs.com/package/yaml' ] }</span>
-</code></pre></div><h4 id='yaml-parse-str-options-any'><code>YAML.parse(str, options = {}): any</code></h4>
-<p><code>str</code> should be a string with YAML formatting. See <a href="#options">Options</a> for more information on the second parameter, an optional configuration object.</p>
+</code></pre></div><h4 id='yaml-parse-str-reviver-options-any'><code>YAML.parse(str, reviver?, options = {}): any</code></h4>
+<p><code>str</code> should be a string with YAML formatting. If defined, the <code>reviver</code> function follows the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter">JSON implementation</a>. See <a href="#options">Options</a> for more information on the last argument, an optional configuration object.</p>
 
 <p>The returned value will match the type of the root value of the parsed YAML document, so Maps become objects, Sequences arrays, and scalars result in nulls, booleans, numbers and strings.</p>
 
@@ -48,8 +48,8 @@
 <span class="c1">//</span>
 <span class="c1">//   lines</span>
 <span class="c1">// `</span>
-</code></pre></div><h4 id='yaml-stringify-value-options-string'><code>YAML.stringify(value, options = {}): string</code></h4>
-<p><code>value</code> can be of any type. The returned string will always include <code>\n</code> as the last character, as is expected of YAML documents. See <a href="#options">Options</a> for more information on the second parameter, an optional configuration object.</p>
+</code></pre></div><h4 id='yaml-stringify-value-replacer-options-string'><code>YAML.stringify(value, replacer?, options = {}): string</code></h4>
+<p><code>value</code> can be of any type. The returned string will always include <code>\n</code> as the last character, as is expected of YAML documents. If defined, the <code>replacer</code> array or function follows the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>. See <a href="#options">Options</a> for more information on the last argument, an optional configuration object. For JSON compatibility, using a number or a string as the <code>options</code> value will set the <code>indent</code> option accordingly.</p>
 
 <p>As strings in particular may be represented in a number of different styles, the simplest option for the value in question will always be chosen, depending mostly on the presence of escaped or control characters and leading &amp; trailing whitespace.</p>
 

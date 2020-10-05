@@ -29,8 +29,8 @@ yarn add yaml@next
 <span class="kd">const</span> <span class="nx">YAML</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span><span class="p">)</span>
 </code></pre></div>
 <ul>
-<li><a href="#yaml-parse"><code>YAML.parse(str, options): value</code></a></li>
-<li><a href="#yaml-stringify"><code>YAML.stringify(value, options): string</code></a></li>
+<li><a href="#yaml-parse"><code>YAML.parse(str, reviver?, options?): value</code></a></li>
+<li><a href="#yaml-stringify"><code>YAML.stringify(value, replacer?, options?): string</code></a></li>
 </ul>
 
 <h3>Documents</h3>
@@ -40,15 +40,15 @@ yarn add yaml@next
 <li><a href="#documents"><code>YAML.Document</code></a>
 
 <ul>
-<li><a href="#creating-documents"><code>constructor(value, options)</code></a></li>
+<li><a href="#creating-documents"><code>constructor(value, replacer?, options?)</code></a></li>
 <li><a href="#options"><code>defaults</code></a></li>
-<li><a href="#creating-nodes"><code>#createNode(value, options): Node</code></a></li>
+<li><a href="#creating-nodes"><code>#createNode(value, options?): Node</code></a></li>
 <li><a href="#working-with-anchors"><code>#anchors</code></a></li>
 <li><a href="#content-nodes"><code>#contents</code></a></li>
 <li><a href="#errors"><code>#errors</code></a></li>
 </ul></li>
-<li><a href="#parsing-documents"><code>YAML.parseAllDocuments(str, options): YAML.Document[]</code></a></li>
-<li><a href="#parsing-documents"><code>YAML.parseDocument(str, options): YAML.Document</code></a></li>
+<li><a href="#parsing-documents"><code>YAML.parseAllDocuments(str, options?): YAML.Document[]</code></a></li>
+<li><a href="#parsing-documents"><code>YAML.parseDocument(str, options?): YAML.Document</code></a></li>
 </ul>
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Pair</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/types</span><span class="dl">'</span>
 </code></pre></div>
