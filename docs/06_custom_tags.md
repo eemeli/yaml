@@ -110,7 +110,7 @@ If you wish to implement your own custom tags, the [`!!binary`](https://github.c
 
 At the lowest level, [`YAML.parseCST()`](#cst-parser) will take care of turning string input into a concrete syntax tree (CST). In the CST all scalar values are available as strings, and maps & sequences as collections of nodes. Each schema includes a set of default data types, which handle converting at least strings, maps and sequences into their AST nodes. These are considered to have _implicit_ tags, and are autodetected. Custom tags, on the other hand, should almost always define an _explicit_ `tag` with which their value will be prefixed. This may be application-specific local `!tag`, a shorthand `!ns!tag`, or a verbatim `!<tag:example.com,2019:tag>`.
 
-Once identified by matching the `tag`, the `resolve(doc, cstNode): Node | any` function will turn a CST node into an AST node. For scalars, this is relatively simple, as the stringified node value is directly available, and should be converted to its actual value. Collections are trickier, and it's almost certain that it'll make sense to use the `parseMap(doc, cstNode)` and `parseSeq(doc, cstNode)` functions exported from `'yaml/util'` to initially resolve the CST collection into a `YAMLMap` or `YAMLSeq` object, and to work with that instead -- this is for instance what the YAML 1.1 collections do.
+Once identified by matching the `tag`, the `resolve(value, onError): Node | any` function will turn a parsed value into an AST node. `value` may be either a `string`, a `YAMLMap` or a `YAMLSeq`, depending on the node's shape. A custom tag should verify that value is of its expected type.
 
 Note that during the CST -> AST parsing, the anchors and comments attached to each node are also resolved for each node. This metadata will unfortunately be lost when converting the values to JS objects, so collections should have values that extend one of the existing collection classes. Collections should therefore either fall back to their parent classes' `toJSON()` methods, or define their own in order to allow their contents to be expressed as the appropriate JS object.
 
@@ -128,8 +128,6 @@ Finally, `stringify(item, ctx, ...): string` defines how your data should be rep
 ```js
 import {
   findPair, // (items, key) => Pair? -- Given a key, find a matching Pair
-  parseMap, // (doc, cstNode) => new YAMLMap
-  parseSeq, // (doc, cstNode) => new YAMLSeq
   stringifyNumber, // (node) => string
   stringifyString, // (node, ctx, ...) => string
   toJS, // (value, arg, ctx) => any -- Recursively convert to plain JS
@@ -145,7 +143,7 @@ To define your own tag, you'll need to define an object comprising of some of th
 - **`identify(value): boolean`** is used by `doc.createNode()` to detect your data type, e.g. using `typeof` or `instanceof`. Required.
 - `nodeClass: Node` is the `Node` child class that implements this tag. Required for collections and tags that have overlapping JS representations.
 - `options: Object` is used by some tags to configure their stringification.
-- **`resolve(doc, cstNode): Node | any`** turns a CST node into an AST node; `doc` is the resulting `YAML.Document` instance. If returning a non-`Node` value, the output will be wrapped as a `Scalar`. Required.
+- **`resolve(value, onError): Node | any`** turns a parsed value into an AST node; `value` is either a `string`, a `YAMLMap` or a `YAMLSeq`. `onError(msg)` should be called with an error message string when encountering errors, as it'll allow you to still return some value for the node. If returning a non-`Node` value, the output will be wrapped as a `Scalar`. Required.
 - `stringify(item, ctx, onComment, onChompKeep): string` is an optional function stringifying the `item` AST node in the current context `ctx`. `onComment` and `onChompKeep` are callback functions for a couple of special cases. If your data includes a suitable `.toString()` method, you can probably leave this undefined and use the default stringifier.
 - **`tag: string`** is the identifier for your data type, with which its stringified form will be prefixed. Should either be a !-prefixed local `!tag`, or a fully qualified `tag:domain,date:foo`. Required.
 - `test: RegExp` and `default: boolean` allow for values to be stringified without an explicit tag and detected using a regular expression. For most cases, it's unlikely that you'll actually want to use these, even if you first think you do.

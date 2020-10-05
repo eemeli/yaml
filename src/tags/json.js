@@ -1,7 +1,6 @@
 /* global BigInt */
 
 import { Scalar } from '../ast/Scalar.js'
-import { resolveString } from '../resolve/resolveString.js'
 import { map } from './failsafe/map.js'
 import { seq } from './failsafe/seq.js'
 import { intOptions } from './options.js'
@@ -18,7 +17,7 @@ export const json = [
     identify: value => typeof value === 'string',
     default: true,
     tag: 'tag:yaml.org,2002:str',
-    resolve: resolveString,
+    resolve: str => str,
     stringify: stringifyJSON
   },
   {
@@ -55,9 +54,13 @@ export const json = [
     test: /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][-+]?[0-9]+)?$/,
     resolve: str => parseFloat(str),
     stringify: stringifyJSON
+  },
+  {
+    default: true,
+    test: /^/,
+    resolve(str, onError) {
+      onError(`Unresolved plain scalar ${JSON.stringify(str)}`)
+      return str
+    }
   }
 ]
-
-json.scalarFallback = str => {
-  throw new SyntaxError(`Unresolved plain scalar ${JSON.stringify(str)}`)
-}

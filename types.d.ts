@@ -119,6 +119,14 @@ export namespace Schema {
      */
     options?: object
     /**
+     * Turns a value into an AST node.
+     * If returning a non-`Node` value, the output will be wrapped as a `Scalar`.
+     */
+    resolve(
+      value: string | YAMLMap | YAMLSeq,
+      onError: (message: string) => void
+    ): Node | any
+    /**
      * Optional function stringifying the AST node in the current context. If your
      * data includes a suitable `.toString()` method, you can probably leave this
      * undefined and use the default stringifier.
@@ -145,11 +153,7 @@ export namespace Schema {
   }
 
   interface CustomTag extends BaseTag {
-    /**
-     * Turns a CST node into an AST node. If returning a non-`Node` value, the
-     * output will be wrapped as a `Scalar`.
-     */
-    resolve(doc: Document, cstNode: CST.Node): Node | any
+    default?: false
   }
 
   interface DefaultTag extends BaseTag {
@@ -159,10 +163,6 @@ export namespace Schema {
      * use this, even if you first think you do.
      */
     default: true
-    /**
-     * Alternative form used by default tags; called with `test` match results.
-     */
-    resolve(...match: string[]): Node | any
     /**
      * Together with `default` allows for values to be stringified without an
      * explicit tag and detected using a regular expression. For most cases, it's

@@ -515,10 +515,10 @@ application specific tag: !something |
       ],
       warnings: [
         [
-          'The tag tag:clarkevans.com,2002:shape is unavailable, falling back to tag:yaml.org,2002:seq',
           'The tag tag:clarkevans.com,2002:circle is unavailable, falling back to tag:yaml.org,2002:map',
           'The tag tag:clarkevans.com,2002:line is unavailable, falling back to tag:yaml.org,2002:map',
-          'The tag tag:clarkevans.com,2002:label is unavailable, falling back to tag:yaml.org,2002:map'
+          'The tag tag:clarkevans.com,2002:label is unavailable, falling back to tag:yaml.org,2002:map',
+          'The tag tag:clarkevans.com,2002:shape is unavailable, falling back to tag:yaml.org,2002:seq'
         ]
       ]
     },
@@ -730,10 +730,7 @@ alias: *anchor`,
         ['The tag !local is unavailable, falling back to tag:yaml.org,2002:str']
       ],
       special: src => {
-        const tag = {
-          tag: '!local',
-          resolve: (doc, node) => 'local:' + node.strValue
-        }
+        const tag = { tag: '!local', resolve: str => `local:${str}` }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject({
           anchored: 'local:value',
@@ -1096,7 +1093,7 @@ bar`,
       special: src => {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
-          resolve: (doc, node) => 'foo' + node.strValue
+          resolve: str => `foo${str}`
         }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toBe('foobar')
@@ -1121,10 +1118,7 @@ bar`,
         ]
       ],
       special: src => {
-        const tag = {
-          tag: '!my-light',
-          resolve: (doc, node) => 'light:' + node.strValue
-        }
+        const tag = { tag: '!my-light', resolve: str => `light:${str}` }
         const docs = YAML.parseAllDocuments(src, { customTags: [tag] })
         expect(docs.map(d => d.toJS())).toMatchObject([
           'light:fluorescent',
@@ -1146,7 +1140,7 @@ bar`,
       special: src => {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
-          resolve: (doc, node) => 'foo' + node.strValue
+          resolve: str => `foo${str}`
         }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject(['foobar'])
@@ -1169,10 +1163,7 @@ bar`,
         ['The tag !bar is unavailable, falling back to tag:yaml.org,2002:str']
       ],
       special: src => {
-        const tag = {
-          tag: '!bar',
-          resolve: (doc, node) => 'bar' + node.strValue
-        }
+        const tag = { tag: '!bar', resolve: str => `bar${str}` }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject({ foo: 'barbaz' })
       }
@@ -1203,13 +1194,10 @@ bar`,
       ],
       special: src => {
         const customTags = [
-          {
-            tag: '!local',
-            resolve: (doc, node) => 'local:' + node.strValue
-          },
+          { tag: '!local', resolve: str => `local:${str}` },
           {
             tag: 'tag:example.com,2000:app/tag!',
-            resolve: (doc, node) => 'tag!' + node.strValue
+            resolve: str => `tag!${str}`
           }
         ]
         const res = YAML.parse(src, { customTags })
@@ -1777,10 +1765,7 @@ folded:
         ['The tag !foo is unavailable, falling back to tag:yaml.org,2002:str']
       ],
       special: src => {
-        const tag = {
-          tag: '!foo',
-          resolve: (doc, node) => 'foo' + node.strValue
-        }
+        const tag = { tag: '!foo', resolve: str => `foo${str}` }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject({ literal: 'value\n', folded: 'foovalue\n' })
       }

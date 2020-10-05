@@ -1,4 +1,3 @@
-import { YAMLSemanticError } from '../../errors.js'
 import { Pair } from '../../ast/Pair.js'
 import { Scalar } from '../../ast/Scalar.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
@@ -39,14 +38,13 @@ export class YAMLOMap extends YAMLSeq {
   }
 }
 
-function parseOMap(doc, cst) {
-  const pairs = parsePairs(doc, cst)
+function parseOMap(seq, onError) {
+  const pairs = parsePairs(seq, onError)
   const seenKeys = []
   for (const { key } of pairs.items) {
     if (key instanceof Scalar) {
       if (seenKeys.includes(key.value)) {
-        const msg = 'Ordered maps must not include duplicate keys'
-        throw new YAMLSemanticError(cst, msg)
+        onError(`Ordered maps must not include duplicate keys: ${key.value}`)
       } else {
         seenKeys.push(key.value)
       }

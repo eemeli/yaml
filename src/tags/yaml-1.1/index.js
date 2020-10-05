@@ -16,8 +16,10 @@ const boolStringify = ({ value }) =>
 const intIdentify = value =>
   typeof value === 'bigint' || Number.isInteger(value)
 
-function intResolve(sign, src, radix) {
-  let str = src.replace(/_/g, '')
+function intResolve(str, offset, radix) {
+  const sign = str[0]
+  if (sign === '-' || sign === '+') offset += 1
+  str = str.substring(offset).replace(/_/g, '')
   if (intOptions.asBigInt) {
     switch (radix) {
       case 2:
@@ -76,7 +78,7 @@ export const yaml11 = failsafe.concat(
       identify: value => typeof value === 'boolean',
       default: true,
       tag: 'tag:yaml.org,2002:bool',
-      test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
+      test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/,
       resolve: () => false,
       options: boolOptions,
       stringify: boolStringify
@@ -86,8 +88,8 @@ export const yaml11 = failsafe.concat(
       default: true,
       tag: 'tag:yaml.org,2002:int',
       format: 'BIN',
-      test: /^([-+]?)0b([0-1_]+)$/,
-      resolve: (str, sign, bin) => intResolve(sign, bin, 2),
+      test: /^[-+]?0b[0-1_]+$/,
+      resolve: str => intResolve(str, 2, 2),
       stringify: node => intStringify(node, 2, '0b')
     },
     {
@@ -95,16 +97,16 @@ export const yaml11 = failsafe.concat(
       default: true,
       tag: 'tag:yaml.org,2002:int',
       format: 'OCT',
-      test: /^([-+]?)0([0-7_]+)$/,
-      resolve: (str, sign, oct) => intResolve(sign, oct, 8),
+      test: /^[-+]?0[0-7_]+$/,
+      resolve: str => intResolve(str, 1, 8),
       stringify: node => intStringify(node, 8, '0')
     },
     {
       identify: intIdentify,
       default: true,
       tag: 'tag:yaml.org,2002:int',
-      test: /^([-+]?)([0-9][0-9_]*)$/,
-      resolve: (str, sign, abs) => intResolve(sign, abs, 10),
+      test: /^[-+]?[0-9][0-9_]*$/,
+      resolve: str => intResolve(str, 0, 10),
       stringify: stringifyNumber
     },
     {
@@ -112,17 +114,17 @@ export const yaml11 = failsafe.concat(
       default: true,
       tag: 'tag:yaml.org,2002:int',
       format: 'HEX',
-      test: /^([-+]?)0x([0-9a-fA-F_]+)$/,
-      resolve: (str, sign, hex) => intResolve(sign, hex, 16),
+      test: /^[-+]?0x[0-9a-fA-F_]+$/,
+      resolve: str => intResolve(str, 2, 16),
       stringify: node => intStringify(node, 16, '0x')
     },
     {
       identify: value => typeof value === 'number',
       default: true,
       tag: 'tag:yaml.org,2002:float',
-      test: /^(?:[-+]?\.inf|(\.nan))$/i,
-      resolve: (str, nan) =>
-        nan
+      test: /^[-+]?\.(?:inf|Inf|INF|nan|NaN|NAN)$/,
+      resolve: str =>
+        str.slice(-3).toLowerCase() === 'nan'
           ? NaN
           : str[0] === '-'
           ? Number.NEGATIVE_INFINITY
@@ -134,7 +136,7 @@ export const yaml11 = failsafe.concat(
       default: true,
       tag: 'tag:yaml.org,2002:float',
       format: 'EXP',
-      test: /^[-+]?([0-9][0-9_]*)?(\.[0-9_]*)?[eE][-+]?[0-9]+$/,
+      test: /^[-+]?(?:[0-9][0-9_]*)?(?:\.[0-9_]*)?[eE][-+]?[0-9]+$/,
       resolve: str => parseFloat(str.replace(/_/g, '')),
       stringify: ({ value }) => Number(value).toExponential()
     },
@@ -142,11 +144,12 @@ export const yaml11 = failsafe.concat(
       identify: value => typeof value === 'number',
       default: true,
       tag: 'tag:yaml.org,2002:float',
-      test: /^[-+]?(?:[0-9][0-9_]*)?\.([0-9_]*)$/,
-      resolve(str, frac) {
+      test: /^[-+]?(?:[0-9][0-9_]*)?\.[0-9_]*$/,
+      resolve(str) {
         const node = new Scalar(parseFloat(str.replace(/_/g, '')))
-        if (frac) {
-          const f = frac.replace(/_/g, '')
+        const dot = str.indexOf('.')
+        if (dot !== -1) {
+          const f = str.substring(dot + 1).replace(/_/g, '')
           if (f[f.length - 1] === '0') node.minFractionDigits = f.length
         }
         return node

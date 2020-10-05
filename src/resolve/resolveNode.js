@@ -7,7 +7,6 @@ import {
 } from '../errors.js'
 
 import { resolveScalar } from './resolveScalar.js'
-import { resolveString } from './resolveString.js'
 import { resolveTagName } from './resolveTagName.js'
 import { resolveTag } from './resolveTag.js'
 
@@ -93,8 +92,12 @@ function resolveNodeValue(doc, node) {
   }
 
   try {
-    const str = resolveString(doc, node)
-    return resolveScalar(str, schema.tags, schema.tags.scalarFallback)
+    let str = node.strValue || ''
+    if (typeof str !== 'string') {
+      str.errors.forEach(error => doc.errors.push(error))
+      str = str.str
+    }
+    return resolveScalar(str, schema.tags)
   } catch (error) {
     if (!error.source) error.source = node
     errors.push(error)

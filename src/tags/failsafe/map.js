@@ -1,6 +1,5 @@
 import { createPair } from '../../ast/Pair.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
-import { resolveMap } from '../../resolve/resolveMap.js'
 
 function createMap(schema, obj, ctx) {
   const { keepUndefined, replacer } = ctx
@@ -27,5 +26,5 @@ export const map = {
   default: true,
   nodeClass: YAMLMap,
   tag: 'tag:yaml.org,2002:map',
-  resolve: resolveMap
+  resolve: map => map
 }

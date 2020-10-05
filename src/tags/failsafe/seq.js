@@ -1,6 +1,5 @@
 import { YAMLSeq } from '../../ast/YAMLSeq.js'
 import { createNode } from '../../doc/createNode.js'
-import { resolveSeq } from '../../resolve/resolveSeq.js'
 
 function createSeq(schema, obj, ctx) {
   const { replacer } = ctx
@@ -23,5 +22,5 @@ export const seq = {
   default: true,
   nodeClass: YAMLSeq,
   tag: 'tag:yaml.org,2002:seq',
-  resolve: resolveSeq
+  resolve: seq => seq
 }
