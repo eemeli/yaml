@@ -285,7 +285,17 @@ export class Parser {
   document(doc: Document) {
     if (doc.value) return this.lineEnd(doc)
     switch (this.type) {
-      case 'doc-start':
+      case 'doc-start': {
+        const hasContent = doc.start.some(
+          ({ type }) =>
+            type === 'doc-start' || type === 'anchor' || type === 'tag'
+        )
+        if (hasContent) {
+          this.pop()
+          this.step()
+        } else doc.start.push(this.sourceToken)
+        return
+      }
       case 'anchor':
       case 'tag':
       case 'space':
