@@ -30,7 +30,7 @@ const consumeMoreIndentedLines = (text, i) => {
  *   the first line, defaulting to `indent.length`
  * @param {number} [options.lineWidth=80]
  * @param {number} [options.minContentWidth=20] Allow highly indented lines to
- *   stretch the line width
+ *   stretch the line width or indent content from the start
  * @param {function} options.onFold Called once if the text is folded
  * @param {function} options.onFold Called once if any line of text exceeds
  *   lineWidth characters
@@ -46,9 +46,11 @@ export function foldFlowLines(
   if (text.length <= endStep) return text
   const folds = []
   const escapedFolds = {}
-  let end =
-    lineWidth -
-    (typeof indentAtStart === 'number' ? indentAtStart : indent.length)
+  let end = lineWidth - indent.length
+  if (typeof indentAtStart === 'number') {
+    if (indentAtStart > lineWidth - Math.max(2, minContentWidth)) folds.push(0)
+    else end = lineWidth - indentAtStart
+  }
   let split = undefined
   let prev = undefined
   let overflow = false
@@ -120,8 +122,11 @@ export function foldFlowLines(
   for (let i = 0; i < folds.length; ++i) {
     const fold = folds[i]
     const end = folds[i + 1] || text.length
-    if (mode === FOLD_QUOTED && escapedFolds[fold]) res += `${text[fold]}\\`
-    res += `\n${indent}${text.slice(fold + 1, end)}`
+    if (fold === 0) res = `\n${indent}${text.slice(0, end)}`
+    else {
+      if (mode === FOLD_QUOTED && escapedFolds[fold]) res += `${text[fold]}\\`
+      res += `\n${indent}${text.slice(fold + 1, end)}`
+    }
   }
   return res
 }

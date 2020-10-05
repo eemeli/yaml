@@ -172,7 +172,7 @@ export class Pair extends Node {
     } else if (!explicitKey && value instanceof Collection) {
       const flow = valueStr[0] === '[' || valueStr[0] === '{'
       if (!flow || valueStr.includes('\n')) ws = `\n${ctx.indent}`
-    }
+    } else if (valueStr[0] === '\n') ws = ''
     if (chompKeep && !valueComment && onChompKeep) onChompKeep()
     return addComment(str + ws + valueStr, ctx.indent, valueComment)
   }
