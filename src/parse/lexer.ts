@@ -274,7 +274,7 @@ export class Lexer {
     switch (line[n]) {
       case undefined:
       case '#':
-        this.pushCount(line.length)
+        this.pushCount(line.length - n)
         this.pushNewline()
         return this.parseLineStart()
       case '{':
