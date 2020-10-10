@@ -10,8 +10,37 @@ import { pairs } from './pairs.js'
 import { set } from './set.js'
 import { intTime, floatTime, timestamp } from './timestamp.js'
 
-const boolStringify = ({ value }) =>
-  value ? boolOptions.trueStr : boolOptions.falseStr
+const boolStringify = ({ value, sourceStr }) => {
+  const boolObj = value ? trueObj : falseObj
+  if (sourceStr && boolObj.test.test(sourceStr)) return sourceStr
+  return value ? boolOptions.trueStr : boolOptions.falseStr
+}
+
+const boolResolve = (value, str) => {
+  const node = new Scalar(value)
+  node.sourceStr = str
+  return node
+}
+
+const trueObj = {
+  identify: value => value === true,
+  default: true,
+  tag: 'tag:yaml.org,2002:bool',
+  test: /^(?:Y|y|[Yy]es|YES|[Tt]rue|TRUE|[Oo]n|ON)$/,
+  resolve: str => boolResolve(true, str),
+  options: boolOptions,
+  stringify: boolStringify
+}
+
+const falseObj = {
+  identify: value => value === false,
+  default: true,
+  tag: 'tag:yaml.org,2002:bool',
+  test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
+  resolve: str => boolResolve(false, str),
+  options: boolOptions,
+  stringify: boolStringify
+}
 
 const intIdentify = value =>
   typeof value === 'bigint' || Number.isInteger(value)
@@ -65,24 +94,8 @@ export const yaml11 = failsafe.concat(
       options: nullOptions,
       stringify: ({ sourceStr }) => sourceStr ?? nullOptions.nullStr
     },
-    {
-      identify: value => typeof value === 'boolean',
-      default: true,
-      tag: 'tag:yaml.org,2002:bool',
-      test: /^(?:Y|y|[Yy]es|YES|[Tt]rue|TRUE|[Oo]n|ON)$/,
-      resolve: () => true,
-      options: boolOptions,
-      stringify: boolStringify
-    },
-    {
-      identify: value => typeof value === 'boolean',
-      default: true,
-      tag: 'tag:yaml.org,2002:bool',
-      test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/,
-      resolve: () => false,
-      options: boolOptions,
-      stringify: boolStringify
-    },
+    trueObj,
+    falseObj,
     {
       identify: intIdentify,
       default: true,

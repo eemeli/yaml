@@ -445,10 +445,105 @@ test('eemeli/yaml#87', () => {
   expect(String(doc)).toBe('test:\n  a: test\n')
 })
 
+describe('emitter custom null/bool string', () => {
+  let origNullOptions
+  let origBoolOptions
+  beforeAll(() => {
+    origNullOptions = YAML.scalarOptions.null.nullStr
+    origBoolOptions = YAML.scalarOptions.bool
+  })
+  afterAll(() => {
+    YAML.scalarOptions.null.nullStr = origNullOptions
+    YAML.scalarOptions.bool = origBoolOptions
+  })
+
+  test('tiled null', () => {
+    YAML.scalarOptions.null.nullStr = '~'
+    const doc = YAML.parse('a: null')
+    const str = YAML.stringify(doc, {simpleKeys: true})
+    expect(str).toBe('a: ~\n')
+    expect(YAML.parse(str)).toEqual({a: null})
+  })
+
+  test('empty string null', () => {
+    YAML.scalarOptions.null.nullStr = ''
+    const doc = YAML.parse('a: null')
+    const str = YAML.stringify(doc, {simpleKeys: true})
+    expect(str).toBe('a: \n')
+    expect(YAML.parse(str)).toEqual({a: null})
+  })
+
+  test('empty string camelBool', () => {
+    YAML.scalarOptions.bool.trueStr = 'True'
+    YAML.scalarOptions.bool.falseStr = 'False'
+    const doc = YAML.parse('[true, false]')
+    const str = YAML.stringify(doc)
+    expect(str).toBe('- True\n- False\n')
+    expect(YAML.parse(str)).toEqual([true, false])
+  })
+
+  test('empty string upperBool', () => {
+    YAML.scalarOptions.bool.trueStr = 'TRUE'
+    YAML.scalarOptions.bool.falseStr = 'FALSE'
+    const doc = YAML.parse('[true, false]')
+    const str = YAML.stringify(doc)
+    expect(str).toBe('- TRUE\n- FALSE\n')
+    expect(YAML.parse(str)).toEqual([true, false])
+  })
+})
+
 describe('scalar styles', () => {
     test('null Scalar styles', () => {
         const doc = YAML.parseDocument('[ null, Null, NULL, ~ ]')
         expect(String(doc)).toBe('[ null, Null, NULL, ~ ]\n')
+    })
+
+    test('bool Scalar styles on core', () => {
+        const doc = YAML.parseDocument('[ true, false, True, False, TRUE, FALSE, on, off, y, n ]')
+        const str = `[
+  true,
+  false,
+  True,
+  False,
+  TRUE,
+  FALSE,
+  on,
+  off,
+  y,
+  n
+]\n`
+        expect(String(doc)).toBe(str)
+        expect(YAML.parse(str)).toEqual([ true, false, true, false, true, false, 'on', 'off', 'y', 'n'])
+    })
+
+    test('bool Scalar styles on YAML1.1', () => {
+        const doc = YAML.parseDocument('[ n, N, NO, no, No, False, false, FALSE, Off, off, OFF, y, Y, Yes, yes, YES, true, True, TRUE, ON, on, On ]', { schema: 'yaml-1.1' })
+        const str = `[
+  n,
+  N,
+  NO,
+  no,
+  No,
+  False,
+  false,
+  FALSE,
+  Off,
+  off,
+  OFF,
+  y,
+  Y,
+  Yes,
+  yes,
+  YES,
+  true,
+  True,
+  TRUE,
+  ON,
+  on,
+  On
+]\n`
+        expect(String(doc)).toBe(str)
+        expect(YAML.parse(str, { schema: 'yaml-1.1' })).toEqual([false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true])
     })
 })
 
