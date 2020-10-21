@@ -123,8 +123,8 @@ option: TruE\n`
       option: 'TruE'
     })
     expect(String(doc)).toBe(`canonical: true
-answer: false
-logical: true
+answer: FALSE
+logical: True
 option: TruE\n`)
   })
 
@@ -291,10 +291,10 @@ option: on`
       logical: true,
       option: true
     })
-    expect(String(doc)).toBe(`canonical: true
-answer: false
-logical: true
-option: true\n`)
+    expect(String(doc)).toBe(`canonical: y
+answer: NO
+logical: True
+option: on\n`)
   })
 
   test('!!float', () => {
@@ -779,5 +779,29 @@ describe('schema changes', () => {
     })
     doc.setSchema(1.2, ['timestamp'])
     expect(String(doc)).toBe('foo: 1971-02-03T12:13:14\n')
+  })
+
+  test('schema changes on bool', () => {
+    const doc = YAML.parseDocument('[y, yes, on, n, no, off]', {
+      version: '1.1'
+    })
+    doc.setSchema('core')
+    expect(String(doc)).toBe('[ true, true, true, false, false, false ]\n')
+    doc.setSchema('1.1')
+    expect(String(doc)).toBe('[ y, yes, on, n, no, off ]\n')
+  })
+
+  test('set bool + re-stringified', () => {
+    let doc = YAML.parseDocument('a: True', {
+      version: '1.2'
+    })
+    doc.set('a', false)
+    expect(String(doc)).toBe('a: false\n')
+
+    doc = YAML.parseDocument('a: on', {
+      version: '1.1'
+    })
+    doc.set('a', false)
+    expect(String(doc)).toBe('a: false\n')
   })
 })
