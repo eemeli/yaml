@@ -35,8 +35,7 @@ export function composeBlockMap(
 
     // key value
     const keyStart = offset
-    const kt = key || { type: 'scalar', offset, indent: -1, source: '' }
-    const keyNode = composeNode(doc, kt, keyProps, onError)
+    const keyNode = composeNode(doc, key || offset, keyProps, onError)
     if (keyNode.range) offset = keyNode.range[1]
     else {
       // FIXME: remove once verified never happens
@@ -53,8 +52,7 @@ export function composeBlockMap(
 
     if (valueProps.found) {
       // value value
-      const vt = value || { type: 'scalar', offset, indent: -1, source: '' }
-      const valueNode = composeNode(doc, vt, valueProps, onError)
+      const valueNode = composeNode(doc, value || offset, valueProps, onError)
       if (valueNode.range) offset = valueNode.range[1]
       else {
         // FIXME: remove once verified never happens

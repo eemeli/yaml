@@ -25,8 +25,7 @@ export function composeBlockSeq(
         continue
       }
     }
-    const token = value || { type: 'scalar', offset, indent: -1, source: '' }
-    const node = composeNode(doc, token, props, onError)
+    const node = composeNode(doc, value || offset, props, onError)
     if (node.range) offset = node.range[1]
     else {
       // FIXME: remove once verified never happens

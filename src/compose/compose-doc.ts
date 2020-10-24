@@ -20,8 +20,7 @@ export function composeDoc(
   if (props.found) doc.directivesEndMarker = true
 
   let to = offset + props.length
-  const token = value || { type: 'scalar', offset: to, indent: -1, source: '' }
-  doc.contents = composeNode(doc, token, props, onError)
+  doc.contents = composeNode(doc, value || to, props, onError)
   if (doc.contents.range) to = doc.contents.range[1]
   else {
     // FIXME: remove once verified never happens

@@ -9,10 +9,13 @@ import type { Props } from './resolve-props.js'
 
 export function composeNode(
   doc: Document.Parsed,
-  token: Token,
-  { spaceBefore, comment, anchor, tagName }: Props,
+  token: Token | number,
+  props: Props,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
+  if (typeof token === 'number')
+    return composeEmptyNode(doc, token, props, onError)
+  const { spaceBefore, comment, anchor, tagName } = props
   let node: Node
   switch (token.type) {
     case 'alias':
@@ -45,6 +48,20 @@ export function composeNode(
     if (token.type === 'scalar' && token.source === '') node.comment = comment
     else node.commentBefore = comment
   }
+  return node
+}
+
+function composeEmptyNode(
+  doc: Document.Parsed,
+  offset: number,
+  { spaceBefore, comment, anchor, tagName }: Props,
+  onError: (offset: number, message: string, warning?: boolean) => void
+) {
+  const token: FlowScalar = { type: 'scalar', offset, indent: -1, source: '' }
+  const node = composeScalar(doc.schema, tagName, token, onError)
+  if (anchor) doc.anchors.setAnchor(node, anchor)
+  if (spaceBefore) node.spaceBefore = true
+  if (comment) node.comment = comment
   return node
 }
 
