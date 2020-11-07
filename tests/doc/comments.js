@@ -787,6 +787,7 @@ a:
   c: 2
   #1
 
+
 #2
 d: 1\n`
     const doc = YAML.parseDocument(src)
@@ -804,7 +805,7 @@ d: 1\n`
         },
         {
           spaceBefore: true,
-          spacesBefore: 1,
+          spacesBefore: 2,
           commentBefore: '2',
           key: { value: 'd' },
           value: { value: 1 }
