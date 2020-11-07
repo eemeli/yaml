@@ -187,6 +187,8 @@ export class Node {
   range?: [number, number] | null
   /** A blank line before this node and its commentBefore */
   spaceBefore?: boolean
+  /** The number of blank lines before this node and its commentBefore */
+  spacesBefore?: number
   /** A fully qualified tag, if required */
   tag?: string
   /** A plain JS representation of this node */

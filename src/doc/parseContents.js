@@ -7,6 +7,7 @@ export function parseContents(doc, contents) {
   const comments = { before: [], after: [] }
   let body = undefined
   let spaceBefore = false
+  let spacesBefore = 0
   for (const node of contents) {
     if (node.valueRange) {
       if (body !== undefined) {
@@ -20,12 +21,17 @@ export function parseContents(doc, contents) {
         res.spaceBefore = true
         spaceBefore = false
       }
+      if (spacesBefore) {
+        res.spacesBefore = spacesBefore
+        spacesBefore = 0
+      }
       body = res
     } else if (node.comment !== null) {
       const cc = body === undefined ? comments.before : comments.after
       cc.push(node.comment)
     } else if (node.type === Type.BLANK_LINE) {
       spaceBefore = true
+      spacesBefore += 1
       if (
         body === undefined &&
         comments.before.length > 0 &&

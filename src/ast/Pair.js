@@ -141,7 +141,11 @@ export class Pair extends Node {
     let vcb = ''
     let valueComment = null
     if (value instanceof Node) {
-      if (value.spaceBefore) vcb = '\n'
+      if (value.spacesBefore) {
+        vcb = '\n'.repeat(value.spacesBefore)
+      } else if (value.spaceBefore) {
+        vcb = '\n'
+      }
       if (value.commentBefore) {
         const cs = value.commentBefore.replace(/^/gm, `${ctx.indent}#`)
         vcb += `\n${cs}`

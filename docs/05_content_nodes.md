@@ -13,6 +13,8 @@ class Node {
       // into this node (undefined for pairs or if not parsed)
   spaceBefore: ?boolean,
       // a blank line before this node and its commentBefore
+  spacesBefore: ?number,
+      // the number of blank lines before this node and its commentBefore
   tag: ?string,       // a fully qualified tag, if required
   toJSON(): any       // a plain JS or JSON representation of this node
 }
@@ -243,6 +245,7 @@ const doc = YAML.parseDocument('[ one, two, three ]')
 
 doc.contents.items[0].comment = ' item comment'
 doc.contents.items[1].spaceBefore = true
+doc.contents.items[1].spacesBefore = 1
 doc.comment = ' document end comment'
 
 doc.toString()

@@ -146,8 +146,13 @@ export class Collection extends Node {
     const nodes = this.items.reduce((nodes, item, i) => {
       let comment
       if (item) {
-        if (!chompKeep && item.spaceBefore)
+        if (!chompKeep && item.spacesBefore) {
+          for (let count = 0; count < item.spacesBefore; count++) {
+            nodes.push({ type: 'comment', str: '' })
+          }
+        } else if (!chompKeep && item.spaceBefore) {
           nodes.push({ type: 'comment', str: '' })
+        }
 
         if (item.commentBefore)
           item.commentBefore.match(/^.*$/gm).forEach(line => {

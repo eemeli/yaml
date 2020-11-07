@@ -371,6 +371,7 @@ describe('stringify comments', () => {
       doc.contents.items[1].commentBefore = 'c1'
       doc.contents.items[1].comment = 'c2'
       doc.contents.items[1].value.spaceBefore = true
+      doc.contents.items[1].value.spacesBefore = 1
       doc.contents.comment = 'c3'
       expect(String(doc)).toBe(`#c0
 key1: value 1
@@ -388,6 +389,7 @@ key2: #c2
       doc.contents.items[1].commentBefore = '\nc2\n\nc3'
       doc.contents.items[1].comment = 'c4\nc5'
       doc.contents.items[1].value.spaceBefore = true
+      doc.contents.items[1].value.spacesBefore = 1
       doc.contents.items[1].value.commentBefore = 'c6'
       doc.contents.comment = 'c7\nc8'
       expect(String(doc)).toBe(
@@ -481,19 +483,20 @@ describe('blank lines', () => {
     const doc = YAML.parseDocument('str\n')
     doc.directivesEndMarker = true
     doc.contents.spaceBefore = true
+    doc.contents.spacesBefore = 1
     expect(String(doc)).toBe('---\n\nstr\n')
   })
 
   test('between seq items', () => {
-    const src = '- a\n\n- b\n\n\n- c\n'
+    const src = '- a\n\n- b\n\n\n\n- c\n'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('- a\n\n- b\n\n- c\n')
+    expect(String(doc)).toBe('- a\n\n- b\n\n\n\n- c\n')
   })
 
   test('between seq items with leading comments', () => {
     const src = '#A\n- a\n\n#B\n- b\n\n\n#C\n\n- c\n'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('#A\n- a\n\n#B\n- b\n\n#C\n- c\n')
+    expect(String(doc)).toBe('#A\n- a\n\n#B\n- b\n\n\n#C\n- c\n')
   })
 
   describe('not after block scalar with keep chomping', () => {
@@ -508,6 +511,8 @@ describe('blank lines', () => {
         expect(String(doc)).toBe(src)
         expect(doc.contents.items[1]).not.toHaveProperty('spaceBefore', true)
         doc.contents.items[1].spaceBefore = true
+        expect(doc.contents.items[1]).not.toHaveProperty('spacesBefore', true)
+        doc.contents.items[1].spacesBefore = 1
         expect(String(doc)).toBe(src)
       })
     }
@@ -530,11 +535,11 @@ describe('blank lines', () => {
       items: [
         {
           key: { value: 'a' },
-          value: { value: 1, spaceBefore: true }
+          value: { value: 1, spaceBefore: true, spacesBefore: 1 }
         },
         {
           key: { value: 'b' },
-          value: { value: 2, commentBefore: 'c', spaceBefore: true }
+          value: { value: 2, commentBefore: 'c', spaceBefore: true, spacesBefore: 1 }
         }
       ]
     })
@@ -564,9 +569,9 @@ describe('blank lines', () => {
       expect(doc.contents).toMatchObject({
         items: [
           { value: 1 },
-          { value: 2, spaceBefore: true },
+          { value: 2, spaceBefore: true, spacesBefore: 1 },
           { value: 3 },
-          { value: 4, spaceBefore: true }
+          { value: 4, spaceBefore: true, spacesBefore: 1 }
         ]
       })
       expect(String(doc)).toBe('[\n  1,\n\n  2,\n  3,\n\n  4\n]\n')
@@ -577,8 +582,8 @@ describe('blank lines', () => {
       const doc = YAML.parseDocument(src)
       expect(doc.contents).toMatchObject({
         items: [
-          { key: { value: 'a' }, value: { value: 1 }, spaceBefore: true },
-          { key: { value: 'b' }, value: { value: 2 }, spaceBefore: true }
+          { key: { value: 'a' }, value: { value: 1 }, spaceBefore: true, spacesBefore: 1 },
+          { key: { value: 'b' }, value: { value: 2 }, spaceBefore: true, spacesBefore: 1 }
         ]
       })
     })
@@ -594,7 +599,7 @@ describe('blank lines', () => {
           },
           {
             key: { value: 'b' },
-            value: { value: 2, commentBefore: 'd', spaceBefore: true }
+            value: { value: 2, commentBefore: 'd', spaceBefore: true, spacesBefore: 1 }
           }
         ]
       })
@@ -717,7 +722,7 @@ describe('collection end comments', () => {
     expect(doc.contents).toMatchObject({
       items: [
         { items: [{ value: 'a' }, { value: 'b' }], comment: '1' },
-        { spaceBefore: true, commentBefore: '2', value: 'd' }
+        { spaceBefore: true, spacesBefore: 1, commentBefore: '2', value: 'd' }
       ]
     })
     expect(String(doc)).toBe(src)
@@ -741,7 +746,7 @@ describe('collection end comments', () => {
           ],
           comment: '1'
         },
-        { spaceBefore: true, commentBefore: '2', value: 'd' }
+        { spaceBefore: true, spacesBefore: 1, commentBefore: '2', value: 'd' }
       ]
     })
     expect(String(doc)).toBe(src)
@@ -765,6 +770,7 @@ d: 1\n`
         },
         {
           spaceBefore: true,
+          spacesBefore: 1,
           commentBefore: '2',
           key: { value: 'd' },
           value: { value: 1 }
@@ -798,6 +804,7 @@ d: 1\n`
         },
         {
           spaceBefore: true,
+          spacesBefore: 1,
           commentBefore: '2',
           key: { value: 'd' },
           value: { value: 1 }
@@ -813,6 +820,8 @@ a:
   #1
   - b:
       - c
+
+
 
   #2
   - e\n`
@@ -832,7 +841,7 @@ a:
                   }
                 ]
               },
-              { spaceBefore: true, commentBefore: '2', value: 'e' }
+              { spaceBefore: true, spacesBefore: 3, commentBefore: '2', value: 'e' }
             ]
           }
         }
