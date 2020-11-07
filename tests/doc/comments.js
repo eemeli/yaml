@@ -716,13 +716,14 @@ describe('collection end comments', () => {
   - b
   #1
 
+
 #2
 - d\n`
     const doc = YAML.parseDocument(src)
     expect(doc.contents).toMatchObject({
       items: [
         { items: [{ value: 'a' }, { value: 'b' }], comment: '1' },
-        { spaceBefore: true, spacesBefore: 1, commentBefore: '2', value: 'd' }
+        { spaceBefore: true, spacesBefore: 2, commentBefore: '2', value: 'd' }
       ]
     })
     expect(String(doc)).toBe(src)
