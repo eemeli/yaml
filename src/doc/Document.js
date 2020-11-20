@@ -8,7 +8,7 @@ import {
   isEmptyPath,
   toJS
 } from '../ast/index.js'
-import { Document as CSTDocument } from '../cst/Document'
+import { Document as CSTDocument } from '../cst/Document.js'
 import { defaultTagPrefix } from '../constants.js'
 import { YAMLError } from '../errors.js'
 import { defaultOptions, documentOptions } from '../options.js'
