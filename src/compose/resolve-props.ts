@@ -1,14 +1,5 @@
 import { SourceToken } from '../parse/parser'
 
-export interface Props {
-  found: boolean
-  spaceBefore: boolean
-  comment: string
-  anchor: string
-  tagName: string
-  length: number
-}
-
 export function resolveProps(
   start: SourceToken[],
   indicator:
@@ -45,9 +36,12 @@ export function resolveProps(
         sep += token.source
         break
       case 'anchor':
+        if (anchor)
+          onError(offset + length, 'A node can have at most one anchor')
         anchor = token.source.substring(1)
         break
       case 'tag':
+        if (tagName) onError(offset + length, 'A node can have at most one tag')
         tagName = token.source // FIXME
         break
       case indicator:

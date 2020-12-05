@@ -5,7 +5,13 @@ import { composeBlockMap } from './compose-block-map.js'
 import { composeBlockSeq } from './compose-block-seq.js'
 import { composeScalar } from './compose-scalar.js'
 import { resolveEnd } from './resolve-end.js'
-import type { Props } from './resolve-props.js'
+
+export interface Props {
+    spaceBefore: boolean
+    comment: string
+    anchor: string
+    tagName: string
+}
 
 export function composeNode(
   doc: Document.Parsed,
