@@ -68,9 +68,9 @@ export interface FlowCollection {
   type: 'flow-collection'
   offset: number
   indent: number
-  start: Token
-  items: Token[]
-  end?: Token
+  start: SourceToken
+  items: Array<Token>
+  end?: SourceToken
 }
 
 export type Token =

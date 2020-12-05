@@ -3,6 +3,7 @@ import type { Document } from '../doc/Document.js'
 import type { FlowScalar, Token } from '../parse/parser.js'
 import { composeBlockMap } from './compose-block-map.js'
 import { composeBlockSeq } from './compose-block-seq.js'
+import { composeFlowCollection } from './compose-flow-collection.js'
 import { composeScalar } from './compose-scalar.js'
 import { resolveEnd } from './resolve-end.js'
 
@@ -41,6 +42,9 @@ export function composeNode(
       break
     case 'block-seq':
       node = composeBlockSeq(doc, token, anchor, onError)
+      break
+    case 'flow-collection':
+      node = composeFlowCollection(doc, token, anchor, onError)
       break
     default:
       onError(
