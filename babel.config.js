@@ -6,4 +6,7 @@ module.exports = {
 }
 
 if (process.env.NODE_ENV === 'test')
-  module.exports.presets = [['@babel/env', { targets: { node: 'current' } }]]
+  module.exports.presets = [
+    ['@babel/env', { targets: { node: 'current' } }],
+    '@babel/preset-typescript'
+  ]
