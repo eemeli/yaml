@@ -7,12 +7,12 @@ import { resolveProps } from './resolve-props.js'
 import { StreamDirectives } from './stream-directives.js'
 
 export function composeDoc(
-  options: Options | null,
+  options: Options | undefined,
   directives: StreamDirectives,
   { offset, start, value, end }: Parser.Document,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
-  const doc = new Document(undefined, options || undefined) as Document.Parsed
+  const doc = new Document(undefined, options) as Document.Parsed
   doc.version = directives.yaml.version
   doc.setSchema() // FIXME: always do this in the constructor
 

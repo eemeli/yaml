@@ -1,3 +1,4 @@
+import { parseDocs } from './compose/parse-docs.js'
 import { LogLevel } from './constants.js'
 import { parse as parseCST } from './cst/parse.js'
 import { Document } from './doc/Document.js'
@@ -7,28 +8,18 @@ import { warn } from './log.js'
 export { defaultOptions, scalarOptions } from './options.js'
 export { Document, parseCST }
 
-export function parseAllDocuments(src, options) {
-  const stream = []
-  let prev
-  for (const cstDoc of parseCST(src)) {
-    const doc = new Document(undefined, null, options)
-    doc.parse(cstDoc, prev)
-    stream.push(doc)
-    prev = doc
-  }
-  return stream
-}
+export const parseAllDocuments = parseDocs
 
 export function parseDocument(src, options) {
-  const cst = parseCST(src)
-  const doc = new Document(cst[0], null, options)
+  const docs = parseDocs(src, options)
+  const doc = docs[0]
   if (
-    cst.length > 1 &&
+    docs.length > 1 &&
     LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR
   ) {
     const errMsg =
       'Source contains multiple documents; please use YAML.parseAllDocuments()'
-    doc.errors.unshift(new YAMLSemanticError(cst[1], errMsg))
+    doc.errors.unshift(new YAMLSemanticError(-1, errMsg))
   }
   return doc
 }

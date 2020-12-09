@@ -141,7 +141,7 @@ export class Parser {
   /** Advance the parser by the `source` of one lexical token. */
   token(source: string) {
     this.source = source
-    console.log('>', prettyToken(source))
+    //console.log('>', prettyToken(source))
 
     if (this.atScalar) {
       this.atScalar = false

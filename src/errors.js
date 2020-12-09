@@ -4,12 +4,12 @@ import { Range } from './cst/Range.js'
 
 export class YAMLError extends Error {
   constructor(name, source, message) {
-    if (!message || !(source instanceof Node))
-      throw new Error(`Invalid arguments for new ${name}`)
+    if (!message) throw new Error(`Invalid arguments for new ${name}`)
     super()
     this.name = name
     this.message = message
-    this.source = source
+    if (source instanceof Node) this.source = source
+    else if (typeof source === 'number') this.offset = source
   }
 
   makePretty() {
@@ -35,6 +35,12 @@ export class YAMLError extends Error {
       if (ctx) this.message += `:\n\n${ctx}\n`
     }
     delete this.source
+  }
+}
+
+export class YAMLParseError extends YAMLError {
+  constructor(source, message) {
+    super('YAMLParseError', source, message)
   }
 }
 

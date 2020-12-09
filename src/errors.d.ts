@@ -8,11 +8,13 @@ interface LinePos {
 
 export class YAMLError extends Error {
   name:
+    | 'YAMLParseError'
     | 'YAMLReferenceError'
     | 'YAMLSemanticError'
     | 'YAMLSyntaxError'
     | 'YAMLWarning'
   message: string
+  offset?: number
   source?: CST.Node
 
   nodeType?: Type
@@ -25,6 +27,11 @@ export class YAMLError extends Error {
    * the `prettyErrors` option is set.
    */
   makePretty(): void
+}
+
+export class YAMLParseError extends YAMLError {
+  name: 'YAMLParseError'
+  constructor(source: Node | number, message: string)
 }
 
 export class YAMLReferenceError extends YAMLError {
@@ -41,4 +48,5 @@ export class YAMLSyntaxError extends YAMLError {
 
 export class YAMLWarning extends YAMLError {
   name: 'YAMLWarning'
+  constructor(source: Node | number, message: string)
 }
