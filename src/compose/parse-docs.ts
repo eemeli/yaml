@@ -31,6 +31,7 @@ export function parseDocs(source: string, options?: Options) {
 
   const parser = new Parser(
     token => {
+      if (process.env.LOG_STREAM) console.dir(token, { depth: null })
       switch (token.type) {
         case 'directive':
           directives.add(token.source, onError)
