@@ -1,3 +1,13 @@
+export type LogLevelId = 'silent' | 'error' | 'warn' | 'debug'
+
+export interface LogLevel extends Array<LogLevelId> {
+  SILENT: 0
+  ERROR: 1
+  WARN: 2
+  DEBUG: 3
+}
+export const LogLevel: LogLevel
+
 export enum Type {
   ALIAS = 'ALIAS',
   BLANK_LINE = 'BLANK_LINE',
@@ -17,4 +27,3 @@ export enum Type {
   SEQ = 'SEQ',
   SEQ_ITEM = 'SEQ_ITEM'
 }
-

@@ -1,4 +1,5 @@
 import { Scalar } from './ast'
+import { LogLevelId } from './constants'
 import { Schema } from './doc/Schema'
 
 /**
@@ -48,6 +49,12 @@ export interface Options extends Schema.Options {
    * Default: `false`
    */
   keepUndefined?: boolean
+  /**
+   * Control the logging level during parsing
+   *
+   * Default: `'warn'`
+   */
+  logLevel?: LogLevelId
   /**
    * When outputting JS, use Map rather than Object to represent mappings.
    *

@@ -56,6 +56,7 @@ export class Document extends Collection {
    * The schema used with the document. Use `setSchema()` to change or
    * initialise.
    */
+  options: Required<Options>
   schema?: Schema
   /**
    * Array of prefixes; each will have a string `handle` that

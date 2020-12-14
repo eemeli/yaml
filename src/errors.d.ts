@@ -36,14 +36,17 @@ export class YAMLParseError extends YAMLError {
 
 export class YAMLReferenceError extends YAMLError {
   name: 'YAMLReferenceError'
+  constructor(source: Node | number, message: string)
 }
 
 export class YAMLSemanticError extends YAMLError {
   name: 'YAMLSemanticError'
+  constructor(source: Node | number, message: string)
 }
 
 export class YAMLSyntaxError extends YAMLError {
   name: 'YAMLSyntaxError'
+  constructor(source: Node | number, message: string)
 }
 
 export class YAMLWarning extends YAMLError {
