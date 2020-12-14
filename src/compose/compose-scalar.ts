@@ -1,13 +1,15 @@
 import { Scalar } from '../ast/index.js'
+import { Document } from '../doc/Document.js'
 import type { Schema } from '../doc/Schema.js'
 import type { BlockScalar, FlowScalar } from '../parse/parser.js'
 import { resolveBlockScalar } from './resolve-block-scalar.js'
 import { resolveFlowScalar } from './resolve-flow-scalar.js'
 
 export function composeScalar(
-  schema: Schema,
-  tagName: string | null,
+  doc: Document.Parsed,
   token: FlowScalar | BlockScalar,
+  anchor: string | null,
+  tagName: string | null,
   onError: (offset: number, message: string) => void
 ) {
   const { offset } = token
@@ -17,9 +19,9 @@ export function composeScalar(
       : resolveFlowScalar(token, onError)
 
   const tag =
-    findScalarTagByName(schema, value, tagName, onError) ||
-    findScalarTagByTest(schema, value, token.type === 'scalar') ||
-    findScalarTagByName(schema, value, '!', onError)
+    findScalarTagByName(doc.schema, value, tagName, onError) ||
+    findScalarTagByTest(doc.schema, value, token.type === 'scalar') ||
+    findScalarTagByName(doc.schema, value, '!', onError)
 
   let scalar: Scalar
   try {
@@ -35,6 +37,7 @@ export function composeScalar(
   if (tag?.format) scalar.format = tag.format
   if (comment) scalar.comment = comment
 
+  if (anchor) doc.anchors.setAnchor(scalar, anchor)
   return scalar as Scalar.Parsed
 }
 

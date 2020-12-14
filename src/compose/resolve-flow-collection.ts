@@ -3,7 +3,7 @@ import type { Document } from '../doc/Document.js'
 import type { FlowCollection, SourceToken } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
 
-export function composeFlowCollection(
+export function resolveFlowCollection(
   doc: Document.Parsed,
   fc: FlowCollection,
   _anchor: string | null,
@@ -24,7 +24,6 @@ export function composeFlowCollection(
   let anchor = ''
   let tagName = ''
 
-  // let atExplicitKey = false
   let atValueEnd = false
 
   function resetProps() {
@@ -34,7 +33,6 @@ export function composeFlowCollection(
     newlines = ''
     anchor = ''
     tagName = ''
-    // atExplicitKey = false
     atValueEnd = false
   }
 
@@ -97,7 +95,6 @@ export function composeFlowCollection(
         break
       }
       case 'explicit-key-ind':
-        // atExplicitKey = true
         if (anchor || tagName)
           onError(offset, 'Anchors and tags must be after the ? indicator')
         break

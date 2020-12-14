@@ -4,7 +4,7 @@ import type { BlockMap } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
 import { resolveProps } from './resolve-props.js'
 
-export function composeBlockMap(
+export function resolveBlockMap(
   doc: Document.Parsed,
   { items, offset }: BlockMap,
   anchor: string | null,

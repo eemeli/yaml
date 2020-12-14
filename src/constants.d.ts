@@ -27,3 +27,10 @@ export enum Type {
   SEQ = 'SEQ',
   SEQ_ITEM = 'SEQ_ITEM'
 }
+
+export const defaultTagPrefix : 'tag:yaml.org,2002:'
+export const defaultTags : {
+  MAP: 'tag:yaml.org,2002:map',
+  SEQ: 'tag:yaml.org,2002:seq',
+  STR: 'tag:yaml.org,2002:str'
+}

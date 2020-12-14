@@ -1,9 +1,7 @@
 import { Alias, Node } from '../ast/index.js'
 import type { Document } from '../doc/Document.js'
 import type { FlowScalar, Token } from '../parse/parser.js'
-import { composeBlockMap } from './compose-block-map.js'
-import { composeBlockSeq } from './compose-block-seq.js'
-import { composeFlowCollection } from './compose-flow-collection.js'
+import { composeCollection } from './compose-collection.js'
 import { composeScalar } from './compose-scalar.js'
 import { resolveEnd } from './resolve-end.js'
 
@@ -34,17 +32,12 @@ export function composeNode(
     case 'single-quoted-scalar':
     case 'double-quoted-scalar':
     case 'block-scalar':
-      node = composeScalar(doc.schema, tagName, token, onError)
-      if (anchor) doc.anchors.setAnchor(node, anchor)
+      node = composeScalar(doc, token, anchor, tagName, onError)
       break
     case 'block-map':
-      node = composeBlockMap(doc, token, anchor, onError)
-      break
     case 'block-seq':
-      node = composeBlockSeq(doc, token, anchor, onError)
-      break
     case 'flow-collection':
-      node = composeFlowCollection(doc, token, anchor, onError)
+      node = composeCollection(doc, token, anchor, tagName, onError)
       break
     default:
       console.log(token)
@@ -65,8 +58,7 @@ function composeEmptyNode(
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const token: FlowScalar = { type: 'scalar', offset, indent: -1, source: '' }
-  const node = composeScalar(doc.schema, tagName, token, onError)
-  if (anchor) doc.anchors.setAnchor(node, anchor)
+  const node = composeScalar(doc, token, anchor, tagName, onError)
   if (spaceBefore) node.spaceBefore = true
   if (comment) node.comment = comment
   return node

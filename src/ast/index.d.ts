@@ -141,6 +141,7 @@ export class Collection extends Node {
 }
 
 export class YAMLMap extends Collection {
+  static readonly tagName: 'tag:yaml.org,2002:map'
   type?: Type.FLOW_MAP | Type.MAP
   items: Array<Pair>
   hasAllNullValues(): boolean
@@ -159,6 +160,7 @@ export namespace YAMLMap {
 }
 
 export class YAMLSeq extends Collection {
+  static readonly tagName: 'tag:yaml.org,2002:seq'
   type?: Type.FLOW_SEQ | Type.SEQ
   delete(key: number | string | Scalar): boolean
   get(key: number | string | Scalar, keepScalar?: boolean): any

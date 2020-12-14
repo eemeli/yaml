@@ -4,7 +4,7 @@ import type { BlockSequence } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
 import { resolveProps } from './resolve-props.js'
 
-export function composeBlockSeq(
+export function resolveBlockSeq(
   doc: Document.Parsed,
   { items, offset }: BlockSequence,
   anchor: string | null,

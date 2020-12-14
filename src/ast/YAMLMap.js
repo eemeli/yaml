@@ -14,6 +14,10 @@ export function findPair(items, key) {
 }
 
 export class YAMLMap extends Collection {
+  static get tagName() {
+    return 'tag:yaml.org,2002:map'
+  }
+
   add(pair, overwrite) {
     if (!pair) pair = new Pair(pair)
     else if (!(pair instanceof Pair))
