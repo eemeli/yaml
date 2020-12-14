@@ -90,10 +90,12 @@ export function composeFlowCollection(
         if (anchor) onError(offset, 'A node can have at most one anchor')
         anchor = token.source.substring(1)
         break
-      case 'tag':
+      case 'tag': {
         if (tagName) onError(offset, 'A node can have at most one tag')
-        tagName = token.source // FIXME
+        const tn = doc.directives.tagName(token.source, m => onError(offset, m))
+        if (tn) tagName = tn
         break
+      }
       case 'explicit-key-ind':
         // atExplicitKey = true
         if (anchor || tagName)

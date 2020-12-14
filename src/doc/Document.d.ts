@@ -1,4 +1,5 @@
 import { Alias, Collection, Merge, Node, Pair } from '../ast'
+import { StreamDirectives } from '../compose/stream-directives'
 import { Type } from '../constants'
 import { CST } from '../cst'
 import { YAMLError, YAMLWarning } from '../errors'
@@ -36,6 +37,9 @@ export class Document extends Collection {
    */
   constructor(value?: any, options?: Options)
   constructor(value: any, replacer: null | Replacer, options?: Options)
+
+  directives?: StreamDirectives
+
   tag: never
   directivesEndMarker?: boolean
   type: Type.DOCUMENT
@@ -129,6 +133,7 @@ export class Document extends Collection {
 export namespace Document {
   interface Parsed extends Document {
     contents: Node | null
+    directives: StreamDirectives
     /** The schema used with the document. */
     schema: Schema
   }

@@ -1,6 +1,8 @@
 import { SourceToken } from '../parse/parser'
+import { StreamDirectives } from './stream-directives'
 
 export function resolveProps(
+  directives: StreamDirectives,
   start: SourceToken[],
   indicator:
     | 'doc-start'
@@ -40,10 +42,12 @@ export function resolveProps(
           onError(offset + length, 'A node can have at most one anchor')
         anchor = token.source.substring(1)
         break
-      case 'tag':
+      case 'tag': {
         if (tagName) onError(offset + length, 'A node can have at most one tag')
-        tagName = token.source // FIXME
+        const tn = directives.tagName(token.source, msg => onError(offset, msg))
+        if (tn) tagName = tn
         break
+      }
       case indicator:
         // Could here handle preceding comments differently
         found = true

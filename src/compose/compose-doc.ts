@@ -13,10 +13,17 @@ export function composeDoc(
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const doc = new Document(undefined, options) as Document.Parsed
+  doc.directives = StreamDirectives.from(directives)
   doc.version = directives.yaml.version
   doc.setSchema() // FIXME: always do this in the constructor
 
-  const props = resolveProps(start, 'doc-start', offset, onError)
+  const props = resolveProps(
+    doc.directives,
+    start,
+    'doc-start',
+    offset,
+    onError
+  )
   if (props.found) doc.directivesEndMarker = true
 
   let to = offset + props.length

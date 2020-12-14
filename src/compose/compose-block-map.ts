@@ -16,7 +16,13 @@ export function composeBlockMap(
 
   for (const { start, key, sep, value } of items) {
     // key properties
-    const keyProps = resolveProps(start, 'explicit-key-ind', offset, onError)
+    const keyProps = resolveProps(
+      doc.directives,
+      start,
+      'explicit-key-ind',
+      offset,
+      onError
+    )
     if (!keyProps.found) {
       // implicit key
       if (keyProps.anchor || keyProps.tagName || sep) {
@@ -47,7 +53,13 @@ export function composeBlockMap(
     }
 
     // value properties
-    const valueProps = resolveProps(sep || [], 'map-value-ind', offset, onError)
+    const valueProps = resolveProps(
+      doc.directives,
+      sep || [],
+      'map-value-ind',
+      offset,
+      onError
+    )
     offset += valueProps.length
 
     if (valueProps.found) {

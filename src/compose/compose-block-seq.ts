@@ -14,7 +14,13 @@ export function composeBlockSeq(
   const seq = new YAMLSeq(doc.schema)
   if (anchor) doc.anchors.setAnchor(seq, anchor)
   for (const { start, value } of items) {
-    const props = resolveProps(start, 'seq-item-ind', offset, onError)
+    const props = resolveProps(
+      doc.directives,
+      start,
+      'seq-item-ind',
+      offset,
+      onError
+    )
     offset += props.length
     if (!props.found) {
       if (props.anchor || props.tagName || value) {

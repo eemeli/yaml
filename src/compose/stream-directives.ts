@@ -52,22 +52,22 @@ export class StreamDirectives {
    * @returns Resolved tag, which may also be the non-specific tag `'!'` or a
    *   `'!local'` tag, or `null` if unresolvable.
    */
-  tagName(source: string, onError: (offset: number, message: string) => void) {
+  tagName(source: string, onError: (message: string) => void) {
     if (source === '!') return '!' // non-specific tag
 
     if (source[0] !== '!') {
-      onError(0, `Not a valid tag: ${source}`)
+      onError(`Not a valid tag: ${source}`)
       return null
     }
 
     if (source[1] === '<') {
       const verbatim = source.slice(2, -1)
       if (verbatim === '!' || verbatim === '!!') {
-        onError(0, `Verbatim tags aren't resolved, so ${source} is invalid.`)
+        onError(`Verbatim tags aren't resolved, so ${source} is invalid.`)
         return null
       }
       if (source[source.length - 1] !== '>')
-        onError(source.length - 1, 'Verbatim tags must end with a >')
+        onError('Verbatim tags must end with a >')
       return verbatim
     }
 
@@ -76,7 +76,7 @@ export class StreamDirectives {
     if (prefix) return prefix + suffix
     if (handle === '!') return source // local tag
 
-    onError(0, `Could not resolve tag: ${source}`)
+    onError(`Could not resolve tag: ${source}`)
     return null
   }
 
