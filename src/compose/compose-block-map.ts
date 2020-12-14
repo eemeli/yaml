@@ -42,15 +42,7 @@ export function composeBlockMap(
     // key value
     const keyStart = offset
     const keyNode = composeNode(doc, key || offset, keyProps, onError)
-    if (keyNode.range) offset = keyNode.range[1]
-    else {
-      // FIXME: remove once verified never happens
-      onError(offset, 'Resolved child node has no range')
-      if (key) {
-        if ('offset' in key) offset = key.offset
-        if ('source' in key && key.source) offset += key.source.length
-      }
-    }
+    offset = keyNode.range[1]
 
     // value properties
     const valueProps = resolveProps(
@@ -65,16 +57,7 @@ export function composeBlockMap(
     if (valueProps.found) {
       // value value
       const valueNode = composeNode(doc, value || offset, valueProps, onError)
-      if (valueNode.range) offset = valueNode.range[1]
-      else {
-        // FIXME: remove once verified never happens
-        onError(offset, 'Resolved child node has no range')
-        if (value) {
-          if ('offset' in value) offset = value.offset
-          if ('source' in value && value.source) offset += value.source.length
-        }
-      }
-
+      offset = valueNode.range[1]
       map.items.push(new Pair(keyNode, valueNode))
     } else {
       // key with no value
@@ -88,5 +71,5 @@ export function composeBlockMap(
     }
   }
   map.range = [start, offset]
-  return map
+  return map as YAMLMap.Parsed
 }

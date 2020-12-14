@@ -26,20 +26,15 @@ export function composeDoc(
   )
   if (props.found) doc.directivesEndMarker = true
 
-  let to = offset + props.length
-  doc.contents = composeNode(doc, value || to, props, onError)
-  if (doc.contents.range) to = doc.contents.range[1]
-  else {
-    // FIXME: remove once verified never happens
-    onError(to, 'Resolved child node has no range')
-    if (value) {
-      if ('offset' in value) to = value.offset
-      if ('source' in value && value.source) to += value.source.length
-    }
-  }
+  doc.contents = composeNode(
+    doc,
+    value || offset + props.length,
+    props,
+    onError
+  )
   const { comment, length } = resolveEnd(end)
   if (comment) doc.comment = comment
 
-  doc.range = [offset, to + length]
+  doc.range = [offset, doc.contents.range[1] + length]
   return doc
 }

@@ -32,17 +32,9 @@ export function composeBlockSeq(
       }
     }
     const node = composeNode(doc, value || offset, props, onError)
-    if (node.range) offset = node.range[1]
-    else {
-      // FIXME: remove once verified never happens
-      onError(offset, 'Resolved child node has no range')
-      if (value) {
-        if ('offset' in value) offset = value.offset
-        if ('source' in value && value.source) offset += value.source.length
-      }
-    }
+    offset = node.range[1]
     seq.items.push(node)
   }
   seq.range = [start, offset]
-  return seq
+  return seq as YAMLSeq.Parsed
 }

@@ -14,8 +14,8 @@ export function composeFlowCollection(
   const coll = isMap ? new YAMLMap(doc.schema) : new YAMLSeq(doc.schema)
   if (_anchor) doc.anchors.setAnchor(coll, _anchor)
 
-  let key: Node | null = null
-  let value: Node | null = null
+  let key: Node.Parsed | null = null
+  let value: Node.Parsed | null = null
 
   let spaceBefore = false
   let comment = ''
@@ -107,7 +107,8 @@ export function composeFlowCollection(
             onError(offset, 'Missing {} around pair used as mapping key')
             const map = new YAMLMap(doc.schema)
             map.items.push(new Pair(key, value))
-            key = map
+            map.range = [key.range[0], value.range[1]]
+            key = map as YAMLMap.Parsed
             value = null
           } // else explicit key
         } else if (value) {
@@ -135,13 +136,7 @@ export function composeFlowCollection(
         if (value) onError(offset, 'Missing , between flow collection items')
         const props = { spaceBefore, comment, anchor, tagName }
         value = composeNode(doc, token, props, onError)
-        if (value.range) offset = value.range[1]
-        else {
-          // FIXME: remove once verified never happens
-          onError(offset, 'Resolved child node has no range')
-          if ('offset' in token) offset = token.offset
-          if ('source' in token && token.source) offset += token.source.length
-        }
+        offset = value.range[1]
         isSourceToken = false
       }
     }
@@ -149,5 +144,5 @@ export function composeFlowCollection(
   }
   if (key || value) addItem()
   coll.range = [fc.offset, offset]
-  return coll
+  return coll as YAMLMap.Parsed | YAMLSeq.Parsed
 }

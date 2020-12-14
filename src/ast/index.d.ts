@@ -24,6 +24,12 @@ export class Node {
   type?: Type | Pair.Type
 }
 
+export namespace Node {
+  interface Parsed extends Node {
+    range: [number, number]
+  }
+}
+
 export class Scalar extends Node {
   constructor(value: any)
   type?: Scalar.Type
@@ -38,6 +44,9 @@ export class Scalar extends Node {
   toString(): string
 }
 export namespace Scalar {
+  interface Parsed extends Scalar {
+    range: [number, number]
+  }
   type Type =
     | Type.BLOCK_FOLDED
     | Type.BLOCK_LITERAL
@@ -52,6 +61,12 @@ export class Alias extends Node {
   source: Node
   cstNode?: CST.Alias
   toString(ctx: Schema.StringifyContext): string
+}
+
+export namespace Alias {
+  interface Parsed extends Alias {
+    range: [number, number]
+  }
 }
 
 export class Pair extends Node {
@@ -137,6 +152,12 @@ export class YAMLMap extends Collection {
   ): string
 }
 
+export namespace YAMLMap {
+  interface Parsed extends YAMLMap {
+    range: [number, number]
+  }
+}
+
 export class YAMLSeq extends Collection {
   type?: Type.FLOW_SEQ | Type.SEQ
   delete(key: number | string | Scalar): boolean
@@ -150,6 +171,12 @@ export class YAMLSeq extends Collection {
     onComment?: () => void,
     onChompKeep?: () => void
   ): string
+}
+
+export namespace YAMLSeq {
+  interface Parsed extends YAMLSeq {
+    range: [number, number]
+  }
 }
 
 export namespace AST {

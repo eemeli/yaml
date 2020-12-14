@@ -8,10 +8,10 @@ import { composeScalar } from './compose-scalar.js'
 import { resolveEnd } from './resolve-end.js'
 
 export interface Props {
-    spaceBefore: boolean
-    comment: string
-    anchor: string
-    tagName: string
+  spaceBefore: boolean
+  comment: string
+  anchor: string
+  tagName: string
 }
 
 export function composeNode(
@@ -23,7 +23,7 @@ export function composeNode(
   if (typeof token === 'number')
     return composeEmptyNode(doc, token, props, onError)
   const { spaceBefore, comment, anchor, tagName } = props
-  let node: Node
+  let node: Node.Parsed
   switch (token.type) {
     case 'alias':
       node = composeAlias(doc.anchors, token, onError)
@@ -47,11 +47,8 @@ export function composeNode(
       node = composeFlowCollection(doc, token, anchor, onError)
       break
     default:
-      onError(
-        'offset' in token ? token.offset : -1,
-        `Unsupporten token type: ${token.type}`
-      )
-      return new Node()
+      console.log(token)
+      throw new Error(`Unsupporten token type: ${(token as any).type}`)
   }
   if (spaceBefore) node.spaceBefore = true
   if (comment) {
@@ -87,5 +84,5 @@ function composeAlias(
   const { comment, length } = resolveEnd(end)
   alias.range = [offset, offset + source.length + length]
   if (comment) alias.comment = comment
-  return alias
+  return alias as Alias.Parsed
 }

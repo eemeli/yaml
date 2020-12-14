@@ -133,7 +133,7 @@ export class Document extends Collection {
 
 export namespace Document {
   interface Parsed extends Document {
-    contents: Node | null
+    contents: Node.Parsed | null
     directives: StreamDirectives
     /** The schema used with the document. */
     schema: Schema

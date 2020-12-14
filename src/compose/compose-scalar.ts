@@ -35,7 +35,7 @@ export function composeScalar(
   if (tag?.format) scalar.format = tag.format
   if (comment) scalar.comment = comment
 
-  return scalar
+  return scalar as Scalar.Parsed
 }
 
 function findScalarTagByName(
