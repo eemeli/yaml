@@ -45,7 +45,12 @@ export class Collection extends Node {
 
   constructor(schema) {
     super()
-    this.schema = schema
+    Object.defineProperty(this, 'schema', {
+      value: schema,
+      configurable: true,
+      enumerable: false,
+      writable: true
+    })
   }
 
   addIn(path, value) {
