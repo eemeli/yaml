@@ -1,6 +1,13 @@
 import { SourceToken } from '../parse/parser'
 import { StreamDirectives } from './stream-directives'
 
+function isSpaceBefore(sep: string) {
+  if (!sep) return false
+  const first = sep.indexOf('\n')
+  if (first === -1) return false
+  return sep.includes('\n', first + 1)
+}
+
 export function resolveProps(
   directives: StreamDirectives,
   start: SourceToken[],
@@ -27,7 +34,7 @@ export function resolveProps(
       case 'comment': {
         const cb = token.source.substring(1)
         if (!hasComment) {
-          if (sep) spaceBefore = true
+          if (isSpaceBefore(sep)) spaceBefore = true
           comment = cb
         } else comment += sep + cb
         hasComment = true
@@ -57,6 +64,6 @@ export function resolveProps(
     }
     if (token.source) length += token.source.length
   }
-  if (!comment && sep) spaceBefore = true
+  if (!comment && isSpaceBefore(sep)) spaceBefore = true
   return { found, spaceBefore, comment, anchor, tagName, length }
 }

@@ -24,11 +24,7 @@ export function resolveBlockScalar(
   // shortcut for empty contents
   if (!scalar.source || chompStart === 0) {
     const value =
-      header.chomp === '+'
-        ? lines.map(line => line[0]).join('\n') + '\n'
-        : header.chomp === '-'
-        ? ''
-        : '\n'
+      header.chomp === '+' ? lines.map(line => line[0]).join('\n') + '\n' : ''
     let length = header.length
     if (scalar.source) length += scalar.source.length
     return { value, type, comment: header.comment, length }

@@ -7,7 +7,9 @@ export function addCommentBefore(str, indent, comment) {
 export function addComment(str, indent, comment) {
   return !comment
     ? str
-    : comment.indexOf('\n') === -1
-    ? `${str} #${comment}`
-    : `${str}\n` + comment.replace(/^/gm, `${indent || ''}#`)
+    : comment.includes('\n')
+    ? `${str}\n` + comment.replace(/^/gm, `${indent || ''}#`)
+    : str.endsWith(' ')
+    ? `${str}#${comment}`
+    : `${str} #${comment}`
 }

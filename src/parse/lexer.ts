@@ -101,6 +101,7 @@ export class Lexer {
 
   atEnd = false
   buffer = ''
+  flowKey = false
   flowLevel = 0
   indent = 0
   indentMore = ''
@@ -280,6 +281,7 @@ export class Lexer {
       case '{':
       case '[':
         this.pushCount(1)
+        this.flowKey = false
         this.flowLevel = 1
         return 'flow'
       case '}':
@@ -317,17 +319,27 @@ export class Lexer {
       case '{':
       case '[':
         this.pushCount(1)
+        this.flowKey = false
         this.flowLevel += 1
         return 'flow'
       case '}':
       case ']':
         this.pushCount(1)
+        this.flowKey = true
         this.flowLevel -= 1
         return this.flowLevel ? 'flow' : 'doc'
       case '"':
       case "'":
+        this.flowKey = true
         return this.parseQuotedScalar()
+      case ':':
+        if (this.flowKey) {
+          this.pushCount(1) + this.pushSpaces()
+          return 'flow'
+        }
+      // fallthrough
       default:
+        this.flowKey = false
         return this.parsePlainScalar()
     }
   }

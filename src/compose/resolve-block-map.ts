@@ -1,4 +1,5 @@
 import { Pair, YAMLMap } from '../ast/index.js'
+import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { BlockMap } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
@@ -12,6 +13,7 @@ export function resolveBlockMap(
 ) {
   const start = offset
   const map = new YAMLMap(doc.schema)
+  map.type = Type.MAP
   if (anchor) doc.anchors.setAnchor(map, anchor)
 
   for (const { start, key, sep, value } of items) {

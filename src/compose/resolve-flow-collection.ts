@@ -1,4 +1,5 @@
 import { Node, Pair, YAMLMap, YAMLSeq } from '../ast/index.js'
+import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { FlowCollection, SourceToken } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
@@ -12,6 +13,7 @@ export function resolveFlowCollection(
   let offset = fc.offset
   const isMap = fc.start.source === '{'
   const coll = isMap ? new YAMLMap(doc.schema) : new YAMLSeq(doc.schema)
+  coll.type = isMap ? Type.FLOW_MAP : Type.FLOW_SEQ
   if (_anchor) doc.anchors.setAnchor(coll, _anchor)
 
   let key: Node.Parsed | null = null
@@ -24,6 +26,7 @@ export function resolveFlowCollection(
   let anchor = ''
   let tagName = ''
 
+  let atExplicitKey = false
   let atValueEnd = false
 
   function resetProps() {
@@ -33,6 +36,7 @@ export function resolveFlowCollection(
     newlines = ''
     anchor = ''
     tagName = ''
+    atExplicitKey = false
     atValueEnd = false
   }
 
@@ -43,7 +47,7 @@ export function resolveFlowCollection(
       const props = { spaceBefore, comment, anchor, tagName }
       value = composeNode(doc, offset, props, onError)
     }
-    if (isMap) {
+    if (isMap || atExplicitKey) {
       const pair = key ? new Pair(key, value) : new Pair(value)
       coll.items.push(pair)
     } else {
@@ -97,8 +101,10 @@ export function resolveFlowCollection(
       case 'explicit-key-ind':
         if (anchor || tagName)
           onError(offset, 'Anchors and tags must be after the ? indicator')
+        atExplicitKey = true
         break
       case 'map-value-ind': {
+        atExplicitKey = false
         if (key) {
           if (value) {
             onError(offset, 'Missing {} around pair used as mapping key')
@@ -139,7 +145,7 @@ export function resolveFlowCollection(
     }
     if (isSourceToken) offset += (token as SourceToken).source.length
   }
-  if (key || value) addItem()
+  if (key || value || atExplicitKey) addItem()
   coll.range = [fc.offset, offset]
   return coll as YAMLMap.Parsed | YAMLSeq.Parsed
 }
