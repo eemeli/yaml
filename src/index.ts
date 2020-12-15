@@ -12,6 +12,7 @@ export const parseAllDocuments = parseDocs
 
 export function parseDocument(src: string, options?: Options) {
   const docs = parseDocs(src, options)
+  if (docs.length === 0) return null
   const doc = docs[0]
   if (
     docs.length > 1 &&
@@ -35,6 +36,7 @@ export function parse(
   }
 
   const doc = parseDocument(src, options)
+  if (!doc) return null
   doc.warnings.forEach(warning => warn(doc.options.logLevel, warning))
   if (doc.errors.length > 0) {
     if (LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR)
