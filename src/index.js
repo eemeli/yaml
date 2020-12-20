@@ -1,7 +1,8 @@
+import { LogLevel } from './constants.js'
 import { parse as parseCST } from './cst/parse.js'
 import { Document } from './doc/Document.js'
 import { YAMLSemanticError } from './errors.js'
-import { warn } from './warnings.js'
+import { warn } from './log.js'
 
 export { defaultOptions, scalarOptions } from './options.js'
 export { Document, parseCST }
@@ -36,8 +37,12 @@ export function parse(src, reviver, options) {
   }
 
   const doc = parseDocument(src, options)
-  doc.warnings.forEach(warning => warn(warning))
-  if (doc.errors.length > 0) throw doc.errors[0]
+  doc.warnings.forEach(warning => warn(doc.options.logLevel, warning))
+  if (doc.errors.length > 0) {
+    if (LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR)
+      throw doc.errors[0]
+    else doc.errors = []
+  }
   return doc.toJS({ reviver })
 }
 

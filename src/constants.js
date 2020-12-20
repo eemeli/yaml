@@ -6,6 +6,13 @@ export const Char = {
   DOCUMENT_END: '.'
 }
 
+export const LogLevel = Object.assign(['silent', 'error', 'warn', 'debug'], {
+  SILENT: 0,
+  ERROR: 1,
+  WARN: 2,
+  DEBUG: 3
+})
+
 export const Type = {
   ALIAS: 'ALIAS',
   BLANK_LINE: 'BLANK_LINE',
