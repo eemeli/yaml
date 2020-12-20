@@ -285,10 +285,8 @@ describe('logLevel', () => {
   // process.emitWarning will throw in Jest if `warning` is an Error instance
   // due to https://github.com/facebook/jest/issues/2549
 
-  let mock
-  beforeEach(() => {
-    mock = jest.spyOn(global.process, 'emitWarning').mockImplementation()
-  })
+  const mock = jest.spyOn(global.process, 'emitWarning').mockImplementation()
+  beforeEach(() => mock.mockClear())
   afterEach(() => mock.mockRestore())
 
   test('by default, warn for tag fallback', () => {

@@ -1,8 +1,7 @@
 import * as YAML from '../../index.js'
 import { YAMLError } from '../../util.js'
 
-const collectionKeyWarning =
-  'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
+const collectionKeyWarning = /^Keys with collection values will be stringified due to JS Object restrictions/
 
 const spec = {
   '2.1. Collections': {
@@ -203,7 +202,7 @@ rbi:
           ]
         }
       ],
-      warnings: [[collectionKeyWarning]]
+      jsWarnings: [collectionKeyWarning]
     },
 
     'Example 2.12. Compact Nested Mapping': {
@@ -963,7 +962,7 @@ Chomping: |
   avg: # Average
    0.278`,
       tgt: [{ '{ first: Sammy, last: Sosa }': { hr: 65, avg: 0.278 } }],
-      warnings: [[collectionKeyWarning]]
+      jsWarnings: [collectionKeyWarning]
     }
   },
   '6.8. Directives': {
@@ -1476,7 +1475,7 @@ foo: bar
           [{ '{ JSON: like }': 'adjacent' }]
         ]
       ],
-      warnings: [[collectionKeyWarning]]
+      jsWarnings: [collectionKeyWarning]
     },
 
     'Example 7.22. Invalid Implicit Keys': {
@@ -1738,7 +1737,7 @@ last line
 - ? earth: blue
   : moon: white\n`,
       tgt: [[{ sun: 'yellow' }, { '{ earth: blue }': { moon: 'white' } }]],
-      warnings: [[collectionKeyWarning]]
+      jsWarnings: [collectionKeyWarning]
     }
   },
 
@@ -1871,6 +1870,7 @@ matches %: 20`,
 }
 
 let origFoldOptions, origPrettyErrors
+const mockWarn = jest.spyOn(global.process, 'emitWarning').mockImplementation()
 
 beforeAll(() => {
   origFoldOptions = YAML.scalarOptions.str.fold
@@ -1882,24 +1882,23 @@ beforeAll(() => {
   YAML.defaultOptions.prettyErrors = false
 })
 
+beforeEach(() => mockWarn.mockClear())
+
 afterAll(() => {
   YAML.scalarOptions.str.fold = origFoldOptions
   YAML.defaultOptions.prettyErrors = origPrettyErrors
+  mockWarn.mockRestore()
 })
 
 for (const section in spec) {
   describe(section, () => {
     for (const name in spec[section]) {
       test(name, () => {
-        const { src, tgt, errors, special, warnings } = spec[section][name]
+        const { src, tgt, errors, special, jsWarnings, warnings } = spec[
+          section
+        ][name]
         const documents = YAML.parseAllDocuments(src)
         const json = documents.map(doc => doc.toJS())
-        const docErrors = documents.map(doc =>
-          doc.errors.map(err => err.message)
-        )
-        trace: name,
-          '\n' + JSON.stringify(json, null, '  '),
-          { errors: docErrors }
         expect(json).toMatchObject(tgt)
         documents.forEach((doc, i) => {
           if (!errors || !errors[i]) expect(doc.errors).toHaveLength(0)
@@ -1913,18 +1912,17 @@ for (const section in spec) {
             warnings[i].forEach((err, j) =>
               expect(doc.warnings[j].message).toBe(err)
             )
+          if (!jsWarnings) expect(mockWarn).not.toHaveBeenCalled()
+          else {
+            for (const warning of jsWarnings)
+              expect(mockWarn.mock.calls.some(call => warning.test(call[0])))
+          }
         })
         if (special) special(src)
         if (!errors) {
           const src2 = documents.map(doc => String(doc)).join('\n...\n')
           const documents2 = YAML.parseAllDocuments(src2)
           const json2 = documents2.map(doc => doc.toJS())
-          trace: name,
-            '\nIN\n' + src,
-            '\nJSON\n' + JSON.stringify(json, null, '  '),
-            '\n\nOUT\n' + src2,
-            '\nOUT-JSON\n' + JSON.stringify(src2),
-            '\nRE-JSON\n' + JSON.stringify(json2, null, '  ')
           expect(json2).toMatchObject(tgt)
         }
       })

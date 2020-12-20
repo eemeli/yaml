@@ -575,16 +575,25 @@ describe('handling complex keys', () => {
     process.emitWarning = origEmitWarning
   })
 
-  test('add warning to doc when casting key in collection to string', () => {
+  test('emit warning when casting key in collection to string as JS Object key', () => {
+    process.emitWarning = jest.fn()
     const doc = YAML.parseDocument('[foo]: bar', { prettyErrors: false })
-    const message =
-      'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
-    expect(doc.warnings).toMatchObject([{ message }])
+    expect(doc.warnings).toHaveLength(0)
+    expect(process.emitWarning).not.toHaveBeenCalled()
+
+    doc.toJS()
+    expect(process.emitWarning).toHaveBeenCalledTimes(1)
+    expect(process.emitWarning.mock.calls[0][0]).toMatch(
+      /^Keys with collection values will be stringified due to JS Object restrictions/
+    )
   })
 
   test('do not add warning when using mapIsMap: true', () => {
+    process.emitWarning = jest.fn()
     const doc = YAML.parseDocument('[foo]: bar', { mapAsMap: true })
+    doc.toJS()
     expect(doc.warnings).toMatchObject([])
+    expect(process.emitWarning).not.toHaveBeenCalled()
   })
 
   test('warn when casting key in collection to string', () => {
@@ -618,7 +627,7 @@ describe('__proto__ as mapping key', () => {
     const src = '{ __proto__: [42] }'
     const obj = YAML.parse(src)
     expect(Array.isArray(obj)).toBe(false)
-    expect(obj.hasOwnProperty('__proto__')).toBe(true)
+    expect({}.hasOwnProperty.call(obj, '__proto__')).toBe(true)
     expect(obj).not.toHaveProperty('length')
     expect(JSON.stringify(obj)).toBe('{"__proto__":[42]}')
   })
@@ -626,8 +635,8 @@ describe('__proto__ as mapping key', () => {
   test('with merge key', () => {
     const src = '- &A { __proto__: [42] }\n- { <<: *A }\n'
     const obj = YAML.parse(src, { merge: true })
-    expect(obj[0].hasOwnProperty('__proto__')).toBe(true)
-    expect(obj[1].hasOwnProperty('__proto__')).toBe(true)
+    expect({}.hasOwnProperty.call(obj[0], '__proto__')).toBe(true)
+    expect({}.hasOwnProperty.call(obj[1], '__proto__')).toBe(true)
     expect(JSON.stringify(obj)).toBe('[{"__proto__":[42]},{"__proto__":[42]}]')
   })
 })

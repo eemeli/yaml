@@ -270,6 +270,7 @@ export class Document {
       keep: !json,
       mapAsMap:
         typeof mapAsMap === 'boolean' ? mapAsMap : !!this.options.mapAsMap,
+      mapKeyWarned: false,
       maxAliasCount: this.options.maxAliasCount,
       stringify // Requiring directly in Pair would create circular dependencies
     }
