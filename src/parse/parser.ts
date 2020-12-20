@@ -84,6 +84,11 @@ export type Token =
   | BlockSequence
   | FlowCollection
 
+function includesToken(list: SourceToken[], type: SourceToken['type']) {
+  for (let i = 0; i < list.length; ++i) if (list[i].type === type) return true
+  return false
+}
+
 /** A YAML concrete syntax tree parser */
 export class Parser {
   push: (token: Token) => void
@@ -102,7 +107,10 @@ export class Parser {
 
   offset = 0
 
-  /** Top indicates the bode that's currently being built */
+  /** On the same line with a block map key */
+  onKeyLine = false
+
+  /** Top indicates the node that's currently being built */
   stack: Token[] = []
 
   /** The source of the current token, set in parse() */
@@ -236,7 +244,10 @@ export class Parser {
           const it = top.items[top.items.length - 1]
           if (it.value) top.items.push({ start: [], key: token, sep: [] })
           else if (it.sep) it.value = token
-          else Object.assign(it, { key: token, sep: [] })
+          else {
+            Object.assign(it, { key: token, sep: [] })
+            this.onKeyLine = true
+          }
           break
         }
         case 'block-seq': {
@@ -286,10 +297,10 @@ export class Parser {
     if (doc.value) return this.lineEnd(doc)
     switch (this.type) {
       case 'doc-start': {
-        const hasContent = doc.start.some(
-          ({ type }) =>
-            type === 'doc-start' || type === 'anchor' || type === 'tag'
-        )
+        const hasContent =
+          includesToken(doc.start, 'doc-start') ||
+          includesToken(doc.start, 'anchor') ||
+          includesToken(doc.start, 'tag')
         if (hasContent) {
           this.pop()
           this.step()
@@ -330,6 +341,7 @@ export class Parser {
         indent: scalar.indent,
         items: [{ start: [], key: scalar, sep }]
       }
+      this.onKeyLine = true
       this.stack[this.stack.length - 1] = map
     } else this.lineEnd(scalar)
   }
@@ -365,26 +377,30 @@ export class Parser {
     const it = map.items[map.items.length - 1]
     // it.sep is true-ish if pair already has key or : separator
     switch (this.type) {
+      case 'newline':
+        this.onKeyLine = false
+      // fallthrough
       case 'space':
       case 'comment':
-      case 'newline':
         if (it.value) map.items.push({ start: [this.sourceToken] })
         else if (it.sep) it.sep.push(this.sourceToken)
         else it.start.push(this.sourceToken)
         return
     }
     if (this.indent >= map.indent) {
+      const atNextItem = !this.onKeyLine && this.indent === map.indent
       switch (this.type) {
         case 'anchor':
         case 'tag':
-          if (it.value) map.items.push({ start: [this.sourceToken] })
+          if (atNextItem || it.value)
+            map.items.push({ start: [this.sourceToken] })
           else if (it.sep) it.sep.push(this.sourceToken)
           else it.start.push(this.sourceToken)
           return
 
         case 'explicit-key-ind':
           if (!it.sep) it.start.push(this.sourceToken)
-          else if (it.value || this.indent === map.indent)
+          else if (atNextItem || it.value)
             map.items.push({ start: [this.sourceToken] })
           else
             this.stack.push({
@@ -393,13 +409,17 @@ export class Parser {
               indent: this.indent,
               items: [{ start: [this.sourceToken] }]
             })
+          this.onKeyLine = true
           return
 
         case 'map-value-ind':
           if (!it.sep) Object.assign(it, { key: null, sep: [this.sourceToken] })
-          else if (it.value)
+          else if (
+            it.value ||
+            (atNextItem && !includesToken(it.start, 'explicit-key-ind'))
+          )
             map.items.push({ start: [], key: null, sep: [this.sourceToken] })
-          else if (it.sep.some(tok => tok.type === 'map-value-ind'))
+          else if (includesToken(it.sep, 'map-value-ind'))
             this.stack.push({
               type: 'block-map',
               offset: this.offset,
@@ -407,6 +427,7 @@ export class Parser {
               items: [{ start: [], key: null, sep: [this.sourceToken] }]
             })
           else it.sep.push(this.sourceToken)
+          this.onKeyLine = true
           return
 
         case 'alias':
@@ -414,9 +435,15 @@ export class Parser {
         case 'single-quoted-scalar':
         case 'double-quoted-scalar': {
           const fs = this.flowScalar(this.type)
-          if (it.value) map.items.push({ start: [], key: fs, sep: [] })
-          else if (it.sep) this.stack.push(fs)
-          else Object.assign(it, { key: fs, sep: [] })
+          if (atNextItem || it.value) {
+            map.items.push({ start: [], key: fs, sep: [] })
+            this.onKeyLine = true
+          } else if (it.sep) {
+            this.stack.push(fs)
+          } else {
+            Object.assign(it, { key: fs, sep: [] })
+            this.onKeyLine = true
+          }
           return
         }
 
@@ -446,7 +473,7 @@ export class Parser {
         return
       case 'seq-item-ind':
         if (this.indent !== seq.indent) break
-        if (it.value || it.start.some(tok => tok.type === 'seq-item-ind'))
+        if (it.value || includesToken(it.start, 'seq-item-ind'))
           seq.items.push({ start: [this.sourceToken] })
         else it.start.push(this.sourceToken)
         return
@@ -540,6 +567,7 @@ export class Parser {
           items: [{ start: [this.sourceToken] }]
         } as BlockSequence
       case 'explicit-key-ind':
+        this.onKeyLine = true
         return {
           type: 'block-map',
           offset: this.offset,
@@ -547,6 +575,7 @@ export class Parser {
           items: [{ start: [this.sourceToken] }]
         } as BlockMap
       case 'map-value-ind':
+        this.onKeyLine = true
         return {
           type: 'block-map',
           offset: this.offset,
