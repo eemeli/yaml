@@ -22,7 +22,10 @@ export function parseAllDocuments(src, options) {
 export function parseDocument(src, options) {
   const cst = parseCST(src)
   const doc = new Document(cst[0], null, options)
-  if (cst.length > 1) {
+  if (
+    cst.length > 1 &&
+    LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR
+  ) {
     const errMsg =
       'Source contains multiple documents; please use YAML.parseAllDocuments()'
     doc.errors.unshift(new YAMLSemanticError(cst[1], errMsg))

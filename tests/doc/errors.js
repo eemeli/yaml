@@ -307,7 +307,7 @@ describe('logLevel', () => {
   })
 
   test("silence errors with logLevel: 'silent'", () => {
-    const res = YAML.parse('foo: bar: baz', { logLevel: 'silent' })
+    const res = YAML.parse('foo: bar: baz\n---\ndoc2\n', { logLevel: 'silent' })
     expect(res).toMatchObject({ foo: { bar: 'baz' } })
   })
 })
