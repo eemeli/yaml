@@ -70,7 +70,7 @@ export interface FlowCollection {
   indent: number
   start: SourceToken
   items: Array<Token>
-  end?: SourceToken
+  end: SourceToken[]
 }
 
 export type Token =
@@ -487,35 +487,49 @@ export class Parser {
   }
 
   flowCollection(fc: FlowCollection) {
-    switch (this.type) {
-      case 'space':
-      case 'comment':
-      case 'newline':
-      case 'comma':
-      case 'explicit-key-ind':
-      case 'map-value-ind':
-      case 'anchor':
-      case 'tag':
-        fc.items.push(this.sourceToken)
-        return
+    if (fc.end.length === 0) {
+      switch (this.type) {
+        case 'space':
+        case 'comment':
+        case 'newline':
+        case 'comma':
+        case 'explicit-key-ind':
+        case 'map-value-ind':
+        case 'anchor':
+        case 'tag':
+          fc.items.push(this.sourceToken)
+          return
 
-      case 'alias':
-      case 'scalar':
-      case 'single-quoted-scalar':
-      case 'double-quoted-scalar':
-        fc.items.push(this.flowScalar(this.type))
-        return
+        case 'alias':
+        case 'scalar':
+        case 'single-quoted-scalar':
+        case 'double-quoted-scalar':
+          fc.items.push(this.flowScalar(this.type))
+          return
 
-      case 'flow-map-end':
-      case 'flow-seq-end':
-        fc.end = this.sourceToken
-        this.pop()
-        return
+        case 'flow-map-end':
+        case 'flow-seq-end':
+          fc.end.push(this.sourceToken)
+          return
+      }
+      const bv = this.startBlockValue()
+      if (bv) return this.stack.push(bv)
+      this.pop()
+      this.step()
+    } else if (this.type === 'map-value-ind') {
+      const sep = fc.end.splice(1, fc.end.length)
+      sep.push(this.sourceToken)
+      const map: BlockMap = {
+        type: 'block-map',
+        offset: fc.offset,
+        indent: fc.indent,
+        items: [{ start: [], key: fc, sep }]
+      }
+      this.onKeyLine = true
+      this.stack[this.stack.length - 1] = map
+    } else {
+      this.lineEnd(fc)
     }
-    const bv = this.startBlockValue()
-    if (bv) return this.stack.push(bv)
-    this.pop()
-    this.step()
   }
 
   flowScalar(
@@ -557,7 +571,8 @@ export class Parser {
           offset: this.offset,
           indent: this.indent,
           start: this.sourceToken,
-          items: []
+          items: [],
+          end: []
         } as FlowCollection
       case 'seq-item-ind':
         return {
@@ -586,7 +601,7 @@ export class Parser {
     return null
   }
 
-  lineEnd(token: Document | FlowScalar) {
+  lineEnd(token: Document | FlowCollection | FlowScalar) {
     switch (this.type) {
       case 'space':
       case 'comment':
