@@ -281,28 +281,33 @@ test('multiple tags on one node', () => {
   expect(doc.warnings).toMatchObject([{}])
 })
 
-describe('warnings', () => {
-  let mock
-  beforeEach(() => {
-    mock = jest.spyOn(global.process, 'emitWarning').mockImplementation()
-  })
+describe('logLevel', () => {
+  // process.emitWarning will throw in Jest if `warning` is an Error instance
+  // due to https://github.com/facebook/jest/issues/2549
+
+  const mock = jest.spyOn(global.process, 'emitWarning').mockImplementation()
+  beforeEach(() => mock.mockClear())
   afterEach(() => mock.mockRestore())
 
-  test('warn for tag fallback', () => {
+  test('by default, warn for tag fallback', () => {
     YAML.parse('!foo bar')
     const message =
       'The tag !foo is unavailable, falling back to tag:yaml.org,2002:str'
-    expect(mock.mock.calls).toMatchObject([[{ message }, undefined]])
+    expect(mock.mock.calls).toMatchObject([[{ message }]])
   })
 
-  test('silence with env var', () => {
-    const prev = global.YAML_SILENCE_WARNINGS
-    try {
-      global.YAML_SILENCE_WARNINGS = true
-      YAML.parse('!foo bar')
-      expect(mock).toHaveBeenCalledTimes(0)
-    } finally {
-      global.YAML_SILENCE_WARNINGS = prev
-    }
+  test("silence warnings with logLevel: 'error'", () => {
+    YAML.parse('!foo bar', { logLevel: 'error' })
+    expect(mock).toHaveBeenCalledTimes(0)
+  })
+
+  test("silence warnings with logLevel: 'silent'", () => {
+    YAML.parse('!foo bar', { logLevel: 'silent' })
+    expect(mock).toHaveBeenCalledTimes(0)
+  })
+
+  test("silence errors with logLevel: 'silent'", () => {
+    const res = YAML.parse('foo: bar: baz\n---\ndoc2\n', { logLevel: 'silent' })
+    expect(res).toMatchObject({ foo: { bar: 'baz' } })
   })
 })

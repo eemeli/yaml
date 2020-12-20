@@ -1,11 +1,10 @@
 import { Alias } from '../ast/Alias.js'
-import { Collection } from '../ast/Collection.js'
 import { Merge, MERGE_KEY } from '../ast/Merge.js'
 import { Pair } from '../ast/Pair.js'
 import { YAMLMap } from '../ast/YAMLMap.js'
 import { Char, Type } from '../constants.js'
 import { PlainValue } from '../cst/PlainValue.js'
-import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors.js'
+import { YAMLSemanticError, YAMLSyntaxError } from '../errors.js'
 
 import {
   checkFlowCollectionEnd,
@@ -23,10 +22,8 @@ export function resolveMap(doc, cst) {
   const map = new YAMLMap(doc.schema)
   map.items = items
   resolveComments(map, comments)
-  let hasCollectionKey = false
   for (let i = 0; i < items.length; ++i) {
     const { key: iKey } = items[i]
-    if (iKey instanceof Collection) hasCollectionKey = true
     if (doc.schema.merge && iKey && iKey.value === MERGE_KEY) {
       items[i] = new Merge(items[i])
       const sources = items[i].value.items
@@ -58,11 +55,6 @@ export function resolveMap(doc, cst) {
         }
       }
     }
-  }
-  if (hasCollectionKey && !doc.options.mapAsMap) {
-    const warn =
-      'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
-    doc.warnings.push(new YAMLWarning(cst, warn))
   }
   cst.resolved = map
   return map

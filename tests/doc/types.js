@@ -191,7 +191,7 @@ english: null
 one: 1
 2: two
 { 3: 4 }: many\n`
-      const doc = YAML.parseDocument(src)
+      const doc = YAML.parseDocument(src, { logLevel: 'error' })
       expect(doc.toJS()).toMatchObject({
         one: 1,
         2: 'two',

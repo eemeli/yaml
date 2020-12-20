@@ -1,5 +1,6 @@
 import { Type } from '../constants.js'
 import { createNode } from '../doc/createNode.js'
+import { warn } from '../log.js'
 import { addComment } from '../stringify/addComment.js'
 import { Collection } from './Collection.js'
 import { Node } from './Node.js'
@@ -7,11 +8,11 @@ import { Scalar } from './Scalar.js'
 import { YAMLSeq } from './YAMLSeq.js'
 import { toJS } from './toJS.js'
 
-const stringifyKey = (key, jsKey, ctx) => {
+function stringifyKey(key, jsKey, ctx) {
   if (jsKey === null) return ''
   if (typeof jsKey !== 'object') return String(jsKey)
-  if (key instanceof Node && ctx && ctx.doc)
-    return key.toString({
+  if (key instanceof Node && ctx && ctx.doc) {
+    const strKey = key.toString({
       anchors: Object.create(null),
       doc: ctx.doc,
       indent: '',
@@ -20,6 +21,18 @@ const stringifyKey = (key, jsKey, ctx) => {
       inStringifyKey: true,
       stringify: ctx.stringify
     })
+    if (!ctx.mapKeyWarned) {
+      let jsonStr = JSON.stringify(strKey)
+      if (jsonStr.length > 40)
+        jsonStr = jsonStr.split('').splice(36, '..."').join('')
+      warn(
+        ctx.doc.options.logLevel,
+        `Keys with collection values will be stringified due to JS Object restrictions: ${jsonStr}. Set mapAsMap: true to use object keys.`
+      )
+      ctx.mapKeyWarned = true
+    }
+    return strKey
+  }
   return JSON.stringify(jsKey)
 }
 

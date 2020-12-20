@@ -1,8 +1,7 @@
-import { Collection } from '../ast/Collection.js'
 import { Pair } from '../ast/Pair.js'
 import { YAMLSeq } from '../ast/YAMLSeq.js'
 import { Type } from '../constants.js'
-import { YAMLSemanticError, YAMLSyntaxError, YAMLWarning } from '../errors.js'
+import { YAMLSemanticError, YAMLSyntaxError } from '../errors.js'
 
 import {
   checkFlowCollectionEnd,
@@ -20,14 +19,6 @@ export function resolveSeq(doc, cst) {
   const seq = new YAMLSeq(doc.schema)
   seq.items = items
   resolveComments(seq, comments)
-  if (
-    !doc.options.mapAsMap &&
-    items.some(it => it instanceof Pair && it.key instanceof Collection)
-  ) {
-    const warn =
-      'Keys with collection values will be stringified as YAML due to JS Object restrictions. Use mapAsMap: true to avoid this.'
-    doc.warnings.push(new YAMLWarning(cst, warn))
-  }
   cst.resolved = seq
   return seq
 }

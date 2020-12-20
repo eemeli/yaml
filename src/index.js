@@ -1,7 +1,8 @@
+import { LogLevel } from './constants.js'
 import { parse as parseCST } from './cst/parse.js'
 import { Document } from './doc/Document.js'
 import { YAMLSemanticError } from './errors.js'
-import { warn } from './warnings.js'
+import { warn } from './log.js'
 
 export { defaultOptions, scalarOptions } from './options.js'
 export { Document, parseCST }
@@ -21,7 +22,10 @@ export function parseAllDocuments(src, options) {
 export function parseDocument(src, options) {
   const cst = parseCST(src)
   const doc = new Document(cst[0], null, options)
-  if (cst.length > 1) {
+  if (
+    cst.length > 1 &&
+    LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR
+  ) {
     const errMsg =
       'Source contains multiple documents; please use YAML.parseAllDocuments()'
     doc.errors.unshift(new YAMLSemanticError(cst[1], errMsg))
@@ -36,8 +40,12 @@ export function parse(src, reviver, options) {
   }
 
   const doc = parseDocument(src, options)
-  doc.warnings.forEach(warning => warn(warning))
-  if (doc.errors.length > 0) throw doc.errors[0]
+  doc.warnings.forEach(warning => warn(doc.options.logLevel, warning))
+  if (doc.errors.length > 0) {
+    if (LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR)
+      throw doc.errors[0]
+    else doc.errors = []
+  }
   return doc.toJS({ reviver })
 }
 
