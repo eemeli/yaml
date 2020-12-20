@@ -193,13 +193,17 @@ describe('double-quoted', () => {
     test('quoted', () => {
       options.indentAtStart = 6
       options.minContentWidth = 6
-      expect(fold('"ab cd ef gh"', ' ', FOLD_QUOTED, options)).toBe('\n "ab cd ef\n gh"')
+      expect(fold('"ab cd ef gh"', ' ', FOLD_QUOTED, options)).toBe(
+        '\n "ab cd ef\n gh"'
+      )
     })
 
     test('plain', () => {
       options.indentAtStart = 6
       options.minContentWidth = 6
-      expect(fold('ab cd ef gh', ' ', FOLD_FLOW, options)).toBe('\n ab cd ef\n gh')
+      expect(fold('ab cd ef gh', ' ', FOLD_FLOW, options)).toBe(
+        '\n ab cd ef\n gh'
+      )
     })
 
     test('reported', () => {

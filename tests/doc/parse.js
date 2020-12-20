@@ -396,7 +396,10 @@ test('eemeli/yaml#38', () => {
   expect(YAML.parse(src)).toEqual({
     content: {
       arrayOfArray: [
-        [{ first: 'John', last: 'Black' }, { first: 'Brian', last: 'Green' }],
+        [
+          { first: 'John', last: 'Black' },
+          { first: 'Brian', last: 'Green' }
+        ],
         [{ first: 'Mark', last: 'Orange' }],
         [{ first: 'Adam', last: 'Grey' }]
       ]

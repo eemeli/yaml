@@ -21,7 +21,8 @@ function stringifyBool(node) {
   const { value, sourceStr } = node
   if (sourceStr) {
     const match = boolObj.test.test(sourceStr)
-    if (match && value === (sourceStr[0] === 't' || sourceStr[0] === 'T')) return sourceStr
+    if (match && value === (sourceStr[0] === 't' || sourceStr[0] === 'T'))
+      return sourceStr
   }
   return value ? boolOptions.trueStr : boolOptions.falseStr
 }

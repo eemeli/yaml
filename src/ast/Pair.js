@@ -128,7 +128,8 @@ export class Pair extends Node {
       if (!simpleKeys) {
         explicitKey = true
       } else {
-        const msg = 'With simple keys, single line scalar must not span more than 1024 characters'
+        const msg =
+          'With simple keys, single line scalar must not span more than 1024 characters'
         throw new Error(msg)
       }
     }

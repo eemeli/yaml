@@ -356,7 +356,7 @@ describe('eemeli/yaml#80: custom tags', () => {
   const sharedSymbol = {
     identify: value => value.constructor === Symbol,
     tag: '!symbol/shared',
-    resolve: (str) => Symbol.for(str),
+    resolve: str => Symbol.for(str),
     stringify(item, ctx, onComment, onChompKeep) {
       const key = Symbol.keyFor(item.value)
       if (key === undefined)
@@ -460,17 +460,17 @@ describe('emitter custom null/bool string', () => {
   test('tiled null', () => {
     YAML.scalarOptions.null.nullStr = '~'
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, {simpleKeys: true})
+    const str = YAML.stringify(doc, { simpleKeys: true })
     expect(str).toBe('a: ~\n')
-    expect(YAML.parse(str)).toEqual({a: null})
+    expect(YAML.parse(str)).toEqual({ a: null })
   })
 
   test('empty string null', () => {
     YAML.scalarOptions.null.nullStr = ''
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, {simpleKeys: true})
+    const str = YAML.stringify(doc, { simpleKeys: true })
     expect(str).toBe('a: \n')
-    expect(YAML.parse(str)).toEqual({a: null})
+    expect(YAML.parse(str)).toEqual({ a: null })
   })
 
   test('empty string camelBool', () => {
@@ -493,14 +493,16 @@ describe('emitter custom null/bool string', () => {
 })
 
 describe('scalar styles', () => {
-    test('null Scalar styles', () => {
-        const doc = YAML.parseDocument('[ null, Null, NULL, ~ ]')
-        expect(String(doc)).toBe('[ null, Null, NULL, ~ ]\n')
-    })
+  test('null Scalar styles', () => {
+    const doc = YAML.parseDocument('[ null, Null, NULL, ~ ]')
+    expect(String(doc)).toBe('[ null, Null, NULL, ~ ]\n')
+  })
 
-    test('bool Scalar styles on core', () => {
-        const doc = YAML.parseDocument('[ true, false, True, False, TRUE, FALSE, on, off, y, n ]')
-        const str = `[
+  test('bool Scalar styles on core', () => {
+    const doc = YAML.parseDocument(
+      '[ true, false, True, False, TRUE, FALSE, on, off, y, n ]'
+    )
+    const str = `[
   true,
   false,
   True,
@@ -512,13 +514,27 @@ describe('scalar styles', () => {
   y,
   n
 ]\n`
-        expect(String(doc)).toBe(str)
-        expect(YAML.parse(str)).toEqual([ true, false, true, false, true, false, 'on', 'off', 'y', 'n'])
-    })
+    expect(String(doc)).toBe(str)
+    expect(YAML.parse(str)).toEqual([
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      'on',
+      'off',
+      'y',
+      'n'
+    ])
+  })
 
-    test('bool Scalar styles on YAML1.1', () => {
-        const doc = YAML.parseDocument('[ n, N, NO, no, No, False, false, FALSE, Off, off, OFF, y, Y, Yes, yes, YES, true, True, TRUE, ON, on, On ]', { schema: 'yaml-1.1' })
-        const str = `[
+  test('bool Scalar styles on YAML1.1', () => {
+    const doc = YAML.parseDocument(
+      '[ n, N, NO, no, No, False, false, FALSE, Off, off, OFF, y, Y, Yes, yes, YES, true, True, TRUE, ON, on, On ]',
+      { schema: 'yaml-1.1' }
+    )
+    const str = `[
   n,
   N,
   NO,
@@ -542,9 +558,32 @@ describe('scalar styles', () => {
   on,
   On
 ]\n`
-        expect(String(doc)).toBe(str)
-        expect(YAML.parse(str, { schema: 'yaml-1.1' })).toEqual([false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true])
-    })
+    expect(String(doc)).toBe(str)
+    expect(YAML.parse(str, { schema: 'yaml-1.1' })).toEqual([
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ])
+  })
 })
 
 describe('simple keys', () => {

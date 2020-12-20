@@ -517,8 +517,6 @@ describe('Document', () => {
 
   test('setIn with __proto__ as key', () => {
     doc.setIn(['c', '__proto__'], 9)
-    expect(String(doc)).toBe(
-      'a: 1\nb:\n  - 2\n  - 3\nc:\n  __proto__: 9\n'
-    )
+    expect(String(doc)).toBe('a: 1\nb:\n  - 2\n  - 3\nc:\n  __proto__: 9\n')
   })
 })

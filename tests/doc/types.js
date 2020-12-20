@@ -194,14 +194,14 @@ one: 1
       const doc = YAML.parseDocument(src)
       expect(doc.toJS()).toMatchObject({
         one: 1,
-        '2': 'two',
+        2: 'two',
         '{ 3: 4 }': 'many'
       })
       expect(doc.errors).toHaveLength(0)
       doc.contents.items[2].key = { 3: 4 }
       expect(doc.toJS()).toMatchObject({
         one: 1,
-        '2': 'two',
+        2: 'two',
         '{"3":4}': 'many'
       })
     })

@@ -73,7 +73,10 @@ export class Document {
     this.contents.addIn(path, value)
   }
 
-  createNode(value, { keepUndefined, onTagObj, replacer, tag, wrapScalars } = {}) {
+  createNode(
+    value,
+    { keepUndefined, onTagObj, replacer, tag, wrapScalars } = {}
+  ) {
     this.setSchema()
     if (typeof replacer === 'function')
       value = replacer.call({ '': value }, '', value)
@@ -83,7 +86,8 @@ export class Document {
       const asStr = replacer.filter(keyToStr).map(String)
       if (asStr.length > 0) replacer = replacer.concat(asStr)
     }
-    if (typeof keepUndefined !== 'boolean') keepUndefined = !!this.options.keepUndefined
+    if (typeof keepUndefined !== 'boolean')
+      keepUndefined = !!this.options.keepUndefined
     const aliasNodes = []
     const ctx = {
       keepUndefined,

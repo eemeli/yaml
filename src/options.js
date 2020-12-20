@@ -64,7 +64,7 @@ export const documentOptions = {
       { handle: '!!', prefix: 'tag:private.yaml.org,2002:' }
     ]
   },
-  '1.1': {
+  1.1: {
     schema: 'yaml-1.1',
     merge: true,
     tagPrefixes: [
@@ -72,7 +72,7 @@ export const documentOptions = {
       { handle: '!!', prefix: defaultTagPrefix }
     ]
   },
-  '1.2': {
+  1.2: {
     schema: 'core',
     merge: false,
     resolveKnownTags: true,
