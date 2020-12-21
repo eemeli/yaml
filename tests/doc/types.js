@@ -648,62 +648,6 @@ describe('custom tags', () => {
     )
   })
 
-  test('YAML 1.0 explicit tags', () => {
-    const src = `%YAML:1.0
----
-date: 2001-01-23
-number: !int '123'
-string: !str 123
-pool: !!ball { number: 8 }
-perl: !perl/Text::Tabs {}`
-
-    const doc = YAML.parseDocument(src)
-    expect(doc.version).toBe('1.0')
-    expect(doc.toJS()).toMatchObject({
-      number: 123,
-      string: '123',
-      pool: { number: 8 },
-      perl: {}
-    })
-    const date = doc.contents.items[0].value.value
-    expect(date).toBeInstanceOf(Date)
-    expect(date.getFullYear()).toBe(2001)
-    expect(String(doc)).toBe(`%YAML:1.0
----
-date: 2001-01-23
-number: !yaml.org,2002:int 123
-string: !yaml.org,2002:str "123"
-pool:
-  !ball { number: 8 }
-perl:
-  !perl/Text::Tabs {}\n`)
-  })
-
-  test('YAML 1.0 tag prefixing', () => {
-    const src = `%YAML:1.0
----
-invoice: !domain.tld,2002/^invoice
-  customers: !seq
-    - !^customer
-      given : Chris
-      family : Dumars`
-
-    const doc = YAML.parseDocument(src)
-    expect(doc.version).toBe('1.0')
-    expect(doc.toJS()).toMatchObject({
-      invoice: { customers: [{ family: 'Dumars', given: 'Chris' }] }
-    })
-    expect(String(doc)).toBe(`%YAML:1.0
----
-invoice:
-  !domain.tld,2002/^invoice
-  customers:
-    !yaml.org,2002:seq
-    - !^customer
-      given: Chris
-      family: Dumars\n`)
-  })
-
   describe('custom tag objects', () => {
     const src = `!!binary |
       R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5
