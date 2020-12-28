@@ -289,6 +289,9 @@ export class Lexer {
         // this is an error
         this.pushCount(1)
         return 'doc'
+      case '*':
+        this.pushUntil(isNotIdentifierChar)
+        return 'doc'
       case '"':
       case "'":
         return this.parseQuotedScalar()
@@ -328,6 +331,9 @@ export class Lexer {
         this.flowKey = true
         this.flowLevel -= 1
         return this.flowLevel ? 'flow' : 'doc'
+      case '*':
+        this.pushUntil(isNotIdentifierChar)
+        return 'flow'
       case '"':
       case "'":
         this.flowKey = true
@@ -440,7 +446,6 @@ export class Lexer {
     switch (this.charAt(0)) {
       case '!':
       case '&':
-      case '*':
         return (
           this.pushUntil(isNotIdentifierChar) +
           this.pushSpaces() +
