@@ -384,13 +384,16 @@ export class Lexer {
   parseBlockScalar() {
     const reqIndent =
       this.indent > 0 ? this.indent + 1 : this.indentMore ? 1 : 0
-    let nl = this.buffer.indexOf('\n', this.pos)
+    let nl = reqIndent === 0 ? -1 : this.buffer.indexOf('\n', this.pos)
     while (nl !== -1) {
       const cs = this.continueScalar(nl + 1, reqIndent)
       if (cs === -1) break
       nl = this.buffer.indexOf('\n', cs)
     }
-    if (nl === -1 && !this.atEnd) return this.setNext('block-scalar')
+    if (nl === -1) {
+      if (!this.atEnd) return this.setNext('block-scalar')
+      nl = this.buffer.length
+    }
     this.push(SCALAR)
     this.pushToIndex(nl + 1)
     return this.parseLineStart()

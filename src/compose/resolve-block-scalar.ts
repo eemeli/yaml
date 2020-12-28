@@ -109,6 +109,7 @@ export function resolveBlockScalar(
       for (let i = chompStart; i < lines.length; ++i)
         value += '\n' + lines[i][0].slice(trimIndent)
       if (value[value.length - 1] !== '\n') value += '\n'
+      break
     default:
       value += '\n'
   }
