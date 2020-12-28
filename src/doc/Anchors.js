@@ -68,30 +68,30 @@ export class Anchors {
   }
 
   setAnchor(node, name) {
-    if (node != null && !Anchors.validAnchorNode(node)) {
-      throw new Error('Anchors may only be set for Scalar, Seq and Map nodes')
-    }
-    if (name && /[\x00-\x19\s,[\]{}]/.test(name)) {
-      throw new Error(
-        'Anchor names must not contain whitespace or control characters'
-      )
-    }
     const { map } = this
-    const prev = node && Object.keys(map).find(a => map[a] === node)
-    if (prev) {
-      if (!name) {
-        return prev
-      } else if (prev !== name) {
-        delete map[prev]
-        map[name] = node
-      }
-    } else {
-      if (!name) {
-        if (!node) return null
-        name = this.newName()
-      }
-      map[name] = node
+    if (!node) {
+      if (!name) return null
+      delete map[name]
+      return name
     }
+
+    if (!Anchors.validAnchorNode(node))
+      throw new Error('Anchors may only be set for Scalar, Seq and Map nodes')
+    if (name) {
+      if (/[\x00-\x19\s,[\]{}]/.test(name))
+        throw new Error(
+          'Anchor names must not contain whitespace or control characters'
+        )
+      const prevNode = map[name]
+      if (prevNode && prevNode !== node) map[this.newName(name)] = prevNode
+    }
+
+    const prevName = Object.keys(map).find(a => map[a] === node)
+    if (prevName) {
+      if (!name || prevName === name) return prevName
+      delete map[prevName]
+    } else if (!name) name = this.newName()
+    map[name] = node
     return name
   }
 }
