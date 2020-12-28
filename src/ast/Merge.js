@@ -3,9 +3,9 @@ import { Scalar } from './Scalar.js'
 import { YAMLMap } from './YAMLMap.js'
 import { YAMLSeq } from './YAMLSeq.js'
 
-export const MERGE_KEY = '<<'
-
 export class Merge extends Pair {
+  static KEY = '<<'
+
   constructor(pair) {
     if (pair instanceof Pair) {
       let seq = pair.value
@@ -17,7 +17,7 @@ export class Merge extends Pair {
       super(pair.key, seq)
       this.range = pair.range
     } else {
-      super(new Scalar(MERGE_KEY), new YAMLSeq())
+      super(new Scalar(Merge.KEY), new YAMLSeq())
     }
     this.type = Pair.Type.MERGE_PAIR
   }

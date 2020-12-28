@@ -92,6 +92,8 @@ export namespace Pair {
 }
 
 export class Merge extends Pair {
+  static KEY: '<<'
+  constructor(pair?: Pair)
   type: Pair.Type.MERGE_PAIR
   /** Always Scalar('<<'), defined by the type specification */
   key: AST.PlainValue

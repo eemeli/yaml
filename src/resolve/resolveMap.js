@@ -1,5 +1,5 @@
 import { Alias } from '../ast/Alias.js'
-import { Merge, MERGE_KEY } from '../ast/Merge.js'
+import { Merge } from '../ast/Merge.js'
 import { Pair } from '../ast/Pair.js'
 import { YAMLMap } from '../ast/YAMLMap.js'
 import { Char, Type } from '../constants.js'
@@ -24,7 +24,7 @@ export function resolveMap(doc, cst) {
   resolveComments(map, comments)
   for (let i = 0; i < items.length; ++i) {
     const { key: iKey } = items[i]
-    if (doc.schema.merge && iKey && iKey.value === MERGE_KEY) {
+    if (doc.schema.merge && iKey && iKey.value === Merge.KEY) {
       items[i] = new Merge(items[i])
       const sources = items[i].value.items
       let error = null

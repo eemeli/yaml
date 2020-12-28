@@ -3,6 +3,7 @@ import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { FlowCollection, SourceToken } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
+import { resolveMergePair } from './resolve-merge-pair.js'
 
 export function resolveFlowCollection(
   doc: Document.Parsed,
@@ -49,7 +50,7 @@ export function resolveFlowCollection(
     }
     if (isMap || atExplicitKey) {
       const pair = key ? new Pair(key, value) : new Pair(value)
-      coll.items.push(pair)
+      coll.items.push(doc.schema.merge ? resolveMergePair(pair, onError) : pair)
     } else {
       const seq = coll as YAMLSeq
       if (key) {
