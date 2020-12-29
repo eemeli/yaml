@@ -55,12 +55,15 @@ export function foldFlowLines(
   let prev = undefined
   let overflow = false
   let i = -1
+  let escStart = -1
+  let escEnd = -1
   if (mode === FOLD_BLOCK) {
     i = consumeMoreIndentedLines(text, i)
     if (i !== -1) end = i + endStep
   }
   for (let ch; (ch = text[(i += 1)]); ) {
     if (mode === FOLD_QUOTED && ch === '\\') {
+      escStart = i
       switch (text[i + 1]) {
         case 'x':
           i += 3
@@ -74,6 +77,7 @@ export function foldFlowLines(
         default:
           i += 1
       }
+      escEnd = i
     }
     if (ch === '\n') {
       if (mode === FOLD_BLOCK) i = consumeMoreIndentedLines(text, i)
@@ -103,10 +107,13 @@ export function foldFlowLines(
             ch = text[(i += 1)]
             overflow = true
           }
-          // i - 2 accounts for not-dropped last char + newline-escaping \
-          folds.push(i - 2)
-          escapedFolds[i - 2] = true
-          end = i - 2 + endStep
+          // Account for newline escape, but don't break preceding escape
+          const j = i > escEnd + 1 ? i - 2 : escStart - 1
+          // Bail out if lineWidth & minContentWidth are shorter than an escape string
+          if (escapedFolds[j]) return text
+          folds.push(j)
+          escapedFolds[j] = true
+          end = j + endStep
           split = undefined
         } else {
           overflow = true

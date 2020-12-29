@@ -140,52 +140,75 @@ describe('double-quoted', () => {
     )
   })
 
-  describe('eemeli/yaml#48: Split \\" escape in double-quoted string', () => {
-    test('minimal', () => {
-      const src2 = '"01234567\\""'
-      expect(fold(src2, '', FOLD_QUOTED, options)).toBe('"01234567\\\n\\""')
-      const src3 = '"012345678\\""'
-      expect(fold(src3, '', FOLD_QUOTED, options)).toBe('"012345678\\\n\\""')
-    })
-
-    test('reported', () => {
-      const x =
-        '{"module":"database","props":{"databaseType":"postgresql"},"extra":{},"foo":"bar\'"}'
-      const str = YAML.stringify({ x })
-      const doc = YAML.parseDocument(str)
-      expect(doc.errors).toHaveLength(0)
-      expect(doc.contents.items[0].value.value).toBe(x)
-    })
+  test('escape longer than lineWidth', () => {
+    const src2 = `"foo\\U01234567"`
+    expect(fold(src2, '', FOLD_QUOTED, options)).toBe(src2)
   })
 
-  describe('eemeli/yaml#57', () => {
-    test('minimal', () => {
-      const str = `"0123\\"\\\\ '"`
-      expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"0123\\"\\\\\n'"`)
+  describe('Folding double-quoted strings', () => {
+    describe('eemeli/yaml#48: Split \\" escape in double-quoted string', () => {
+      test('minimal', () => {
+        const src2 = '"01234567\\""'
+        expect(fold(src2, '', FOLD_QUOTED, options)).toBe('"01234567\\\n\\""')
+        const src3 = '"012345678\\""'
+        expect(fold(src3, '', FOLD_QUOTED, options)).toBe('"012345678\\\n\\""')
+      })
+
+      test('reported', () => {
+        const x =
+          '{"module":"database","props":{"databaseType":"postgresql"},"extra":{},"foo":"bar\'"}'
+        const str = YAML.stringify({ x })
+        const doc = YAML.parseDocument(str)
+        expect(doc.errors).toHaveLength(0)
+        expect(doc.contents.items[0].value.value).toBe(x)
+      })
     })
 
-    test('reported', () => {
-      const key2 = `!""""""""""""""""""""""""""""""""""#"\\ '`
-      const str = YAML.stringify([{ key2 }])
-      const doc = YAML.parseDocument(str)
-      expect(doc.errors).toHaveLength(0)
-      expect(doc.contents.items[0].items[0].value.value).toBe(key2)
-    })
-  })
+    describe('eemeli/yaml#57', () => {
+      test('minimal', () => {
+        const str = `"0123\\"\\\\ '"`
+        expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"0123\\"\\\\\n'"`)
+      })
 
-  describe('eemeli/yaml#59', () => {
-    test('minimal', () => {
-      const str = `"######\\\\P#"`
-      expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"######\\\\\\\nP#"`)
+      test('reported', () => {
+        const key2 = `!""""""""""""""""""""""""""""""""""#"\\ '`
+        const str = YAML.stringify([{ key2 }])
+        const res = YAML.parse(str)
+        expect(res[0].key2).toBe(key2)
+      })
     })
 
-    test('reported', () => {
-      const value =
-        '>####################################"##########################\'####\\P#'
-      const str = YAML.stringify({ key: [[value]] })
-      const doc = YAML.parseDocument(str)
-      expect(doc.errors).toHaveLength(0)
-      expect(doc.contents.items[0].value.items[0].items[0].value).toBe(value)
+    describe('eemeli/yaml#59', () => {
+      test('minimal', () => {
+        const str = `"######\\\\P#"`
+        expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"######\\\\\\\nP#"`)
+      })
+
+      test('reported', () => {
+        const value =
+          '>####################################"##########################\'####\\P#'
+        const str = YAML.stringify({ key: [[value]] })
+        const doc = YAML.parseDocument(str)
+        expect(doc.errors).toHaveLength(0)
+        expect(doc.contents.items[0].value.items[0].items[0].value).toBe(value)
+      })
+    })
+
+    describe('awslabs/cdk8s#494', () => {
+      test('slash', () => {
+        const str = `"1234567\\\\ab"`
+        expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"1234567\\\n\\\\ab"`)
+      })
+
+      test('null', () => {
+        const str = `"1234567\\\0ab"`
+        expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"1234567\\\n\\\0ab"`)
+      })
+
+      test('space', () => {
+        const str = `"1234567\\ ab"`
+        expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"1234567\\\n\\ ab"`)
+      })
     })
   })
 
