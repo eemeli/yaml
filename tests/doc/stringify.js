@@ -323,6 +323,12 @@ z:
     const doc = YAML.parseDocument('? >+ #comment\n foo\n\n: bar')
     expect(String(doc)).toBe('? >+ #comment\n  foo\n\n: bar\n')
   })
+
+  test('Document as key', () => {
+    const doc = new YAML.Document({ a: 1 })
+    doc.add(new YAML.Document({ b: 2, c: 3 }))
+    expect(String(doc)).toBe('a: 1\n? b: 2\n  c: 3\n: null\n')
+  })
 })
 
 test('eemeli/yaml#43: Quoting colons', () => {
