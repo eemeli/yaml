@@ -135,7 +135,7 @@ export class Lexer {
   atLineEnd() {
     let i = this.pos
     let ch = this.buffer[i]
-    while (ch === ' ') ch = this.buffer[++i]
+    while (ch === ' ' || ch === '\t') ch = this.buffer[++i]
     if (!ch || ch === '#' || ch === '\n') return true
     if (ch === '\r') return this.buffer[i + 1] === '\n'
     return false
@@ -209,16 +209,24 @@ export class Lexer {
     const line = this.getLine()
     if (line === null) return this.setNext('stream')
     if (line[0] === '%') {
-      let dirEnd = line.indexOf(' #') + 1
-      if (dirEnd === 0) dirEnd = line.length
-      while (line[dirEnd - 1] === ' ') dirEnd -= 1
-      const n = this.pushCount(dirEnd) + this.pushSpaces()
+      let dirEnd = line.length
+      const cs = line.indexOf('#')
+      if (cs !== -1) {
+        const ch = line[cs - 1]
+        if (ch === ' ' || ch === '\t') dirEnd = cs - 1
+      }
+      while (true) {
+        const ch = line[dirEnd - 1]
+        if (ch === ' ' || ch === '\t') dirEnd -= 1
+        else break
+      }
+      const n = this.pushCount(dirEnd) + this.pushSpaces(true)
       this.pushCount(line.length - n) // possible comment
       this.pushNewline()
       return 'stream'
     }
     if (this.atLineEnd()) {
-      const sp = this.pushSpaces()
+      const sp = this.pushSpaces(true)
       this.pushCount(line.length - sp)
       this.pushNewline()
       return 'stream'
@@ -242,7 +250,7 @@ export class Lexer {
         return 'stream'
       }
     }
-    this.indent = this.pushSpaces()
+    this.indent = this.pushSpaces(false)
     this.indentMore = ''
     return this.parseBlockStart()
   }
@@ -252,7 +260,7 @@ export class Lexer {
     if (!ch1 && !this.atEnd) return this.setNext('block-start')
     if ((ch0 === '-' || ch0 === '?' || ch0 === ':') && isEmpty(ch1)) {
       const start = this.pos
-      const n = this.pushCount(1) + this.pushSpaces()
+      const n = this.pushCount(1) + this.pushSpaces(true)
       this.indentMore += this.buffer.substr(start, n)
       return this.parseBlockStart()
     }
@@ -268,7 +276,7 @@ export class Lexer {
   }
 
   parseDocument() {
-    this.pushSpaces()
+    this.pushSpaces(true)
     const line = this.getLine()
     if (line === null) return this.setNext('doc')
     let n = this.pushIndicators()
@@ -298,7 +306,7 @@ export class Lexer {
       case '|':
       case '>':
         n += this.pushUntil(isEmpty)
-        n += this.pushSpaces()
+        n += this.pushSpaces(true)
         this.pushCount(line.length - n)
         this.pushNewline()
         return this.parseBlockScalar()
@@ -308,10 +316,10 @@ export class Lexer {
   }
 
   parseFlowCollection() {
-    while (this.pushNewline() + this.pushSpaces() > 0) {}
+    while (this.pushNewline() + this.pushSpaces(true) > 0) {}
     const line = this.getLine()
     if (line === null) return this.setNext('flow')
-    let n = line[0] === ',' ? this.pushCount(1) + this.pushSpaces() : 0
+    let n = line[0] === ',' ? this.pushCount(1) + this.pushSpaces(true) : 0
     n += this.pushIndicators()
     switch (line[n]) {
       case undefined:
@@ -338,12 +346,15 @@ export class Lexer {
       case "'":
         this.flowKey = true
         return this.parseQuotedScalar()
-      case ':':
-        if (this.flowKey) {
-          this.pushCount(1) + this.pushSpaces()
+      case ':': {
+        const next = this.charAt(1)
+        if (this.flowKey || isEmpty(next) || next === ',') {
+          this.pushCount(1)
+          this.pushSpaces(true)
           return 'flow'
         }
-      // fallthrough
+        // fallthrough
+      }
       default:
         this.flowKey = false
         return this.parsePlainScalar()
@@ -377,7 +388,7 @@ export class Lexer {
       if (nl !== -1 && nl < end) end = nl - 1
     }
     if (end === -1) return this.setNext('quoted-scalar')
-    this.pushToIndex(end + 1)
+    this.pushToIndex(end + 1, false)
     return this.flowLevel ? 'flow' : 'doc'
   }
 
@@ -395,7 +406,7 @@ export class Lexer {
       nl = this.buffer.length
     }
     this.push(SCALAR)
-    this.pushToIndex(nl + 1)
+    this.pushToIndex(nl + 1, true)
     return this.parseLineStart()
   }
 
@@ -413,8 +424,9 @@ export class Lexer {
         const next = this.buffer[i + 1]
         if (next === '#' || (inFlow && invalidFlowScalarChars.includes(next)))
           break
-        if (ch === '\n') {
-          const cs = this.continueScalar(i + 1, reqIndent)
+        if (ch === '\n' || (ch === '\r' && next === '\n')) {
+          const ls = i + (ch === '\n' ? 1 : 2)
+          const cs = this.continueScalar(ls, reqIndent)
           if (cs === -1) break
           i = Math.max(i, cs - 2) // to advance, but still account for ' #'
         }
@@ -422,7 +434,7 @@ export class Lexer {
     }
     if (!ch && !this.atEnd) return this.setNext('plain-scalar')
     this.push(SCALAR)
-    this.pushToIndex(i)
+    this.pushToIndex(i, true)
     return inFlow ? 'flow' : 'doc'
   }
 
@@ -435,13 +447,13 @@ export class Lexer {
     return 0
   }
 
-  pushToIndex(i: number) {
+  pushToIndex(i: number, allowEmpty: boolean) {
     const s = this.buffer.slice(this.pos, i)
     if (s) {
       this.push(s)
       this.pos += s.length
       return s.length
-    }
+    } else if (allowEmpty) this.push('')
     return 0
   }
 
@@ -451,7 +463,7 @@ export class Lexer {
       case '&':
         return (
           this.pushUntil(isNotIdentifierChar) +
-          this.pushSpaces() +
+          this.pushSpaces(true) +
           this.pushIndicators()
         )
       case ':':
@@ -464,7 +476,9 @@ export class Lexer {
           } else {
             this.indentMore = ' '
           }
-          return this.pushCount(1) + this.pushSpaces() + this.pushIndicators()
+          return (
+            this.pushCount(1) + this.pushSpaces(true) + this.pushIndicators()
+          )
         }
     }
     return 0
@@ -477,9 +491,12 @@ export class Lexer {
     else return 0
   }
 
-  pushSpaces() {
-    let i = this.pos
-    while (this.buffer[i] === ' ') i += 1
+  pushSpaces(allowTabs: boolean) {
+    let i = this.pos - 1
+    let ch: string
+    do {
+      ch = this.buffer[++i]
+    } while (ch === ' ' || (allowTabs && ch === '\t'))
     const n = i - this.pos
     if (n > 0) {
       this.push(this.buffer.substr(this.pos, n))
@@ -492,6 +509,6 @@ export class Lexer {
     let i = this.pos
     let ch = this.buffer[i]
     while (!test(ch)) ch = this.buffer[++i]
-    return this.pushToIndex(i)
+    return this.pushToIndex(i, false)
   }
 }
