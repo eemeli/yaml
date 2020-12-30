@@ -94,9 +94,11 @@ export class Pair extends Node {
       !simpleKeys &&
       (!key ||
         keyComment ||
-        key instanceof Collection ||
-        key.type === Type.BLOCK_FOLDED ||
-        key.type === Type.BLOCK_LITERAL)
+        (key instanceof Node
+          ? key instanceof Collection ||
+            key.type === Type.BLOCK_FOLDED ||
+            key.type === Type.BLOCK_LITERAL
+          : typeof key === 'object'))
     const { doc, indent, indentStep, stringify } = ctx
     ctx = Object.assign({}, ctx, {
       implicitKey: !explicitKey,
@@ -110,20 +112,19 @@ export class Pair extends Node {
       () => (chompKeep = true)
     )
     str = addComment(str, ctx.indent, keyComment)
+    if (!explicitKey && str.length > 1024) {
+      if (simpleKeys)
+        throw new Error(
+          'With simple keys, single line scalar must not span more than 1024 characters'
+        )
+      explicitKey = true
+    }
     if (ctx.allNullValues && !simpleKeys) {
       if (this.comment) {
         str = addComment(str, ctx.indent, this.comment)
         if (onComment) onComment()
       } else if (chompKeep && !keyComment && onChompKeep) onChompKeep()
-      return ctx.inFlow ? str : `? ${str}`
-    }
-    if (!explicitKey && str.length > 1024) {
-      if (!simpleKeys) {
-        explicitKey = true
-      } else {
-        const msg = 'With simple keys, single line scalar must not span more than 1024 characters'
-        throw new Error(msg)
-      }
+      return ctx.inFlow && !explicitKey ? str : `? ${str}`
     }
     str = explicitKey ? `? ${str}\n${indent}:` : `${str}:`
     if (this.comment) {
