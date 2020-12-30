@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/eemeli/yaml/discussions
+    about: Please ask and answer questions here.
+  - name: Documentation (v1)
+    url: https://eemeli.org/yaml/v1
+    about: Documentation for yaml@latest
+  - name: Documentation (v2)
+    url: https://eemeli.org/yaml/
+    about: Documentation for yaml@next
