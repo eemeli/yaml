@@ -104,6 +104,24 @@ function isFlowToken(
   }
 }
 
+/** Note: May modify input array */
+function getFirstKeyStartProps(prev: SourceToken[]) {
+  if (prev.length === 0) return []
+
+  let i = prev.length
+  loop: while (--i >= 0) {
+    switch (prev[i].type) {
+      case 'explicit-key-ind':
+      case 'map-value-ind':
+      case 'seq-item-ind':
+      case 'newline':
+        break loop
+    }
+  }
+  while (prev[++i]?.type === 'space') {}
+  return prev.splice(i, prev.length)
+}
+
 /** A YAML concrete syntax tree parser */
 export class Parser {
   push: (token: Token) => void
@@ -215,7 +233,7 @@ export class Parser {
   }
 
   step() {
-    const top = this.peek()
+    const top = this.peek(1)
     if (!top) return this.stream()
     switch (top.type) {
       case 'document':
@@ -237,8 +255,8 @@ export class Parser {
     this.pop() // error
   }
 
-  peek() {
-    return this.stack[this.stack.length - 1]
+  peek(n: number) {
+    return this.stack[this.stack.length - n]
   }
 
   pop(error?: Token) {
@@ -249,7 +267,7 @@ export class Parser {
     } else if (this.stack.length === 0) {
       this.push(token)
     } else {
-      const top = this.peek()
+      const top = this.peek(1)
       switch (top.type) {
         case 'document':
           top.value = token
@@ -346,17 +364,37 @@ export class Parser {
 
   scalar(scalar: FlowScalar) {
     if (this.type === 'map-value-ind') {
+      const parent = this.peek(2)
+      let prev: SourceToken[]
+      switch (parent.type) {
+        case 'document':
+          prev = parent.start
+          break
+        case 'block-map': {
+          const it = parent.items[parent.items.length - 1]
+          prev = it.sep || it.start
+          break
+        }
+        case 'block-seq':
+          prev = parent.items[parent.items.length - 1].start
+          break
+        default:
+          prev = []
+      }
+      const start = getFirstKeyStartProps(prev)
+
       let sep: SourceToken[]
       if (scalar.end) {
         sep = scalar.end
         sep.push(this.sourceToken)
         delete scalar.end
       } else sep = [this.sourceToken]
+
       const map: BlockMap = {
         type: 'block-map',
         offset: scalar.offset,
         indent: scalar.indent,
-        items: [{ start: [], key: scalar, sep }]
+        items: [{ start, key: scalar, sep }]
       }
       this.onKeyLine = true
       this.stack[this.stack.length - 1] = map
@@ -450,6 +488,7 @@ export class Parser {
             isFlowToken(it.key) &&
             !includesToken(it.sep, 'newline')
           ) {
+            const start = getFirstKeyStartProps(it.start)
             const key = it.key
             const sep = it.sep
             sep.push(this.sourceToken)
@@ -459,7 +498,7 @@ export class Parser {
               type: 'block-map',
               offset: this.offset,
               indent: this.indent,
-              items: [{ start: [], key, sep }]
+              items: [{ start, key, sep }]
             })
           } else it.sep.push(this.sourceToken)
           this.onKeyLine = true
@@ -552,13 +591,13 @@ export class Parser {
       this.pop()
       this.step()
     } else {
-      const parent = this.stack[this.stack.length - 2].type
-      if (parent === 'block-map') {
+      const parent = this.peek(2)
+      if (parent.type === 'block-map') {
         this.pop()
         this.step()
       } else if (
         this.type === 'map-value-ind' &&
-        parent !== 'flow-collection'
+        parent.type !== 'flow-collection'
       ) {
         const sep = fc.end.splice(1, fc.end.length)
         sep.push(this.sourceToken)
