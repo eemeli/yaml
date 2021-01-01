@@ -81,6 +81,12 @@ export interface Options extends Schema.Options {
    */
   simpleKeys?: boolean
   /**
+   * When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.
+   *
+   * Default: `true`
+   */
+  strict?: boolean
+  /**
    * The YAML version used by documents without a `%YAML` directive.
    *
    * Default: `"1.2"`

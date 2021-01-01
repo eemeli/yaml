@@ -20,6 +20,7 @@ export const defaultOptions = {
   maxAliasCount: 100,
   prettyErrors: true,
   simpleKeys: false,
+  strict: true,
   version: '1.2'
 }
 
