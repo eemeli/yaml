@@ -31,7 +31,8 @@ export function resolveBlockScalar(
   }
 
   // find the indentation level to trim from start
-  let trimIndent = scalar.indent + header.indent
+  // FIXME probably wrong for explicit indents
+  let trimIndent = header.indent
   let offset = scalar.offset + header.length
   let contentStart = 0
   for (let i = 0; i < chompStart; ++i) {

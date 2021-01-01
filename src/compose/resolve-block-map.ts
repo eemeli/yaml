@@ -6,9 +6,11 @@ import { composeNode } from './compose-node.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 import { resolveProps } from './resolve-props.js'
 
+const startColMsg = 'All collection items must start at the same column'
+
 export function resolveBlockMap(
   doc: Document.Parsed,
-  { items, offset }: BlockMap,
+  { indent, items, offset }: BlockMap,
   anchor: string | null,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
@@ -26,8 +28,10 @@ export function resolveBlockMap(
       offset,
       onError
     )
-    if (!keyProps.found) {
-      // implicit key
+    const implicitKey = keyProps.found === -1
+    if (implicitKey) {
+      if (key && 'indent' in key && key.indent !== indent)
+        onError(offset, startColMsg)
       if (keyProps.anchor || keyProps.tagName || sep) {
         // FIXME: check single-line
         // FIXME: check 1024 chars
@@ -39,7 +43,7 @@ export function resolveBlockMap(
         }
         continue
       }
-    }
+    } else if (keyProps.found !== indent) onError(offset, startColMsg)
     offset += keyProps.length
 
     // key value
@@ -57,7 +61,9 @@ export function resolveBlockMap(
     )
     offset += valueProps.length
 
-    if (valueProps.found) {
+    if (valueProps.found !== -1) {
+      if (implicitKey && value?.type === 'block-map' && !valueProps.hasNewline)
+        onError(offset, 'Nested mappings are not allowed in compact mappings')
       // value value
       const valueNode = composeNode(doc, value || offset, valueProps, onError)
       offset = valueNode.range[1]
@@ -65,7 +71,7 @@ export function resolveBlockMap(
       map.items.push(doc.schema.merge ? resolveMergePair(pair, onError) : pair)
     } else {
       // key with no value
-      if (!keyProps.found)
+      if (implicitKey)
         onError(keyStart, 'Implicit map keys need to be followed by map values')
       if (valueProps.comment) {
         if (map.comment) map.comment += '\n' + valueProps.comment

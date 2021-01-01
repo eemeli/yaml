@@ -10,7 +10,7 @@ function isSpaceBefore(sep: string) {
 
 export function resolveProps(
   directives: StreamDirectives,
-  start: SourceToken[],
+  tokens: SourceToken[],
   indicator:
     | 'doc-start'
     | 'explicit-key-ind'
@@ -23,11 +23,12 @@ export function resolveProps(
   let spaceBefore = false
   let comment = ''
   let hasComment = false
+  let hasNewline = false
   let sep = ''
   let anchor = ''
   let tagName = ''
-  let found = false
-  for (const token of start) {
+  let found = -1
+  for (const token of tokens) {
     switch (token.type) {
       case 'space':
         break
@@ -42,6 +43,7 @@ export function resolveProps(
         break
       }
       case 'newline':
+        hasNewline = true
         sep += token.source
         break
       case 'anchor':
@@ -57,7 +59,7 @@ export function resolveProps(
       }
       case indicator:
         // Could here handle preceding comments differently
-        found = true
+        found = token.indent
         break
       default:
         onError(offset + length, `Unexpected ${token.type} token`)
@@ -65,5 +67,5 @@ export function resolveProps(
     if (token.source) length += token.source.length
   }
   if (!comment && isSpaceBefore(sep)) spaceBefore = true
-  return { found, spaceBefore, comment, anchor, tagName, length }
+  return { found, spaceBefore, comment, hasNewline, anchor, tagName, length }
 }

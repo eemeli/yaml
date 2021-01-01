@@ -24,7 +24,7 @@ export function resolveBlockSeq(
       onError
     )
     offset += props.length
-    if (!props.found) {
+    if (props.found === -1) {
       if (props.anchor || props.tagName || value) {
         onError(offset, 'Sequence item without - indicator')
       } else {

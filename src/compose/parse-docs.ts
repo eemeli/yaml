@@ -10,6 +10,7 @@ export function parseDocs(source: string, options?: Options) {
   const docs: Document.Parsed[] = []
   const lines: number[] = []
 
+  let atDirectives = false
   let comment = ''
   let errors: YAMLParseError[] = []
   let warnings: YAMLWarning[] = []
@@ -35,11 +36,13 @@ export function parseDocs(source: string, options?: Options) {
       switch (token.type) {
         case 'directive':
           directives.add(token.source, onError)
+          atDirectives = true
           break
         case 'document': {
           const doc = composeDoc(options, directives, token, onError)
           decorate(doc)
           docs.push(doc)
+          atDirectives = false
           break
         }
         case 'comment':
@@ -52,10 +55,13 @@ export function parseDocs(source: string, options?: Options) {
           const msg = token.source
             ? `${token.message}: ${JSON.stringify(token.source)}`
             : token.message
-          errors.push(new YAMLParseError(-1, msg))
+          const error = new YAMLParseError(-1, msg)
+          if (atDirectives || docs.length === 0) errors.push(error)
+          else docs[docs.length - 1].errors.push(error)
           break
         }
         case 'space':
+        case 'doc-end':
           break
         default:
           console.log('###', token)

@@ -29,24 +29,26 @@ export function resolveFlowCollection(
 
   let atExplicitKey = false
   let atValueEnd = false
+  let nlAfterValueInSeq = false
 
-  function resetProps() {
+  function getProps() {
+    const props = { spaceBefore, comment, anchor, tagName }
+
     spaceBefore = false
     comment = ''
     hasComment = false
     newlines = ''
     anchor = ''
     tagName = ''
-    atExplicitKey = false
-    atValueEnd = false
+
+    return props
   }
 
   function addItem() {
     if (value) {
       if (hasComment) value.comment = comment
     } else {
-      const props = { spaceBefore, comment, anchor, tagName }
-      value = composeNode(doc, offset, props, onError)
+      value = composeNode(doc, offset, getProps(), onError)
     }
     if (isMap || atExplicitKey) {
       const pair = key ? new Pair(key, value) : new Pair(value)
@@ -59,7 +61,6 @@ export function resolveFlowCollection(
         seq.items.push(map)
       } else seq.items.push(value)
     }
-    resetProps()
   }
 
   for (const token of fc.items) {
@@ -87,25 +88,30 @@ export function resolveFlowCollection(
             hasComment = false
           }
           atValueEnd = false
-        } else newlines += token.source
+        } else {
+          newlines += token.source
+          if (!isMap && !key && value) nlAfterValueInSeq = true
+        }
         break
       case 'anchor':
         if (anchor) onError(offset, 'A node can have at most one anchor')
         anchor = token.source.substring(1)
+        atValueEnd = false
         break
       case 'tag': {
         if (tagName) onError(offset, 'A node can have at most one tag')
         const tn = doc.directives.tagName(token.source, m => onError(offset, m))
         if (tn) tagName = tn
+        atValueEnd = false
         break
       }
       case 'explicit-key-ind':
         if (anchor || tagName)
           onError(offset, 'Anchors and tags must be after the ? indicator')
         atExplicitKey = true
+        atValueEnd = false
         break
       case 'map-value-ind': {
-        atExplicitKey = false
         if (key) {
           if (value) {
             onError(offset, 'Missing {} around pair used as mapping key')
@@ -116,32 +122,39 @@ export function resolveFlowCollection(
             value = null
           } // else explicit key
         } else if (value) {
+          if (doc.options.strict && nlAfterValueInSeq)
+            onError(
+              offset,
+              'Implicit keys of flow sequence pairs need to be on a single line'
+            )
           key = value
           value = null
         } else {
-          const props = { spaceBefore, comment, anchor, tagName }
-          key = composeNode(doc, offset, props, onError) // empty node
-          resetProps()
+          key = composeNode(doc, offset, getProps(), onError) // empty node
         }
         if (hasComment) {
           key.comment = comment
           comment = ''
           hasComment = false
         }
+        atExplicitKey = false
+        atValueEnd = false
         break
       }
       case 'comma':
         addItem()
+        atExplicitKey = false
         atValueEnd = true
+        nlAfterValueInSeq = false
         key = null
         value = null
         break
       default: {
         if (value) onError(offset, 'Missing , between flow collection items')
-        const props = { spaceBefore, comment, anchor, tagName }
-        value = composeNode(doc, token, props, onError)
+        value = composeNode(doc, token, getProps(), onError)
         offset = value.range[1]
         isSourceToken = false
+        atValueEnd = false
       }
     }
     if (isSourceToken) offset += (token as SourceToken).source.length

@@ -24,7 +24,7 @@ export function composeDoc(
     offset,
     onError
   )
-  if (props.found) doc.directivesEndMarker = true
+  if (props.found !== -1) doc.directivesEndMarker = true
 
   doc.contents = composeNode(
     doc,

@@ -89,6 +89,21 @@ function includesToken(list: SourceToken[], type: SourceToken['type']) {
   return false
 }
 
+function isFlowToken(
+  token: Token | null
+): token is FlowScalar | FlowCollection {
+  switch (token?.type) {
+    case 'alias':
+    case 'scalar':
+    case 'single-quoted-scalar':
+    case 'double-quoted-scalar':
+    case 'flow-collection':
+      return true
+    default:
+      return false
+  }
+}
+
 /** A YAML concrete syntax tree parser */
 export class Parser {
   push: (token: Token) => void
@@ -177,6 +192,8 @@ export class Parser {
           if (this.onNewLine) this.onNewLine(this.offset + source.length)
           break
         case 'space':
+        case 'explicit-key-ind':
+        case 'map-value-ind':
         case 'seq-item-ind':
           if (this.atNewLine) this.indent += source.length
           break
@@ -315,8 +332,8 @@ export class Parser {
         doc.start.push(this.sourceToken)
         return
       case 'doc-end':
-        doc.start.push(this.sourceToken)
         this.pop()
+        this.push(this.sourceToken)
         return
     }
     const bv = this.startBlockValue()
@@ -392,14 +409,16 @@ export class Parser {
       switch (this.type) {
         case 'anchor':
         case 'tag':
-          if (atNextItem || it.value)
+          if (atNextItem || it.value) {
             map.items.push({ start: [this.sourceToken] })
-          else if (it.sep) it.sep.push(this.sourceToken)
+            this.onKeyLine = true
+          } else if (it.sep) it.sep.push(this.sourceToken)
           else it.start.push(this.sourceToken)
           return
 
         case 'explicit-key-ind':
-          if (!it.sep) it.start.push(this.sourceToken)
+          if (!it.sep && !includesToken(it.start, 'explicit-key-ind'))
+            it.start.push(this.sourceToken)
           else if (atNextItem || it.value)
             map.items.push({ start: [this.sourceToken] })
           else
@@ -426,7 +445,23 @@ export class Parser {
               indent: this.indent,
               items: [{ start: [], key: null, sep: [this.sourceToken] }]
             })
-          else it.sep.push(this.sourceToken)
+          else if (
+            includesToken(it.start, 'explicit-key-ind') &&
+            isFlowToken(it.key) &&
+            !includesToken(it.sep, 'newline')
+          ) {
+            const key = it.key
+            const sep = it.sep
+            sep.push(this.sourceToken)
+            // @ts-ignore type guard is wrong here
+            delete it.key, delete it.sep
+            this.stack.push({
+              type: 'block-map',
+              offset: this.offset,
+              indent: this.indent,
+              items: [{ start: [], key, sep }]
+            })
+          } else it.sep.push(this.sourceToken)
           this.onKeyLine = true
           return
 
@@ -516,19 +551,28 @@ export class Parser {
       if (bv) return this.stack.push(bv)
       this.pop()
       this.step()
-    } else if (this.type === 'map-value-ind') {
-      const sep = fc.end.splice(1, fc.end.length)
-      sep.push(this.sourceToken)
-      const map: BlockMap = {
-        type: 'block-map',
-        offset: fc.offset,
-        indent: fc.indent,
-        items: [{ start: [], key: fc, sep }]
-      }
-      this.onKeyLine = true
-      this.stack[this.stack.length - 1] = map
     } else {
-      this.lineEnd(fc)
+      const parent = this.stack[this.stack.length - 2].type
+      if (parent === 'block-map') {
+        this.pop()
+        this.step()
+      } else if (
+        this.type === 'map-value-ind' &&
+        parent !== 'flow-collection'
+      ) {
+        const sep = fc.end.splice(1, fc.end.length)
+        sep.push(this.sourceToken)
+        const map: BlockMap = {
+          type: 'block-map',
+          offset: fc.offset,
+          indent: fc.indent,
+          items: [{ start: [], key: fc, sep }]
+        }
+        this.onKeyLine = true
+        this.stack[this.stack.length - 1] = map
+      } else {
+        this.lineEnd(fc)
+      }
     }
   }
 
@@ -603,9 +647,11 @@ export class Parser {
 
   lineEnd(token: Document | FlowCollection | FlowScalar) {
     switch (this.type) {
+      case 'newline':
+        this.onKeyLine = false
+      // fallthrough
       case 'space':
       case 'comment':
-      case 'newline':
         if (token.end) token.end.push(this.sourceToken)
         else token.end = [this.sourceToken]
         if (this.type === 'newline') this.pop()
