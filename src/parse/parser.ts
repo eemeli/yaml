@@ -9,6 +9,7 @@ export interface SourceToken {
 
 export interface ErrorToken {
   type: 'error'
+  offset?: number
   source: string
   message: string
 }
@@ -194,7 +195,7 @@ export class Parser {
     const type = tokenType(source)
     if (!type) {
       const message = `Not a YAML token: ${source}`
-      this.pop({ type: 'error', source, message })
+      this.pop({ type: 'error', offset: this.offset, message, source })
       this.offset += source.length
     } else if (type === 'scalar') {
       this.atNewLine = false
@@ -324,8 +325,12 @@ export class Parser {
         return
       }
     }
-    const message = `Unexpected ${this.type} token in YAML stream`
-    this.push({ type: 'error', message, source: this.source })
+    this.push({
+      type: 'error',
+      offset: this.offset,
+      message: `Unexpected ${this.type} token in YAML stream`,
+      source: this.source
+    })
   }
 
   document(doc: Document) {
@@ -357,8 +362,12 @@ export class Parser {
     const bv = this.startBlockValue()
     if (bv) this.stack.push(bv)
     else {
-      const message = `Unexpected ${this.type} token in YAML document`
-      this.push({ type: 'error', message, source: this.source })
+      this.push({
+        type: 'error',
+        offset: this.offset,
+        message: `Unexpected ${this.type} token in YAML document`,
+        source: this.source
+      })
     }
   }
 
