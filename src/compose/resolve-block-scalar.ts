@@ -31,8 +31,7 @@ export function resolveBlockScalar(
   }
 
   // find the indentation level to trim from start
-  // FIXME probably wrong for explicit indents
-  let trimIndent = header.indent
+  let trimIndent = scalar.indent + header.indent
   let offset = scalar.offset + header.length
   let contentStart = 0
   for (let i = 0; i < chompStart; ++i) {
@@ -46,7 +45,7 @@ export function resolveBlockScalar(
           'Block scalars with more-indented leading empty lines must use an explicit indentation indicator'
         onError(offset + indent.length, message)
       }
-      trimIndent = indent.length
+      if (header.indent === 0) trimIndent = indent.length
       contentStart = i
       break
     }
@@ -67,39 +66,33 @@ export function resolveBlockScalar(
     const crlf = content[content.length - 1] === '\r'
     if (crlf) content = content.slice(0, -1)
 
-    if (indent.length < trimIndent) {
-      if (content === '') {
-        // empty line
-        if (sep === '\n') value += '\n'
-        else sep = '\n'
-        continue
-      } else {
-        const src = header.indent
-          ? 'explicit indentation indicator'
-          : 'first line'
-        const message = `Block scalar lines must not be less indented than their ${src}`
-        onError(offset - content.length - (crlf ? 2 : 1), message)
-        indent = ''
-      }
+    if (content && indent.length < trimIndent) {
+      const src = header.indent
+        ? 'explicit indentation indicator'
+        : 'first line'
+      const message = `Block scalar lines must not be less indented than their ${src}`
+      onError(offset - content.length - (crlf ? 2 : 1), message)
+      indent = ''
     }
 
-    if (type === Type.BLOCK_FOLDED) {
-      if (!indent || indent.length === trimIndent) {
-        value += sep + content
-        sep = ' '
-        prevMoreIndented = false
-      } else {
-        // more-indented content within a folded block
-        if (sep === ' ') sep = '\n'
-        else if (!prevMoreIndented && sep === '\n') sep = '\n\n'
-        value += sep + indent.slice(trimIndent) + content
-        sep = '\n'
-        prevMoreIndented = true
-      }
-    } else {
-      // literal
+    if (type === Type.BLOCK_LITERAL) {
       value += sep + indent.slice(trimIndent) + content
       sep = '\n'
+    } else if (indent.length > trimIndent || content[0] === '\t') {
+      // more-indented content within a folded block
+      if (sep === ' ') sep = '\n'
+      else if (!prevMoreIndented && sep === '\n') sep = '\n\n'
+      value += sep + indent.slice(trimIndent) + content
+      sep = '\n'
+      prevMoreIndented = true
+    } else if (content === '') {
+      // empty line
+      if (sep === '\n') value += '\n'
+      else sep = '\n'
+    } else {
+      value += sep + content
+      sep = ' '
+      prevMoreIndented = false
     }
   }
 

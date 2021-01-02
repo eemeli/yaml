@@ -101,6 +101,7 @@ export class Lexer {
 
   atEnd = false
   buffer = ''
+  blockScalarIndent = -1 // non-negative if explicitly in header
   flowKey = false // can : immediately follow this flow node
   flowLevel = 0 // count of surrounding flow collection levels
   indentNext = 0 // minimum indent level for next line
@@ -298,7 +299,7 @@ export class Lexer {
         return this.parseQuotedScalar()
       case '|':
       case '>':
-        n += this.pushUntil(isEmpty)
+        n += this.parseBlockScalarHeader()
         n += this.pushSpaces(true)
         this.pushCount(line.length - n)
         this.pushNewline()
@@ -386,19 +387,53 @@ export class Lexer {
     return this.flowLevel ? 'flow' : 'doc'
   }
 
+  parseBlockScalarHeader() {
+    let i = this.pos
+    while (true) {
+      const ch = this.buffer[++i]
+      if (ch === '-' || ch === '+') continue
+      const n = Number(ch)
+      this.blockScalarIndent = n > 0 ? n - 1 : -1
+      break
+    }
+    return this.pushUntil(isEmpty)
+  }
+
   parseBlockScalar() {
-    let nl = this.buffer.indexOf('\n', this.pos)
-    while (nl !== -1) {
-      const cs = this.continueScalar(nl + 1)
-      if (cs === -1) break
-      nl = this.buffer.indexOf('\n', cs)
+    let nl = this.pos - 1
+    let indent = 0
+    let ch: string
+    loop: for (let i = this.pos; (ch = this.buffer[i]); ++i) {
+      switch (ch) {
+        case ' ':
+          indent += 1
+          break
+        case '\n':
+          nl = i
+          indent = 0
+          break
+        default:
+          break loop
+      }
     }
-    if (nl === -1) {
-      if (!this.atEnd) return this.setNext('block-scalar')
-      nl = this.buffer.length
+    if (ch && indent < this.indentNext) {
+      this.push(SCALAR)
+      this.push('')
+    } else {
+      if (this.blockScalarIndent === -1) this.indentNext = indent
+      else this.indentNext += this.blockScalarIndent
+      while (nl !== -1) {
+        const cs = this.continueScalar(nl + 1)
+        if (cs === -1) break
+        nl = this.buffer.indexOf('\n', cs)
+      }
+      if (nl === -1) {
+        if (!this.atEnd) return this.setNext('block-scalar')
+        nl = this.buffer.length
+      }
+      this.push(SCALAR)
+      this.pushToIndex(nl + 1, true)
     }
-    this.push(SCALAR)
-    this.pushToIndex(nl + 1, true)
     return this.parseLineStart()
   }
 

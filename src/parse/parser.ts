@@ -214,6 +214,7 @@ export class Parser {
         case 'explicit-key-ind':
         case 'map-value-ind':
         case 'seq-item-ind':
+          // TODO: also track parent indent
           if (this.atNewLine) this.indent += source.length
           break
         case 'doc-mode':
@@ -269,6 +270,9 @@ export class Parser {
       this.push(token)
     } else {
       const top = this.peek(1)
+      // For these, parent indent is needed instead of own
+      if (token.type === 'block-scalar' || token.type === 'flow-collection')
+        token.indent = 'indent' in top ? top.indent : -1
       switch (top.type) {
         case 'document':
           top.value = token

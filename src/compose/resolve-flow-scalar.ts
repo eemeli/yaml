@@ -66,7 +66,7 @@ function singleQuotedValue(
   source: string,
   onError: (relOffset: number, message: string) => void
 ) {
-  if (source[source.length - 1] !== "'")
+  if (source[source.length - 1] !== "'" || source.length === 1)
     onError(source.length, "Missing closing 'quote")
   return foldLines(source.slice(1, -1)).replace(/''/g, "'")
 }
@@ -126,7 +126,7 @@ function doubleQuotedValue(
       res += ch
     }
   }
-  if (source[source.length - 1] !== '"')
+  if (source[source.length - 1] !== '"' || source.length === 1)
     onError(source.length, 'Missing closing "quote')
   return res
 }
