@@ -239,12 +239,6 @@ export class Document {
     return this
   }
 
-  listNonDefaultTags() {
-    return listTagNames(this.contents).filter(
-      t => t.indexOf(defaultTagPrefix) !== 0
-    )
-  }
-
   setTagPrefix(handle, prefix) {
     if (handle[0] !== '!' || handle[handle.length - 1] !== '!')
       throw new Error('Handle must start and end with !')
@@ -306,7 +300,9 @@ export class Document {
       lines.push(vd)
       hasDirectives = true
     }
-    const tagNames = this.listNonDefaultTags()
+    const tagNames = listTagNames(this.contents).filter(
+      t => t.indexOf(defaultTagPrefix) !== 0
+    )
     this.tagPrefixes.forEach(({ handle, prefix }) => {
       if (tagNames.some(t => t.indexOf(prefix) === 0)) {
         lines.push(`%TAG ${handle} ${prefix}`)

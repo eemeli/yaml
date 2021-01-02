@@ -283,11 +283,7 @@ export class Document extends Collection {
    *   `Scalar` objects.
    */
   createPair(key: any, value: any, options?: { wrapScalars?: boolean }): Pair
-  /**
-   * List the tags used in the document that are not in the default
-   * `tag:yaml.org,2002:` namespace.
-   */
-  listNonDefaultTags(): string[]
+
   /** Parse a CST into this document */
   parse(cst: CST.Document): this
   /**
