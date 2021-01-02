@@ -17,8 +17,9 @@ export function resolveBlockSeq(
   if (anchor) doc.anchors.setAnchor(seq, anchor)
   for (const { start, value } of items) {
     const props = resolveProps(
-      doc.directives,
+      doc,
       start,
+      true,
       'seq-item-ind',
       offset,
       onError

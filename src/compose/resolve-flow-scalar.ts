@@ -4,6 +4,7 @@ import { resolveEnd } from './resolve-end.js'
 
 export function resolveFlowScalar(
   { offset, type, source, end }: FlowScalar,
+  strict: boolean,
   onError: (offset: number, message: string) => void
 ): {
   value: string
@@ -40,8 +41,13 @@ export function resolveFlowScalar(
       }
   }
 
-  const { comment, length } = resolveEnd(end)
-  return { value, type: _type, comment, length: source.length + length }
+  const re = resolveEnd(end, 0, strict, _onError)
+  return {
+    value,
+    type: _type,
+    comment: re.comment,
+    length: source.length + re.offset
+  }
 }
 
 function plainValue(

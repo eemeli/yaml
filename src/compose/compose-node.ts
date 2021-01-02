@@ -24,7 +24,7 @@ export function composeNode(
   let node: Node.Parsed
   switch (token.type) {
     case 'alias':
-      node = composeAlias(doc.anchors, token, onError)
+      node = composeAlias(doc, token, onError)
       if (anchor || tagName)
         onError(token.offset, 'An alias node must not specify any properties')
       break
@@ -65,16 +65,22 @@ function composeEmptyNode(
 }
 
 function composeAlias(
-  anchors: Document.Anchors,
+  doc: Document.Parsed,
   { offset, source, end }: FlowScalar,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const name = source.substring(1)
-  const src = anchors.getNode(name)
+  const src = doc.anchors.getNode(name)
   if (!src) onError(offset, `Aliased anchor not found: ${name}`)
   const alias = new Alias(src as Node)
-  const { comment, length } = resolveEnd(end)
-  alias.range = [offset, offset + source.length + length]
-  if (comment) alias.comment = comment
+
+  const re = resolveEnd(
+    end,
+    offset + source.length,
+    doc.options.strict,
+    onError
+  )
+  alias.range = [offset, re.offset]
+  if (re.comment) alias.comment = re.comment
   return alias as Alias.Parsed
 }

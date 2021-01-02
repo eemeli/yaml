@@ -1,21 +1,43 @@
 import { SourceToken } from '../parse/parser.js'
 
-export function resolveEnd(end: SourceToken[] | undefined) {
+export function resolveEnd(
+  end: SourceToken[] | undefined,
+  offset: number,
+  reqSpace: boolean,
+  onError: (offset: number, message: string) => void
+) {
   let comment = ''
-  let length = 0
   if (end) {
+    let hasSpace = false
     let hasComment = false
     let sep = ''
-    for (const token of end) {
-      if (token.type === 'comment') {
-        const cb = token.source.substring(1)
-        if (!hasComment) comment = cb
-        else comment += sep + cb
-        hasComment = true
-        sep = ''
-      } else if (hasComment && token.type === 'newline') sep += token.source
-      length += token.source.length
+    for (const { source, type } of end) {
+      switch (type) {
+        case 'space':
+          hasSpace = true
+          break
+        case 'comment': {
+          if (reqSpace && !hasSpace)
+            onError(
+              offset,
+              'Comments must be separated from other tokens by white space characters'
+            )
+          const cb = source.substring(1)
+          if (!hasComment) comment = cb
+          else comment += sep + cb
+          hasComment = true
+          sep = ''
+          break
+        }
+        case 'newline':
+          if (hasComment) sep += source
+          hasSpace = true
+          break
+        default:
+          onError(offset, `Unexpected ${type} at node end`)
+      }
+      offset += source.length
     }
   }
-  return { comment, length }
+  return { comment, offset }
 }

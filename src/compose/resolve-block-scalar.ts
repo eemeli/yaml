@@ -3,6 +3,7 @@ import type { BlockScalar } from '../parse/parser.js'
 
 export function resolveBlockScalar(
   scalar: BlockScalar,
+  strict: boolean,
   onError: (offset: number, message: string) => void
 ): {
   value: string
@@ -10,7 +11,7 @@ export function resolveBlockScalar(
   comment: string
   length: number
 } {
-  const header = parseBlockScalarHeader(scalar, onError)
+  const header = parseBlockScalarHeader(scalar, strict, onError)
   if (!header) return { value: '', type: null, comment: '', length: 0 }
   const type = header.mode === '>' ? Type.BLOCK_FOLDED : Type.BLOCK_LITERAL
   const lines = scalar.source ? splitLines(scalar.source) : []
@@ -118,6 +119,7 @@ export function resolveBlockScalar(
 
 function parseBlockScalarHeader(
   { offset, props }: BlockScalar,
+  strict: boolean,
   onError: (offset: number, message: string) => void
 ) {
   if (props[0].type !== 'block-scalar-header') {
@@ -140,16 +142,24 @@ function parseBlockScalarHeader(
   }
   if (error !== -1)
     onError(error, `Block scalar header includes extra characters: ${source}`)
+  let hasSpace = false
   let comment = ''
   let length = source.length
   for (let i = 1; i < props.length; ++i) {
     const token = props[i]
     switch (token.type) {
       case 'space':
+        hasSpace = true
+      // fallthrough
       case 'newline':
         length += token.source.length
         break
       case 'comment':
+        if (strict && !hasSpace) {
+          const message =
+            'Comments must be separated from other tokens by white space characters'
+          onError(offset + length, message)
+        }
         length += token.source.length
         comment = token.source.substring(1)
         break

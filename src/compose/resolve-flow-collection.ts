@@ -3,6 +3,7 @@ import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { FlowCollection, SourceToken } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
+import { resolveEnd } from './resolve-end.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 
 export function resolveFlowCollection(
@@ -22,6 +23,7 @@ export function resolveFlowCollection(
 
   let spaceBefore = false
   let comment = ''
+  let hasSpace = false
   let hasComment = false
   let newlines = ''
   let anchor = ''
@@ -67,8 +69,14 @@ export function resolveFlowCollection(
     let isSourceToken = true
     switch (token.type) {
       case 'space':
+        hasSpace = true
         break
       case 'comment':
+        if (doc.options.strict && !hasSpace)
+          onError(
+            offset,
+            'Comments must be separated from other tokens by white space characters'
+          )
         const cb = token.source.substring(1)
         if (!hasComment) {
           if (newlines) spaceBefore = true
@@ -92,17 +100,20 @@ export function resolveFlowCollection(
           newlines += token.source
           if (!isMap && !key && value) nlAfterValueInSeq = true
         }
+        hasSpace = true
         break
       case 'anchor':
         if (anchor) onError(offset, 'A node can have at most one anchor')
         anchor = token.source.substring(1)
         atValueEnd = false
+        hasSpace = false
         break
       case 'tag': {
         if (tagName) onError(offset, 'A node can have at most one tag')
         const tn = doc.directives.tagName(token.source, m => onError(offset, m))
         if (tn) tagName = tn
         atValueEnd = false
+        hasSpace = false
         break
       }
       case 'explicit-key-ind':
@@ -110,6 +121,7 @@ export function resolveFlowCollection(
           onError(offset, 'Anchors and tags must be after the ? indicator')
         atExplicitKey = true
         atValueEnd = false
+        hasSpace = false
         break
       case 'map-value-ind': {
         if (key) {
@@ -139,15 +151,17 @@ export function resolveFlowCollection(
         }
         atExplicitKey = false
         atValueEnd = false
+        hasSpace = false
         break
       }
       case 'comma':
         addItem()
-        atExplicitKey = false
-        atValueEnd = true
-        nlAfterValueInSeq = false
         key = null
         value = null
+        atExplicitKey = false
+        atValueEnd = true
+        hasSpace = false
+        nlAfterValueInSeq = false
         break
       default: {
         if (value) onError(offset, 'Missing , between flow collection items')
@@ -155,11 +169,26 @@ export function resolveFlowCollection(
         offset = value.range[1]
         isSourceToken = false
         atValueEnd = false
+        hasSpace = false
       }
     }
     if (isSourceToken) offset += (token as SourceToken).source.length
   }
   if (key || value || atExplicitKey) addItem()
+
+  const expectedEnd = isMap ? '}' : ']'
+  const [ce, ...ee] = fc.end
+  if (!ce || ce.source !== expectedEnd) {
+    const cs = isMap ? 'map' : 'sequence'
+    onError(offset, `Expected flow ${cs} to end with ${expectedEnd}`)
+  }
+  if (ce) offset += ce.source.length
+  if (ee.length > 0) {
+    const end = resolveEnd(ee, offset, doc.options.strict, onError)
+    if (end.comment) coll.comment = comment
+    offset = end.offset
+  }
+
   coll.range = [fc.offset, offset]
   return coll as YAMLMap.Parsed | YAMLSeq.Parsed
 }

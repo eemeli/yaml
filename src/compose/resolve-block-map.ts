@@ -22,8 +22,9 @@ export function resolveBlockMap(
   for (const { start, key, sep, value } of items) {
     // key properties
     const keyProps = resolveProps(
-      doc.directives,
+      doc,
       start,
+      true,
       'explicit-key-ind',
       offset,
       onError
@@ -53,8 +54,9 @@ export function resolveBlockMap(
 
     // value properties
     const valueProps = resolveProps(
-      doc.directives,
+      doc,
       sep || [],
+      !key || key.type === 'block-scalar',
       'map-value-ind',
       offset,
       onError

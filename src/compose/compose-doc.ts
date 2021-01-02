@@ -17,13 +17,7 @@ export function composeDoc(
   doc.version = directives.yaml.version
   doc.setSchema() // FIXME: always do this in the constructor
 
-  const props = resolveProps(
-    doc.directives,
-    start,
-    'doc-start',
-    offset,
-    onError
-  )
+  const props = resolveProps(doc, start, true, 'doc-start', offset, onError)
   if (props.found !== -1) doc.directivesEndMarker = true
 
   doc.contents = composeNode(
@@ -32,9 +26,9 @@ export function composeDoc(
     props,
     onError
   )
-  const { comment, length } = resolveEnd(end)
-  if (comment) doc.comment = comment
 
-  doc.range = [offset, doc.contents.range[1] + length]
+  const re = resolveEnd(end, doc.contents.range[1], false, onError)
+  if (re.comment) doc.comment = re.comment
+  doc.range = [offset, re.offset]
   return doc
 }

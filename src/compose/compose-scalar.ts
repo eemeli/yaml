@@ -15,8 +15,8 @@ export function composeScalar(
   const { offset } = token
   const { value, type, comment, length } =
     token.type === 'block-scalar'
-      ? resolveBlockScalar(token, onError)
-      : resolveFlowScalar(token, onError)
+      ? resolveBlockScalar(token, doc.options.strict, onError)
+      : resolveFlowScalar(token, doc.options.strict, onError)
 
   const tag =
     findScalarTagByName(doc.schema, value, tagName, onError) ||
