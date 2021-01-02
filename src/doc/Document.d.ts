@@ -1,10 +1,10 @@
 import { Alias, Collection, Merge, Node, Pair } from '../ast'
-import { StreamDirectives } from '../compose/stream-directives'
 import { Type } from '../constants'
 import { CST } from '../cst'
 import { YAMLError, YAMLWarning } from '../errors'
 import { Options } from '../options'
 import { Schema } from './Schema'
+import { StreamDirectives } from './stream-directives'
 
 type Replacer = any[] | ((key: any, value: any) => boolean)
 type Reviver = (key: any, value: any) => any
@@ -38,7 +38,7 @@ export class Document extends Collection {
   constructor(value?: any, options?: Options)
   constructor(value: any, replacer: null | Replacer, options?: Options)
 
-  directives?: StreamDirectives
+  directives: StreamDirectives
 
   tag: never
   directivesEndMarker?: boolean
@@ -130,7 +130,6 @@ export class Document extends Collection {
 export namespace Document {
   interface Parsed extends Document {
     contents: Node.Parsed | null
-    directives: StreamDirectives
     /** The schema used with the document. */
     schema: Schema
   }

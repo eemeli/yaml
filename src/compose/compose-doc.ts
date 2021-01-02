@@ -1,10 +1,10 @@
 import { Document } from '../doc/Document.js'
+import { StreamDirectives } from '../doc/stream-directives.js'
 import type { Options } from '../options.js'
 import type * as Parser from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveProps } from './resolve-props.js'
-import { StreamDirectives } from './stream-directives.js'
 
 export function composeDoc(
   options: Options | undefined,

@@ -1,3 +1,18 @@
+import type { Document } from './Document.js'
+import { listTagNames } from './listTagNames.js'
+
+const escapeChars: Record<string, string> = {
+  '!': '%21',
+  ',': '%2C',
+  '[': '%5B',
+  ']': '%5D',
+  '{': '%7B',
+  '}': '%7D'
+}
+
+const escapeTagName = (tn: string) =>
+  tn.replace(/[!,[\]{}]/g, ch => escapeChars[ch])
+
 export class StreamDirectives {
   tags: Record<string, string> = { '!!': 'tag:yaml.org,2002:' }
   yaml: { version: '1.1' | '1.2' | undefined } = { version: undefined }
@@ -80,12 +95,27 @@ export class StreamDirectives {
     return null
   }
 
-  toString(includeVersion: boolean) {
-    let res = includeVersion ? `%YAML ${this.yaml.version}\n` : ''
+  /**
+   * Given a fully resolved tag, returns its printable string form,
+   * taking into account current tag prefixes and defaults.
+   */
+  tagString(tag: string) {
     for (const [handle, prefix] of Object.entries(this.tags)) {
-      if (handle !== '!!' || prefix !== 'tag:yaml.org,2002:')
-        res += `%TAG ${handle} ${prefix}\n`
+      if (tag.startsWith(prefix))
+        return handle + escapeTagName(tag.substring(prefix.length))
     }
-    return res
+    return tag[0] === '!' ? tag : `!<${tag}>`
+  }
+
+  toString(doc?: Document) {
+    const lines =
+      !doc || doc.version ? [`%YAML ${this.yaml.version || '1.2'}`] : []
+    const tagNames = doc && listTagNames(doc.contents)
+    for (const [handle, prefix] of Object.entries(this.tags)) {
+      if (handle === '!!' && prefix === 'tag:yaml.org,2002:') continue
+      if (!tagNames || tagNames.some(tn => tn.startsWith(prefix)))
+        lines.push(`%TAG ${handle} ${prefix}`)
+    }
+    return lines.join('\n')
   }
 }

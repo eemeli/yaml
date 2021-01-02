@@ -1,3 +1,4 @@
+import { resolve } from 'path'
 import babel from '@rollup/plugin-babel'
 
 export default {
@@ -7,6 +8,7 @@ export default {
     'src/errors.js',
     'src/options.js'
   ],
+  external: [resolve('src/doc/stream-directives.js')],
   output: { dir: 'lib', format: 'cjs', esModule: false, preserveModules: true },
   plugins: [babel()]
 }

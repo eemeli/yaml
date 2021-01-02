@@ -1,9 +1,9 @@
-import { Document } from '../doc/Document'
-import { YAMLParseError, YAMLWarning } from '../errors'
-import type { Options } from '../options'
-import { Parser } from '../parse/parser'
-import { composeDoc } from './compose-doc'
-import { StreamDirectives } from './stream-directives'
+import { Document } from '../doc/Document.js'
+import { StreamDirectives } from '../doc/stream-directives.js'
+import { YAMLParseError, YAMLWarning } from '../errors.js'
+import type { Options } from '../options.js'
+import { Parser } from '../parse/parser.js'
+import { composeDoc } from './compose-doc.js'
 
 export function parseDocs(source: string, options?: Options) {
   const directives = new StreamDirectives()

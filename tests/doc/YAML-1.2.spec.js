@@ -994,9 +994,6 @@ Chomping: |
 ---
 foo`,
       tgt: ['foo'],
-      errors: [
-        ['The %YAML directive must only be given at most once per document.']
-      ],
       special: src => {
         const doc = YAML.parseDocument(src)
         expect(doc.version).toBe('1.1')
@@ -1017,14 +1014,12 @@ foo`,
 ---
 bar`,
       tgt: ['bar'],
-      errors: [
-        [
-          'The %TAG directive must only be given at most once per handle in the same document.'
-        ]
-      ],
       special: src => {
         const doc = YAML.parseDocument(src)
-        expect(doc.tagPrefixes).toMatchObject([{ handle: '!', prefix: '!foo' }])
+        expect(doc.directives.tags).toMatchObject({
+          '!!': 'tag:yaml.org,2002:',
+          '!': '!foo'
+        })
       }
     },
 

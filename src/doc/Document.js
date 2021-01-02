@@ -9,7 +9,6 @@ import {
   toJS
 } from '../ast/index.js'
 import { Document as CSTDocument } from '../cst/Document.js'
-import { defaultTagPrefix } from '../constants.js'
 import { YAMLError } from '../errors.js'
 import { defaultOptions, documentOptions } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
@@ -19,9 +18,9 @@ import { Anchors } from './Anchors.js'
 import { Schema } from './Schema.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode } from './createNode.js'
-import { listTagNames } from './listTagNames.js'
 import { parseContents } from './parseContents.js'
 import { parseDirectives } from './parseDirectives.js'
+import { StreamDirectives } from './stream-directives.js'
 
 function assertCollection(contents) {
   if (contents instanceof Collection) return true
@@ -46,6 +45,7 @@ export class Document {
     this.anchors = new Anchors(this.options.anchorPrefix)
     this.commentBefore = null
     this.comment = null
+    this.directives = new StreamDirectives()
     this.directivesEndMarker = null
     this.errors = []
     this.schema = null
@@ -291,24 +291,11 @@ export class Document {
     this.setSchema()
     const lines = []
     let hasDirectives = false
-    if (this.version) {
-      let vd = '%YAML 1.2'
-      if (this.schema.name === 'yaml-1.1') {
-        if (this.version === '1.0') vd = '%YAML:1.0'
-        else if (this.version === '1.1') vd = '%YAML 1.1'
-      }
-      lines.push(vd)
+    const dir = this.directives.toString(this)
+    if (dir) {
+      lines.push(dir)
       hasDirectives = true
     }
-    const tagNames = listTagNames(this.contents).filter(
-      t => t.indexOf(defaultTagPrefix) !== 0
-    )
-    this.tagPrefixes.forEach(({ handle, prefix }) => {
-      if (tagNames.some(t => t.indexOf(prefix) === 0)) {
-        lines.push(`%TAG ${handle} ${prefix}`)
-        hasDirectives = true
-      }
-    })
     if (hasDirectives || this.directivesEndMarker) lines.push('---')
     if (this.commentBefore) {
       if (hasDirectives || !this.directivesEndMarker) lines.unshift('')

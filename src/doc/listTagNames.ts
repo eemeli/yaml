@@ -1,6 +1,6 @@
-import { Collection, Pair, Scalar } from '../ast/index.js'
+import { Collection, Node, Pair, Scalar } from '../ast/index.js'
 
-const visit = (node, tags) => {
+function visit(node: Node, tags: Record<string, boolean>) {
   if (node && typeof node === 'object') {
     const { tag } = node
     if (node instanceof Collection) {
@@ -16,4 +16,4 @@ const visit = (node, tags) => {
   return tags
 }
 
-export const listTagNames = node => Object.keys(visit(node, {}))
+export const listTagNames = (node: Node) => Object.keys(visit(node, {}))
