@@ -5,6 +5,7 @@ import type { BlockMap } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 import { resolveProps } from './resolve-props.js'
+import { validateImplicitKey } from './validate-implicit-key.js'
 
 const startColMsg = 'All collection items must start at the same column'
 
@@ -34,8 +35,12 @@ export function resolveBlockMap(
       if (key && 'indent' in key && key.indent !== indent)
         onError(offset, startColMsg)
       if (keyProps.anchor || keyProps.tagName || sep) {
-        // FIXME: check single-line
-        // FIXME: check 1024 chars
+        const err = validateImplicitKey(key)
+        if (err === 'single-line')
+          onError(
+            offset + keyProps.length,
+            'Implicit keys need to be on a single line'
+          )
       } else {
         // TODO: assert being at last item?
         if (keyProps.comment) {

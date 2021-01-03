@@ -1,10 +1,11 @@
 import { Node, Pair, YAMLMap, YAMLSeq } from '../ast/index.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
-import type { FlowCollection, SourceToken } from '../parse/parser.js'
+import type { FlowCollection, SourceToken, Token } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
+import { validateImplicitKey } from './validate-implicit-key.js'
 
 export function resolveFlowCollection(
   doc: Document.Parsed,
@@ -32,6 +33,7 @@ export function resolveFlowCollection(
   let atExplicitKey = false
   let atValueEnd = false
   let nlAfterValueInSeq = false
+  let seqKeyToken: Token | null = null
 
   function getProps() {
     const props = { spaceBefore, comment, anchor, tagName }
@@ -134,11 +136,16 @@ export function resolveFlowCollection(
             value = null
           } // else explicit key
         } else if (value) {
-          if (doc.options.strict && nlAfterValueInSeq)
-            onError(
-              offset,
+          if (doc.options.strict) {
+            const slMsg =
               'Implicit keys of flow sequence pairs need to be on a single line'
-            )
+            if (nlAfterValueInSeq) onError(offset, slMsg)
+            else if (seqKeyToken) {
+              const err = validateImplicitKey(seqKeyToken)
+              if (err === 'single-line') onError(offset, slMsg)
+              seqKeyToken = null
+            }
+          }
           key = value
           value = null
         } else {
@@ -162,9 +169,11 @@ export function resolveFlowCollection(
         atValueEnd = true
         hasSpace = false
         nlAfterValueInSeq = false
+        seqKeyToken = null
         break
       default: {
         if (value) onError(offset, 'Missing , between flow collection items')
+        if (!isMap && !key && !atExplicitKey) seqKeyToken = token
         value = composeNode(doc, token, getProps(), onError)
         offset = value.range[1]
         isSourceToken = false

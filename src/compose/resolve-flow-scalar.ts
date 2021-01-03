@@ -78,10 +78,10 @@ function singleQuotedValue(
 }
 
 function foldLines(source: string) {
-  const lines = source.split(/[ \t]*\n[ \t]*/)
-  let res = ''
-  let sep = ''
-  for (let i = 0; i < lines.length; ++i) {
+  const lines = source.split(/[ \t]*\r?\n[ \t]*/)
+  let res = lines[0]
+  let sep = ' '
+  for (let i = 1; i < lines.length - 1; ++i) {
     const line = lines[i]
     if (line === '') {
       if (sep === '\n') res += sep
@@ -91,6 +91,7 @@ function foldLines(source: string) {
       sep = ' '
     }
   }
+  if (lines.length > 1) res += sep + lines[lines.length - 1]
   return res
 }
 

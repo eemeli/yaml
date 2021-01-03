@@ -105,6 +105,21 @@ function isFlowToken(
   }
 }
 
+function getPrevProps(parent: Token) {
+  switch (parent.type) {
+    case 'document':
+      return parent.start
+    case 'block-map': {
+      const it = parent.items[parent.items.length - 1]
+      return it.sep || it.start
+    }
+    case 'block-seq':
+      return parent.items[parent.items.length - 1].start
+    default:
+      return []
+  }
+}
+
 /** Note: May modify input array */
 function getFirstKeyStartProps(prev: SourceToken[]) {
   if (prev.length === 0) return []
@@ -363,7 +378,7 @@ export class Parser {
         this.push(this.sourceToken)
         return
     }
-    const bv = this.startBlockValue()
+    const bv = this.startBlockValue(doc)
     if (bv) this.stack.push(bv)
     else {
       this.push({
@@ -377,23 +392,7 @@ export class Parser {
 
   scalar(scalar: FlowScalar) {
     if (this.type === 'map-value-ind') {
-      const parent = this.peek(2)
-      let prev: SourceToken[]
-      switch (parent.type) {
-        case 'document':
-          prev = parent.start
-          break
-        case 'block-map': {
-          const it = parent.items[parent.items.length - 1]
-          prev = it.sep || it.start
-          break
-        }
-        case 'block-seq':
-          prev = parent.items[parent.items.length - 1].start
-          break
-        default:
-          prev = []
-      }
+      const prev = getPrevProps(this.peek(2))
       const start = getFirstKeyStartProps(prev)
 
       let sep: SourceToken[]
@@ -535,7 +534,7 @@ export class Parser {
         }
 
         default: {
-          const bv = this.startBlockValue()
+          const bv = this.startBlockValue(map)
           if (bv) return this.stack.push(bv)
         }
       }
@@ -566,7 +565,7 @@ export class Parser {
         return
     }
     if (this.indent > seq.indent) {
-      const bv = this.startBlockValue()
+      const bv = this.startBlockValue(seq)
       if (bv) return this.stack.push(bv)
     }
     this.pop()
@@ -599,7 +598,7 @@ export class Parser {
           fc.end.push(this.sourceToken)
           return
       }
-      const bv = this.startBlockValue()
+      const bv = this.startBlockValue(fc)
       if (bv) return this.stack.push(bv)
       this.pop()
       this.step()
@@ -646,7 +645,7 @@ export class Parser {
     } as FlowScalar
   }
 
-  startBlockValue() {
+  startBlockValue(parent: Token) {
     switch (this.type) {
       case 'alias':
       case 'scalar':
@@ -685,33 +684,42 @@ export class Parser {
           indent: this.indent,
           items: [{ start: [this.sourceToken] }]
         } as BlockMap
-      case 'map-value-ind':
+      case 'map-value-ind': {
         this.onKeyLine = true
+        const prev = getPrevProps(parent)
+        const start = getFirstKeyStartProps(prev)
         return {
           type: 'block-map',
           offset: this.offset,
           indent: this.indent,
-          items: [{ start: [], key: null, sep: [this.sourceToken] }]
+          items: [{ start, key: null, sep: [this.sourceToken] }]
         } as BlockMap
+      }
     }
     return null
   }
 
   lineEnd(token: Document | FlowCollection | FlowScalar) {
     switch (this.type) {
+      case 'comma':
+      case 'doc-start':
+      case 'doc-end':
+      case 'flow-seq-end':
+      case 'flow-map-end':
+      case 'map-value-ind':
+        this.pop()
+        this.step()
+        break
       case 'newline':
         this.onKeyLine = false
       // fallthrough
       case 'space':
       case 'comment':
+      default:
+        // all other values are errors
         if (token.end) token.end.push(this.sourceToken)
         else token.end = [this.sourceToken]
         if (this.type === 'newline') this.pop()
-        return
-      default:
-        this.pop()
-        this.step()
-        return
     }
   }
 }
