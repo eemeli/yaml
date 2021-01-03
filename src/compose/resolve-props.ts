@@ -22,6 +22,7 @@ export function resolveProps(
 ) {
   let length = 0
   let spaceBefore = false
+  let atNewline = startOnNewline
   let hasSpace = startOnNewline
   let comment = ''
   let hasComment = false
@@ -33,6 +34,10 @@ export function resolveProps(
   for (const token of tokens) {
     switch (token.type) {
       case 'space':
+        // At the doc level, tabs at line start may be parsed as leading
+        // white space rather than indentation.
+        if (atNewline && indicator !== 'doc-start' && token.source[0] === '\t')
+          onError(offset + length, 'Tabs are not allowed as indentation')
         hasSpace = true
         break
       case 'comment': {
@@ -51,6 +56,7 @@ export function resolveProps(
         break
       }
       case 'newline':
+        atNewline = true
         hasNewline = true
         hasSpace = true
         sep += token.source
@@ -59,6 +65,7 @@ export function resolveProps(
         if (anchor)
           onError(offset + length, 'A node can have at most one anchor')
         anchor = token.source.substring(1)
+        atNewline = false
         hasSpace = false
         break
       case 'tag': {
@@ -67,16 +74,19 @@ export function resolveProps(
           onError(offset, msg)
         )
         if (tn) tagName = tn
+        atNewline = false
         hasSpace = false
         break
       }
       case indicator:
         // Could here handle preceding comments differently
         found = token.indent
+        atNewline = false
         hasSpace = false
         break
       default:
         onError(offset + length, `Unexpected ${token.type} token`)
+        atNewline = false
         hasSpace = false
     }
     if (token.source) length += token.source.length

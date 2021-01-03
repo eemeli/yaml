@@ -162,7 +162,9 @@ export function resolveFlowCollection(
         break
       }
       case 'comma':
-        addItem()
+        if (key || value || anchor || tagName || atExplicitKey) addItem()
+        else
+          onError(offset, `Unexpected , in flow ${isMap ? 'map' : 'sequence'}`)
         key = null
         value = null
         atExplicitKey = false
@@ -183,7 +185,7 @@ export function resolveFlowCollection(
     }
     if (isSourceToken) offset += (token as SourceToken).source.length
   }
-  if (key || value || atExplicitKey) addItem()
+  if (key || value || anchor || tagName || atExplicitKey) addItem()
 
   const expectedEnd = isMap ? '}' : ']'
   const [ce, ...ee] = fc.end

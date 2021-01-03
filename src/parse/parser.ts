@@ -234,10 +234,11 @@ export class Parser {
           if (this.onNewLine) this.onNewLine(this.offset + source.length)
           break
         case 'space':
+          if (this.atNewLine && source[0] === ' ') this.indent += source.length
+          break
         case 'explicit-key-ind':
         case 'map-value-ind':
         case 'seq-item-ind':
-          // TODO: also track parent indent
           if (this.atNewLine) this.indent += source.length
           break
         case 'doc-mode':
@@ -618,20 +619,25 @@ export class Parser {
       this.step()
     } else {
       const parent = this.peek(2)
-      if (parent.type === 'block-map') {
+      if (
+        (this.type === 'newline' || this.type == 'map-value-ind') &&
+        parent.type === 'block-map'
+      ) {
         this.pop()
         this.step()
       } else if (
         this.type === 'map-value-ind' &&
         parent.type !== 'flow-collection'
       ) {
+        const prev = getPrevProps(parent)
+        const start = getFirstKeyStartProps(prev)
         const sep = fc.end.splice(1, fc.end.length)
         sep.push(this.sourceToken)
         const map: BlockMap = {
           type: 'block-map',
           offset: fc.offset,
           indent: fc.indent,
-          items: [{ start: [], key: fc, sep }]
+          items: [{ start, key: fc, sep }]
         }
         this.onKeyLine = true
         this.stack[this.stack.length - 1] = map

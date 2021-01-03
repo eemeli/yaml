@@ -358,7 +358,8 @@ export class Lexer {
       this.flowLevel = 0
       return this.parseLineStart()
     }
-    let n = line[0] === ',' ? this.pushCount(1) + this.pushSpaces(true) : 0
+    let n = 0
+    while (line[n] === ',') n += this.pushCount(1) + this.pushSpaces(true)
     n += this.pushIndicators()
     switch (line[n]) {
       case '#':
@@ -428,7 +429,10 @@ export class Lexer {
         end = nl - 1
       }
     }
-    if (end === -1) return this.setNext('quoted-scalar')
+    if (end === -1) {
+      if (!this.atEnd) return this.setNext('quoted-scalar')
+      end = this.buffer.length
+    }
     this.pushToIndex(end + 1, false)
     return this.flowLevel ? 'flow' : 'doc'
   }

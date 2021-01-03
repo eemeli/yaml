@@ -28,7 +28,7 @@ export class StreamDirectives {
    * @param onError - May be called even if the action was successful
    * @returns `true` on success
    */
-  add(line: string, onError: (offset: number, message: string) => void) {
+  add(line: string, onError: (offset: number, message: string, warning?: boolean) => void) {
     const parts = line.trim().split(/[ \t]+/)
     const name = parts.shift()
     switch (name) {
@@ -51,12 +51,12 @@ export class StreamDirectives {
           this.yaml.version = version
           return true
         } else {
-          onError(6, `Unsupported YAML version ${version}`)
+          onError(6, `Unsupported YAML version ${version}`, true)
           return false
         }
       }
       default:
-        onError(0, `Unknown directive ${name}`)
+        onError(0, `Unknown directive ${name}`, true)
         return false
     }
   }
