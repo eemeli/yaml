@@ -2,7 +2,7 @@ import { Lexer } from './lexer.js'
 import { SourceTokenType, prettyToken, tokenType } from './token-type.js'
 
 export interface SourceToken {
-  type: Exclude<SourceTokenType, FlowScalar['type']>
+  type: Exclude<SourceTokenType, DocumentEnd['type'] | FlowScalar['type']>
   indent: number
   source: string
 }
@@ -24,6 +24,13 @@ export interface Document {
   offset: number
   start: SourceToken[]
   value?: Token
+  end?: SourceToken[]
+}
+
+export interface DocumentEnd {
+  type: 'doc-end'
+  offset: number
+  source: string
   end?: SourceToken[]
 }
 
@@ -79,6 +86,7 @@ export type Token =
   | ErrorToken
   | Directive
   | Document
+  | DocumentEnd
   | FlowScalar
   | BlockScalar
   | BlockMap
@@ -251,6 +259,15 @@ export class Parser {
 
   step() {
     const top = this.peek(1)
+    if (this.type === 'doc-end' && top.type !== 'doc-end') {
+      while (this.stack.length > 0) this.pop()
+      this.stack.push({
+        type: 'doc-end',
+        offset: this.offset,
+        source: this.source
+      })
+      return
+    }
     if (!top) return this.stream()
     switch (top.type) {
       case 'document':
@@ -268,6 +285,8 @@ export class Parser {
         return this.blockSequence(top)
       case 'flow-collection':
         return this.flowCollection(top)
+      case 'doc-end':
+        return this.documentEnd(top)
     }
     this.pop() // error
   }
@@ -326,7 +345,6 @@ export class Parser {
       case 'directive-line':
         this.push({ type: 'directive', source: this.source })
         return
-      case 'doc-end':
       case 'space':
       case 'comment':
       case 'newline':
@@ -372,10 +390,6 @@ export class Parser {
       case 'comment':
       case 'newline':
         doc.start.push(this.sourceToken)
-        return
-      case 'doc-end':
-        this.pop()
-        this.push(this.sourceToken)
         return
     }
     const bv = this.startBlockValue(doc)
@@ -697,6 +711,14 @@ export class Parser {
       }
     }
     return null
+  }
+
+  documentEnd(docEnd: DocumentEnd) {
+    if (this.type !== 'doc-mode') {
+      if (docEnd.end) docEnd.end.push(this.sourceToken)
+      else docEnd.end = [this.sourceToken]
+      if (this.type === 'newline') this.pop()
+    }
   }
 
   lineEnd(token: Document | FlowCollection | FlowScalar) {

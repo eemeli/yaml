@@ -4,6 +4,7 @@ import { YAMLParseError, YAMLWarning } from '../errors.js'
 import type { Options } from '../options.js'
 import { Parser } from '../parse/parser.js'
 import { composeDoc } from './compose-doc.js'
+import { resolveEnd } from './resolve-end.js'
 
 export function parseDocs(source: string, options?: Options) {
   const directives = new StreamDirectives()
@@ -45,6 +46,8 @@ export function parseDocs(source: string, options?: Options) {
           atDirectives = false
           break
         }
+        case 'space':
+          break
         case 'comment':
           comment += token.source.substring(1)
           break
@@ -60,9 +63,29 @@ export function parseDocs(source: string, options?: Options) {
           else docs[docs.length - 1].errors.push(error)
           break
         }
-        case 'space':
-        case 'doc-end':
+        case 'doc-end': {
+          const doc = docs[docs.length - 1]
+          if (!doc) {
+            const msg = 'Unexpected doc-end without preceding document'
+            errors.push(new YAMLParseError(token.offset, msg))
+            break
+          }
+          const end = resolveEnd(
+            token.end,
+            token.offset + token.source.length,
+            doc.options.strict,
+            onError
+          )
+          if (end.comment) {
+            if (doc.comment) doc.comment += `\n${end.comment}`
+            else doc.comment = end.comment
+          }
+          if (errors.length > 0) {
+            Array.prototype.push.apply(doc.errors, errors)
+            errors = []
+          }
           break
+        }
         default:
           console.log('###', token)
       }

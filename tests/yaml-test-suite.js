@@ -5,8 +5,9 @@ import * as YAML from '../index.js'
 import { testEvents } from '../dist/test-events.js'
 
 const skip = {
+  B63P: ['errors'], // allow ... after directives
   QLJ7: ['errors'], // allow %TAG directives to persist across documents
-  SF5V: ['errors'] // duplicate %YAML directives is not an error
+  SF5V: ['errors'] // allow duplicate %YAML directives
 }
 
 const testDirs = fs
