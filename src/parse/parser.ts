@@ -588,7 +588,13 @@ export class Parser {
   }
 
   flowCollection(fc: FlowCollection) {
-    if (fc.end.length === 0) {
+    if (this.type === 'flow-error-end') {
+      let top
+      do {
+        this.pop()
+        top = this.peek(1)
+      } while (top && top.type === 'flow-collection')
+    } else if (fc.end.length === 0) {
       switch (this.type) {
         case 'space':
         case 'comment':

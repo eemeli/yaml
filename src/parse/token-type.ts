@@ -1,4 +1,5 @@
 export const DOCUMENT = '\x02' // Start of Text
+export const FLOW_END = '\x18' // Cancel
 export const SCALAR = '\x1f' // Unit Separator
 
 export type SourceTokenType =
@@ -20,6 +21,7 @@ export type SourceTokenType =
   | 'flow-map-end'
   | 'flow-seq-start'
   | 'flow-seq-end'
+  | 'flow-error-end'
   | 'comma'
   | 'single-quoted-scalar'
   | 'double-quoted-scalar'
@@ -27,6 +29,7 @@ export type SourceTokenType =
 
 export function prettyToken(token: string) {
   if (token === DOCUMENT) return '<DOC>'
+  if (token === FLOW_END) return '<FLOW_END>'
   if (token === SCALAR) return '<SCALAR>'
   return JSON.stringify(token)
 }
@@ -35,6 +38,8 @@ export function tokenType(source: string): SourceTokenType | null {
   switch (source) {
     case DOCUMENT: // start of doc-mode
       return 'doc-mode'
+    case FLOW_END: // unexpected end of flow mode
+      return 'flow-error-end'
     case SCALAR: // next token is a scalar value
       return 'scalar'
     case '---':

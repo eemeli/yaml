@@ -66,7 +66,7 @@ plain-scalar(is-flow, min)
   [else] -> plain-scalar(min)
 */
 
-import { DOCUMENT, SCALAR } from './token-type.js'
+import { DOCUMENT, FLOW_END, SCALAR } from './token-type.js'
 
 type State =
   | 'stream'
@@ -345,28 +345,38 @@ export class Lexer {
     do {
       nl = this.pushNewline()
       sp = this.pushSpaces(true)
-      if (nl > 0) indent = sp
+      if (nl > 0) this.indentValue = indent = sp
     } while (nl + sp > 0)
     const line = this.getLine()
     if (line === null) return this.setNext('flow')
     if (
-      indent === 0 &&
-      (line.startsWith('---') || line.startsWith('...')) &&
-      isEmpty(line[3])
+      (indent !== -1 && indent < this.indentNext) ||
+      (indent === 0 &&
+        (line.startsWith('---') || line.startsWith('...')) &&
+        isEmpty(line[3]))
     ) {
-      // error: document marker within flow collection
-      this.flowLevel = 0
-      return this.parseLineStart()
+      // Allowing for the terminal ] or } at the same (rather than greater)
+      // indent level as the initial [ or { is technically invalid, but
+      // failing here would be surprising to users.
+      const atFlowEndMarker =
+        indent === this.indentNext - 1 &&
+        this.flowLevel === 1 &&
+        (line[0] === ']' || line[0] === '}')
+      if (!atFlowEndMarker) {
+        // this is an error
+        this.flowLevel = 0
+        this.push(FLOW_END)
+        return this.parseLineStart()
+      }
     }
     let n = 0
     while (line[n] === ',') n += this.pushCount(1) + this.pushSpaces(true)
     n += this.pushIndicators()
     switch (line[n]) {
+      case undefined:
+        return 'flow'
       case '#':
         this.pushCount(line.length - n)
-      // fallthrough
-      case undefined:
-        this.pushNewline()
         return 'flow'
       case '{':
       case '[':
@@ -549,7 +559,7 @@ export class Lexer {
       case '?': // this is an error outside flow collections
       case '-': // this is an error
         if (isEmpty(this.charAt(1))) {
-          this.indentNext = this.indentValue + 1
+          if (this.flowLevel === 0) this.indentNext = this.indentValue + 1
           return (
             this.pushCount(1) + this.pushSpaces(true) + this.pushIndicators()
           )
