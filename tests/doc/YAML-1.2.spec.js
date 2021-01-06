@@ -473,11 +473,7 @@ application specific tag: !something |
             'The semantics of the tag\nabove may be different for\ndifferent documents.\n'
         }
       ],
-      warnings: [
-        [
-          'The tag !something is unavailable, falling back to tag:yaml.org,2002:str'
-        ]
-      ],
+      warnings: [['Unresolved tag: !something']],
       special: src => {
         const doc = YAML.parseDocument(src, { schema: 'yaml-1.1' })
         const data = doc.contents.items[1].value.value
@@ -514,10 +510,10 @@ application specific tag: !something |
       ],
       warnings: [
         [
-          'The tag tag:clarkevans.com,2002:circle is unavailable, falling back to tag:yaml.org,2002:map',
-          'The tag tag:clarkevans.com,2002:line is unavailable, falling back to tag:yaml.org,2002:map',
-          'The tag tag:clarkevans.com,2002:label is unavailable, falling back to tag:yaml.org,2002:map',
-          'The tag tag:clarkevans.com,2002:shape is unavailable, falling back to tag:yaml.org,2002:seq'
+          'Unresolved tag: tag:clarkevans.com,2002:circle',
+          'Unresolved tag: tag:clarkevans.com,2002:line',
+          'Unresolved tag: tag:clarkevans.com,2002:label',
+          'Unresolved tag: tag:clarkevans.com,2002:shape'
         ]
       ]
     },
@@ -626,11 +622,7 @@ comments:
             'Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.'
         }
       ],
-      warnings: [
-        [
-          'The tag tag:clarkevans.com,2002:invoice is unavailable, falling back to tag:yaml.org,2002:map'
-        ]
-      ]
+      warnings: [['Unresolved tag: tag:clarkevans.com,2002:invoice']]
     },
 
     'Example 2.28. Log File': {
@@ -725,9 +717,7 @@ mapping: { sky: blue, sea: green }`,
       src: `anchored: !local &anchor value
 alias: *anchor`,
       tgt: [{ anchored: 'value', alias: 'value' }],
-      warnings: [
-        ['The tag !local is unavailable, falling back to tag:yaml.org,2002:str']
-      ],
+      warnings: [['Unresolved tag: !local']],
       special: src => {
         const tag = { tag: '!local', resolve: str => `local:${str}` }
         const res = YAML.parse(src, { customTags: [tag] })
@@ -971,7 +961,7 @@ Chomping: |
 # with a warning.
 --- "foo"`,
       tgt: ['foo'],
-      warnings: [['YAML only supports %TAG and %YAML directives, and not %FOO']]
+      warnings: [['Unknown directive %FOO']]
     }
   },
   '6.8.1. “YAML” Directives': {
@@ -981,7 +971,7 @@ Chomping: |
 ---
 "foo"`,
       tgt: ['foo'],
-      warnings: [['Document will be parsed as YAML 1.2 rather than YAML 1.3']],
+      warnings: [['Unsupported YAML version 1.3']],
       special: src => {
         const doc = YAML.parseDocument(src)
         expect(doc.version).toBe('1.3')
@@ -1033,10 +1023,8 @@ bar`,
 !foo "bar"`,
       tgt: ['bar', 'bar'],
       warnings: [
-        ['The tag !foo is unavailable, falling back to tag:yaml.org,2002:str'],
-        [
-          'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str'
-        ]
+        ['Unresolved tag: !foo'],
+        ['Unresolved tag: tag:example.com,2000:app/foo']
       ],
       special: src => {
         const customTags = [
@@ -1059,11 +1047,7 @@ bar`,
 ---
 !!int 1 - 3 # Interval, not integer`,
       tgt: ['1 - 3'],
-      warnings: [
-        [
-          'The tag tag:example.com,2000:app/int is unavailable, falling back to tag:yaml.org,2002:str'
-        ]
-      ],
+      warnings: [['Unresolved tag: tag:example.com,2000:app/int']],
       special: src => {
         const tag = {
           tag: 'tag:example.com,2000:app/int',
@@ -1079,11 +1063,7 @@ bar`,
 ---
 !e!foo "bar"`,
       tgt: ['bar'],
-      warnings: [
-        [
-          'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str'
-        ]
-      ],
+      warnings: [['Unresolved tag: tag:example.com,2000:app/foo']],
       special: src => {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
@@ -1103,14 +1083,7 @@ bar`,
 --- # Color here
 !m!light green`,
       tgt: ['fluorescent', 'green'],
-      warnings: [
-        [
-          'The tag !my-light is unavailable, falling back to tag:yaml.org,2002:str'
-        ],
-        [
-          'The tag !my-light is unavailable, falling back to tag:yaml.org,2002:str'
-        ]
-      ],
+      warnings: [['Unresolved tag: !my-light'], ['Unresolved tag: !my-light']],
       special: src => {
         const tag = { tag: '!my-light', resolve: str => `light:${str}` }
         const docs = YAML.parseAllDocuments(src, { customTags: [tag] })
@@ -1126,11 +1099,7 @@ bar`,
 ---
 - !e!foo "bar"`,
       tgt: [['bar']],
-      warnings: [
-        [
-          'The tag tag:example.com,2000:app/foo is unavailable, falling back to tag:yaml.org,2002:str'
-        ]
-      ],
+      warnings: [['Unresolved tag: tag:example.com,2000:app/foo']],
       special: src => {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
@@ -1153,9 +1122,7 @@ bar`,
       src: `!<tag:yaml.org,2002:str> foo :
   !<!bar> baz`,
       tgt: [{ foo: 'baz' }],
-      warnings: [
-        ['The tag !bar is unavailable, falling back to tag:yaml.org,2002:str']
-      ],
+      warnings: [['Unresolved tag: !bar']],
       special: src => {
         const tag = { tag: '!bar', resolve: str => `bar${str}` }
         const res = YAML.parse(src, { customTags: [tag] })
@@ -1167,10 +1134,8 @@ bar`,
       src: `- !<!> foo
 - !<$:?> bar`,
       tgt: [['foo', 'bar']],
-      errors: [["Verbatim tags aren't resolved, so ! is invalid."]],
-      warnings: [
-        ['The tag $:? is unavailable, falling back to tag:yaml.org,2002:str']
-      ]
+      errors: [["Verbatim tags aren't resolved, so !<!> is invalid."]],
+      warnings: [['Unresolved tag: $:?']]
     },
 
     'Example 6.26. Tag Shorthands': {
@@ -1182,8 +1147,8 @@ bar`,
       tgt: [['foo', 'bar', 'baz']],
       warnings: [
         [
-          'The tag !local is unavailable, falling back to tag:yaml.org,2002:str',
-          'The tag tag:example.com,2000:app/tag! is unavailable, falling back to tag:yaml.org,2002:str'
+          'Unresolved tag: !local',
+          'Unresolved tag: tag:example.com,2000:app/tag!'
         ]
       ],
       special: src => {
@@ -1205,12 +1170,7 @@ bar`,
 - !e! foo
 - !h!bar baz`,
       tgt: [['foo', 'baz']],
-      errors: [
-        [
-          'The !e! tag has no suffix.',
-          'The !h! tag handle is non-default and was not declared.'
-        ]
-      ]
+      errors: [['Could not resolve tag: !h!bar', 'The !e! tag has no suffix.']]
     },
 
     'Example 6.28. Non-Specific Tags': {
@@ -1555,15 +1515,13 @@ foo: bar
 ---
 - |2
 ·text`.replace(/·/g, ' '),
-      tgt: [[' \ntext\n'], ['text text\n'], ['text\n']],
+      tgt: [[' \ntext\n'], ['text\n', 'text'], ['', 'text']],
       errors: [
         [
           'Block scalars with more-indented leading empty lines must use an explicit indentation indicator'
         ],
-        ['Block scalars must not be less indented than their first line'],
-        [
-          'Block scalars must not be less indented than their explicit indentation indicator'
-        ]
+        ['Sequence item without - indicator'],
+        ['Sequence item without - indicator']
       ]
     },
 
@@ -1755,9 +1713,7 @@ folded:
   >1
  value`,
       tgt: [{ literal: 'value\n', folded: 'value\n' }],
-      warnings: [
-        ['The tag !foo is unavailable, falling back to tag:yaml.org,2002:str']
-      ],
+      warnings: [['Unresolved tag: !foo']],
       special: src => {
         const tag = { tag: '!foo', resolve: str => `foo${str}` }
         const res = YAML.parse(src, { customTags: [tag] })
@@ -1896,17 +1852,14 @@ for (const section in spec) {
         const json = documents.map(doc => doc.toJS())
         expect(json).toMatchObject(tgt)
         documents.forEach((doc, i) => {
-          if (!errors || !errors[i]) expect(doc.errors).toHaveLength(0)
-          else
-            errors[i].forEach((err, j) => {
-              expect(doc.errors[j]).toBeInstanceOf(YAMLError)
-              expect(doc.errors[j].message).toBe(err)
-            })
-          if (!warnings || !warnings[i]) expect(doc.warnings).toHaveLength(0)
-          else
-            warnings[i].forEach((err, j) =>
-              expect(doc.warnings[j].message).toBe(err)
-            )
+          expect(doc.errors.map(err => err.message)).toMatchObject(
+            (errors && errors[i]) || []
+          )
+          expect(doc.warnings.map(err => err.message)).toMatchObject(
+            (warnings && warnings[i]) || []
+          )
+          for (const err of doc.errors.concat(doc.warnings))
+            expect(err).toBeInstanceOf(YAMLError)
           if (!jsWarnings) expect(mockWarn).not.toHaveBeenCalled()
           else {
             for (const warning of jsWarnings)

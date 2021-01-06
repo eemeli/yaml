@@ -32,13 +32,14 @@ describe('json schema', () => {
     expect(doc.toJS()).toMatchObject({
       canonical: true,
       answer: false,
-      logical: null,
-      option: null
+      logical: 'True',
+      option: 'TruE'
     })
     expect(doc.errors).toHaveLength(2)
     doc.errors = []
-    doc.contents.items.splice(2, 2)
-    expect(String(doc)).toBe('"canonical": true\n"answer": false\n')
+    expect(String(doc)).toBe(
+      '"canonical": true\n"answer": false\n"logical": "True"\n"option": "TruE"\n'
+    )
   })
 
   test('!!float', () => {
@@ -51,15 +52,14 @@ describe('json schema', () => {
     expect(doc.toJS()).toMatchObject({
       canonical: 685230.15,
       fixed: 685230.15,
-      'negative infinity': null,
-      'not a number': null
+      'negative infinity': '-.inf',
+      'not a number': '.NaN'
     })
     expect(doc.errors).toHaveLength(2)
     doc.errors = []
-    doc.contents.items.splice(2, 2)
     doc.contents.items[1].value.tag = 'tag:yaml.org,2002:float'
     expect(String(doc)).toBe(
-      '"canonical": 685230.15\n"fixed": !!float 685230.15\n'
+      '"canonical": 685230.15\n"fixed": !!float 685230.15\n"negative infinity": "-.inf"\n"not a number": ".NaN"\n'
     )
   })
 
@@ -73,15 +73,14 @@ describe('json schema', () => {
     expect(doc.toJS()).toMatchObject({
       canonical: 685230,
       decimal: -685230,
-      octal: null,
-      hexadecimal: null
+      octal: '0o2472256',
+      hexadecimal: '0x0A74AE'
     })
     expect(doc.errors).toHaveLength(2)
     doc.errors = []
-    doc.contents.items.splice(2, 2)
     doc.set('bigint', 42n)
     expect(String(doc)).toBe(
-      '"canonical": 685230\n"decimal": -685230\n"bigint": 42\n'
+      '"canonical": 685230\n"decimal": -685230\n"octal": "0o2472256"\n"hexadecimal": "0x0A74AE"\n"bigint": 42\n'
     )
   })
 
@@ -93,18 +92,17 @@ describe('json schema', () => {
 
     const doc = YAML.parseDocument(src, { schema: 'json' })
     expect(doc.toJS()).toMatchObject({
-      empty: null,
-      canonical: null,
+      empty: '',
+      canonical: '~',
       english: null,
-      '': 'null key'
+      '~': 'null key'
     })
-    expect(doc.errors).toHaveLength(2)
+    expect(doc.errors).toHaveLength(3)
     doc.errors = []
-    expect(String(doc)).toBe(`"empty": null
-"canonical": null
+    expect(String(doc)).toBe(`"empty": ""
+"canonical": "~"
 "english": null
-? null
-: "null key"\n`)
+"~": "null key"\n`)
   })
 })
 
@@ -508,7 +506,7 @@ date (00:00:00Z): 2002-12-14\n`)
       const doc = YAML.parseDocument(src, { version: '1.1' })
       expect(doc.errors).toMatchObject([
         {
-          name: 'YAMLSemanticError',
+          name: 'YAMLParseError',
           message: 'Ordered maps must not include duplicate keys: b'
         }
       ])
@@ -559,7 +557,7 @@ date (00:00:00Z): 2002-12-14\n`)
       const doc = YAML.parseDocument(src, { version: '1.1' })
       expect(doc.errors).toMatchObject([
         {
-          name: 'YAMLSemanticError',
+          name: 'YAMLParseError',
           message: 'Set items must all have null values'
         }
       ])
@@ -698,9 +696,16 @@ describe('schema changes', () => {
       version: '1.1'
     })
     expect(doc.options.version).toBe('1.1')
+    expect(doc.directives.yaml).toMatchObject({
+      version: '1.1',
+      explicit: false
+    })
     doc.setSchema('1.2')
-    expect(doc.version).toBeNull()
-    expect(doc.options.version).toBe('1.2')
+    expect(doc.directives.yaml).toMatchObject({
+      version: '1.2',
+      explicit: false
+    })
+    expect(doc.options.version).toBe('1.1')
     expect(doc.options.schema).toBeUndefined()
     expect(() => String(doc)).toThrow(/Tag not resolved for Date value/)
   })

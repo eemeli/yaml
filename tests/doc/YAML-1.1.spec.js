@@ -32,9 +32,7 @@ test('Use preceding directives if none defined', () => {
   const docs = YAML.parseAllDocuments(src, { prettyErrors: false })
   expect(docs).toHaveLength(5)
   expect(docs.map(doc => doc.errors)).toMatchObject([[], [], [], [], []])
-  const warn = tag => ({
-    message: `The tag ${tag} is unavailable, falling back to tag:yaml.org,2002:str`
-  })
+  const warn = tag => ({ message: `Unresolved tag: ${tag}` })
   expect(docs.map(doc => doc.warnings)).toMatchObject([
     [warn('!bar')],
     [warn('!foobar')],
