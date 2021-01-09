@@ -8,7 +8,7 @@ export default {
     'src/errors.js',
     'src/options.js'
   ],
-  external: [resolve('src/doc/stream-directives.js')],
+  external: [resolve('src/doc/directives.js')],
   output: { dir: 'lib', format: 'cjs', esModule: false, preserveModules: true },
   plugins: [babel()]
 }

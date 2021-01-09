@@ -6,7 +6,6 @@ import { testEvents } from '../dist/test-events.js'
 
 const skip = {
   B63P: ['errors'], // allow ... after directives
-  QLJ7: ['errors'], // allow %TAG directives to persist across documents
   SF5V: ['errors'] // allow duplicate %YAML directives
 }
 

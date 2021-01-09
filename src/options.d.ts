@@ -91,7 +91,7 @@ export interface Options extends Schema.Options {
    *
    * Default: `"1.2"`
    */
-  version?: '1.0' | '1.1' | '1.2'
+  version?: '1.1' | '1.2'
 }
 
 /**

@@ -13,14 +13,45 @@ const escapeChars: Record<string, string> = {
 const escapeTagName = (tn: string) =>
   tn.replace(/[!,[\]{}]/g, ch => escapeChars[ch])
 
-export class StreamDirectives {
-  tags: Record<string, string> = { '!!': 'tag:yaml.org,2002:' }
-  yaml: { version: '1.1' | '1.2' | undefined } = { version: undefined }
+export class Directives {
+  static defaultYaml: Directives['yaml'] = { explicit: false, version: '1.2' }
+  static defaultTags: Directives['tags'] = { '!!': 'tag:yaml.org,2002:' }
 
-  static from(src: StreamDirectives) {
-    const res = new StreamDirectives()
-    Object.assign(res.tags, src.tags)
-    Object.assign(res.yaml, src.yaml)
+  yaml: { version: '1.1' | '1.2'; explicit?: boolean }
+  tags: Record<string, string>
+
+  /**
+   * Used when parsing YAML 1.1, where:
+   * > If the document specifies no directives, it is parsed using the same
+   * > settings as the previous document. If the document does specify any
+   * > directives, all directives of previous documents, if any, are ignored.
+   */
+  private atNextDocument = false
+
+  constructor(yaml?: Directives['yaml'], tags?: Directives['tags']) {
+    this.yaml = Object.assign({}, Directives.defaultYaml, yaml)
+    this.tags = Object.assign({}, Directives.defaultTags, tags)
+  }
+
+  /**
+   * During parsing, get a Directives instance for the current document and
+   * update the stream state according to the current version's spec.
+   */
+  atDocument() {
+    const res = new Directives(this.yaml, this.tags)
+    switch (this.yaml.version) {
+      case '1.1':
+        this.atNextDocument = true
+        break
+      case '1.2':
+        this.atNextDocument = false
+        this.yaml = {
+          explicit: Directives.defaultYaml.explicit,
+          version: '1.2'
+        }
+        this.tags = Object.assign({}, Directives.defaultTags)
+        break
+    }
     return res
   }
 
@@ -28,7 +59,15 @@ export class StreamDirectives {
    * @param onError - May be called even if the action was successful
    * @returns `true` on success
    */
-  add(line: string, onError: (offset: number, message: string, warning?: boolean) => void) {
+  add(
+    line: string,
+    onError: (offset: number, message: string, warning?: boolean) => void
+  ) {
+    if (this.atNextDocument) {
+      this.yaml = { explicit: Directives.defaultYaml.explicit, version: '1.1' }
+      this.tags = Object.assign({}, Directives.defaultTags)
+      this.atNextDocument = false
+    }
     const parts = line.trim().split(/[ \t]+/)
     const name = parts.shift()
     switch (name) {
@@ -42,6 +81,7 @@ export class StreamDirectives {
         return true
       }
       case '%YAML': {
+        this.yaml.explicit = true
         if (parts.length < 1) {
           onError(0, '%YAML directive should contain exactly one part')
           return false
@@ -108,8 +148,9 @@ export class StreamDirectives {
   }
 
   toString(doc?: Document) {
-    const lines =
-      !doc || doc.version ? [`%YAML ${this.yaml.version || '1.2'}`] : []
+    const lines = this.yaml.explicit
+      ? [`%YAML ${this.yaml.version || '1.2'}`]
+      : []
     const tagNames = doc && listTagNames(doc.contents)
     for (const [handle, prefix] of Object.entries(this.tags)) {
       if (handle === '!!' && prefix === 'tag:yaml.org,2002:') continue

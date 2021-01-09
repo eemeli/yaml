@@ -1,13 +1,15 @@
+import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
-import { StreamDirectives } from '../doc/stream-directives.js'
 import { YAMLParseError, YAMLWarning } from '../errors.js'
-import type { Options } from '../options.js'
+import { defaultOptions, Options } from '../options.js'
 import { Parser } from '../parse/parser.js'
 import { composeDoc } from './compose-doc.js'
 import { resolveEnd } from './resolve-end.js'
 
 export function parseDocs(source: string, options?: Options) {
-  const directives = new StreamDirectives()
+  const directives = new Directives({
+    version: options?.version || defaultOptions.version || '1.2'
+  })
   const docs: Document.Parsed[] = []
   const lines: number[] = []
 

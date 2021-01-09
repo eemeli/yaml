@@ -18,9 +18,9 @@ import { Anchors } from './Anchors.js'
 import { Schema } from './Schema.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode } from './createNode.js'
+import { Directives } from './directives.js'
 import { parseContents } from './parseContents.js'
 import { parseDirectives } from './parseDirectives.js'
-import { StreamDirectives } from './stream-directives.js'
 
 function assertCollection(contents) {
   if (contents instanceof Collection) return true
@@ -45,12 +45,11 @@ export class Document {
     this.anchors = new Anchors(this.options.anchorPrefix)
     this.commentBefore = null
     this.comment = null
-    this.directives = new StreamDirectives()
+    this.directives = new Directives({ version: this.options.version })
     this.directivesEndMarker = null
     this.errors = []
     this.schema = null
     this.tagPrefixes = []
-    this.version = null
     this.warnings = []
 
     if (value === undefined) {
@@ -140,7 +139,7 @@ export class Document {
 
   getDefaults() {
     return (
-      Document.defaults[this.version] ||
+      Document.defaults[this.directives.yaml.version] ||
       Document.defaults[this.options.version] ||
       {}
     )
@@ -197,9 +196,8 @@ export class Document {
   setSchema(id, customTags) {
     if (!id && !customTags && this.schema) return
     if (typeof id === 'number') id = id.toFixed(1)
-    if (id === '1.0' || id === '1.1' || id === '1.2') {
-      if (this.version) this.version = id
-      else this.options.version = id
+    if (id === '1.1' || id === '1.2') {
+      this.directives.yaml.version = id
       delete this.options.schema
     } else if (id && typeof id === 'string') {
       this.options.schema = id

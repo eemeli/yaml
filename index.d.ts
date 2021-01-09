@@ -96,7 +96,7 @@ export interface Options extends Schema.Options {
    *
    * Default: `"1.2"`
    */
-  version?: '1.0' | '1.1' | '1.2'
+  version?: '1.1' | '1.2'
 }
 
 /**
@@ -326,6 +326,7 @@ export class Document extends Collection {
 export namespace Document {
   interface Parsed extends Document {
     contents: Node | null
+    range: [number, number]
     /** The schema used with the document. */
     schema: Schema
   }

@@ -20,7 +20,7 @@ export function parseDocument(src: string, options?: Options) {
   ) {
     const errMsg =
       'Source contains multiple documents; please use YAML.parseAllDocuments()'
-    doc.errors.unshift(new YAMLSemanticError(-1, errMsg))
+    doc.errors.push(new YAMLSemanticError(docs[1].range[0], errMsg))
   }
   return doc
 }

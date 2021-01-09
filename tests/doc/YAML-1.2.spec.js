@@ -756,7 +756,10 @@ double: "text"`,
       tgt: ['text'],
       special: src => {
         const doc = YAML.parseDocument(src)
-        expect(doc.version).toBe('1.2')
+        expect(doc.directives.yaml).toMatchObject({
+          version: '1.2',
+          explicit: true
+        })
       }
     },
 
@@ -974,7 +977,10 @@ Chomping: |
       warnings: [['Unsupported YAML version 1.3']],
       special: src => {
         const doc = YAML.parseDocument(src)
-        expect(doc.version).toBe('1.3')
+        expect(doc.directives.yaml).toMatchObject({
+          version: '1.2',
+          explicit: true
+        })
       }
     },
 
@@ -986,7 +992,10 @@ foo`,
       tgt: ['foo'],
       special: src => {
         const doc = YAML.parseDocument(src)
-        expect(doc.version).toBe('1.1')
+        expect(doc.directives.yaml).toMatchObject({
+          version: '1.1',
+          explicit: true
+        })
       }
     }
   },
@@ -1760,7 +1769,11 @@ Document`,
 Document
 ... # Suffix`,
       tgt: ['Document'],
-      special: src => expect(YAML.parseDocument(src).version).toBe('1.2')
+      special: src =>
+        expect(YAML.parseDocument(src).directives.yaml).toMatchObject({
+          version: '1.2',
+          explicit: true
+        })
     },
 
     'Example 9.3. Bare Documents': {
@@ -1795,10 +1808,14 @@ document
 # Empty
 ...`,
       tgt: ['%!PS-Adobe-2.0\n', null],
-      special: src =>
-        YAML.parseAllDocuments(src).forEach(doc =>
-          expect(doc.version).toBe('1.2')
-        )
+      special(src) {
+        expect(
+          YAML.parseAllDocuments(src).map(doc => doc.directives.yaml)
+        ).toMatchObject([
+          { version: '1.2', explicit: true },
+          { version: '1.2', explicit: true }
+        ])
+      }
     }
   },
 
@@ -1812,9 +1829,14 @@ document
 ---
 matches %: 20`,
       tgt: ['Document', null, { 'matches %': 20 }],
-      special: src => {
-        const versions = YAML.parseAllDocuments(src).map(doc => doc.version)
-        expect(versions).toMatchObject([null, null, '1.2'])
+      special(src) {
+        expect(
+          YAML.parseAllDocuments(src).map(doc => doc.directives.yaml)
+        ).toMatchObject([
+          { version: '1.2', explicit: false },
+          { version: '1.2', explicit: false },
+          { version: '1.2', explicit: true }
+        ])
       }
     }
   }
