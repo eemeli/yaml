@@ -1467,7 +1467,7 @@ foo: bar
       errors: [
         [
           'Implicit keys of flow sequence pairs need to be on a single line',
-          'The "foo xxxx...xxxx bar" key is too long'
+          'The : indicator must be at most 1024 chars after the start of an implicit flow sequence key'
         ]
       ]
     }

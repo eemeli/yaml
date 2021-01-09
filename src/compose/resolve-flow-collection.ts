@@ -5,7 +5,7 @@ import type { FlowCollection, SourceToken, Token } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
-import { validateImplicitKey } from './validate-implicit-key.js'
+import { containsNewline } from './util-contains-newline.js'
 
 export function resolveFlowCollection(
   doc: Document.Parsed,
@@ -141,8 +141,13 @@ export function resolveFlowCollection(
               'Implicit keys of flow sequence pairs need to be on a single line'
             if (nlAfterValueInSeq) onError(offset, slMsg)
             else if (seqKeyToken) {
-              const err = validateImplicitKey(seqKeyToken)
-              if (err === 'single-line') onError(offset, slMsg)
+              if (containsNewline(seqKeyToken)) onError(offset, slMsg)
+              const start = 'offset' in seqKeyToken && seqKeyToken.offset
+              if (typeof start === 'number' && start < offset - 1024)
+                onError(
+                  offset,
+                  'The : indicator must be at most 1024 chars after the start of an implicit flow sequence key'
+                )
               seqKeyToken = null
             }
           }

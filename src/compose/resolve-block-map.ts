@@ -5,7 +5,7 @@ import type { BlockMap } from '../parse/parser.js'
 import { composeNode } from './compose-node.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 import { resolveProps } from './resolve-props.js'
-import { validateImplicitKey } from './validate-implicit-key.js'
+import { containsNewline } from './util-contains-newline.js'
 
 const startColMsg = 'All mapping items must start at the same column'
 
@@ -41,14 +41,7 @@ export function resolveBlockMap(
         else if ('indent' in key && key.indent !== indent)
           onError(offset, startColMsg)
       }
-      if (keyProps.anchor || keyProps.tagName || sep) {
-        const err = validateImplicitKey(key)
-        if (err === 'single-line')
-          onError(
-            offset + keyProps.length,
-            'Implicit keys need to be on a single line'
-          )
-      } else {
+      if (!keyProps.anchor && !keyProps.tagName && !sep) {
         // TODO: assert being at last item?
         if (keyProps.comment) {
           if (map.comment) map.comment += '\n' + keyProps.comment
@@ -58,6 +51,8 @@ export function resolveBlockMap(
       }
     } else if (keyProps.found !== indent) onError(offset, startColMsg)
     offset += keyProps.length
+    if (implicitKey && containsNewline(key))
+      onError(offset, 'Implicit keys need to be on a single line')
 
     // key value
     const keyStart = offset
@@ -76,8 +71,15 @@ export function resolveBlockMap(
     offset += valueProps.length
 
     if (valueProps.found !== -1) {
-      if (implicitKey && value?.type === 'block-map' && !valueProps.hasNewline)
-        onError(offset, 'Nested mappings are not allowed in compact mappings')
+      if (implicitKey) {
+        if (value?.type === 'block-map' && !valueProps.hasNewline)
+          onError(offset, 'Nested mappings are not allowed in compact mappings')
+        if (doc.options.strict && keyProps.start < valueProps.found - 1024)
+          onError(
+            offset,
+            'The : indicator must be at most 1024 chars after the start of an implicit block mapping key'
+          )
+      }
       // value value
       const valueNode = composeNode(doc, value || offset, valueProps, onError)
       offset = valueNode.range[1]

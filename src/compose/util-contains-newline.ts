@@ -1,6 +1,7 @@
 import type { Token } from '../parse/parser.js'
 
-function containsNewline(key: Token) {
+export function containsNewline(key: Token | null | undefined) {
+  if (!key) return null
   switch (key.type) {
     case 'alias':
     case 'scalar':
@@ -25,12 +26,4 @@ function containsNewline(key: Token) {
     default:
       return true
   }
-}
-
-export function validateImplicitKey(key: Token | null | undefined) {
-  if (key) {
-    if (containsNewline(key)) return 'single-line'
-    // TODO: check 1024 chars
-  }
-  return null
 }

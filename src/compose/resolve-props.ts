@@ -31,6 +31,7 @@ export function resolveProps(
   let anchor = ''
   let tagName = ''
   let found = -1
+  let start: number | null = null
   for (const token of tokens) {
     switch (token.type) {
       case 'space':
@@ -65,6 +66,7 @@ export function resolveProps(
         if (anchor)
           onError(offset + length, 'A node can have at most one anchor')
         anchor = token.source.substring(1)
+        if (start === null) start = offset + length
         atNewline = false
         hasSpace = false
         break
@@ -74,6 +76,7 @@ export function resolveProps(
           onError(offset, msg)
         )
         if (tn) tagName = tn
+        if (start === null) start = offset + length
         atNewline = false
         hasSpace = false
         break
@@ -91,6 +94,14 @@ export function resolveProps(
     }
     if (token.source) length += token.source.length
   }
-  if (!comment && isSpaceBefore(sep)) spaceBefore = true
-  return { found, spaceBefore, comment, hasNewline, anchor, tagName, length }
+  return {
+    found,
+    spaceBefore: spaceBefore || (!comment && isSpaceBefore(sep)),
+    comment,
+    hasNewline,
+    anchor,
+    tagName,
+    length,
+    start: start ?? offset + length
+  }
 }
