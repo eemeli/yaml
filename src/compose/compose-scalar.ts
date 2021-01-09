@@ -18,10 +18,9 @@ export function composeScalar(
       ? resolveBlockScalar(token, doc.options.strict, onError)
       : resolveFlowScalar(token, doc.options.strict, onError)
 
-  const tag =
-    findScalarTagByName(doc.schema, value, tagName, onError) ||
-    findScalarTagByTest(doc.schema, value, token.type === 'scalar') ||
-    findScalarTagByName(doc.schema, value, '!', onError)
+  const tag = tagName
+    ? findScalarTagByName(doc.schema, value, tagName, onError)
+    : findScalarTagByTest(doc.schema, value, token.type === 'scalar')
 
   let scalar: Scalar
   try {
@@ -41,14 +40,16 @@ export function composeScalar(
   return scalar as Scalar.Parsed
 }
 
+const defaultScalarTag = (schema: Schema) =>
+  schema.tags.find(tag => tag.tag === 'tag:yaml.org,2002:str')
+
 function findScalarTagByName(
   schema: Schema,
   value: string,
-  tagName: string | null,
+  tagName: string,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
-  if (!tagName) return null
-  if (tagName === '!') tagName = 'tag:yaml.org,2002:str' // non-specific tag
+  if (tagName === '!') return defaultScalarTag(schema) // non-specific tag
   const matchWithTest: Schema.Tag[] = []
   for (const tag of schema.tags) {
     if (tag.tag === tagName) {
@@ -65,7 +66,7 @@ function findScalarTagByName(
     return kt
   }
   onError(0, `Unresolved tag: ${tagName}`, tagName !== 'tag:yaml.org,2002:str')
-  return null
+  return defaultScalarTag(schema)
 }
 
 function findScalarTagByTest(schema: Schema, value: string, apply: boolean) {
@@ -74,5 +75,5 @@ function findScalarTagByTest(schema: Schema, value: string, apply: boolean) {
       if (tag.default && tag.test?.test(value)) return tag
     }
   }
-  return null
+  return defaultScalarTag(schema)
 }

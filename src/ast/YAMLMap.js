@@ -80,6 +80,8 @@ export class YAMLMap extends Collection {
           `Map items must all be pairs; found ${JSON.stringify(item)} instead`
         )
     }
+    if (!ctx.allNullValues && this.hasAllNullValues(false))
+      ctx = Object.assign({}, ctx, { allNullValues: true })
     return super.toString(
       ctx,
       {

@@ -140,13 +140,14 @@ export class Collection extends Node {
    */
   set(key: any, value: any): void
   setIn(path: Iterable<any>, value: any): void
+
+  hasAllNullValues(allowScalar?: boolean): boolean
 }
 
 export class YAMLMap extends Collection {
   static readonly tagName: 'tag:yaml.org,2002:map'
   type?: Type.FLOW_MAP | Type.MAP
   items: Array<Pair>
-  hasAllNullValues(): boolean
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
   toString(
     ctx?: Schema.StringifyContext,
@@ -168,7 +169,6 @@ export class YAMLSeq extends Collection {
   get(key: number | string | Scalar, keepScalar?: boolean): any
   has(key: number | string | Scalar): boolean
   set(key: number | string | Scalar, value: any): void
-  hasAllNullValues(): boolean
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any[]
   toString(
     ctx?: Schema.StringifyContext,

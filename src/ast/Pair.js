@@ -121,6 +121,7 @@ export class Pair extends Node {
           : typeof key === 'object'))
     const { allNullValues, doc, indent, indentStep, stringify } = ctx
     ctx = Object.assign({}, ctx, {
+      allNullValues: false,
       implicitKey: !explicitKey && (simpleKeys || !allNullValues),
       indent: indent + indentStep
     })
@@ -139,7 +140,10 @@ export class Pair extends Node {
         )
       explicitKey = true
     }
-    if (allNullValues && !simpleKeys) {
+    if (
+      (allNullValues || (value == null && (explicitKey || ctx.inFlow))) &&
+      !simpleKeys
+    ) {
       if (this.comment) {
         str = addComment(str, ctx.indent, this.comment)
         if (onComment) onComment()

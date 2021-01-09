@@ -88,7 +88,7 @@ export const yaml11 = failsafe.concat(
       test: /^(?:~|[Nn]ull|NULL)?$/,
       resolve: str => {
         const node = new Scalar(null)
-        node.sourceStr = str
+        if (str) node.sourceStr = str
         return node
       },
       options: nullOptions,

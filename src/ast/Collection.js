@@ -88,13 +88,14 @@ export class Collection extends Node {
         : undefined
   }
 
-  hasAllNullValues() {
+  hasAllNullValues(allowScalar) {
     return this.items.every(node => {
       if (!node || node.type !== 'PAIR') return false
       const n = node.value
       return (
         n == null ||
-        (n instanceof Scalar &&
+        (allowScalar &&
+          n instanceof Scalar &&
           n.value == null &&
           !n.commentBefore &&
           !n.comment &&
@@ -129,23 +130,12 @@ export class Collection extends Node {
     return null
   }
 
-  toString(
-    ctx,
-    { blockItem, flowChars, isMap, itemIndent },
-    onComment,
-    onChompKeep
-  ) {
+  toString(ctx, { blockItem, flowChars, itemIndent }, onComment, onChompKeep) {
     const { indent, indentStep, stringify } = ctx
     const inFlow =
       this.type === Type.FLOW_MAP || this.type === Type.FLOW_SEQ || ctx.inFlow
     if (inFlow) itemIndent += indentStep
-    const allNullValues = isMap && this.hasAllNullValues()
-    ctx = Object.assign({}, ctx, {
-      allNullValues,
-      indent: itemIndent,
-      inFlow,
-      type: null
-    })
+    ctx = Object.assign({}, ctx, { indent: itemIndent, inFlow, type: null })
     let chompKeep = false
     let hasItemWithNewLine = false
     const nodes = this.items.reduce((nodes, item, i) => {
