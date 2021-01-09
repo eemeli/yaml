@@ -1,13 +1,6 @@
 import type { Document } from '../doc/Document.js'
 import { SourceToken } from '../parse/parser.js'
 
-function isSpaceBefore(sep: string) {
-  if (!sep) return false
-  const first = sep.indexOf('\n')
-  if (first === -1) return false
-  return sep.includes('\n', first + 1)
-}
-
 export function resolveProps(
   doc: Document.Parsed,
   tokens: SourceToken[],
@@ -48,15 +41,14 @@ export function resolveProps(
             'Comments must be separated from other tokens by white space characters'
           )
         const cb = token.source.substring(1)
-        if (!hasComment) {
-          if (isSpaceBefore(sep)) spaceBefore = true
-          comment = cb
-        } else comment += sep + cb
+        if (!hasComment) comment = cb
+        else comment += sep + cb
         hasComment = true
         sep = ''
         break
       }
       case 'newline':
+        if (atNewline && !hasComment) spaceBefore = true
         atNewline = true
         hasNewline = true
         hasSpace = true
@@ -96,7 +88,7 @@ export function resolveProps(
   }
   return {
     found,
-    spaceBefore: spaceBefore || (!comment && isSpaceBefore(sep)),
+    spaceBefore,
     comment,
     hasNewline,
     anchor,

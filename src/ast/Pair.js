@@ -69,6 +69,20 @@ export class Pair extends Node {
     }
   }
 
+  get spaceBefore() {
+    return this.key instanceof Node ? this.key.spaceBefore : undefined
+  }
+
+  set spaceBefore(sb) {
+    if (this.key == null) this.key = new Scalar(null)
+    if (this.key instanceof Node) this.key.spaceBefore = sb
+    else {
+      const msg =
+        'Pair.spaceBefore is an alias for Pair.key.spaceBefore. To set it, the key must be a Node.'
+      throw new Error(msg)
+    }
+  }
+
   addToJSMap(ctx, map) {
     const key = toJS(this.key, '', ctx)
     if (map instanceof Map) {
@@ -113,7 +127,7 @@ export class Pair extends Node {
     let explicitKey =
       !simpleKeys &&
       (!key ||
-        keyComment ||
+        (keyComment && value == null) ||
         (key instanceof Node
           ? key instanceof Collection ||
             key.type === Type.BLOCK_FOLDED ||
@@ -132,30 +146,37 @@ export class Pair extends Node {
       () => (keyComment = null),
       () => (chompKeep = true)
     )
-    str = addComment(str, ctx.indent, keyComment)
-    if (!explicitKey && str.length > 1024) {
+    if (!explicitKey && !ctx.inFlow && str.length > 1024) {
       if (simpleKeys)
         throw new Error(
           'With simple keys, single line scalar must not span more than 1024 characters'
         )
       explicitKey = true
     }
+
     if (
-      (allNullValues || (value == null && (explicitKey || ctx.inFlow))) &&
-      !simpleKeys
+      (allNullValues && (!simpleKeys || ctx.inFlow)) ||
+      (value == null && (explicitKey || ctx.inFlow))
     ) {
+      str = addComment(str, ctx.indent, keyComment)
       if (this.comment) {
+        if (keyComment) str += '\n'
         str = addComment(str, ctx.indent, this.comment)
         if (onComment) onComment()
       } else if (chompKeep && !keyComment && onChompKeep) onChompKeep()
       return ctx.inFlow && !explicitKey ? str : `? ${str}`
     }
-    str = explicitKey ? `? ${str}\n${indent}:` : `${str}:`
+
+    str = explicitKey
+      ? `? ${addComment(str, ctx.indent, keyComment)}\n${indent}:`
+      : addComment(`${str}:`, ctx.indent, keyComment)
     if (this.comment) {
+      if (keyComment && !explicitKey) str += '\n'
       // expected (but not strictly required) to be a single-line comment
       str = addComment(str, ctx.indent, this.comment)
       if (onComment) onComment()
     }
+
     let vcb = ''
     let valueComment = null
     if (value instanceof Node) {
@@ -169,7 +190,7 @@ export class Pair extends Node {
       value = doc.createNode(value)
     }
     ctx.implicitKey = false
-    if (!explicitKey && !this.comment && value instanceof Scalar)
+    if (!explicitKey && !keyComment && !this.comment && value instanceof Scalar)
       ctx.indentAtStart = str.length + 1
     chompKeep = false
     if (
@@ -192,7 +213,7 @@ export class Pair extends Node {
       () => (chompKeep = true)
     )
     let ws = ' '
-    if (vcb || this.comment) {
+    if (vcb || keyComment || this.comment) {
       ws = `${vcb}\n${ctx.indent}`
     } else if (!explicitKey && value instanceof Collection) {
       const flow = valueStr[0] === '[' || valueStr[0] === '{'

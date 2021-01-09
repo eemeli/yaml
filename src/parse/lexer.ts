@@ -501,27 +501,37 @@ export class Lexer {
 
   parsePlainScalar() {
     const inFlow = this.flowLevel > 0
+    let end = this.pos - 1
     let i = this.pos - 1
     let ch: string
     while ((ch = this.buffer[++i])) {
       if (ch === ':') {
         const next = this.buffer[i + 1]
         if (isEmpty(next) || (inFlow && next === ',')) break
+        end = i
       } else if (isEmpty(ch)) {
         const next = this.buffer[i + 1]
         if (next === '#' || (inFlow && invalidFlowScalarChars.includes(next)))
           break
-        if (ch === '\n' || (ch === '\r' && next === '\n')) {
-          const ls = i + (ch === '\n' ? 1 : 2)
-          const cs = this.continueScalar(ls)
+        if (ch === '\r') {
+          if (next === '\n') {
+            i += 1
+            ch = '\n'
+          } else end = i
+        }
+        if (ch === '\n') {
+          const cs = this.continueScalar(i + 1)
           if (cs === -1) break
           i = Math.max(i, cs - 2) // to advance, but still account for ' #'
         }
-      } else if (inFlow && invalidFlowScalarChars.includes(ch)) break
+      } else {
+        if (inFlow && invalidFlowScalarChars.includes(ch)) break
+        end = i
+      }
     }
     if (!ch && !this.atEnd) return this.setNext('plain-scalar')
     this.push(SCALAR)
-    this.pushToIndex(i, true)
+    this.pushToIndex(end + 1, true)
     return inFlow ? 'flow' : 'doc'
   }
 

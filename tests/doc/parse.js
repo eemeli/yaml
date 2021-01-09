@@ -465,7 +465,7 @@ describe('maps with no values', () => {
   test('block map', () => {
     const src = `a: null\n? b #c`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(`a: null\nb: #c\n`)
+    expect(String(doc)).toBe(`a: null\n? b #c\n`)
     doc.set('b', 'x')
     expect(String(doc)).toBe(`a: null\nb: #c\n  x\n`)
   })

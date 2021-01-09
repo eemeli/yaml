@@ -98,6 +98,20 @@ function includesToken(list: SourceToken[], type: SourceToken['type']) {
   return false
 }
 
+function includesNonEmpty(list: SourceToken[]) {
+  for (let i = 0; i < list.length; ++i) {
+    switch (list[i].type) {
+      case 'space':
+      case 'comment':
+      case 'newline':
+        break
+      default:
+        return true
+    }
+  }
+  return false
+}
+
 function isFlowToken(
   token: Token | null
 ): token is FlowScalar | FlowCollection {
@@ -320,8 +334,9 @@ export class Parser {
           if (it.value) {
             top.items.push({ start: [], key: token, sep: [] })
             this.onKeyLine = true
-          } else if (it.sep) it.value = token
-          else {
+          } else if (it.sep) {
+            it.value = token
+          } else {
             Object.assign(it, { key: token, sep: [] })
             this.onKeyLine = true
           }
@@ -378,11 +393,7 @@ export class Parser {
     if (doc.value) return this.lineEnd(doc)
     switch (this.type) {
       case 'doc-start': {
-        const hasContent =
-          includesToken(doc.start, 'doc-start') ||
-          includesToken(doc.start, 'anchor') ||
-          includesToken(doc.start, 'tag')
-        if (hasContent) {
+        if (includesNonEmpty(doc.start)) {
           this.pop()
           this.step()
         } else doc.start.push(this.sourceToken)
@@ -473,7 +484,10 @@ export class Parser {
         return
     }
     if (this.indent >= map.indent) {
-      const atNextItem = !this.onKeyLine && this.indent === map.indent
+      const atNextItem =
+        !this.onKeyLine &&
+        this.indent === map.indent &&
+        (it.sep || includesNonEmpty(it.start))
       switch (this.type) {
         case 'anchor':
         case 'tag':
@@ -629,8 +643,10 @@ export class Parser {
     } else {
       const parent = this.peek(2)
       if (
-        (this.type === 'newline' || this.type == 'map-value-ind') &&
-        parent.type === 'block-map'
+        parent.type === 'block-map' &&
+        (this.type == 'map-value-ind' ||
+          (this.type === 'newline' &&
+            !parent.items[parent.items.length - 1].sep))
       ) {
         this.pop()
         this.step()

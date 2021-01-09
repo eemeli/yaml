@@ -30,6 +30,7 @@ export function resolveFlowCollection(
   let tagName = ''
 
   let offset = fc.offset + 1
+  let atLineStart = false
   let atExplicitKey = false
   let atValueEnd = false
   let nlAfterValueInSeq = false
@@ -80,14 +81,14 @@ export function resolveFlowCollection(
             'Comments must be separated from other tokens by white space characters'
           )
         const cb = token.source.substring(1)
-        if (!hasComment) {
-          if (newlines) spaceBefore = true
-          comment = cb
-        } else comment += newlines + cb
+        if (!hasComment) comment = cb
+        else comment += newlines + cb
+        atLineStart = false
         hasComment = true
         newlines = ''
         break
       case 'newline':
+        if (atLineStart && !hasComment) spaceBefore = true
         if (atValueEnd) {
           if (hasComment) {
             let node = coll.items[coll.items.length - 1]
@@ -102,11 +103,13 @@ export function resolveFlowCollection(
           newlines += token.source
           if (!isMap && !key && value) nlAfterValueInSeq = true
         }
+        atLineStart = true
         hasSpace = true
         break
       case 'anchor':
         if (anchor) onError(offset, 'A node can have at most one anchor')
         anchor = token.source.substring(1)
+        atLineStart = false
         atValueEnd = false
         hasSpace = false
         break
@@ -114,6 +117,7 @@ export function resolveFlowCollection(
         if (tagName) onError(offset, 'A node can have at most one tag')
         const tn = doc.directives.tagName(token.source, m => onError(offset, m))
         if (tn) tagName = tn
+        atLineStart = false
         atValueEnd = false
         hasSpace = false
         break
@@ -122,6 +126,7 @@ export function resolveFlowCollection(
         if (anchor || tagName)
           onError(offset, 'Anchors and tags must be after the ? indicator')
         atExplicitKey = true
+        atLineStart = false
         atValueEnd = false
         hasSpace = false
         break
@@ -183,6 +188,7 @@ export function resolveFlowCollection(
         if (!isMap && !key && !atExplicitKey) seqKeyToken = token
         value = composeNode(doc, token, getProps(), onError)
         offset = value.range[1]
+        atLineStart = false
         isSourceToken = false
         atValueEnd = false
         hasSpace = false

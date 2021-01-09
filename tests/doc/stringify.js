@@ -611,7 +611,7 @@ describe('simple keys', () => {
   test('key with comment', () => {
     const doc = YAML.parseDocument('foo: bar')
     doc.contents.items[0].key.comment = 'FOO'
-    expect(String(doc)).toBe('? foo #FOO\n: bar\n')
+    expect(String(doc)).toBe('foo: #FOO\n  bar\n')
     doc.options.simpleKeys = true
     expect(() => String(doc)).toThrow(
       /With simple keys, key nodes cannot have comments/

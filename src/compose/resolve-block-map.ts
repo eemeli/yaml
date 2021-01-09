@@ -90,8 +90,8 @@ export function resolveBlockMap(
       if (implicitKey)
         onError(keyStart, 'Implicit map keys need to be followed by map values')
       if (valueProps.comment) {
-        if (map.comment) map.comment += '\n' + valueProps.comment
-        else map.comment = valueProps.comment
+        if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
+        else keyNode.comment = valueProps.comment
       }
       map.items.push(new Pair(keyNode))
     }
