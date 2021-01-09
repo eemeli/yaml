@@ -1,8 +1,17 @@
-export const DOCUMENT = '\x02' // Start of Text
-export const FLOW_END = '\x18' // Cancel
-export const SCALAR = '\x1f' // Unit Separator
+/** The byte order mark */
+export const BOM = '\u{FEFF}'
+
+/** Start of doc-mode */
+export const DOCUMENT = '\x02' // C0: Start of Text
+
+/** Unexpected end of flow-mode */
+export const FLOW_END = '\x18' // C0: Cancel
+
+/** Next token is a scalar value */
+export const SCALAR = '\x1f' // C0: Unit Separator
 
 export type SourceTokenType =
+  | 'byte-order-mark'
   | 'doc-mode'
   | 'scalar'
   | 'doc-start'
@@ -28,6 +37,7 @@ export type SourceTokenType =
   | 'block-scalar-header'
 
 export function prettyToken(token: string) {
+  if (token === BOM) return '<BOM>'
   if (token === DOCUMENT) return '<DOC>'
   if (token === FLOW_END) return '<FLOW_END>'
   if (token === SCALAR) return '<SCALAR>'
@@ -36,11 +46,13 @@ export function prettyToken(token: string) {
 
 export function tokenType(source: string): SourceTokenType | null {
   switch (source) {
-    case DOCUMENT: // start of doc-mode
+    case BOM:
+      return 'byte-order-mark'
+    case DOCUMENT:
       return 'doc-mode'
-    case FLOW_END: // unexpected end of flow mode
+    case FLOW_END:
       return 'flow-error-end'
-    case SCALAR: // next token is a scalar value
+    case SCALAR:
       return 'scalar'
     case '---':
       return 'doc-start'

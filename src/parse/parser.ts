@@ -346,6 +346,7 @@ export class Parser {
       case 'directive-line':
         this.push({ type: 'directive', source: this.source })
         return
+      case 'byte-order-mark':
       case 'space':
       case 'comment':
       case 'newline':

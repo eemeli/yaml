@@ -66,7 +66,7 @@ plain-scalar(is-flow, min)
   [else] -> plain-scalar(min)
 */
 
-import { DOCUMENT, FLOW_END, SCALAR } from './token-type.js'
+import { BOM, DOCUMENT, FLOW_END, SCALAR } from './token-type.js'
 
 type State =
   | 'stream'
@@ -237,8 +237,12 @@ export class Lexer {
   }
 
   parseStream() {
-    const line = this.getLine()
+    let line = this.getLine()
     if (line === null) return this.setNext('stream')
+    if (line[0] === BOM) {
+      this.pushCount(1)
+      line = line.substring(1)
+    }
     if (line[0] === '%') {
       let dirEnd = line.length
       const cs = line.indexOf('#')

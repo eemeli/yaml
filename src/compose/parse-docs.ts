@@ -48,6 +48,7 @@ export function parseDocs(source: string, options?: Options) {
           atDirectives = false
           break
         }
+        case 'byte-order-mark':
         case 'space':
           break
         case 'comment':
