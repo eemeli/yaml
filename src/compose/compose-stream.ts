@@ -6,7 +6,23 @@ import { Parser } from '../parse/parser.js'
 import { composeDoc } from './compose-doc.js'
 import { resolveEnd } from './resolve-end.js'
 
-export function parseDocs(source: string, options?: Options) {
+export interface EmptyStream extends Array<Document.Parsed> {
+  empty: true
+  comment: string
+  errors: YAMLParseError[]
+  warnings: YAMLWarning[]
+}
+
+/**
+ * @returns If an empty `docs` array is returned, it will be of type
+ *   EmptyStream. In TypeScript, you may use `'empty' in docs` as a
+ *   type guard for it, as `docs.length === 0` won't catch it.
+ */
+export function composeStream(
+  source: string,
+  forceDoc: boolean,
+  options?: Options
+) {
   const directives = new Directives({
     version: options?.version || defaultOptions.version || '1.2'
   })
@@ -90,12 +106,45 @@ export function parseDocs(source: string, options?: Options) {
           break
         }
         default:
-          console.log('###', token)
+          errors.push(new YAMLParseError(-1, `Unsupported token ${token.type}`))
       }
     },
     n => lines.push(n)
   )
   parser.parse(source)
 
-  return docs
+  if (docs.length === 0) {
+    if (forceDoc) {
+      const doc = new Document(undefined, options) as Document.Parsed
+      doc.directives = directives.atDocument()
+      if (atDirectives) {
+        const errMsg = 'Missing directives-end indicator line'
+        doc.errors.push(new YAMLParseError(source.length, errMsg))
+      }
+      doc.setSchema() // FIXME: always do this in the constructor
+      doc.range = [0, source.length]
+      docs.push(doc)
+    } else {
+      const empty: EmptyStream = Object.assign(
+        [],
+        { empty: true } as { empty: true },
+        { comment: comment.trimRight(), errors, warnings }
+      )
+      return empty
+    }
+  }
+
+  if (comment || errors.length > 0 || warnings.length > 0) {
+    const lastDoc = docs[docs.length - 1]
+    comment = comment.trimRight()
+    if (comment) {
+      if (lastDoc.comment) lastDoc.comment += `\n${comment}`
+      else lastDoc.comment = comment
+    }
+    Array.prototype.push.apply(lastDoc.errors, errors)
+    Array.prototype.push.apply(lastDoc.warnings, warnings)
+  }
+
+  // TS would complain without the cast, but docs is always non-empty here
+  return (docs as unknown) as [Document.Parsed, ...Document.Parsed[]]
 }

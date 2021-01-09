@@ -710,7 +710,11 @@ mapping: { sky: blue, sea: green }`,
 
     'Example 5.5. Comment Indicator': {
       src: `# Comment only.`,
-      tgt: [null]
+      tgt: [],
+      special(src) {
+        const doc = YAML.parseDocument(src)
+        expect(doc.comment).toBe(' Comment only.')
+      }
     },
 
     'Example 5.6. Node Property Indicators': {
@@ -936,7 +940,11 @@ Chomping: |
     'Example 6.10. Comment Lines': {
       src: `  # Comment
    \n\n`,
-      tgt: [null]
+      tgt: [],
+      special(src) {
+        const doc = YAML.parseDocument(src)
+        expect(doc.comment).toBe(' Comment')
+      }
     },
 
     'Example 6.11. Multi-Line Comments': {

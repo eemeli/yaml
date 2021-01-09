@@ -226,7 +226,7 @@ describe('broken directives', () => {
 
   test('missing separator', () => {
     const doc = YAML.parseDocument(`%YAML 1.2\n`)
-    expect(doc.errors).toMatchObject([{ name: 'YAMLParseError', offset: 9 }])
+    expect(doc.errors).toMatchObject([{ name: 'YAMLParseError', offset: 10 }])
   })
 })
 

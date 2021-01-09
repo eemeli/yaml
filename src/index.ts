@@ -1,4 +1,4 @@
-import { parseDocs } from './compose/parse-docs.js'
+import { composeStream } from './compose/compose-stream.js'
 import { LogLevel } from './constants.js'
 import { Document } from './doc/Document.js'
 import { YAMLSemanticError } from './errors.js'
@@ -8,10 +8,12 @@ import { Options } from './options.js'
 export { defaultOptions, scalarOptions } from './options.js'
 export { Document }
 
-export const parseAllDocuments = parseDocs
+export function parseAllDocuments(src: string, options?: Options) {
+  return composeStream(src, false, options)
+}
 
 export function parseDocument(src: string, options?: Options) {
-  const docs = parseDocs(src, options)
+  const docs = composeStream(src, true, options)
   if (docs.length === 0) return null
   const doc = docs[0]
   if (
