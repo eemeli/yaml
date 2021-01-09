@@ -286,7 +286,8 @@ export class Lexer {
       }
     }
     this.indentValue = this.pushSpaces(false)
-    if (this.indentNext > this.indentValue) this.indentNext = this.indentValue
+    if (this.indentNext > this.indentValue && !isEmpty(this.charAt(1)))
+      this.indentNext = this.indentValue
     return this.parseBlockStart()
   }
 

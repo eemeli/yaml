@@ -1187,7 +1187,8 @@ bar`,
 - !e! foo
 - !h!bar baz`,
       tgt: [['foo', 'baz']],
-      errors: [['Could not resolve tag: !h!bar', 'The !e! tag has no suffix.']]
+      errors: [['The !e! tag has no suffix', 'Could not resolve tag: !h!bar']],
+      warnings: [['Unresolved tag: tag:example,2000:app/']]
     },
 
     'Example 6.28. Non-Specific Tags': {

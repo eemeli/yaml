@@ -68,7 +68,7 @@ describe('block collections', () => {
     const src = 'foo: "1"\n bar: 2\n'
     const doc = YAML.parseDocument(src)
     expect(doc.errors).toMatchObject([
-      { message: 'All collection items must start at the same column' }
+      { message: 'All mapping items must start at the same column' }
     ])
     expect(doc.contents).toMatchObject({
       type: 'MAP',
@@ -83,11 +83,11 @@ describe('block collections', () => {
     const src = '- "foo"\n - bar\n'
     const doc = YAML.parseDocument(src)
     expect(doc.errors).toMatchObject([
-      { message: 'All collection items must start at the same column' }
+      { message: 'All sequence items must start at the same column' }
     ])
     expect(doc.contents).toMatchObject({
       type: 'SEQ',
-      items: [{ value: 'foo' }, { value: 'bar' }]
+      items: [{ value: 'foo' }, { items: [{ value: 'bar' }] }]
     })
   })
 
@@ -95,7 +95,7 @@ describe('block collections', () => {
     const src = 'foo: "1"\n- bar\n'
     const doc = YAML.parseDocument(src)
     expect(doc.errors).toMatchObject([
-      { message: 'A collection cannot be both a mapping and a sequence' },
+      { message: 'A block sequence may not be used as an implicit map key' },
       { message: 'Implicit keys need to be on a single line' },
       { message: 'Implicit map keys need to be followed by map values' }
     ])
@@ -103,7 +103,7 @@ describe('block collections', () => {
       type: 'MAP',
       items: [
         { key: { value: 'foo' }, value: { value: '1' } },
-        { key: null, value: null }
+        { key: { items: [{ value: 'bar' }] }, value: null }
       ]
     })
   })

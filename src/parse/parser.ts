@@ -260,7 +260,7 @@ export class Parser {
 
   step() {
     const top = this.peek(1)
-    if (this.type === 'doc-end' && top.type !== 'doc-end') {
+    if (this.type === 'doc-end' && (!top || top.type !== 'doc-end')) {
       while (this.stack.length > 0) this.pop()
       this.stack.push({
         type: 'doc-end',
@@ -317,8 +317,10 @@ export class Parser {
           break
         case 'block-map': {
           const it = top.items[top.items.length - 1]
-          if (it.value) top.items.push({ start: [], key: token, sep: [] })
-          else if (it.sep) it.value = token
+          if (it.value) {
+            top.items.push({ start: [], key: token, sep: [] })
+            this.onKeyLine = true
+          } else if (it.sep) it.value = token
           else {
             Object.assign(it, { key: token, sep: [] })
             this.onKeyLine = true

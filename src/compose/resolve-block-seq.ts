@@ -15,7 +15,7 @@ export function resolveBlockSeq(
   const seq = new YAMLSeq(doc.schema)
   seq.type = Type.SEQ
   if (anchor) doc.anchors.setAnchor(seq, anchor)
-  for (const { start, value } of items) {
+  loop: for (const { start, value } of items) {
     const props = resolveProps(
       doc,
       start,
@@ -27,7 +27,11 @@ export function resolveBlockSeq(
     offset += props.length
     if (props.found === -1) {
       if (props.anchor || props.tagName || value) {
-        onError(offset, 'Sequence item without - indicator')
+        const msg =
+          value && value.type === 'block-seq'
+            ? 'All sequence items must start at the same column'
+            : 'Sequence item without - indicator'
+        onError(offset, msg)
       } else {
         // TODO: assert being at last item?
         if (props.comment) seq.comment = props.comment

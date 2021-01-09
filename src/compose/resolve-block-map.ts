@@ -7,7 +7,7 @@ import { resolveMergePair } from './resolve-merge-pair.js'
 import { resolveProps } from './resolve-props.js'
 import { validateImplicitKey } from './validate-implicit-key.js'
 
-const startColMsg = 'All collection items must start at the same column'
+const startColMsg = 'All mapping items must start at the same column'
 
 export function resolveBlockMap(
   doc: Document.Parsed,
@@ -32,8 +32,15 @@ export function resolveBlockMap(
     )
     const implicitKey = keyProps.found === -1
     if (implicitKey) {
-      if (key && 'indent' in key && key.indent !== indent)
-        onError(offset, startColMsg)
+      if (key) {
+        if (key.type === 'block-seq')
+          onError(
+            offset,
+            'A block sequence may not be used as an implicit map key'
+          )
+        else if ('indent' in key && key.indent !== indent)
+          onError(offset, startColMsg)
+      }
       if (keyProps.anchor || keyProps.tagName || sep) {
         const err = validateImplicitKey(key)
         if (err === 'single-line')

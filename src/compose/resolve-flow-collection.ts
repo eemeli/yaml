@@ -13,7 +13,6 @@ export function resolveFlowCollection(
   _anchor: string | null,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
-  let offset = fc.offset
   const isMap = fc.start.source === '{'
   const coll = isMap ? new YAMLMap(doc.schema) : new YAMLSeq(doc.schema)
   coll.type = isMap ? Type.FLOW_MAP : Type.FLOW_SEQ
@@ -30,6 +29,7 @@ export function resolveFlowCollection(
   let anchor = ''
   let tagName = ''
 
+  let offset = fc.offset + 1
   let atExplicitKey = false
   let atValueEnd = false
   let nlAfterValueInSeq = false
