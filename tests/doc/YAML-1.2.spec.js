@@ -713,7 +713,7 @@ mapping: { sky: blue, sea: green }`,
       tgt: [],
       special(src) {
         const doc = YAML.parseDocument(src)
-        expect(doc.comment).toBe(' Comment only.')
+        expect(doc.commentBefore).toBe(' Comment only.')
       }
     },
 
@@ -943,7 +943,7 @@ Chomping: |
       tgt: [],
       special(src) {
         const doc = YAML.parseDocument(src)
-        expect(doc.comment).toBe(' Comment')
+        expect(doc.commentBefore).toBe(' Comment')
       }
     },
 
