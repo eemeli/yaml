@@ -1,3 +1,4 @@
+import { Collection, Node } from '../ast/index.js'
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { YAMLParseError, YAMLWarning } from '../errors.js'
@@ -71,14 +72,22 @@ export function composeStream(
     const { comment, afterEmptyLine } = parsePrelude(prelude)
     //console.log({ dc: doc.comment, prelude, comment })
     if (comment) {
+      const dc = doc.contents
       if (afterDoc) {
-        const dc = doc.comment
-        doc.comment = dc ? `${dc}\n${comment}` : comment
-      } else if (afterEmptyLine || doc.directivesEndMarker || !doc.contents) {
+        doc.comment = doc.comment ? `${doc.comment}\n${comment}` : comment
+      } else if (afterEmptyLine || doc.directivesEndMarker || !dc) {
         doc.commentBefore = comment
+      } else if (
+        dc instanceof Collection &&
+        (dc.type === 'MAP' || dc.type === 'SEQ') &&
+        dc.items.length > 0
+      ) {
+        const it = dc.items[0] as Node
+        const cb = it.commentBefore
+        it.commentBefore = cb ? `${comment}\n${cb}` : comment
       } else {
-        const cb = doc.contents.commentBefore
-        doc.contents.commentBefore = cb ? `${comment}\n${cb}` : comment
+        const cb = dc.commentBefore
+        dc.commentBefore = cb ? `${comment}\n${cb}` : comment
       }
     }
 

@@ -112,6 +112,37 @@ function includesNonEmpty(list: SourceToken[]) {
   return false
 }
 
+function atFirstEmptyLineAfterComments(start: SourceToken[]) {
+  let hasComment = false
+  for (let i = 0; i < start.length; ++i) {
+    switch (start[i].type) {
+      case 'space':
+        break
+      case 'comment':
+        hasComment = true
+        break
+      case 'newline':
+        if (!hasComment) return false
+        break
+      default:
+        return false
+    }
+  }
+  if (hasComment) {
+    for (let i = start.length - 1; i >= 0; --i) {
+      switch (start[i].type) {
+        case 'space':
+          break
+        case 'newline':
+          return true
+        default:
+          return false
+      }
+    }
+  }
+  return false
+}
+
 function isFlowToken(
   token: Token | null
 ): token is FlowScalar | FlowCollection {
@@ -475,6 +506,15 @@ export class Parser {
     switch (this.type) {
       case 'newline':
         this.onKeyLine = false
+        if (!it.sep && atFirstEmptyLineAfterComments(it.start)) {
+          const prev = map.items[map.items.length - 2]
+          const end = (prev?.value as { end: SourceToken[] })?.end
+          if (Array.isArray(end)) {
+            Array.prototype.push.apply(end, it.start)
+            it.start = [this.sourceToken]
+            return
+          }
+        }
       // fallthrough
       case 'space':
       case 'comment':
@@ -578,9 +618,19 @@ export class Parser {
   blockSequence(seq: BlockSequence) {
     const it = seq.items[seq.items.length - 1]
     switch (this.type) {
+      case 'newline':
+        if (!it.value && atFirstEmptyLineAfterComments(it.start)) {
+          const prev = seq.items[seq.items.length - 2]
+          const end = (prev?.value as { end: SourceToken[] })?.end
+          if (Array.isArray(end)) {
+            Array.prototype.push.apply(end, it.start)
+            it.start = [this.sourceToken]
+            return
+          }
+        }
+        // fallthrough
       case 'space':
       case 'comment':
-      case 'newline':
         if (it.value) seq.items.push({ start: [this.sourceToken] })
         else it.start.push(this.sourceToken)
         return

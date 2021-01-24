@@ -179,6 +179,7 @@ export class YAMLSeq extends Collection {
 
 export namespace YAMLSeq {
   interface Parsed extends YAMLSeq {
+    items: Node[]
     range: [number, number]
   }
 }

@@ -160,8 +160,9 @@ export class Pair extends Node {
     ) {
       str = addComment(str, ctx.indent, keyComment)
       if (this.comment) {
-        if (keyComment) str += '\n'
-        str = addComment(str, ctx.indent, this.comment)
+        if (keyComment && !this.comment.includes('\n'))
+          str += `\n${ctx.indent || ''}#${this.comment}`
+        else str = addComment(str, ctx.indent, this.comment)
         if (onComment) onComment()
       } else if (chompKeep && !keyComment && onChompKeep) onChompKeep()
       return ctx.inFlow && !explicitKey ? str : `? ${str}`
@@ -171,9 +172,9 @@ export class Pair extends Node {
       ? `? ${addComment(str, ctx.indent, keyComment)}\n${indent}:`
       : addComment(`${str}:`, ctx.indent, keyComment)
     if (this.comment) {
-      if (keyComment && !explicitKey) str += '\n'
-      // expected (but not strictly required) to be a single-line comment
-      str = addComment(str, ctx.indent, this.comment)
+      if (keyComment && !explicitKey && !this.comment.includes('\n'))
+        str += `\n${ctx.indent || ''}#${this.comment}`
+      else str = addComment(str, ctx.indent, this.comment)
       if (onComment) onComment()
     }
 
