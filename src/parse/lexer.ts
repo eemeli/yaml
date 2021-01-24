@@ -112,6 +112,13 @@ export class Lexer {
    */
   blockScalarIndent = -1
 
+  /**
+   * Block scalars that include a + (keep) chomping indicator in their header
+   * include trailing empty lines, which are otherwise excluded from the
+   * scalar's contents.
+   */
+  blockScalarKeep = false
+
   /** Current input */
   buffer = ''
 
@@ -453,13 +460,14 @@ export class Lexer {
   }
 
   parseBlockScalarHeader() {
+    this.blockScalarIndent = -1
+    this.blockScalarKeep = false
     let i = this.pos
     while (true) {
       const ch = this.buffer[++i]
-      if (ch === '-' || ch === '+') continue
-      const n = Number(ch)
-      this.blockScalarIndent = n > 0 ? n - 1 : -1
-      break
+      if (ch === '+') this.blockScalarKeep = true
+      else if (ch > '0' && ch <= '9') this.blockScalarIndent = Number(ch) - 1
+      else if (ch !== '-') break
     }
     return this.pushUntil(ch => isEmpty(ch) || ch === '#')
   }
@@ -493,6 +501,16 @@ export class Lexer {
         if (!this.atEnd) return this.setNext('block-scalar')
         nl = this.buffer.length
       }
+    }
+    if (!this.blockScalarKeep) {
+      do {
+        let i = nl - 1
+        let ch = this.buffer[i]
+        if (ch === '\r') ch = this.buffer[--i]
+        while (ch === ' ' || ch === '\t') ch = this.buffer[--i]
+        if (ch === '\n' && i >= this.pos) nl = i
+        else break
+      } while (true)
     }
     this.push(SCALAR)
     this.pushToIndex(nl + 1, true)
