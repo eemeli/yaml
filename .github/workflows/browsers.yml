@@ -1,7 +1,7 @@
 name: Browsers
 
 on:
-  - push
+  # - push
   - workflow_dispatch
 
 jobs:
