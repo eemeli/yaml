@@ -69,7 +69,7 @@ export interface BlockSequence {
   type: 'block-seq'
   offset: number
   indent: number
-  items: Array<{ start: SourceToken[]; value?: Token }>
+  items: Array<{ start: SourceToken[]; value?: Token; sep?: never }>
 }
 
 export interface FlowCollection {
@@ -365,11 +365,13 @@ export class Parser {
           if (it.value) {
             top.items.push({ start: [], key: token, sep: [] })
             this.onKeyLine = true
+            return
           } else if (it.sep) {
             it.value = token
           } else {
             Object.assign(it, { key: token, sep: [] })
             this.onKeyLine = true
+            return
           }
           break
         }
@@ -385,6 +387,30 @@ export class Parser {
         default:
           this.pop()
           this.pop(token)
+      }
+
+      if (
+        (top.type === 'document' ||
+          top.type === 'block-map' ||
+          top.type === 'block-seq') &&
+        (token.type === 'block-map' || token.type === 'block-seq')
+      ) {
+        const last = token.items[token.items.length - 1]
+        if (
+          last &&
+          !last.sep &&
+          !last.value &&
+          last.start.length > 0 &&
+          !includesNonEmpty(last.start) &&
+          (token.indent === 0 ||
+            last.start.every(
+              st => st.type !== 'comment' || st.indent < token.indent
+            ))
+        ) {
+          if (top.type === 'document') top.end = last.start
+          else top.items.push({ start: last.start })
+          token.items.splice(-1, 1)
+        }
       }
     }
   }
@@ -628,7 +654,7 @@ export class Parser {
             return
           }
         }
-        // fallthrough
+      // fallthrough
       case 'space':
       case 'comment':
         if (it.value) seq.items.push({ start: [this.sourceToken] })
