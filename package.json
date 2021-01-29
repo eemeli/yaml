@@ -63,7 +63,7 @@
     "preversion": "npm test && npm run build",
     "prepublishOnly": "npm run clean && npm test && npm run build"
   },
-  "browserslist": "> 0.5%, not dead",
+  "browserslist": "> 0.5%, not dead, not ie 11",
   "prettier": {
     "arrowParens": "avoid",
     "semi": false,
