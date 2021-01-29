@@ -1,1 +1,2 @@
-module.exports = require('./dist')
+export * as default from './dist'
+export * from './dist'
