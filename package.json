@@ -24,10 +24,10 @@
   "main": "./index.js",
   "browser": {
     "./index.js": "./browser/index.js",
-    "./types.js": "./browser/types.js",
-    "./types.mjs": "./browser/types.js",
-    "./util.js": "./browser/util.js",
-    "./util.mjs": "./browser/util.js"
+    "./types.js": "./browser/dist/types.js",
+    "./types.mjs": "./browser/dist/types.js",
+    "./util.js": "./browser/dist/util.js",
+    "./util.mjs": "./browser/dist/util.js"
   },
   "exports": {
     ".": "./index.js",
