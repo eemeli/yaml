@@ -16,7 +16,7 @@ export default {
   plugins: [
     babel({
       babelHelpers: 'bundled',
-      presets: [['@babel/env', { modules: false, targets: { node: '6.5' } }]]
+      presets: [['@babel/env', { modules: false, targets: { node: '10.0' } }]]
     })
   ],
   treeshake: { moduleSideEffects: false, propertyReadSideEffects: false }
