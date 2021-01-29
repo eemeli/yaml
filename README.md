@@ -54,11 +54,6 @@ import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'
 
 ### CST Parser
 
-```js
-import parseCST from 'yaml/parse-cst'
-```
-
-- [`parseCST(str): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
 - [`YAML.parseCST(str): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
 
 ## YAML.parse

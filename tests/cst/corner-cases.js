@@ -1,5 +1,6 @@
 import { source } from 'common-tags'
-import parse from '../../parse-cst.js'
+import * as YAML from '../../index.js'
+const parse = YAML.parseCST
 
 describe('folded block with chomp: keep', () => {
   test('nl + nl', () => {

@@ -1,5 +1,5 @@
 import { Document, scalarOptions } from './index'
-import { CST } from './parse-cst'
+import { CST } from './cst'
 import { Type } from './util'
 
 export const binaryOptions: scalarOptions.Binary
