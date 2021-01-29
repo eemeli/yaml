@@ -30,20 +30,25 @@
     "./util.mjs": "./browser/dist/util.js"
   },
   "exports": {
-    ".": "./index.js",
+    ".": {
+      "node": "./index.js",
+      "default": "./browser/index.js"
+    },
     "./package.json": "./package.json",
-    "./types": [
-      {
-        "import": "./types.mjs"
+    "./types": {
+      "node": {
+        "import": "./types.mjs",
+        "require": "./types.js"
       },
-      "./types.js"
-    ],
-    "./util": [
-      {
-        "import": "./util.mjs"
+      "default": "./browser/dist/types.js"
+    },
+    "./util": {
+      "node": {
+        "import": "./util.mjs",
+        "require": "./util.js"
       },
-      "./util.js"
-    ]
+      "default": "./browser/dist/util.js"
+    }
   },
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
