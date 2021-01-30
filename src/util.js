@@ -1,4 +1,4 @@
-export { findPair, toJS } from './ast/index.js'
+export { findPair, toJS, visit } from './ast/index.js'
 
 export { stringifyNumber } from './stringify/stringifyNumber.js'
 export { stringifyString } from './stringify/stringifyString.js'

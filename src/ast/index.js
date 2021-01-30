@@ -8,3 +8,4 @@ export { YAMLMap, findPair } from './YAMLMap.js'
 export { YAMLSeq } from './YAMLSeq.js'
 
 export { toJS } from './toJS.js'
+export { visit } from './visit.js'
