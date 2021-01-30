@@ -1,7 +1,7 @@
 import { Pair, YAMLMap } from '../ast/index.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
-import type { BlockMap } from '../parse/parser.js'
+import type { BlockMap } from '../parse/tokens.js'
 import { composeNode } from './compose-node.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 import { resolveProps } from './resolve-props.js'

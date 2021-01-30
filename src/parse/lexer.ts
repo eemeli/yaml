@@ -66,7 +66,7 @@ plain-scalar(is-flow, min)
   [else] -> plain-scalar(min)
 */
 
-import { BOM, DOCUMENT, FLOW_END, SCALAR } from './token-type.js'
+import { BOM, DOCUMENT, FLOW_END, SCALAR } from './tokens.js'
 
 type State =
   | 'stream'
@@ -97,54 +97,54 @@ const isNotIdentifierChar = (ch: string) =>
   !ch || invalidIdentifierChars.includes(ch)
 
 export class Lexer {
-  push: (token: string) => void
+  private push: (token: string) => void
 
   /**
    * Flag indicating whether the end of the current buffer marks the end of
    * all input
    */
-  atEnd = false
+  private atEnd = false
 
   /**
    * Explicit indent set in block scalar header, as an offset from the current
    * minimum indent, so e.g. set to 1 from a header `|2+`. Set to -1 if not
    * explicitly set.
    */
-  blockScalarIndent = -1
+  private blockScalarIndent = -1
 
   /**
    * Block scalars that include a + (keep) chomping indicator in their header
    * include trailing empty lines, which are otherwise excluded from the
    * scalar's contents.
    */
-  blockScalarKeep = false
+  private blockScalarKeep = false
 
   /** Current input */
-  buffer = ''
+  private buffer = ''
 
   /**
    * Flag noting whether the map value indicator : can immediately follow this
    * node within a flow context.
    */
-  flowKey = false
+  private flowKey = false
 
   /** Count of surrounding flow collection levels. */
-  flowLevel = 0
+  private flowLevel = 0
 
   /**
    * Minimum level of indentation required for next lines to be parsed as a
    * part of the current scalar value.
    */
-  indentNext = 0
+  private indentNext = 0
 
   /** Indentation level of the current line. */
-  indentValue = 0 // actual indent level of current line
+  private indentValue = 0
 
   /** Stores the state of the lexer if reaching the end of incpomplete input */
-  next: State | null = null
+  private next: State | null = null
 
   /** A pointer to `buffer`; the current position of the lexer. */
-  pos = 0
+  private pos = 0
 
   /**
    * Define/initialise a YAML lexer. `push` will be called separately with each
@@ -170,7 +170,7 @@ export class Lexer {
     while (next && (incomplete || this.hasChars(1))) next = this.parseNext(next)
   }
 
-  atLineEnd() {
+  private atLineEnd() {
     let i = this.pos
     let ch = this.buffer[i]
     while (ch === ' ' || ch === '\t') ch = this.buffer[++i]
@@ -179,11 +179,11 @@ export class Lexer {
     return false
   }
 
-  charAt(n: number) {
+  private charAt(n: number) {
     return this.buffer[this.pos + n]
   }
 
-  continueScalar(offset: number) {
+  private continueScalar(offset: number) {
     let ch = this.buffer[offset]
     if (this.indentNext > 0) {
       let indent = 0
@@ -200,29 +200,29 @@ export class Lexer {
     return offset
   }
 
-  getLine(): string | null {
+  private getLine(): string | null {
     let end = this.buffer.indexOf('\n', this.pos)
     if (end === -1) return this.atEnd ? this.buffer.substring(this.pos) : null
     if (this.buffer[end - 1] === '\r') end -= 1
     return this.buffer.substring(this.pos, end)
   }
 
-  hasChars(n: number) {
+  private hasChars(n: number) {
     return this.pos + n <= this.buffer.length
   }
 
-  setNext(state: State) {
+  private setNext(state: State) {
     this.buffer = this.buffer.substring(this.pos)
     this.pos = 0
     this.next = state
     return null
   }
 
-  peek(n: number) {
+  private peek(n: number) {
     return this.buffer.substr(this.pos, n)
   }
 
-  parseNext(next: State) {
+  private parseNext(next: State) {
     switch (next) {
       case 'stream':
         return this.parseStream()
@@ -243,7 +243,7 @@ export class Lexer {
     }
   }
 
-  parseStream() {
+  private parseStream() {
     let line = this.getLine()
     if (line === null) return this.setNext('stream')
     if (line[0] === BOM) {
@@ -277,7 +277,7 @@ export class Lexer {
     return this.parseLineStart()
   }
 
-  parseLineStart() {
+  private parseLineStart() {
     const ch = this.charAt(0)
     if (ch === '-' || ch === '.') {
       if (!this.atEnd && !this.hasChars(4)) return this.setNext('line-start')
@@ -298,7 +298,7 @@ export class Lexer {
     return this.parseBlockStart()
   }
 
-  parseBlockStart(): 'doc' | null {
+  private parseBlockStart(): 'doc' | null {
     const [ch0, ch1] = this.peek(2)
     if (!ch1 && !this.atEnd) return this.setNext('block-start')
     if ((ch0 === '-' || ch0 === '?' || ch0 === ':') && isEmpty(ch1)) {
@@ -310,7 +310,7 @@ export class Lexer {
     return 'doc'
   }
 
-  parseDocument() {
+  private parseDocument() {
     this.pushSpaces(true)
     const line = this.getLine()
     if (line === null) return this.setNext('doc')
@@ -351,7 +351,7 @@ export class Lexer {
     }
   }
 
-  parseFlowCollection() {
+  private parseFlowCollection() {
     let nl: number, sp: number
     let indent = -1
     do {
@@ -424,7 +424,7 @@ export class Lexer {
     }
   }
 
-  parseQuotedScalar() {
+  private parseQuotedScalar() {
     const quote = this.charAt(0)
     let end = this.buffer.indexOf(quote, this.pos + 1)
     if (quote === "'") {
@@ -459,7 +459,7 @@ export class Lexer {
     return this.flowLevel ? 'flow' : 'doc'
   }
 
-  parseBlockScalarHeader() {
+  private parseBlockScalarHeader() {
     this.blockScalarIndent = -1
     this.blockScalarKeep = false
     let i = this.pos
@@ -472,7 +472,7 @@ export class Lexer {
     return this.pushUntil(ch => isEmpty(ch) || ch === '#')
   }
 
-  parseBlockScalar() {
+  private parseBlockScalar() {
     let nl = this.pos - 1
     let indent = 0
     let ch: string
@@ -517,7 +517,7 @@ export class Lexer {
     return this.parseLineStart()
   }
 
-  parsePlainScalar() {
+  private parsePlainScalar() {
     const inFlow = this.flowLevel > 0
     let end = this.pos - 1
     let i = this.pos - 1
@@ -553,7 +553,7 @@ export class Lexer {
     return inFlow ? 'flow' : 'doc'
   }
 
-  pushCount(n: number) {
+  private pushCount(n: number) {
     if (n > 0) {
       this.push(this.buffer.substr(this.pos, n))
       this.pos += n
@@ -562,7 +562,7 @@ export class Lexer {
     return 0
   }
 
-  pushToIndex(i: number, allowEmpty: boolean) {
+  private pushToIndex(i: number, allowEmpty: boolean) {
     const s = this.buffer.slice(this.pos, i)
     if (s) {
       this.push(s)
@@ -572,7 +572,7 @@ export class Lexer {
     return 0
   }
 
-  pushIndicators(): number {
+  private pushIndicators(): number {
     switch (this.charAt(0)) {
       case '!':
         if (this.charAt(1) === '<')
@@ -601,21 +601,21 @@ export class Lexer {
     return 0
   }
 
-  pushVerbatimTag() {
+  private pushVerbatimTag() {
     let i = this.pos + 2
     let ch = this.buffer[i]
     while (!isEmpty(ch) && ch !== '>') ch = this.buffer[++i]
     return this.pushToIndex(ch === '>' ? i + 1 : i, false)
   }
 
-  pushNewline() {
+  private pushNewline() {
     const ch = this.buffer[this.pos]
     if (ch === '\n') return this.pushCount(1)
     else if (ch === '\r' && this.charAt(1) === '\n') return this.pushCount(2)
     else return 0
   }
 
-  pushSpaces(allowTabs: boolean) {
+  private pushSpaces(allowTabs: boolean) {
     let i = this.pos - 1
     let ch: string
     do {
@@ -629,7 +629,7 @@ export class Lexer {
     return n
   }
 
-  pushUntil(test: (ch: string) => boolean) {
+  private pushUntil(test: (ch: string) => boolean) {
     let i = this.pos
     let ch = this.buffer[i]
     while (!test(ch)) ch = this.buffer[++i]

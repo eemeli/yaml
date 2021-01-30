@@ -1,15 +1,15 @@
-import { ParseStream } from './parse-stream.js'
-import { Parser } from './parser.js'
+import { CSTStream } from './cst-stream.js'
+import { CSTParser } from './cst-parser.js'
 
 export function stream(source: string) {
-  const ps = new ParseStream().on('data', d => console.dir(d, { depth: null }))
+  const ps = new CSTStream().on('data', d => console.dir(d, { depth: null }))
   ps.write(source)
   ps.end()
 }
 
 export function test(source: string) {
   const lines: number[] = []
-  const parser = new Parser(
+  const parser = new CSTParser(
     t => console.dir(t, { depth: null }),
     n => lines.push(n)
   )

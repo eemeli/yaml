@@ -1,6 +1,6 @@
 import { Alias, Node } from '../ast/index.js'
 import type { Document } from '../doc/Document.js'
-import type { FlowScalar, Token } from '../parse/parser.js'
+import type { FlowScalar, Token } from '../parse/tokens.js'
 import { composeCollection } from './compose-collection.js'
 import { composeScalar } from './compose-scalar.js'
 import { resolveEnd } from './resolve-end.js'

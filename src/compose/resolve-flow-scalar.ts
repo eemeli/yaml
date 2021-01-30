@@ -1,5 +1,5 @@
 import { Type } from '../constants.js'
-import type { FlowScalar } from '../parse/parser.js'
+import type { FlowScalar } from '../parse/tokens.js'
 import { resolveEnd } from './resolve-end.js'
 
 export function resolveFlowScalar(

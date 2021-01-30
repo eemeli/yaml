@@ -1,97 +1,18 @@
 import { Lexer } from './lexer.js'
-import { SourceTokenType, prettyToken, tokenType } from './token-type.js'
-
-export interface SourceToken {
-  type: Exclude<SourceTokenType, DocumentEnd['type'] | FlowScalar['type']>
-  indent: number
-  source: string
-}
-
-export interface ErrorToken {
-  type: 'error'
-  offset?: number
-  source: string
-  message: string
-}
-
-export interface Directive {
-  type: 'directive'
-  source: string
-}
-
-export interface Document {
-  type: 'document'
-  offset: number
-  start: SourceToken[]
-  value?: Token
-  end?: SourceToken[]
-}
-
-export interface DocumentEnd {
-  type: 'doc-end'
-  offset: number
-  source: string
-  end?: SourceToken[]
-}
-
-export interface FlowScalar {
-  type: 'alias' | 'scalar' | 'single-quoted-scalar' | 'double-quoted-scalar'
-  offset: number
-  indent: number
-  source: string
-  end?: SourceToken[]
-}
-
-export interface BlockScalar {
-  type: 'block-scalar'
-  offset: number
-  indent: number
-  props: Token[]
-  source?: string
-}
-
-export interface BlockMap {
-  type: 'block-map'
-  offset: number
-  indent: number
-  items: Array<
-    | { start: SourceToken[]; key?: never; sep?: never; value?: never }
-    | {
-        start: SourceToken[]
-        key: Token | null
-        sep: SourceToken[]
-        value?: Token
-      }
-  >
-}
-
-export interface BlockSequence {
-  type: 'block-seq'
-  offset: number
-  indent: number
-  items: Array<{ start: SourceToken[]; value?: Token; sep?: never }>
-}
-
-export interface FlowCollection {
-  type: 'flow-collection'
-  offset: number
-  indent: number
-  start: SourceToken
-  items: Array<Token>
-  end: SourceToken[]
-}
-
-export type Token =
-  | SourceToken
-  | ErrorToken
-  | Directive
-  | Document
-  | DocumentEnd
-  | FlowScalar
-  | BlockScalar
-  | BlockMap
-  | BlockSequence
-  | FlowCollection
+import {
+  SourceToken,
+  SourceTokenType,
+  Token,
+  FlowScalar,
+  FlowCollection,
+  Document,
+  BlockMap,
+  BlockScalar,
+  BlockSequence,
+  DocumentEnd,
+  prettyToken,
+  tokenType
+} from './tokens.js'
 
 function includesToken(list: SourceToken[], type: SourceToken['type']) {
   for (let i = 0; i < list.length; ++i) if (list[i].type === type) return true
@@ -192,34 +113,35 @@ function getFirstKeyStartProps(prev: SourceToken[]) {
 }
 
 /** A YAML concrete syntax tree parser */
-export class Parser {
-  push: (token: Token) => void
-  onNewLine?: (offset: number) => void
+export class CSTParser {
+  private push: (token: Token) => void
+  private onNewLine?: (offset: number) => void
 
-  lexer = new Lexer(ts => this.token(ts))
+  private lexer = new Lexer(ts => this.token(ts))
 
   /** If true, space and sequence indicators count as indentation */
-  atNewLine = true
+  private atNewLine = true
 
   /** If true, next token is a scalar value */
-  atScalar = false
+  private atScalar = false
 
   /** Current indentation level */
-  indent = 0
+  private indent = 0
 
+  /** Current offset since the start of parsing */
   offset = 0
 
   /** On the same line with a block map key */
-  onKeyLine = false
+  private onKeyLine = false
 
   /** Top indicates the node that's currently being built */
   stack: Token[] = []
 
   /** The source of the current token, set in parse() */
-  source = ''
+  private source = ''
 
   /** The type of the current token, set in parse() */
-  type = '' as SourceTokenType
+  private type = '' as SourceTokenType
 
   /**
    * @param push - Called separately with each parsed token
@@ -295,7 +217,7 @@ export class Parser {
     }
   }
 
-  get sourceToken() {
+  private get sourceToken() {
     return {
       type: this.type,
       indent: this.indent,
@@ -303,7 +225,7 @@ export class Parser {
     } as SourceToken
   }
 
-  step() {
+  private step() {
     const top = this.peek(1)
     if (this.type === 'doc-end' && (!top || top.type !== 'doc-end')) {
       while (this.stack.length > 0) this.pop()
@@ -337,11 +259,11 @@ export class Parser {
     this.pop() // error
   }
 
-  peek(n: number) {
+  private peek(n: number) {
     return this.stack[this.stack.length - n]
   }
 
-  pop(error?: Token) {
+  private pop(error?: Token) {
     const token = error || this.stack.pop()
     if (!token) {
       const message = 'Tried to pop an empty stack'
@@ -415,7 +337,7 @@ export class Parser {
     }
   }
 
-  stream() {
+  private stream() {
     switch (this.type) {
       case 'directive-line':
         this.push({ type: 'directive', source: this.source })
@@ -446,7 +368,7 @@ export class Parser {
     })
   }
 
-  document(doc: Document) {
+  private document(doc: Document) {
     if (doc.value) return this.lineEnd(doc)
     switch (this.type) {
       case 'doc-start': {
@@ -476,7 +398,7 @@ export class Parser {
     }
   }
 
-  scalar(scalar: FlowScalar) {
+  private scalar(scalar: FlowScalar) {
     if (this.type === 'map-value-ind') {
       const prev = getPrevProps(this.peek(2))
       const start = getFirstKeyStartProps(prev)
@@ -499,7 +421,7 @@ export class Parser {
     } else this.lineEnd(scalar)
   }
 
-  blockScalar(scalar: BlockScalar) {
+  private blockScalar(scalar: BlockScalar) {
     switch (this.type) {
       case 'space':
       case 'comment':
@@ -526,7 +448,7 @@ export class Parser {
     }
   }
 
-  blockMap(map: BlockMap) {
+  private blockMap(map: BlockMap) {
     const it = map.items[map.items.length - 1]
     // it.sep is true-ish if pair already has key or : separator
     switch (this.type) {
@@ -641,7 +563,7 @@ export class Parser {
     this.step()
   }
 
-  blockSequence(seq: BlockSequence) {
+  private blockSequence(seq: BlockSequence) {
     const it = seq.items[seq.items.length - 1]
     switch (this.type) {
       case 'newline':
@@ -680,7 +602,7 @@ export class Parser {
     this.step()
   }
 
-  flowCollection(fc: FlowCollection) {
+  private flowCollection(fc: FlowCollection) {
     if (this.type === 'flow-error-end') {
       let top
       do {
@@ -748,7 +670,7 @@ export class Parser {
     }
   }
 
-  flowScalar(
+  private flowScalar(
     type: 'alias' | 'scalar' | 'single-quoted-scalar' | 'double-quoted-scalar'
   ) {
     if (this.onNewLine) {
@@ -766,7 +688,7 @@ export class Parser {
     } as FlowScalar
   }
 
-  startBlockValue(parent: Token) {
+  private startBlockValue(parent: Token) {
     switch (this.type) {
       case 'alias':
       case 'scalar':
@@ -820,7 +742,7 @@ export class Parser {
     return null
   }
 
-  documentEnd(docEnd: DocumentEnd) {
+  private documentEnd(docEnd: DocumentEnd) {
     if (this.type !== 'doc-mode') {
       if (docEnd.end) docEnd.end.push(this.sourceToken)
       else docEnd.end = [this.sourceToken]
@@ -828,7 +750,7 @@ export class Parser {
     }
   }
 
-  lineEnd(token: Document | FlowCollection | FlowScalar) {
+  private lineEnd(token: Document | FlowCollection | FlowScalar) {
     switch (this.type) {
       case 'comma':
       case 'doc-start':

@@ -1,5 +1,5 @@
 import { Type } from '../constants.js'
-import type { BlockScalar } from '../parse/parser.js'
+import type { BlockScalar } from '../parse/tokens.js'
 
 export function resolveBlockScalar(
   scalar: BlockScalar,

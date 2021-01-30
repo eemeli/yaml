@@ -1,7 +1,7 @@
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import type { Options } from '../options.js'
-import type * as Parser from '../parse/parser.js'
+import type * as Tokens from '../parse/tokens.js'
 import { composeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveProps } from './resolve-props.js'
@@ -9,7 +9,7 @@ import { resolveProps } from './resolve-props.js'
 export function composeDoc(
   options: Options | undefined,
   directives: Directives,
-  { offset, start, value, end }: Parser.Document,
+  { offset, start, value, end }: Tokens.Document,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const doc = new Document(undefined, options) as Document.Parsed

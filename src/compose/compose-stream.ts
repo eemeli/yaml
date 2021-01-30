@@ -3,7 +3,7 @@ import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { YAMLParseError, YAMLWarning } from '../errors.js'
 import { defaultOptions, Options } from '../options.js'
-import { Parser } from '../parse/parser.js'
+import { CSTParser } from '../parse/cst-parser.js'
 import { composeDoc } from './compose-doc.js'
 import { resolveEnd } from './resolve-end.js'
 
@@ -104,7 +104,7 @@ export function composeStream(
     warnings = []
   }
 
-  const parser = new Parser(
+  const parser = new CSTParser(
     token => {
       if (process.env.LOG_STREAM) console.dir(token, { depth: null })
       switch (token.type) {

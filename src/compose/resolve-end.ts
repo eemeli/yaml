@@ -1,4 +1,4 @@
-import { SourceToken } from '../parse/parser.js'
+import type { SourceToken } from '../parse/tokens.js'
 
 export function resolveEnd(
   end: SourceToken[] | undefined,

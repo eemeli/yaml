@@ -1,7 +1,7 @@
 import { Scalar } from '../ast/index.js'
 import { Document } from '../doc/Document.js'
 import type { Schema } from '../doc/Schema.js'
-import type { BlockScalar, FlowScalar } from '../parse/parser.js'
+import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
 import { resolveBlockScalar } from './resolve-block-scalar.js'
 import { resolveFlowScalar } from './resolve-flow-scalar.js'
 

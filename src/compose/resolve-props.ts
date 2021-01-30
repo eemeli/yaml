@@ -1,5 +1,5 @@
 import type { Document } from '../doc/Document.js'
-import { SourceToken } from '../parse/parser.js'
+import type { SourceToken } from '../parse/tokens.js'
 
 export function resolveProps(
   doc: Document.Parsed,
