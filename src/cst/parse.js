@@ -1,5 +1,3 @@
-// Published as 'yaml/parse-cst'
-
 import { Document } from './Document.js'
 import { ParseContext } from './ParseContext.js'
 

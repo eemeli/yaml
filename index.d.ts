@@ -1,4 +1,4 @@
-import { CST } from './parse-cst'
+import { CST } from './cst'
 import {
   AST,
   Alias,
@@ -14,7 +14,12 @@ import {
 import { Type, YAMLError, YAMLWarning } from './util'
 
 export { AST, CST }
-export { default as parseCST } from './parse-cst'
+
+export function parseCST(str: string): ParsedCST
+
+export interface ParsedCST extends Array<CST.Document> {
+  setOrigRanges(): boolean
+}
 
 /**
  * `yaml` defines document-specific options in three places: as an argument of

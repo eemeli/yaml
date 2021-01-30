@@ -24,7 +24,6 @@
   "main": "./index.js",
   "browser": {
     "./index.js": "./browser/index.js",
-    "./parse-cst.js": "./browser/parse-cst.js",
     "./types.js": "./browser/types.js",
     "./types.mjs": "./browser/types.js",
     "./util.js": "./browser/util.js",
@@ -33,7 +32,6 @@
   "exports": {
     ".": "./index.js",
     "./package.json": "./package.json",
-    "./parse-cst": "./parse-cst.js",
     "./types": [
       {
         "import": "./types.mjs"

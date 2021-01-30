@@ -38,7 +38,7 @@ npm test # just to be sure
   - **`tests/cst/`** - Tests for the CST parser
   - **`tests/doc/`** - Tests for the AST level of the library
   - **`tests/yaml-test-suite/`** - Git submodule of a custom fork of the [YAML Test Suite](https://github.com/yaml/yaml-test-suite)
-- **`{index,parse-cst,types,util}.js`** - The library's published API; see the documentation site for more details. Not transpiled, so written as backwards-compatible CommonJS.
+- **`{index,types,util}.js`** - The library's published API; see the documentation site for more details. Not transpiled, so written as backwards-compatible CommonJS.
 
 ## Contributing Code
 

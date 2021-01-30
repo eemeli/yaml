@@ -3,7 +3,6 @@ import babel from '@rollup/plugin-babel'
 export default {
   input: {
     index: 'src/index.js',
-    'parse-cst': 'src/cst/parse.js',
     'test-events': 'src/test-events.js',
     types: 'src/types.js',
     util: 'src/util.js'

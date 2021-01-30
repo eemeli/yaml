@@ -59,9 +59,4 @@ import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'
 
 <h3>CST Parser</h3>
 
-```js
-import parseCST from 'yaml/parse-cst'
-```
-
-- [`parseCST(str): CSTDocument[]`](#parsecst)
 - [`YAML.parseCST(str): CSTDocument[]`](#parsecst)
