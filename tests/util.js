@@ -150,4 +150,33 @@ describe('visitor', () => {
     ])
     expect(String(doc)).toBe('- one\n- 42\n- three\n')
   })
+
+  test('Remove seq item', () => {
+    const doc = YAML.parseDocument('- one\n- two\n- three\n')
+    const Scalar = jest.fn(node =>
+      node.value === 'two' ? visit.REMOVE : undefined
+    )
+    visit(doc, { Scalar })
+    expect(Scalar.mock.calls).toMatchObject([
+      [{ type: 'PLAIN', value: 'one' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'two' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'three' }, [{}, {}]]
+    ])
+    expect(String(doc)).toBe('- one\n- three\n')
+  })
+
+  test('Remove map value', () => {
+    const doc = YAML.parseDocument('one: 1\ntwo: 2\n')
+    const Scalar = jest.fn(node =>
+      node.value === 2 ? visit.REMOVE : undefined
+    )
+    visit(doc, { Scalar })
+    expect(Scalar.mock.calls).toMatchObject([
+      [{ type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
+      [{ type: 'PLAIN', value: 1 }, [{}, {}, {}]],
+      [{ type: 'PLAIN', value: 'two' }, [{}, {}, {}]],
+      [{ type: 'PLAIN', value: 2 }, [{}, {}, {}]]
+    ])
+    expect(String(doc)).toBe('one: 1\ntwo: null\n')
+  })
 })

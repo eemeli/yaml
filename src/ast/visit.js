@@ -7,6 +7,7 @@ import { YAMLSeq } from './YAMLSeq.js'
 
 const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')
+const REMOVE = Symbol('remove node')
 
 function _visit(node, visitor, path) {
   let ctrl = typeof visitor === 'function' ? visitor(node, path) : undefined
@@ -42,12 +43,31 @@ function _visit(node, visitor, path) {
     return _visit(ctrl, visitor, path)
   }
 
-  if (ctrl === BREAK) return BREAK
-  if (ctrl !== SKIP && children.length > 0) {
+  if (ctrl === REMOVE) {
+    const parent = path[path.length - 1]
+    if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
+      const idx = parent.items.indexOf(node)
+      if (idx !== -1) parent.items.splice(idx, 1)
+    } else if (parent instanceof Pair) {
+      if (parent.key === node) parent.key = null
+      else if (parent.value === node) parent.value = null
+    } else if (parent && parent.type === Type.DOCUMENT) {
+      parent.contents = null
+    }
+  }
+
+  if (typeof ctrl === 'symbol') return ctrl
+
+  if (children.length > 0) {
     path = Object.freeze(path.concat(node))
-    for (const item of children) {
-      ctrl = _visit(item, visitor, path)
+    for (let i = 0; i < children.length; ++i) {
+      ctrl = _visit(children[i], visitor, path)
       if (ctrl === BREAK) return BREAK
+      else if (
+        ctrl === REMOVE &&
+        (node instanceof YAMLMap || node instanceof YAMLSeq)
+      )
+        i -= 1
     }
   }
 }
@@ -58,3 +78,4 @@ export function visit(node, visitor) {
 
 visit.BREAK = BREAK
 visit.SKIP = SKIP
+visit.REMOVE = REMOVE

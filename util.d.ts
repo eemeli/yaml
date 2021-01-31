@@ -29,7 +29,14 @@ export interface visit {
           Scalar?: visitor<Scalar>
         }
   ): void
+
+  /** Terminate visit traversal completely */
   BREAK: symbol
+
+  /** Remove the current node */
+  REMOVE: symbol
+
+  /** Do not visit the children of the current node */
   SKIP: symbol
 }
 
@@ -41,9 +48,10 @@ export interface visit {
  * root `node`. The return value of the visitor may be used to control the
  * traversal:
  *   - `undefined` (default): Do nothing and continue
- *   - `visit.SKIP`: Do not visit the children of this node
+ *   - `visit.SKIP`: Do not visit the children of this node, continue with next sibling
  *   - `visit.BREAK`: Terminate traversal completely
- *   - `Node`: Replace the current node, then continueby visiting it
+ *   - `visit.REMOVE`: Remove the current node, then continue with the next one
+ *   - `Node`: Replace the current node, then continue by visiting it
  *
  * If `visitor` is a single function, it will be called with all values
  * encountered in the tree, including e.g. `null` values. Alternatively,

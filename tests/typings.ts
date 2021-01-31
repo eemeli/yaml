@@ -107,6 +107,9 @@ visit(doc, {
   Map(map) {
     if (map.items.length > 3) return visit.SKIP
   },
+  Pair(pair) {
+    if (pair.key.value === 'foo') return visit.REMOVE
+  },
   Seq(seq) {
     if (seq.items.length > 3) return visit.BREAK
   }
