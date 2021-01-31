@@ -191,6 +191,68 @@
 <p>To construct a <code>YAMLSeq</code> or <code>YAMLMap</code>, use <code>doc.createNode()</code> with array, object or iterable input, or create the collections directly by importing the classes from <code>yaml/types</code>.</p>
 
 <p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created either by importing the class from <code>yaml/types</code> and using its <code>new Pair(key, value)</code> constructor, or by using the <code>doc.createPair(key, value, options?)</code> method. The latter will recursively wrap the <code>key</code> and <code>value</code> as nodes, and accepts the same options as <code>doc.createNode()</code></p>
+<h2 id='modifying-nodes'>Modifying Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
+  - some values
+  - 42
+  - "3": a string
+    including: objects
+  - 1: a number
+`</span><span class="p">)</span>
+
+<span class="kd">const</span> <span class="nx">obs</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="dl">'</span><span class="s1">including</span><span class="dl">'</span><span class="p">],</span> <span class="kc">true</span><span class="p">)</span>
+<span class="nx">obs</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">QUOTE_DOUBLE</span><span class="dl">'</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">visit</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">Pair</span><span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="nx">pair</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">pair</span><span class="p">.</span><span class="nx">key</span> <span class="o">&amp;&amp;</span> <span class="nx">pair</span><span class="p">.</span><span class="nx">key</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">3</span><span class="dl">'</span><span class="p">)</span> <span class="k">return</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">visit</span><span class="p">.</span><span class="nx">REMOVE</span>
+  <span class="p">},</span>
+  <span class="nx">Scalar</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span>
+      <span class="nx">key</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">key</span><span class="dl">'</span> <span class="o">&amp;&amp;</span>
+      <span class="k">typeof</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">string</span><span class="dl">'</span> <span class="o">&amp;&amp;</span>
+      <span class="nx">node</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">PLAIN</span><span class="dl">'</span>
+    <span class="p">)</span> <span class="p">{</span>
+      <span class="nx">node</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">QUOTE_SINGLE</span><span class="dl">'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// - 'some values'</span>
+<span class="c1">// - 42</span>
+<span class="c1">// - including: "objects"</span>
+<span class="c1">// - 1: 'a number'</span>
+</code></pre></div>
+<p>In general, it&#39;s safe to modify nodes manually, e.g. splicing the <code>items</code> array of a <code>YAMLMap</code> or changing its <code>type</code> from <code>&#39;MAP&#39;</code> to <code>&#39;FLOW_MAP&#39;</code>.
+For operations on nodes at a known location in the tree, it&#39;s probably easiest to use <code>doc.getIn(path, true)</code> to access them.
+For more complex or general operations, a visitor API is provided:</p>
+<h4 id='yaml-visit-node-visitor'><code>YAML.visit(node, visitor)</code></h4>
+<p>Apply a visitor to an AST node or document.</p>
+
+<p>Walks through the tree (depth-first) starting from <code>node</code>, calling a <code>visitor</code> function with three arguments:</p>
+
+<ul>
+<li><code>key</code>: For sequence values and map <code>Pair</code>, the node&#39;s index in the collection.
+Within a <code>Pair</code>, <code>&#39;key&#39;</code> or <code>&#39;value&#39;</code>, correspondingly.
+<code>null</code> for the root node.</li>
+<li><code>node</code>: The current node.</li>
+<li><code>path</code>: The ancestry of the current node.</li>
+</ul>
+
+<p>The return value of the visitor may be used to control the traversal:</p>
+
+<ul>
+<li><code>undefined</code> (default): Do nothing and continue</li>
+<li><code>YAML.visit.SKIP</code>: Do not visit the children of this node, continue with next sibling</li>
+<li><code>YAML.visit.BREAK</code>: Terminate traversal completely</li>
+<li><code>YAML.visit.REMOVE</code>: Remove the current node, then continue with the next one</li>
+<li><code>Node</code>: Replace the current node, then continue by visiting it</li>
+<li><code>number</code>: While iterating the items of a sequence or map, set the index of the next step.
+This is useful especially if the index of the current node has changed.</li>
+</ul>
+
+<p>If <code>visitor</code> is a single function, it will be called with all values encountered in the tree, including e.g. <code>null</code> values.
+Alternatively, separate visitor functions may be defined for each <code>Map</code>, <code>Pair</code>, <code>Seq</code>, <code>Alias</code> and <code>Scalar</code> node.</p>
 <h2 id='comments'>Comments</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---

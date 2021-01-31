@@ -300,6 +300,9 @@
                     <a href="#creating-nodes" class="toc-h2 toc-link" data-title="Creating Nodes">Creating Nodes</a>
                   </li>
                   <li>
+                    <a href="#modifying-nodes" class="toc-h2 toc-link" data-title="Modifying Nodes">Modifying Nodes</a>
+                  </li>
+                  <li>
                     <a href="#comments" class="toc-h2 toc-link" data-title="Comments">Comments</a>
                   </li>
                   <li>
@@ -384,7 +387,8 @@ yarn add yaml@next
 <li>Supports parsing, modifying, and writing YAML comments.</li>
 </ul>
 
-<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies and runs on Node.js 6 and later, and in browsers from IE 11 upwards.</p>
+<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>.
+It has no external dependencies and runs on Node.js as well as modern browsers.</p>
 
 <p>For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes. Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).</p>
 
@@ -418,6 +422,7 @@ yarn add yaml@next
 </ul></li>
 <li><a href="#parsing-documents"><code>YAML.parseAllDocuments(str, options?): YAML.Document[]</code></a></li>
 <li><a href="#parsing-documents"><code>YAML.parseDocument(str, options?): YAML.Document</code></a></li>
+<li><a href="#modifying-nodes"><code>YAML.visit(node, visitor)</code></a></li>
 </ul>
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Pair</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/types</span><span class="dl">'</span>
 </code></pre></div>
@@ -428,10 +433,8 @@ yarn add yaml@next
 </ul>
 
 <h3>CST Parser</h3>
-<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">parseCST</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/parse-cst</span><span class="dl">'</span>
-</code></pre></div>
+
 <ul>
-<li><a href="#parsecst"><code>parseCST(str): CSTDocument[]</code></a></li>
 <li><a href="#parsecst"><code>YAML.parseCST(str): CSTDocument[]</code></a></li>
 </ul>
 <h1 id='parse-amp-stringify'>Parse &amp; Stringify</h1><div class="highlight"><pre class="highlight yaml tab-yaml"><code><span class="c1"># file.yml</span>
@@ -546,6 +549,11 @@ yarn add yaml@next
 <td>keepUndefined</td>
 <td><code>boolean</code></td>
 <td>Keep <code>undefined</code> object values when creating mappings and return a Scalar node when stringifying <code>undefined</code>. By default <code>false</code>.</td>
+</tr>
+<tr>
+<td>logLevel</td>
+<td><code>&#39;warn&#39; ⎮ &#39;error&#39; ⎮ &#39;silent&#39;</code></td>
+<td>Control the verbosity of <code>YAML.parse()</code>. Set to <code>&#39;error&#39;</code> to silence warnings, and to <code>&#39;silent&#39;</code> to also silence most errors. By default <code>&#39;warn&#39;</code>.</td>
 </tr>
 <tr>
 <td>mapAsMap</td>
@@ -704,7 +712,8 @@ target:
 </tr>
 </tbody></table>
 <h2 id='silencing-warnings'>Silencing Warnings</h2>
-<p>By default, the library will emit warnings as required by the YAML spec during parsing. If you&#39;d like to silence these, define a global or <code>process.env</code> variable <code>YAML_SILENCE_WARNINGS</code> with a true-ish value.</p>
+<p>By default, the library will emit warnings as required by the YAML spec during parsing.
+If you&#39;d like to silence these, set the <code>logLevel</code> option to <code>&#39;error&#39;</code>.</p>
 <h1 id='documents'>Documents</h1>
 <p>In order to work with YAML features not directly supported by native JavaScript data types, such as comments, anchors and aliases, <code>yaml</code> provides the <code>YAML.Document</code> API.</p>
 <h2 id='parsing-documents'>Parsing Documents</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">fs</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">fs</span><span class="dl">'</span>
@@ -1201,6 +1210,68 @@ target:
 <p>To construct a <code>YAMLSeq</code> or <code>YAMLMap</code>, use <code>doc.createNode()</code> with array, object or iterable input, or create the collections directly by importing the classes from <code>yaml/types</code>.</p>
 
 <p>Once created, normal array operations may be used to modify the <code>items</code> array. New <code>Pair</code> objects may created either by importing the class from <code>yaml/types</code> and using its <code>new Pair(key, value)</code> constructor, or by using the <code>doc.createPair(key, value, options?)</code> method. The latter will recursively wrap the <code>key</code> and <code>value</code> as nodes, and accepts the same options as <code>doc.createNode()</code></p>
+<h2 id='modifying-nodes'>Modifying Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
+  - some values
+  - 42
+  - "3": a string
+    including: objects
+  - 1: a number
+`</span><span class="p">)</span>
+
+<span class="kd">const</span> <span class="nx">obs</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="dl">'</span><span class="s1">including</span><span class="dl">'</span><span class="p">],</span> <span class="kc">true</span><span class="p">)</span>
+<span class="nx">obs</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">QUOTE_DOUBLE</span><span class="dl">'</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">visit</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">Pair</span><span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="nx">pair</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">pair</span><span class="p">.</span><span class="nx">key</span> <span class="o">&amp;&amp;</span> <span class="nx">pair</span><span class="p">.</span><span class="nx">key</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">3</span><span class="dl">'</span><span class="p">)</span> <span class="k">return</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">visit</span><span class="p">.</span><span class="nx">REMOVE</span>
+  <span class="p">},</span>
+  <span class="nx">Scalar</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span>
+      <span class="nx">key</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">key</span><span class="dl">'</span> <span class="o">&amp;&amp;</span>
+      <span class="k">typeof</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">string</span><span class="dl">'</span> <span class="o">&amp;&amp;</span>
+      <span class="nx">node</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">PLAIN</span><span class="dl">'</span>
+    <span class="p">)</span> <span class="p">{</span>
+      <span class="nx">node</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">QUOTE_SINGLE</span><span class="dl">'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// - 'some values'</span>
+<span class="c1">// - 42</span>
+<span class="c1">// - including: "objects"</span>
+<span class="c1">// - 1: 'a number'</span>
+</code></pre></div>
+<p>In general, it&#39;s safe to modify nodes manually, e.g. splicing the <code>items</code> array of a <code>YAMLMap</code> or changing its <code>type</code> from <code>&#39;MAP&#39;</code> to <code>&#39;FLOW_MAP&#39;</code>.
+For operations on nodes at a known location in the tree, it&#39;s probably easiest to use <code>doc.getIn(path, true)</code> to access them.
+For more complex or general operations, a visitor API is provided:</p>
+<h4 id='yaml-visit-node-visitor'><code>YAML.visit(node, visitor)</code></h4>
+<p>Apply a visitor to an AST node or document.</p>
+
+<p>Walks through the tree (depth-first) starting from <code>node</code>, calling a <code>visitor</code> function with three arguments:</p>
+
+<ul>
+<li><code>key</code>: For sequence values and map <code>Pair</code>, the node&#39;s index in the collection.
+Within a <code>Pair</code>, <code>&#39;key&#39;</code> or <code>&#39;value&#39;</code>, correspondingly.
+<code>null</code> for the root node.</li>
+<li><code>node</code>: The current node.</li>
+<li><code>path</code>: The ancestry of the current node.</li>
+</ul>
+
+<p>The return value of the visitor may be used to control the traversal:</p>
+
+<ul>
+<li><code>undefined</code> (default): Do nothing and continue</li>
+<li><code>YAML.visit.SKIP</code>: Do not visit the children of this node, continue with next sibling</li>
+<li><code>YAML.visit.BREAK</code>: Terminate traversal completely</li>
+<li><code>YAML.visit.REMOVE</code>: Remove the current node, then continue with the next one</li>
+<li><code>Node</code>: Replace the current node, then continue by visiting it</li>
+<li><code>number</code>: While iterating the items of a sequence or map, set the index of the next step.
+This is useful especially if the index of the current node has changed.</li>
+</ul>
+
+<p>If <code>visitor</code> is a single function, it will be called with all values encountered in the tree, including e.g. <code>null</code> values.
+Alternatively, separate visitor functions may be defined for each <code>Map</code>, <code>Pair</code>, <code>Seq</code>, <code>Alias</code> and <code>Scalar</code> node.</p>
 <h2 id='comments'>Comments</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---
@@ -1480,9 +1551,9 @@ it has:
 <p>For ease of implementation and to provide better error handling and reporting, the lowest level of the library&#39;s parser turns any input string into a <a href="https://en.wikipedia.org/wiki/Concrete_syntax_tree"><strong>Concrete Syntax Tree</strong></a> of nodes as if the input were YAML. This level of the API has not been designed to be particularly user-friendly for external users, but it is fast, robust, and not dependent on the rest of the library.</p>
 <h2 id='parsecst'>parseCST</h2>
 <!-- prettier-ignore -->
-<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">parseCST</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/parse-cst</span><span class="dl">'</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">YAML</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 
-<span class="kd">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">parseCST</span><span class="p">(</span><span class="s2">`
+<span class="kd">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseCST</span><span class="p">(</span><span class="s2">`
 sequence: [ one, two, ]
 mapping: { sky: blue, sea: green }
 ---
@@ -1504,10 +1575,12 @@ mapping: { sky: blue, sea: green }
   <span class="p">.</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1">// document contents (as opposed to directives)</span>
   <span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">node</span>  <span class="c1">// the second item, a block value</span>
   <span class="p">.</span><span class="nx">strValue</span>       <span class="c1">// 'Block scalar\n'</span>
-</code></pre></div><h4 id='parsecst-string-cstdocument'><code>parseCST(string): CSTDocument[]</code></h4><h4 id='yaml-parsecst-string-cstdocument'><code>YAML.parseCST(string): CSTDocument[]</code></h4>
+</code></pre></div><h4 id='yaml-parsecst-string-cstdocument'><code>YAML.parseCST(string): CSTDocument[]</code></h4>
 <p>The CST parser will not produce a CST that is necessarily valid YAML, and in particular its representation of collections of items is expected to undergo further processing and validation. The parser should never throw errors, but may include them as a value of the relevant node. On the other hand, if you feed it garbage, you&#39;ll likely get a garbage CST as well.</p>
 
-<p>The public API of the CST layer is a single function which returns an array of parsed CST documents. The array and its contained nodes override the default <code>toString</code> method, each returning a YAML string representation of its contents. The same function is exported as a part of the default <code>YAML</code> object, as well as seprately at <code>yaml/parse-cst</code>. It has no dependency on the rest of the library, so importing only <code>parseCST</code> should add about 9kB to your gzipped bundle size, when the whole library will add about 27kB.</p>
+<p>The public API of the CST layer is a single function which returns an array of parsed CST documents.
+The array and its contained nodes override the default <code>toString</code> method, each returning a YAML string representation of its contents.
+The <code>parseCST</code> function has no dependency on the rest of the library, so importing only it should add about 9kB to your gzipped bundle size, when the whole library will add about 27kB.</p>
 
 <p>Care should be taken when modifying the CST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren&#39;t broken. In other words, this is an engineering tool and you may hurt yourself. If you&#39;re looking to generate a brand new YAML document, see the section on <a href="#creating-documents">Creating Documents</a>.</p>
 
@@ -1548,10 +1621,10 @@ mapping: { sky: blue, sea: green }
 <p>While the YAML spec considers e.g. block collections within a flow collection to be an error, this error will not be detected by the CST parser. For complete validation, you will need to parse the CST into a <code>YAML.Document</code>. If the document contains errors, they will be included in the document&#39;s <code>errors</code> array, and each error will will contain a <code>source</code> reference to the CST node where it was encountered. Do note that even if an error is encountered, the document contents might still be available. In such a case, the error will be a <a href="#yamlsemanticerror"><code>YAMLSemanticError</code></a> rather than a <a href="#yamlsyntaxerror"><code>YAMLSyntaxError</code></a>.</p>
 
 <h3 style="clear:both">Dealing with CRLF line terminators</h3>
-<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">parseCST</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/parse-cst</span><span class="dl">'</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">YAML</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 
 <span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">- foo</span><span class="se">\r\n</span><span class="s1">- bar</span><span class="se">\r\n</span><span class="dl">'</span>
-<span class="kd">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">parseCST</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseCST</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
 <span class="nx">cst</span><span class="p">.</span><span class="nx">setOrigRanges</span><span class="p">()</span> <span class="c1">// true</span>
 <span class="kd">const</span> <span class="p">{</span> <span class="nx">range</span><span class="p">,</span> <span class="nx">valueRange</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">cst</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">node</span>
 

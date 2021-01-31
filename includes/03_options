@@ -56,6 +56,11 @@
 <td>Keep <code>undefined</code> object values when creating mappings and return a Scalar node when stringifying <code>undefined</code>. By default <code>false</code>.</td>
 </tr>
 <tr>
+<td>logLevel</td>
+<td><code>&#39;warn&#39; ⎮ &#39;error&#39; ⎮ &#39;silent&#39;</code></td>
+<td>Control the verbosity of <code>YAML.parse()</code>. Set to <code>&#39;error&#39;</code> to silence warnings, and to <code>&#39;silent&#39;</code> to also silence most errors. By default <code>&#39;warn&#39;</code>.</td>
+</tr>
+<tr>
 <td>mapAsMap</td>
 <td><code>boolean</code></td>
 <td>When outputting JS, use Map rather than Object to represent mappings. By default <code>false</code>.</td>
@@ -212,4 +217,5 @@ target:
 </tr>
 </tbody></table>
 <h2 id='silencing-warnings'>Silencing Warnings</h2>
-<p>By default, the library will emit warnings as required by the YAML spec during parsing. If you&#39;d like to silence these, define a global or <code>process.env</code> variable <code>YAML_SILENCE_WARNINGS</code> with a true-ish value.</p>
+<p>By default, the library will emit warnings as required by the YAML spec during parsing.
+If you&#39;d like to silence these, set the <code>logLevel</code> option to <code>&#39;error&#39;</code>.</p>

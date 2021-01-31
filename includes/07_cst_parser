@@ -2,9 +2,9 @@
 <p>For ease of implementation and to provide better error handling and reporting, the lowest level of the library&#39;s parser turns any input string into a <a href="https://en.wikipedia.org/wiki/Concrete_syntax_tree"><strong>Concrete Syntax Tree</strong></a> of nodes as if the input were YAML. This level of the API has not been designed to be particularly user-friendly for external users, but it is fast, robust, and not dependent on the rest of the library.</p>
 <h2 id='parsecst'>parseCST</h2>
 <!-- prettier-ignore -->
-<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">parseCST</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/parse-cst</span><span class="dl">'</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">YAML</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 
-<span class="kd">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">parseCST</span><span class="p">(</span><span class="s2">`
+<span class="kd">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseCST</span><span class="p">(</span><span class="s2">`
 sequence: [ one, two, ]
 mapping: { sky: blue, sea: green }
 ---
@@ -26,10 +26,12 @@ mapping: { sky: blue, sea: green }
   <span class="p">.</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="c1">// document contents (as opposed to directives)</span>
   <span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">node</span>  <span class="c1">// the second item, a block value</span>
   <span class="p">.</span><span class="nx">strValue</span>       <span class="c1">// 'Block scalar\n'</span>
-</code></pre></div><h4 id='parsecst-string-cstdocument'><code>parseCST(string): CSTDocument[]</code></h4><h4 id='yaml-parsecst-string-cstdocument'><code>YAML.parseCST(string): CSTDocument[]</code></h4>
+</code></pre></div><h4 id='yaml-parsecst-string-cstdocument'><code>YAML.parseCST(string): CSTDocument[]</code></h4>
 <p>The CST parser will not produce a CST that is necessarily valid YAML, and in particular its representation of collections of items is expected to undergo further processing and validation. The parser should never throw errors, but may include them as a value of the relevant node. On the other hand, if you feed it garbage, you&#39;ll likely get a garbage CST as well.</p>
 
-<p>The public API of the CST layer is a single function which returns an array of parsed CST documents. The array and its contained nodes override the default <code>toString</code> method, each returning a YAML string representation of its contents. The same function is exported as a part of the default <code>YAML</code> object, as well as seprately at <code>yaml/parse-cst</code>. It has no dependency on the rest of the library, so importing only <code>parseCST</code> should add about 9kB to your gzipped bundle size, when the whole library will add about 27kB.</p>
+<p>The public API of the CST layer is a single function which returns an array of parsed CST documents.
+The array and its contained nodes override the default <code>toString</code> method, each returning a YAML string representation of its contents.
+The <code>parseCST</code> function has no dependency on the rest of the library, so importing only it should add about 9kB to your gzipped bundle size, when the whole library will add about 27kB.</p>
 
 <p>Care should be taken when modifying the CST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren&#39;t broken. In other words, this is an engineering tool and you may hurt yourself. If you&#39;re looking to generate a brand new YAML document, see the section on <a href="#creating-documents">Creating Documents</a>.</p>
 
@@ -70,10 +72,10 @@ mapping: { sky: blue, sea: green }
 <p>While the YAML spec considers e.g. block collections within a flow collection to be an error, this error will not be detected by the CST parser. For complete validation, you will need to parse the CST into a <code>YAML.Document</code>. If the document contains errors, they will be included in the document&#39;s <code>errors</code> array, and each error will will contain a <code>source</code> reference to the CST node where it was encountered. Do note that even if an error is encountered, the document contents might still be available. In such a case, the error will be a <a href="#yamlsemanticerror"><code>YAMLSemanticError</code></a> rather than a <a href="#yamlsyntaxerror"><code>YAMLSyntaxError</code></a>.</p>
 
 <h3 style="clear:both">Dealing with CRLF line terminators</h3>
-<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">parseCST</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/parse-cst</span><span class="dl">'</span>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">YAML</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 
 <span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">- foo</span><span class="se">\r\n</span><span class="s1">- bar</span><span class="se">\r\n</span><span class="dl">'</span>
-<span class="kd">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">parseCST</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">cst</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseCST</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
 <span class="nx">cst</span><span class="p">.</span><span class="nx">setOrigRanges</span><span class="p">()</span> <span class="c1">// true</span>
 <span class="kd">const</span> <span class="p">{</span> <span class="nx">range</span><span class="p">,</span> <span class="nx">valueRange</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">cst</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">node</span>
 

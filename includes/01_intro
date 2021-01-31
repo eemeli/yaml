@@ -15,7 +15,8 @@ yarn add yaml@next
 <li>Supports parsing, modifying, and writing YAML comments.</li>
 </ul>
 
-<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>. It has no external dependencies and runs on Node.js 6 and later, and in browsers from IE 11 upwards.</p>
+<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>.
+It has no external dependencies and runs on Node.js as well as modern browsers.</p>
 
 <p>For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes. Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).</p>
 
@@ -49,6 +50,7 @@ yarn add yaml@next
 </ul></li>
 <li><a href="#parsing-documents"><code>YAML.parseAllDocuments(str, options?): YAML.Document[]</code></a></li>
 <li><a href="#parsing-documents"><code>YAML.parseDocument(str, options?): YAML.Document</code></a></li>
+<li><a href="#modifying-nodes"><code>YAML.visit(node, visitor)</code></a></li>
 </ul>
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Pair</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/types</span><span class="dl">'</span>
 </code></pre></div>
@@ -59,9 +61,7 @@ yarn add yaml@next
 </ul>
 
 <h3>CST Parser</h3>
-<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">parseCST</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/parse-cst</span><span class="dl">'</span>
-</code></pre></div>
+
 <ul>
-<li><a href="#parsecst"><code>parseCST(str): CSTDocument[]</code></a></li>
 <li><a href="#parsecst"><code>YAML.parseCST(str): CSTDocument[]</code></a></li>
 </ul>
