@@ -198,6 +198,71 @@ To construct a `YAMLSeq` or `YAMLMap`, use `doc.createNode()` with array, object
 
 Once created, normal array operations may be used to modify the `items` array. New `Pair` objects may created either by importing the class from `yaml/types` and using its `new Pair(key, value)` constructor, or by using the `doc.createPair(key, value, options?)` method. The latter will recursively wrap the `key` and `value` as nodes, and accepts the same options as `doc.createNode()`
 
+## Modifying Nodes
+
+```js
+const doc = YAML.parseDocument(`
+  - some values
+  - 42
+  - "3": a string
+    including: objects
+  - 1: a number
+`)
+
+const obs = doc.getIn([2, 'including'], true)
+obs.type = 'QUOTE_DOUBLE'
+
+YAML.visit(doc, {
+  Pair(_, pair) {
+    if (pair.key && pair.key.value === '3') return YAML.visit.REMOVE
+  },
+  Scalar(key, node) {
+    if (
+      key !== 'key' &&
+      typeof node.value === 'string' &&
+      node.type === 'PLAIN'
+    ) {
+      node.type = 'QUOTE_SINGLE'
+    }
+  }
+})
+
+String(doc)
+// - 'some values'
+// - 42
+// - including: "objects"
+// - 1: 'a number'
+```
+
+In general, it's safe to modify nodes manually, e.g. splicing the `items` array of a `YAMLMap` or changing its `type` from `'MAP'` to `'FLOW_MAP'`.
+For operations on nodes at a known location in the tree, it's probably easiest to use `doc.getIn(path, true)` to access them.
+For more complex or general operations, a visitor API is provided:
+
+#### `YAML.visit(node, visitor)`
+
+Apply a visitor to an AST node or document.
+
+Walks through the tree (depth-first) starting from `node`, calling a `visitor` function with three arguments:
+
+- `key`: For sequence values and map `Pair`, the node's index in the collection.
+  Within a `Pair`, `'key'` or `'value'`, correspondingly.
+  `null` for the root node.
+- `node`: The current node.
+- `path`: The ancestry of the current node.
+
+The return value of the visitor may be used to control the traversal:
+
+- `undefined` (default): Do nothing and continue
+- `YAML.visit.SKIP`: Do not visit the children of this node, continue with next sibling
+- `YAML.visit.BREAK`: Terminate traversal completely
+- `YAML.visit.REMOVE`: Remove the current node, then continue with the next one
+- `Node`: Replace the current node, then continue by visiting it
+- `number`: While iterating the items of a sequence or map, set the index of the next step.
+  This is useful especially if the index of the current node has changed.
+
+If `visitor` is a single function, it will be called with all values encountered in the tree, including e.g. `null` values.
+Alternatively, separate visitor functions may be defined for each `Map`, `Pair`, `Seq`, `Alias` and `Scalar` node.
+
 ## Comments
 
 ```js

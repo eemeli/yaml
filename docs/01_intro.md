@@ -49,6 +49,7 @@ const YAML = require('yaml')
   - [`#errors`](#errors)
 - [`YAML.parseAllDocuments(str, options?): YAML.Document[]`](#parsing-documents)
 - [`YAML.parseDocument(str, options?): YAML.Document`](#parsing-documents)
+- [`YAML.visit(node, visitor)`](#modifying-nodes)
 
 ```js
 import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'

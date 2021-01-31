@@ -44,6 +44,7 @@ const YAML = require('yaml')
   - [`#errors`](https://eemeli.org/yaml/#errors)
 - [`YAML.parseAllDocuments(str, options?): YAML.Document[]`](https://eemeli.org/yaml/#parsing-documents)
 - [`YAML.parseDocument(str, options?): YAML.Document`](https://eemeli.org/yaml/#parsing-documents)
+- [`YAML.visit(node, visitor)`](https://eemeli.org/yaml/#modifying-nodes)
 
 ```js
 import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'
