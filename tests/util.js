@@ -7,25 +7,25 @@ describe('visitor', () => {
     const fn = jest.fn()
     visit(doc, { Document: fn, Map: fn, Pair: fn, Seq: fn, Scalar: fn })
     expect(fn.mock.calls).toMatchObject([
-      [{ type: 'DOCUMENT' }],
-      [{ type: 'FLOW_MAP' }],
-      [{ type: 'PAIR' }],
-      [{ type: 'PLAIN', value: 'one' }],
-      [{ type: 'PLAIN', value: 1 }],
-      [{ type: 'PAIR' }],
-      [{ type: 'PLAIN', value: 'two' }]
+      [{ type: 'DOCUMENT' }, []],
+      [{ type: 'FLOW_MAP' }, [{}]],
+      [{ type: 'PAIR' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
+      [{ type: 'PLAIN', value: 1 }, [{}, {}, {}]],
+      [{ type: 'PAIR' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'two' }, [{}, {}, {}]]
     ])
   })
 
   test('Seq', () => {
-    const doc = YAML.parseDocument('- one\n- two\n')
+    const doc = YAML.parseDocument('- 1\n- two\n')
     const fn = jest.fn()
     visit(doc, { Document: fn, Map: fn, Pair: fn, Seq: fn, Scalar: fn })
     expect(fn.mock.calls).toMatchObject([
-      [{ type: 'DOCUMENT' }],
-      [{ type: 'SEQ' }],
-      [{ type: 'PLAIN', value: 'one' }],
-      [{ type: 'PLAIN', value: 'two' }]
+      [{ type: 'DOCUMENT' }, []],
+      [{ type: 'SEQ' }, [{ type: 'DOCUMENT' }]],
+      [{ type: 'PLAIN', value: 1 }, [{ type: 'DOCUMENT' }, { type: 'SEQ' }]],
+      [{ type: 'PLAIN', value: 'two' }, [{ type: 'DOCUMENT' }, { type: 'SEQ' }]]
     ])
   })
 
@@ -34,13 +34,24 @@ describe('visitor', () => {
     const fn = jest.fn()
     visit(doc, { Document: fn, Map: fn, Pair: fn, Seq: fn, Scalar: fn })
     expect(fn.mock.calls).toMatchObject([
-      [{ type: 'DOCUMENT' }],
-      [{ type: 'MAP' }],
-      [{ type: 'PAIR' }],
-      [{ type: 'PLAIN', value: 'foo' }],
-      [{ type: 'SEQ' }],
-      [{ type: 'QUOTE_DOUBLE', value: 'one' }],
-      [{ type: 'QUOTE_SINGLE', value: 'two' }]
+      [{ type: 'DOCUMENT' }, []],
+      [{ type: 'MAP' }, [{}]],
+      [{ type: 'PAIR' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
+      [{ type: 'SEQ' }, [{}, {}, {}]],
+      [{ type: 'QUOTE_DOUBLE', value: 'one' }, [{}, {}, {}, {}]],
+      [{ type: 'QUOTE_SINGLE', value: 'two' }, [{}, {}, {}, {}]]
+    ])
+  })
+
+  test('Visit called with non-Document root', () => {
+    const doc = YAML.parseDocument('foo:\n  - "one"\n  - \'two\'\n')
+    const fn = jest.fn()
+    visit(doc.get('foo'), fn)
+    expect(fn.mock.calls).toMatchObject([
+      [{ type: 'SEQ' }, []],
+      [{ type: 'QUOTE_DOUBLE', value: 'one' }, [{ type: 'SEQ' }]],
+      [{ type: 'QUOTE_SINGLE', value: 'two' }, [{ type: 'SEQ' }]]
     ])
   })
 
@@ -49,9 +60,9 @@ describe('visitor', () => {
     const Scalar = jest.fn()
     visit(doc, { Scalar })
     expect(Scalar.mock.calls).toMatchObject([
-      [{ type: 'PLAIN', value: 'foo' }],
-      [{ type: 'QUOTE_DOUBLE', value: 'one' }],
-      [{ type: 'QUOTE_SINGLE', value: 'two' }]
+      [{ type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
+      [{ type: 'QUOTE_DOUBLE', value: 'one' }, [{}, {}, {}, {}]],
+      [{ type: 'QUOTE_SINGLE', value: 'two' }, [{}, {}, {}, {}]]
     ])
   })
 
@@ -60,14 +71,14 @@ describe('visitor', () => {
     const fn = jest.fn()
     visit(doc, fn)
     expect(fn.mock.calls).toMatchObject([
-      [{ type: 'DOCUMENT' }],
-      [{ type: 'FLOW_MAP' }],
-      [{ type: 'PAIR' }],
-      [{ type: 'PLAIN', value: 'one' }],
-      [{ type: 'PLAIN', value: 1 }],
-      [{ type: 'PAIR' }],
-      [{ type: 'PLAIN', value: 'two' }],
-      [null]
+      [{ type: 'DOCUMENT' }, []],
+      [{ type: 'FLOW_MAP' }, [{}]],
+      [{ type: 'PAIR' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
+      [{ type: 'PLAIN', value: 1 }, [{}, {}, {}]],
+      [{ type: 'PAIR' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'two' }, [{}, {}, {}]],
+      [null, [{}, {}, {}]]
     ])
   })
 
@@ -91,9 +102,9 @@ describe('visitor', () => {
       Scalar
     })
     expect(Scalar.mock.calls).toMatchObject([
-      [{ type: 'PLAIN', value: 'one' }],
-      [{ type: 'PLAIN', value: 'two' }],
-      [{ value: 'three' }]
+      [{ type: 'PLAIN', value: 'one' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'two' }, [{}, {}]],
+      [{ value: 'three' }, [{}, {}]]
     ])
     expect(String(doc)).toBe('- one\n- two\n- three\n')
   })

@@ -18,18 +18,20 @@ export function toJS(value: any, arg?: any, ctx?: Schema.CreateNodeContext): any
  * Apply a visitor to an AST node or document.
  *
  * Walks through the tree (depth-first) starting from `node`, calling each of
- * the visitor functions (if defined) according to the current node type.
+ * the visitor functions (if defined) according to the current node type. The
+ * second argument `path` of visitor calls is the sequence of the current node's
+ * ancestors, starting from the initial root `node`.
  */
 export function visit(
   node: Node | Document,
   visitor:
-    | ((node: any) => void)
+    | ((node: any, path: Node[]) => void)
     | {
-        Document?: (doc: Document) => void
-        Map?: (map: YAMLMap) => void
-        Pair?: (pair: Pair) => void
-        Seq?: (seq: YAMLSeq) => void
-        Scalar?: (scalar: Scalar) => void
+        Document?: (doc: Document, path: Node[]) => void
+        Map?: (map: YAMLMap, path: Node[]) => void
+        Pair?: (pair: Pair, path: Node[]) => void
+        Seq?: (seq: YAMLSeq, path: Node[]) => void
+        Scalar?: (scalar: Scalar, path: Node[]) => void
       }
 ): void
 
