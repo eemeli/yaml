@@ -179,4 +179,12 @@ describe('visitor', () => {
     ])
     expect(String(doc)).toBe('one: 1\ntwo: null\n')
   })
+
+  test('Fail to remove root node', () => {
+    const doc = YAML.parseDocument('- one\n- two\n- three\n')
+    const Document = jest.fn(() => visit.REMOVE)
+    expect(() => visit(doc, { Document })).toThrow(
+      'Cannot remove node with undefined parent'
+    )
+  })
 })

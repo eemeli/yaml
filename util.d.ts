@@ -53,6 +53,8 @@ export interface visit {
  *   - `visit.REMOVE`: Remove the current node, then continue with the next one
  *   - `Node`: Replace the current node, then continue by visiting it
  *
+ * Attempting to remove or replace the root node of a visit will throw an error.
+ *
  * If `visitor` is a single function, it will be called with all values
  * encountered in the tree, including e.g. `null` values. Alternatively,
  * separate visitor functions may be defined for each `Document`, `Map`, `Pair`,

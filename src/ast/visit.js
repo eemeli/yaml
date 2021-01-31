@@ -39,6 +39,9 @@ function _visit(node, visitor, path) {
       else if (parent.value === node) parent.value = ctrl
     } else if (parent && parent.type === Type.DOCUMENT) {
       parent.contents = ctrl
+    } else {
+      const pt = parent && parent.type
+      throw new Error(`Cannot replace node with ${pt} parent`)
     }
     return _visit(ctrl, visitor, path)
   }
@@ -53,6 +56,9 @@ function _visit(node, visitor, path) {
       else if (parent.value === node) parent.value = null
     } else if (parent && parent.type === Type.DOCUMENT) {
       parent.contents = null
+    } else {
+      const pt = parent && parent.type
+      throw new Error(`Cannot remove node with ${pt} parent`)
     }
   }
 
