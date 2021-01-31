@@ -1,4 +1,5 @@
 import { Type } from '../constants.js'
+import { Alias } from './Alias.js'
 import { Node } from './Node.js'
 import { Pair } from './Pair.js'
 import { Scalar } from './Scalar.js'
@@ -20,6 +21,8 @@ function _visit(key, node, visitor, path) {
     if (visitor.Pair) ctrl = visitor.Pair(key, node, path)
   } else if (node instanceof Scalar) {
     if (visitor.Scalar) ctrl = visitor.Scalar(key, node, path)
+  } else if (node instanceof Alias) {
+    if (visitor.Scalar) ctrl = visitor.Alias(key, node, path)
   }
 
   if (ctrl instanceof Node) {

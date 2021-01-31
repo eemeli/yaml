@@ -5,7 +5,7 @@ describe('visitor', () => {
   test('Map', () => {
     const doc = YAML.parseDocument('{ one: 1, two }')
     const fn = jest.fn()
-    visit(doc, { Map: fn, Pair: fn, Seq: fn, Scalar: fn })
+    visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
     expect(fn.mock.calls).toMatchObject([
       [null, { type: 'FLOW_MAP' }, [{}]],
       [0, { type: 'PAIR' }, [{}, {}]],
@@ -19,7 +19,7 @@ describe('visitor', () => {
   test('Seq', () => {
     const doc = YAML.parseDocument('- 1\n- two\n')
     const fn = jest.fn()
-    visit(doc, { Map: fn, Pair: fn, Seq: fn, Scalar: fn })
+    visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
     expect(fn.mock.calls).toMatchObject([
       [null, { type: 'SEQ' }, [{ type: 'DOCUMENT' }]],
       [0, { type: 'PLAIN', value: 1 }, [{ type: 'DOCUMENT' }, { type: 'SEQ' }]],
@@ -31,10 +31,21 @@ describe('visitor', () => {
     ])
   })
 
+  test('Alias', () => {
+    const doc = YAML.parseDocument('- &a 1\n- *a\n')
+    const fn = jest.fn()
+    visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
+    expect(fn.mock.calls).toMatchObject([
+      [null, { type: 'SEQ' }, [{}]],
+      [0, { type: 'PLAIN', value: 1 }, [{}, {}]],
+      [1, { type: 'ALIAS', source: { value: 1 } }, [{}, {}]]
+    ])
+  })
+
   test('Seq in Map', () => {
     const doc = YAML.parseDocument('foo:\n  - "one"\n  - \'two\'\n')
     const fn = jest.fn()
-    visit(doc, { Map: fn, Pair: fn, Seq: fn, Scalar: fn })
+    visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
     expect(fn.mock.calls).toMatchObject([
       [null, { type: 'MAP' }, [{}]],
       [0, { type: 'PAIR' }, [{}, {}]],

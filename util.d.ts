@@ -1,6 +1,6 @@
 import { Document } from '.'
 import { CST } from './cst'
-import { Node, Pair, Scalar, Schema, YAMLMap, YAMLSeq } from './types'
+import { Alias, Node, Pair, Scalar, Schema, YAMLMap, YAMLSeq } from './types'
 
 export function findPair(items: any[], key: Scalar | any): Pair | undefined
 
@@ -26,10 +26,11 @@ export interface visit {
     visitor:
       | visitor<any>
       | {
+          Alias?: visitor<Alias>
           Map?: visitor<YAMLMap>
           Pair?: visitor<Pair>
-          Seq?: visitor<YAMLSeq>
           Scalar?: visitor<Scalar>
+          Seq?: visitor<YAMLSeq>
         }
   ): void
 
@@ -67,8 +68,8 @@ export interface visit {
  *
  * If `visitor` is a single function, it will be called with all values
  * encountered in the tree, including e.g. `null` values. Alternatively,
- * separate visitor functions may be defined for each `Map`, `Pair`, `Seq` and
- * `Scalar` node.
+ * separate visitor functions may be defined for each `Map`, `Pair`, `Seq`,
+ * `Alias` and `Scalar` node.
  */
 export declare const visit: visit
 
