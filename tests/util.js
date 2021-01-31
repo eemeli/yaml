@@ -111,7 +111,7 @@ describe('visitor', () => {
 
   test('Do not visit seq items', () => {
     const doc = YAML.parseDocument('foo:\n  - one\n  - two\nbar:\n')
-    const fn = jest.fn(node => (node.type === 'SEQ' ? false : undefined))
+    const fn = jest.fn(node => (node.type === 'SEQ' ? visit.SKIP : undefined))
     visit(doc, { Document: fn, Map: fn, Pair: fn, Seq: fn, Scalar: fn })
     expect(fn.mock.calls).toMatchObject([
       [{ type: 'DOCUMENT' }, []],
@@ -134,5 +134,20 @@ describe('visitor', () => {
       [{ type: 'PLAIN', value: 'one' }, [{}, {}]],
       [{ type: 'PLAIN', value: 'two' }, [{}, {}]]
     ])
+  })
+
+  test('Modify seq item', () => {
+    const doc = YAML.parseDocument('- one\n- two\n- three\n')
+    const Scalar = jest.fn(node =>
+      node.value === 'two' ? doc.createNode(42) : undefined
+    )
+    visit(doc, { Scalar })
+    expect(Scalar.mock.calls).toMatchObject([
+      [{ type: 'PLAIN', value: 'one' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'two' }, [{}, {}]],
+      [{ value: 42 }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'three' }, [{}, {}]]
+    ])
+    expect(String(doc)).toBe('- one\n- 42\n- three\n')
   })
 })

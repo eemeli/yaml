@@ -14,7 +14,7 @@ export function stringifyString(
 
 export function toJS(value: any, arg?: any, ctx?: Schema.CreateNodeContext): any
 
-export type visitor<T> = (node: T, path: Node[]) => void | false | symbol
+export type visitor<T> = (node: T, path: Node[]) => void | symbol | Node
 
 export interface visit {
   (
@@ -30,6 +30,7 @@ export interface visit {
         }
   ): void
   BREAK: symbol
+  SKIP: symbol
 }
 
 /**
@@ -37,8 +38,12 @@ export interface visit {
  *
  * Walks through the tree (depth-first) starting from `node`, calling a
  * `visitor` function with each node and the ancestral `path` of nodes from the
- * root `node`. If a visitor returns `false`, its children will not be visited.
- * Returning `visit.BREAK` will terminate tree traversal completely.
+ * root `node`. The return value of the visitor may be used to control the
+ * traversal:
+ *   - `undefined` (default): Do nothing and continue
+ *   - `visit.SKIP`: Do not visit the children of this node
+ *   - `visit.BREAK`: Terminate traversal completely
+ *   - `Node`: Replace the current node, then continueby visiting it
  *
  * If `visitor` is a single function, it will be called with all values
  * encountered in the tree, including e.g. `null` values. Alternatively,

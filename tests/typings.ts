@@ -101,11 +101,11 @@ doc2.add(doc2.createPair('baz', 42))
 
 visit(doc, (node, path) => console.log(node, path))
 visit(doc, {
-  Scalar(node, path) {
-    console.log(node, path)
+  Scalar(node) {
+    if (typeof node.value === 'number') return doc.createNode(node.value + 1)
   },
   Map(map) {
-    if (map.items.length > 3) return false
+    if (map.items.length > 3) return visit.SKIP
   },
   Seq(seq) {
     if (seq.items.length > 3) return visit.BREAK
