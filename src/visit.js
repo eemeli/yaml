@@ -1,10 +1,10 @@
-import { Type } from '../constants.js'
-import { Alias } from './Alias.js'
-import { Node } from './Node.js'
-import { Pair } from './Pair.js'
-import { Scalar } from './Scalar.js'
-import { YAMLMap } from './YAMLMap.js'
-import { YAMLSeq } from './YAMLSeq.js'
+import { Alias } from './ast/Alias.js'
+import { Node } from './ast/Node.js'
+import { Pair } from './ast/Pair.js'
+import { Scalar } from './ast/Scalar.js'
+import { YAMLMap } from './ast/YAMLMap.js'
+import { YAMLSeq } from './ast/YAMLSeq.js'
+import { Document } from './doc/Document.js'
 
 const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')
@@ -32,7 +32,7 @@ function _visit(key, node, visitor, path) {
     } else if (parent instanceof Pair) {
       if (key === 'key') parent.key = ctrl
       else parent.value = ctrl
-    } else if (parent && parent.type === Type.DOCUMENT) {
+    } else if (parent instanceof Document) {
       parent.contents = ctrl
     } else {
       const pt = parent && parent.type
@@ -68,7 +68,7 @@ function _visit(key, node, visitor, path) {
 }
 
 export function visit(node, visitor) {
-  if (node && node.type === Type.DOCUMENT) {
+  if (node instanceof Document) {
     const cd = _visit(null, node.contents, visitor, Object.freeze([node]))
     if (cd === REMOVE) node.contents = null
   } else _visit(null, node, visitor, Object.freeze([]))

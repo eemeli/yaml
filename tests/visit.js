@@ -1,5 +1,5 @@
 import * as YAML from '../index.js'
-const { parseDocument, visit } = YAML
+const { Document, parseDocument, visit } = YAML
 
 test('Map', () => {
   const doc = parseDocument('{ one: 1, two }')
@@ -64,6 +64,18 @@ test('Visit called with non-Document root', () => {
     [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [{ type: 'SEQ' }]],
     [1, { type: 'QUOTE_SINGLE', value: 'two' }, [{ type: 'SEQ' }]]
   ])
+})
+
+test('Visiting a constructed document', () => {
+  const doc = new Document([1, 'two'])
+  const fn = jest.fn()
+  visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
+  expect(fn.mock.calls).toMatchObject([
+    [null, { items: [{}, {}] }, [{}]],
+    [0, { value: 1 }, [{}, {}]],
+    [1, { value: 'two' }, [{}, {}]]
+  ])
+  expect(String(doc)).toBe('- 1\n- two\n')
 })
 
 test('Only Scalar defined', () => {

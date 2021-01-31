@@ -4,8 +4,8 @@ import { Document } from './doc/Document.js'
 import { YAMLSemanticError } from './errors.js'
 import { warn } from './log.js'
 
-export { visit } from './ast/index.js'
 export { defaultOptions, scalarOptions } from './options.js'
+export { visit } from './visit.js'
 export { Document, parseCST }
 
 export function parseAllDocuments(src, options) {
