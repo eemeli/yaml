@@ -14,7 +14,11 @@ export function stringifyString(
 
 export function toJS(value: any, arg?: any, ctx?: Schema.CreateNodeContext): any
 
-export type visitor<T> = (node: T, path: Node[]) => void | symbol | Node
+export type visitor<T> = (
+  key: number | 'key' | 'value' | null,
+  node: T,
+  path: Node[]
+) => void | symbol | Node
 
 export interface visit {
   (
@@ -22,7 +26,6 @@ export interface visit {
     visitor:
       | visitor<any>
       | {
-          Document?: visitor<Document>
           Map?: visitor<YAMLMap>
           Pair?: visitor<Pair>
           Seq?: visitor<YAMLSeq>
@@ -44,11 +47,17 @@ export interface visit {
  * Apply a visitor to an AST node or document.
  *
  * Walks through the tree (depth-first) starting from `node`, calling a
- * `visitor` function with each node and the ancestral `path` of nodes from the
- * root `node`. The return value of the visitor may be used to control the
- * traversal:
+ * `visitor` function with three arguments:
+ *   - `key`: For sequence values and map `Pair`, the node's index in the
+ *     collection. Within a `Pair`, `'key'` or `'value'`, correspondingly.
+ *     `null` for the root node.
+ *   - `node`: The current node.
+ *   - `path`: The ancestry of the current node.
+ *
+ * The return value of the visitor may be used to control the traversal:
  *   - `undefined` (default): Do nothing and continue
- *   - `visit.SKIP`: Do not visit the children of this node, continue with next sibling
+ *   - `visit.SKIP`: Do not visit the children of this node, continue with next
+ *     sibling
  *   - `visit.BREAK`: Terminate traversal completely
  *   - `visit.REMOVE`: Remove the current node, then continue with the next one
  *   - `Node`: Replace the current node, then continue by visiting it
@@ -57,8 +66,8 @@ export interface visit {
  *
  * If `visitor` is a single function, it will be called with all values
  * encountered in the tree, including e.g. `null` values. Alternatively,
- * separate visitor functions may be defined for each `Document`, `Map`, `Pair`,
- * `Seq` and `Scalar` node.
+ * separate visitor functions may be defined for each `Map`, `Pair`, `Seq` and
+ * `Scalar` node.
  */
 export declare const visit: visit
 

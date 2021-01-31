@@ -9,51 +9,42 @@ const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')
 const REMOVE = Symbol('remove node')
 
-function _visit(node, visitor, path) {
-  let ctrl = typeof visitor === 'function' ? visitor(node, path) : undefined
-  let children = []
-
-  if (node instanceof YAMLMap) {
-    if (visitor.Map) ctrl = visitor.Map(node, path)
-    children = node.items
+function _visit(key, node, visitor, path) {
+  let ctrl = undefined
+  if (typeof visitor === 'function') ctrl = visitor(key, node, path)
+  else if (node instanceof YAMLMap) {
+    if (visitor.Map) ctrl = visitor.Map(key, node, path)
   } else if (node instanceof YAMLSeq) {
-    if (visitor.Seq) ctrl = visitor.Seq(node, path)
-    children = node.items
+    if (visitor.Seq) ctrl = visitor.Seq(key, node, path)
   } else if (node instanceof Pair) {
-    if (visitor.Pair) ctrl = visitor.Pair(node, path)
-    children = [node.key, node.value]
+    if (visitor.Pair) ctrl = visitor.Pair(key, node, path)
   } else if (node instanceof Scalar) {
-    if (visitor.Scalar) ctrl = visitor.Scalar(node, path)
-  } else if (node && node.type === Type.DOCUMENT) {
-    if (visitor.Document) ctrl = visitor.Document(node, path)
-    children = [node.contents]
+    if (visitor.Scalar) ctrl = visitor.Scalar(key, node, path)
   }
 
   if (ctrl instanceof Node) {
     const parent = path[path.length - 1]
     if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
-      const idx = parent.items.indexOf(node)
-      if (idx !== -1) parent.items.splice(idx, 1, ctrl)
+      parent.items.splice(key, 1, ctrl)
     } else if (parent instanceof Pair) {
-      if (parent.key === node) parent.key = ctrl
-      else if (parent.value === node) parent.value = ctrl
+      if (key === 'key') parent.key = ctrl
+      else parent.value = ctrl
     } else if (parent && parent.type === Type.DOCUMENT) {
       parent.contents = ctrl
     } else {
       const pt = parent && parent.type
       throw new Error(`Cannot replace node with ${pt} parent`)
     }
-    return _visit(ctrl, visitor, path)
+    return _visit(key, ctrl, visitor, path)
   }
 
   if (ctrl === REMOVE) {
     const parent = path[path.length - 1]
     if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
-      const idx = parent.items.indexOf(node)
-      if (idx !== -1) parent.items.splice(idx, 1)
+      parent.items.splice(key, 1)
     } else if (parent instanceof Pair) {
-      if (parent.key === node) parent.key = null
-      else if (parent.value === node) parent.value = null
+      if (key === 'key') parent.key = null
+      else parent.value = null
     } else if (parent && parent.type === Type.DOCUMENT) {
       parent.contents = null
     } else {
@@ -64,22 +55,26 @@ function _visit(node, visitor, path) {
 
   if (typeof ctrl === 'symbol') return ctrl
 
-  if (children.length > 0) {
+  if (node instanceof YAMLMap || node instanceof YAMLSeq) {
     path = Object.freeze(path.concat(node))
-    for (let i = 0; i < children.length; ++i) {
-      ctrl = _visit(children[i], visitor, path)
+    for (let i = 0; i < node.items.length; ++i) {
+      ctrl = _visit(i, node.items[i], visitor, path)
       if (ctrl === BREAK) return BREAK
-      else if (
-        ctrl === REMOVE &&
-        (node instanceof YAMLMap || node instanceof YAMLSeq)
-      )
-        i -= 1
+      else if (ctrl === REMOVE) i -= 1
     }
+  } else if (node instanceof Pair) {
+    path = Object.freeze(path.concat(node))
+    ctrl = _visit('key', node.key, visitor, path)
+    if (ctrl === BREAK) return BREAK
+    ctrl = _visit('value', node.value, visitor, path)
+    if (ctrl === BREAK) return BREAK
   }
 }
 
 export function visit(node, visitor) {
-  _visit(node, visitor, Object.freeze([]))
+  if (node && node.type === Type.DOCUMENT)
+    _visit(null, node.contents, visitor, Object.freeze([node]))
+  else _visit(null, node, visitor, Object.freeze([]))
 }
 
 visit.BREAK = BREAK

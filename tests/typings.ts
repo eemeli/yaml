@@ -99,18 +99,19 @@ doc.contents = map
 const doc2 = new YAML.Document({ bizz: 'fuzz' })
 doc2.add(doc2.createPair('baz', 42))
 
-visit(doc, (node, path) => console.log(node, path))
+visit(doc, (key, node, path) => console.log(key, node, path))
 visit(doc, {
-  Scalar(node) {
+  Scalar(key, node) {
+    if (typeof key === 'number') return undefined
     if (typeof node.value === 'number') return doc.createNode(node.value + 1)
   },
-  Map(map) {
+  Map(_, map) {
     if (map.items.length > 3) return visit.SKIP
   },
-  Pair(pair) {
+  Pair(_, pair) {
     if (pair.key.value === 'foo') return visit.REMOVE
   },
-  Seq(seq) {
+  Seq(_, seq) {
     if (seq.items.length > 3) return visit.BREAK
   }
 })
