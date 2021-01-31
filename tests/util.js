@@ -55,6 +55,22 @@ describe('visitor', () => {
     ])
   })
 
+  test('Function as visitor', () => {
+    const doc = YAML.parseDocument('{ one: 1, two }')
+    const fn = jest.fn()
+    visit(doc, fn)
+    expect(fn.mock.calls).toMatchObject([
+      [{ type: 'DOCUMENT' }],
+      [{ type: 'FLOW_MAP' }],
+      [{ type: 'PAIR' }],
+      [{ type: 'PLAIN', value: 'one' }],
+      [{ type: 'PLAIN', value: 1 }],
+      [{ type: 'PAIR' }],
+      [{ type: 'PLAIN', value: 'two' }],
+      [null]
+    ])
+  })
+
   test('Change key value', () => {
     const doc = YAML.parseDocument('foo:\n  - "one"\n  - \'two\'\n')
     visit(doc, {

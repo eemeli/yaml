@@ -11,6 +11,7 @@ import { YAMLSeq } from './YAMLSeq.js'
  * the visitor functions (if defined) according to the current node type.
  */
 export function visit(node, visitor) {
+  if (typeof visitor === 'function') visitor(node)
   if (node instanceof YAMLMap) {
     if (visitor.Map) visitor.Map(node)
     for (const item of node.items) visit(item, visitor)

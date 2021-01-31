@@ -20,13 +20,18 @@ export function toJS(value: any, arg?: any, ctx?: Schema.CreateNodeContext): any
  * Walks through the tree (depth-first) starting from `node`, calling each of
  * the visitor functions (if defined) according to the current node type.
  */
-export function visit(node: Node | Document, visitor: {
-  Document?: (doc: Document) => void
-  Map?: (map: YAMLMap) => void
-  Pair?: (pair: Pair) => void
-  Seq?: (seq: YAMLSeq) => void
-  Scalar?: (scalar: Scalar) => void
-}): void
+export function visit(
+  node: Node | Document,
+  visitor:
+    | ((node: any) => void)
+    | {
+        Document?: (doc: Document) => void
+        Map?: (map: YAMLMap) => void
+        Pair?: (pair: Pair) => void
+        Seq?: (seq: YAMLSeq) => void
+        Scalar?: (scalar: Scalar) => void
+      }
+): void
 
 export enum Type {
   ALIAS = 'ALIAS',
