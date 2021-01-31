@@ -154,6 +154,7 @@ export function composeStream(
             const dc = doc.comment
             doc.comment = dc ? `${dc}\n${end.comment}` : end.comment
           }
+          doc.range[1] = end.offset
           break
         }
         default:

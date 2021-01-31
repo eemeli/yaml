@@ -62,6 +62,7 @@ export function resolveFlowCollection(
       const seq = coll as YAMLSeq
       if (key) {
         const map = new YAMLMap(doc.schema)
+        map.type = Type.FLOW_MAP
         map.items.push(new Pair(key, value))
         seq.items.push(map)
       } else seq.items.push(value)
@@ -135,6 +136,7 @@ export function resolveFlowCollection(
           if (value) {
             onError(offset, 'Missing {} around pair used as mapping key')
             const map = new YAMLMap(doc.schema)
+            map.type = Type.FLOW_MAP
             map.items.push(new Pair(key, value))
             map.range = [key.range[0], value.range[1]]
             key = map as YAMLMap.Parsed
