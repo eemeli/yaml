@@ -5,26 +5,28 @@ import { YAMLMap } from './YAMLMap.js'
 import { YAMLSeq } from './YAMLSeq.js'
 
 function _visit(node, visitor, path) {
-  if (typeof visitor === 'function') visitor(node, path)
+  let ctrl = typeof visitor === 'function' ? visitor(node, path) : undefined
+  let children = []
+
   if (node instanceof YAMLMap) {
-    if (visitor.Map) visitor.Map(node, path)
-    path = Object.freeze(path.concat(node))
-    for (const item of node.items) _visit(item, visitor, path)
+    if (visitor.Map) ctrl = visitor.Map(node, path)
+    children = node.items
   } else if (node instanceof YAMLSeq) {
-    if (visitor.Seq) visitor.Seq(node, path)
-    path = Object.freeze(path.concat(node))
-    for (const item of node.items) _visit(item, visitor, path)
+    if (visitor.Seq) ctrl = visitor.Seq(node, path)
+    children = node.items
   } else if (node instanceof Pair) {
-    if (visitor.Pair) visitor.Pair(node, path)
-    path = Object.freeze(path.concat(node))
-    _visit(node.key, visitor, path)
-    _visit(node.value, visitor, path)
+    if (visitor.Pair) ctrl = visitor.Pair(node, path)
+    children = [node.key, node.value]
   } else if (node instanceof Scalar) {
-    if (visitor.Scalar) visitor.Scalar(node, path)
+    if (visitor.Scalar) ctrl = visitor.Scalar(node, path)
   } else if (node && node.type === Type.DOCUMENT) {
-    if (visitor.Document) visitor.Document(node, path)
+    if (visitor.Document) ctrl = visitor.Document(node, path)
+    children = [node.contents]
+  }
+
+  if (ctrl !== false && children.length > 0) {
     path = Object.freeze(path.concat(node))
-    _visit(node.contents, visitor, path)
+    for (const item of children) _visit(item, visitor, path)
   }
 }
 

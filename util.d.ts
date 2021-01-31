@@ -17,21 +17,25 @@ export function toJS(value: any, arg?: any, ctx?: Schema.CreateNodeContext): any
 /**
  * Apply a visitor to an AST node or document.
  *
- * Walks through the tree (depth-first) starting from `node`, calling each of
- * the visitor functions (if defined) according to the current node type. The
- * second argument `path` of visitor calls is the sequence of the current node's
- * ancestors, starting from the initial root `node`.
+ * Walks through the tree (depth-first) starting from `node`, calling a
+ * `visitor` function with each node and the ancestral `path` of nodes from the
+ * root `node`. If a visitor returns `false`, its children will not be visited.
+ *
+ * If `visitor` is a single function, it will be called with all values
+ * encountered in the tree, including e.g. `null` values. Alternatively,
+ * separate visitor functions may be defined for each `Document`, `Map`, `Pair`,
+ * `Seq` and `Scalar` node.
  */
 export function visit(
   node: Node | Document,
   visitor:
-    | ((node: any, path: Node[]) => void)
+    | ((node: any, path: Node[]) => void | false)
     | {
-        Document?: (doc: Document, path: Node[]) => void
-        Map?: (map: YAMLMap, path: Node[]) => void
-        Pair?: (pair: Pair, path: Node[]) => void
-        Seq?: (seq: YAMLSeq, path: Node[]) => void
-        Scalar?: (scalar: Scalar, path: Node[]) => void
+        Document?: (doc: Document, path: Node[]) => void | false
+        Map?: (map: YAMLMap, path: Node[]) => void | false
+        Pair?: (pair: Pair, path: Node[]) => void | false
+        Seq?: (seq: YAMLSeq, path: Node[]) => void | false
+        Scalar?: (scalar: Scalar, path: Node[]) => void | false
       }
 ): void
 

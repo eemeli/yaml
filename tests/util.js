@@ -108,4 +108,19 @@ describe('visitor', () => {
     ])
     expect(String(doc)).toBe('- one\n- two\n- three\n')
   })
+
+  test('Do not visit seq items', () => {
+    const doc = YAML.parseDocument('foo:\n  - one\n  - two\nbar:\n')
+    const fn = jest.fn(node => (node.type === 'SEQ' ? false : undefined))
+    visit(doc, { Document: fn, Map: fn, Pair: fn, Seq: fn, Scalar: fn })
+    expect(fn.mock.calls).toMatchObject([
+      [{ type: 'DOCUMENT' }, []],
+      [{ type: 'MAP' }, [{}]],
+      [{ type: 'PAIR' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
+      [{ type: 'SEQ' }, [{}, {}, {}]],
+      [{ type: 'PAIR' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'bar' }, [{}, {}, {}]]
+    ])
+  })
 })
