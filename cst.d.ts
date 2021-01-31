@@ -1,11 +1,5 @@
 import { Type, YAMLSyntaxError } from './util'
 
-export default function parseCST(str: string): ParsedCST
-
-export interface ParsedCST extends Array<CST.Document> {
-  setOrigRanges(): boolean
-}
-
 export namespace CST {
   interface Range {
     start: number
@@ -51,6 +45,10 @@ export namespace CST {
     readonly hasComment: boolean
     readonly hasProps: boolean
     readonly jsonLike: boolean
+    readonly rangeAsLinePos: null | {
+      start: { line: number; col: number }
+      end?: { line: number; col: number }
+    }
     readonly rawValue: string | null
     readonly tag:
       | null

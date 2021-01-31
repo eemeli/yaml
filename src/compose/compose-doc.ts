@@ -1,3 +1,4 @@
+import { Type } from '../constants.js'
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import type { Options } from '../options.js'
@@ -13,6 +14,7 @@ export function composeDoc(
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const doc = new Document(undefined, options) as Document.Parsed
+  doc.type = Type.DOCUMENT
   doc.directives = directives.atDocument()
   doc.setSchema() // FIXME: always do this in the constructor
 

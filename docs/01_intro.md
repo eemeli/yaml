@@ -15,7 +15,8 @@ yarn add yaml@next
 - Can accept any string as input without throwing, parsing as much YAML out of it as it can, and
 - Supports parsing, modifying, and writing YAML comments.
 
-The library is released under the ISC open source license, and the code is [available on GitHub](https://github.com/eemeli/yaml/). It has no external dependencies and runs on Node.js 6 and later, and in browsers from IE 11 upwards.
+The library is released under the ISC open source license, and the code is [available on GitHub](https://github.com/eemeli/yaml/).
+It has no external dependencies and runs on Node.js as well as modern browsers.
 
 For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes. Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).
 
@@ -48,6 +49,7 @@ const YAML = require('yaml')
   - [`#errors`](#errors)
 - [`YAML.parseAllDocuments(str, options?): YAML.Document[]`](#parsing-documents)
 - [`YAML.parseDocument(str, options?): YAML.Document`](#parsing-documents)
+- [`YAML.visit(node, visitor)`](#modifying-nodes)
 
 ```js
 import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'
@@ -59,9 +61,4 @@ import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'
 
 <h3>CST Parser</h3>
 
-```js
-import parseCST from 'yaml/parse-cst'
-```
-
-- [`parseCST(str): CSTDocument[]`](#parsecst)
 - [`YAML.parseCST(str): CSTDocument[]`](#parsecst)

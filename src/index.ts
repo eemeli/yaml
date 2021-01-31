@@ -6,6 +6,7 @@ import { warn } from './log.js'
 import { Options } from './options.js'
 
 export { defaultOptions, scalarOptions } from './options.js'
+export { visit } from './visit.js'
 export { Document }
 
 export function parseAllDocuments(src: string, options?: Options) {

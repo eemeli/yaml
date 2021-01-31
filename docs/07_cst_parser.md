@@ -6,9 +6,9 @@ For ease of implementation and to provide better error handling and reporting, t
 
 <!-- prettier-ignore -->
 ```js
-import parseCST from 'yaml/parse-cst'
+import YAML from 'yaml'
 
-const cst = parseCST(`
+const cst = YAML.parseCST(`
 sequence: [ one, two, ]
 mapping: { sky: blue, sea: green }
 ---
@@ -32,13 +32,13 @@ cst[1]            // second document, containing a sequence
   .strValue       // 'Block scalar\n'
 ```
 
-#### `parseCST(string): CSTDocument[]`
-
 #### `YAML.parseCST(string): CSTDocument[]`
 
 The CST parser will not produce a CST that is necessarily valid YAML, and in particular its representation of collections of items is expected to undergo further processing and validation. The parser should never throw errors, but may include them as a value of the relevant node. On the other hand, if you feed it garbage, you'll likely get a garbage CST as well.
 
-The public API of the CST layer is a single function which returns an array of parsed CST documents. The array and its contained nodes override the default `toString` method, each returning a YAML string representation of its contents. The same function is exported as a part of the default `YAML` object, as well as seprately at `yaml/parse-cst`. It has no dependency on the rest of the library, so importing only `parseCST` should add about 9kB to your gzipped bundle size, when the whole library will add about 27kB.
+The public API of the CST layer is a single function which returns an array of parsed CST documents.
+The array and its contained nodes override the default `toString` method, each returning a YAML string representation of its contents.
+The `parseCST` function has no dependency on the rest of the library, so importing only it should add about 9kB to your gzipped bundle size, when the whole library will add about 27kB.
 
 Care should be taken when modifying the CST, as no error checks are included to verify that the resulting YAML is valid, or that e.g. indentation levels aren't broken. In other words, this is an engineering tool and you may hurt yourself. If you're looking to generate a brand new YAML document, see the section on [Creating Documents](#creating-documents).
 
@@ -84,10 +84,10 @@ While the YAML spec considers e.g. block collections within a flow collection to
 <h3 style="clear:both">Dealing with CRLF line terminators</h3>
 
 ```js
-import parseCST from 'yaml/parse-cst'
+import YAML from 'yaml'
 
 const src = '- foo\r\n- bar\r\n'
-const cst = parseCST(src)
+const cst = YAML.parseCST(src)
 cst.setOrigRanges() // true
 const { range, valueRange } = cst[0].contents[0].items[1].node
 

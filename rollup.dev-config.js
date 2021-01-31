@@ -6,7 +6,8 @@ export default {
     'src/ast/index.js',
     'src/doc/Document.js',
     'src/errors.js',
-    'src/options.js'
+    'src/options.js',
+    'src/visit.js'
   ],
   external: [resolve('src/doc/directives.js')],
   output: { dir: 'lib', format: 'cjs', esModule: false, preserveModules: true },

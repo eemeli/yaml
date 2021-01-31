@@ -1,4 +1,4 @@
-import { CST } from './parse-cst'
+import { CST } from './cst'
 import { Pair, Scalar, Schema } from './types'
 
 export function findPair(items: any[], key: Scalar | any): Pair | undefined
