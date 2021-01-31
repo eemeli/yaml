@@ -46,6 +46,7 @@ export class Scalar extends Node {
 export namespace Scalar {
   interface Parsed extends Scalar {
     range: [number, number]
+    source: string
   }
   type Type =
     | Type.BLOCK_FOLDED

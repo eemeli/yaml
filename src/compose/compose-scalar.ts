@@ -22,22 +22,23 @@ export function composeScalar(
     ? findScalarTagByName(doc.schema, value, tagName, onError)
     : findScalarTagByTest(doc.schema, value, token.type === 'scalar')
 
-  let scalar: Scalar
+  let scalar: Scalar.Parsed
   try {
     const res = tag ? tag.resolve(value, msg => onError(offset, msg)) : value
-    scalar = res instanceof Scalar ? res : new Scalar(res)
+    scalar = (res instanceof Scalar ? res : new Scalar(res)) as Scalar.Parsed
   } catch (error) {
     onError(offset, error.message)
-    scalar = new Scalar(value)
+    scalar = new Scalar(value) as Scalar.Parsed
   }
   scalar.range = [offset, offset + length]
+  scalar.source = value
   if (type) scalar.type = type
   if (tagName) scalar.tag = tagName
   if (tag?.format) scalar.format = tag.format
   if (comment) scalar.comment = comment
 
   if (anchor) doc.anchors.setAnchor(scalar, anchor)
-  return scalar as Scalar.Parsed
+  return scalar
 }
 
 const defaultScalarTag = (schema: Schema) =>
