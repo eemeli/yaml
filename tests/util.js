@@ -162,6 +162,16 @@ describe('visitor', () => {
     expect(String(doc)).toBe('- one\n- 42\n- three\n')
   })
 
+  test('Skip seq item', () => {
+    const doc = YAML.parseDocument('- one\n- two\n- three\n')
+    const Scalar = jest.fn(key => (key === 0 ? 2 : undefined))
+    visit(doc, { Scalar })
+    expect(Scalar.mock.calls).toMatchObject([
+      [0, { type: 'PLAIN', value: 'one' }, [{}, {}]],
+      [2, { type: 'PLAIN', value: 'three' }, [{}, {}]]
+    ])
+  })
+
   test('Remove seq item', () => {
     const doc = YAML.parseDocument('- one\n- two\n- three\n')
     const Scalar = jest.fn((_, node) =>
@@ -191,11 +201,11 @@ describe('visitor', () => {
     expect(String(doc)).toBe('one: 1\ntwo: null\n')
   })
 
-  test('Fail to remove root node', () => {
+  test('Fail to replace root node', () => {
     const doc = YAML.parseDocument('- one\n- two\n- three\n')
-    const Seq = jest.fn(() => visit.REMOVE)
+    const Seq = jest.fn(() => doc.createNode(42))
     expect(() => visit(doc.contents, { Seq })).toThrow(
-      'Cannot remove node with undefined parent'
+      'Cannot replace node with undefined parent'
     )
   })
 })

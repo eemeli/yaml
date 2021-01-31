@@ -102,7 +102,7 @@ doc2.add(doc2.createPair('baz', 42))
 visit(doc, (key, node, path) => console.log(key, node, path))
 visit(doc, {
   Scalar(key, node) {
-    if (typeof key === 'number') return undefined
+    if (key === 3) return 5
     if (typeof node.value === 'number') return doc.createNode(node.value + 1)
   },
   Map(_, map) {

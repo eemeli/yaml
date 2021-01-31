@@ -18,7 +18,7 @@ export type visitor<T> = (
   key: number | 'key' | 'value' | null,
   node: T,
   path: Node[]
-) => void | symbol | Node
+) => void | symbol | number | Node
 
 export interface visit {
   (
@@ -61,8 +61,9 @@ export interface visit {
  *   - `visit.BREAK`: Terminate traversal completely
  *   - `visit.REMOVE`: Remove the current node, then continue with the next one
  *   - `Node`: Replace the current node, then continue by visiting it
- *
- * Attempting to remove or replace the root node of a visit will throw an error.
+ *   - `number`: While iterating the items of a sequence or map, set the index
+ *     of the next step. This is useful especially if the index of the current
+ *     node has changed.
  *
  * If `visitor` is a single function, it will be called with all values
  * encountered in the tree, including e.g. `null` values. Alternatively,

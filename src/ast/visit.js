@@ -25,7 +25,7 @@ function _visit(key, node, visitor, path) {
   if (ctrl instanceof Node) {
     const parent = path[path.length - 1]
     if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
-      parent.items.splice(key, 1, ctrl)
+      parent.items[key] = ctrl
     } else if (parent instanceof Pair) {
       if (key === 'key') parent.key = ctrl
       else parent.value = ctrl
@@ -38,43 +38,37 @@ function _visit(key, node, visitor, path) {
     return _visit(key, ctrl, visitor, path)
   }
 
-  if (ctrl === REMOVE) {
-    const parent = path[path.length - 1]
-    if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
-      parent.items.splice(key, 1)
-    } else if (parent instanceof Pair) {
-      if (key === 'key') parent.key = null
-      else parent.value = null
-    } else if (parent && parent.type === Type.DOCUMENT) {
-      parent.contents = null
-    } else {
-      const pt = parent && parent.type
-      throw new Error(`Cannot remove node with ${pt} parent`)
+  if (typeof ctrl !== 'symbol') {
+    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
+      path = Object.freeze(path.concat(node))
+      for (let i = 0; i < node.items.length; ++i) {
+        const ci = _visit(i, node.items[i], visitor, path)
+        if (typeof ci === 'number') i = ci - 1
+        else if (ci === BREAK) return BREAK
+        else if (ci === REMOVE) {
+          node.items.splice(i, 1)
+          i -= 1
+        }
+      }
+    } else if (node instanceof Pair) {
+      path = Object.freeze(path.concat(node))
+      const ck = _visit('key', node.key, visitor, path)
+      if (ck === BREAK) return BREAK
+      else if (ck === REMOVE) node.key = null
+      const cv = _visit('value', node.value, visitor, path)
+      if (cv === BREAK) return BREAK
+      else if (cv === REMOVE) node.value = null
     }
   }
 
-  if (typeof ctrl === 'symbol') return ctrl
-
-  if (node instanceof YAMLMap || node instanceof YAMLSeq) {
-    path = Object.freeze(path.concat(node))
-    for (let i = 0; i < node.items.length; ++i) {
-      ctrl = _visit(i, node.items[i], visitor, path)
-      if (ctrl === BREAK) return BREAK
-      else if (ctrl === REMOVE) i -= 1
-    }
-  } else if (node instanceof Pair) {
-    path = Object.freeze(path.concat(node))
-    ctrl = _visit('key', node.key, visitor, path)
-    if (ctrl === BREAK) return BREAK
-    ctrl = _visit('value', node.value, visitor, path)
-    if (ctrl === BREAK) return BREAK
-  }
+  return ctrl
 }
 
 export function visit(node, visitor) {
-  if (node && node.type === Type.DOCUMENT)
-    _visit(null, node.contents, visitor, Object.freeze([node]))
-  else _visit(null, node, visitor, Object.freeze([]))
+  if (node && node.type === Type.DOCUMENT) {
+    const cd = _visit(null, node.contents, visitor, Object.freeze([node]))
+    if (cd === REMOVE) node.contents = null
+  } else _visit(null, node, visitor, Object.freeze([]))
 }
 
 visit.BREAK = BREAK
