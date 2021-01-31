@@ -2,6 +2,7 @@
 
 import * as YAML from '../index'
 import { YAMLMap, YAMLSeq, Pair } from '../types'
+import { visit } from '../util'
 
 YAML.parse('3.14159')
 // 3.14159
@@ -97,3 +98,16 @@ doc.contents = map
 
 const doc2 = new YAML.Document({ bizz: 'fuzz' })
 doc2.add(doc2.createPair('baz', 42))
+
+visit(doc, (node, path) => console.log(node, path))
+visit(doc, {
+  Scalar(node, path) {
+    console.log(node, path)
+  },
+  Map(map) {
+    if (map.items.length > 3) return false
+  },
+  Seq(seq) {
+    if (seq.items.length > 3) return visit.BREAK
+  }
+})

@@ -123,4 +123,16 @@ describe('visitor', () => {
       [{ type: 'PLAIN', value: 'bar' }, [{}, {}, {}]]
     ])
   })
+
+  test('Break visit on command', () => {
+    const doc = YAML.parseDocument('- one\n- two\n- three\n')
+    const Scalar = jest.fn(node =>
+      node.value === 'two' ? visit.BREAK : undefined
+    )
+    visit(doc, { Scalar })
+    expect(Scalar.mock.calls).toMatchObject([
+      [{ type: 'PLAIN', value: 'one' }, [{}, {}]],
+      [{ type: 'PLAIN', value: 'two' }, [{}, {}]]
+    ])
+  })
 })

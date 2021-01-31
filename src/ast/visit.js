@@ -4,6 +4,8 @@ import { Scalar } from './Scalar.js'
 import { YAMLMap } from './YAMLMap.js'
 import { YAMLSeq } from './YAMLSeq.js'
 
+const BREAK = Symbol('break visit')
+
 function _visit(node, visitor, path) {
   let ctrl = typeof visitor === 'function' ? visitor(node, path) : undefined
   let children = []
@@ -24,18 +26,18 @@ function _visit(node, visitor, path) {
     children = [node.contents]
   }
 
+  if (ctrl === BREAK) return BREAK
   if (ctrl !== false && children.length > 0) {
     path = Object.freeze(path.concat(node))
-    for (const item of children) _visit(item, visitor, path)
+    for (const item of children) {
+      ctrl = _visit(item, visitor, path)
+      if (ctrl === BREAK) return BREAK
+    }
   }
 }
 
-/**
- * Apply a visitor to an AST node or document.
- *
- * Walks through the tree (depth-first) starting from `node`, calling each of
- * the visitor functions (if defined) according to the current node type.
- */
 export function visit(node, visitor) {
   _visit(node, visitor, Object.freeze([]))
 }
+
+visit.BREAK = BREAK

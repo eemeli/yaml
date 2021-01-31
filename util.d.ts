@@ -14,30 +14,38 @@ export function stringifyString(
 
 export function toJS(value: any, arg?: any, ctx?: Schema.CreateNodeContext): any
 
+export type visitor<T> = (node: T, path: Node[]) => void | false | symbol
+
+export interface visit {
+  (
+    node: Node | Document,
+    visitor:
+      | visitor<any>
+      | {
+          Document?: visitor<Document>
+          Map?: visitor<YAMLMap>
+          Pair?: visitor<Pair>
+          Seq?: visitor<YAMLSeq>
+          Scalar?: visitor<Scalar>
+        }
+  ): void
+  BREAK: symbol
+}
+
 /**
  * Apply a visitor to an AST node or document.
  *
  * Walks through the tree (depth-first) starting from `node`, calling a
  * `visitor` function with each node and the ancestral `path` of nodes from the
  * root `node`. If a visitor returns `false`, its children will not be visited.
+ * Returning `visit.BREAK` will terminate tree traversal completely.
  *
  * If `visitor` is a single function, it will be called with all values
  * encountered in the tree, including e.g. `null` values. Alternatively,
  * separate visitor functions may be defined for each `Document`, `Map`, `Pair`,
  * `Seq` and `Scalar` node.
  */
-export function visit(
-  node: Node | Document,
-  visitor:
-    | ((node: any, path: Node[]) => void | false)
-    | {
-        Document?: (doc: Document, path: Node[]) => void | false
-        Map?: (map: YAMLMap, path: Node[]) => void | false
-        Pair?: (pair: Pair, path: Node[]) => void | false
-        Seq?: (seq: YAMLSeq, path: Node[]) => void | false
-        Scalar?: (scalar: Scalar, path: Node[]) => void | false
-      }
-): void
+export declare const visit: visit
 
 export enum Type {
   ALIAS = 'ALIAS',
