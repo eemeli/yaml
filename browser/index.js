@@ -1,2 +1,2 @@
-export * as default from './dist'
-export * from './dist'
+export * as default from './dist/index.js'
+export * from './dist/index.js'
