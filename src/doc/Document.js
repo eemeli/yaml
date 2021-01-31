@@ -8,8 +8,6 @@ import {
   isEmptyPath,
   toJS
 } from '../ast/index.js'
-import { Document as CSTDocument } from '../cst/Document.js'
-import { YAMLError } from '../errors.js'
 import { defaultOptions, documentOptions } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
 import { stringify } from '../stringify/stringify.js'
@@ -19,8 +17,6 @@ import { Schema } from './Schema.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode } from './createNode.js'
 import { Directives } from './directives.js'
-import { parseContents } from './parseContents.js'
-import { parseDirectives } from './parseDirectives.js'
 
 function assertCollection(contents) {
   if (contents instanceof Collection) return true
@@ -52,14 +48,9 @@ export class Document {
     this.tagPrefixes = []
     this.warnings = []
 
-    if (value === undefined) {
-      // note that this.schema is left as null here
-      this.contents = null
-    } else if (value instanceof CSTDocument) {
-      this.parse(value)
-    } else {
-      this.contents = this.createNode(value, { replacer })
-    }
+    // note that this.schema is left as null here
+    this.contents =
+      value === undefined ? null : this.createNode(value, { replacer })
   }
 
   add(value) {
@@ -205,36 +196,6 @@ export class Document {
     if (Array.isArray(customTags)) this.options.customTags = customTags
     const opt = Object.assign({}, this.getDefaults(), this.options)
     this.schema = new Schema(opt)
-  }
-
-  parse(node, prevDoc) {
-    if (this.options.keepCstNodes) this.cstNode = node
-    if (this.options.keepNodeTypes) this.type = 'DOCUMENT'
-    const {
-      directives = [],
-      contents = [],
-      directivesEndMarker,
-      error,
-      valueRange
-    } = node
-    if (error) {
-      if (!error.source) error.source = this
-      this.errors.push(error)
-    }
-    parseDirectives(this, directives, prevDoc)
-    if (directivesEndMarker) this.directivesEndMarker = true
-    this.range = valueRange ? [valueRange.start, valueRange.end] : null
-    this.setSchema()
-    this.anchors._cstAliases = []
-    parseContents(this, contents)
-    this.anchors.resolveNodes()
-    if (this.options.prettyErrors) {
-      for (const error of this.errors)
-        if (error instanceof YAMLError) error.makePretty()
-      for (const warn of this.warnings)
-        if (warn instanceof YAMLError) warn.makePretty()
-    }
-    return this
   }
 
   setTagPrefix(handle, prefix) {

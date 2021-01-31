@@ -88,8 +88,6 @@ export class Document extends Collection {
    */
   createPair(key: any, value: any, options?: { wrapScalars?: boolean }): Pair
 
-  /** Parse a CST into this document */
-  parse(cst: CST.Document): this
   /**
    * When a document is created with `new YAML.Document()`, the schema object is
    * not set as it may be influenced by parsed directives; call this with no
