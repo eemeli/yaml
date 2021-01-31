@@ -2,7 +2,8 @@
 
 `yaml` is a JavaScript parser and stringifier for [YAML](http://yaml.org/), a human friendly data serialization standard. It supports both parsing and stringifying data using all versions of YAML, along with all common data schemas. As a particularly distinguishing feature, `yaml` fully supports reading and writing comments and blank lines in YAML documents.
 
-The library is released under the ISC open source license, and the code is [available on GitHub](https://github.com/eemeli/yaml/). It has no external dependencies and runs on Node.js 6 and later, and in browsers from IE 11 upwards.
+The library is released under the ISC open source license, and the code is [available on GitHub](https://github.com/eemeli/yaml/).
+It has no external dependencies and runs on Node.js as well as modern browsers.
 
 For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes. Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).
 

@@ -24,8 +24,8 @@ npm test # just to be sure
 
 ## Repository Directory & File Structure
 
-- **`browser/`** - Browser-optimised build of the library, which should work in IE 11 & later. Used automatically by e.g. Webpack & Rollup via the `"browser"` value in `package.json`. A corresponding minimal set of the library's required polyfills is available at `playground/src/polyfill.js`
-- **`dist/`** - Node-optimised build of the library, which should work in Node.js 6.0.0 and later without polyfills.
+- **`browser/`** - Browser-optimised ES build of the library, which should work in modern browsers. Used automatically by e.g. Webpack & Rollup via the `"browser"` value in `package.json`. A corresponding minimal set of the library's required polyfills is available at `playground/src/polyfill.js`
+- **`dist/`** - Node-optimised build of the library, which should work in Node.js 10.0 and later without polyfills.
 - **`docs/`** - Sources for the library's [documentation site](https://eemeli.org/yaml).
 - **`docs-slate/`** - Compiler for the library's [documentation site](https://eemeli.org/yaml). Maintained as a git submodule to allow merges from its upstream source, [Slate](https://github.com/slatedocs/slate). See its [`README`](./docs-slate/README.md) for installation instructions. Note that the build target is the `gh-pages` branch of _this_ repo.
 - **`playground/`** - Source files for a browser-based [playground](https://eemeli.org/yaml-playground/) using this library. Also contains the Selenium browser tests for the library. Maintained as a git submodule to allow for easier publication.
@@ -42,6 +42,8 @@ npm test # just to be sure
 
 ## Contributing Code
 
-First of all, make sure that all the tests pass, and that you've added test cases covering your changes. Our set of test suites is rather extensive, and is a significant help in making sure no regressions are introduced. Note that the CI environment runs tests in e.g. Node.js 6.0 and IE 11, so using new language features may require extending the minimal set of [polyfills](./playground/src/polyfill.js)
+First of all, make sure that all the tests pass, and that you've added test cases covering your changes.
+Our set of test suites is rather extensive, and is a significant help in making sure no regressions are introduced.
+Note that the CI environment runs tests in both Node.js and browsers, so using new language features may require extending the minimal set of [polyfills](./playground/src/polyfill.js)
 
 If you're intending to contribute to the upstream repo, please make sure that your code style matches the Prettier and ESLint rules. The easiest way to do that is to configure your editor to do that for you, but `lint` and `prettier` npm scripts are also provided.

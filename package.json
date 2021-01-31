@@ -24,26 +24,31 @@
   "main": "./index.js",
   "browser": {
     "./index.js": "./browser/index.js",
-    "./types.js": "./browser/types.js",
-    "./types.mjs": "./browser/types.js",
-    "./util.js": "./browser/util.js",
-    "./util.mjs": "./browser/util.js"
+    "./types.js": "./browser/dist/types.js",
+    "./types.mjs": "./browser/dist/types.js",
+    "./util.js": "./browser/dist/util.js",
+    "./util.mjs": "./browser/dist/util.js"
   },
   "exports": {
-    ".": "./index.js",
+    ".": {
+      "node": "./index.js",
+      "default": "./browser/index.js"
+    },
     "./package.json": "./package.json",
-    "./types": [
-      {
-        "import": "./types.mjs"
+    "./types": {
+      "node": {
+        "import": "./types.mjs",
+        "require": "./types.js"
       },
-      "./types.js"
-    ],
-    "./util": [
-      {
-        "import": "./util.mjs"
+      "default": "./browser/dist/types.js"
+    },
+    "./util": {
+      "node": {
+        "import": "./util.mjs",
+        "require": "./util.js"
       },
-      "./util.js"
-    ]
+      "default": "./browser/dist/util.js"
+    }
   },
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
@@ -63,7 +68,7 @@
     "preversion": "npm test && npm run build",
     "prepublishOnly": "npm run clean && npm test && npm run build"
   },
-  "browserslist": "> 0.5%, not dead",
+  "browserslist": "> 0.5%, not dead, not ie 11",
   "prettier": {
     "arrowParens": "avoid",
     "semi": false,
@@ -89,6 +94,6 @@
     "typescript": "^4.1.3"
   },
   "engines": {
-    "node": ">= 6"
+    "node": ">= 10"
   }
 }
