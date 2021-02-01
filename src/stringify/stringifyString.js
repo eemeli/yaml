@@ -1,6 +1,5 @@
 import { addCommentBefore } from './addComment.js'
 import { Type } from '../constants.js'
-import { resolveScalar } from '../resolve/resolveScalar.js'
 import {
   foldFlowLines,
   FOLD_BLOCK,
@@ -259,9 +258,14 @@ function plainString(item, ctx, onComment, onChompKeep) {
   // booleans get parsed with those types in v1.2 (e.g. '42', 'true' & '0.9e-3'),
   // and others in v1.1.
   if (actualString) {
-    const { tags } = ctx.doc.schema
-    const resolved = resolveScalar(str, tags).value
-    if (typeof resolved !== 'string') return doubleQuotedString(value, ctx)
+    for (const tag of ctx.doc.schema.tags) {
+      if (
+        tag.default &&
+        tag.tag !== 'tag:yaml.org,2002:str' &&
+        tag.test?.test(str)
+      )
+        return doubleQuotedString(value, ctx)
+    }
   }
   const body = implicitKey
     ? str
