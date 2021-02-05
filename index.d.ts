@@ -118,6 +118,13 @@ export interface Options extends Schema.Options {
    */
   keepCstNodes?: boolean
   /**
+   * Set original ranges (support \r\n line endings) for included cstNodes
+   * Only has an effect if `keepCstNodes` is enabled
+   *
+   * Default: `false`
+   */
+  setOrigRanges?: boolean
+  /**
    * Store the original node type when parsing documents.
    *
    * Default: `true`

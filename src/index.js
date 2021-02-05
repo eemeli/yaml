@@ -11,7 +11,9 @@ export { Document, parseCST }
 export function parseAllDocuments(src, options) {
   const stream = []
   let prev
-  for (const cstDoc of parseCST(src)) {
+  const cst = parseCST(src)
+  if (options && options.setOrigRanges) cst.setOrigRanges()
+  for (const cstDoc of cst) {
     const doc = new Document(undefined, null, options)
     doc.parse(cstDoc, prev)
     stream.push(doc)
@@ -22,6 +24,7 @@ export function parseAllDocuments(src, options) {
 
 export function parseDocument(src, options) {
   const cst = parseCST(src)
+  if (options && options.setOrigRanges) cst.setOrigRanges()
   const doc = new Document(cst[0], null, options)
   if (
     cst.length > 1 &&
