@@ -1,5 +1,4 @@
 import { Type } from '../constants'
-import { CST } from '../cst'
 import { Schema } from '../doc/Schema'
 
 export class Node {
@@ -8,7 +7,7 @@ export class Node {
   /** A comment before this */
   commentBefore?: string | null
   /** Only available when `keepCstNodes` is set to `true` */
-  cstNode?: CST.Node
+  // cstNode?: CST.Node
   /**
    * The [start, end] range of characters of the source parsed
    * into this node (undefined for pairs or if not parsed)
@@ -60,7 +59,7 @@ export class Alias extends Node {
   constructor(source: Node)
   type: Type.ALIAS
   source: Node
-  cstNode?: CST.Alias
+  // cstNode?: CST.Alias
   toString(ctx: Schema.StringifyContext): string
 }
 
@@ -198,48 +197,48 @@ export namespace AST {
 
   interface BlockFolded extends Scalar {
     type: Type.BLOCK_FOLDED
-    cstNode?: CST.BlockFolded
+    // cstNode?: CST.BlockFolded
   }
 
   interface BlockLiteral extends Scalar {
     type: Type.BLOCK_LITERAL
-    cstNode?: CST.BlockLiteral
+    // cstNode?: CST.BlockLiteral
   }
 
   interface PlainValue extends Scalar {
     type: Type.PLAIN
-    cstNode?: CST.PlainValue
+    // cstNode?: CST.PlainValue
   }
 
   interface QuoteDouble extends Scalar {
     type: Type.QUOTE_DOUBLE
-    cstNode?: CST.QuoteDouble
+    // cstNode?: CST.QuoteDouble
   }
 
   interface QuoteSingle extends Scalar {
     type: Type.QUOTE_SINGLE
-    cstNode?: CST.QuoteSingle
+    // cstNode?: CST.QuoteSingle
   }
 
   interface FlowMap extends YAMLMap {
     type: Type.FLOW_MAP
-    cstNode?: CST.FlowMap
+    // cstNode?: CST.FlowMap
   }
 
   interface BlockMap extends YAMLMap {
     type: Type.MAP
-    cstNode?: CST.Map
+    // cstNode?: CST.Map
   }
 
   interface FlowSeq extends YAMLSeq {
     type: Type.FLOW_SEQ
     items: Array<Node>
-    cstNode?: CST.FlowSeq
+    // cstNode?: CST.FlowSeq
   }
 
   interface BlockSeq extends YAMLSeq {
     type: Type.SEQ
     items: Array<Node | null>
-    cstNode?: CST.Seq
+    // cstNode?: CST.Seq
   }
 }

@@ -1,4 +1,3 @@
-import { Node } from '../../src/cst/Node.js'
 import { YAMLError } from '../../src/errors.js'
 import * as YAML from '../../src/index.js'
 
@@ -7,8 +6,6 @@ test('require a message and source for all errors', () => {
   expect(() => new YAMLError()).toThrow(exp)
   expect(() => new YAMLError('Foo')).toThrow(exp)
   expect(() => new YAMLError('Foo', {})).toThrow(exp)
-  expect(() => new YAMLError('Foo', new Node())).toThrow(exp)
-  expect(() => new YAMLError('Foo', new Node(), 'foo')).not.toThrow()
 })
 
 test('fail on map value indented with tab', () => {
@@ -37,12 +34,12 @@ describe.skip('eemeli/yaml#7', () => {
       { name: 'YAMLParseError', offset: 16 },
       { name: 'YAMLParseError', offset: 17 }
     ])
-    const node = docs[0].errors[0].source
-    expect(node).toBeInstanceOf(Node)
-    expect(node.rangeAsLinePos).toMatchObject({
-      start: { line: 1, col: 1 },
-      end: { line: 1, col: 6 }
-    })
+    // const node = docs[0].errors[0].source
+    // expect(node).toBeInstanceOf(Node)
+    // expect(node.rangeAsLinePos).toMatchObject({
+    //   start: { line: 1, col: 1 },
+    //   end: { line: 1, col: 6 }
+    // })
   })
   test('seq', () => {
     const src = '[ , ]\n---\n[ 123,,, ]\n'
@@ -54,12 +51,12 @@ describe.skip('eemeli/yaml#7', () => {
       { name: 'YAMLParseError', offset: 16 },
       { name: 'YAMLParseError', offset: 17 }
     ])
-    const node = docs[1].errors[0].source
-    expect(node).toBeInstanceOf(Node)
-    expect(node.rangeAsLinePos).toMatchObject({
-      start: { line: 3, col: 1 },
-      end: { line: 3, col: 11 }
-    })
+    // const node = docs[1].errors[0].source
+    // expect(node).toBeInstanceOf(Node)
+    // expect(node.rangeAsLinePos).toMatchObject({
+    //   start: { line: 3, col: 1 },
+    //   end: { line: 3, col: 11 }
+    // })
   })
 })
 

@@ -1,6 +1,4 @@
-import { Document } from './Document'
 import { Node, Pair, Scalar, YAMLMap, YAMLSeq } from '../ast'
-import { CST } from '../cst'
 
 export class Schema {
   constructor(options: Schema.Options)

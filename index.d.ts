@@ -1,4 +1,3 @@
-import { CST } from './cst'
 import {
   AST,
   Alias,
@@ -13,13 +12,7 @@ import {
 } from './types'
 import { Type, YAMLError, YAMLWarning } from './util'
 
-export { AST, CST }
-
-export function parseCST(str: string): ParsedCST
-
-export interface ParsedCST extends Array<CST.Document> {
-  setOrigRanges(): boolean
-}
+export { AST }
 
 /**
  * Apply a visitor to an AST node or document.
@@ -294,7 +287,7 @@ export interface CreateNodeOptions {
 }
 
 export class Document extends Collection {
-  cstNode?: CST.Document
+  // cstNode?: CST.Document
   /**
    * @param value - The initial value for the document, which will be wrapped
    *   in a Node container.

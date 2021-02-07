@@ -683,19 +683,6 @@ entryB:
     expect(String(doc)).toBe(`a: b #c\n\n#d\n`)
   })
 
-  test.skip('comment association by indentation', () => {
-    const src = `
-a:
-  - b #c
-#d\n`
-    const cst = YAML.parseCST(src)
-    const collection = cst[0].contents[1]
-    expect(collection.items).toHaveLength(2)
-    const comment = cst[0].contents[2]
-    expect(comment.type).toBe('COMMENT')
-    expect(comment.comment).toBe('d')
-  })
-
   test('blank line after seq in map', () => {
     const src = `a:
   - aa

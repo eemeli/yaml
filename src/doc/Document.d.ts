@@ -1,6 +1,5 @@
 import { Alias, Collection, Merge, Node, Pair } from '../ast'
 import { Type } from '../constants'
-import { CST } from '../cst'
 import { YAMLError, YAMLWarning } from '../errors'
 import { Options } from '../options'
 import { Directives } from './directives'
@@ -30,7 +29,7 @@ export interface CreateNodeOptions {
 }
 
 export class Document extends Collection {
-  cstNode?: CST.Document
+  // cstNode?: CST.Document
   /**
    * @param value - The initial value for the document, which will be wrapped
    *   in a Node container.
@@ -135,9 +134,7 @@ export namespace Document {
 
   interface Anchors {
     /** @private */
-    _cstAliases: any[]
-    /** @private */
-    map: Record<string, Node | CST.Node>
+    map: Record<string, Node>
 
     /**
      * Create a new `Alias` node, adding the required anchor for `node`.
