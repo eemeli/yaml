@@ -6,12 +6,7 @@ interface LinePos {
 }
 
 export class YAMLError extends Error {
-  name:
-    | 'YAMLParseError'
-    | 'YAMLReferenceError'
-    | 'YAMLSemanticError'
-    | 'YAMLSyntaxError'
-    | 'YAMLWarning'
+  name: 'YAMLParseError' | 'YAMLWarning'
   message: string
   offset?: number
 
@@ -29,21 +24,6 @@ export class YAMLError extends Error {
 
 export class YAMLParseError extends YAMLError {
   name: 'YAMLParseError'
-  constructor(source: number, message: string)
-}
-
-export class YAMLReferenceError extends YAMLError {
-  name: 'YAMLReferenceError'
-  constructor(source: number, message: string)
-}
-
-export class YAMLSemanticError extends YAMLError {
-  name: 'YAMLSemanticError'
-  constructor(source: number, message: string)
-}
-
-export class YAMLSyntaxError extends YAMLError {
-  name: 'YAMLSyntaxError'
   constructor(source: number, message: string)
 }
 

@@ -38,11 +38,7 @@ interface LinePos {
 }
 
 export class YAMLError extends Error {
-  name:
-    | 'YAMLReferenceError'
-    | 'YAMLSemanticError'
-    | 'YAMLSyntaxError'
-    | 'YAMLWarning'
+  name: 'YAMLParseError' | 'YAMLWarning'
   message: string
   offset?: number
 
@@ -58,16 +54,8 @@ export class YAMLError extends Error {
   makePretty(): void
 }
 
-export class YAMLReferenceError extends YAMLError {
-  name: 'YAMLReferenceError'
-}
-
-export class YAMLSemanticError extends YAMLError {
-  name: 'YAMLSemanticError'
-}
-
-export class YAMLSyntaxError extends YAMLError {
-  name: 'YAMLSyntaxError'
+export class YAMLParseError extends YAMLError {
+  name: 'YAMLParseError'
 }
 
 export class YAMLWarning extends YAMLError {

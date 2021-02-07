@@ -8,7 +8,5 @@ exports.stringifyString = util.stringifyString
 exports.Type = util.Type
 
 exports.YAMLError = util.YAMLError
-exports.YAMLReferenceError = util.YAMLReferenceError
-exports.YAMLSemanticError = util.YAMLSemanticError
-exports.YAMLSyntaxError = util.YAMLSyntaxError
+exports.YAMLParseError = util.YAMLParseError
 exports.YAMLWarning = util.YAMLWarning

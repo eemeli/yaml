@@ -1,7 +1,7 @@
 import { composeStream } from './compose/compose-stream.js'
 import { LogLevel } from './constants.js'
 import { Document } from './doc/Document.js'
-import { YAMLSemanticError } from './errors.js'
+import { YAMLParseError } from './errors.js'
 import { warn } from './log.js'
 import { Options } from './options.js'
 
@@ -23,7 +23,7 @@ export function parseDocument(src: string, options?: Options) {
   ) {
     const errMsg =
       'Source contains multiple documents; please use YAML.parseAllDocuments()'
-    doc.errors.push(new YAMLSemanticError(docs[1].range[0], errMsg))
+    doc.errors.push(new YAMLParseError(docs[1].range[0], errMsg))
   }
   return doc
 }

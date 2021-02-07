@@ -132,7 +132,7 @@ import {
   stringifyString, // (node, ctx, ...) => string
   toJS, // (value, arg, ctx) => any -- Recursively convert to plain JS
   Type, // { [string]: string } -- Used as enum for node types
-  YAMLReferenceError, YAMLSemanticError, YAMLSyntaxError, YAMLWarning
+  YAMLError, YAMLParseError, YAMLWarning
 } from 'yaml/util'
 ```
 

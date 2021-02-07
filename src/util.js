@@ -4,10 +4,4 @@ export { stringifyNumber } from './stringify/stringifyNumber.js'
 export { stringifyString } from './stringify/stringifyString.js'
 export { Type } from './constants.js'
 
-export {
-  YAMLError,
-  YAMLReferenceError,
-  YAMLSemanticError,
-  YAMLSyntaxError,
-  YAMLWarning
-} from './errors.js'
+export { YAMLError, YAMLParseError, YAMLWarning } from './errors.js'

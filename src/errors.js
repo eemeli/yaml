@@ -39,24 +39,6 @@ export class YAMLParseError extends YAMLError {
   }
 }
 
-export class YAMLReferenceError extends YAMLError {
-  constructor(source, message) {
-    super('YAMLReferenceError', source, message)
-  }
-}
-
-export class YAMLSemanticError extends YAMLError {
-  constructor(source, message) {
-    super('YAMLSemanticError', source, message)
-  }
-}
-
-export class YAMLSyntaxError extends YAMLError {
-  constructor(source, message) {
-    super('YAMLSyntaxError', source, message)
-  }
-}
-
 export class YAMLWarning extends YAMLError {
   constructor(source, message) {
     super('YAMLWarning', source, message)
