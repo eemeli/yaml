@@ -1,5 +1,16 @@
+// import { Type } from './constants'
+// interface LinePos { line: number; col: number }
+
 export class YAMLError extends Error {
-  constructor(name, offset, message) {
+  name: 'YAMLParseError' | 'YAMLWarning'
+  message: string
+  offset?: number
+
+  // nodeType?: Type
+  // range?: CST.Range
+  // linePos?: { start: LinePos; end: LinePos }
+
+  constructor(name: YAMLError['name'], offset: number | null, message: string) {
     if (!message) throw new Error(`Invalid arguments for new ${name}`)
     super()
     this.name = name
@@ -7,8 +18,12 @@ export class YAMLError extends Error {
     if (typeof offset === 'number') this.offset = offset
   }
 
+  /**
+   * Drops `source` and adds `nodeType`, `range` and `linePos`, as well as
+   * adding details to `message`. Run automatically for document errors if
+   * the `prettyErrors` option is set.
+   */
   makePretty() {
-    if (!this.source) return
     // this.nodeType = this.source.type
     // const cst = this.source.context && this.source.context.root
     // if (typeof this.offset === 'number') {
@@ -29,18 +44,17 @@ export class YAMLError extends Error {
     //   const ctx = cst && getPrettyContext(this.linePos, cst)
     //   if (ctx) this.message += `:\n\n${ctx}\n`
     // }
-    delete this.source
   }
 }
 
 export class YAMLParseError extends YAMLError {
-  constructor(source, message) {
-    super('YAMLParseError', source, message)
+  constructor(offset: number | null, message: string) {
+    super('YAMLParseError', offset, message)
   }
 }
 
 export class YAMLWarning extends YAMLError {
-  constructor(source, message) {
-    super('YAMLWarning', source, message)
+  constructor(offset: number | null, message: string) {
+    super('YAMLWarning', offset, message)
   }
 }
