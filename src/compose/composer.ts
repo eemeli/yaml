@@ -35,8 +35,6 @@ function parsePrelude(prelude: string[]) {
 }
 
 export class Composer {
-  lines: number[] = []
-
   private directives: Directives
   private doc: Document.Parsed | null = null
   private onDocument: (doc: Document.Parsed) => void
@@ -166,10 +164,6 @@ export class Composer {
           new YAMLParseError(-1, `Unsupported token ${token.type}`)
         )
     }
-  }
-
-  handleLine(n: number) {
-    this.lines.push(n)
   }
 
   handleEnd(forceDoc = false, offset = -1) {

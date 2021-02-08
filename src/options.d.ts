@@ -1,6 +1,7 @@
 import { Scalar } from './ast'
 import { LogLevelId } from './constants'
 import { Schema } from './doc/Schema'
+import { LineCounter } from './parse/line-counter'
 
 /**
  * `yaml` defines document-specific options in three places: as an argument of
@@ -49,6 +50,14 @@ export interface Options extends Schema.Options {
    * Default: `false`
    */
   keepUndefined?: boolean
+
+  /**
+   * If set, newlines will be tracked while parsing, to allow for
+   * `lineCounter.linePos(offset)` to provide the `{ line, col }` positions
+   * within the input.
+   */
+  lineCounter?: LineCounter | null
+
   /**
    * Control the logging level during parsing
    *

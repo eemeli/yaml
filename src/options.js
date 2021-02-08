@@ -15,6 +15,7 @@ export const defaultOptions = {
   keepCstNodes: false,
   keepNodeTypes: true,
   keepUndefined: false,
+  lineCounter: null,
   logLevel: 'warn',
   mapAsMap: false,
   maxAliasCount: 100,
