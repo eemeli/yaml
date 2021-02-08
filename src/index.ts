@@ -1,30 +1,60 @@
-import { composeStream } from './compose/compose-stream.js'
+import { Composer } from './compose/composer.js'
 import { LogLevel } from './constants.js'
 import { Document } from './doc/Document.js'
 import { YAMLParseError } from './errors.js'
 import { warn } from './log.js'
 import { Options } from './options.js'
+import { CSTParser } from './parse/cst-parser.js'
 
 export { defaultOptions, scalarOptions } from './options.js'
 export { visit } from './visit.js'
 export { Document }
 
-export function parseAllDocuments(src: string, options?: Options) {
-  return composeStream(src, false, options)
+export interface EmptyStream
+  extends Array<Document.Parsed>,
+    ReturnType<Composer['streamInfo']> {
+  empty: true
 }
 
-export function parseDocument(src: string, options?: Options) {
-  const docs = composeStream(src, true, options)
-  if (docs.length === 0) return null
-  const doc = docs[0]
-  if (
-    docs.length > 1 &&
-    LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR
-  ) {
-    const errMsg =
-      'Source contains multiple documents; please use YAML.parseAllDocuments()'
-    doc.errors.push(new YAMLParseError(docs[1].range[0], errMsg))
-  }
+/**
+ * @returns If an empty `docs` array is returned, it will be of type
+ *   EmptyStream and contain additional stream information. In
+ *   TypeScript, you should use `'empty' in docs` as a type guard for it.
+ */
+export function parseAllDocuments(
+  source: string,
+  options?: Options
+): Document.Parsed[] | EmptyStream {
+  const docs: Document.Parsed[] = []
+  const composer = new Composer(doc => docs.push(doc), options)
+  const parser = new CSTParser(token => composer.handleToken(token))
+  parser.parse(source)
+  composer.handleEnd(false, source.length)
+
+  if (docs.length > 0) return docs
+  return Object.assign<
+    Document.Parsed[],
+    { empty: true },
+    ReturnType<Composer['streamInfo']>
+  >([], { empty: true }, composer.streamInfo())
+}
+
+export function parseDocument(
+  source: string,
+  options?: Options
+): Document.Parsed | null {
+  let doc: Document.Parsed | null = null
+  const composer = new Composer(_doc => {
+    if (!doc) doc = _doc
+    else if (LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR) {
+      const errMsg =
+        'Source contains multiple documents; please use YAML.parseAllDocuments()'
+      doc.errors.push(new YAMLParseError(_doc.range[0], errMsg))
+    }
+  }, options)
+  const parser = new CSTParser(token => composer.handleToken(token))
+  parser.parse(source)
+  composer.handleEnd(true, source.length)
   return doc
 }
 
