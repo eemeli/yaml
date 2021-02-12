@@ -1,6 +1,6 @@
 import { Transform, TransformOptions } from 'stream'
 import { StringDecoder } from 'string_decoder'
-import { CSTParser } from './cst-parser.js'
+import { Parser } from './parser.js'
 
 export type ParseStreamOptions = Omit<
   TransformOptions,
@@ -9,7 +9,7 @@ export type ParseStreamOptions = Omit<
 
 export class CSTStream extends Transform {
   decoder: StringDecoder
-  parser: CSTParser
+  parser: Parser
 
   constructor(options: ParseStreamOptions = {}) {
     super({
@@ -19,7 +19,7 @@ export class CSTStream extends Transform {
       objectMode: true
     })
     this.decoder = new StringDecoder(options.defaultEncoding || 'utf8')
-    this.parser = new CSTParser(token => this.push(token))
+    this.parser = new Parser(token => this.push(token))
   }
 
   _flush(done: (error?: Error) => void) {

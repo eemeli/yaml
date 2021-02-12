@@ -113,7 +113,7 @@ function getFirstKeyStartProps(prev: SourceToken[]) {
 }
 
 /** A YAML concrete syntax tree parser */
-export class CSTParser {
+export class Parser {
   private push: (token: Token) => void
   private onNewLine?: (offset: number) => void
 

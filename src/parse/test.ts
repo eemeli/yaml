@@ -1,5 +1,5 @@
 import { CSTStream } from './cst-stream.js'
-import { CSTParser } from './cst-parser.js'
+import { Parser } from './parser.js'
 
 export function stream(source: string) {
   const ps = new CSTStream().on('data', d => console.dir(d, { depth: null }))
@@ -9,7 +9,7 @@ export function stream(source: string) {
 
 export function test(source: string) {
   const lines: number[] = []
-  const parser = new CSTParser(
+  const parser = new Parser(
     t => console.dir(t, { depth: null }),
     n => lines.push(n)
   )

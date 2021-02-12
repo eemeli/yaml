@@ -4,7 +4,7 @@ import { Document } from './doc/Document.js'
 import { YAMLParseError } from './errors.js'
 import { warn } from './log.js'
 import { Options } from './options.js'
-import { CSTParser } from './parse/cst-parser.js'
+import { Parser } from './parse/parser.js'
 
 export { defaultOptions, scalarOptions } from './options.js'
 export { LineCounter } from './parse/line-counter.js'
@@ -28,7 +28,7 @@ export function parseAllDocuments(
 ): Document.Parsed[] | EmptyStream {
   const docs: Document.Parsed[] = []
   const composer = new Composer(doc => docs.push(doc), options)
-  const parser = new CSTParser(
+  const parser = new Parser(
     token => composer.handleToken(token),
     options?.lineCounter?.addNewLine
   )
@@ -56,7 +56,7 @@ export function parseDocument(
       doc.errors.push(new YAMLParseError(_doc.range[0], errMsg))
     }
   }, options)
-  const parser = new CSTParser(
+  const parser = new Parser(
     token => composer.handleToken(token),
     options?.lineCounter?.addNewLine
   )

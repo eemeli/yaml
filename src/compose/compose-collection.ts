@@ -1,6 +1,10 @@
 import { Node, Scalar, YAMLMap, YAMLSeq } from '../ast/index.js'
 import type { Document } from '../doc/Document.js'
-import type { BlockMap, BlockSequence, FlowCollection } from '../parse/tokens.js'
+import type {
+  BlockMap,
+  BlockSequence,
+  FlowCollection
+} from '../parse/tokens.js'
 import { resolveBlockMap } from './resolve-block-map.js'
 import { resolveBlockSeq } from './resolve-block-seq.js'
 import { resolveFlowCollection } from './resolve-flow-collection.js'
