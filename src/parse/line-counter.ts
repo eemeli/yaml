@@ -1,3 +1,8 @@
+/**
+ * Tracks newlines during parsing in order to provide an efficient API for
+ * determining the one-indexed `{ line, col }` position for any offset
+ * within the input.
+ */
 export class LineCounter {
   lineStarts: number[] = []
 
@@ -6,14 +11,6 @@ export class LineCounter {
    * `lineCounter.lineStarts.sort()` before calling `linePos()`.
    */
   addNewLine = (offset: number) => this.lineStarts.push(offset)
-
-  // linePos = (offset: number) => {
-  //   for (let i = this.lineStarts.length - 1; i >= 0; --i) {
-  //     const start = this.lineStarts[i]
-  //     if (start <= offset) return { line: i + 1, col: offset - start + 1 }
-  //   }
-  //   return { line: 0, col: offset }
-  // }
 
   /**
    * Performs a binary search and returns the 1-indexed { line, col }

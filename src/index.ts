@@ -7,9 +7,11 @@ import { Options } from './options.js'
 import { Parser } from './parse/parser.js'
 
 export { defaultOptions, scalarOptions } from './options.js'
+export { Lexer } from './parse/lexer.js'
 export { LineCounter } from './parse/line-counter.js'
+export * as tokens from './parse/tokens.js'
 export { visit } from './visit.js'
-export { Document }
+export { Composer, Document, Parser }
 
 export interface EmptyStream
   extends Array<Document.Parsed>,
@@ -28,12 +30,9 @@ export function parseAllDocuments(
 ): Document.Parsed[] | EmptyStream {
   const docs: Document.Parsed[] = []
   const composer = new Composer(doc => docs.push(doc), options)
-  const parser = new Parser(
-    token => composer.handleToken(token),
-    options?.lineCounter?.addNewLine
-  )
+  const parser = new Parser(composer.next, options?.lineCounter?.addNewLine)
   parser.parse(source)
-  composer.handleEnd(false, source.length)
+  composer.end()
 
   if (docs.length > 0) return docs
   return Object.assign<
@@ -56,12 +55,9 @@ export function parseDocument(
       doc.errors.push(new YAMLParseError(_doc.range[0], errMsg))
     }
   }, options)
-  const parser = new Parser(
-    token => composer.handleToken(token),
-    options?.lineCounter?.addNewLine
-  )
+  const parser = new Parser(composer.next, options?.lineCounter?.addNewLine)
   parser.parse(source)
-  composer.handleEnd(true, source.length)
+  composer.end(true, source.length)
   return doc
 }
 

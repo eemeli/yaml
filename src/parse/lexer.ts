@@ -96,6 +96,21 @@ const invalidIdentifierChars = [' ', ',', '[', ']', '{', '}', '\n', '\r', '\t']
 const isNotIdentifierChar = (ch: string) =>
   !ch || invalidIdentifierChars.includes(ch)
 
+/**
+ * Splits an input string into lexical tokens, i.e. smaller strings that are
+ * easily identifiable by `tokens.tokenType()`.
+ *
+ * Lexing starts always in a "stream" context. Incomplete input may be buffered
+ * until a complete token can be emitted.
+ *
+ * In addition to slices of the original input, the following control characters
+ * may also be emitted:
+ *
+ * - `\x02` (Start of Text): A document starts with the next token
+ * - `\x18` (Cancel): Unexpected end of flow-mode (indicates an error)
+ * - `\x1f` (Unit Separator): Next token is a scalar value
+ * - `\u{FEFF}` (Byte order mark): Emitted separately outside documents
+ */
 export class Lexer {
   private push: (token: string) => void
 

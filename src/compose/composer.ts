@@ -3,7 +3,7 @@ import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { YAMLParseError, YAMLWarning } from '../errors.js'
 import { defaultOptions, Options } from '../options.js'
-import { Token } from '../parse/tokens.js'
+import type { Token } from '../parse/tokens.js'
 import { composeDoc } from './compose-doc.js'
 import { resolveEnd } from './resolve-end.js'
 
@@ -34,6 +34,18 @@ function parsePrelude(prelude: string[]) {
   return { comment, afterEmptyLine }
 }
 
+/**
+ * Compose a stream of CST nodes into a stream of YAML Documents.
+ *
+ * ```ts
+ * const options: Options = { ... }
+ * const docs: Document.Parsed[] = []
+ * const composer = new Composer(doc => docs.push(doc), options)
+ * const parser = new Parser(composer.next)
+ * parser.parse(source)
+ * composer.end()
+ * ```
+ */
 export class Composer {
   private directives: Directives
   private doc: Document.Parsed | null = null
@@ -93,6 +105,11 @@ export class Composer {
     this.warnings = []
   }
 
+  /**
+   * Current stream status information.
+   *
+   * Mostly useful at the end of input for an empty stream.
+   */
   streamInfo() {
     return {
       comment: parsePrelude(this.prelude).comment,
@@ -102,7 +119,11 @@ export class Composer {
     }
   }
 
-  handleToken(token: Token) {
+  /**
+   * Advance the composed by one CST token. Bound to the Composer
+   * instance, so may be used directly as a callback function.
+   */
+  next = (token: Token) => {
     if (process.env.LOG_STREAM) console.dir(token, { depth: null })
     switch (token.type) {
       case 'directive':
@@ -166,7 +187,21 @@ export class Composer {
     }
   }
 
-  handleEnd(forceDoc = false, offset = -1) {
+  /** Call at end of input to push out any remaining document. */
+  end(): void
+
+  /**
+   * Call at end of input to push out any remaining document.
+   *
+   * @param forceDoc - If the stream contains no document, still emit a final
+   *   document including any comments and directives that would be applied
+   *   to a subsequent document.
+   * @param offset - Should be set if `forceDoc` is also set, to set the
+   *   document range end and to indicate errors correctly.
+   */
+  end(forceDoc: true, offset: number): void
+
+  end(forceDoc = false, offset = -1) {
     if (this.doc) {
       this.decorate(this.doc, true)
       this.onDocument(this.doc)

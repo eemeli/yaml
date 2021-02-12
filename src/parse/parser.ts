@@ -112,12 +112,26 @@ function getFirstKeyStartProps(prev: SourceToken[]) {
   return prev.splice(i, prev.length)
 }
 
-/** A YAML concrete syntax tree parser */
+/**
+ * A YAML concrete syntax tree (CST) parser
+ *
+ * While the `parse()` method provides an API for parsing a source string
+ * directly, the parser may also be used with a user-provided lexer:
+ *
+ * ```ts
+ * const cst: Token[] = []
+ * const parser = new Parser(tok => cst.push(tok))
+ * const src: string = ...
+ *
+ * // The following would be equivalent to `parser.parse(src, false)`
+ * const lexer = new Lexer(parser.next)
+ * lexer.lex(src, false)
+ * parser.end()
+ * ```
+ */
 export class Parser {
   private push: (token: Token) => void
   private onNewLine?: (offset: number) => void
-
-  private lexer = new Lexer(ts => this.token(ts))
 
   /** If true, space and sequence indicators count as indentation */
   private atNewLine = true
@@ -145,7 +159,8 @@ export class Parser {
 
   /**
    * @param push - Called separately with each parsed token
-   * @param onNewLine - If defined, called separately with the start position of each new line
+   * @param onNewLine - If defined, called separately with the start position of
+   *   each new line (in `parse()`, including the start of input).
    * @public
    */
   constructor(
@@ -157,9 +172,9 @@ export class Parser {
   }
 
   /**
-   * Parse `source` as a YAML stream, calling `push` with each
-   * directive, document and other structure as it is completely parsed.
-   * If `incomplete`, a part of the last line may be left as a buffer for the next call.
+   * Parse `source` as a YAML stream, calling `push` with each directive,
+   * document and other structure as it is completely parsed. If `incomplete`,
+   * a part of the last line may be left as a buffer for the next call.
    *
    * Errors are not thrown, but pushed out as `{ type: 'error', message }` tokens.
    * @public
@@ -167,11 +182,14 @@ export class Parser {
   parse(source: string, incomplete = false) {
     if (this.onNewLine && this.offset === 0) this.onNewLine(0)
     this.lexer.lex(source, incomplete)
-    if (!incomplete) while (this.stack.length > 0) this.pop()
+    if (!incomplete) this.end()
   }
 
-  /** Advance the parser by the `source` of one lexical token. */
-  token(source: string) {
+  /**
+   * Advance the parser by the `source` of one lexical token. Bound to the
+   * Parser instance, so may be used directly as a callback function.
+   */
+  next = (source: string) => {
     this.source = source
     if (process.env.LOG_TOKENS) console.log('|', prettyToken(source))
 
@@ -215,6 +233,14 @@ export class Parser {
       }
       this.offset += source.length
     }
+  }
+
+  // Must be defined after `next()`
+  private lexer = new Lexer(this.next)
+
+  /** Call at end of input to push out any remaining constructions */
+  end() {
+    while (this.stack.length > 0) this.pop()
   }
 
   private get sourceToken() {
