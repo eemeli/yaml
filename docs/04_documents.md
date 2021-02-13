@@ -102,7 +102,6 @@ During stringification, a document with a true-ish `version` value will include 
 | ------------------------------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | createNode(value,&nbsp;options?)           | `Node`     | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.                                                                     |
 | createPair(key,&nbsp;value,&nbsp;options?) | `Pair`     | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.                                                                           |
-| listNonDefaultTags()                       | `string[]` | List the tags used in the document that are not in the default `tag:yaml.org,2002:` namespace.                                                                                                 |
 | parse(cst)                                 | `Document` | Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed `cst`. Calling this multiple times on a Document is not recommended. |
 | setSchema(id?, customTags?)                | `void`     | Set the schema used by the document. `id` may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, `customTags` should have the same shape as the similarly-named option. |
 | setTagPrefix(handle, prefix)               | `void`     | Set `handle` as a shorthand string for the `prefix` tag namespace.                                                                                                                             |
@@ -162,7 +161,7 @@ A description of [alias and merge nodes](#alias-nodes) is included in the next s
 | getNames()                             | `string[]` | List of all defined anchor names.                                                                                          |
 | getNode(name: string)                  | `Node?`    | The node associated with the anchor `name`, if set.                                                                        |
 | newName(prefix: string)                | `string`   | Find an available anchor name with the given `prefix` and a numerical suffix.                                              |
-| setAnchor(node: Node, name?: string)   | `string?`  | Associate an anchor with `node`. If `name` is empty, a new name will be generated.                                         |
+| setAnchor(node?: Node, name?: string)  | `string?`  | Associate an anchor with `node`. If `name` is empty, a new name will be generated.                                         |
 
 ```js
 const src = '[{ a: A }, { b: B }]'
@@ -208,8 +207,14 @@ String(doc)
 // ]
 ```
 
-The constructors for `Alias` and `Merge` are not directly exported by the library, as they depend on the document's anchors; instead you'll need to use **`createAlias(node, name)`** and **`createMergePair(...sources)`**. You should make sure to only add alias and merge nodes to the document after the nodes to which they refer, or the document's YAML stringification will fail.
+The constructors for `Alias` and `Merge` are not directly exported by the library, as they depend on the document's anchors; instead you'll need to use **`createAlias(node, name)`** and **`createMergePair(...sources)`**.
+You should make sure to only add alias and merge nodes to the document after the nodes to which they refer, or the document's YAML stringification will fail.
 
-It is valid to have an anchor associated with a node even if it has no aliases. `yaml` will not allow you to associate the same name with more than one node, even though this is allowed by the YAML spec (all but the last instance will have numerical suffixes added). To add or reassign an anchor, use **`setAnchor(node, name)`**. The second parameter is optional, and if left out either the pre-existing anchor name of the node will be used, or a new one generated. To remove an anchor, use `setAnchor(null, name)`. The function will return the new anchor's name, or `null` if both of its arguments are `null`.
+It is valid to have an anchor associated with a node even if it has no aliases.
+`yaml` will not allow you to associate the same name with more than one node, even though this is allowed by the YAML spec (all but the last instance will have numerical suffixes added).
+To add or reassign an anchor, use **`setAnchor(node, name)`**.
+The second parameter is optional, and if left out either the pre-existing anchor name of the node will be used, or a new one generated.
+To remove an anchor, use `setAnchor(null, name)`.
+The function will return the new anchor's name, or `null` if both of its arguments are `null`.
 
 While the `merge` option needs to be true to parse `Merge` nodes as such, this is not required during stringification.

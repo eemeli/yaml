@@ -30,24 +30,33 @@ test('Use preceding directives if none defined', () => {
     !bar "Using previous YAML directive"
   `
   const docs = YAML.parseAllDocuments(src, { prettyErrors: false })
-  expect(docs).toHaveLength(5)
-  expect(docs.map(doc => doc.errors)).toMatchObject([[], [], [], [], []])
-  const warn = tag => ({
-    message: `The tag ${tag} is unavailable, falling back to tag:yaml.org,2002:str`
-  })
-  expect(docs.map(doc => doc.warnings)).toMatchObject([
-    [warn('!bar')],
-    [warn('!foobar')],
-    [warn('!foobar')],
-    [warn('!bar')],
-    [warn('!bar')]
-  ])
-  expect(docs.map(doc => doc.version)).toMatchObject([
-    null,
-    null,
-    null,
-    '1.1',
-    '1.1'
+  const warn = tag => ({ message: `Unresolved tag: ${tag}` })
+  expect(docs).toMatchObject([
+    {
+      directives: { yaml: { version: '1.1', explicit: false } },
+      errors: [],
+      warnings: [warn('!bar')]
+    },
+    {
+      directives: { yaml: { version: '1.1', explicit: false } },
+      errors: [],
+      warnings: [warn('!foobar')]
+    },
+    {
+      directives: { yaml: { version: '1.1', explicit: false } },
+      errors: [],
+      warnings: [warn('!foobar')]
+    },
+    {
+      directives: { yaml: { version: '1.1', explicit: true } },
+      errors: [],
+      warnings: [warn('!bar')]
+    },
+    {
+      directives: { yaml: { version: '1.1', explicit: true } },
+      errors: [],
+      warnings: [warn('!bar')]
+    }
   ])
   expect(docs.map(String)).toMatchObject([
     '!bar "First document"\n',

@@ -1,13 +1,9 @@
-import { parse } from './cst/parse.js'
-import { Document } from './doc/Document.js'
+import { parseAllDocuments } from './index.js'
 
 // test harness for yaml-test-suite event tests
 export function testEvents(src, options) {
-  const opt = Object.assign(
-    { keepCstNodes: true, keepNodeTypes: true, version: '1.2' },
-    options
-  )
-  const docs = parse(src).map(cstDoc => new Document(null, opt).parse(cstDoc))
+  const opt = Object.assign({ keepNodeTypes: true, version: '1.2' }, options)
+  const docs = parseAllDocuments(src, opt)
   const errDoc = docs.find(doc => doc.errors.length > 0)
   const error = errDoc ? errDoc.errors[0].message : null
   const events = ['+STR']
@@ -22,17 +18,15 @@ export function testEvents(src, options) {
       if (e && (e.type === 'DOCUMENT' || e.range.start < rootStart))
         throw new Error()
       let docStart = '+DOC'
-      const pre = src.slice(0, rootStart)
-      const explicitDoc = /---\s*$/.test(pre)
-      if (explicitDoc) docStart += ' ---'
-      else if (!doc.contents) continue
+      if (doc.directivesEndMarker) docStart += ' ---'
+      else if (doc.contents.range[1] === doc.contents.range[0]) continue
       events.push(docStart)
       addEvents(events, doc, e, root)
       if (doc.contents && doc.contents.length > 1) throw new Error()
       let docEnd = '-DOC'
       if (rootEnd) {
-        const post = src.slice(rootEnd)
-        if (/^\.\.\./.test(post)) docEnd += ' ...'
+        const post = src.slice(rootStart, rootEnd)
+        if (/^\.\.\.($|\s)/m.test(post)) docEnd += ' ...'
       }
       events.push(docEnd)
     }
@@ -48,7 +42,7 @@ function addEvents(events, doc, e, node) {
     events.push('=VAL :')
     return
   }
-  if (e && node.cstNode === e) throw new Error()
+  if (e /*&& node.cstNode === e*/) throw new Error()
   let props = ''
   let anchor = doc.anchors.getName(node)
   if (anchor) {
@@ -58,10 +52,7 @@ function addEvents(events, doc, e, node) {
     }
     props = ` &${anchor}`
   }
-  if (node.cstNode && node.cstNode.tag) {
-    const { handle, suffix } = node.cstNode.tag
-    props += handle === '!' && !suffix ? ' <!>' : ` <${node.tag}>`
-  }
+  if (node.tag) props += ` <${node.tag}>`
   let scalar = null
   switch (node.type) {
     case 'ALIAS':
@@ -116,7 +107,7 @@ function addEvents(events, doc, e, node) {
       throw new Error(`Unexpected node type ${node.type}`)
   }
   if (scalar) {
-    const value = node.cstNode.strValue
+    const value = node.source
       .replace(/\\/g, '\\\\')
       .replace(/\0/g, '\\0')
       .replace(/\x07/g, '\\a')

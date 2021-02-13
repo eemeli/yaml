@@ -4,6 +4,11 @@ import path from 'path'
 import * as YAML from '../index.js'
 import { testEvents } from '../dist/test-events.js'
 
+const skip = {
+  B63P: ['errors'], // allow ... after directives
+  SF5V: ['errors'] // allow duplicate %YAML directives
+}
+
 const testDirs = fs
   .readdirSync(path.resolve(__dirname, 'yaml-test-suite'))
   .filter(dir => /^[A-Z0-9]{4}$/.test(dir))
@@ -67,17 +72,23 @@ testDirs.forEach(dir => {
     /* ignore error */
   }
 
+  function _test(name, cb) {
+    const sd = skip[dir]
+    if (sd === true || (sd && sd.includes(name))) test.skip(name, cb)
+    else test(name, cb)
+  }
+
   describe(`${dir}: ${name}`, () => {
     const docs = YAML.parseAllDocuments(yaml, { resolveKnownTags: false })
     if (events) {
-      test('test.event', () => {
+      _test('test.event', () => {
         const res = testEvents(yaml)
         expect(res.events.join('\n') + '\n').toBe(events)
         expect(res.error).toBeNull()
       })
     }
-    if (json) test('in.json', () => matchJson(docs, json))
-    test('errors', () => {
+    if (json) _test('in.json', () => matchJson(docs, json))
+    _test('errors', () => {
       const errors = docs
         .map(doc => doc.errors)
         .filter(docErrors => docErrors.length > 0)
@@ -98,10 +109,10 @@ testDirs.forEach(dir => {
         '\nOUT-JSON\n' + JSON.stringify(src2),
         '\nRE-JSON\n' + JSON.stringify(docs2[0], null, '  ')
 
-      if (json) test('stringfy+re-parse', () => matchJson(docs2, json))
+      if (json) _test('stringfy+re-parse', () => matchJson(docs2, json))
 
       if (outYaml) {
-        test('out.yaml', () => {
+        _test('out.yaml', () => {
           const resDocs = YAML.parseAllDocuments(yaml, { mapAsMap: true })
           const resJson = resDocs.map(doc => doc.toJS())
           const expDocs = YAML.parseAllDocuments(outYaml, { mapAsMap: true })

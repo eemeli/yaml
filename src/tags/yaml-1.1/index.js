@@ -10,16 +10,23 @@ import { pairs } from './pairs.js'
 import { set } from './set.js'
 import { intTime, floatTime, timestamp } from './timestamp.js'
 
-const boolStringify = ({ value, sourceStr }) => {
-  const boolObj = value ? trueObj : falseObj
-  if (sourceStr && boolObj.test.test(sourceStr)) return sourceStr
-  return value ? boolOptions.trueStr : boolOptions.falseStr
+const nullObj = {
+  identify: value => value == null,
+  createNode: (schema, value, ctx) =>
+    ctx.wrapScalars ? new Scalar(null) : null,
+  default: true,
+  tag: 'tag:yaml.org,2002:null',
+  test: /^(?:~|[Nn]ull|NULL)?$/,
+  resolve: () => new Scalar(null),
+  options: nullOptions,
+  stringify: ({ source }) =>
+    source && nullObj.test.test(source) ? source : nullOptions.nullStr
 }
 
-const boolResolve = (value, str) => {
-  const node = new Scalar(value)
-  node.sourceStr = str
-  return node
+const boolStringify = ({ value, source }) => {
+  const boolObj = value ? trueObj : falseObj
+  if (source && boolObj.test.test(source)) return source
+  return value ? boolOptions.trueStr : boolOptions.falseStr
 }
 
 const trueObj = {
@@ -27,7 +34,7 @@ const trueObj = {
   default: true,
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:Y|y|[Yy]es|YES|[Tt]rue|TRUE|[Oo]n|ON)$/,
-  resolve: str => boolResolve(true, str),
+  resolve: () => new Scalar(true),
   options: boolOptions,
   stringify: boolStringify
 }
@@ -37,7 +44,7 @@ const falseObj = {
   default: true,
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
-  resolve: str => boolResolve(false, str),
+  resolve: () => new Scalar(false),
   options: boolOptions,
   stringify: boolStringify
 }
@@ -79,21 +86,7 @@ function intStringify(node, radix, prefix) {
 
 export const yaml11 = failsafe.concat(
   [
-    {
-      identify: value => value == null,
-      createNode: (schema, value, ctx) =>
-        ctx.wrapScalars ? new Scalar(null) : null,
-      default: true,
-      tag: 'tag:yaml.org,2002:null',
-      test: /^(?:~|[Nn]ull|NULL)?$/,
-      resolve: str => {
-        const node = new Scalar(null)
-        node.sourceStr = str
-        return node
-      },
-      options: nullOptions,
-      stringify: ({ sourceStr }) => sourceStr ?? nullOptions.nullStr
-    },
+    nullObj,
     trueObj,
     falseObj,
     {

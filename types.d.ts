@@ -1,5 +1,4 @@
 import { Document, scalarOptions } from './index'
-import { CST } from './cst'
 import { Type } from './util'
 
 export const binaryOptions: scalarOptions.Binary
@@ -179,7 +178,7 @@ export class Node {
   /** A comment before this */
   commentBefore?: string | null
   /** Only available when `keepCstNodes` is set to `true` */
-  cstNode?: CST.Node
+  // cstNode?: CST.Node
   /**
    * The [start, end] range of characters of the source parsed
    * into this node (undefined for pairs or if not parsed)
@@ -219,7 +218,7 @@ export namespace Scalar {
 export class Alias extends Node {
   type: Type.ALIAS
   source: Node
-  cstNode?: CST.Alias
+  // cstNode?: CST.Alias
   toString(ctx: Schema.StringifyContext): string
 }
 
@@ -230,7 +229,7 @@ export class Pair extends Node {
   key: any
   /** Always Node or null when parsed, but can be set to anything. */
   value: any
-  cstNode?: never // no corresponding cstNode
+  // cstNode?: never // no corresponding cstNode
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
   toString(
     ctx?: Schema.StringifyContext,
@@ -290,12 +289,13 @@ export class Collection extends Node {
    */
   set(key: any, value: any): void
   setIn(path: Iterable<any>, value: any): void
+
+  hasAllNullValues(allowScalar?: boolean): boolean
 }
 
 export class YAMLMap extends Collection {
   type?: Type.FLOW_MAP | Type.MAP
   items: Array<Pair>
-  hasAllNullValues(): boolean
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): object | Map<any, any>
   toString(
     ctx?: Schema.StringifyContext,
@@ -310,7 +310,6 @@ export class YAMLSeq extends Collection {
   get(key: number | string | Scalar, keepScalar?: boolean): any
   has(key: number | string | Scalar): boolean
   set(key: number | string | Scalar, value: any): void
-  hasAllNullValues(): boolean
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any[]
   toString(
     ctx?: Schema.StringifyContext,
@@ -332,48 +331,48 @@ export namespace AST {
 
   interface BlockFolded extends Scalar {
     type: Type.BLOCK_FOLDED
-    cstNode?: CST.BlockFolded
+    // cstNode?: CST.BlockFolded
   }
 
   interface BlockLiteral extends Scalar {
     type: Type.BLOCK_LITERAL
-    cstNode?: CST.BlockLiteral
+    // cstNode?: CST.BlockLiteral
   }
 
   interface PlainValue extends Scalar {
     type: Type.PLAIN
-    cstNode?: CST.PlainValue
+    // cstNode?: CST.PlainValue
   }
 
   interface QuoteDouble extends Scalar {
     type: Type.QUOTE_DOUBLE
-    cstNode?: CST.QuoteDouble
+    // cstNode?: CST.QuoteDouble
   }
 
   interface QuoteSingle extends Scalar {
     type: Type.QUOTE_SINGLE
-    cstNode?: CST.QuoteSingle
+    // cstNode?: CST.QuoteSingle
   }
 
   interface FlowMap extends YAMLMap {
     type: Type.FLOW_MAP
-    cstNode?: CST.FlowMap
+    // cstNode?: CST.FlowMap
   }
 
   interface BlockMap extends YAMLMap {
     type: Type.MAP
-    cstNode?: CST.Map
+    // cstNode?: CST.Map
   }
 
   interface FlowSeq extends YAMLSeq {
     type: Type.FLOW_SEQ
     items: Array<Node>
-    cstNode?: CST.FlowSeq
+    // cstNode?: CST.FlowSeq
   }
 
   interface BlockSeq extends YAMLSeq {
     type: Type.SEQ
     items: Array<Node | null>
-    cstNode?: CST.Seq
+    // cstNode?: CST.Seq
   }
 }

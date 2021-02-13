@@ -8,9 +8,6 @@ import {
   isEmptyPath,
   toJS
 } from '../ast/index.js'
-import { Document as CSTDocument } from '../cst/Document.js'
-import { defaultTagPrefix } from '../constants.js'
-import { YAMLError } from '../errors.js'
 import { defaultOptions, documentOptions } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
 import { stringify } from '../stringify/stringify.js'
@@ -19,9 +16,7 @@ import { Anchors } from './Anchors.js'
 import { Schema } from './Schema.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode } from './createNode.js'
-import { listTagNames } from './listTagNames.js'
-import { parseContents } from './parseContents.js'
-import { parseDirectives } from './parseDirectives.js'
+import { Directives } from './directives.js'
 
 function assertCollection(contents) {
   if (contents instanceof Collection) return true
@@ -46,21 +41,16 @@ export class Document {
     this.anchors = new Anchors(this.options.anchorPrefix)
     this.commentBefore = null
     this.comment = null
+    this.directives = new Directives({ version: this.options.version })
     this.directivesEndMarker = null
     this.errors = []
     this.schema = null
     this.tagPrefixes = []
-    this.version = null
     this.warnings = []
 
-    if (value === undefined) {
-      // note that this.schema is left as null here
-      this.contents = null
-    } else if (value instanceof CSTDocument) {
-      this.parse(value)
-    } else {
-      this.contents = this.createNode(value, { replacer })
-    }
+    // note that this.schema is left as null here
+    this.contents =
+      value === undefined ? null : this.createNode(value, { replacer })
   }
 
   add(value) {
@@ -140,7 +130,7 @@ export class Document {
 
   getDefaults() {
     return (
-      Document.defaults[this.version] ||
+      Document.defaults[this.directives.yaml.version] ||
       Document.defaults[this.options.version] ||
       {}
     )
@@ -197,9 +187,8 @@ export class Document {
   setSchema(id, customTags) {
     if (!id && !customTags && this.schema) return
     if (typeof id === 'number') id = id.toFixed(1)
-    if (id === '1.0' || id === '1.1' || id === '1.2') {
-      if (this.version) this.version = id
-      else this.options.version = id
+    if (id === '1.1' || id === '1.2') {
+      this.directives.yaml.version = id
       delete this.options.schema
     } else if (id && typeof id === 'string') {
       this.options.schema = id
@@ -207,42 +196,6 @@ export class Document {
     if (Array.isArray(customTags)) this.options.customTags = customTags
     const opt = Object.assign({}, this.getDefaults(), this.options)
     this.schema = new Schema(opt)
-  }
-
-  parse(node, prevDoc) {
-    if (this.options.keepCstNodes) this.cstNode = node
-    if (this.options.keepNodeTypes) this.type = 'DOCUMENT'
-    const {
-      directives = [],
-      contents = [],
-      directivesEndMarker,
-      error,
-      valueRange
-    } = node
-    if (error) {
-      if (!error.source) error.source = this
-      this.errors.push(error)
-    }
-    parseDirectives(this, directives, prevDoc)
-    if (directivesEndMarker) this.directivesEndMarker = true
-    this.range = valueRange ? [valueRange.start, valueRange.end] : null
-    this.setSchema()
-    this.anchors._cstAliases = []
-    parseContents(this, contents)
-    this.anchors.resolveNodes()
-    if (this.options.prettyErrors) {
-      for (const error of this.errors)
-        if (error instanceof YAMLError) error.makePretty()
-      for (const warn of this.warnings)
-        if (warn instanceof YAMLError) warn.makePretty()
-    }
-    return this
-  }
-
-  listNonDefaultTags() {
-    return listTagNames(this.contents).filter(
-      t => t.indexOf(defaultTagPrefix) !== 0
-    )
   }
 
   setTagPrefix(handle, prefix) {
@@ -297,22 +250,11 @@ export class Document {
     this.setSchema()
     const lines = []
     let hasDirectives = false
-    if (this.version) {
-      let vd = '%YAML 1.2'
-      if (this.schema.name === 'yaml-1.1') {
-        if (this.version === '1.0') vd = '%YAML:1.0'
-        else if (this.version === '1.1') vd = '%YAML 1.1'
-      }
-      lines.push(vd)
+    const dir = this.directives.toString(this)
+    if (dir) {
+      lines.push(dir)
       hasDirectives = true
     }
-    const tagNames = this.listNonDefaultTags()
-    this.tagPrefixes.forEach(({ handle, prefix }) => {
-      if (tagNames.some(t => t.indexOf(prefix) === 0)) {
-        lines.push(`%TAG ${handle} ${prefix}`)
-        hasDirectives = true
-      }
-    })
     if (hasDirectives || this.directivesEndMarker) lines.push('---')
     if (this.commentBefore) {
       if (hasDirectives || !this.directivesEndMarker) lines.unshift('')

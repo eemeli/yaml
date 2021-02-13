@@ -17,16 +17,6 @@ function intStringify(node, radix, prefix) {
   return stringifyNumber(node)
 }
 
-function stringifyBool(node) {
-  const { value, sourceStr } = node
-  if (sourceStr) {
-    const match = boolObj.test.test(sourceStr)
-    if (match && value === (sourceStr[0] === 't' || sourceStr[0] === 'T'))
-      return sourceStr
-  }
-  return value ? boolOptions.trueStr : boolOptions.falseStr
-}
-
 export const nullObj = {
   identify: value => value == null,
   createNode: (schema, value, ctx) =>
@@ -34,13 +24,10 @@ export const nullObj = {
   default: true,
   tag: 'tag:yaml.org,2002:null',
   test: /^(?:~|[Nn]ull|NULL)?$/,
-  resolve: str => {
-    const node = new Scalar(null)
-    node.sourceStr = str
-    return node
-  },
+  resolve: () => new Scalar(null),
   options: nullOptions,
-  stringify: ({ sourceStr }) => sourceStr ?? nullOptions.nullStr
+  stringify: ({ source }) =>
+    source && nullObj.test.test(source) ? source : nullOptions.nullStr
 }
 
 export const boolObj = {
@@ -48,13 +35,15 @@ export const boolObj = {
   default: true,
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:[Tt]rue|TRUE|[Ff]alse|FALSE)$/,
-  resolve: str => {
-    const node = new Scalar(str[0] === 't' || str[0] === 'T')
-    node.sourceStr = str
-    return node
-  },
+  resolve: str => new Scalar(str[0] === 't' || str[0] === 'T'),
   options: boolOptions,
-  stringify: stringifyBool
+  stringify({ source, value }) {
+    if (source && boolObj.test.test(source)) {
+      const sv = source[0] === 't' || source[0] === 'T'
+      if (value === sv) return source
+    }
+    return value ? boolOptions.trueStr : boolOptions.falseStr
+  }
 }
 
 export const octObj = {

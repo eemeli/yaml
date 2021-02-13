@@ -3,7 +3,6 @@ import { Node } from '../ast/Node.js'
 import { Pair } from '../ast/Pair.js'
 import { Scalar } from '../ast/Scalar.js'
 import { stringifyString } from './stringifyString.js'
-import { stringifyTag } from './stringifyTag.js'
 
 function getTagObject(tags, item) {
   if (item instanceof Alias) return Alias
@@ -40,9 +39,9 @@ function stringifyProps(node, tagObj, { anchors, doc }) {
     props.push(`&${anchor}`)
   }
   if (node.tag) {
-    props.push(stringifyTag(doc, node.tag))
+    props.push(doc.directives.tagString(node.tag))
   } else if (!tagObj.default) {
-    props.push(stringifyTag(doc, tagObj.tag))
+    props.push(doc.directives.tagString(tagObj.tag))
   }
   return props.join(' ')
 }

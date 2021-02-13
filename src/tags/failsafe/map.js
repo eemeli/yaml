@@ -26,5 +26,8 @@ export const map = {
   default: true,
   nodeClass: YAMLMap,
   tag: 'tag:yaml.org,2002:map',
-  resolve: map => map
+  resolve(map, onError) {
+    if (!(map instanceof YAMLMap)) onError('Expected a mapping for this tag')
+    return map
+  }
 }

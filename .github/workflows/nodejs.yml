@@ -1,9 +1,11 @@
 name: Node.js
 
 on:
-  - pull_request
-  - push
-  - workflow_dispatch
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
 
 jobs:
   test:

@@ -1,4 +1,3 @@
-import { CST } from './cst'
 import {
   AST,
   Alias,
@@ -13,13 +12,7 @@ import {
 } from './types'
 import { Type, YAMLError, YAMLWarning } from './util'
 
-export { AST, CST }
-
-export function parseCST(str: string): ParsedCST
-
-export interface ParsedCST extends Array<CST.Document> {
-  setOrigRanges(): boolean
-}
+export { AST }
 
 /**
  * Apply a visitor to an AST node or document.
@@ -160,7 +153,7 @@ export interface Options extends Schema.Options {
    *
    * Default: `"1.2"`
    */
-  version?: '1.0' | '1.1' | '1.2'
+  version?: '1.1' | '1.2'
 }
 
 /**
@@ -294,7 +287,7 @@ export interface CreateNodeOptions {
 }
 
 export class Document extends Collection {
-  cstNode?: CST.Document
+  // cstNode?: CST.Document
   /**
    * @param value - The initial value for the document, which will be wrapped
    *   in a Node container.
@@ -347,13 +340,7 @@ export class Document extends Collection {
    *   `Scalar` objects.
    */
   createPair(key: any, value: any, options?: { wrapScalars?: boolean }): Pair
-  /**
-   * List the tags used in the document that are not in the default
-   * `tag:yaml.org,2002:` namespace.
-   */
-  listNonDefaultTags(): string[]
-  /** Parse a CST into this document */
-  parse(cst: CST.Document): this
+
   /**
    * When a document is created with `new YAML.Document()`, the schema object is
    * not set as it may be influenced by parsed directives; call this with no
@@ -394,6 +381,7 @@ export class Document extends Collection {
 export namespace Document {
   interface Parsed extends Document {
     contents: Scalar | YAMLMap | YAMLSeq | null
+    range: [number, number]
     /** The schema used with the document. */
     schema: Schema
   }

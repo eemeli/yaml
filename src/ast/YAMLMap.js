@@ -14,6 +14,10 @@ export function findPair(items, key) {
 }
 
 export class YAMLMap extends Collection {
+  static get tagName() {
+    return 'tag:yaml.org,2002:map'
+  }
+
   add(pair, overwrite) {
     if (!pair) pair = new Pair(pair)
     else if (!(pair instanceof Pair))
@@ -76,6 +80,8 @@ export class YAMLMap extends Collection {
           `Map items must all be pairs; found ${JSON.stringify(item)} instead`
         )
     }
+    if (!ctx.allNullValues && this.hasAllNullValues(false))
+      ctx = Object.assign({}, ctx, { allNullValues: true })
     return super.toString(
       ctx,
       {

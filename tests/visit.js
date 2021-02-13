@@ -153,7 +153,8 @@ test('Do not visit block seq items', () => {
     ['key', { type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
     ['value', { type: 'SEQ' }, [{}, {}, {}]],
     [1, { type: 'PAIR' }, [{}, {}]],
-    ['key', { type: 'PLAIN', value: 'bar' }, [{}, {}, {}]]
+    ['key', { type: 'PLAIN', value: 'bar' }, [{}, {}, {}]],
+    ['value', { type: 'PLAIN', value: null }, [{}, {}, {}]]
   ])
 })
 

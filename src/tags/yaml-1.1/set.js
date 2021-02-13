@@ -44,15 +44,19 @@ export class YAMLSet extends YAMLMap {
 
   toString(ctx, onComment, onChompKeep) {
     if (!ctx) return JSON.stringify(this)
-    if (this.hasAllNullValues())
-      return super.toString(ctx, onComment, onChompKeep)
+    if (this.hasAllNullValues(true))
+      return super.toString(
+        Object.assign({}, ctx, { allNullValues: true }),
+        onComment,
+        onChompKeep
+      )
     else throw new Error('Set items must all have null values')
   }
 }
 
 function parseSet(map, onError) {
   if (map instanceof YAMLMap) {
-    if (map.hasAllNullValues()) return Object.assign(new YAMLSet(), map)
+    if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map)
     else onError('Set items must all have null values')
   } else onError('Expected a mapping for this tag')
   return map

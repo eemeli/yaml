@@ -1,4 +1,3 @@
-import { CST } from './cst'
 import { Pair, Scalar, Schema } from './types'
 
 export function findPair(items: any[], key: Scalar | any): Pair | undefined
@@ -39,17 +38,13 @@ interface LinePos {
 }
 
 export class YAMLError extends Error {
-  name:
-    | 'YAMLReferenceError'
-    | 'YAMLSemanticError'
-    | 'YAMLSyntaxError'
-    | 'YAMLWarning'
+  name: 'YAMLParseError' | 'YAMLWarning'
   message: string
-  source?: CST.Node
+  offset?: number
 
-  nodeType?: Type
-  range?: CST.Range
-  linePos?: { start: LinePos; end: LinePos }
+  // nodeType?: Type
+  // range?: CST.Range
+  // linePos?: { start: LinePos; end: LinePos }
 
   /**
    * Drops `source` and adds `nodeType`, `range` and `linePos`, as well as
@@ -59,16 +54,8 @@ export class YAMLError extends Error {
   makePretty(): void
 }
 
-export class YAMLReferenceError extends YAMLError {
-  name: 'YAMLReferenceError'
-}
-
-export class YAMLSemanticError extends YAMLError {
-  name: 'YAMLSemanticError'
-}
-
-export class YAMLSyntaxError extends YAMLError {
-  name: 'YAMLSyntaxError'
+export class YAMLParseError extends YAMLError {
+  name: 'YAMLParseError'
 }
 
 export class YAMLWarning extends YAMLError {

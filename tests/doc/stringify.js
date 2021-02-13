@@ -284,7 +284,7 @@ foo:
 
   test('do not match nulls', () => {
     const set = { a: null, b: null }
-    expect(YAML.stringify(set)).toBe('? a\n? b\n')
+    expect(YAML.stringify(set)).toBe('a: null\nb: null\n')
   })
 })
 
@@ -327,7 +327,7 @@ z:
   test('Document as key', () => {
     const doc = new YAML.Document({ a: 1 })
     doc.add(new YAML.Document({ b: 2, c: 3 }))
-    expect(String(doc)).toBe('a: 1\n? b: 2\n  c: 3\n: null\n')
+    expect(String(doc)).toBe('a: 1\n? b: 2\n  c: 3\n')
   })
 })
 
@@ -593,11 +593,11 @@ describe('scalar styles', () => {
 })
 
 describe('simple keys', () => {
-  test('key with null value', () => {
-    const doc = YAML.parseDocument('~: ~')
+  test('key with no value', () => {
+    const doc = YAML.parseDocument('? ~')
     expect(String(doc)).toBe('? ~\n')
     doc.options.simpleKeys = true
-    expect(String(doc)).toBe('~: ~\n')
+    expect(String(doc)).toBe('~: null\n')
   })
 
   test('key with block scalar value', () => {
@@ -611,7 +611,7 @@ describe('simple keys', () => {
   test('key with comment', () => {
     const doc = YAML.parseDocument('foo: bar')
     doc.contents.items[0].key.comment = 'FOO'
-    expect(String(doc)).toBe('? foo #FOO\n: bar\n')
+    expect(String(doc)).toBe('foo: #FOO\n  bar\n')
     doc.options.simpleKeys = true
     expect(() => String(doc)).toThrow(
       /With simple keys, key nodes cannot have comments/
@@ -828,7 +828,9 @@ describe('Scalar options', () => {
     test('Use defaultType for explicit keys', () => {
       YAML.scalarOptions.str.defaultType = Type.QUOTE_DOUBLE
       YAML.scalarOptions.str.defaultKeyType = Type.QUOTE_SINGLE
-      expect(YAML.stringify({ foo: null })).toBe('? "foo"\n')
+      const doc = new YAML.Document({ foo: null })
+      doc.contents.items[0].value = null
+      expect(String(doc)).toBe('? "foo"\n')
     })
   })
 

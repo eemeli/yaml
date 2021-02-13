@@ -75,6 +75,24 @@ describe('tags', () => {
   })
 })
 
+describe('custom string on node', () => {
+  test('tiled null', () => {
+    YAML.scalarOptions.null.nullStr = '~'
+    const doc = YAML.parse('a: null')
+    const str = YAML.stringify(doc, { simpleKeys: true })
+    expect(str).toBe('a: ~\n')
+    expect(YAML.parse(str)).toEqual({ a: null })
+  })
+
+  test('empty string null', () => {
+    YAML.scalarOptions.null.nullStr = ''
+    const doc = YAML.parse('a: null')
+    const str = YAML.stringify(doc, { simpleKeys: true })
+    expect(str).toBe('a: \n')
+    expect(YAML.parse(str)).toEqual({ a: null })
+  })
+})
+
 describe('number types', () => {
   describe('asBigInt: false', () => {
     test('Version 1.1', () => {
@@ -214,7 +232,7 @@ test('eemeli/yaml#3', () => {
   const src = '{ ? : 123 }'
   const doc = YAML.parseDocument(src)
   expect(doc.errors).toHaveLength(0)
-  expect(doc.contents.items[0].key).toBeNull()
+  expect(doc.contents.items[0].key.value).toBeNull()
   expect(doc.contents.items[0].value.value).toBe(123)
 })
 
@@ -352,13 +370,13 @@ describe('eemeli/yaml#l19', () => {
   test('map', () => {
     const src = 'a:\n  # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('? a\n\n# 123\n')
+    expect(String(doc)).toBe('a: # 123\n')
   })
 
   test('seq', () => {
     const src = '- a: # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('- ? a # 123\n')
+    expect(String(doc)).toBe('- a: # 123\n')
   })
 })
 
@@ -422,17 +440,14 @@ test('comment between key & : in flow collection (eemeli/yaml#149)', () => {
 
   const src2 = '{a\n#c\n:1}'
   expect(() => YAML.parse(src2)).toThrow(
-    'Indicator : missing in flow map entry'
+    'Missing , between flow collection items'
   )
 })
 
 test('empty node should respect setOrigRanges()', () => {
-  const cst = YAML.parseCST('\r\na: # 123\r\n')
-  expect(cst).toHaveLength(1)
-  expect(cst.setOrigRanges()).toBe(true)
-  const doc = new YAML.Document(undefined, { keepCstNodes: true }).parse(cst[0])
-  const empty = doc.contents.items[0].value.cstNode
-  expect(empty.range).toEqual({ start: 3, end: 3, origStart: 4, origEnd: 4 })
+  const doc = YAML.parseDocument('\r\na: # 123\r\n')
+  const empty = doc.contents.items[0].value
+  expect(empty.range).toEqual([12, 12])
 })
 
 test('parse an empty string as null', () => {
@@ -450,18 +465,18 @@ describe('maps with no values', () => {
   test('block map', () => {
     const src = `a: null\n? b #c`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(`? a\n? b #c\n`)
-    doc.contents.items[1].value = 'x'
-    expect(String(doc)).toBe(`a: null\n? b #c\n: x\n`)
+    expect(String(doc)).toBe(`a: null\n? b #c\n`)
+    doc.set('b', 'x')
+    expect(String(doc)).toBe(`a: null\nb: #c\n  x\n`)
   })
 
   test('flow map', () => {
     const src = `{\na: null,\n? b\n}`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(`{ a, b }\n`)
+    expect(String(doc)).toBe(`{ a: null, b }\n`)
     doc.contents.items[1].comment = 'c'
-    expect(String(doc)).toBe(`{\n  a,\n  b #c\n}\n`)
-    doc.contents.items[1].value = 'x'
+    expect(String(doc)).toBe(`{\n  a: null,\n  b #c\n}\n`)
+    doc.set('b', 'x')
     expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n    x\n}\n`)
   })
 })

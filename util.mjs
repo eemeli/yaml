@@ -9,7 +9,5 @@ export const stringifyString = util.stringifyString
 export const Type = util.Type
 
 export const YAMLError = util.YAMLError
-export const YAMLReferenceError = util.YAMLReferenceError
-export const YAMLSemanticError = util.YAMLSemanticError
-export const YAMLSyntaxError = util.YAMLSyntaxError
+export const YAMLParseError = util.YAMLParseError
 export const YAMLWarning = util.YAMLWarning

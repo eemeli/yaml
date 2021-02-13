@@ -9,6 +9,10 @@ function asItemIndex(key) {
 }
 
 export class YAMLSeq extends Collection {
+  static get tagName() {
+    return 'tag:yaml.org,2002:map'
+  }
+
   add(value) {
     this.items.push(value)
   }

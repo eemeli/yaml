@@ -1,5 +1,4 @@
 import { Type } from '../constants.js'
-import { YAMLReferenceError } from '../errors.js'
 import { Collection } from './Collection.js'
 import { Node } from './Node.js'
 import { Pair } from './Pair.js'
@@ -58,8 +57,7 @@ export class Alias extends Node {
     /* istanbul ignore if */
     if (!anchor || anchor.res === undefined) {
       const msg = 'This should not happen: Alias anchor was not resolved?'
-      if (this.cstNode) throw new YAMLReferenceError(this.cstNode, msg)
-      else throw new ReferenceError(msg)
+      throw new ReferenceError(msg)
     }
     if (maxAliasCount >= 0) {
       anchor.count += 1
@@ -68,8 +66,7 @@ export class Alias extends Node {
       if (anchor.count * anchor.aliasCount > maxAliasCount) {
         const msg =
           'Excessive alias count indicates a resource exhaustion attack'
-        if (this.cstNode) throw new YAMLReferenceError(this.cstNode, msg)
-        else throw new ReferenceError(msg)
+        throw new ReferenceError(msg)
       }
     }
     return anchor.res
