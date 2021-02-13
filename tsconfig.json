@@ -1,10 +1,8 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "lib/",
     "strict": true,
     "target": "ES2017"
   },
