@@ -17,7 +17,7 @@ export namespace Schema {
      * Array of additional tags to include in the schema, or a function that may
      * modify the schema's base tag array.
      */
-    customTags?: (TagId | Tag)[] | ((tags: Tag[]) => Tag[])
+    customTags?: (TagId | Tag)[] | ((tags: Tag[]) => Tag[]) | null
     /**
      * Enable support for `<<` merge keys.
      *
