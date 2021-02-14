@@ -1,5 +1,4 @@
-import * as YAML from '../index.js'
-const { Document, parseDocument, visit } = YAML
+import { Document, parseDocument, visit } from '../index.js'
 
 test('Map', () => {
   const doc = parseDocument('{ one: 1, two }')

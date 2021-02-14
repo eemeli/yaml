@@ -1,5 +1,4 @@
-import * as YAML from '../index.js'
-const { LineCounter, parseDocument } = YAML
+import { LineCounter, parseDocument } from '../index.js'
 
 test('Parse error, no newlines', () => {
   const lineCounter = new LineCounter()

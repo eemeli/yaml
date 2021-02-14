@@ -1,13 +1,13 @@
 import * as fc from 'fast-check'
-import * as YAML from '../index.js'
+import { parse, stringify } from '../index.js'
 
 describe('properties', () => {
   test('parse stringified object', () => {
     const key = fc.fullUnicodeString()
     const values = [
       key,
-      fc.lorem(1000, false), // words
-      fc.lorem(100, true), // sentences
+      fc.lorem({ maxCount: 1000, mode: 'words' }),
+      fc.lorem({ maxCount: 100, mode: 'sentences' }),
       fc.boolean(),
       fc.integer(),
       fc.double(),
@@ -20,14 +20,14 @@ describe('properties', () => {
         keepNodeTypes: fc.boolean(),
         mapAsMap: fc.constant(false),
         merge: fc.boolean(),
-        schema: fc.constantFrom('core', 'yaml-1.1') // ignore 'failsafe', 'json'
+        schema: fc.constantFrom<('core' | 'yaml-1.1')[]>('core', 'yaml-1.1') // ignore 'failsafe', 'json'
       },
       { withDeletedKeys: true }
     )
 
     fc.assert(
       fc.property(yamlArbitrary, optionsArbitrary, (obj, opts) => {
-        expect(YAML.parse(YAML.stringify(obj, opts), opts)).toStrictEqual(obj)
+        expect(parse(stringify(obj, opts), opts)).toStrictEqual(obj)
       })
     )
   })
