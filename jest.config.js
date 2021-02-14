@@ -29,11 +29,11 @@ switch (process.env.npm_lifecycle_event) {
 }
 
 module.exports = {
-  collectCoverageFrom: ['src/**/*.js'],
+  collectCoverageFrom: ['src/**/*.{js,ts}', '!src/**/*.d.ts'],
   moduleNameMapper,
   resolver: 'jest-ts-webcompat-resolver',
   testEnvironment: 'node',
-  testMatch: ['**/tests/**/*.js'],
+  testMatch: ['**/tests/**/*.{js,ts}', '!**/tests/typings.ts'],
   testPathIgnorePatterns,
   transform: { '/(src|tests)/.*\\.(js|ts)$': 'babel-jest' }
 }

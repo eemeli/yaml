@@ -85,6 +85,7 @@
     "@rollup/plugin-babel": "^5.2.3",
     "@rollup/plugin-replace": "^2.3.4",
     "@rollup/plugin-typescript": "^8.1.1",
+    "@types/jest": "^26.0.20",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.3",
     "babel-plugin-trace": "^1.1.0",

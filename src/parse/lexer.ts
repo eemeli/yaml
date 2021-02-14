@@ -203,9 +203,13 @@ export class Lexer {
     if (this.indentNext > 0) {
       let indent = 0
       while (ch === ' ') ch = this.buffer[++indent + offset]
-      if (ch === '\r' && this.buffer[indent + offset + 1] === '\n')
-        return offset + indent + 1
-      return ch === '\n' || indent >= this.indentNext ? offset + indent : -1
+      if (ch === '\r') {
+        const next = this.buffer[indent + offset + 1]
+        if (next === '\n' || (!next && !this.atEnd)) return offset + indent + 1
+      }
+      return ch === '\n' || indent >= this.indentNext || (!ch && !this.atEnd)
+        ? offset + indent
+        : -1
     }
     if (ch === '-' || ch === '.') {
       const dt = this.buffer.substr(offset, 3)
@@ -294,6 +298,7 @@ export class Lexer {
 
   private parseLineStart() {
     const ch = this.charAt(0)
+    if (!ch && !this.atEnd) return this.setNext('line-start')
     if (ch === '-' || ch === '.') {
       if (!this.atEnd && !this.hasChars(4)) return this.setNext('line-start')
       const s = this.peek(3)
@@ -488,7 +493,7 @@ export class Lexer {
   }
 
   private parseBlockScalar() {
-    let nl = this.pos - 1
+    let nl = this.pos - 1 // may be -1 if this.pos === 0
     let indent = 0
     let ch: string
     loop: for (let i = this.pos; (ch = this.buffer[i]); ++i) {
@@ -500,18 +505,24 @@ export class Lexer {
           nl = i
           indent = 0
           break
+        case '\r': {
+          const next = this.buffer[i + 1]
+          if (!next && !this.atEnd) return this.setNext('block-scalar')
+          if (next === '\n') break
+        } // fallthrough
         default:
           break loop
       }
     }
+    if (!ch && !this.atEnd) return this.setNext('block-scalar')
     if (indent >= this.indentNext) {
       if (this.blockScalarIndent === -1) this.indentNext = indent
       else this.indentNext += this.blockScalarIndent
-      while (nl !== -1) {
+      do {
         const cs = this.continueScalar(nl + 1)
         if (cs === -1) break
         nl = this.buffer.indexOf('\n', cs)
-      }
+      } while (nl !== -1)
       if (nl === -1) {
         if (!this.atEnd) return this.setNext('block-scalar')
         nl = this.buffer.length
