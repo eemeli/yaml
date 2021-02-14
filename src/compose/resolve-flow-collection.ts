@@ -94,6 +94,7 @@ export function resolveFlowCollection(
           if (hasComment) {
             let node = coll.items[coll.items.length - 1]
             if (node instanceof Pair) node = node.value || node.key
+            /* istanbul ignore else should not happen */
             if (node instanceof Node) node.comment = comment
             else onError(offset, 'Error adding trailing comment to node')
             comment = ''
@@ -185,6 +186,13 @@ export function resolveFlowCollection(
         nlAfterValueInSeq = false
         seqKeyToken = null
         break
+      case 'block-map':
+      case 'block-seq':
+        onError(
+          offset,
+          'Block collections are not allowed within flow collections'
+        )
+      // fallthrough
       default: {
         if (value) onError(offset, 'Missing , between flow collection items')
         if (!isMap && !key && !atExplicitKey) seqKeyToken = token

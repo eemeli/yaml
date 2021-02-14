@@ -69,6 +69,7 @@ export function resolveBlockScalar(
     const crlf = content[content.length - 1] === '\r'
     if (crlf) content = content.slice(0, -1)
 
+    /* istanbul ignore if already caught in lexer */
     if (content && indent.length < trimIndent) {
       const src = header.indent
         ? 'explicit indentation indicator'
@@ -124,6 +125,7 @@ function parseBlockScalarHeader(
   strict: boolean,
   onError: (offset: number, message: string) => void
 ) {
+  /* istanbul ignore if should not happen */
   if (props[0].type !== 'block-scalar-header') {
     onError(offset, 'Block scalar header not found')
     return null
@@ -169,6 +171,7 @@ function parseBlockScalarHeader(
         onError(offset + length, token.message)
         length += token.source.length
         break
+      /* istanbul ignore next should not happen */
       default: {
         const message = `Unexpected token in block scalar header: ${token.type}`
         onError(offset + length, message)

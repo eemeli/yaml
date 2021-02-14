@@ -30,7 +30,7 @@ export function resolveBlockMap(
       offset,
       onError
     )
-    const implicitKey = keyProps.found === -1
+    const implicitKey = !keyProps.found
     if (implicitKey) {
       if (key) {
         if (key.type === 'block-seq')
@@ -49,7 +49,7 @@ export function resolveBlockMap(
         }
         continue
       }
-    } else if (keyProps.found !== indent) onError(offset, startColMsg)
+    } else if (keyProps.found?.indent !== indent) onError(offset, startColMsg)
     offset += keyProps.length
     if (implicitKey && containsNewline(key))
       onError(offset, 'Implicit keys need to be on a single line')
@@ -70,11 +70,11 @@ export function resolveBlockMap(
     )
     offset += valueProps.length
 
-    if (valueProps.found !== -1) {
+    if (valueProps.found) {
       if (implicitKey) {
         if (value?.type === 'block-map' && !valueProps.hasNewline)
           onError(offset, 'Nested mappings are not allowed in compact mappings')
-        if (doc.options.strict && keyProps.start < valueProps.found - 1024)
+        if (doc.options.strict && keyProps.start < valueProps.found.offset - 1024)
           onError(
             offset,
             'The : indicator must be at most 1024 chars after the start of an implicit block mapping key'

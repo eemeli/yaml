@@ -23,7 +23,7 @@ export function resolveProps(
   let sep = ''
   let anchor = ''
   let tagName = ''
-  let found = -1
+  let found: { indent: number, offset: number} | null = null
   let start: number | null = null
   for (const token of tokens) {
     switch (token.type) {
@@ -75,7 +75,7 @@ export function resolveProps(
       }
       case indicator:
         // Could here handle preceding comments differently
-        found = token.indent
+        found = { indent: token.indent, offset: offset + length }
         atNewline = false
         hasSpace = false
         break
@@ -84,6 +84,7 @@ export function resolveProps(
         atNewline = false
         hasSpace = false
     }
+    /* istanbul ignore else should not happen */
     if (token.source) length += token.source.length
   }
   return {

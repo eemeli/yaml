@@ -31,6 +31,7 @@ export function resolveFlowScalar(
       value = doubleQuotedValue(source, _onError)
       break
 
+    /* istanbul ignore next should not happen */
     default:
       onError(offset, `Expected a flow scalar value, but found: ${type}`)
       return {
@@ -55,9 +56,16 @@ function plainValue(
   onError: (relOffset: number, message: string) => void
 ) {
   switch (source[0]) {
+    /* istanbul ignore next should not happen */
     case '\t':
       onError(0, 'Plain value cannot start with a tab character')
       break
+    case '|':
+    case '>': {
+      const message = `Plain value cannot start with block scalar indicator ${source[0]}`
+      onError(0, message)
+      break
+    }
     case '@':
     case '`': {
       const message = `Plain value cannot start with reserved character ${source[0]}`
@@ -147,10 +155,7 @@ function foldNewline(source: string, offset: number) {
   let fold = ''
   let ch = source[offset + 1]
   while (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
-    if (ch === '\r') {
-      if (source[offset + 2] === '\n') fold += '\n'
-      else break
-    }
+    if (ch === '\r' && source[offset + 2] !== '\n') break
     if (ch === '\n') fold += '\n'
     offset += 1
     ch = source[offset + 1]

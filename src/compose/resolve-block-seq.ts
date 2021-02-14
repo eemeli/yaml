@@ -25,7 +25,7 @@ export function resolveBlockSeq(
       onError
     )
     offset += props.length
-    if (props.found === -1) {
+    if (!props.found) {
       if (props.anchor || props.tagName || value) {
         const msg =
           value && value.type === 'block-seq'

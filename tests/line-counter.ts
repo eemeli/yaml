@@ -18,7 +18,7 @@ test('Parse error with newlines', () => {
 
 test('block scalar', () => {
   const lineCounter = new LineCounter()
-  const doc = parseDocument('foo: |\n a\n b\n c\nbar:\n baz\n', { lineCounter })
+  parseDocument('foo: |\n a\n b\n c\nbar:\n baz\n', { lineCounter })
   expect(lineCounter.lineStarts).toMatchObject([0, 7, 10, 13, 16, 21, 26])
   for (const { offset, line, col } of [
     { offset: 10, line: 3, col: 1 },
@@ -33,4 +33,23 @@ test('block scalar', () => {
   ]) {
     expect(lineCounter.linePos(offset)).toMatchObject({ line, col })
   }
+})
+
+test('flow scalar', () => {
+  const lineCounter = new LineCounter()
+  const doc = parseDocument(`?\n "a\n b"\n: '\n c\n \n\n d'\n`, {
+    lineCounter
+  })
+  expect(doc.toJS()).toMatchObject({ 'a b': ' c\n\nd' })
+  expect(lineCounter.lineStarts).toMatchObject([
+    0,
+    2,
+    6,
+    10,
+    14,
+    17,
+    19,
+    20,
+    24
+  ])
 })

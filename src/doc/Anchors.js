@@ -55,18 +55,6 @@ export class Anchors {
     }
   }
 
-  // During parsing, map & aliases contain CST nodes
-  resolveNodes() {
-    const { map, _cstAliases } = this
-    Object.keys(map).forEach(a => {
-      map[a] = map[a].resolved
-    })
-    _cstAliases.forEach(a => {
-      a.source = a.source.resolved
-    })
-    delete this._cstAliases
-  }
-
   setAnchor(node, name) {
     const { map } = this
     if (!node) {

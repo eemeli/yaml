@@ -245,6 +245,16 @@ k2:
 #c5\n`)
     })
   })
+
+  describe('flow collection commens', () => {
+    test('multi-line comments', () => {
+      const doc = YAML.parseDocument('{ a,\n#c0\n#c1\nb }')
+      expect(doc.contents.items).toMatchObject([
+        { key: { value: 'a' } },
+        { commentBefore: 'c0\nc1', key: { value: 'b' } }
+      ])
+    })
+  })
 })
 
 describe('stringify comments', () => {

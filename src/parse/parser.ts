@@ -52,6 +52,7 @@ function atFirstEmptyLineAfterComments(start: SourceToken[]) {
   if (hasComment) {
     for (let i = start.length - 1; i >= 0; --i) {
       switch (start[i].type) {
+        /* istanbul ignore next */
         case 'space':
           break
         case 'newline':
@@ -89,6 +90,7 @@ function getPrevProps(parent: Token) {
     }
     case 'block-seq':
       return parent.items[parent.items.length - 1].start
+    /* istanbul ignore next should not happen */
     default:
       return []
   }
@@ -282,7 +284,8 @@ export class Parser {
       case 'doc-end':
         return this.documentEnd(top)
     }
-    this.pop() // error
+    /* istanbul ignore next should not happen */
+    this.pop()
   }
 
   private peek(n: number) {
@@ -291,6 +294,7 @@ export class Parser {
 
   private pop(error?: Token) {
     const token = error || this.stack.pop()
+    /* istanbul ignore if should not happen */
     if (!token) {
       const message = 'Tried to pop an empty stack'
       this.push({ type: 'error', source: '', message })
@@ -332,6 +336,7 @@ export class Parser {
         case 'flow-collection':
           top.items.push(token)
           break
+        /* istanbul ignore next should not happen */
         default:
           this.pop()
           this.pop(token)
@@ -468,6 +473,7 @@ export class Parser {
         }
         this.pop()
         break
+      /* istanbul ignore next should not happen */
       default:
         this.pop()
         this.step()
@@ -661,9 +667,12 @@ export class Parser {
           return
       }
       const bv = this.startBlockValue(fc)
+      /* istanbul ignore else should not happen */
       if (bv) return this.stack.push(bv)
-      this.pop()
-      this.step()
+      else {
+        this.pop()
+        this.step()
+      }
     } else {
       const parent = this.peek(2)
       if (

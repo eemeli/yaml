@@ -128,6 +128,7 @@ export const FLOW_END = '\x18' // C0: Cancel
 /** Next token is a scalar value */
 export const SCALAR = '\x1f' // C0: Unit Separator
 
+/* istanbul ignore next */
 /** Get a printable representation of a lexer token */
 export function prettyToken(token: string) {
   switch (token) {

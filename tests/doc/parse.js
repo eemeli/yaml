@@ -2,6 +2,18 @@ import fs from 'fs'
 import path from 'path'
 import * as YAML from '../../index.js'
 
+describe('scalars', () => {
+  test('empty block scalar at end of document', () => {
+    const docs = YAML.parseAllDocuments('|\n---\nfoo')
+    expect(docs.map(doc => doc.toJS())).toMatchObject(['', 'foo'])
+  })
+
+  test('carriage returns in double-quotes', () => {
+    const src = '"a\nb\n\rc\n\r\nd\n\r\n\re\n\r\n\r\nf"'
+    expect(YAML.parse(src)).toBe('a b \rc\nd\n\re\n\nf')
+  })
+})
+
 describe('tags', () => {
   describe('implicit tags', () => {
     test('plain string', () => {
@@ -718,6 +730,34 @@ describe('reviver', () => {
       3: { 4: 4, 5: { 6: 6, 9: 9 }, 9: 9 },
       9: 9
     })
+  })
+
+  test('sequence', () => {
+    const these = []
+    const reviver = jest.fn(function (key, value) {
+      these.push(Array.from(key === '' ? this[''] : this))
+      if (key === '0') return undefined
+      if (key === '3') return 10
+      return value
+    })
+    const src = '[ 2, 4, 6, 8 ]'
+    const seq = YAML.parse(src, reviver)
+    expect(seq).toBeInstanceOf(Array)
+    expect(seq).toMatchObject([undefined, 4, 6, 10])
+    expect(reviver.mock.calls).toMatchObject([
+      ['0', 2],
+      ['1', 4],
+      ['2', 6],
+      ['3', 8],
+      ['', {}]
+    ])
+    expect(these).toMatchObject([
+      [2, 4, 6, 8],
+      [undefined, 4, 6, 8],
+      [undefined, 4, 6, 8],
+      [undefined, 4, 6, 8],
+      [undefined, 4, 6, 10]
+    ])
   })
 
   test('!!set', () => {

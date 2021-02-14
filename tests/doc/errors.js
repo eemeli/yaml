@@ -60,6 +60,20 @@ describe.skip('eemeli/yaml#7', () => {
   })
 })
 
+describe('block scalars', () => {
+  test('invalid header', () => {
+    const doc = YAML.parseDocument('>99\n foo\n')
+    expect(doc.errors).toMatchObject([
+      { message: 'Block scalar header includes extra characters: >99' },
+      { message: 'Unexpected scalar at node end' }
+    ])
+  })
+  test('missing newline at header end', () => {
+    const doc = YAML.parseDocument('> foo\n')
+    expect(doc.errors).toMatchObject([{ message: 'Not a YAML token: foo' }])
+  })
+})
+
 describe('block collections', () => {
   test('mapping with bad indentation', () => {
     const src = 'foo: "1"\n bar: 2\n'
@@ -104,9 +118,26 @@ describe('block collections', () => {
       ]
     })
   })
+
+  test('doubled value indicator', () => {
+    const doc = YAML.parseDocument('foo : : bar\n')
+    expect(doc.errors).toMatchObject([
+      { message: 'Nested mappings are not allowed in compact mappings' }
+    ])
+  })
+
+  test('excessively long key', () => {
+    const doc = YAML.parseDocument(`foo ${'x'.repeat(1024)} : bar\n`)
+    expect(doc.errors).toMatchObject([
+      {
+        message:
+          'The : indicator must be at most 1024 chars after the start of an implicit block mapping key'
+      }
+    ])
+  })
 })
 
-describe('missing flow collection terminator', () => {
+describe('flow collections', () => {
   test('start only of flow map (eemeli/yaml#8)', () => {
     const doc = YAML.parseDocument('{')
     expect(doc.errors).toMatchObject([
@@ -136,6 +167,61 @@ describe('missing flow collection terminator', () => {
         name: 'YAMLParseError',
         message: 'Expected flow sequence to end with ]',
         offset: 11
+      }
+    ])
+  })
+
+  test('doc-end within flow sequence', () => {
+    const doc = YAML.parseDocument('[ foo, bar,\n...\n]')
+    expect(doc.errors).toMatchObject([
+      { message: 'Expected flow sequence to end with ]' },
+      { message: 'Unexpected flow-seq-end token in YAML document: "]"' },
+      {
+        message:
+          'Source contains multiple documents; please use YAML.parseAllDocuments()'
+      }
+    ])
+  })
+
+  test('block scalar in flow collection', () => {
+    const doc = YAML.parseDocument('{ |\n foo\n}')
+    expect(doc.errors).toMatchObject([
+      { message: 'Plain value cannot start with block scalar indicator |' }
+    ])
+  })
+
+  test('block seq in flow collection', () => {
+    const doc = YAML.parseDocument('{\n- foo\n}')
+    expect(doc.errors).toMatchObject([
+      { message: 'Block collections are not allowed within flow collections' }
+    ])
+  })
+
+  test('anchor before explicit key indicator', () => {
+    const doc = YAML.parseDocument('{ &a ? A }')
+    expect(doc.errors).toMatchObject([
+      { message: 'Anchors and tags must be after the ? indicator' }
+    ])
+  })
+})
+
+describe('comments', () => {
+  test('comment without whitespace after tag', () => {
+    const doc = YAML.parseDocument('!<a>#cc\nA')
+    expect(doc.errors).toMatchObject([
+      {
+        message:
+          'Comments must be separated from other tokens by white space characters'
+      }
+    ])
+  })
+
+  test('comment without whitespace after value', () => {
+    const doc = YAML.parseDocument('foo: "bar"#cc')
+    expect(doc.errors).toMatchObject([
+      {
+        message:
+          'Comments must be separated from other tokens by white space characters'
       }
     ])
   })

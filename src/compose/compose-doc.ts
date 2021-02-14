@@ -19,7 +19,7 @@ export function composeDoc(
   doc.setSchema() // FIXME: always do this in the constructor
 
   const props = resolveProps(doc, start, true, 'doc-start', offset, onError)
-  if (props.found !== -1) doc.directivesEndMarker = true
+  if (props.found) doc.directivesEndMarker = true
 
   doc.contents = composeNode(
     doc,
