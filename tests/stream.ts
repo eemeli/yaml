@@ -1,6 +1,11 @@
-import { Composer, Parser, parse } from '../index.js'
+import { Composer, Document, Parser, parseDocument } from '../index.js'
 
 const src = `
+#c0\n \n
+%YAML 1.2
+#c1
+---
+#c2\n \n
 aa: AA
  AA
 'bb': 'BB
@@ -20,7 +25,7 @@ aa: AA
 }
 {hh}:
  - HH
- -\tII II
+ -\tII\rII
     II
 `
 
@@ -31,10 +36,22 @@ describe('Input in parts', () => {
   ]
   for (const { title, src } of cases)
     test(title, () => {
-      const exp = [parse(src, { logLevel: 'error' })]
+      const doc = parseDocument(src, { logLevel: 'error' })
+      const exp = [doc.toJS()]
+      expect(exp[0]).toMatchObject({
+        aa: 'AA AA',
+        bb: 'BB BB',
+        cc: 'CC',
+        'dd\n': '\nDD\n DD\n\nDD\n',
+        '[ ee, ff ]': { 'gg gg': ['GG'] },
+        '{ hh }': ['HH', 'II\rII II']
+      })
+      const cb = [doc.commentBefore, doc.contents.commentBefore]
+      expect(cb).toMatchObject(['c0\n\nc1', 'c2'])
+
       for (let i = 1; i < src.length - 1; ++i) {
-        const res: any[] = []
-        const composer = new Composer(doc => res.push(doc.toJS()), {
+        const res: Document.Parsed[] = []
+        const composer = new Composer(doc => res.push(doc), {
           logLevel: 'error'
         })
         const parser = new Parser(composer.next)
@@ -46,7 +63,9 @@ describe('Input in parts', () => {
         composer.end()
 
         try {
-          expect(res).toMatchObject(exp)
+          expect(res.map(doc => doc.toJS())).toMatchObject(exp)
+          expect(res[0].commentBefore).toBe(cb[0])
+          expect(res[0].contents.commentBefore).toBe(cb[1])
         } catch (error) {
           console.log({ start, end, res })
           throw error

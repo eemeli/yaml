@@ -18,9 +18,11 @@ export function resolveBlockScalar(
 
   // determine the end of content & start of chomping
   let chompStart = lines.length
-  for (let i = lines.length - 1; i >= 0; --i)
-    if (lines[i][1] === '') chompStart = i
+  for (let i = lines.length - 1; i >= 0; --i) {
+    const content = lines[i][1]
+    if (content === '' || content === '\r') chompStart = i
     else break
+  }
 
   // shortcut for empty contents
   if (!scalar.source || chompStart === 0) {
@@ -37,7 +39,7 @@ export function resolveBlockScalar(
   let contentStart = 0
   for (let i = 0; i < chompStart; ++i) {
     const [indent, content] = lines[i]
-    if (content === '') {
+    if (content === '' || content === '\r') {
       if (header.indent === 0 && indent.length > trimIndent)
         trimIndent = indent.length
     } else {

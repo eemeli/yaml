@@ -436,7 +436,7 @@ describe('blank lines', () => {
     })
 
     test('content comment', () => {
-      const src = '\n\n#cc\n\nstr\n'
+      const src = '\n\n#cc\n \nstr\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('#cc\n\nstr\n')
     })

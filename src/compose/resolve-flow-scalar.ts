@@ -102,6 +102,7 @@ function doubleQuotedValue(
   let res = ''
   for (let i = 1; i < source.length - 1; ++i) {
     const ch = source[i]
+    if (ch === '\r' && source[i + 1] === '\n') continue
     if (ch === '\n') {
       const { fold, offset } = foldNewline(source, i)
       res += fold
@@ -145,7 +146,11 @@ function doubleQuotedValue(
 function foldNewline(source: string, offset: number) {
   let fold = ''
   let ch = source[offset + 1]
-  while (ch === ' ' || ch === '\t' || ch === '\n') {
+  while (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
+    if (ch === '\r') {
+      if (source[offset + 2] === '\n') fold += '\n'
+      else break
+    }
     if (ch === '\n') fold += '\n'
     offset += 1
     ch = source[offset + 1]
