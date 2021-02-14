@@ -1,4 +1,5 @@
 import babel from '@rollup/plugin-babel'
+import copy from 'rollup-plugin-copy'
 import typescript from '@rollup/plugin-typescript'
 
 export default {
@@ -19,7 +20,14 @@ export default {
       babelHelpers: 'bundled',
       presets: [['@babel/env', { modules: false, targets: { node: '10.0' } }]]
     }),
-    typescript()
+    typescript(),
+    copy({
+      targets: [
+        { src: 'src/*.d.ts', dest: 'dist' },
+        { src: 'src/ast/*.d.ts', dest: 'dist/ast' },
+        { src: 'src/doc/*.d.ts', dest: 'dist/doc' }
+      ]
+    })
   ],
   treeshake: { moduleSideEffects: false, propertyReadSideEffects: false }
 }

@@ -58,7 +58,7 @@
     "lint": "eslint src/",
     "prettier": "prettier --write .",
     "prestart": "npm run build:node",
-    "start": "node -i -e 'YAML=require(\"./lib/index.js\")'",
+    "start": "node -i -e 'YAML=require(\"./dist/index.js\")'",
     "test": "jest",
     "test:browsers": "cd playground && npm test",
     "test:dist": "npm run build:node && jest",
@@ -97,6 +97,7 @@
     "jest-ts-webcompat-resolver": "^1.0.0",
     "prettier": "^2.2.1",
     "rollup": "^2.38.2",
+    "rollup-plugin-copy": "^3.3.0",
     "tslib": "^2.1.0",
     "typescript": "^4.1.3"
   },

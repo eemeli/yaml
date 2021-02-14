@@ -5,8 +5,8 @@ import { Options } from '../options'
 import { Directives } from './directives'
 import { Schema } from './Schema'
 
-type Replacer = any[] | ((key: any, value: any) => boolean)
-type Reviver = (key: any, value: any) => any
+export type Replacer = any[] | ((key: any, value: any) => boolean)
+export type Reviver = (key: any, value: any) => any
 
 export interface CreateNodeOptions {
   /**

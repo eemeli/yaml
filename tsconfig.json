@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
+    "declaration": true,
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "outDir": "dist",
+    "rootDir": "src",
     "strict": true,
     "target": "ES2017"
   },

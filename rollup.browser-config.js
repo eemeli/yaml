@@ -18,7 +18,7 @@ export default {
       babelHelpers: 'bundled',
       presets: [['@babel/env', { modules: false }]]
     }),
-    typescript()
+    typescript({ declaration: false, outDir: 'browser/dist' })
   ],
   treeshake: { moduleSideEffects: false, propertyReadSideEffects: false }
 }
