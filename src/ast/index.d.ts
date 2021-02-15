@@ -1,4 +1,5 @@
 import { Type } from '../constants'
+import { Document } from '../doc/Document'
 import { Schema } from '../doc/Schema'
 
 export class Node {

@@ -66,14 +66,18 @@ export function visit(
   } else _visit(null, node, visitor, Object.freeze([]))
 }
 
+// Without the `as symbol` casts, TS declares these in the `visit`
+// namespace using `var`, but then complains about that because
+// `unique symbol` must be `const`.
+
 /** Terminate visit traversal completely */
-visit.BREAK = BREAK
+visit.BREAK = BREAK as symbol
 
 /** Do not visit the children of the current node */
-visit.SKIP = SKIP
+visit.SKIP = SKIP as symbol
 
 /** Remove the current node */
-visit.REMOVE = REMOVE
+visit.REMOVE = REMOVE as symbol
 
 function _visit(
   key: number | 'key' | 'value' | null,

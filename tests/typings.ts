@@ -1,12 +1,12 @@
 // To test types, compile this file with tsc
 
-import * as YAML from '../index'
+import { Document, parse, parseDocument, stringify, visit } from '../index'
 import { YAMLMap, YAMLSeq, Pair } from '../types'
 
-YAML.parse('3.14159')
+parse('3.14159')
 // 3.14159
 
-YAML.parse('[ true, false, maybe, null ]\n', { version: '1.2' })
+parse('[ true, false, maybe, null ]\n', { version: '1.2' })
 // [ true, false, 'maybe', null ]
 
 const file = `# file.yml
@@ -16,7 +16,7 @@ YAML:
 yaml:
   - A complete JavaScript implementation
   - https://www.npmjs.com/package/yaml`
-YAML.parse(file, (key, value) => value)
+parse(file, (key, value) => value)
 // { YAML:
 //   [ 'A human-readable data serialization language',
 //     'https://en.wikipedia.org/wiki/YAML' ],
@@ -24,17 +24,17 @@ YAML.parse(file, (key, value) => value)
 //   [ 'A complete JavaScript implementation',
 //     'https://www.npmjs.com/package/yaml' ] }
 
-YAML.stringify(3.14159)
+stringify(3.14159)
 // '3.14159\n'
 
-YAML.stringify([true, false, 'maybe', null], { version: '1.2' })
+stringify([true, false, 'maybe', null], { version: '1.2' })
 // `- true
 // - false
 // - maybe
 // - null
 // `
 
-YAML.stringify(
+stringify(
   { number: 3, plain: 'string', block: 'two\nlines\n' },
   (key, value) => value
 )
@@ -47,7 +47,7 @@ YAML.stringify(
 // `
 
 const src = '[{ a: A }, { b: B }]'
-const doc = YAML.parseDocument(src)
+const doc = parseDocument(src)
 const seq = doc.contents as YAMLSeq
 const { anchors } = doc
 const [a, b] = seq.items as YAMLMap[]
@@ -91,26 +91,27 @@ String(doc)
 //   *AA
 // ]
 
+const mod: Document = doc
 const map = new YAMLMap()
 map.items.push(new Pair('foo', 'bar'))
-doc.contents = map
+mod.contents = map
 
-const doc2 = new YAML.Document({ bizz: 'fuzz' })
+const doc2 = new Document({ bizz: 'fuzz' })
 doc2.add(doc2.createPair('baz', 42))
 
-YAML.visit(doc, (key, node, path) => console.log(key, node, path))
-YAML.visit(doc, {
+visit(doc, (key, node, path) => console.log(key, node, path))
+visit(doc, {
   Scalar(key, node) {
     if (key === 3) return 5
     if (typeof node.value === 'number') return doc.createNode(node.value + 1)
   },
   Map(_, map) {
-    if (map.items.length > 3) return YAML.visit.SKIP
+    if (map.items.length > 3) return visit.SKIP
   },
   Pair(_, pair) {
-    if (pair.key.value === 'foo') return YAML.visit.REMOVE
+    if (pair.key.value === 'foo') return visit.REMOVE
   },
   Seq(_, seq) {
-    if (seq.items.length > 3) return YAML.visit.BREAK
+    if (seq.items.length > 3) return visit.BREAK
   }
 })
