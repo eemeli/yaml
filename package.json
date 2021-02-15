@@ -62,7 +62,7 @@
     "test": "jest",
     "test:browsers": "cd playground && npm test",
     "test:dist": "npm run build:node && jest",
-    "test:types": "tsc --lib ES2017 --noEmit tests/typings.ts",
+    "test:types": "tsc --moduleResolution node --target ES2017 --noEmit tests/typings.ts",
     "docs:install": "cd docs-slate && bundle install",
     "docs:deploy": "cd docs-slate && ./deploy.sh",
     "docs": "cd docs-slate && bundle exec middleman server",

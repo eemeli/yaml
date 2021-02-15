@@ -1,7 +1,7 @@
 // To test types, compile this file with tsc
 
-import { Document, parse, parseDocument, stringify, visit } from '../index'
-import { YAMLMap, YAMLSeq, Pair } from '../types'
+import { Document, parse, parseDocument, stringify, visit } from '../src/index'
+import { YAMLMap, YAMLSeq, Pair } from '../src/types'
 
 parse('3.14159')
 // 3.14159
