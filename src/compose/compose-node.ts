@@ -14,12 +14,10 @@ export interface Props {
 
 export function composeNode(
   doc: Document.Parsed,
-  token: Token | number,
+  token: Token,
   props: Props,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
-  if (typeof token === 'number')
-    return composeEmptyNode(doc, token, props, onError)
   const { spaceBefore, comment, anchor, tagName } = props
   let node: Node.Parsed
   switch (token.type) {
@@ -51,7 +49,7 @@ export function composeNode(
   return node
 }
 
-function composeEmptyNode(
+export function composeEmptyNode(
   doc: Document.Parsed,
   offset: number,
   { spaceBefore, comment, anchor, tagName }: Props,

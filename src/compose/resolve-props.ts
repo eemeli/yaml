@@ -23,7 +23,7 @@ export function resolveProps(
   let sep = ''
   let anchor = ''
   let tagName = ''
-  let found: { indent: number, offset: number} | null = null
+  let found: { indent: number; offset: number } | null = null
   let start: number | null = null
   for (const token of tokens) {
     switch (token.type) {

@@ -3,7 +3,7 @@ import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import type { Options } from '../options.js'
 import type * as Tokens from '../parse/tokens.js'
-import { composeNode } from './compose-node.js'
+import { composeEmptyNode, composeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveProps } from './resolve-props.js'
 
@@ -21,12 +21,9 @@ export function composeDoc(
   const props = resolveProps(doc, start, true, 'doc-start', offset, onError)
   if (props.found) doc.directivesEndMarker = true
 
-  doc.contents = composeNode(
-    doc,
-    value || offset + props.length,
-    props,
-    onError
-  )
+  doc.contents = value
+    ? composeNode(doc, value, props, onError)
+    : composeEmptyNode(doc, offset + props.length, props, onError)
 
   const re = resolveEnd(end, doc.contents.range[1], false, onError)
   if (re.comment) doc.comment = re.comment

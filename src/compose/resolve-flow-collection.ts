@@ -2,7 +2,7 @@ import { Node, Pair, YAMLMap, YAMLSeq } from '../ast/index.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { FlowCollection, SourceToken, Token } from '../parse/tokens.js'
-import { composeNode } from './compose-node.js'
+import { composeEmptyNode, composeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 import { containsNewline } from './util-contains-newline.js'
@@ -53,7 +53,7 @@ export function resolveFlowCollection(
     if (value) {
       if (hasComment) value.comment = comment
     } else {
-      value = composeNode(doc, offset, getProps(), onError)
+      value = composeEmptyNode(doc, offset, getProps(), onError)
     }
     if (isMap || atExplicitKey) {
       const pair = key ? new Pair(key, value) : new Pair(value)
@@ -162,7 +162,7 @@ export function resolveFlowCollection(
           key = value
           value = null
         } else {
-          key = composeNode(doc, offset, getProps(), onError) // empty node
+          key = composeEmptyNode(doc, offset, getProps(), onError)
         }
         if (hasComment) {
           key.comment = comment

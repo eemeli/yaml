@@ -2,7 +2,7 @@ import { Pair, YAMLMap } from '../ast/index.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { BlockMap } from '../parse/tokens.js'
-import { composeNode } from './compose-node.js'
+import { composeEmptyNode, composeNode } from './compose-node.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 import { resolveProps } from './resolve-props.js'
 import { containsNewline } from './util-contains-newline.js'
@@ -56,7 +56,9 @@ export function resolveBlockMap(
 
     // key value
     const keyStart = offset
-    const keyNode = composeNode(doc, key || offset, keyProps, onError)
+    const keyNode = key
+      ? composeNode(doc, key, keyProps, onError)
+      : composeEmptyNode(doc, offset, keyProps, onError)
     offset = keyNode.range[1]
 
     // value properties
@@ -74,14 +76,19 @@ export function resolveBlockMap(
       if (implicitKey) {
         if (value?.type === 'block-map' && !valueProps.hasNewline)
           onError(offset, 'Nested mappings are not allowed in compact mappings')
-        if (doc.options.strict && keyProps.start < valueProps.found.offset - 1024)
+        if (
+          doc.options.strict &&
+          keyProps.start < valueProps.found.offset - 1024
+        )
           onError(
             offset,
             'The : indicator must be at most 1024 chars after the start of an implicit block mapping key'
           )
       }
       // value value
-      const valueNode = composeNode(doc, value || offset, valueProps, onError)
+      const valueNode = value
+        ? composeNode(doc, value, valueProps, onError)
+        : composeEmptyNode(doc, offset, valueProps, onError)
       offset = valueNode.range[1]
       const pair = new Pair(keyNode, valueNode)
       map.items.push(doc.schema.merge ? resolveMergePair(pair, onError) : pair)

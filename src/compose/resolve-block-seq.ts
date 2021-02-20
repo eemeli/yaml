@@ -2,7 +2,7 @@ import { YAMLSeq } from '../ast/index.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { BlockSequence } from '../parse/tokens.js'
-import { composeNode } from './compose-node.js'
+import { composeEmptyNode, composeNode } from './compose-node.js'
 import { resolveProps } from './resolve-props.js'
 
 export function resolveBlockSeq(
@@ -38,7 +38,9 @@ export function resolveBlockSeq(
         continue
       }
     }
-    const node = composeNode(doc, value || offset, props, onError)
+    const node = value
+      ? composeNode(doc, value, props, onError)
+      : composeEmptyNode(doc, offset, props, onError)
     offset = node.range[1]
     seq.items.push(node)
   }
