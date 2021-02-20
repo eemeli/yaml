@@ -4,6 +4,7 @@ import type { FlowScalar, Token } from '../parse/tokens.js'
 import { composeCollection } from './compose-collection.js'
 import { composeScalar } from './compose-scalar.js'
 import { resolveEnd } from './resolve-end.js'
+import { emptyScalarPosition } from './util-empty-scalar-position.js'
 
 export interface Props {
   spaceBefore: boolean
@@ -52,10 +53,17 @@ export function composeNode(
 export function composeEmptyNode(
   doc: Document.Parsed,
   offset: number,
+  before: Token[] | undefined,
+  pos: number | null,
   { spaceBefore, comment, anchor, tagName }: Props,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
-  const token: FlowScalar = { type: 'scalar', offset, indent: -1, source: '' }
+  const token: FlowScalar = {
+    type: 'scalar',
+    offset: emptyScalarPosition(offset, before, pos),
+    indent: -1,
+    source: ''
+  }
   const node = composeScalar(doc, token, anchor, tagName, onError)
   if (spaceBefore) node.spaceBefore = true
   if (comment) node.comment = comment

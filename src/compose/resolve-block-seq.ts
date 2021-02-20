@@ -15,7 +15,7 @@ export function resolveBlockSeq(
   const seq = new YAMLSeq(doc.schema)
   seq.type = Type.SEQ
   if (anchor) doc.anchors.setAnchor(seq, anchor)
-  loop: for (const { start, value } of items) {
+  for (const { start, value } of items) {
     const props = resolveProps(
       doc,
       start,
@@ -40,7 +40,7 @@ export function resolveBlockSeq(
     }
     const node = value
       ? composeNode(doc, value, props, onError)
-      : composeEmptyNode(doc, offset, props, onError)
+      : composeEmptyNode(doc, offset, start, null, props, onError)
     offset = node.range[1]
     seq.items.push(node)
   }

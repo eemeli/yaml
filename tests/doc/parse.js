@@ -456,10 +456,10 @@ test('comment between key & : in flow collection (eemeli/yaml#149)', () => {
   )
 })
 
-test('empty node should respect setOrigRanges()', () => {
+test('empty node position', () => {
   const doc = YAML.parseDocument('\r\na: # 123\r\n')
   const empty = doc.contents.items[0].value
-  expect(empty.range).toEqual([12, 12])
+  expect(empty.range).toEqual([5, 5])
 })
 
 test('parse an empty string as null', () => {

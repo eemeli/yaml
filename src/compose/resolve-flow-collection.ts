@@ -49,11 +49,11 @@ export function resolveFlowCollection(
     return props
   }
 
-  function addItem() {
+  function addItem(pos: number) {
     if (value) {
       if (hasComment) value.comment = comment
     } else {
-      value = composeEmptyNode(doc, offset, getProps(), onError)
+      value = composeEmptyNode(doc, offset, fc.items, pos, getProps(), onError)
     }
     if (isMap || atExplicitKey) {
       const pair = key ? new Pair(key, value) : new Pair(value)
@@ -69,7 +69,8 @@ export function resolveFlowCollection(
     }
   }
 
-  for (const token of fc.items) {
+  for (let i = 0; i < fc.items.length; ++i) {
+    const token = fc.items[i]
     let isSourceToken = true
     switch (token.type) {
       case 'space':
@@ -162,7 +163,7 @@ export function resolveFlowCollection(
           key = value
           value = null
         } else {
-          key = composeEmptyNode(doc, offset, getProps(), onError)
+          key = composeEmptyNode(doc, offset, fc.items, i, getProps(), onError)
         }
         if (hasComment) {
           key.comment = comment
@@ -175,7 +176,7 @@ export function resolveFlowCollection(
         break
       }
       case 'comma':
-        if (key || value || anchor || tagName || atExplicitKey) addItem()
+        if (key || value || anchor || tagName || atExplicitKey) addItem(i)
         else
           onError(offset, `Unexpected , in flow ${isMap ? 'map' : 'sequence'}`)
         key = null
@@ -206,7 +207,8 @@ export function resolveFlowCollection(
     }
     if (isSourceToken) offset += (token as SourceToken).source.length
   }
-  if (key || value || anchor || tagName || atExplicitKey) addItem()
+  if (key || value || anchor || tagName || atExplicitKey)
+    addItem(fc.items.length)
 
   const expectedEnd = isMap ? '}' : ']'
   const [ce, ...ee] = fc.end

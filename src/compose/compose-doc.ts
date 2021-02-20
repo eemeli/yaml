@@ -23,7 +23,7 @@ export function composeDoc(
 
   doc.contents = value
     ? composeNode(doc, value, props, onError)
-    : composeEmptyNode(doc, offset + props.length, props, onError)
+    : composeEmptyNode(doc, offset + props.length, start, null, props, onError)
 
   const re = resolveEnd(end, doc.contents.range[1], false, onError)
   if (re.comment) doc.comment = re.comment

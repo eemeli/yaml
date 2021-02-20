@@ -58,7 +58,7 @@ export function resolveBlockMap(
     const keyStart = offset
     const keyNode = key
       ? composeNode(doc, key, keyProps, onError)
-      : composeEmptyNode(doc, offset, keyProps, onError)
+      : composeEmptyNode(doc, offset, start, null, keyProps, onError)
     offset = keyNode.range[1]
 
     // value properties
@@ -88,7 +88,7 @@ export function resolveBlockMap(
       // value value
       const valueNode = value
         ? composeNode(doc, value, valueProps, onError)
-        : composeEmptyNode(doc, offset, valueProps, onError)
+        : composeEmptyNode(doc, offset, sep, null, valueProps, onError)
       offset = valueNode.range[1]
       const pair = new Pair(keyNode, valueNode)
       map.items.push(doc.schema.merge ? resolveMergePair(pair, onError) : pair)
