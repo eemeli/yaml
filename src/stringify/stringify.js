@@ -5,7 +5,6 @@ import { Scalar } from '../ast/Scalar.js'
 import { stringifyString } from './stringifyString.js'
 
 function getTagObject(tags, item) {
-  if (item instanceof Alias) return Alias
   if (item.tag) {
     const match = tags.filter(t => t.tag === item.tag)
     if (match.length > 0)
@@ -58,6 +57,7 @@ export function stringify(item, ctx, onComment, onChompKeep) {
   }
 
   if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
+  if (item instanceof Alias) return item.toString(ctx)
   if (!tagObj) tagObj = getTagObject(schema.tags, item)
 
   const props = stringifyProps(item, tagObj, ctx)

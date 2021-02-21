@@ -1,6 +1,8 @@
+import { Node } from '../ast';
 import type { Document } from '../doc/Document'
 
 export interface StringifyContext {
+  anchors: Record<string, Node>
   doc: Document
   forceBlockIndent?: boolean
   implicitKey?: boolean

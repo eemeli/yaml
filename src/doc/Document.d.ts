@@ -165,7 +165,7 @@ export namespace Document {
      * Find an available anchor name with the given `prefix` and a
      * numerical suffix.
      */
-    newName(prefix: string): string
+    newName(prefix?: string): string
     /**
      * Associate an anchor with `node`. If `name` is empty, a new name will be generated.
      * To remove an anchor, use `setAnchor(null, name)`.

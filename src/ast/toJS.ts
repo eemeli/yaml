@@ -5,7 +5,7 @@ export interface ToJSContext {
   anchors: Map<
     Node,
     { alias: string[]; aliasCount: number; count: number; res?: unknown }
-  > | null
+  >
   doc: Document
   indentStep: string
   keep: boolean

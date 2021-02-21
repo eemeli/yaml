@@ -1,31 +1,15 @@
 import { Type } from '../constants'
-import type { StringifyContext } from '../stringify/stringify'
-import { Collection } from './Collection'
+export { Alias } from './Alias'
+export { Collection } from './Collection'
 export { Merge } from './Merge'
 import { Node } from './Node'
 export { Pair, PairType } from './Pair'
 import { Scalar } from './Scalar'
-import { ToJSContext } from './toJS'
 import { YAMLMap, findPair } from './YAMLMap'
 import { YAMLSeq } from './YAMLSeq'
-
 export { ToJSContext, toJS } from './toJS'
-export { Collection, Node, Scalar, YAMLMap, YAMLSeq, findPair }
 
-export class Alias extends Node {
-  constructor(source: Node)
-  type: Type.ALIAS
-  source: Node
-  // cstNode?: CST.Alias
-  toJSON(arg?: any, ctx?: ToJSContext): any
-  toString(ctx: StringifyContext): string
-}
-
-export namespace Alias {
-  interface Parsed extends Alias {
-    range: [number, number]
-  }
-}
+export { Node, Scalar, YAMLMap, YAMLSeq, findPair }
 
 export namespace AST {
   interface BlockFolded extends Scalar {

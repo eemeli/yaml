@@ -7,7 +7,7 @@ export function resolveMergePair(
   if (!(pair.key instanceof Scalar) || pair.key.value !== Merge.KEY) return pair
 
   const merge = new Merge(pair as Pair<Scalar, Alias>)
-  for (const node of merge.value.items as Node.Parsed[]) {
+  for (const node of merge.value.items as Alias.Parsed[]) {
     if (node instanceof Alias) {
       if (node.source instanceof YAMLMap) {
         // ok
@@ -15,7 +15,10 @@ export function resolveMergePair(
         onError(node.range[0], 'Merge nodes aliases can only point to maps')
       }
     } else {
-      onError(node.range[0], 'Merge nodes can only have Alias nodes as values')
+      onError(
+        (node as Node.Parsed).range[0],
+        'Merge nodes can only have Alias nodes as values'
+      )
     }
   }
   return merge
