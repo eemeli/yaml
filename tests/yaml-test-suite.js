@@ -102,12 +102,6 @@ testDirs.forEach(dir => {
       const src2 =
         docs.map(doc => String(doc).replace(/\n$/, '')).join('\n...\n') + '\n'
       const docs2 = YAML.parseAllDocuments(src2, { resolveKnownTags: false })
-      trace: name,
-        '\nIN\n' + yaml,
-        '\nJSON\n' + JSON.stringify(docs[0], null, '  '),
-        '\n\nOUT\n' + src2,
-        '\nOUT-JSON\n' + JSON.stringify(src2),
-        '\nRE-JSON\n' + JSON.stringify(docs2[0], null, '  ')
 
       if (json) _test('stringfy+re-parse', () => matchJson(docs2, json))
 

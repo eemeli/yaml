@@ -88,7 +88,6 @@
     "@types/jest": "^26.0.20",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.3",
-    "babel-plugin-trace": "^1.1.0",
     "common-tags": "^1.8.0",
     "cross-env": "^7.0.3",
     "eslint": "^7.19.0",
