@@ -1,12 +1,22 @@
 export type LogLevelId = 'silent' | 'error' | 'warn' | 'debug'
 
-export interface LogLevel extends Array<LogLevelId> {
-  SILENT: 0
-  ERROR: 1
-  WARN: 2
-  DEBUG: 3
+export const Char = {
+  ANCHOR: '&',
+  COMMENT: '#',
+  TAG: '!',
+  DIRECTIVES_END: '-',
+  DOCUMENT_END: '.'
 }
-export const LogLevel: LogLevel
+
+export const LogLevel = Object.assign<
+  LogLevelId[],
+  { SILENT: 0; ERROR: 1; WARN: 2; DEBUG: 3 }
+>(['silent', 'error', 'warn', 'debug'], {
+  SILENT: 0,
+  ERROR: 1,
+  WARN: 2,
+  DEBUG: 3
+})
 
 export enum Type {
   ALIAS = 'ALIAS',
@@ -28,9 +38,9 @@ export enum Type {
   SEQ_ITEM = 'SEQ_ITEM'
 }
 
-export const defaultTagPrefix: 'tag:yaml.org,2002:'
-export const defaultTags: {
-  MAP: 'tag:yaml.org,2002:map'
-  SEQ: 'tag:yaml.org,2002:seq'
+export const defaultTagPrefix = 'tag:yaml.org,2002:'
+export const defaultTags = {
+  MAP: 'tag:yaml.org,2002:map',
+  SEQ: 'tag:yaml.org,2002:seq',
   STR: 'tag:yaml.org,2002:str'
 }

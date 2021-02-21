@@ -6,8 +6,8 @@ export default {
   input: {
     index: 'src/index.ts',
     'test-events': 'src/test-events.js',
-    types: 'src/types.js',
-    util: 'src/util.js'
+    types: 'src/types.ts',
+    util: 'src/util.ts'
   },
   output: {
     dir: 'dist',

@@ -1,4 +1,11 @@
-export function stringifyNumber({ format, minFractionDigits, tag, value }) {
+import { Scalar } from '../ast'
+
+export function stringifyNumber({
+  format,
+  minFractionDigits,
+  tag,
+  value
+}: Scalar) {
   if (typeof value === 'bigint') return String(value)
   if (!isFinite(value))
     return isNaN(value) ? '.nan' : value < 0 ? '-.inf' : '.inf'

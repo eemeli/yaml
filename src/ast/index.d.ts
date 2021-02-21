@@ -2,6 +2,10 @@ import { Type } from '../constants'
 import { Document } from '../doc/Document'
 import { Schema } from '../doc/Schema'
 
+export { ToJSContext, toJS } from './toJS'
+
+export function findPair(items: any[], key: Scalar | any): Pair | undefined
+
 export class Node {
   /** A comment on or immediately after this */
   comment?: string | null
@@ -39,6 +43,7 @@ export class Scalar extends Node {
    * The YAML 1.1 schema also supports 'BIN' and 'TIME'
    */
   format?: string
+  minFractionDigits?: number
   value: any
   toJSON(arg?: any, ctx?: AST.NodeToJsonContext): any
   toString(): string
