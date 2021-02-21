@@ -16,7 +16,7 @@ export class YAMLSeq<T = unknown> extends Collection {
     return 'tag:yaml.org,2002:seq'
   }
 
-  declare items: T[]
+  items: T[] = []
 
   type?: Type.FLOW_SEQ | Type.SEQ
 

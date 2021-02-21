@@ -157,7 +157,7 @@ export class Directives {
     const tagEntries = Object.entries(this.tags)
 
     let tagNames: string[]
-    if (doc && tagEntries.length > 0) {
+    if (doc && tagEntries.length > 0 && doc.contents instanceof Node) {
       const tags: Record<string, boolean> = {}
       visit(doc.contents, (_key, node) => {
         if (node instanceof Node && node.tag) tags[node.tag] = true

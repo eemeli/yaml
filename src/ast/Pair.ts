@@ -16,8 +16,8 @@ export function createPair(
   value: unknown,
   ctx: CreateNodeContext
 ) {
-  const k = createNode(key, null, ctx)
-  const v = createNode(value, null, ctx)
+  const k = createNode(key, undefined, ctx)
+  const v = createNode(value, undefined, ctx)
   return new Pair(k, v)
 }
 

@@ -29,7 +29,7 @@ export class Alias<T extends Node = Node> extends Node {
     if (!ctx)
       return toJS(this.source, typeof arg === 'string' ? arg : null, ctx)
     const { anchors, maxAliasCount } = ctx
-    const anchor = anchors.get(this.source)
+    const anchor = anchors && anchors.get(this.source)
     /* istanbul ignore if */
     if (!anchor || anchor.res === undefined) {
       const msg = 'This should not happen: Alias anchor was not resolved?'
@@ -64,7 +64,7 @@ export class Alias<T extends Node = Node> extends Node {
 
 function getAliasCount(node: unknown, anchors: ToJSContext['anchors']): number {
   if (node instanceof Alias) {
-    const anchor = anchors.get(node.source)
+    const anchor = anchors && anchors.get(node.source)
     return anchor ? anchor.count * anchor.aliasCount : 0
   } else if (node instanceof Collection) {
     let count = 0

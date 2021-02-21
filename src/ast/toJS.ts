@@ -1,11 +1,16 @@
-import { Document } from '../doc/Document.js'
+import type { Document } from '../doc/Document.js'
+import type { stringify } from '../stringify/stringify.js'
 import { Node } from './index.js'
 
+export interface ToJSAnchorValue {
+  alias: string[]
+  aliasCount: number
+  count: number
+  res?: unknown
+}
+
 export interface ToJSContext {
-  anchors: Map<
-    Node,
-    { alias: string[]; aliasCount: number; count: number; res?: unknown }
-  >
+  anchors: Map<Node, ToJSAnchorValue> | null
   doc: Document
   indentStep: string
   keep: boolean
@@ -14,8 +19,8 @@ export interface ToJSContext {
   maxAliasCount: number
   onCreate?: (res: unknown) => void
 
-  /** Requiring directly in Pair would create circular dependencies */
-  stringify: () => string
+  /** Requiring this directly in Pair would create circular dependencies */
+  stringify: typeof stringify
 }
 
 /**

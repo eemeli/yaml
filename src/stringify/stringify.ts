@@ -79,10 +79,7 @@ export function stringify(
   const node: Node =
     item instanceof Node
       ? item
-      : ctx.doc.createNode(item, {
-          onTagObj: o => (tagObj = o),
-          wrapScalars: true
-        })
+      : ctx.doc.createNode(item, { onTagObj: o => (tagObj = o) })
 
   if (!tagObj) tagObj = getTagObject(ctx.doc.schema.tags, node)
 

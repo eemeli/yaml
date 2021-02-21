@@ -31,13 +31,12 @@ export function collectionFromPath(
       v = o
     }
   }
-  return createNode(v, null, {
+  return createNode(v, undefined, {
     onAlias() {
       throw new Error('Repeated objects are not supported here')
     },
     prevObjects: new Map(),
-    schema,
-    wrapScalars: false
+    schema
   })
 }
 
@@ -61,8 +60,9 @@ export declare namespace Collection {
 export abstract class Collection extends Node {
   static maxFlowStringSingleLineLength = 60
 
-  items: unknown[] = []
   schema: Schema | undefined
+
+  declare items: unknown[]
 
   declare type?:
     | Type.MAP

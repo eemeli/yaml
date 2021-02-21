@@ -1,13 +1,15 @@
-import { Alias } from '../ast/index.js'
+import type { Alias } from '../ast/Alias.js'
 import { Node } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
+import type { YAMLMap } from '../ast/YAMLMap.js'
+import type { YAMLSeq } from '../ast/YAMLSeq.js'
 import { defaultTagPrefix } from '../constants.js'
 import type { Tag } from '../tags/types.js'
 import type { Replacer } from './Document.js'
 import type { Schema } from './Schema.js'
 
 export interface CreateNodeAliasRef {
-  node: unknown
+  node: Scalar | YAMLMap | YAMLSeq | undefined
   value: unknown
 }
 
@@ -18,12 +20,11 @@ export interface CreateNodeContext {
   prevObjects: Map<unknown, CreateNodeAliasRef>
   replacer?: Replacer
   schema: Schema
-  wrapScalars: boolean
 }
 
 function findTagObject(
   value: unknown,
-  tagName: string | null,
+  tagName: string | undefined,
   tags: Tag[]
 ) {
   if (tagName) {
@@ -37,11 +38,11 @@ function findTagObject(
 
 export function createNode(
   value: unknown,
-  tagName: string | null,
+  tagName: string | undefined,
   ctx: CreateNodeContext
-) {
+): Node {
   if (value instanceof Node) return value
-  const { onAlias, onTagObj, prevObjects, wrapScalars } = ctx
+  const { onAlias, onTagObj, prevObjects } = ctx
   const { map, seq, tags } = ctx.schema
   if (tagName && tagName.startsWith('!!'))
     tagName = defaultTagPrefix + tagName.slice(2)
@@ -50,8 +51,7 @@ export function createNode(
   if (!tagObj) {
     if (value && typeof (value as any).toJSON === 'function')
       value = (value as any).toJSON()
-    if (!value || typeof value !== 'object')
-      return wrapScalars ? new Scalar(value) : value
+    if (!value || typeof value !== 'object') return new Scalar(value)
     tagObj =
       value instanceof Map ? map : Symbol.iterator in Object(value) ? seq : map
   }
@@ -70,12 +70,11 @@ export function createNode(
     prevObjects.set(value, ref)
   }
 
-  ref.node = tagObj.createNode
+  const node = tagObj.createNode
     ? tagObj.createNode(ctx.schema, value, ctx)
-    : wrapScalars
-    ? new Scalar(value)
-    : value
-  if (tagName && ref.node instanceof Node) ref.node.tag = tagName
+    : new Scalar(value)
+  if (tagName) node.tag = tagName
+  ref.node = node
 
-  return ref.node
+  return node
 }

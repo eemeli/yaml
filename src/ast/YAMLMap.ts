@@ -28,9 +28,9 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     return 'tag:yaml.org,2002:map'
   }
 
-  type?: Type.FLOW_MAP | Type.MAP
+  items: Pair<K, V>[] = []
 
-  declare items: Pair<K, V>[]
+  type?: Type.FLOW_MAP | Type.MAP
 
   /**
    * Adds a value to the collection.

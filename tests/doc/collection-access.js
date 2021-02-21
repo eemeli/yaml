@@ -506,7 +506,9 @@ describe('Document', () => {
   test('setIn on empty document', () => {
     doc.contents = null
     doc.setIn(['a', 2], 1)
-    expect(doc.get('a')).toMatchObject({ items: [null, null, 1] })
+    expect(doc.get('a')).toMatchObject({
+      items: [{ value: null }, { value: null }, { value: 1 }]
+    })
   })
 
   test('setIn on parsed document', () => {

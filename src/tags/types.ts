@@ -26,11 +26,11 @@ export interface Tag {
   /**
    * An optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.
    */
-  createNode?: (
+  createNode?: <T = unknown>(
     schema: Schema,
-    value: any,
+    value: T,
     ctx: CreateNodeContext
-  ) => YAMLMap | YAMLSeq | Scalar
+  ) => YAMLMap | YAMLSeq | Scalar<T>
 
   /**
    * If `true`, together with `test` allows for values to be stringified without

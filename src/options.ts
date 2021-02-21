@@ -9,7 +9,7 @@ import {
   strOptions
 } from './tags/options.js'
 
-export interface Options extends SchemaOptions {
+export interface DocumentOptions {
   /**
    * Default prefix for anchors.
    *
@@ -100,6 +100,8 @@ export interface Options extends SchemaOptions {
   version?: '1.1' | '1.2'
 }
 
+export type Options = DocumentOptions & SchemaOptions
+
 /**
  * `yaml` defines document-specific options in three places: as an argument of
  * parse, create and stringify calls, in the values of `YAML.defaultOptions`,
@@ -107,9 +109,8 @@ export interface Options extends SchemaOptions {
  * `YAML.defaultOptions` override version-dependent defaults, and argument
  * options override both.
  */
-export const defaultOptions: Options = {
+export const defaultOptions: Required<DocumentOptions> = {
   anchorPrefix: 'a',
-  customTags: null,
   indent: 2,
   indentSeq: true,
   keepCstNodes: false,

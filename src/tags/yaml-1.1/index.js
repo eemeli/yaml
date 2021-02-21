@@ -12,8 +12,7 @@ import { intTime, floatTime, timestamp } from './timestamp.js'
 
 const nullObj = {
   identify: value => value == null,
-  createNode: (schema, value, ctx) =>
-    ctx.wrapScalars ? new Scalar(null) : null,
+  createNode: () => new Scalar(null),
   default: true,
   tag: 'tag:yaml.org,2002:null',
   test: /^(?:~|[Nn]ull|NULL)?$/,

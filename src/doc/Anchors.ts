@@ -1,7 +1,7 @@
 import { Alias, Merge, Node, Scalar, YAMLMap, YAMLSeq } from '../ast/index.js'
 
 export class Anchors {
-  private map: Record<string, Node> = Object.create(null)
+  map: Record<string, Node> = Object.create(null)
   private prefix: string
 
   constructor(prefix: string) {

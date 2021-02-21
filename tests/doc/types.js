@@ -475,7 +475,7 @@ date (00:00:00Z): 2002-12-14\n`)
           ['b', 2],
           ['a', 3]
         ],
-        { tag: '!!pairs', wrapScalars: false }
+        { tag: '!!pairs' }
       )
       expect(doc.contents.tag).toBe('tag:yaml.org,2002:pairs')
       expect(String(doc)).toBe(`!!pairs\n- a: 1\n- b: 2\n- a: 3\n`)
@@ -532,7 +532,7 @@ date (00:00:00Z): 2002-12-14\n`)
           ['b', 2],
           ['a', 3]
         ],
-        { tag: '!!omap', wrapScalars: false }
+        { tag: '!!omap' }
       )
       expect(doc.contents).toBeInstanceOf(YAMLOMap)
       expect(String(doc)).toBe(`!!omap\n- a: 1\n- b: 2\n- a: 3\n`)
