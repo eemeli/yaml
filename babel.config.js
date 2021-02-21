@@ -1,13 +1,23 @@
 module.exports = {
-  plugins: [
-    '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-proposal-nullish-coalescing-operator',
-    ['babel-plugin-trace', { strip: true }]
+  overrides: [
+    {
+      test: /\.js$/,
+      plugins: [
+        '@babel/plugin-proposal-class-properties',
+        '@babel/plugin-proposal-nullish-coalescing-operator',
+        ['babel-plugin-trace', { strip: true }]
+      ]
+    },
+    {
+      test: /\.ts$/,
+      plugins: [
+        ['@babel/plugin-transform-typescript', { allowDeclareFields: true }],
+        '@babel/plugin-proposal-class-properties',
+        '@babel/plugin-proposal-nullish-coalescing-operator'
+      ]
+    }
   ]
 }
 
 if (process.env.NODE_ENV === 'test')
-  module.exports.presets = [
-    ['@babel/env', { targets: { node: 'current' } }],
-    '@babel/preset-typescript'
-  ]
+  module.exports.presets = [['@babel/env', { targets: { node: 'current' } }]]
