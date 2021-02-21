@@ -55,7 +55,7 @@ export class YAMLSeq extends Collection {
 
   toString(ctx, onComment, onChompKeep) {
     if (!ctx) return JSON.stringify(this)
-    return super.toString(
+    return super._toString(
       ctx,
       {
         blockItem: n => (n.type === 'comment' ? n.str : `- ${n.str}`),

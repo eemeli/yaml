@@ -56,7 +56,10 @@ export class Document extends Collection {
    * initialise.
    */
   options: Required<Options>
-  schema?: Schema
+
+  // FIXME required by Collection, currently optional in Document
+  declare schema: Schema
+
   /**
    * Array of prefixes; each will have a string `handle` that
    * starts and ends with `!` and a string `prefix` that the handle will be replaced by.
@@ -69,6 +72,12 @@ export class Document extends Collection {
   version?: string
   /** Warnings encountered during parsing. */
   warnings: YAMLWarning[]
+
+  add(value: unknown): void
+  delete(key: unknown): boolean
+  get(key: unknown, keepScalar?: boolean): unknown
+  has(key: unknown): boolean
+  set(key: unknown, value: unknown): void
 
   /**
    * Convert any value into a `Node` using the current schema, recursively

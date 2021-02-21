@@ -1,11 +1,14 @@
 import { Node, Pair, Scalar, YAMLMap, YAMLSeq } from '../ast'
-import type { Document } from './Document'
+import { StringifyContext } from '../stringify/stringify'
+import { CreateNodeContext } from './createNode'
 
 export class Schema {
   constructor(options: Schema.Options)
   knownTags: { [key: string]: Schema.Tag }
   merge: boolean
+  map: Schema.Tag
   name: Schema.Name
+  seq: Schema.Tag
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
   tags: Schema.Tag[]
 }
@@ -52,21 +55,6 @@ export namespace Schema {
     tags?: Options['customTags']
   }
 
-  interface CreateNodeContext {
-    wrapScalars?: boolean
-    [key: string]: unknown
-  }
-
-  interface StringifyContext {
-    doc: Document.Parsed
-    forceBlockIndent?: boolean
-    implicitKey?: boolean
-    indent: string
-    indentAtStart?: number
-    inFlow?: boolean
-    [key: string]: unknown
-  }
-
   type TagId =
     | 'binary'
     | 'bool'
@@ -91,7 +79,7 @@ export namespace Schema {
     createNode?: (
       schema: Schema,
       value: any,
-      ctx: Schema.CreateNodeContext
+      ctx: CreateNodeContext
     ) => YAMLMap | YAMLSeq | Scalar
     /**
      * If `true`, together with `test` allows for values to be stringified without
@@ -138,7 +126,7 @@ export namespace Schema {
      */
     stringify?: (
       item: Node,
-      ctx: Schema.StringifyContext,
+      ctx: StringifyContext,
       onComment?: () => void,
       onChompKeep?: () => void
     ) => string

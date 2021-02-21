@@ -1,0 +1,37 @@
+import type { Type } from '../constants'
+import type { Pair } from '.'
+
+export declare namespace Node {
+  interface Parsed extends Node {
+    range: [number, number]
+  }
+}
+
+export abstract class Node {
+  /** A comment on or immediately after this */
+  declare comment?: string | null
+
+  /** A comment before this */
+  declare commentBefore?: string | null
+
+  /** Only available when `keepCstNodes` is set to `true` */
+  // cstNode?: CST.Node
+
+  /**
+   * The [start, end] range of characters of the source parsed
+   * into this node (undefined for pairs or if not parsed)
+   */
+  declare range?: [number, number] | null
+
+  /** A blank line before this node and its commentBefore */
+  declare spaceBefore?: boolean
+
+  /** A fully qualified tag, if required */
+  declare tag?: string
+
+  /** A plain JS representation of this node */
+  abstract toJSON(arg?: any): any
+
+  /** The type of this node */
+  declare type?: Type | Pair.Type
+}

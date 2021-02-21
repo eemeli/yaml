@@ -28,10 +28,11 @@ export interface ToJSContext {
  *   `{ keep: true }` is not set, output should be suitable for JSON
  *   stringification.
  */
-export function toJS(value: any, arg: string | null, ctx: ToJSContext): any {
+export function toJS(value: any, arg: string | null, ctx?: ToJSContext): any {
   if (Array.isArray(value)) return value.map((v, i) => toJS(v, String(i), ctx))
   if (value && typeof value.toJSON === 'function') {
-    const anchor = ctx && ctx.anchors && ctx.anchors.get(value)
+    if (!ctx) return value.toJSON(arg)
+    const anchor = ctx.anchors && ctx.anchors.get(value)
     if (anchor)
       ctx.onCreate = res => {
         anchor.res = res

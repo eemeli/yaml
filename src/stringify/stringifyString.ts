@@ -1,6 +1,5 @@
 import type { Scalar } from '../ast/index.js'
 import { Type } from '../constants.js'
-import type { Schema } from '../doc/Schema.js'
 import { strOptions } from '../tags/options.js'
 import { addCommentBefore } from './addComment.js'
 import {
@@ -9,12 +8,13 @@ import {
   FOLD_FLOW,
   FOLD_QUOTED
 } from './foldFlowLines.js'
+import type { StringifyContext } from './stringify.js'
 
 interface StringifyScalar extends Scalar {
   value: string
 }
 
-const getFoldOptions = ({ indentAtStart }: Schema.StringifyContext) =>
+const getFoldOptions = ({ indentAtStart }: StringifyContext) =>
   indentAtStart
     ? Object.assign({ indentAtStart }, strOptions.fold)
     : strOptions.fold
@@ -36,7 +36,7 @@ function lineLengthOverLimit(str: string, limit: number) {
   return true
 }
 
-function doubleQuotedString(value: string, ctx: Schema.StringifyContext) {
+function doubleQuotedString(value: string, ctx: StringifyContext) {
   const { implicitKey } = ctx
   const { jsonEncoding, minMultiLineLength } = strOptions.doubleQuoted
   const json = JSON.stringify(value)
@@ -126,7 +126,7 @@ function doubleQuotedString(value: string, ctx: Schema.StringifyContext) {
     : foldFlowLines(str, indent, FOLD_QUOTED, getFoldOptions(ctx))
 }
 
-function singleQuotedString(value: string, ctx: Schema.StringifyContext) {
+function singleQuotedString(value: string, ctx: StringifyContext) {
   if (ctx.implicitKey) {
     if (/\n/.test(value)) return doubleQuotedString(value, ctx)
   } else {
@@ -143,7 +143,7 @@ function singleQuotedString(value: string, ctx: Schema.StringifyContext) {
 
 function blockString(
   { comment, type, value }: StringifyScalar,
-  ctx: Schema.StringifyContext,
+  ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
 ) {
@@ -216,7 +216,7 @@ function blockString(
 
 function plainString(
   item: StringifyScalar,
-  ctx: Schema.StringifyContext,
+  ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
 ) {
@@ -299,7 +299,7 @@ function plainString(
 
 export function stringifyString(
   item: Scalar,
-  ctx: Schema.StringifyContext,
+  ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
 ) {

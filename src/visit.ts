@@ -12,7 +12,7 @@ export type visitorFn<T> = (
 ) => void | symbol | number | Node
 
 export type visitor =
-  | visitorFn<any>
+  | visitorFn<unknown>
   | {
       Alias?: visitorFn<Alias>
       Map?: visitorFn<YAMLMap>
@@ -51,7 +51,7 @@ export type visitor =
 export function visit(
   node: Node | Document,
   visitor:
-    | visitorFn<any>
+    | visitorFn<unknown>
     | {
         Alias?: visitorFn<Alias>
         Map?: visitorFn<YAMLMap>
@@ -81,7 +81,7 @@ visit.REMOVE = REMOVE as symbol
 
 function _visit(
   key: number | 'key' | 'value' | null,
-  node: Node,
+  node: unknown,
   visitor: visitor,
   path: readonly Node[]
 ): void | symbol | number | Node {

@@ -82,7 +82,7 @@ export class YAMLMap extends Collection {
     }
     if (!ctx.allNullValues && this.hasAllNullValues(false))
       ctx = Object.assign({}, ctx, { allNullValues: true })
-    return super.toString(
+    return super._toString(
       ctx,
       {
         blockItem: n => n.str,

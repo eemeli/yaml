@@ -1,8 +1,30 @@
+import { Alias } from '../ast/index.js'
 import { Node } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
 import { defaultTagPrefix } from '../constants.js'
+import type { Replacer } from './Document.js'
+import type { Schema } from './Schema.js'
 
-function findTagObject(value, tagName, tags) {
+export interface CreateNodeAliasRef {
+  node: unknown
+  value: unknown
+}
+
+export interface CreateNodeContext {
+  keepUndefined?: boolean
+  onAlias(source: CreateNodeAliasRef): Alias
+  onTagObj?: (tagObj: unknown) => void
+  prevObjects: Map<unknown, CreateNodeAliasRef>
+  replacer?: Replacer
+  schema: Schema
+  wrapScalars: boolean
+}
+
+function findTagObject(
+  value: unknown,
+  tagName: string | null,
+  tags: Schema.Tag[]
+) {
   if (tagName) {
     const match = tags.filter(t => t.tag === tagName)
     const tagObj = match.find(t => !t.format) || match[0]
@@ -12,7 +34,11 @@ function findTagObject(value, tagName, tags) {
   return tags.find(t => t.identify && t.identify(value) && !t.format)
 }
 
-export function createNode(value, tagName, ctx) {
+export function createNode(
+  value: unknown,
+  tagName: string | null,
+  ctx: CreateNodeContext
+) {
   if (value instanceof Node) return value
   const { onAlias, onTagObj, prevObjects, wrapScalars } = ctx
   const { map, seq, tags } = ctx.schema
@@ -21,10 +47,12 @@ export function createNode(value, tagName, ctx) {
 
   let tagObj = findTagObject(value, tagName, tags)
   if (!tagObj) {
-    if (typeof value.toJSON === 'function') value = value.toJSON()
+    if (value && typeof (value as any).toJSON === 'function')
+      value = (value as any).toJSON()
     if (!value || typeof value !== 'object')
       return wrapScalars ? new Scalar(value) : value
-    tagObj = value instanceof Map ? map : value[Symbol.iterator] ? seq : map
+    tagObj =
+      value instanceof Map ? map : Symbol.iterator in Object(value) ? seq : map
   }
   if (onTagObj) {
     onTagObj(tagObj)
@@ -32,21 +60,21 @@ export function createNode(value, tagName, ctx) {
   }
 
   // Detect duplicate references to the same object & use Alias nodes for all
-  // after first. The `obj` wrapper allows for circular references to resolve.
-  const obj = { value: undefined, node: undefined }
+  // after first. The `ref` wrapper allows for circular references to resolve.
+  const ref: CreateNodeAliasRef = { value: undefined, node: undefined }
   if (value && typeof value === 'object') {
     const prev = prevObjects.get(value)
     if (prev) return onAlias(prev)
-    obj.value = value
-    prevObjects.set(value, obj)
+    ref.value = value
+    prevObjects.set(value, ref)
   }
 
-  obj.node = tagObj.createNode
+  ref.node = tagObj.createNode
     ? tagObj.createNode(ctx.schema, value, ctx)
     : wrapScalars
     ? new Scalar(value)
     : value
-  if (tagName && obj.node instanceof Node) obj.node.tag = tagName
+  if (tagName && ref.node instanceof Node) ref.node.tag = tagName
 
-  return obj.node
+  return ref.node
 }

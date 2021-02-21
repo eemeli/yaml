@@ -1,14 +1,18 @@
 export function addCommentBefore(
   str: string,
   indent: string,
-  comment?: string
+  comment?: string | null
 ) {
   if (!comment) return str
   const cc = comment.replace(/[\s\S]^/gm, `$&${indent}#`)
   return `#${cc}\n${indent}${str}`
 }
 
-export function addComment(str: string, indent: string, comment?: string) {
+export function addComment(
+  str: string,
+  indent: string,
+  comment?: string | null
+) {
   return !comment
     ? str
     : comment.includes('\n')

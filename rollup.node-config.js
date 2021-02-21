@@ -25,7 +25,8 @@ export default {
       targets: [
         { src: 'src/*.d.ts', dest: 'dist' },
         { src: 'src/ast/*.d.ts', dest: 'dist/ast' },
-        { src: 'src/doc/*.d.ts', dest: 'dist/doc' }
+        { src: 'src/doc/*.d.ts', dest: 'dist/doc' },
+        { src: 'src/stringify/*.d.ts', dest: 'dist/stringify' }
       ]
     })
   ],
