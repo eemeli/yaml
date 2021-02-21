@@ -6,5 +6,4 @@ export { Pair, PairType } from './Pair.js'
 export { Scalar } from './Scalar.js'
 export { YAMLMap, findPair } from './YAMLMap.js'
 export { YAMLSeq } from './YAMLSeq.js'
-
-export { toJS } from './toJS.js'
+export { ToJSContext, toJS } from './toJS.js'

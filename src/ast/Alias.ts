@@ -11,11 +11,11 @@ export declare namespace Alias {
   }
 }
 
-export class Alias extends Node {
-  source: Node
+export class Alias<T extends Node = Node> extends Node {
+  source: T
   type: Type.ALIAS = Type.ALIAS
 
-  constructor(source: Node) {
+  constructor(source: T) {
     super()
     this.source = source
     Object.defineProperty(this, 'tag', {

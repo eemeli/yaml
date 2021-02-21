@@ -30,7 +30,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
 
   type?: Type.FLOW_MAP | Type.MAP
 
-  items: Pair<K, V>[] = []
+  declare items: Pair<K, V>[]
 
   /**
    * Adds a value to the collection.

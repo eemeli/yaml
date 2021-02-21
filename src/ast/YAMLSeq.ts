@@ -82,5 +82,7 @@ export class YAMLSeq<T = unknown> extends Collection {
 function asItemIndex(key: unknown): number | null {
   let idx = key instanceof Scalar ? key.value : key
   if (idx && typeof idx === 'string') idx = Number(idx)
-  return Number.isInteger(idx) && idx >= 0 ? idx : null
+  return typeof idx === 'number' && Number.isInteger(idx) && idx >= 0
+    ? idx
+    : null
 }

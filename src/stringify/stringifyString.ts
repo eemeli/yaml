@@ -305,14 +305,15 @@ export function stringifyString(
 ) {
   const { defaultKeyType, defaultType } = strOptions
   const { implicitKey, inFlow } = ctx
-  let { type, value } = item
-  if (typeof value !== 'string') {
-    value = String(value)
-    item = Object.assign({}, item, { value })
-  }
+  const ss: Scalar<string> =
+    typeof item.value === 'string'
+      ? (item as Scalar<string>)
+      : Object.assign({}, item, { value: String(item.value) })
+
+  let { type } = item
   if (type !== Type.QUOTE_DOUBLE) {
     // force double quotes on control characters & unpaired surrogates
-    if (/[\x00-\x08\x0b-\x1f\x7f-\x9f\u{D800}-\u{DFFF}]/u.test(value))
+    if (/[\x00-\x08\x0b-\x1f\x7f-\x9f\u{D800}-\u{DFFF}]/u.test(ss.value))
       type = Type.QUOTE_DOUBLE
   }
 
@@ -321,14 +322,14 @@ export function stringifyString(
       case Type.BLOCK_FOLDED:
       case Type.BLOCK_LITERAL:
         return implicitKey || inFlow
-          ? doubleQuotedString(value, ctx) // blocks are not valid inside flow containers
-          : blockString(item, ctx, onComment, onChompKeep)
+          ? doubleQuotedString(ss.value, ctx) // blocks are not valid inside flow containers
+          : blockString(ss, ctx, onComment, onChompKeep)
       case Type.QUOTE_DOUBLE:
-        return doubleQuotedString(value, ctx)
+        return doubleQuotedString(ss.value, ctx)
       case Type.QUOTE_SINGLE:
-        return singleQuotedString(value, ctx)
+        return singleQuotedString(ss.value, ctx)
       case Type.PLAIN:
-        return plainString(item, ctx, onComment, onChompKeep)
+        return plainString(ss, ctx, onComment, onChompKeep)
       default:
         return null
     }

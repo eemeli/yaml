@@ -19,8 +19,8 @@ export declare namespace Scalar {
     | Type.QUOTE_SINGLE
 }
 
-export class Scalar extends Node {
-  value: any
+export class Scalar<T = unknown> extends Node {
+  value: T
 
   declare type?: Scalar.Type
 
@@ -33,7 +33,7 @@ export class Scalar extends Node {
 
   declare minFractionDigits?: number
 
-  constructor(value: unknown) {
+  constructor(value: T) {
     super()
     this.value = value
   }

@@ -7,8 +7,8 @@ export function stringifyNumber({
   value
 }: Scalar) {
   if (typeof value === 'bigint') return String(value)
-  if (!isFinite(value))
-    return isNaN(value) ? '.nan' : value < 0 ? '-.inf' : '.inf'
+  const num = typeof value === 'number' ? value : Number(value)
+  if (!isFinite(num)) return isNaN(num) ? '.nan' : num < 0 ? '-.inf' : '.inf'
   let n = JSON.stringify(value)
   if (
     !format &&
