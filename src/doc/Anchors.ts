@@ -1,26 +1,27 @@
-import { Alias, Merge, Scalar, YAMLMap, YAMLSeq } from '../ast/index.js'
+import { Alias, Merge, Node, Scalar, YAMLMap, YAMLSeq } from '../ast/index.js'
 
 export class Anchors {
-  static validAnchorNode(node) {
-    return (
-      node instanceof Scalar ||
-      node instanceof YAMLSeq ||
-      node instanceof YAMLMap
-    )
-  }
+  private map: Record<string, Node> = Object.create(null)
+  private prefix: string
 
-  map = Object.create(null)
-
-  constructor(prefix) {
+  constructor(prefix: string) {
     this.prefix = prefix
   }
 
-  createAlias(node, name) {
+  /**
+   * Create a new `Alias` node, adding the required anchor for `node`.
+   * If `name` is empty, a new anchor name will be generated.
+   */
+  createAlias(node: Node, name?: string) {
     this.setAnchor(node, name)
     return new Alias(node)
   }
 
-  createMergePair(...sources) {
+  /**
+   * Create a new `Merge` node with the given source nodes.
+   * Non-`Alias` sources will be automatically wrapped.
+   */
+  createMergePair(...sources: Node[]) {
     const merge = new Merge()
     merge.value.items = sources.map(s => {
       if (s instanceof Alias) {
@@ -33,20 +34,26 @@ export class Anchors {
     return merge
   }
 
-  getName(node) {
-    const { map } = this
-    return Object.keys(map).find(a => map[a] === node)
+  /** The anchor name associated with `node`, if set. */
+  getName(node: Node) {
+    return Object.keys(this.map).find(a => this.map[a] === node)
   }
 
+  /** List of all defined anchor names. */
   getNames() {
     return Object.keys(this.map)
   }
 
-  getNode(name) {
+  /** The node associated with the anchor `name`, if set. */
+  getNode(name: string) {
     return this.map[name]
   }
 
-  newName(prefix) {
+  /**
+   * Find an available anchor name with the given `prefix` and a
+   * numerical suffix.
+   */
+  newName(prefix?: string) {
     if (!prefix) prefix = this.prefix
     const names = Object.keys(this.map)
     for (let i = 1; true; ++i) {
@@ -55,7 +62,11 @@ export class Anchors {
     }
   }
 
-  setAnchor(node, name) {
+  /**
+   * Associate an anchor with `node`. If `name` is empty, a new name will be generated.
+   * To remove an anchor, use `setAnchor(null, name)`.
+   */
+  setAnchor(node: Node | null, name?: string) {
     const { map } = this
     if (!node) {
       if (!name) return null
@@ -63,7 +74,11 @@ export class Anchors {
       return name
     }
 
-    if (!Anchors.validAnchorNode(node))
+    const valid =
+      node instanceof Scalar ||
+      node instanceof YAMLSeq ||
+      node instanceof YAMLMap
+    if (!valid)
       throw new Error('Anchors may only be set for Scalar, Seq and Map nodes')
     if (name) {
       if (/[\x00-\x19\s,[\]{}]/.test(name))

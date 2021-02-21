@@ -3,7 +3,7 @@ import { Node } from '../ast/Node.js'
 import { Pair } from '../ast/Pair.js'
 import { Scalar } from '../ast/Scalar.js'
 import type { Document } from '../doc/Document'
-import { Schema } from '../doc/Schema.js'
+import type { Tag } from '../tags/types.js'
 import { stringifyString } from './stringifyString.js'
 
 export interface StringifyContext {
@@ -19,14 +19,14 @@ export interface StringifyContext {
   [key: string]: unknown
 }
 
-function getTagObject(tags: Schema.Tag[], item: Node) {
+function getTagObject(tags: Tag[], item: Node) {
   if (item.tag) {
     const match = tags.filter(t => t.tag === item.tag)
     if (match.length > 0)
       return match.find(t => t.format === (item as Scalar).format) || match[0]
   }
 
-  let tagObj: Schema.Tag | undefined = undefined
+  let tagObj: Tag | undefined = undefined
   let obj: unknown
   if (item instanceof Scalar) {
     obj = item.value
@@ -49,7 +49,7 @@ function getTagObject(tags: Schema.Tag[], item: Node) {
 // needs to be called before value stringifier to allow for circular anchor refs
 function stringifyProps(
   node: Node,
-  tagObj: Schema.Tag,
+  tagObj: Tag,
   { anchors, doc }: StringifyContext
 ) {
   const props = []
@@ -75,7 +75,7 @@ export function stringify(
   if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
   if (item instanceof Alias) return item.toString(ctx)
 
-  let tagObj: Schema.Tag | undefined = undefined
+  let tagObj: Tag | undefined = undefined
   const node: Node =
     item instanceof Node
       ? item

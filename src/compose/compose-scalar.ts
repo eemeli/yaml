@@ -2,6 +2,7 @@ import { Scalar } from '../ast/index.js'
 import { Document } from '../doc/Document.js'
 import type { Schema } from '../doc/Schema.js'
 import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
+import type { Tag } from '../tags/types.js'
 import { resolveBlockScalar } from './resolve-block-scalar.js'
 import { resolveFlowScalar } from './resolve-flow-scalar.js'
 
@@ -51,7 +52,7 @@ function findScalarTagByName(
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   if (tagName === '!') return defaultScalarTag(schema) // non-specific tag
-  const matchWithTest: Schema.Tag[] = []
+  const matchWithTest: Tag[] = []
   for (const tag of schema.tags) {
     if (tag.tag === tagName) {
       if (tag.default && tag.test) matchWithTest.push(tag)

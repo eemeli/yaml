@@ -2,6 +2,7 @@ import { Alias } from '../ast/index.js'
 import { Node } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
 import { defaultTagPrefix } from '../constants.js'
+import type { Tag } from '../tags/types.js'
 import type { Replacer } from './Document.js'
 import type { Schema } from './Schema.js'
 
@@ -13,7 +14,7 @@ export interface CreateNodeAliasRef {
 export interface CreateNodeContext {
   keepUndefined?: boolean
   onAlias(source: CreateNodeAliasRef): Alias
-  onTagObj?: (tagObj: Schema.Tag) => void
+  onTagObj?: (tagObj: Tag) => void
   prevObjects: Map<unknown, CreateNodeAliasRef>
   replacer?: Replacer
   schema: Schema
@@ -23,7 +24,7 @@ export interface CreateNodeContext {
 function findTagObject(
   value: unknown,
   tagName: string | null,
-  tags: Schema.Tag[]
+  tags: Tag[]
 ) {
   if (tagName) {
     const match = tags.filter(t => t.tag === tagName)

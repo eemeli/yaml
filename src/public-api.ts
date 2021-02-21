@@ -73,11 +73,7 @@ export function parseDocument(
  *   nulls, booleans, numbers and strings.
  */
 export function parse(src: string, options?: Options): any
-export function parse(
-  src: string,
-  reviver: (key: string, value: any) => any,
-  options?: Options
-): any
+export function parse(src: string, reviver: Reviver, options?: Options): any
 
 export function parse(
   src: string,

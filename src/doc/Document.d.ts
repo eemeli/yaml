@@ -1,15 +1,18 @@
-import { Alias, Collection, Merge, Node, Pair } from '../ast'
+import { Collection, Node, Pair } from '../ast'
 import { Type } from '../constants'
 import { YAMLError, YAMLWarning } from '../errors'
 import { Options } from '../options'
+import type { Tag, TagId } from '../tags/types'
+import { Anchors } from './Anchors'
+import { Reviver } from './applyReviver'
 import { Directives } from './directives'
-import { Schema } from './Schema'
+import { Schema, SchemaName } from './Schema'
 
 export type Replacer = any[] | ((key: any, value: any) => boolean)
-export type Reviver = (key: any, value: any) => any
+export type { Anchors, Reviver }
 
 export interface CreateNodeOptions {
-  onTagObj?: (tagObj: Schema.Tag) => void
+  onTagObj?: (tagObj: Tag) => void
 
   /**
    * Filter or modify values while creating a node.
@@ -48,7 +51,7 @@ export class Document extends Collection {
    * Anchors associated with the document's nodes;
    * also provides alias & merge node creators.
    */
-  anchors: Document.Anchors
+  anchors: Anchors
   /** The document contents. */
   contents: any
   /** Errors encountered during parsing. */
@@ -105,8 +108,8 @@ export class Document extends Collection {
    * by the document.
    */
   setSchema(
-    id?: Options['version'] | Schema.Name,
-    customTags?: (Schema.TagId | Schema.Tag)[]
+    id?: Options['version'] | SchemaName,
+    customTags?: (TagId | Tag)[]
   ): void
   /** Set `handle` as a shorthand string for the `prefix` tag namespace. */
   setTagPrefix(handle: string, prefix: string): void
@@ -141,38 +144,6 @@ export namespace Document {
     range: [number, number]
     /** The schema used with the document. */
     schema: Schema
-  }
-
-  interface Anchors {
-    /** @private */
-    map: Record<string, Node>
-
-    /**
-     * Create a new `Alias` node, adding the required anchor for `node`.
-     * If `name` is empty, a new anchor name will be generated.
-     */
-    createAlias(node: Node, name?: string): Alias
-    /**
-     * Create a new `Merge` node with the given source nodes.
-     * Non-`Alias` sources will be automatically wrapped.
-     */
-    createMergePair(...nodes: Node[]): Merge
-    /** The anchor name associated with `node`, if set. */
-    getName(node: Node): undefined | string
-    /** List of all defined anchor names. */
-    getNames(): string[]
-    /** The node associated with the anchor `name`, if set. */
-    getNode(name: string): undefined | Node
-    /**
-     * Find an available anchor name with the given `prefix` and a
-     * numerical suffix.
-     */
-    newName(prefix?: string): string
-    /**
-     * Associate an anchor with `node`. If `name` is empty, a new name will be generated.
-     * To remove an anchor, use `setAnchor(null, name)`.
-     */
-    setAnchor(node: Node | null, name?: string): void | string
   }
 
   interface TagPrefix {

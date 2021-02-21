@@ -21,7 +21,9 @@ export default {
       presets: [['@babel/env', { modules: false, targets: { node: '10.0' } }]]
     }),
     typescript(),
-    copy({ targets: [{ src: 'src/doc/*.d.ts', dest: 'dist/doc' }] })
+    copy({
+      targets: [{ src: 'src/tags/*.d.ts', dest: 'dist/tags' }]
+    })
   ],
   treeshake: { moduleSideEffects: false, propertyReadSideEffects: false }
 }

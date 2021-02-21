@@ -1,3 +1,5 @@
+export type Reviver = (key: unknown, value: unknown) => unknown
+
 /**
  * Applies the JSON.parse reviver algorithm as defined in the ECMA-262 spec,
  * in section 24.5.1.1 "Runtime Semantics: InternalizeJSONProperty" of the
@@ -5,7 +7,12 @@
  *
  * Includes extensions for handling Map and Set objects.
  */
-export function applyReviver(reviver, obj, key, val) {
+export function applyReviver(
+  reviver: Reviver,
+  obj: unknown,
+  key: unknown,
+  val: any
+) {
   if (val && typeof val === 'object') {
     if (Array.isArray(val)) {
       for (let i = 0, len = val.length; i < len; ++i) {

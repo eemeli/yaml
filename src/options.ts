@@ -1,5 +1,5 @@
 import { LogLevelId, defaultTagPrefix } from './constants.js'
-import type { Schema } from './doc/Schema.js'
+import type { SchemaOptions } from './doc/Schema.js'
 import type { LineCounter } from './parse/line-counter.js'
 import {
   binaryOptions,
@@ -9,7 +9,7 @@ import {
   strOptions
 } from './tags/options.js'
 
-export interface Options extends Schema.Options {
+export interface Options extends SchemaOptions {
   /**
    * Default prefix for anchors.
    *
