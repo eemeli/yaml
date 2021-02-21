@@ -1,4 +1,5 @@
 import { Node, Pair, Scalar, YAMLMap, YAMLSeq } from '../ast'
+import type { Document } from './Document'
 
 export class Schema {
   constructor(options: Schema.Options)
@@ -53,16 +54,17 @@ export namespace Schema {
 
   interface CreateNodeContext {
     wrapScalars?: boolean
-    [key: string]: any
+    [key: string]: unknown
   }
 
   interface StringifyContext {
+    doc: Document.Parsed
     forceBlockIndent?: boolean
     implicitKey?: boolean
-    indent?: string
+    indent: string
     indentAtStart?: number
     inFlow?: boolean
-    [key: string]: any
+    [key: string]: unknown
   }
 
   type TagId =

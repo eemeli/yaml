@@ -2,17 +2,35 @@ export const FOLD_FLOW = 'flow'
 export const FOLD_BLOCK = 'block'
 export const FOLD_QUOTED = 'quoted'
 
-// presumes i+1 is at the start of a line
-// returns index of last newline in more-indented block
-const consumeMoreIndentedLines = (text, i) => {
-  let ch = text[i + 1]
-  while (ch === ' ' || ch === '\t') {
-    do {
-      ch = text[(i += 1)]
-    } while (ch && ch !== '\n')
-    ch = text[i + 1]
-  }
-  return i
+/**
+ * `'block'` prevents more-indented lines from being folded;
+ * `'quoted'` allows for `\` escapes, including escaped newlines
+ */
+export type FoldMode = 'flow' | 'block' | 'quoted'
+
+export interface FoldOptions {
+  /**
+   * Accounts for leading contents on the first line, defaulting to
+   * `indent.length`
+   */
+  indentAtStart?: number
+
+  /** Default: `80` */
+  lineWidth?: number
+
+  /**
+   * Allow highly indented lines to stretch the line width or indent content
+   * from the start.
+   *
+   * Default: `20`
+   */
+  minContentWidth?: number
+
+  /** Called once if the text is folded */
+  onFold?: () => void
+
+  /** Called once if any line of text exceeds lineWidth characters */
+  onOverflow?: () => void
 }
 
 /**
@@ -22,30 +40,25 @@ const consumeMoreIndentedLines = (text, i) => {
  *
  * @param {string} text
  * @param {string} indent
- * @param {string} [mode='flow'] `'block'` prevents more-indented lines
- *   from being folded; `'quoted'` allows for `\` escapes, including escaped
- *   newlines
  * @param {Object} options
- * @param {number} [options.indentAtStart] Accounts for leading contents on
- *   the first line, defaulting to `indent.length`
- * @param {number} [options.lineWidth=80]
- * @param {number} [options.minContentWidth=20] Allow highly indented lines to
- *   stretch the line width or indent content from the start
- * @param {function} options.onFold Called once if the text is folded
- * @param {function} options.onFold Called once if any line of text exceeds
- *   lineWidth characters
  */
 export function foldFlowLines(
-  text,
-  indent,
-  mode,
-  { indentAtStart, lineWidth = 80, minContentWidth = 20, onFold, onOverflow }
+  text: string,
+  indent: string,
+  mode: FoldMode = 'flow',
+  {
+    indentAtStart,
+    lineWidth = 80,
+    minContentWidth = 20,
+    onFold,
+    onOverflow
+  }: FoldOptions = {}
 ) {
   if (!lineWidth || lineWidth < 0) return text
   const endStep = Math.max(1 + minContentWidth, 1 + lineWidth - indent.length)
   if (text.length <= endStep) return text
   const folds = []
-  const escapedFolds = {}
+  const escapedFolds: Record<number, boolean> = {}
   let end = lineWidth - indent.length
   if (typeof indentAtStart === 'number') {
     if (indentAtStart > lineWidth - Math.max(2, minContentWidth)) folds.push(0)
@@ -136,4 +149,19 @@ export function foldFlowLines(
     }
   }
   return res
+}
+
+/**
+ * Presumes `i + 1` is at the start of a line
+ * @returns index of last newline in more-indented block
+ */
+function consumeMoreIndentedLines(text: string, i: number) {
+  let ch = text[i + 1]
+  while (ch === ' ' || ch === '\t') {
+    do {
+      ch = text[(i += 1)]
+    } while (ch && ch !== '\n')
+    ch = text[i + 1]
+  }
+  return i
 }

@@ -1,23 +1,29 @@
-import { addCommentBefore } from './addComment.js'
+import type { Scalar } from '../ast/index.js'
 import { Type } from '../constants.js'
+import type { Schema } from '../doc/Schema.js'
+import { strOptions } from '../tags/options.js'
+import { addCommentBefore } from './addComment.js'
 import {
   foldFlowLines,
   FOLD_BLOCK,
   FOLD_FLOW,
   FOLD_QUOTED
 } from './foldFlowLines.js'
-import { strOptions } from '../tags/options.js'
 
-const getFoldOptions = ({ indentAtStart }) =>
+interface StringifyScalar extends Scalar {
+  value: string
+}
+
+const getFoldOptions = ({ indentAtStart }: Schema.StringifyContext) =>
   indentAtStart
     ? Object.assign({ indentAtStart }, strOptions.fold)
     : strOptions.fold
 
 // Also checks for lines starting with %, as parsing the output as YAML 1.1 will
 // presume that's starting a new document.
-const containsDocumentMarker = str => /^(%|---|\.\.\.)/m.test(str)
+const containsDocumentMarker = (str: string) => /^(%|---|\.\.\.)/m.test(str)
 
-function lineLengthOverLimit(str, limit) {
+function lineLengthOverLimit(str: string, limit: number) {
   const strLen = str.length
   if (strLen <= limit) return false
   for (let i = 0, start = 0; i < strLen; ++i) {
@@ -30,7 +36,7 @@ function lineLengthOverLimit(str, limit) {
   return true
 }
 
-function doubleQuotedString(value, ctx) {
+function doubleQuotedString(value: string, ctx: Schema.StringifyContext) {
   const { implicitKey } = ctx
   const { jsonEncoding, minMultiLineLength } = strOptions.doubleQuoted
   const json = JSON.stringify(value)
@@ -120,7 +126,7 @@ function doubleQuotedString(value, ctx) {
     : foldFlowLines(str, indent, FOLD_QUOTED, getFoldOptions(ctx))
 }
 
-function singleQuotedString(value, ctx) {
+function singleQuotedString(value: string, ctx: Schema.StringifyContext) {
   if (ctx.implicitKey) {
     if (/\n/.test(value)) return doubleQuotedString(value, ctx)
   } else {
@@ -135,7 +141,12 @@ function singleQuotedString(value, ctx) {
     : foldFlowLines(res, indent, FOLD_FLOW, getFoldOptions(ctx))
 }
 
-function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
+function blockString(
+  { comment, type, value }: StringifyScalar,
+  ctx: Schema.StringifyContext,
+  onComment?: () => void,
+  onChompKeep?: () => void
+) {
   // 1. Block can't end in whitespace unless the last line is non-empty.
   // 2. Strings consisting of only whitespace are best rendered explicitly.
   if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
@@ -203,7 +214,12 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
   return `${header}\n${indent}${body}`
 }
 
-function plainString(item, ctx, onComment, onChompKeep) {
+function plainString(
+  item: StringifyScalar,
+  ctx: Schema.StringifyContext,
+  onComment?: () => void,
+  onChompKeep?: () => void
+) {
   const { comment, type, value } = item
   const { actualString, implicitKey, indent, inFlow } = ctx
   if (
@@ -281,7 +297,12 @@ function plainString(item, ctx, onComment, onChompKeep) {
   return body
 }
 
-export function stringifyString(item, ctx, onComment, onChompKeep) {
+export function stringifyString(
+  item: Scalar,
+  ctx: Schema.StringifyContext,
+  onComment?: () => void,
+  onChompKeep?: () => void
+) {
   const { defaultKeyType, defaultType } = strOptions
   const { implicitKey, inFlow } = ctx
   let { type, value } = item
@@ -295,7 +316,7 @@ export function stringifyString(item, ctx, onComment, onChompKeep) {
       type = Type.QUOTE_DOUBLE
   }
 
-  const _stringify = _type => {
+  const _stringify = (_type: Type | undefined) => {
     switch (_type) {
       case Type.BLOCK_FOLDED:
       case Type.BLOCK_LITERAL:
