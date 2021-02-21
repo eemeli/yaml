@@ -943,6 +943,12 @@ describe('Document markers in top-level scalars', () => {
     expect(str).toBe('|\n  foo\n  %bar\n')
     expect(YAML.parse(str)).toBe('foo\n%bar\n')
   })
+
+  test('use marker line for block scalar header', () => {
+    const doc = YAML.parseDocument('|\nfoo\n')
+    doc.directivesEndMarker = true
+    expect(String(doc)).toBe('--- |\nfoo\n')
+  })
 })
 
 describe('undefined values', () => {

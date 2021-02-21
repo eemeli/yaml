@@ -283,13 +283,21 @@ export class Document {
         contentComment = this.contents.comment
       }
       const onChompKeep = contentComment ? null : () => (chompKeep = true)
-      const body = stringify(
+      let body = stringify(
         this.contents,
         ctx,
         () => (contentComment = null),
         onChompKeep
       )
-      lines.push(addComment(body, '', contentComment))
+      if (contentComment) body = addComment(body, '', contentComment)
+      if (
+        (body[0] === '|' || body[0] === '>') &&
+        lines[lines.length - 1] === '---'
+      ) {
+        // Top-level block scalars with a preceding doc marker ought to use the
+        // same line for their header.
+        lines[lines.length - 1] = `--- ${body}`
+      } else lines.push(body)
     } else {
       lines.push(stringify(this.contents, ctx))
     }
