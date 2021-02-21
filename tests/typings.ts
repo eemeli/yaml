@@ -1,7 +1,7 @@
 // To test types, compile this file with tsc
 
 import { Document, parse, parseDocument, stringify, visit } from '../src/index'
-import { YAMLMap, YAMLSeq, Pair } from '../src/types'
+import { YAMLMap, YAMLSeq, Pair, Scalar } from '../src/types'
 
 parse('3.14159')
 // 3.14159
@@ -50,7 +50,7 @@ const src = '[{ a: A }, { b: B }]'
 const doc = parseDocument(src)
 const seq = doc.contents as YAMLSeq
 const { anchors } = doc
-const [a, b] = seq.items as YAMLMap[]
+const [a, b] = seq.items as YAMLMap.Parsed[]
 anchors.setAnchor(a.items[0].value) // 'a1'
 anchors.setAnchor(b.items[0].value) // 'a2'
 anchors.setAnchor(null, 'a1') // 'a1'
@@ -109,7 +109,8 @@ visit(doc, {
     if (map.items.length > 3) return visit.SKIP
   },
   Pair(_, pair) {
-    if (pair.key.value === 'foo') return visit.REMOVE
+    if (pair.key instanceof Scalar && pair.key.value === 'foo')
+      return visit.REMOVE
   },
   Seq(_, seq) {
     if (seq.items.length > 3) return visit.BREAK

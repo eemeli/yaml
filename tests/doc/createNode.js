@@ -1,5 +1,5 @@
 import * as YAML from '../../src/index.js'
-import { Pair, Scalar, YAMLMap, YAMLSeq } from '../../src/ast/index.js'
+import { Pair, PairType, Scalar, YAMLMap, YAMLSeq } from '../../src/ast/index.js'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
 let doc
@@ -144,15 +144,15 @@ describe('objects', () => {
     const s = doc.createNode({ x: true, y: undefined })
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toMatchObject([
-      { type: Pair.Type.PAIR, key: { value: 'x' }, value: { value: true } }
+      { type: PairType.PAIR, key: { value: 'x' }, value: { value: true } }
     ])
   })
   test('createNode({ x: true, y: undefined }, { keepUndefined: true })', () => {
     const s = doc.createNode({ x: true, y: undefined }, { keepUndefined: true })
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toMatchObject([
-      { type: Pair.Type.PAIR, key: { value: 'x' }, value: { value: true } },
-      { type: Pair.Type.PAIR, key: { value: 'y' }, value: { value: null } }
+      { type: PairType.PAIR, key: { value: 'x' }, value: { value: true } },
+      { type: PairType.PAIR, key: { value: 'y' }, value: { value: null } }
     ])
   })
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {

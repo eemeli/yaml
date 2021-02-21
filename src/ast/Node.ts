@@ -1,5 +1,6 @@
 import type { Type } from '../constants'
-import type { Pair } from '.'
+import { StringifyContext } from '../stringify/stringify'
+import type { PairType } from './Pair'
 
 export declare namespace Node {
   interface Parsed extends Node {
@@ -30,8 +31,14 @@ export abstract class Node {
   declare tag?: string
 
   /** A plain JS representation of this node */
-  abstract toJSON(arg?: any): any
+  abstract toJSON(): any
+
+  abstract toString(
+    ctx?: StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ): string
 
   /** The type of this node */
-  declare type?: Type | Pair.Type
+  declare type?: Type | PairType
 }

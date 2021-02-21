@@ -5,8 +5,8 @@ import { addComment } from '../stringify/addComment.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 
 import { Node } from './Node.js'
+import type { Pair } from './Pair.js'
 import { Scalar } from './Scalar.js'
-import type { Pair } from './index.js' // FIXME
 
 export function collectionFromPath(
   schema: Schema,
@@ -81,11 +81,7 @@ export abstract class Collection extends Node {
     })
   }
 
-  /**
-   * Adds a value to the collection. For `!!map` and `!!omap` the value must
-   * be a Pair instance or a `{ key, value }` object, which may not have a key
-   * that already exists in the map.
-   */
+  /** Adds a value to the collection. */
   abstract add(value: unknown): void
 
   /**
@@ -233,7 +229,7 @@ export abstract class Collection extends Node {
 
           if (item.comment) comment = item.comment
 
-          const pair = item as Pair
+          const pair = item as any // Apply guards manually in the following
           if (
             inFlow &&
             ((!chompKeep && item.spaceBefore) ||
@@ -261,7 +257,7 @@ export abstract class Collection extends Node {
       },
       []
     )
-    let str
+    let str: string
     if (nodes.length === 0) {
       str = flowChars.start + flowChars.end
     } else if (inFlow) {
@@ -282,7 +278,7 @@ export abstract class Collection extends Node {
       }
     } else {
       const strings = nodes.map(blockItem)
-      str = strings.shift()
+      str = strings.shift() || ''
       for (const s of strings) str += s ? `\n${indent}${s}` : '\n'
     }
     if (this.comment) {

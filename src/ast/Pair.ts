@@ -1,66 +1,61 @@
 import { Type } from '../constants.js'
-import { createNode } from '../doc/createNode.js'
+import { createNode, CreateNodeContext } from '../doc/createNode.js'
 import { warn } from '../log.js'
 import { addComment } from '../stringify/addComment.js'
+import { StringifyContext } from '../stringify/stringify.js'
+
 import { Collection } from './Collection.js'
 import { Node } from './Node.js'
 import { Scalar } from './Scalar.js'
 import { YAMLSeq } from './YAMLSeq.js'
-import { toJS } from './toJS.js'
+import { toJS, ToJSContext } from './toJS.js'
+import type { YAMLMap } from './index.js'
 
-function stringifyKey(key, jsKey, ctx) {
-  if (jsKey === null) return ''
-  if (typeof jsKey !== 'object') return String(jsKey)
-  if (key instanceof Node && ctx && ctx.doc) {
-    const strKey = key.toString({
-      anchors: Object.create(null),
-      doc: ctx.doc,
-      indent: '',
-      indentStep: ctx.indentStep,
-      inFlow: true,
-      inStringifyKey: true,
-      stringify: ctx.stringify
-    })
-    if (!ctx.mapKeyWarned) {
-      let jsonStr = JSON.stringify(strKey)
-      if (jsonStr.length > 40)
-        jsonStr = jsonStr.split('').splice(36, '..."').join('')
-      warn(
-        ctx.doc.options.logLevel,
-        `Keys with collection values will be stringified due to JS Object restrictions: ${jsonStr}. Set mapAsMap: true to use object keys.`
-      )
-      ctx.mapKeyWarned = true
-    }
-    return strKey
-  }
-  return JSON.stringify(jsKey)
-}
-
-export function createPair(key, value, ctx) {
+export function createPair(
+  key: unknown,
+  value: unknown,
+  ctx: CreateNodeContext
+) {
   const k = createNode(key, null, ctx)
   const v = createNode(value, null, ctx)
   return new Pair(k, v)
 }
 
-export class Pair extends Node {
-  static Type = {
-    PAIR: 'PAIR',
-    MERGE_PAIR: 'MERGE_PAIR'
-  }
+export enum PairType {
+  PAIR = 'PAIR',
+  MERGE_PAIR = 'MERGE_PAIR'
+}
 
-  constructor(key, value = null) {
+export declare namespace Pair {
+  interface Parsed extends Pair {
+    key: Scalar | YAMLMap | YAMLSeq
+    value: Scalar | YAMLMap | YAMLSeq | null
+  }
+}
+
+export class Pair<K = unknown, V = unknown> extends Node {
+  /** Always Node or null when parsed, but can be set to anything. */
+  key: K
+
+  /** Always Node or null when parsed, but can be set to anything. */
+  value: V | null
+
+  type: PairType
+
+  constructor(key: K, value: V | null = null) {
     super()
     this.key = key
     this.value = value
-    this.type = Pair.Type.PAIR
+    this.type = PairType.PAIR
   }
 
+  // @ts-ignore This is fine.
   get commentBefore() {
     return this.key instanceof Node ? this.key.commentBefore : undefined
   }
 
   set commentBefore(cb) {
-    if (this.key == null) this.key = new Scalar(null)
+    if (this.key == null) this.key = new Scalar(null) as any // FIXME
     if (this.key instanceof Node) this.key.commentBefore = cb
     else {
       const msg =
@@ -69,12 +64,13 @@ export class Pair extends Node {
     }
   }
 
+  // @ts-ignore This is fine.
   get spaceBefore() {
     return this.key instanceof Node ? this.key.spaceBefore : undefined
   }
 
   set spaceBefore(sb) {
-    if (this.key == null) this.key = new Scalar(null)
+    if (this.key == null) this.key = new Scalar(null) as any // FIXME
     if (this.key instanceof Node) this.key.spaceBefore = sb
     else {
       const msg =
@@ -83,7 +79,13 @@ export class Pair extends Node {
     }
   }
 
-  addToJSMap(ctx, map) {
+  addToJSMap(
+    ctx: ToJSContext | undefined,
+    map:
+      | Map<unknown, unknown>
+      | Set<unknown>
+      | Record<string | number | symbol, unknown>
+  ) {
     const key = toJS(this.key, '', ctx)
     if (map instanceof Map) {
       const value = toJS(this.value, key, ctx)
@@ -105,16 +107,20 @@ export class Pair extends Node {
     return map
   }
 
-  toJSON(_, ctx) {
+  toJSON(_?: unknown, ctx?: ToJSContext) {
     const pair = ctx && ctx.mapAsMap ? new Map() : {}
     return this.addToJSMap(ctx, pair)
   }
 
-  toString(ctx, onComment, onChompKeep) {
+  toString(
+    ctx?: StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ) {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
     const { indent: indentSize, indentSeq, simpleKeys } = ctx.doc.options
-    let { key, value } = this
-    let keyComment = key instanceof Node && key.comment
+    let { key, value }: { key: K; value: V | Node | null } = this
+    let keyComment = (key instanceof Node && key.comment) || null
     if (simpleKeys) {
       if (keyComment) {
         throw new Error('With simple keys, key nodes cannot have comments')
@@ -223,4 +229,35 @@ export class Pair extends Node {
     if (chompKeep && !valueComment && onChompKeep) onChompKeep()
     return addComment(str + ws + valueStr, ctx.indent, valueComment)
   }
+}
+
+function stringifyKey(
+  key: unknown,
+  jsKey: unknown,
+  ctx: ToJSContext | undefined
+) {
+  if (jsKey === null) return ''
+  if (typeof jsKey !== 'object') return String(jsKey)
+  if (key instanceof Node && ctx && ctx.doc) {
+    const strKey = key.toString({
+      anchors: Object.create(null),
+      doc: ctx.doc,
+      indent: '',
+      indentStep: ctx.indentStep,
+      inFlow: true,
+      inStringifyKey: true,
+      stringify: ctx.stringify
+    })
+    if (!ctx.mapKeyWarned) {
+      let jsonStr = JSON.stringify(strKey)
+      if (jsonStr.length > 40) jsonStr = jsonStr.substring(0, 36) + '..."'
+      warn(
+        ctx.doc.options.logLevel,
+        `Keys with collection values will be stringified due to JS Object restrictions: ${jsonStr}. Set mapAsMap: true to use object keys.`
+      )
+      ctx.mapKeyWarned = true
+    }
+    return strKey
+  }
+  return JSON.stringify(jsKey)
 }

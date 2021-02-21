@@ -6,7 +6,7 @@ export function resolveMergePair(
 ) {
   if (!(pair.key instanceof Scalar) || pair.key.value !== Merge.KEY) return pair
 
-  const merge = new Merge(pair)
+  const merge = new Merge(pair as Pair<Scalar, Alias>)
   for (const node of merge.value.items as Node.Parsed[]) {
     if (node instanceof Alias) {
       if (node.source instanceof YAMLMap) {

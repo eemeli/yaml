@@ -1,25 +1,33 @@
-import { Pair } from './Pair.js'
+import { StringifyContext } from '../stringify/stringify.js'
+import type { Alias } from './index.js'
+import { Node } from './Node.js'
+import { Pair, PairType } from './Pair.js'
 import { Scalar } from './Scalar.js'
+import type { ToJSContext } from './toJS.js'
 import { YAMLMap } from './YAMLMap.js'
 import { YAMLSeq } from './YAMLSeq.js'
 
-export class Merge extends Pair {
+export class Merge extends Pair<Scalar, YAMLSeq<Alias>> {
   static KEY = '<<'
 
-  constructor(pair) {
-    if (pair instanceof Pair) {
-      let seq = pair.value
-      if (!(seq instanceof YAMLSeq)) {
-        seq = new YAMLSeq()
+  type: PairType.MERGE_PAIR
+
+  declare value: YAMLSeq<Alias>
+
+  constructor(pair?: Pair<Scalar, Alias | YAMLSeq<Alias>>) {
+    if (pair instanceof Pair && pair.value instanceof Node) {
+      if (pair.value instanceof YAMLSeq) super(pair.key, pair.value)
+      else {
+        const seq = new YAMLSeq<Alias>()
         seq.items.push(pair.value)
         seq.range = pair.value.range
+        super(pair.key, seq)
       }
-      super(pair.key, seq)
       this.range = pair.range
     } else {
       super(new Scalar(Merge.KEY), new YAMLSeq())
     }
-    this.type = Pair.Type.MERGE_PAIR
+    this.type = PairType.MERGE_PAIR
   }
 
   // If the value associated with a merge key is a single mapping node, each of
@@ -29,7 +37,13 @@ export class Merge extends Pair {
   // of these nodes is merged in turn according to its order in the sequence.
   // Keys in mapping nodes earlier in the sequence override keys specified in
   // later mapping nodes. -- http://yaml.org/type/merge.html
-  addToJSMap(ctx, map) {
+  addToJSMap(
+    ctx: ToJSContext | undefined,
+    map:
+      | Map<unknown, unknown>
+      | Set<unknown>
+      | Record<string | number | symbol, unknown>
+  ) {
     for (const { source } of this.value.items) {
       if (!(source instanceof YAMLMap))
         throw new Error('Merge sources must be maps')
@@ -52,12 +66,14 @@ export class Merge extends Pair {
     return map
   }
 
-  toString(ctx, onComment) {
+  toString(ctx?: StringifyContext, onComment?: () => void) {
     const seq = this.value
     if (seq.items.length > 1) return super.toString(ctx, onComment)
-    this.value = seq.items[0]
-    const str = super.toString(ctx, onComment)
-    this.value = seq
-    return str
+    try {
+      this.value = seq.items[0] as any
+      return super.toString(ctx, onComment)
+    } finally {
+      this.value = seq
+    }
   }
 }

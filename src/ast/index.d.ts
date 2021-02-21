@@ -1,15 +1,16 @@
 import { Type } from '../constants'
 import type { StringifyContext } from '../stringify/stringify'
 import { Collection } from './Collection'
+export { Merge } from './Merge'
 import { Node } from './Node'
+export { Pair, PairType } from './Pair'
 import { Scalar } from './Scalar'
 import { ToJSContext } from './toJS'
+import { YAMLMap, findPair } from './YAMLMap'
+import { YAMLSeq } from './YAMLSeq'
 
 export { ToJSContext, toJS } from './toJS'
-
-export { Collection, Node, Scalar }
-
-export function findPair(items: any[], key: Scalar | any): Pair | undefined
+export { Collection, Node, Scalar, YAMLMap, YAMLSeq, findPair }
 
 export class Alias extends Node {
   constructor(source: Node)
@@ -22,85 +23,6 @@ export class Alias extends Node {
 
 export namespace Alias {
   interface Parsed extends Alias {
-    range: [number, number]
-  }
-}
-
-export class Pair extends Node {
-  constructor(key: any, value?: any)
-  type: Pair.Type.PAIR | Pair.Type.MERGE_PAIR
-  /** Always Node or null when parsed, but can be set to anything. */
-  key: any
-  /** Always Node or null when parsed, but can be set to anything. */
-  value: any
-  cstNode?: never // no corresponding cstNode
-  toJSON(arg?: any, ctx?: ToJSContext): object | Map<any, any>
-  toString(
-    ctx?: StringifyContext,
-    onComment?: () => void,
-    onChompKeep?: () => void
-  ): string
-}
-export namespace Pair {
-  enum Type {
-    PAIR = 'PAIR',
-    MERGE_PAIR = 'MERGE_PAIR'
-  }
-}
-
-export class Merge extends Pair {
-  static KEY: '<<'
-  constructor(pair?: Pair)
-  type: Pair.Type.MERGE_PAIR
-  /** Always Scalar('<<'), defined by the type specification */
-  key: AST.PlainValue
-  /** Always YAMLSeq<Alias(Map)>, stringified as *A if length = 1 */
-  value: YAMLSeq
-  toString(ctx?: StringifyContext, onComment?: () => void): string
-}
-
-export class YAMLMap extends Collection {
-  static readonly tagName: 'tag:yaml.org,2002:map'
-  type?: Type.FLOW_MAP | Type.MAP
-  items: Array<Pair>
-  add(value: unknown): void
-  delete(key: unknown): boolean
-  get(key: unknown, keepScalar?: boolean): unknown
-  has(key: unknown): boolean
-  set(key: unknown, value: unknown): void
-  toJSON(arg?: any, ctx?: ToJSContext): object | Map<any, any>
-  toString(
-    ctx?: StringifyContext,
-    onComment?: () => void,
-    onChompKeep?: () => void
-  ): string
-}
-
-export namespace YAMLMap {
-  interface Parsed extends YAMLMap {
-    range: [number, number]
-  }
-}
-
-export class YAMLSeq extends Collection {
-  static readonly tagName: 'tag:yaml.org,2002:seq'
-  type?: Type.FLOW_SEQ | Type.SEQ
-  add(value: unknown): void
-  delete(key: number | string | Scalar): boolean
-  get(key: number | string | Scalar, keepScalar?: boolean): any
-  has(key: number | string | Scalar): boolean
-  set(key: number | string | Scalar, value: any): void
-  toJSON(arg?: any, ctx?: ToJSContext): any[]
-  toString(
-    ctx?: StringifyContext,
-    onComment?: () => void,
-    onChompKeep?: () => void
-  ): string
-}
-
-export namespace YAMLSeq {
-  interface Parsed extends YAMLSeq {
-    items: Node[]
     range: [number, number]
   }
 }

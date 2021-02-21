@@ -1,7 +1,7 @@
 import type { Document } from '../doc/Document'
 
 export interface StringifyContext {
-  doc: Document.Parsed
+  doc: Document
   forceBlockIndent?: boolean
   implicitKey?: boolean
   indent: string
