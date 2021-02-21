@@ -13,7 +13,7 @@ export interface CreateNodeAliasRef {
 export interface CreateNodeContext {
   keepUndefined?: boolean
   onAlias(source: CreateNodeAliasRef): Alias
-  onTagObj?: (tagObj: unknown) => void
+  onTagObj?: (tagObj: Schema.Tag) => void
   prevObjects: Map<unknown, CreateNodeAliasRef>
   replacer?: Replacer
   schema: Schema

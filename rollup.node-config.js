@@ -21,14 +21,7 @@ export default {
       presets: [['@babel/env', { modules: false, targets: { node: '10.0' } }]]
     }),
     typescript(),
-    copy({
-      targets: [
-        { src: 'src/*.d.ts', dest: 'dist' },
-        { src: 'src/ast/*.d.ts', dest: 'dist/ast' },
-        { src: 'src/doc/*.d.ts', dest: 'dist/doc' },
-        { src: 'src/stringify/*.d.ts', dest: 'dist/stringify' }
-      ]
-    })
+    copy({ targets: [{ src: 'src/doc/*.d.ts', dest: 'dist/doc' }] })
   ],
   treeshake: { moduleSideEffects: false, propertyReadSideEffects: false }
 }

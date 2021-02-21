@@ -9,6 +9,8 @@ export type Replacer = any[] | ((key: any, value: any) => boolean)
 export type Reviver = (key: any, value: any) => any
 
 export interface CreateNodeOptions {
+  onTagObj?: (tagObj: Schema.Tag) => void
+
   /**
    * Filter or modify values while creating a node.
    *
