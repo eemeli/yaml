@@ -282,13 +282,15 @@ describe.skip('pretty errors', () => {
 
 describe('invalid options', () => {
   test('unknown schema', () => {
-    const doc = new YAML.Document(undefined, { schema: 'foo' })
-    expect(() => doc.setSchema()).toThrow(/Unknown schema/)
+    expect(() => new YAML.Document(undefined, { schema: 'foo' })).toThrow(
+      /Unknown schema/
+    )
   })
 
   test('unknown custom tag', () => {
-    const doc = new YAML.Document(undefined, { customTags: ['foo'] })
-    expect(() => doc.setSchema()).toThrow(/Unknown custom tag/)
+    expect(() => new YAML.Document(undefined, { customTags: ['foo'] })).toThrow(
+      /Unknown custom tag/
+    )
   })
 })
 

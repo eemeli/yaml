@@ -101,12 +101,8 @@ export class Document {
 
   options: Required<DocumentOptions> & SchemaOptions
 
-  // FIXME required by Collection, currently optional in Document
-  /**
-   * The schema used with the document. Use `setSchema()` to change or
-   * initialise.
-   */
-  declare schema: Schema
+  /** The schema used with the document. Use `setSchema()` to change. */
+  schema: Schema
 
   /**
    * Array of prefixes; each will have a string `handle` that
@@ -146,12 +142,15 @@ export class Document {
 
     this.options = Object.assign({}, defaultOptions, options)
     this.anchors = new Anchors(this.options.anchorPrefix)
-    this.directives = new Directives({ version: this.options.version })
+    if (options?.directives) {
+      this.directives = options.directives.atDocument()
+      if (options.version && !this.directives.yaml.explicit)
+        this.directives.yaml.version = options.version
+    } else this.directives = new Directives({ version: this.options.version })
 
-    // @ts-ignore FIXME
-    this.schema = null
+    const schemaOpts = Object.assign({}, this.getDefaults(), this.options)
+    this.schema = new Schema(schemaOpts)
 
-    // note that this.schema is left as null here
     this.contents =
       value === undefined
         ? null
@@ -176,7 +175,6 @@ export class Document {
     value: unknown,
     { keepUndefined, onTagObj, replacer, tag }: CreateNodeOptions = {}
   ): Node {
-    this.setSchema()
     if (typeof replacer === 'function')
       value = replacer.call({ '': value }, '', value)
     else if (Array.isArray(replacer)) {
@@ -231,7 +229,7 @@ export class Document {
   }
 
   /**
-   * Removes a value from the collection.
+   * Removes a value from the document.
    * @returns `true` if the item was found and removed.
    */
   delete(key: any) {
@@ -239,7 +237,7 @@ export class Document {
   }
 
   /**
-   * Removes a value from the collection.
+   * Removes a value from the document.
    * @returns `true` if the item was found and removed.
    */
   deleteIn(path: Iterable<unknown>) {
@@ -310,7 +308,6 @@ export class Document {
    */
   set(key: any, value: unknown) {
     if (this.contents == null) {
-      this.setSchema()
       this.contents = collectionFromPath(this.schema, [key], value)
     } else if (assertCollection(this.contents)) {
       this.contents.set(key, value)
@@ -324,7 +321,6 @@ export class Document {
   setIn(path: Iterable<unknown>, value: unknown) {
     if (isEmptyPath(path)) this.contents = value
     else if (this.contents == null) {
-      this.setSchema()
       this.contents = collectionFromPath(this.schema, Array.from(path), value)
     } else if (assertCollection(this.contents)) {
       this.contents.setIn(path, value)
@@ -338,10 +334,10 @@ export class Document {
    * by the document.
    */
   setSchema(
-    id?: Options['version'] | SchemaName,
+    id: Options['version'] | SchemaName | null,
     customTags?: (TagId | Tag)[]
   ) {
-    if (!id && !customTags && this.schema) return
+    if (!id && !customTags) return
 
     // @ts-ignore Never happens in TypeScript
     if (typeof id === 'number') id = id.toFixed(1)
@@ -353,8 +349,8 @@ export class Document {
       this.options.schema = id
     }
     if (Array.isArray(customTags)) this.options.customTags = customTags
-    const opt = Object.assign({}, this.getDefaults(), this.options)
-    this.schema = new Schema(opt)
+    const schemaOpts = Object.assign({}, this.getDefaults(), this.options)
+    this.schema = new Schema(schemaOpts)
   }
 
   /** Set `handle` as a shorthand string for the `prefix` tag namespace. */
@@ -426,7 +422,6 @@ export class Document {
       const s = JSON.stringify(indentSize)
       throw new Error(`"indent" option must be a positive integer, not ${s}`)
     }
-    this.setSchema()
     const lines = []
     let hasDirectives = false
     const dir = this.directives.toString(this)

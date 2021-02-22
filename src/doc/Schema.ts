@@ -1,6 +1,7 @@
 import type { Pair } from '../ast/Pair.js'
 import { schemas, tags } from '../tags/index.js'
 import type { Tag, TagId } from '../tags/types.js'
+import { Directives } from './directives.js'
 import { getSchemaTags } from './getSchemaTags.js'
 
 export type SchemaName = 'core' | 'failsafe' | 'json' | 'yaml-1.1'
@@ -14,6 +15,8 @@ export interface SchemaOptions {
     | Array<TagId | Tag>
     | ((tags: Array<TagId | Tag>) => Array<TagId | Tag>)
     | null
+
+  directives?: Directives
 
   /**
    * Enable support for `<<` merge keys.
