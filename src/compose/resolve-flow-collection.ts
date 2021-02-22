@@ -1,13 +1,17 @@
-import { Node, Pair, YAMLMap, YAMLSeq } from '../ast/index.js'
+import { Node } from '../ast/Node.js'
+import { Pair } from '../ast/Pair.js'
+import { YAMLMap } from '../ast/YAMLMap.js'
+import { YAMLSeq } from '../ast/YAMLSeq.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { FlowCollection, SourceToken, Token } from '../parse/tokens.js'
-import { composeEmptyNode, composeNode } from './compose-node.js'
+import type { ComposeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 import { containsNewline } from './util-contains-newline.js'
 
 export function resolveFlowCollection(
+  { composeNode, composeEmptyNode }: ComposeNode,
   doc: Document.Parsed,
   fc: FlowCollection,
   _anchor: string | null,

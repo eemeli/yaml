@@ -1,5 +1,5 @@
-import { Scalar } from '../ast/index.js'
-import { Document } from '../doc/Document.js'
+import { Scalar } from '../ast/Scalar.js'
+import type { Document } from '../doc/Document.js'
 import type { Schema } from '../doc/Schema.js'
 import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
 import type { Tag } from '../tags/types.js'

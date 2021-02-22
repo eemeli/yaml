@@ -1,4 +1,4 @@
-// import { Type } from './constants'
+// import { Type } from './constants.js'
 // interface LinePos { line: number; col: number }
 
 export class YAMLError extends Error {

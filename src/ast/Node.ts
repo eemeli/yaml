@@ -1,6 +1,6 @@
-import type { Type } from '../constants'
-import { StringifyContext } from '../stringify/stringify'
-import type { PairType } from './Pair'
+import type { Type } from '../constants.js'
+import { StringifyContext } from '../stringify/stringify.js'
+import type { PairType } from './Pair.js'
 
 export declare namespace Node {
   interface Parsed extends Node {

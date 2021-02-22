@@ -1,4 +1,9 @@
-import { Alias, Merge, Node, Pair, Scalar, YAMLMap } from '../ast/index.js'
+import { Alias } from '../ast/Alias.js'
+import { Merge } from '../ast/Merge.js'
+import type { Node } from '../ast/Node.js'
+import type { Pair } from '../ast/Pair.js'
+import { Scalar } from '../ast/Scalar.js'
+import { YAMLMap } from '../ast/YAMLMap.js'
 
 export function resolveMergePair(
   pair: Pair,

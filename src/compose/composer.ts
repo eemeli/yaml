@@ -1,4 +1,5 @@
-import { Collection, Node } from '../ast/index.js'
+import { Collection } from '../ast/Collection.js'
+import type { Node } from '../ast/Node.js'
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { YAMLParseError, YAMLWarning } from '../errors.js'

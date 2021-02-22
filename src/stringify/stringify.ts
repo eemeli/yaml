@@ -2,7 +2,7 @@ import { Alias } from '../ast/Alias.js'
 import { Node } from '../ast/Node.js'
 import { Pair } from '../ast/Pair.js'
 import { Scalar } from '../ast/Scalar.js'
-import type { Document } from '../doc/Document'
+import type { Document } from '../doc/Document.js'
 import type { Tag } from '../tags/types.js'
 import { stringifyString } from './stringifyString.js'
 

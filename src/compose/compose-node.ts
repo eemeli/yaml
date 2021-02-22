@@ -1,4 +1,5 @@
-import { Alias, Node } from '../ast/index.js'
+import { Alias } from '../ast/Alias.js'
+import type { Node } from '../ast/Node.js'
 import type { Document } from '../doc/Document.js'
 import type { FlowScalar, Token } from '../parse/tokens.js'
 import { composeCollection } from './compose-collection.js'
@@ -12,6 +13,9 @@ export interface Props {
   anchor: string
   tagName: string
 }
+
+const CN = { composeNode, composeEmptyNode }
+export type ComposeNode = typeof CN
 
 export function composeNode(
   doc: Document.Parsed,
@@ -36,7 +40,7 @@ export function composeNode(
     case 'block-map':
     case 'block-seq':
     case 'flow-collection':
-      node = composeCollection(doc, token, anchor, tagName, onError)
+      node = composeCollection(CN, doc, token, anchor, tagName, onError)
       break
     default:
       console.log(token)

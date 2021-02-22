@@ -11,8 +11,8 @@ import {
   toJS,
   ToJSContext
 } from '../ast/index.js'
-import { Type } from '../constants'
-import type { YAMLError, YAMLWarning } from '../errors'
+import { Type } from '../constants.js'
+import type { YAMLError, YAMLWarning } from '../errors.js'
 import {
   DocumentOptions,
   Options,
@@ -21,7 +21,7 @@ import {
 } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
 import { stringify, StringifyContext } from '../stringify/stringify.js'
-import type { Tag, TagId } from '../tags/types'
+import type { Tag, TagId } from '../tags/types.js'
 
 import { Anchors } from './Anchors.js'
 import { Schema, SchemaName, SchemaOptions } from './Schema.js'

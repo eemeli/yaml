@@ -1,4 +1,4 @@
-import { Directives } from '../doc/directives.js'
+import type { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import type { Options } from '../options.js'
 import type * as Tokens from '../parse/tokens.js'

@@ -1,11 +1,12 @@
-import { YAMLSeq } from '../ast/index.js'
+import { YAMLSeq } from '../ast/YAMLSeq.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { BlockSequence } from '../parse/tokens.js'
-import { composeEmptyNode, composeNode } from './compose-node.js'
+import type { ComposeNode } from './compose-node.js'
 import { resolveProps } from './resolve-props.js'
 
 export function resolveBlockSeq(
+  { composeNode, composeEmptyNode }: ComposeNode,
   doc: Document.Parsed,
   { items, offset }: BlockSequence,
   anchor: string | null,

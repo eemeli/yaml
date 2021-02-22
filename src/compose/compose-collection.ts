@@ -1,15 +1,20 @@
-import { Node, Scalar, YAMLMap, YAMLSeq } from '../ast/index.js'
+import { Node } from '../ast/Node.js'
+import { Scalar } from '../ast/Scalar.js'
+import type { YAMLMap } from '../ast/YAMLMap.js'
+import type { YAMLSeq } from '../ast/YAMLSeq.js'
 import type { Document } from '../doc/Document.js'
 import type {
   BlockMap,
   BlockSequence,
   FlowCollection
 } from '../parse/tokens.js'
+import type { ComposeNode } from './compose-node.js'
 import { resolveBlockMap } from './resolve-block-map.js'
 import { resolveBlockSeq } from './resolve-block-seq.js'
 import { resolveFlowCollection } from './resolve-flow-collection.js'
 
 export function composeCollection(
+  CN: ComposeNode,
   doc: Document.Parsed,
   token: BlockMap | BlockSequence | FlowCollection,
   anchor: string | null,
@@ -19,15 +24,15 @@ export function composeCollection(
   let coll: YAMLMap.Parsed | YAMLSeq.Parsed
   switch (token.type) {
     case 'block-map': {
-      coll = resolveBlockMap(doc, token, anchor, onError)
+      coll = resolveBlockMap(CN, doc, token, anchor, onError)
       break
     }
     case 'block-seq': {
-      coll = resolveBlockSeq(doc, token, anchor, onError)
+      coll = resolveBlockSeq(CN, doc, token, anchor, onError)
       break
     }
     case 'flow-collection': {
-      coll = resolveFlowCollection(doc, token, anchor, onError)
+      coll = resolveFlowCollection(CN, doc, token, anchor, onError)
       break
     }
   }
