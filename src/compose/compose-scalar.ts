@@ -2,7 +2,7 @@ import { Scalar } from '../ast/Scalar.js'
 import type { Document } from '../doc/Document.js'
 import type { Schema } from '../doc/Schema.js'
 import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
-import type { Tag } from '../tags/types.js'
+import type { ScalarTag } from '../tags/types.js'
 import { resolveBlockScalar } from './resolve-block-scalar.js'
 import { resolveFlowScalar } from './resolve-flow-scalar.js'
 
@@ -43,7 +43,9 @@ export function composeScalar(
 }
 
 const defaultScalarTag = (schema: Schema) =>
-  schema.tags.find(tag => tag.tag === 'tag:yaml.org,2002:str')
+  schema.tags.find(
+    tag => !tag.collection && tag.tag === 'tag:yaml.org,2002:str'
+  ) as ScalarTag | undefined
 
 function findScalarTagByName(
   schema: Schema,
@@ -52,16 +54,16 @@ function findScalarTagByName(
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   if (tagName === '!') return defaultScalarTag(schema) // non-specific tag
-  const matchWithTest: Tag[] = []
+  const matchWithTest: ScalarTag[] = []
   for (const tag of schema.tags) {
-    if (tag.tag === tagName) {
+    if (!tag.collection && tag.tag === tagName) {
       if (tag.default && tag.test) matchWithTest.push(tag)
       else return tag
     }
   }
   for (const tag of matchWithTest) if (tag.test?.test(value)) return tag
   const kt = schema.knownTags[tagName]
-  if (kt) {
+  if (kt && !kt.collection) {
     // Ensure that the known tag is available for stringifying,
     // but does not get used by default.
     schema.tags.push(Object.assign({}, kt, { default: false, test: undefined }))

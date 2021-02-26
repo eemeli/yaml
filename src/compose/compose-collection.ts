@@ -2,12 +2,14 @@ import { Node } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
 import type { YAMLMap } from '../ast/YAMLMap.js'
 import type { YAMLSeq } from '../ast/YAMLSeq.js'
+import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type {
   BlockMap,
   BlockSequence,
   FlowCollection
 } from '../parse/tokens.js'
+import { CollectionTag } from '../tags/types.js'
 import type { ComposeNode } from './compose-node.js'
 import { resolveBlockMap } from './resolve-block-map.js'
 import { resolveBlockSeq } from './resolve-block-seq.js'
@@ -46,10 +48,28 @@ export function composeCollection(
     return coll
   }
 
-  let tag = doc.schema.tags.find(t => t.tag === tagName)
+  let expType: 'map' | 'seq' // | null = null
+  switch (coll.type) {
+    case Type.FLOW_MAP:
+    case Type.MAP:
+      expType = 'map'
+      break
+    case Type.FLOW_SEQ:
+    case Type.SEQ:
+      expType = 'seq'
+      break
+    default:
+      onError(coll.range[0], `Unexpected collection type: ${coll.type}`)
+      coll.tag = tagName
+      return coll
+  }
+
+  let tag = doc.schema.tags.find(
+    t => t.collection === expType && t.tag === tagName
+  ) as CollectionTag | undefined
   if (!tag) {
     const kt = doc.schema.knownTags[tagName]
-    if (kt) {
+    if (kt && kt.collection === expType) {
       doc.schema.tags.push(Object.assign({}, kt, { default: false }))
       tag = kt
     } else {

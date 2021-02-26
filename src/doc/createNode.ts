@@ -1,22 +1,20 @@
 import type { Alias } from '../ast/Alias.js'
 import { Node } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
-import type { YAMLMap } from '../ast/YAMLMap.js'
-import type { YAMLSeq } from '../ast/YAMLSeq.js'
 import { defaultTagPrefix } from '../constants.js'
-import type { Tag } from '../tags/types.js'
+import type { TagObj } from '../tags/types.js'
 import type { Replacer } from './Document.js'
 import type { Schema } from './Schema.js'
 
 export interface CreateNodeAliasRef {
-  node: Scalar | YAMLMap | YAMLSeq | undefined
+  node: Node | undefined
   value: unknown
 }
 
 export interface CreateNodeContext {
   keepUndefined?: boolean
   onAlias(source: CreateNodeAliasRef): Alias
-  onTagObj?: (tagObj: Tag) => void
+  onTagObj?: (tagObj: TagObj) => void
   prevObjects: Map<unknown, CreateNodeAliasRef>
   replacer?: Replacer
   schema: Schema
@@ -25,7 +23,7 @@ export interface CreateNodeContext {
 function findTagObject(
   value: unknown,
   tagName: string | undefined,
-  tags: Tag[]
+  tags: TagObj[]
 ) {
   if (tagName) {
     const match = tags.filter(t => t.tag === tagName)
@@ -56,7 +54,7 @@ export function createNode(
       value instanceof Map ? map : Symbol.iterator in Object(value) ? seq : map
   }
   if (onTagObj) {
-    onTagObj(tagObj)
+    onTagObj(tagObj as TagObj)
     delete ctx.onTagObj
   }
 
@@ -70,7 +68,7 @@ export function createNode(
     prevObjects.set(value, ref)
   }
 
-  const node = tagObj.createNode
+  const node = tagObj?.createNode
     ? tagObj.createNode(ctx.schema, value, ctx)
     : new Scalar(value)
   if (tagName) node.tag = tagName

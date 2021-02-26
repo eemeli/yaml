@@ -61,6 +61,7 @@ function createOMap(schema, iterable, ctx) {
 }
 
 export const omap = {
+  collection: 'seq',
   identify: value => value instanceof Map,
   nodeClass: YAMLOMap,
   default: false,

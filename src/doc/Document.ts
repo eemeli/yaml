@@ -21,7 +21,7 @@ import {
 } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
 import { stringify, StringifyContext } from '../stringify/stringify.js'
-import type { Tag, TagId } from '../tags/types.js'
+import type { TagId, TagObj } from '../tags/types.js'
 
 import { Anchors } from './Anchors.js'
 import { Schema, SchemaName, SchemaOptions } from './Schema.js'
@@ -36,7 +36,7 @@ export type { Anchors, Reviver }
 export interface CreateNodeOptions {
   keepUndefined?: boolean | null
 
-  onTagObj?: (tagObj: Tag) => void
+  onTagObj?: (tagObj: TagObj) => void
 
   /**
    * Filter or modify values while creating a node.
@@ -335,7 +335,7 @@ export class Document {
    */
   setSchema(
     id: Options['version'] | SchemaName | null,
-    customTags?: (TagId | Tag)[]
+    customTags?: (TagId | TagObj)[]
   ) {
     if (!id && !customTags) return
 

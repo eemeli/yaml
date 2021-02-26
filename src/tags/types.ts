@@ -22,15 +22,11 @@ export type TagId =
   | 'set'
   | 'timestamp'
 
-export interface Tag {
+interface TagBase {
   /**
    * An optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.
    */
-  createNode?: <T = unknown>(
-    schema: Schema,
-    value: T,
-    ctx: CreateNodeContext
-  ) => YAMLMap | YAMLSeq | Scalar<T>
+  createNode?: (schema: Schema, value: unknown, ctx: CreateNodeContext) => Node
 
   /**
    * If `true`, together with `test` allows for values to be stringified without
@@ -40,7 +36,8 @@ export interface Tag {
   default: boolean
 
   /**
-   * If a tag has multiple forms that should be parsed and/or stringified differently, use `format` to identify them.
+   * If a tag has multiple forms that should be parsed and/or stringified
+   * differently, use `format` to identify them.
    */
   format?: string
 
@@ -48,12 +45,7 @@ export interface Tag {
    * Used by `YAML.createNode` to detect your data type, e.g. using `typeof` or
    * `instanceof`.
    */
-  identify(value: any): boolean
-
-  /**
-   * The `Node` child class that implements this tag. Required for collections and tags that have overlapping JS representations.
-   */
-  nodeClass?: new () => any
+  identify?: (value: unknown) => boolean
 
   /**
    * Used by some tags to configure their stringification, where applicable.
@@ -61,18 +53,27 @@ export interface Tag {
   options?: object
 
   /**
+   * The identifier for your data type, with which its stringified form will be
+   * prefixed. Should either be a !-prefixed local `!tag`, or a fully qualified
+   * `tag:domain,date:foo`.
+   */
+  tag: string
+}
+
+export interface ScalarTag extends TagBase {
+  collection?: never
+  nodeClass?: never
+
+  /**
    * Turns a value into an AST node.
    * If returning a non-`Node` value, the output will be wrapped as a `Scalar`.
    */
-  resolve(
-    value: string | YAMLMap | YAMLSeq,
-    onError: (message: string) => void
-  ): Node | any
+  resolve(value: string, onError: (message: string) => void): unknown
 
   /**
-   * Optional function stringifying the AST node in the current context. If your
-   * data includes a suitable `.toString()` method, you can probably leave this
-   * undefined and use the default stringifier.
+   * Optional function stringifying a Scalar node. If your data includes a
+   * suitable `.toString()` method, you can probably leave this undefined and
+   * use the default stringifier.
    *
    * @param item The node being stringified.
    * @param ctx Contains the stringifying context variables.
@@ -82,18 +83,11 @@ export interface Tag {
    *   type with the `+` chomping indicator.
    */
   stringify?: (
-    item: Node,
+    item: Scalar,
     ctx: StringifyContext,
     onComment?: () => void,
     onChompKeep?: () => void
   ) => string
-
-  /**
-   * The identifier for your data type, with which its stringified form will be
-   * prefixed. Should either be a !-prefixed local `!tag`, or a fully qualified
-   * `tag:domain,date:foo`.
-   */
-  tag: string
 
   /**
    * Together with `default` allows for values to be stringified without an
@@ -103,3 +97,25 @@ export interface Tag {
    */
   test?: RegExp
 }
+
+export interface CollectionTag extends TagBase {
+  stringify?: never
+  test?: never
+
+  /** The source collection type supported by this tag. */
+  collection: 'map' | 'seq'
+
+  /**
+   * The `Node` child class that implements this tag.
+   * If set, used to select this tag when stringifying.
+   */
+  nodeClass?: new () => Node
+
+  /**
+   * Turns a value into an AST node.
+   * If returning a non-`Node` value, the output will be wrapped as a `Scalar`.
+   */
+  resolve(value: YAMLMap | YAMLSeq, onError: (message: string) => void): unknown
+}
+
+export type TagObj = ScalarTag | CollectionTag

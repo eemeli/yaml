@@ -1,18 +1,18 @@
-import type { SchemaId, Tag, TagId } from '../tags/types.js'
+import type { SchemaId, TagId, TagObj } from '../tags/types.js'
 import type { SchemaName } from './Schema.js'
 
 export function getSchemaTags(
-  schemas: Record<SchemaId, Tag[]>,
-  knownTags: Record<TagId, Tag>,
+  schemas: Record<SchemaId, TagObj[]>,
+  knownTags: Record<TagId, TagObj>,
   customTags:
-    | Array<TagId | Tag>
-    | ((tags: Array<TagId | Tag>) => Array<TagId | Tag>)
+    | Array<TagId | TagObj>
+    | ((tags: Array<TagId | TagObj>) => Array<TagId | TagObj>)
     | null
     | undefined,
   schemaName: SchemaName
 ) {
   const schemaId = schemaName.replace(/\W/g, '') as SchemaId // 'yaml-1.1' -> 'yaml11'
-  let tags: Array<TagId | Tag> = schemas[schemaId]
+  let tags: Array<TagId | TagObj> = schemas[schemaId]
   if (!tags) {
     const keys = Object.keys(schemas)
       .map(key => JSON.stringify(key))

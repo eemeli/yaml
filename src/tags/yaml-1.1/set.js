@@ -74,6 +74,7 @@ function createSet(schema, iterable, ctx) {
 }
 
 export const set = {
+  collection: 'map',
   identify: value => value instanceof Set,
   nodeClass: YAMLSet,
   default: false,

@@ -9,7 +9,6 @@ import { Node } from './Node.js'
 import { Scalar } from './Scalar.js'
 import { YAMLSeq } from './YAMLSeq.js'
 import { toJS, ToJSContext } from './toJS.js'
-import type { YAMLMap } from './index.js'
 
 export function createPair(
   key: unknown,
@@ -24,13 +23,6 @@ export function createPair(
 export enum PairType {
   PAIR = 'PAIR',
   MERGE_PAIR = 'MERGE_PAIR'
-}
-
-export declare namespace Pair {
-  interface Parsed extends Pair {
-    key: Scalar | YAMLMap | YAMLSeq
-    value: Scalar | YAMLMap | YAMLSeq | null
-  }
 }
 
 export class Pair<K = unknown, V = unknown> extends Node {

@@ -1,20 +1,19 @@
 import type { Pair } from '../ast/Pair.js'
 import { schemas, tags } from '../tags/index.js'
-import type { Tag, TagId } from '../tags/types.js'
+import type { CollectionTag, ScalarTag, TagId, TagObj } from '../tags/types.js'
 import { Directives } from './directives.js'
 import { getSchemaTags } from './getSchemaTags.js'
 
 export type SchemaName = 'core' | 'failsafe' | 'json' | 'yaml-1.1'
+
+type TagValue = TagId | ScalarTag | CollectionTag
 
 export interface SchemaOptions {
   /**
    * Array of additional tags to include in the schema, or a function that may
    * modify the schema's base tag array.
    */
-  customTags?:
-    | Array<TagId | Tag>
-    | ((tags: Array<TagId | Tag>) => Array<TagId | Tag>)
-    | null
+  customTags?: TagValue[] | ((tags: TagValue[]) => TagValue[]) | null
 
   directives?: Directives
 
@@ -62,11 +61,11 @@ const coreKnownTags = {
 }
 
 export class Schema {
-  knownTags: Record<string, Tag>
+  knownTags: Record<string, TagObj>
   merge: boolean
   name: SchemaName
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
-  tags: Tag[]
+  tags: Array<CollectionTag | ScalarTag>
 
   // Used by createNode(), to avoid circular dependencies
   map = tags.map

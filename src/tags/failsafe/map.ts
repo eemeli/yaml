@@ -1,10 +1,13 @@
 import { createPair } from '../../ast/Pair.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
+import type { CreateNodeContext } from '../../doc/createNode.js'
+import type { Schema } from '../../doc/Schema.js'
+import type { CollectionTag } from '../types.js'
 
-function createMap(schema, obj, ctx) {
+function createMap(schema: Schema, obj: unknown, ctx: CreateNodeContext) {
   const { keepUndefined, replacer } = ctx
   const map = new YAMLMap(schema)
-  const add = (key, value) => {
+  const add = (key: unknown, value: unknown) => {
     if (typeof replacer === 'function') value = replacer.call(obj, key, value)
     else if (Array.isArray(replacer) && !replacer.includes(key)) return
     if (value !== undefined || keepUndefined)
@@ -13,7 +16,7 @@ function createMap(schema, obj, ctx) {
   if (obj instanceof Map) {
     for (const [key, value] of obj) add(key, value)
   } else if (obj && typeof obj === 'object') {
-    for (const key of Object.keys(obj)) add(key, obj[key])
+    for (const key of Object.keys(obj)) add(key, (obj as any)[key])
   }
   if (typeof schema.sortMapEntries === 'function') {
     map.items.sort(schema.sortMapEntries)
@@ -21,7 +24,8 @@ function createMap(schema, obj, ctx) {
   return map
 }
 
-export const map = {
+export const map: CollectionTag = {
+  collection: 'map',
   createNode: createMap,
   default: true,
   nodeClass: YAMLMap,

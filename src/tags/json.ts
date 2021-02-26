@@ -4,15 +4,15 @@ import { Scalar } from '../ast/Scalar.js'
 import { map } from './failsafe/map.js'
 import { seq } from './failsafe/seq.js'
 import { intOptions } from './options.js'
+import { CollectionTag, ScalarTag } from './types.js'
 
-const intIdentify = value =>
-  typeof value === 'bigint' || Number.isInteger(value)
+function intIdentify(value: unknown): value is number | BigInt {
+  return typeof value === 'bigint' || Number.isInteger(value)
+}
 
-const stringifyJSON = ({ value }) => JSON.stringify(value)
+const stringifyJSON = ({ value }: Scalar) => JSON.stringify(value)
 
-export const json = [
-  map,
-  seq,
+const jsonScalars: ScalarTag[] = [
   {
     identify: value => typeof value === 'string',
     default: true,
@@ -53,13 +53,20 @@ export const json = [
     test: /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][-+]?[0-9]+)?$/,
     resolve: str => parseFloat(str),
     stringify: stringifyJSON
-  },
-  {
-    default: true,
-    test: /^/,
-    resolve(str, onError) {
-      onError(`Unresolved plain scalar ${JSON.stringify(str)}`)
-      return str
-    }
   }
 ]
+
+const jsonError: ScalarTag = {
+  default: true,
+  tag: '',
+  test: /^/,
+  resolve(str, onError) {
+    onError(`Unresolved plain scalar ${JSON.stringify(str)}`)
+    return str
+  }
+}
+
+export const json = ([map, seq] as Array<CollectionTag | ScalarTag>).concat(
+  jsonScalars,
+  jsonError
+)

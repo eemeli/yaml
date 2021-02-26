@@ -15,6 +15,7 @@ import { yaml11 } from './yaml-1.1/index.js'
 
 import { map } from './failsafe/map.js'
 import { seq } from './failsafe/seq.js'
+
 import { binary } from './yaml-1.1/binary.js'
 import { omap } from './yaml-1.1/omap.js'
 import { pairs } from './yaml-1.1/pairs.js'

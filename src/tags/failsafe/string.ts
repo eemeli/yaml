@@ -1,7 +1,8 @@
 import { stringifyString } from '../../stringify/stringifyString.js'
 import { strOptions } from '../options.js'
+import type { ScalarTag } from '../types.js'
 
-export const string = {
+export const string: ScalarTag = {
   identify: value => typeof value === 'string',
   default: true,
   tag: 'tag:yaml.org,2002:str',

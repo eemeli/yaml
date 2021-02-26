@@ -56,6 +56,7 @@ export function createPairs(schema, iterable, ctx) {
 }
 
 export const pairs = {
+  collection: 'seq',
   default: false,
   tag: 'tag:yaml.org,2002:pairs',
   resolve: parsePairs,
