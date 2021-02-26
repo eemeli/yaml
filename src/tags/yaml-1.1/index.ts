@@ -1,16 +1,15 @@
-/* global BigInt */
-
 import { Scalar } from '../../ast/Scalar.js'
 import { stringifyNumber } from '../../stringify/stringifyNumber.js'
 import { failsafe } from '../failsafe/index.js'
 import { boolOptions, intOptions, nullOptions } from '../options.js'
+import { ScalarTag } from '../types.js'
 import { binary } from './binary.js'
 import { omap } from './omap.js'
 import { pairs } from './pairs.js'
 import { set } from './set.js'
 import { intTime, floatTime, timestamp } from './timestamp.js'
 
-const nullObj = {
+const nullObj: ScalarTag & { test: RegExp } = {
   identify: value => value == null,
   createNode: () => new Scalar(null),
   default: true,
@@ -22,13 +21,13 @@ const nullObj = {
     source && nullObj.test.test(source) ? source : nullOptions.nullStr
 }
 
-const boolStringify = ({ value, source }) => {
+const boolStringify = ({ value, source }: Scalar) => {
   const boolObj = value ? trueObj : falseObj
   if (source && boolObj.test.test(source)) return source
   return value ? boolOptions.trueStr : boolOptions.falseStr
 }
 
-const trueObj = {
+const trueObj: ScalarTag & { test: RegExp } = {
   identify: value => value === true,
   default: true,
   tag: 'tag:yaml.org,2002:bool',
@@ -38,7 +37,7 @@ const trueObj = {
   stringify: boolStringify
 }
 
-const falseObj = {
+const falseObj: ScalarTag & { test: RegExp } = {
   identify: value => value === false,
   default: true,
   tag: 'tag:yaml.org,2002:bool',
@@ -48,10 +47,10 @@ const falseObj = {
   stringify: boolStringify
 }
 
-const intIdentify = value =>
+const intIdentify = (value: unknown): value is number | bigint =>
   typeof value === 'bigint' || Number.isInteger(value)
 
-function intResolve(str, offset, radix) {
+function intResolve(str: string, offset: number, radix: number) {
   const sign = str[0]
   if (sign === '-' || sign === '+') offset += 1
   str = str.substring(offset).replace(/_/g, '')
@@ -74,7 +73,7 @@ function intResolve(str, offset, radix) {
   return sign === '-' ? -1 * n : n
 }
 
-function intStringify(node, radix, prefix) {
+function intStringify(node: Scalar, radix: number, prefix: string) {
   const { value } = node
   if (intIdentify(value)) {
     const str = value.toString(radix)
@@ -94,7 +93,7 @@ export const yaml11 = failsafe.concat(
       tag: 'tag:yaml.org,2002:int',
       format: 'BIN',
       test: /^[-+]?0b[0-1_]+$/,
-      resolve: str => intResolve(str, 2, 2),
+      resolve: (str: string) => intResolve(str, 2, 2),
       stringify: node => intStringify(node, 2, '0b')
     },
     {
@@ -103,7 +102,7 @@ export const yaml11 = failsafe.concat(
       tag: 'tag:yaml.org,2002:int',
       format: 'OCT',
       test: /^[-+]?0[0-7_]+$/,
-      resolve: str => intResolve(str, 1, 8),
+      resolve: (str: string) => intResolve(str, 1, 8),
       stringify: node => intStringify(node, 8, '0')
     },
     {
@@ -111,7 +110,7 @@ export const yaml11 = failsafe.concat(
       default: true,
       tag: 'tag:yaml.org,2002:int',
       test: /^[-+]?[0-9][0-9_]*$/,
-      resolve: str => intResolve(str, 0, 10),
+      resolve: (str: string) => intResolve(str, 0, 10),
       stringify: stringifyNumber
     },
     {
@@ -120,7 +119,7 @@ export const yaml11 = failsafe.concat(
       tag: 'tag:yaml.org,2002:int',
       format: 'HEX',
       test: /^[-+]?0x[0-9a-fA-F_]+$/,
-      resolve: str => intResolve(str, 2, 16),
+      resolve: (str: string) => intResolve(str, 2, 16),
       stringify: node => intStringify(node, 16, '0x')
     },
     {
@@ -128,7 +127,7 @@ export const yaml11 = failsafe.concat(
       default: true,
       tag: 'tag:yaml.org,2002:float',
       test: /^[-+]?\.(?:inf|Inf|INF|nan|NaN|NAN)$/,
-      resolve: str =>
+      resolve: (str: string) =>
         str.slice(-3).toLowerCase() === 'nan'
           ? NaN
           : str[0] === '-'
@@ -142,7 +141,7 @@ export const yaml11 = failsafe.concat(
       tag: 'tag:yaml.org,2002:float',
       format: 'EXP',
       test: /^[-+]?(?:[0-9][0-9_]*)?(?:\.[0-9_]*)?[eE][-+]?[0-9]+$/,
-      resolve: str => parseFloat(str.replace(/_/g, '')),
+      resolve: (str: string) => parseFloat(str.replace(/_/g, '')),
       stringify: ({ value }) => Number(value).toExponential()
     },
     {
@@ -150,7 +149,7 @@ export const yaml11 = failsafe.concat(
       default: true,
       tag: 'tag:yaml.org,2002:float',
       test: /^[-+]?(?:[0-9][0-9_]*)?\.[0-9_]*$/,
-      resolve(str) {
+      resolve(str: string) {
         const node = new Scalar(parseFloat(str.replace(/_/g, '')))
         const dot = str.indexOf('.')
         if (dot !== -1) {

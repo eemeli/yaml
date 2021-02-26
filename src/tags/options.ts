@@ -6,7 +6,12 @@ export const binaryOptions = {
    *
    * Default: `'BLOCK_LITERAL'`
    */
-  defaultType: Type.BLOCK_LITERAL,
+  defaultType: Type.BLOCK_LITERAL as
+    | Type.BLOCK_FOLDED
+    | Type.BLOCK_LITERAL
+    | Type.PLAIN
+    | Type.QUOTE_DOUBLE
+    | Type.QUOTE_SINGLE,
 
   /**
    * Maximum line width for `!!binary`.

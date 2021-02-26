@@ -2,8 +2,9 @@ import { Pair } from '../../ast/Pair.js'
 import { Scalar } from '../../ast/Scalar.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
 import { YAMLSeq } from '../../ast/YAMLSeq.js'
-import { toJS } from '../../ast/toJS.js'
-import { createPairs, parsePairs } from './pairs.js'
+import { toJS, ToJSContext } from '../../ast/toJS.js'
+import { createPairs, resolvePairs } from './pairs.js'
+import { CollectionTag } from '../types.js'
 
 export class YAMLOMap extends YAMLSeq {
   static tag = 'tag:yaml.org,2002:omap'
@@ -19,7 +20,12 @@ export class YAMLOMap extends YAMLSeq {
   has = YAMLMap.prototype.has.bind(this)
   set = YAMLMap.prototype.set.bind(this)
 
-  toJSON(_, ctx) {
+  /**
+   * If `ctx` is given, the return type is actually `Map<unknown, unknown>`,
+   * but TypeScript won't allow widening the signature of a child method.
+   */
+  toJSON(_?: unknown, ctx?: ToJSContext) {
+    if (!ctx) return super.toJSON(_)
     const map = new Map()
     if (ctx && ctx.onCreate) ctx.onCreate(map)
     for (const pair of this.items) {
@@ -34,38 +40,36 @@ export class YAMLOMap extends YAMLSeq {
         throw new Error('Ordered maps must not include duplicate keys')
       map.set(key, value)
     }
-    return map
+    return (map as unknown) as unknown[]
   }
 }
 
-function parseOMap(seq, onError) {
-  const pairs = parsePairs(seq, onError)
-  const seenKeys = []
-  for (const { key } of pairs.items) {
-    if (key instanceof Scalar) {
-      if (seenKeys.includes(key.value)) {
-        onError(`Ordered maps must not include duplicate keys: ${key.value}`)
-      } else {
-        seenKeys.push(key.value)
-      }
-    }
-  }
-  return Object.assign(new YAMLOMap(), pairs)
-}
-
-function createOMap(schema, iterable, ctx) {
-  const pairs = createPairs(schema, iterable, ctx)
-  const omap = new YAMLOMap()
-  omap.items = pairs.items
-  return omap
-}
-
-export const omap = {
+export const omap: CollectionTag = {
   collection: 'seq',
   identify: value => value instanceof Map,
   nodeClass: YAMLOMap,
   default: false,
   tag: 'tag:yaml.org,2002:omap',
-  resolve: parseOMap,
-  createNode: createOMap
+
+  resolve(seq, onError) {
+    const pairs = resolvePairs(seq, onError)
+    const seenKeys: unknown[] = []
+    for (const { key } of pairs.items) {
+      if (key instanceof Scalar) {
+        if (seenKeys.includes(key.value)) {
+          onError(`Ordered maps must not include duplicate keys: ${key.value}`)
+        } else {
+          seenKeys.push(key.value)
+        }
+      }
+    }
+    return Object.assign(new YAMLOMap(), pairs)
+  },
+
+  createNode(schema, iterable, ctx) {
+    const pairs = createPairs(schema, iterable, ctx)
+    const omap = new YAMLOMap()
+    omap.items = pairs.items
+    return omap
+  }
 }

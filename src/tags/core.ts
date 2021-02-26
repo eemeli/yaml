@@ -1,23 +1,22 @@
-/* global BigInt */
-
 import { Scalar } from '../ast/Scalar.js'
 import { stringifyNumber } from '../stringify/stringifyNumber.js'
 import { failsafe } from './failsafe/index.js'
 import { boolOptions, intOptions, nullOptions } from './options.js'
+import { ScalarTag } from './types.js'
 
-const intIdentify = value =>
+const intIdentify = (value: unknown): value is number | bigint =>
   typeof value === 'bigint' || Number.isInteger(value)
 
-const intResolve = (src, offset, radix) =>
-  intOptions.asBigInt ? BigInt(src) : parseInt(src.substring(offset), radix)
+const intResolve = (str: string, offset: number, radix: number) =>
+  intOptions.asBigInt ? BigInt(str) : parseInt(str.substring(offset), radix)
 
-function intStringify(node, radix, prefix) {
+function intStringify(node: Scalar, radix: number, prefix: string) {
   const { value } = node
   if (intIdentify(value) && value >= 0) return prefix + value.toString(radix)
   return stringifyNumber(node)
 }
 
-export const nullObj = {
+export const nullObj: ScalarTag & { test: RegExp } = {
   identify: value => value == null,
   createNode: () => new Scalar(null),
   default: true,
@@ -29,7 +28,7 @@ export const nullObj = {
     source && nullObj.test.test(source) ? source : nullOptions.nullStr
 }
 
-export const boolObj = {
+export const boolObj: ScalarTag & { test: RegExp } = {
   identify: value => typeof value === 'boolean',
   default: true,
   tag: 'tag:yaml.org,2002:bool',
@@ -45,7 +44,7 @@ export const boolObj = {
   }
 }
 
-export const octObj = {
+export const octObj: ScalarTag = {
   identify: value => intIdentify(value) && value >= 0,
   default: true,
   tag: 'tag:yaml.org,2002:int',
@@ -56,7 +55,7 @@ export const octObj = {
   stringify: node => intStringify(node, 8, '0o')
 }
 
-export const intObj = {
+export const intObj: ScalarTag = {
   identify: intIdentify,
   default: true,
   tag: 'tag:yaml.org,2002:int',
@@ -66,7 +65,7 @@ export const intObj = {
   stringify: stringifyNumber
 }
 
-export const hexObj = {
+export const hexObj: ScalarTag = {
   identify: value => intIdentify(value) && value >= 0,
   default: true,
   tag: 'tag:yaml.org,2002:int',
@@ -77,7 +76,7 @@ export const hexObj = {
   stringify: node => intStringify(node, 16, '0x')
 }
 
-export const nanObj = {
+export const nanObj: ScalarTag = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
@@ -91,7 +90,7 @@ export const nanObj = {
   stringify: stringifyNumber
 }
 
-export const expObj = {
+export const expObj: ScalarTag = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
@@ -101,7 +100,7 @@ export const expObj = {
   stringify: ({ value }) => Number(value).toExponential()
 }
 
-export const floatObj = {
+export const floatObj: ScalarTag = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',

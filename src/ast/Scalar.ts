@@ -33,6 +33,9 @@ export class Scalar<T = unknown> extends Node {
 
   declare minFractionDigits?: number
 
+  /** Set during parsing to the source string value */
+  declare source?: string
+
   constructor(value: T) {
     super()
     this.value = value
