@@ -1,7 +1,10 @@
 export { Composer } from './compose/composer.js'
-export { CreateNodeOptions, Document } from './doc/Document.js'
-export { Options, defaultOptions, scalarOptions } from './options.js'
 
+export { CreateNodeOptions, Document } from './doc/Document.js'
+export { Schema } from './doc/Schema.js'
+
+export { Alias } from './nodes/Alias.js'
+export { Merge } from './nodes/Merge.js'
 export {
   isAlias,
   isCollection,
@@ -14,6 +17,12 @@ export {
   Node,
   ParsedNode
 } from './nodes/Node.js'
+export { Pair } from './nodes/Pair.js'
+export { Scalar } from './nodes/Scalar.js'
+export { YAMLMap } from './nodes/YAMLMap.js'
+export { YAMLSeq } from './nodes/YAMLSeq.js'
+
+export { Options, defaultOptions, scalarOptions } from './options.js'
 
 export { Lexer } from './parse/lexer.js'
 export { LineCounter } from './parse/line-counter.js'

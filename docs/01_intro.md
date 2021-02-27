@@ -52,7 +52,7 @@ const YAML = require('yaml')
 - [`YAML.visit(node, visitor)`](#modifying-nodes)
 
 ```js
-import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'
+import { Pair, YAMLMap, YAMLSeq } from 'yaml'
 ```
 
 - [`new Pair(key, value)`](#creating-nodes)

@@ -6,7 +6,6 @@ export default {
   input: {
     index: 'src/index.ts',
     'test-events': 'src/test-events.ts',
-    types: 'src/types.ts',
     util: 'src/util.ts'
   },
   output: {

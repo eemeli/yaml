@@ -175,10 +175,9 @@ The primary purpose of this method is to enable attaching comments or other meta
 <h4 style="clear:both"><code>new YAMLMap(), new YAMLSeq(), doc.createPair(key, value)</code></h4>
 
 ```js
-import YAML from 'yaml'
-import { YAMLSeq } from 'yaml/types'
+import { Document, YAMLSeq } from 'yaml'
 
-const doc = new YAML.Document(new YAMLSeq())
+const doc = new Document(new YAMLSeq())
 doc.contents.items = [
   'some values',
   42,
@@ -194,9 +193,9 @@ doc.toString()
 // - 1: a number
 ```
 
-To construct a `YAMLSeq` or `YAMLMap`, use `doc.createNode()` with array, object or iterable input, or create the collections directly by importing the classes from `yaml/types`.
+To construct a `YAMLSeq` or `YAMLMap`, use `new Document()` or `doc.createNode()` with array, object or iterable input, or create the collections directly by importing the classes from `yaml`.
 
-Once created, normal array operations may be used to modify the `items` array. New `Pair` objects may created either by importing the class from `yaml/types` and using its `new Pair(key, value)` constructor, or by using the `doc.createPair(key, value, options?)` method. The latter will recursively wrap the `key` and `value` as nodes, and accepts the same options as `doc.createNode()`
+Once created, normal array operations may be used to modify the `items` array. New `Pair` objects may created either by importing the class from `yaml` and using its `new Pair(key, value)` constructor, or by using the `doc.createPair(key, value, options?)` method. The latter will recursively wrap the `key` and `value` as nodes, and accepts the same options as `doc.createNode()`
 
 ## Modifying Nodes
 

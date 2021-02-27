@@ -98,8 +98,6 @@ YAML.stringify({ this: null, that: 'value' })
 
 Some customization options are availabe to control the parsing and stringification of scalars. Note that these values are used by all documents.
 
-These options objects are also exported individually from `'yaml/types'`.
-
 | Option             | Type      | Default value                                       | Description                                                                                                                                                                |
 | ------------------ | --------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | binary.defaultType | `Type`    | `'BLOCK_LITERAL'`                                   | The type of string literal used to stringify `!!binary` values                                                                                                             |

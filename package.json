@@ -14,7 +14,6 @@
   "files": [
     "browser/",
     "dist/",
-    "types/",
     "*.d.ts",
     "*.js",
     "*.mjs",
@@ -24,8 +23,6 @@
   "main": "./index.js",
   "browser": {
     "./index.js": "./browser/index.js",
-    "./types.js": "./browser/dist/types.js",
-    "./types.mjs": "./browser/dist/types.js",
     "./util.js": "./browser/dist/util.js",
     "./util.mjs": "./browser/dist/util.js"
   },
@@ -35,13 +32,6 @@
       "default": "./browser/index.js"
     },
     "./package.json": "./package.json",
-    "./types": {
-      "node": {
-        "import": "./types.mjs",
-        "require": "./types.js"
-      },
-      "default": "./browser/dist/types.js"
-    },
     "./util": {
       "node": {
         "import": "./util.mjs",

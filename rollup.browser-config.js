@@ -5,7 +5,6 @@ import typescript from '@rollup/plugin-typescript'
 export default {
   input: {
     index: 'src/index.ts',
-    types: 'src/types.ts',
     util: 'src/util.ts'
   },
   output: { dir: 'browser/dist', format: 'esm', preserveModules: true },
