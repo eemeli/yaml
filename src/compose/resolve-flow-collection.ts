@@ -80,7 +80,7 @@ export function resolveFlowCollection(
       case 'space':
         hasSpace = true
         break
-      case 'comment':
+      case 'comment': {
         if (doc.options.strict && !hasSpace)
           onError(
             offset,
@@ -93,6 +93,7 @@ export function resolveFlowCollection(
         hasComment = true
         newlines = ''
         break
+      }
       case 'newline':
         if (atLineStart && !hasComment) spaceBefore = true
         if (atValueEnd) {

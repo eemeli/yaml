@@ -53,7 +53,7 @@ interface TagBase {
   /**
    * Used by some tags to configure their stringification, where applicable.
    */
-  options?: object
+  options?: Record<string, unknown>
 
   /**
    * The identifier for your data type, with which its stringified form will be

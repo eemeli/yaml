@@ -436,8 +436,8 @@ export class Lexer {
           this.pushSpaces(true)
           return 'flow'
         }
-        // fallthrough
       }
+      // fallthrough
       default:
         this.flowKey = false
         return this.parsePlainScalar()

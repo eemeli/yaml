@@ -1,4 +1,4 @@
-import { Type } from '../constants.js'
+import type { Type } from '../constants.js'
 import { NodeBase, NODE_TYPE, SCALAR } from './Node.js'
 import { toJS, ToJSContext } from './toJS.js'
 

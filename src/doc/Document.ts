@@ -96,7 +96,7 @@ export class Document {
 
   directives: Directives
 
-  directivesEndMarker: boolean = false
+  directivesEndMarker = false
 
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []

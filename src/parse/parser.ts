@@ -110,7 +110,7 @@ function getFirstKeyStartProps(prev: SourceToken[]) {
         break loop
     }
   }
-  while (prev[++i]?.type === 'space') {}
+  while (prev[++i]?.type === 'space') { /* loop */ }
   return prev.splice(i, prev.length)
 }
 
@@ -587,7 +587,10 @@ export class Parser {
 
         default: {
           const bv = this.startBlockValue(map)
-          if (bv) return this.stack.push(bv)
+          if (bv) {
+            this.stack.push(bv)
+            return
+          }
         }
       }
     }
@@ -677,7 +680,7 @@ export class Parser {
       const parent = this.peek(2)
       if (
         parent.type === 'block-map' &&
-        (this.type == 'map-value-ind' ||
+        (this.type === 'map-value-ind' ||
           (this.type === 'newline' &&
             !parent.items[parent.items.length - 1].sep))
       ) {

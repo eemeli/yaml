@@ -18,7 +18,7 @@ export function testEvents(src: string, options?: Options) {
       let root = doc.contents
       if (Array.isArray(root)) root = root[0]
       const [rootStart, rootEnd] = doc.range || [0, 0]
-      let error = doc.errors[0]
+      const error = doc.errors[0]
       if (error && (!error.offset || error.offset < rootStart))
         throw new Error()
       let docStart = '+DOC'
