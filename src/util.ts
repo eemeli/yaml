@@ -1,4 +1,5 @@
-export { findPair, toJS } from './ast/index.js'
+export { findPair } from './ast/YAMLMap.js'
+export { toJS, ToJSContext } from './ast/toJS.js'
 export { stringifyNumber } from './stringify/stringifyNumber.js'
 export { stringifyString } from './stringify/stringifyString.js'
 export { Type } from './constants.js'

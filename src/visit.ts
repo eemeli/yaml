@@ -1,4 +1,4 @@
-import type { Alias, Pair, Scalar, YAMLMap, YAMLSeq } from './ast/index.js'
+import type { Alias } from './ast/Alias.js'
 import {
   isAlias,
   isCollection,
@@ -10,6 +10,10 @@ import {
   isSeq,
   Node
 } from './ast/Node.js'
+import type { Pair } from './ast/Pair.js'
+import type { Scalar } from './ast/Scalar.js'
+import type { YAMLMap } from './ast/YAMLMap.js'
+import type { YAMLSeq } from './ast/YAMLSeq.js'
 import type { Document } from './doc/Document.js'
 
 const BREAK = Symbol('break visit')

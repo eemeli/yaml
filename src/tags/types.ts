@@ -1,4 +1,7 @@
-import type { Node, Scalar, YAMLMap, YAMLSeq } from '../ast/index.js'
+import type { Node } from '../ast/Node.js'
+import type { Scalar } from '../ast/Scalar.js'
+import type { YAMLMap } from '../ast/YAMLMap.js'
+import type { YAMLSeq } from '../ast/YAMLSeq.js'
 import type { CreateNodeContext } from '../doc/createNode.js'
 import type { Schema } from '../doc/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'

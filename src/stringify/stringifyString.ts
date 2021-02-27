@@ -1,4 +1,4 @@
-import type { Scalar } from '../ast/index.js'
+import type { Scalar } from '../ast/Scalar.js'
 import { Type } from '../constants.js'
 import { strOptions } from '../tags/options.js'
 import { addCommentBefore } from './addComment.js'

@@ -1,11 +1,5 @@
 import { Alias } from '../ast/Alias.js'
-import {
-  collectionFromPath,
-  isEmptyPath,
-  toJS,
-  ToJSContext
-} from '../ast/index.js'
-import { ToJSAnchorValue } from '../ast/toJS.js'
+import { collectionFromPath, isEmptyPath } from '../ast/Collection.js'
 import {
   DOC,
   isCollection,
@@ -16,6 +10,7 @@ import {
   ParsedNode
 } from '../ast/Node.js'
 import { Pair } from '../ast/Pair.js'
+import { toJS, ToJSAnchorValue, ToJSContext } from '../ast/toJS.js'
 import type { YAMLMap } from '../ast/YAMLMap.js'
 import type { YAMLSeq } from '../ast/YAMLSeq.js'
 import { Type } from '../constants.js'
@@ -29,7 +24,6 @@ import {
 import { addComment } from '../stringify/addComment.js'
 import { stringify, StringifyContext } from '../stringify/stringify.js'
 import type { TagId, TagObj } from '../tags/types.js'
-
 import { Anchors } from './Anchors.js'
 import { Schema, SchemaName, SchemaOptions } from './Schema.js'
 import { Reviver, applyReviver } from './applyReviver.js'

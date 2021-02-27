@@ -1,7 +1,6 @@
 import { Alias } from '../ast/Alias.js'
-import type { ParsedNode } from '../ast/index.js'
 import { Merge } from '../ast/Merge.js'
-import { isAlias, isMap, isScalar } from '../ast/Node.js'
+import { isAlias, isMap, isScalar, ParsedNode } from '../ast/Node.js'
 import type { Pair } from '../ast/Pair.js'
 import type { Scalar } from '../ast/Scalar.js'
 

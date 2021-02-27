@@ -1,5 +1,5 @@
 import { Alias } from '../ast/Alias.js'
-import type { Node, ParsedNode } from '../ast/index.js'
+import type { Node, ParsedNode } from '../ast/Node.js'
 import type { Document } from '../doc/Document.js'
 import type { FlowScalar, Token } from '../parse/tokens.js'
 import { composeCollection } from './compose-collection.js'

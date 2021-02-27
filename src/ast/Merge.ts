@@ -1,5 +1,5 @@
 import { StringifyContext } from '../stringify/stringify.js'
-import type { Alias } from './index.js'
+import type { Alias } from './Alias.js'
 import { isMap, isNode, isPair, isSeq } from './Node.js'
 import { Pair, PairType } from './Pair.js'
 import { Scalar } from './Scalar.js'

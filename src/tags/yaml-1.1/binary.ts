@@ -1,6 +1,6 @@
 /* global atob, btoa, Buffer */
 
-import type { Scalar } from '../../ast/index.js'
+import type { Scalar } from '../../ast/Scalar.js'
 import { Type } from '../../constants.js'
 import { stringifyString } from '../../stringify/stringifyString.js'
 import { binaryOptions as options } from '../options.js'
