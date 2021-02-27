@@ -20,7 +20,7 @@
     "!*config.js"
   ],
   "type": "commonjs",
-  "main": "./index.js",
+  "main": "./dist/index.js",
   "browser": {
     "./index.js": "./browser/index.js",
     "./util.js": "./browser/dist/util.js",
@@ -28,15 +28,12 @@
   },
   "exports": {
     ".": {
-      "node": "./index.js",
+      "node": "./dist/index.js",
       "default": "./browser/index.js"
     },
     "./package.json": "./package.json",
     "./util": {
-      "node": {
-        "import": "./util.mjs",
-        "require": "./util.js"
-      },
+      "node": "./dist/util.js",
       "default": "./browser/dist/util.js"
     }
   },
