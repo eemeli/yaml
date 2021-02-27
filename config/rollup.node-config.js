@@ -17,6 +17,7 @@ export default {
   plugins: [
     babel({
       babelHelpers: 'bundled',
+      configFile: './config/babel.config.js',
       presets: [['@babel/env', { modules: false, targets: { node: '10.0' } }]]
     }),
     typescript(),

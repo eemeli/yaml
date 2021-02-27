@@ -13,11 +13,7 @@
   "homepage": "https://eemeli.org/yaml/",
   "files": [
     "browser/",
-    "dist/",
-    "*.d.ts",
-    "*.js",
-    "*.mjs",
-    "!*config.js"
+    "dist/"
   ],
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -39,16 +35,16 @@
   },
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
-    "build:browser": "rollup -c rollup.browser-config.js",
-    "build:node": "rollup -c rollup.node-config.js",
+    "build:browser": "rollup -c config/rollup.browser-config.js",
+    "build:node": "rollup -c config/rollup.node-config.js",
     "clean": "git clean -fdxe node_modules",
     "lint": "eslint src/",
     "prettier": "prettier --write .",
     "prestart": "npm run build:node",
     "start": "node -i -e 'YAML=require(\"./dist/index.js\")'",
-    "test": "jest",
+    "test": "jest --config config/jest.config.js",
     "test:browsers": "cd playground && npm test",
-    "test:dist": "npm run build:node && jest",
+    "test:dist": "npm run build:node && jest --config config/jest.config.js",
     "test:types": "tsc --noEmit",
     "docs:install": "cd docs-slate && bundle install",
     "docs:deploy": "cd docs-slate && ./deploy.sh",

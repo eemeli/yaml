@@ -9,10 +9,7 @@ switch (process.env.npm_lifecycle_event) {
       '^yaml/util$': '<rootDir>/dist/util.js',
       '^yaml/test-events$': '<rootDir>/dist/test-events.js'
     }
-    testPathIgnorePatterns.push(
-      'doc/createNode',
-      'doc/types'
-    )
+    testPathIgnorePatterns.push('doc/createNode', 'doc/types')
     break
 
   case 'test':
@@ -29,8 +26,14 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.{js,ts}', '!src/**/*.d.ts'],
   moduleNameMapper,
   resolver: 'jest-ts-webcompat-resolver',
+  rootDir: '..',
   testEnvironment: 'node',
   testMatch: ['**/tests/**/*.{js,ts}'],
   testPathIgnorePatterns,
-  transform: { '/(src|tests)/.*\\.(js|ts)$': 'babel-jest' }
+  transform: {
+    '/(src|tests)/.*\\.(js|ts)$': [
+      'babel-jest',
+      { configFile: './config/babel.config.js' }
+    ]
+  }
 }
