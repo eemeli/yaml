@@ -1,4 +1,4 @@
-import { Alias, Pair, Scalar, YAMLMap, YAMLSeq } from '../dist/types.js'
+import { Alias, Pair, Scalar, YAMLMap, YAMLSeq } from '../types.js'
 import {
   Document,
   isAlias,

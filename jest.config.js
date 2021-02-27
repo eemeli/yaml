@@ -21,10 +21,10 @@ switch (process.env.npm_lifecycle_event) {
   default:
     process.env.TRACE_LEVEL = 'log'
     moduleNameMapper = {
-      '^\\./dist$': '<rootDir>/src/index.js',
-      '^\\./dist/types(\\.js)?$': '<rootDir>/src/types.js',
+      '^\\./dist$': '<rootDir>/src/index.ts',
+      '^\\./dist/types(\\.js)?$': '<rootDir>/src/types.ts',
       '^\\./dist/(.+)$': '<rootDir>/src/$1',
-      '^\\.\\./dist/test-events.js$': '<rootDir>/src/test-events.js'
+      '^\\.\\./dist/test-events.js$': '<rootDir>/src/test-events.ts'
     }
 }
 
