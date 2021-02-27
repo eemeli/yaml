@@ -10,9 +10,11 @@ export interface StringifyContext {
   forceBlockIndent?: boolean
   implicitKey?: boolean
   indent: string
+  indentSeq: boolean
   indentStep: string
   indentAtStart?: number
   inFlow?: boolean
+  simpleKeys: boolean
   stringify: typeof stringify
   [key: string]: unknown
 }

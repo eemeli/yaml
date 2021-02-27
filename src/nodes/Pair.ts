@@ -116,7 +116,15 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
     onChompKeep?: () => void
   ) {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
-    const { indent: indentSize, indentSeq, simpleKeys } = ctx.doc.options
+    const {
+      allNullValues,
+      doc,
+      indent,
+      indentSeq,
+      indentStep,
+      simpleKeys,
+      stringify
+    } = ctx
     let { key, value }: { key: K; value: V | Node | null } = this
     let keyComment = (isNode(key) && key.comment) || null
     if (simpleKeys) {
@@ -136,7 +144,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
         (isScalar(key)
           ? key.type === Type.BLOCK_FOLDED || key.type === Type.BLOCK_LITERAL
           : typeof key === 'object'))
-    const { allNullValues, doc, indent, indentStep, stringify } = ctx
+
     ctx = Object.assign({}, ctx, {
       allNullValues: false,
       implicitKey: !explicitKey && (simpleKeys || !allNullValues),
@@ -149,6 +157,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
       () => (keyComment = null),
       () => (chompKeep = true)
     )
+
     if (!explicitKey && !ctx.inFlow && str.length > 1024) {
       if (simpleKeys)
         throw new Error(
@@ -199,7 +208,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
     chompKeep = false
     if (
       !indentSeq &&
-      indentSize >= 2 &&
+      indentStep.length >= 2 &&
       !ctx.inFlow &&
       !explicitKey &&
       isSeq(value) &&
@@ -240,9 +249,11 @@ function stringifyKey(
       anchors: Object.create(null),
       doc: ctx.doc,
       indent: '',
+      indentSeq: false,
       indentStep: ctx.indentStep,
       inFlow: true,
       inStringifyKey: true,
+      simpleKeys: false,
       stringify: ctx.stringify
     })
     if (!ctx.mapKeyWarned) {

@@ -55,9 +55,53 @@ export interface CreateNodeOptions {
 export interface ToJSOptions {
   json?: boolean
   jsonArg?: string | null
+
+  /**
+   * Use Map rather than Object to represent mappings.
+   *
+   * Default: `false`
+   */
   mapAsMap?: boolean
+
+  /**
+   * If defined, called with the resolved `value` and reference `count` for
+   * each anchor in the document.
+   */
   onAnchor?: (value: unknown, count: number) => void
+
+  /**
+   * Optional function that may filter or modify the output JS value
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#using_the_reviver_parameter
+   */
   reviver?: Reviver
+
+  [key: string]: unknown
+}
+
+export interface ToStringOptions {
+  /**
+   * The number of spaces to use when indenting code.
+   *
+   * Default: `2`
+   */
+  indent?: number
+
+  /**
+   * Whether block sequences should be indented.
+   *
+   * Default: `true`
+   */
+  indentSeq?: boolean
+
+  /**
+   * Require keys to be scalars and to use implicit rather than explicit notation.
+   *
+   * Default: `false`
+   */
+  simpleKeys?: boolean
+
+  [key: string]: unknown
 }
 
 export declare namespace Document {
@@ -100,7 +144,7 @@ export class Document<T = unknown> {
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []
 
-  options: Required<DocumentOptions> & SchemaOptions
+  options: Required<DocumentOptions & ToStringOptions> & SchemaOptions
 
   /** The schema used with the document. Use `setSchema()` to change. */
   schema: Schema
@@ -374,15 +418,7 @@ export class Document<T = unknown> {
     }
   }
 
-  /**
-   * A plain JavaScript representation of the document `contents`.
-   *
-   * @param mapAsMap - Use Map rather than Object to represent mappings.
-   *   Overrides values set in Document or global options.
-   * @param onAnchor - If defined, called with the resolved `value` and
-   *   reference `count` for each anchor in the document.
-   * @param reviver - A function that may filter or modify the output JS value
-   */
+  /** A plain JavaScript representation of the document `contents`. */
   toJS({ json, jsonArg, mapAsMap, onAnchor, reviver }: ToJSOptions = {}) {
     const anchorNodes = Object.values(this.anchors.map).map(
       node =>
@@ -422,10 +458,10 @@ export class Document<T = unknown> {
   }
 
   /** A YAML representation of the document. */
-  toString() {
+  toString({ indent, indentSeq, simpleKeys }: ToStringOptions = {}) {
     if (this.errors.length > 0)
       throw new Error('Document with errors cannot be stringified')
-    const indentSize = this.options.indent
+    const indentSize = indent ?? this.options.indent
     if (!Number.isInteger(indentSize) || indentSize <= 0) {
       const s = JSON.stringify(indentSize)
       throw new Error(`"indent" option must be a positive integer, not ${s}`)
@@ -446,7 +482,9 @@ export class Document<T = unknown> {
       anchors: Object.create(null),
       doc: this,
       indent: '',
+      indentSeq: indentSeq ?? this.options.indentSeq,
       indentStep: ' '.repeat(indentSize),
+      simpleKeys: simpleKeys ?? this.options.simpleKeys,
       stringify // Requiring directly in nodes would create circular dependencies
     }
     let chompKeep = false

@@ -1,4 +1,5 @@
 import { LogLevelId, defaultTagPrefix } from './constants.js'
+import { ToStringOptions } from './doc/Document.js'
 import type { SchemaOptions } from './doc/Schema.js'
 import type { LineCounter } from './parse/line-counter.js'
 import {
@@ -16,18 +17,7 @@ export interface DocumentOptions {
    * Default: `'a'`, resulting in anchors `a1`, `a2`, etc.
    */
   anchorPrefix?: string
-  /**
-   * The number of spaces to use when indenting code.
-   *
-   * Default: `2`
-   */
-  indent?: number
-  /**
-   * Whether block sequences should be indented.
-   *
-   * Default: `true`
-   */
-  indentSeq?: boolean
+
   /**
    * Include references in the AST to each node's corresponding CST node.
    *
@@ -80,12 +70,7 @@ export interface DocumentOptions {
    * Default: `true`
    */
   prettyErrors?: boolean
-  /**
-   * When stringifying, require keys to be scalars and to use implicit rather than explicit notation.
-   *
-   * Default: `false`
-   */
-  simpleKeys?: boolean
+
   /**
    * When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.
    *
@@ -100,7 +85,7 @@ export interface DocumentOptions {
   version?: '1.1' | '1.2'
 }
 
-export type Options = DocumentOptions & SchemaOptions
+export type Options = DocumentOptions & SchemaOptions & ToStringOptions
 
 /**
  * `yaml` defines document-specific options in three places: as an argument of
@@ -109,7 +94,7 @@ export type Options = DocumentOptions & SchemaOptions
  * `YAML.defaultOptions` override version-dependent defaults, and argument
  * options override both.
  */
-export const defaultOptions: Required<DocumentOptions> = {
+export const defaultOptions: Required<DocumentOptions & ToStringOptions> = {
   anchorPrefix: 'a',
   indent: 2,
   indentSeq: true,
