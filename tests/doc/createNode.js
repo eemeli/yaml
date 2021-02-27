@@ -1,13 +1,9 @@
-import * as YAML from '../../src/index.js'
-import { PairType } from '../../src/nodes/Pair.js'
-import { Scalar } from '../../src/nodes/Scalar.js'
-import { YAMLMap } from '../../src/nodes/YAMLMap.js'
-import { YAMLSeq } from '../../src/nodes/YAMLSeq.js'
+import { Document, PairType, Scalar, YAMLMap, YAMLSeq } from 'yaml'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
 let doc
 beforeEach(() => {
-  doc = new YAML.Document()
+  doc = new Document()
 })
 
 describe('createNode(value)', () => {
@@ -77,7 +73,7 @@ describe('arrays', () => {
     })
     test('set doc contents', () => {
       const res = '- 3\n- - four\n  - 5\n'
-      const doc = new YAML.Document(array)
+      const doc = new Document(array)
       expect(String(doc)).toBe(res)
       doc.contents = array
       expect(String(doc)).toBe(res)
@@ -142,7 +138,7 @@ y:
 z:
   w: five
   v: 6\n`
-      const doc = new YAML.Document(object)
+      const doc = new Document(object)
       expect(String(doc)).toBe(res)
       doc.contents = object
       expect(String(doc)).toBe(res)
@@ -177,7 +173,7 @@ describe('Set', () => {
     })
     test('set doc contents', () => {
       const res = '- 3\n- - four\n  - 5\n'
-      const doc = new YAML.Document(set)
+      const doc = new Document(set)
       expect(String(doc)).toBe(res)
       doc.contents = set
       expect(String(doc)).toBe(res)
@@ -185,7 +181,7 @@ describe('Set', () => {
       expect(String(doc)).toBe(res)
     })
     test('Schema#createNode() - YAML 1.2', () => {
-      const doc = new YAML.Document(null)
+      const doc = new Document(null)
       const s = doc.createNode(set)
       expect(s).toBeInstanceOf(YAMLSeq)
       expect(s.items).toMatchObject([
@@ -194,7 +190,7 @@ describe('Set', () => {
       ])
     })
     test('Schema#createNode() - YAML 1.1', () => {
-      const doc = new YAML.Document(null, { version: '1.1' })
+      const doc = new Document(null, { version: '1.1' })
       const s = doc.createNode(set)
       expect(s).toBeInstanceOf(YAMLSet)
       expect(s.items).toMatchObject([
@@ -255,7 +251,7 @@ y:
 ? w: five
   v: 6
 : z\n`
-      const doc = new YAML.Document(map)
+      const doc = new Document(map)
       expect(String(doc)).toBe(res)
       doc.contents = map
       expect(String(doc)).toBe(res)
@@ -277,7 +273,7 @@ describe('circular references', () => {
   test('parent at root', () => {
     const map = { foo: 'bar' }
     map.map = map
-    const doc = new YAML.Document(null)
+    const doc = new Document(null)
     expect(doc.createNode(map)).toMatchObject({
       items: [
         { key: { value: 'foo' }, value: { value: 'bar' } },
@@ -301,7 +297,7 @@ describe('circular references', () => {
     const baz = {}
     const map = { foo: { bar: { baz } } }
     baz.map = map
-    const doc = new YAML.Document(null)
+    const doc = new Document(null)
     const node = doc.createNode(map)
     expect(node.getIn(['foo', 'bar', 'baz', 'map'])).toMatchObject({
       type: 'ALIAS',
@@ -316,7 +312,7 @@ describe('circular references', () => {
     const one = ['one']
     const two = ['two']
     const seq = [one, two, one, one, two]
-    const doc = new YAML.Document(null)
+    const doc = new Document(null)
     expect(doc.createNode(seq)).toMatchObject({
       items: [
         { items: [{ value: 'one' }] },
@@ -335,7 +331,7 @@ describe('circular references', () => {
   test('further relatives', () => {
     const baz = { a: 1 }
     const seq = [{ foo: { bar: { baz } } }, { fe: { fi: { fo: { baz } } } }]
-    const doc = new YAML.Document(null)
+    const doc = new Document(null)
     const node = doc.createNode(seq)
     const source = node.getIn([0, 'foo', 'bar', 'baz'])
     const alias = node.getIn([1, 'fe', 'fi', 'fo', 'baz'])

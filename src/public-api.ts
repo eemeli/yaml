@@ -47,7 +47,7 @@ export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
 export function parseDocument<T extends ParsedNode = ParsedNode>(
   source: string,
   options?: Options
-): Document.Parsed<T> | null {
+) {
   let doc: Document.Parsed<T> | null = null
   const composer = new Composer(_doc => {
     if (!doc) doc = _doc as Document.Parsed<T>
@@ -60,7 +60,8 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
   const parser = new Parser(composer.next, options?.lineCounter?.addNewLine)
   parser.parse(source)
   composer.end(true, source.length)
-  return doc
+  // `doc` is always set by compose.end(true) at the very latest
+  return (doc as unknown) as Document.Parsed<T>
 }
 
 /**

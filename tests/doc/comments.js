@@ -1,6 +1,5 @@
 import { source } from 'common-tags'
-import * as YAML from '../../index.js'
-import { Pair } from '../../types.js'
+import * as YAML from 'yaml'
 
 describe('parse comments', () => {
   describe('body', () => {
@@ -858,20 +857,20 @@ a:
 describe('Pair.commentBefore', () => {
   test('Should get key comment', () => {
     const key = new YAML.Document().createNode('foo')
-    const pair = new Pair(key, 42)
+    const pair = new YAML.Pair(key, 42)
     key.commentBefore = 'cc'
     expect(pair.commentBefore).toBe('cc')
   })
 
   test('Should set key comment', () => {
     const key = new YAML.Document().createNode('foo')
-    const pair = new Pair(key, 42)
+    const pair = new YAML.Pair(key, 42)
     pair.commentBefore = 'cc'
     expect(key.commentBefore).toBe('cc')
   })
 
   test('Should create a key from a null value', () => {
-    const pair = new Pair(null, 42)
+    const pair = new YAML.Pair(null, 42)
     expect(pair.key).toBeNull()
     pair.commentBefore = 'cc'
     expect(pair.key).not.toBeNull()
@@ -879,7 +878,7 @@ describe('Pair.commentBefore', () => {
   })
 
   test('Should throw for non-Node key', () => {
-    const pair = new Pair({ foo: 'bar' }, 42)
+    const pair = new YAML.Pair({ foo: 'bar' }, 42)
     expect(() => {
       pair.commentBefore = 'cc'
     }).toThrow(/commentBefore is an alias/)

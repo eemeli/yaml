@@ -1,5 +1,5 @@
 import * as fc from 'fast-check'
-import { parse, stringify } from '../index.js'
+import { parse, stringify } from 'yaml'
 
 describe('properties', () => {
   test('parse stringified object', () => {

@@ -1,4 +1,4 @@
-import { LineCounter, parseDocument } from '../index.js'
+import { LineCounter, parseDocument } from 'yaml'
 
 test('Parse error, no newlines', () => {
   const lineCounter = new LineCounter()

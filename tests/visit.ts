@@ -1,4 +1,4 @@
-import { Document, parseDocument, visit } from '../index.js'
+import { Document, Pair, ParsedNode, parseDocument, Scalar, visit } from 'yaml'
 
 test('Map', () => {
   const doc = parseDocument('{ one: 1, two }')
@@ -57,7 +57,7 @@ test('Seq in Map', () => {
 test('Visit called with non-Document root', () => {
   const doc = parseDocument('foo:\n  - "one"\n  - \'two\'\n')
   const fn = jest.fn()
-  visit(doc.get('foo'), fn)
+  visit(doc.get('foo') as Scalar, fn)
   expect(fn.mock.calls).toMatchObject([
     [null, { type: 'SEQ' }, []],
     [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [{ type: 'SEQ' }]],
@@ -107,7 +107,8 @@ test('Change key value within Pair', () => {
   const doc = parseDocument('foo:\n  - "one"\n  - \'two\'\n')
   visit(doc, {
     Pair(_, pair) {
-      if (pair.key.value === 'foo') pair.key.value = 'bar'
+      const sc = pair.key as Scalar
+      if (sc.value === 'foo') sc.value = 'bar'
     }
   })
   expect(String(doc)).toBe('bar:\n  - "one"\n  - \'two\'\n')

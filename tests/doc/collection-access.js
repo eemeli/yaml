@@ -1,10 +1,9 @@
-import * as YAML from '../../index.js'
-import { Pair } from '../../types.js'
+import { Document, parseDocument, Pair } from 'yaml'
 
 describe('Map', () => {
   let doc, map
   beforeEach(() => {
-    doc = new YAML.Document({ a: 1, b: { c: 3, d: 4 } })
+    doc = new Document({ a: 1, b: { c: 3, d: 4 } })
     map = doc.contents
     expect(map.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
@@ -88,7 +87,7 @@ describe('Map', () => {
   })
 
   test('set scalar node with anchor', () => {
-    doc = YAML.parseDocument('a: &A value\nb: *A\n')
+    doc = parseDocument('a: &A value\nb: *A\n')
     doc.set('a', 'foo')
     expect(doc.get('a', true)).toMatchObject({ value: 'foo' })
     expect(String(doc)).toBe('a: &A foo\nb: *A\n')
@@ -98,7 +97,7 @@ describe('Map', () => {
 describe('Seq', () => {
   let doc, seq
   beforeEach(() => {
-    doc = new YAML.Document([1, [2, 3]])
+    doc = new Document([1, [2, 3]])
     seq = doc.contents
     expect(seq.items).toMatchObject([
       { value: 1 },
@@ -180,7 +179,7 @@ describe('Seq', () => {
 describe('Set', () => {
   let doc, set
   beforeEach(() => {
-    doc = new YAML.Document(null, { version: '1.1' })
+    doc = new Document(null, { version: '1.1' })
     set = doc.createNode([1, 2, 3], { tag: '!!set' })
     doc.contents = set
     expect(set.items).toMatchObject([
@@ -228,7 +227,7 @@ describe('Set', () => {
 describe('OMap', () => {
   let doc, omap
   beforeEach(() => {
-    doc = new YAML.Document(null, { version: '1.1' })
+    doc = new Document(null, { version: '1.1' })
     omap = doc.createNode([{ a: 1 }, { b: { c: 3, d: 4 } }], { tag: '!!omap' })
     doc.contents = omap
     expect(omap.items).toMatchObject([
@@ -291,7 +290,7 @@ describe('OMap', () => {
 describe('Collection', () => {
   let doc, map
   beforeEach(() => {
-    doc = new YAML.Document({ a: 1, b: [2, 3] })
+    doc = new Document({ a: 1, b: [2, 3] })
     map = doc.contents
   })
 
@@ -359,7 +358,7 @@ describe('Collection', () => {
 describe('Document', () => {
   let doc
   beforeEach(() => {
-    doc = new YAML.Document({ a: 1, b: [2, 3] })
+    doc = new Document({ a: 1, b: [2, 3] })
     expect(doc.contents.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
@@ -512,7 +511,7 @@ describe('Document', () => {
   })
 
   test('setIn on parsed document', () => {
-    doc = YAML.parseDocument('{ a: 1, b: [2, 3] }')
+    doc = parseDocument('{ a: 1, b: [2, 3] }')
     doc.setIn(['c', 1], 9)
     expect(String(doc)).toBe('{ a: 1, b: [ 2, 3 ], c: [ null, 9 ] }\n')
   })

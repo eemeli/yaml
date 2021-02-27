@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import * as YAML from '../../index.js'
+import * as YAML from 'yaml'
 
 describe('scalars', () => {
   test('empty block scalar at end of document', () => {

@@ -4,15 +4,13 @@ const testPathIgnorePatterns = ['tests/_import', 'cst/common']
 // The npm script name is significant.
 switch (process.env.npm_lifecycle_event) {
   case 'test:dist':
-    moduleNameMapper = {}
+    moduleNameMapper = {
+      '^yaml$': '<rootDir>/dist/index.js',
+      '^yaml/util$': '<rootDir>/dist/util.js',
+      '^yaml/test-events$': '<rootDir>/dist/test-events.js'
+    }
     testPathIgnorePatterns.push(
-      'cst/Node',
-      'cst/set-value',
-      'cst/source-utils',
-      'cst/YAML-1.2',
       'doc/createNode',
-      'doc/errors',
-      'doc/foldFlowLines',
       'doc/types'
     )
     break
@@ -21,10 +19,9 @@ switch (process.env.npm_lifecycle_event) {
   default:
     process.env.TRACE_LEVEL = 'log'
     moduleNameMapper = {
-      '^\\./dist$': '<rootDir>/src/index.ts',
-      '^\\./dist/types(\\.js)?$': '<rootDir>/src/types.ts',
-      '^\\./dist/(.+)$': '<rootDir>/src/$1',
-      '^\\.\\./dist/test-events.js$': '<rootDir>/src/test-events.ts'
+      '^yaml$': '<rootDir>/src/index.ts',
+      '^yaml/util$': '<rootDir>/src/util.ts',
+      '^yaml/test-events$': '<rootDir>/src/test-events.ts'
     }
 }
 

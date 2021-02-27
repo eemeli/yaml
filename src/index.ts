@@ -20,7 +20,7 @@ export {
   Node,
   ParsedNode
 } from './nodes/Node.js'
-export { Pair } from './nodes/Pair.js'
+export { Pair, PairType } from './nodes/Pair.js'
 export { Scalar } from './nodes/Scalar.js'
 export { YAMLMap } from './nodes/YAMLMap.js'
 export { YAMLSeq } from './nodes/YAMLSeq.js'
