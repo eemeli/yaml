@@ -1,4 +1,4 @@
-import type { Scalar } from '../ast/Scalar.js'
+import type { Scalar } from '../nodes/Scalar.js'
 
 export function stringifyNumber({
   format,

@@ -1,4 +1,4 @@
-import { Scalar } from '../../ast/Scalar.js'
+import { Scalar } from '../../nodes/Scalar.js'
 import { stringifyNumber } from '../../stringify/stringifyNumber.js'
 import { failsafe } from '../failsafe/index.js'
 import { boolOptions, intOptions, nullOptions } from '../options.js'

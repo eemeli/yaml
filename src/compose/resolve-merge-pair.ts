@@ -1,8 +1,8 @@
-import { Alias } from '../ast/Alias.js'
-import { Merge } from '../ast/Merge.js'
-import { isAlias, isMap, isScalar, ParsedNode } from '../ast/Node.js'
-import type { Pair } from '../ast/Pair.js'
-import type { Scalar } from '../ast/Scalar.js'
+import { Alias } from '../nodes/Alias.js'
+import { Merge } from '../nodes/Merge.js'
+import { isAlias, isMap, isScalar, ParsedNode } from '../nodes/Node.js'
+import type { Pair } from '../nodes/Pair.js'
+import type { Scalar } from '../nodes/Scalar.js'
 
 export function resolveMergePair(
   pair: Pair,

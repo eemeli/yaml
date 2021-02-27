@@ -1,7 +1,7 @@
-import { isCollection } from '../ast/Node.js'
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { YAMLParseError, YAMLWarning } from '../errors.js'
+import { isCollection } from '../nodes/Node.js'
 import { defaultOptions, Options } from '../options.js'
 import type { Token } from '../parse/tokens.js'
 import { composeDoc } from './compose-doc.js'

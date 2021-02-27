@@ -1,9 +1,9 @@
-import { isNode, ParsedNode } from '../ast/Node.js'
-import { Scalar } from '../ast/Scalar.js'
-import type { YAMLMap } from '../ast/YAMLMap.js'
-import type { YAMLSeq } from '../ast/YAMLSeq.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
+import { isNode, ParsedNode } from '../nodes/Node.js'
+import { Scalar } from '../nodes/Scalar.js'
+import type { YAMLMap } from '../nodes/YAMLMap.js'
+import type { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type {
   BlockMap,
   BlockSequence,

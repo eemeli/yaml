@@ -1,9 +1,9 @@
-import { isMap, isPair, isSeq } from '../../ast/Node.js'
-import { createPair, Pair } from '../../ast/Pair.js'
-import { YAMLMap } from '../../ast/YAMLMap.js'
-import { YAMLSeq } from '../../ast/YAMLSeq.js'
 import type { CreateNodeContext } from '../../doc/createNode.js'
 import type { Schema } from '../../doc/Schema.js'
+import { isMap, isPair, isSeq } from '../../nodes/Node.js'
+import { createPair, Pair } from '../../nodes/Pair.js'
+import { YAMLMap } from '../../nodes/YAMLMap.js'
+import { YAMLSeq } from '../../nodes/YAMLSeq.js'
 import type { CollectionTag } from '../types.js'
 
 export function resolvePairs(

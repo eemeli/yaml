@@ -1,4 +1,4 @@
-import { isNode } from '../ast/Node.js'
+import { isNode } from '../nodes/Node.js'
 import { visit } from '../visit.js'
 import type { Document } from './Document.js'
 

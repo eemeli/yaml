@@ -1,6 +1,6 @@
 /* global BigInt */
 
-import { Scalar } from '../ast/Scalar.js'
+import { Scalar } from '../nodes/Scalar.js'
 import { map } from './failsafe/map.js'
 import { seq } from './failsafe/seq.js'
 import { intOptions } from './options.js'

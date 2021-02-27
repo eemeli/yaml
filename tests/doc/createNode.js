@@ -1,8 +1,8 @@
 import * as YAML from '../../src/index.js'
-import { PairType } from '../../src/ast/Pair.js'
-import { Scalar } from '../../src/ast/Scalar.js'
-import { YAMLMap } from '../../src/ast/YAMLMap.js'
-import { YAMLSeq } from '../../src/ast/YAMLSeq.js'
+import { PairType } from '../../src/nodes/Pair.js'
+import { Scalar } from '../../src/nodes/Scalar.js'
+import { YAMLMap } from '../../src/nodes/YAMLMap.js'
+import { YAMLSeq } from '../../src/nodes/YAMLSeq.js'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
 let doc

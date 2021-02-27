@@ -1,9 +1,9 @@
-import { isNode, ParsedNode } from './ast/Node.js'
-import { Pair } from './ast/Pair.js'
-import { Scalar } from './ast/Scalar.js'
 import { Document } from './doc/Document.js'
-import { parseAllDocuments } from './index.js'
+import { isNode, ParsedNode } from './nodes/Node.js'
+import { Pair } from './nodes/Pair.js'
+import { Scalar } from './nodes/Scalar.js'
 import type { Options } from './options.js'
+import { parseAllDocuments } from './public-api.js'
 
 // test harness for yaml-test-suite event tests
 export function testEvents(src: string, options?: Options) {

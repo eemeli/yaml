@@ -1,4 +1,4 @@
-import type { Pair } from '../ast/Pair.js'
+import type { Pair } from '../nodes/Pair.js'
 import { schemas, tags } from '../tags/index.js'
 import type { CollectionTag, ScalarTag, TagId, TagObj } from '../tags/types.js'
 import { Directives } from './directives.js'

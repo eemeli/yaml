@@ -1,6 +1,6 @@
-import { isAlias, isNode, isPair, isScalar, Node } from '../ast/Node.js'
-import type { Scalar } from '../ast/Scalar.js'
 import type { Document } from '../doc/Document.js'
+import { isAlias, isNode, isPair, isScalar, Node } from '../nodes/Node.js'
+import type { Scalar } from '../nodes/Scalar.js'
 import type { TagObj } from '../tags/types.js'
 import { stringifyString } from './stringifyString.js'
 

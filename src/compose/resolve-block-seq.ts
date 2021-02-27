@@ -1,6 +1,6 @@
-import { YAMLSeq } from '../ast/YAMLSeq.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
+import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { BlockSequence } from '../parse/tokens.js'
 import type { ComposeNode } from './compose-node.js'
 import { resolveProps } from './resolve-props.js'

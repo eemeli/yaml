@@ -1,9 +1,9 @@
-import { YAMLSeq } from '../../ast/YAMLSeq.js'
-import { toJS, ToJSContext } from '../../ast/toJS.js'
-import { isPair, isScalar } from '../../ast/Node.js'
-import { YAMLMap } from '../../ast/YAMLMap.js'
-import { createPairs, resolvePairs } from './pairs.js'
+import { YAMLSeq } from '../../nodes/YAMLSeq.js'
+import { toJS, ToJSContext } from '../../nodes/toJS.js'
+import { isPair, isScalar } from '../../nodes/Node.js'
+import { YAMLMap } from '../../nodes/YAMLMap.js'
 import { CollectionTag } from '../types.js'
+import { createPairs, resolvePairs } from './pairs.js'
 
 export class YAMLOMap extends YAMLSeq {
   static tag = 'tag:yaml.org,2002:omap'

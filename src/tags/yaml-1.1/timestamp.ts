@@ -1,6 +1,4 @@
-/* global BigInt */
-
-import type { Scalar } from '../../ast/Scalar.js'
+import type { Scalar } from '../../nodes/Scalar.js'
 import { stringifyNumber } from '../../stringify/stringifyNumber.js'
 import { intOptions } from '../options.js'
 import type { ScalarTag } from '../types.js'

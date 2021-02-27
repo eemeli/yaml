@@ -1,6 +1,6 @@
-import { Alias } from '../ast/Alias.js'
-import { Merge } from '../ast/Merge.js'
-import { isAlias, isCollection, isMap, isScalar, Node } from '../ast/Node.js'
+import { Alias } from '../nodes/Alias.js'
+import { Merge } from '../nodes/Merge.js'
+import { isAlias, isCollection, isMap, isScalar, Node } from '../nodes/Node.js'
 
 export class Anchors {
   map: Record<string, Node> = Object.create(null)

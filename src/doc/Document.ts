@@ -1,5 +1,7 @@
-import { Alias } from '../ast/Alias.js'
-import { collectionFromPath, isEmptyPath } from '../ast/Collection.js'
+import { Type } from '../constants.js'
+import type { YAMLError, YAMLWarning } from '../errors.js'
+import { Alias } from '../nodes/Alias.js'
+import { collectionFromPath, isEmptyPath } from '../nodes/Collection.js'
 import {
   DOC,
   isCollection,
@@ -8,13 +10,11 @@ import {
   Node,
   NODE_TYPE,
   ParsedNode
-} from '../ast/Node.js'
-import { Pair } from '../ast/Pair.js'
-import { toJS, ToJSAnchorValue, ToJSContext } from '../ast/toJS.js'
-import type { YAMLMap } from '../ast/YAMLMap.js'
-import type { YAMLSeq } from '../ast/YAMLSeq.js'
-import { Type } from '../constants.js'
-import type { YAMLError, YAMLWarning } from '../errors.js'
+} from '../nodes/Node.js'
+import { Pair } from '../nodes/Pair.js'
+import { toJS, ToJSAnchorValue, ToJSContext } from '../nodes/toJS.js'
+import type { YAMLMap } from '../nodes/YAMLMap.js'
+import type { YAMLSeq } from '../nodes/YAMLSeq.js'
 import {
   DocumentOptions,
   Options,
