@@ -1,13 +1,17 @@
-import { Node, Pair, YAMLMap, YAMLSeq } from '../ast/index.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
+import { isNode, isPair, ParsedNode } from '../nodes/Node.js'
+import { Pair } from '../nodes/Pair.js'
+import { YAMLMap } from '../nodes/YAMLMap.js'
+import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { FlowCollection, SourceToken, Token } from '../parse/tokens.js'
-import { composeEmptyNode, composeNode } from './compose-node.js'
+import type { ComposeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 import { containsNewline } from './util-contains-newline.js'
 
 export function resolveFlowCollection(
+  { composeNode, composeEmptyNode }: ComposeNode,
   doc: Document.Parsed,
   fc: FlowCollection,
   _anchor: string | null,
@@ -18,8 +22,8 @@ export function resolveFlowCollection(
   coll.type = isMap ? Type.FLOW_MAP : Type.FLOW_SEQ
   if (_anchor) doc.anchors.setAnchor(coll, _anchor)
 
-  let key: Node.Parsed | null = null
-  let value: Node.Parsed | null = null
+  let key: ParsedNode | null = null
+  let value: ParsedNode | null = null
 
   let spaceBefore = false
   let comment = ''
@@ -76,7 +80,7 @@ export function resolveFlowCollection(
       case 'space':
         hasSpace = true
         break
-      case 'comment':
+      case 'comment': {
         if (doc.options.strict && !hasSpace)
           onError(
             offset,
@@ -89,14 +93,15 @@ export function resolveFlowCollection(
         hasComment = true
         newlines = ''
         break
+      }
       case 'newline':
         if (atLineStart && !hasComment) spaceBefore = true
         if (atValueEnd) {
           if (hasComment) {
             let node = coll.items[coll.items.length - 1]
-            if (node instanceof Pair) node = node.value || node.key
+            if (isPair(node)) node = node.value || node.key
             /* istanbul ignore else should not happen */
-            if (node instanceof Node) node.comment = comment
+            if (isNode(node)) node.comment = comment
             else onError(offset, 'Error adding trailing comment to node')
             comment = ''
             hasComment = false

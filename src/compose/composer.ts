@@ -1,7 +1,7 @@
-import { Collection, Node } from '../ast/index.js'
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { YAMLParseError, YAMLWarning } from '../errors.js'
+import { isCollection } from '../nodes/Node.js'
 import { defaultOptions, Options } from '../options.js'
 import type { Token } from '../parse/tokens.js'
 import { composeDoc } from './compose-doc.js'
@@ -50,7 +50,7 @@ export class Composer {
   private directives: Directives
   private doc: Document.Parsed | null = null
   private onDocument: (doc: Document.Parsed) => void
-  private options: Options
+  private options: Options | undefined
   private atDirectives = false
   private prelude: string[] = []
   private errors: YAMLParseError[] = []
@@ -58,10 +58,10 @@ export class Composer {
 
   constructor(onDocument: Composer['onDocument'], options?: Options) {
     this.directives = new Directives({
-      version: options?.version || defaultOptions.version || '1.2'
+      version: options?.version || defaultOptions.version
     })
     this.onDocument = onDocument
-    this.options = options || defaultOptions
+    this.options = options
   }
 
   private onError = (offset: number, message: string, warning?: boolean) => {
@@ -79,11 +79,11 @@ export class Composer {
       } else if (afterEmptyLine || doc.directivesEndMarker || !dc) {
         doc.commentBefore = comment
       } else if (
-        dc instanceof Collection &&
+        isCollection(dc) &&
         (dc.type === 'MAP' || dc.type === 'SEQ') &&
         dc.items.length > 0
       ) {
-        const it = dc.items[0] as Node
+        const it = dc.items[0]
         const cb = it.commentBefore
         it.commentBefore = cb ? `${comment}\n${cb}` : comment
       } else {
@@ -207,11 +207,10 @@ export class Composer {
       this.onDocument(this.doc)
       this.doc = null
     } else if (forceDoc) {
-      const doc = new Document(undefined, this.options) as Document.Parsed
-      doc.directives = this.directives.atDocument()
+      const opts = Object.assign({ directives: this.directives }, this.options)
+      const doc = new Document(undefined, opts) as Document.Parsed
       if (this.atDirectives)
         this.onError(offset, 'Missing directives-end indicator line')
-      doc.setSchema() // FIXME: always do this in the constructor
       doc.range = [0, offset]
       this.decorate(doc, false)
       this.onDocument(doc)

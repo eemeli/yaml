@@ -1,5 +1,4 @@
-import { Type } from '../constants.js'
-import { Directives } from '../doc/directives.js'
+import type { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import type { Options } from '../options.js'
 import type * as Tokens from '../parse/tokens.js'
@@ -13,10 +12,8 @@ export function composeDoc(
   { offset, start, value, end }: Tokens.Document,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
-  const doc = new Document(undefined, options) as Document.Parsed
-  doc.type = Type.DOCUMENT
-  doc.directives = directives.atDocument()
-  doc.setSchema() // FIXME: always do this in the constructor
+  const opts = Object.assign({ directives }, options)
+  const doc = new Document(undefined, opts) as Document.Parsed
 
   const props = resolveProps(doc, start, true, 'doc-start', offset, onError)
   if (props.found) doc.directivesEndMarker = true

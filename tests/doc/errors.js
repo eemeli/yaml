@@ -280,15 +280,35 @@ describe.skip('pretty errors', () => {
   })
 })
 
+describe('tags on invalid nodes', () => {
+  test('!!map on scalar', () => {
+    const doc = YAML.parseDocument('!!map foo')
+    expect(doc.warnings).toMatchObject([
+      { message: 'Unresolved tag: tag:yaml.org,2002:map' }
+    ])
+    expect(doc.toJS()).toBe('foo')
+  })
+
+  test('!!str on map', () => {
+    const doc = YAML.parseDocument('!!str { answer: 42 }')
+    expect(doc.warnings).toMatchObject([
+      { message: 'Unresolved tag: tag:yaml.org,2002:str' }
+    ])
+    expect(doc.toJS()).toMatchObject({ answer: 42 })
+  })
+})
+
 describe('invalid options', () => {
   test('unknown schema', () => {
-    const doc = new YAML.Document(undefined, { schema: 'foo' })
-    expect(() => doc.setSchema()).toThrow(/Unknown schema/)
+    expect(() => new YAML.Document(undefined, { schema: 'foo' })).toThrow(
+      /Unknown schema/
+    )
   })
 
   test('unknown custom tag', () => {
-    const doc = new YAML.Document(undefined, { customTags: ['foo'] })
-    expect(() => doc.setSchema()).toThrow(/Unknown custom tag/)
+    expect(() => new YAML.Document(undefined, { customTags: ['foo'] })).toThrow(
+      /Unknown custom tag/
+    )
   })
 })
 

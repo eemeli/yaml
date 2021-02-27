@@ -1,0 +1,112 @@
+import type { Schema } from '../../doc/Schema.js'
+import { isMap, isPair, isScalar } from '../../nodes/Node.js'
+import { createPair, Pair } from '../../nodes/Pair.js'
+import { Scalar } from '../../nodes/Scalar.js'
+import { ToJSContext } from '../../nodes/toJS.js'
+import { YAMLMap, findPair } from '../../nodes/YAMLMap.js'
+import type { StringifyContext } from '../../stringify/stringify.js'
+import type { CollectionTag } from '../types.js'
+
+export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
+  static tag = 'tag:yaml.org,2002:set'
+
+  constructor(schema?: Schema) {
+    super(schema)
+    this.tag = YAMLSet.tag
+  }
+
+  add(
+    key:
+      | T
+      | Pair<T, Scalar<null> | null>
+      | { key: T; value: Scalar<null> | null }
+  ) {
+    let pair: Pair<T, Scalar<null> | null>
+    if (isPair(key)) pair = key
+    else if (
+      typeof key === 'object' &&
+      'key' in key &&
+      'value' in key &&
+      key.value === null
+    )
+      pair = new Pair(key.key, null)
+    else pair = new Pair(key as T, null)
+    const prev = findPair(this.items, pair.key)
+    if (!prev) this.items.push(pair)
+  }
+
+  get(key?: T, keepPair?: boolean) {
+    const pair = findPair(this.items, key)
+    return !keepPair && isPair(pair)
+      ? isScalar(pair.key)
+        ? pair.key.value
+        : pair.key
+      : pair
+  }
+
+  set(key: T, value: boolean): void
+
+  /** Will throw; `value` must be boolean */
+  set(key: T, value: null): void
+  set(key: T, value: boolean | null) {
+    if (typeof value !== 'boolean')
+      throw new Error(
+        `Expected boolean value for set(key, value) in a YAML set, not ${typeof value}`
+      )
+    const prev = findPair(this.items, key)
+    if (prev && !value) {
+      this.items.splice(this.items.indexOf(prev), 1)
+    } else if (!prev && value) {
+      this.items.push(new Pair(key))
+    }
+  }
+
+  toJSON(_?: unknown, ctx?: ToJSContext) {
+    return super.toJSON(_, ctx, Set)
+  }
+
+  toString(
+    ctx?: StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ) {
+    if (!ctx) return JSON.stringify(this)
+    if (this.hasAllNullValues(true))
+      return super.toString(
+        Object.assign({}, ctx, { allNullValues: true }),
+        onComment,
+        onChompKeep
+      )
+    else throw new Error('Set items must all have null values')
+  }
+}
+
+export const set: CollectionTag = {
+  collection: 'map',
+  identify: value => value instanceof Set,
+  nodeClass: YAMLSet,
+  default: false,
+  tag: 'tag:yaml.org,2002:set',
+
+  resolve(map, onError) {
+    if (isMap(map)) {
+      if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map)
+      else onError('Set items must all have null values')
+    } else onError('Expected a mapping for this tag')
+    return map
+  },
+
+  createNode(schema, iterable, ctx) {
+    const { replacer } = ctx
+    const set = new YAMLSet(schema)
+    if (iterable && Symbol.iterator in Object(iterable))
+      for (let value of iterable as Iterable<unknown>) {
+        if (typeof replacer === 'function')
+          value = replacer.call(iterable, value, value)
+        set.items.push(
+          createPair(value, null, ctx) as Pair<unknown, Scalar<null>>
+        )
+      }
+    return set
+  }
+}

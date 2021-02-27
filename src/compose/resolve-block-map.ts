@@ -1,8 +1,9 @@
-import { Pair, YAMLMap } from '../ast/index.js'
 import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
+import { Pair } from '../nodes/Pair.js'
+import { YAMLMap } from '../nodes/YAMLMap.js'
 import type { BlockMap } from '../parse/tokens.js'
-import { composeEmptyNode, composeNode } from './compose-node.js'
+import type { ComposeNode } from './compose-node.js'
 import { resolveMergePair } from './resolve-merge-pair.js'
 import { resolveProps } from './resolve-props.js'
 import { containsNewline } from './util-contains-newline.js'
@@ -10,6 +11,7 @@ import { containsNewline } from './util-contains-newline.js'
 const startColMsg = 'All mapping items must start at the same column'
 
 export function resolveBlockMap(
+  { composeNode, composeEmptyNode }: ComposeNode,
   doc: Document.Parsed,
   { indent, items, offset }: BlockMap,
   anchor: string | null,

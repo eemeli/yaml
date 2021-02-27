@@ -5,9 +5,9 @@ import typescript from '@rollup/plugin-typescript'
 export default {
   input: {
     index: 'src/index.ts',
-    'test-events': 'src/test-events.js',
-    types: 'src/types.js',
-    util: 'src/util.js'
+    'test-events': 'src/test-events.ts',
+    types: 'src/types.ts',
+    util: 'src/util.ts'
   },
   output: {
     dir: 'dist',
@@ -22,11 +22,7 @@ export default {
     }),
     typescript(),
     copy({
-      targets: [
-        { src: 'src/*.d.ts', dest: 'dist' },
-        { src: 'src/ast/*.d.ts', dest: 'dist/ast' },
-        { src: 'src/doc/*.d.ts', dest: 'dist/doc' }
-      ]
+      targets: [{ src: 'src/tags/*.d.ts', dest: 'dist/tags' }]
     })
   ],
   treeshake: { moduleSideEffects: false, propertyReadSideEffects: false }

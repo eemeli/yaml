@@ -1,0 +1,8 @@
+export * from './tags/options.js'
+export { Schema } from './doc/Schema.js'
+export { Alias } from './nodes/Alias.js'
+export { Merge } from './nodes/Merge.js'
+export { Pair } from './nodes/Pair.js'
+export { Scalar } from './nodes/Scalar.js'
+export { YAMLMap } from './nodes/YAMLMap.js'
+export { YAMLSeq } from './nodes/YAMLSeq.js'

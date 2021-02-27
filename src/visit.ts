@@ -1,5 +1,20 @@
-import { Alias, Node, Pair, Scalar, YAMLMap, YAMLSeq } from './ast/index.js'
-import { Document } from './doc/Document.js'
+import type { Document } from './doc/Document.js'
+import type { Alias } from './nodes/Alias.js'
+import {
+  isAlias,
+  isCollection,
+  isDocument,
+  isMap,
+  isNode,
+  isPair,
+  isScalar,
+  isSeq,
+  Node
+} from './nodes/Node.js'
+import type { Pair } from './nodes/Pair.js'
+import type { Scalar } from './nodes/Scalar.js'
+import type { YAMLMap } from './nodes/YAMLMap.js'
+import type { YAMLSeq } from './nodes/YAMLSeq.js'
 
 const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')
@@ -8,11 +23,11 @@ const REMOVE = Symbol('remove node')
 export type visitorFn<T> = (
   key: number | 'key' | 'value' | null,
   node: T,
-  path: readonly Node[]
-) => void | symbol | number | Node
+  path: readonly (Document | Node | Pair)[]
+) => void | symbol | number | Node | Pair
 
 export type visitor =
-  | visitorFn<any>
+  | visitorFn<unknown>
   | {
       Alias?: visitorFn<Alias>
       Map?: visitorFn<YAMLMap>
@@ -51,7 +66,7 @@ export type visitor =
 export function visit(
   node: Node | Document,
   visitor:
-    | visitorFn<any>
+    | visitorFn<unknown>
     | {
         Alias?: visitorFn<Alias>
         Map?: visitorFn<YAMLMap>
@@ -60,7 +75,7 @@ export function visit(
         Seq?: visitorFn<YAMLSeq>
       }
 ) {
-  if (node instanceof Document) {
+  if (isDocument(node)) {
     const cd = _visit(null, node.contents, visitor, Object.freeze([node]))
     if (cd === REMOVE) node.contents = null
   } else _visit(null, node, visitor, Object.freeze([]))
@@ -81,32 +96,32 @@ visit.REMOVE = REMOVE as symbol
 
 function _visit(
   key: number | 'key' | 'value' | null,
-  node: Node,
+  node: unknown,
   visitor: visitor,
-  path: readonly Node[]
-): void | symbol | number | Node {
-  let ctrl = undefined
+  path: readonly (Document | Node | Pair)[]
+): number | symbol | void {
+  let ctrl: void | symbol | number | Node | Pair = undefined
   if (typeof visitor === 'function') ctrl = visitor(key, node, path)
-  else if (node instanceof YAMLMap) {
+  else if (isMap(node)) {
     if (visitor.Map) ctrl = visitor.Map(key, node, path)
-  } else if (node instanceof YAMLSeq) {
+  } else if (isSeq(node)) {
     if (visitor.Seq) ctrl = visitor.Seq(key, node, path)
-  } else if (node instanceof Pair) {
+  } else if (isPair(node)) {
     if (visitor.Pair) ctrl = visitor.Pair(key, node, path)
-  } else if (node instanceof Scalar) {
+  } else if (isScalar(node)) {
     if (visitor.Scalar) ctrl = visitor.Scalar(key, node, path)
-  } else if (node instanceof Alias) {
+  } else if (isAlias(node)) {
     if (visitor.Alias) ctrl = visitor.Alias(key, node, path)
   }
 
-  if (ctrl instanceof Node) {
+  if (isNode(ctrl) || isPair(ctrl)) {
     const parent = path[path.length - 1]
-    if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
+    if (isCollection(parent)) {
       parent.items[key as number] = ctrl
-    } else if (parent instanceof Pair) {
+    } else if (isPair(parent)) {
       if (key === 'key') parent.key = ctrl
       else parent.value = ctrl
-    } else if (parent instanceof Document) {
+    } else if (isDocument(parent)) {
       parent.contents = ctrl
     } else {
       const pt = parent && parent.type
@@ -116,7 +131,7 @@ function _visit(
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
+    if (isCollection(node)) {
       path = Object.freeze(path.concat(node))
       for (let i = 0; i < node.items.length; ++i) {
         const ci = _visit(i, node.items[i], visitor, path)
@@ -127,7 +142,7 @@ function _visit(
           i -= 1
         }
       }
-    } else if (node instanceof Pair) {
+    } else if (isPair(node)) {
       path = Object.freeze(path.concat(node))
       const ck = _visit('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK

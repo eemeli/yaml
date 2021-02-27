@@ -1,5 +1,6 @@
+import { isNode } from '../nodes/Node.js'
+import { visit } from '../visit.js'
 import type { Document } from './Document.js'
-import { listTagNames } from './listTagNames.js'
 
 const escapeChars: Record<string, string> = {
   '!': '%21',
@@ -152,10 +153,21 @@ export class Directives {
     const lines = this.yaml.explicit
       ? [`%YAML ${this.yaml.version || '1.2'}`]
       : []
-    const tagNames = doc && listTagNames(doc.contents)
-    for (const [handle, prefix] of Object.entries(this.tags)) {
+
+    const tagEntries = Object.entries(this.tags)
+
+    let tagNames: string[]
+    if (doc && tagEntries.length > 0 && isNode(doc.contents)) {
+      const tags: Record<string, boolean> = {}
+      visit(doc.contents, (_key, node) => {
+        if (isNode(node) && node.tag) tags[node.tag] = true
+      })
+      tagNames = Object.keys(tags)
+    } else tagNames = []
+
+    for (const [handle, prefix] of tagEntries) {
       if (handle === '!!' && prefix === 'tag:yaml.org,2002:') continue
-      if (!tagNames || tagNames.some(tn => tn.startsWith(prefix)))
+      if (!doc || tagNames.some(tn => tn.startsWith(prefix)))
         lines.push(`%TAG ${handle} ${prefix}`)
     }
     return lines.join('\n')
