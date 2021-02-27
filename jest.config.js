@@ -33,7 +33,7 @@ module.exports = {
   moduleNameMapper,
   resolver: 'jest-ts-webcompat-resolver',
   testEnvironment: 'node',
-  testMatch: ['**/tests/**/*.{js,ts}', '!**/tests/typings.ts'],
+  testMatch: ['**/tests/**/*.{js,ts}'],
   testPathIgnorePatterns,
   transform: { '/(src|tests)/.*\\.(js|ts)$': 'babel-jest' }
 }
