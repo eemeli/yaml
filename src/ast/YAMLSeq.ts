@@ -1,13 +1,15 @@
 import { Type } from '../constants.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { Collection } from './Collection.js'
-import { Node, NODE_TYPE, SEQ, isScalar } from './Node.js'
+import { NODE_TYPE, SEQ, isScalar, ParsedNode } from './Node.js'
 import type { Pair } from './Pair.js'
 import { isScalarValue } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
 
 export declare namespace YAMLSeq {
-  interface Parsed<T extends Node | Pair = Node> extends YAMLSeq<T> {
+  interface Parsed<
+    T extends ParsedNode | Pair<ParsedNode, ParsedNode | null> = ParsedNode
+  > extends YAMLSeq<T> {
     items: T[]
     range: [number, number]
   }

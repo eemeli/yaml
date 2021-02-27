@@ -1,7 +1,7 @@
 import { Type } from '../constants.js'
 import { StringifyContext } from '../stringify/stringify.js'
 import { Collection } from './Collection.js'
-import { isPair, isScalar, MAP, Node, NODE_TYPE } from './Node.js'
+import { isPair, isScalar, MAP, NODE_TYPE, ParsedNode } from './Node.js'
 import { Pair } from './Pair.js'
 import { isScalarValue } from './Scalar.js'
 import { ToJSContext } from './toJS.js'
@@ -21,8 +21,10 @@ export function findPair<K = unknown, V = unknown>(
 }
 
 export declare namespace YAMLMap {
-  interface Parsed<K extends Node = Node, V extends Node | null = Node | null>
-    extends YAMLMap<K, V> {
+  interface Parsed<
+    K extends ParsedNode = ParsedNode,
+    V extends ParsedNode | null = ParsedNode | null
+  > extends YAMLMap<K, V> {
     items: Pair<K, V>[]
     range: [number, number]
   }

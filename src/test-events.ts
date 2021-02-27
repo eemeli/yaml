@@ -1,7 +1,12 @@
+import { isNode, ParsedNode } from './ast/Node.js'
+import { Pair } from './ast/Pair.js'
+import { Scalar } from './ast/Scalar.js'
+import { Document } from './doc/Document.js'
 import { parseAllDocuments } from './index.js'
+import type { Options } from './options.js'
 
 // test harness for yaml-test-suite event tests
-export function testEvents(src, options) {
+export function testEvents(src: string, options?: Options) {
   const opt = Object.assign({ keepNodeTypes: true, version: '1.2' }, options)
   const docs = parseAllDocuments(src, opt)
   const errDoc = docs.find(doc => doc.errors.length > 0)
@@ -13,16 +18,16 @@ export function testEvents(src, options) {
       let root = doc.contents
       if (Array.isArray(root)) root = root[0]
       const [rootStart, rootEnd] = doc.range || [0, 0]
-      let e = doc.errors[0] && doc.errors[0].source
-      if (e && e.type === 'SEQ_ITEM') e = e.node
-      if (e && (e.type === 'DOCUMENT' || e.range.start < rootStart))
+      let error = doc.errors[0]
+      if (error && (!error.offset || error.offset < rootStart))
         throw new Error()
       let docStart = '+DOC'
       if (doc.directivesEndMarker) docStart += ' ---'
-      else if (doc.contents.range[1] === doc.contents.range[0]) continue
+      else if (doc.contents && doc.contents.range[1] === doc.contents.range[0])
+        continue
       events.push(docStart)
-      addEvents(events, doc, e, root)
-      if (doc.contents && doc.contents.length > 1) throw new Error()
+      addEvents(events, doc, error?.offset ?? -1, root)
+
       let docEnd = '-DOC'
       if (rootEnd) {
         const post = src.slice(rootStart, rootEnd)
@@ -37,14 +42,20 @@ export function testEvents(src, options) {
   return { events, error }
 }
 
-function addEvents(events, doc, e, node) {
+function addEvents(
+  events: string[],
+  doc: Document,
+  errPos: number,
+  node: ParsedNode | Pair<ParsedNode, ParsedNode | null> | null
+) {
   if (!node) {
     events.push('=VAL :')
     return
   }
-  if (e /*&& node.cstNode === e*/) throw new Error()
+  if (errPos !== -1 && isNode(node) && node.range[0] >= errPos)
+    throw new Error()
   let props = ''
-  let anchor = doc.anchors.getName(node)
+  let anchor = isNode(node) ? doc.anchors.getName(node) : undefined
   if (anchor) {
     if (/\d$/.test(anchor)) {
       const alt = anchor.replace(/\d$/, '')
@@ -58,7 +69,7 @@ function addEvents(events, doc, e, node) {
     case 'ALIAS':
       {
         let alias = doc.anchors.getName(node.source)
-        if (/\d$/.test(alias)) {
+        if (alias && /\d$/.test(alias)) {
           const alt = alias.replace(/\d$/, '')
           if (doc.anchors.getNode(alt)) alias = alt
         }
@@ -82,15 +93,15 @@ function addEvents(events, doc, e, node) {
       break
     case 'PAIR':
       events.push(`+MAP${props}`)
-      addEvents(events, doc, e, node.key)
-      addEvents(events, doc, e, node.value)
+      addEvents(events, doc, errPos, node.key)
+      addEvents(events, doc, errPos, node.value)
       events.push('-MAP')
       break
     case 'FLOW_SEQ':
     case 'SEQ':
       events.push(`+SEQ${props}`)
       node.items.forEach(item => {
-        addEvents(events, doc, e, item)
+        addEvents(events, doc, errPos, item)
       })
       events.push('-SEQ')
       break
@@ -98,8 +109,8 @@ function addEvents(events, doc, e, node) {
     case 'MAP':
       events.push(`+MAP${props}`)
       node.items.forEach(({ key, value }) => {
-        addEvents(events, doc, e, key)
-        addEvents(events, doc, e, value)
+        addEvents(events, doc, errPos, key)
+        addEvents(events, doc, errPos, value)
       })
       events.push('-MAP')
       break
@@ -107,7 +118,7 @@ function addEvents(events, doc, e, node) {
       throw new Error(`Unexpected node type ${node.type}`)
   }
   if (scalar) {
-    const value = node.source
+    const value = (node as Scalar.Parsed).source
       .replace(/\\/g, '\\\\')
       .replace(/\0/g, '\\0')
       .replace(/\x07/g, '\\a')
