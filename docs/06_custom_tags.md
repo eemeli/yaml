@@ -130,9 +130,7 @@ import {
   findPair, // (items, key) => Pair? -- Given a key, find a matching Pair
   stringifyNumber, // (node) => string
   stringifyString, // (node, ctx, ...) => string
-  toJS, // (value, arg, ctx) => any -- Recursively convert to plain JS
-  Type, // { [string]: string } -- Used as enum for node types
-  YAMLError, YAMLParseError, YAMLWarning
+  toJS // (value, arg, ctx) => any -- Recursively convert to plain JS
 } from 'yaml/util'
 ```
 

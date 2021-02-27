@@ -37,10 +37,6 @@ export interface FoldOptions {
  * Tries to keep input at up to `lineWidth` characters, splitting only on spaces
  * not followed by newlines or spaces unless `mode` is `'quoted'`. Lines are
  * terminated with `\n` and started with `indent`.
- *
- * @param {string} text
- * @param {string} indent
- * @param {Object} options
  */
 export function foldFlowLines(
   text: string,
