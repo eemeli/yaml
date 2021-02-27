@@ -15,41 +15,6 @@ export type ParsedNode =
   | YAMLMap.Parsed
   | YAMLSeq.Parsed
 
-export abstract class NodeBase {
-  /** A comment on or immediately after this */
-  declare comment?: string | null
-
-  /** A comment before this */
-  declare commentBefore?: string | null
-
-  /** Only available when `keepCstNodes` is set to `true` */
-  // cstNode?: CST.Node
-
-  /**
-   * The [start, end] range of characters of the source parsed
-   * into this node (undefined for pairs or if not parsed)
-   */
-  declare range?: [number, number] | null
-
-  /** A blank line before this node and its commentBefore */
-  declare spaceBefore?: boolean
-
-  /** A fully qualified tag, if required */
-  declare tag?: string
-
-  /** A plain JS representation of this node */
-  abstract toJSON(): any
-
-  abstract toString(
-    ctx?: StringifyContext,
-    onComment?: () => void,
-    onChompKeep?: () => void
-  ): string
-
-  /** The type of this node */
-  declare type?: Type | PairType
-}
-
 export const ALIAS = Symbol.for('yaml.alias')
 export const DOC = Symbol.for('yaml.document')
 export const MAP = Symbol.for('yaml.map')
@@ -96,4 +61,42 @@ export function isNode(node: any): node is Node {
         return true
     }
   return false
+}
+
+export abstract class NodeBase {
+  readonly [NODE_TYPE]: symbol
+
+  /** A comment on or immediately after this */
+  declare comment?: string | null
+
+  /** A comment before this */
+  declare commentBefore?: string | null
+
+  /**
+   * The [start, end] range of characters of the source parsed
+   * into this node (undefined for pairs or if not parsed)
+   */
+  declare range?: [number, number] | null
+
+  /** A blank line before this node and its commentBefore */
+  declare spaceBefore?: boolean
+
+  /** A fully qualified tag, if required */
+  declare tag?: string
+
+  /** A plain JS representation of this node */
+  abstract toJSON(): any
+
+  abstract toString(
+    ctx?: StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ): string
+
+  /** The type of this node */
+  declare type?: Type | PairType
+
+  constructor(type: symbol) {
+    Object.defineProperty(this, NODE_TYPE, { value: type })
+  }
 }

@@ -1,10 +1,11 @@
-import { Type } from '../constants.js'
-import { StringifyContext } from '../stringify/stringify.js'
+import type { Type } from '../constants.js'
+import type { Schema } from '../doc/Schema.js'
+import type { StringifyContext } from '../stringify/stringify.js'
 import { Collection } from './Collection.js'
-import { isPair, isScalar, MAP, NODE_TYPE, ParsedNode } from './Node.js'
+import { isPair, isScalar, MAP, ParsedNode } from './Node.js'
 import { Pair } from './Pair.js'
 import { isScalarValue } from './Scalar.js'
-import { ToJSContext } from './toJS.js'
+import type { ToJSContext } from './toJS.js'
 
 export function findPair<K = unknown, V = unknown>(
   items: Iterable<Pair<K, V>>,
@@ -35,11 +36,13 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     return 'tag:yaml.org,2002:map'
   }
 
-  [NODE_TYPE] = MAP
-
   items: Pair<K, V>[] = []
 
   type?: Type.FLOW_MAP | Type.MAP
+
+  constructor(schema?: Schema) {
+    super(MAP, schema)
+  }
 
   /**
    * Adds a value to the collection.

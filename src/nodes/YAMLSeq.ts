@@ -1,7 +1,8 @@
-import { Type } from '../constants.js'
+import type { Type } from '../constants.js'
+import type { Schema } from '../doc/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { Collection } from './Collection.js'
-import { NODE_TYPE, SEQ, isScalar, ParsedNode } from './Node.js'
+import { isScalar, ParsedNode, SEQ } from './Node.js'
 import type { Pair } from './Pair.js'
 import { isScalarValue } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
@@ -20,11 +21,13 @@ export class YAMLSeq<T = unknown> extends Collection {
     return 'tag:yaml.org,2002:seq'
   }
 
-  [NODE_TYPE] = SEQ
-
   items: T[] = []
 
   type?: Type.FLOW_SEQ | Type.SEQ
+
+  constructor(schema?: Schema) {
+    super(SEQ, schema)
+  }
 
   add(value: T) {
     this.items.push(value)

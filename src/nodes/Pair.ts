@@ -13,7 +13,6 @@ import {
   isSeq,
   Node,
   NodeBase,
-  NODE_TYPE,
   PAIR
 } from './Node.js'
 
@@ -33,8 +32,6 @@ export enum PairType {
 }
 
 export class Pair<K = unknown, V = unknown> extends NodeBase {
-  [NODE_TYPE] = PAIR
-
   /** Always Node or null when parsed, but can be set to anything. */
   key: K
 
@@ -44,7 +41,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
   type: PairType
 
   constructor(key: K, value: V | null = null) {
-    super()
+    super(PAIR)
     this.key = key
     this.value = value
     this.type = PairType.PAIR

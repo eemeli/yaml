@@ -3,6 +3,7 @@ import { LogLevel } from './constants.js'
 import { Document, Replacer, Reviver } from './doc/Document.js'
 import { YAMLParseError } from './errors.js'
 import { warn } from './log.js'
+import { ParsedNode } from './nodes/Node.js'
 import { Options } from './options.js'
 import { Parser } from './parse/parser.js'
 
@@ -21,32 +22,35 @@ export interface EmptyStream
  *   EmptyStream and contain additional stream information. In
  *   TypeScript, you should use `'empty' in docs` as a type guard for it.
  */
-export function parseAllDocuments(
+export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
   source: string,
   options?: Options
-): Document.Parsed[] | EmptyStream {
-  const docs: Document.Parsed[] = []
-  const composer = new Composer(doc => docs.push(doc), options)
+): Document.Parsed<T>[] | EmptyStream {
+  const docs: Document.Parsed<T>[] = []
+  const composer = new Composer(
+    doc => docs.push(doc as Document.Parsed<T>),
+    options
+  )
   const parser = new Parser(composer.next, options?.lineCounter?.addNewLine)
   parser.parse(source)
   composer.end()
 
   if (docs.length > 0) return docs
   return Object.assign<
-    Document.Parsed[],
+    Document.Parsed<T>[],
     { empty: true },
     ReturnType<Composer['streamInfo']>
   >([], { empty: true }, composer.streamInfo())
 }
 
 /** Parse an input string into a single YAML.Document */
-export function parseDocument(
+export function parseDocument<T extends ParsedNode = ParsedNode>(
   source: string,
   options?: Options
-): Document.Parsed | null {
-  let doc: Document.Parsed | null = null
+): Document.Parsed<T> | null {
+  let doc: Document.Parsed<T> | null = null
   const composer = new Composer(_doc => {
-    if (!doc) doc = _doc
+    if (!doc) doc = _doc as Document.Parsed<T>
     else if (LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR) {
       const errMsg =
         'Source contains multiple documents; please use YAML.parseAllDocuments()'

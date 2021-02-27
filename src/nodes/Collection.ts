@@ -71,8 +71,8 @@ export abstract class Collection extends NodeBase {
     | Type.FLOW_SEQ
     | Type.DOCUMENT
 
-  constructor(schema?: Schema) {
-    super()
+  constructor(type: symbol, schema?: Schema) {
+    super(type)
     Object.defineProperty(this, 'schema', {
       value: schema,
       configurable: true,

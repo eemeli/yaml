@@ -61,8 +61,7 @@ export interface ToJSOptions {
 }
 
 export declare namespace Document {
-  interface Parsed extends Document {
-    contents: ParsedNode | null
+  interface Parsed<T extends ParsedNode = ParsedNode> extends Document<T> {
     range: [number, number]
     /** The schema used with the document. */
     schema: Schema
@@ -74,10 +73,10 @@ export declare namespace Document {
   }
 }
 
-export class Document {
+export class Document<T = unknown> {
   static defaults = documentOptions;
 
-  [NODE_TYPE] = DOC
+  readonly [NODE_TYPE]: symbol
 
   /**
    * Anchors associated with the document's nodes;
@@ -92,7 +91,7 @@ export class Document {
   comment: string | null = null
 
   /** The document contents. */
-  contents: unknown
+  contents: T | null
 
   directives: Directives
 
@@ -134,6 +133,7 @@ export class Document {
     replacer?: Replacer | Options | null,
     options?: Options
   ) {
+    Object.defineProperty(this, NODE_TYPE, { value: DOC })
     let _replacer: Replacer | undefined = undefined
     if (typeof replacer === 'function' || Array.isArray(replacer)) {
       _replacer = replacer
@@ -156,7 +156,7 @@ export class Document {
     this.contents =
       value === undefined
         ? null
-        : this.createNode(value, { replacer: _replacer })
+        : ((this.createNode(value, { replacer: _replacer }) as unknown) as T)
   }
 
   /** Adds a value to the document. */
@@ -308,7 +308,11 @@ export class Document {
    */
   set(key: any, value: unknown) {
     if (this.contents == null) {
-      this.contents = collectionFromPath(this.schema, [key], value)
+      this.contents = (collectionFromPath(
+        this.schema,
+        [key],
+        value
+      ) as unknown) as T
     } else if (assertCollection(this.contents)) {
       this.contents.set(key, value)
     }
@@ -319,9 +323,13 @@ export class Document {
    * boolean to add/remove the item from the set.
    */
   setIn(path: Iterable<unknown>, value: unknown) {
-    if (isEmptyPath(path)) this.contents = value
+    if (isEmptyPath(path)) this.contents = (value as unknown) as T
     else if (this.contents == null) {
-      this.contents = collectionFromPath(this.schema, Array.from(path), value)
+      this.contents = (collectionFromPath(
+        this.schema,
+        Array.from(path),
+        value
+      ) as unknown) as T
     } else if (assertCollection(this.contents)) {
       this.contents.setIn(path, value)
     }

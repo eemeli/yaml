@@ -1,5 +1,5 @@
 import type { Type } from '../constants.js'
-import { NodeBase, NODE_TYPE, SCALAR } from './Node.js'
+import { NodeBase, SCALAR } from './Node.js'
 import { toJS, ToJSContext } from './toJS.js'
 
 export const isScalarValue = (value: unknown) =>
@@ -20,8 +20,6 @@ export declare namespace Scalar {
 }
 
 export class Scalar<T = unknown> extends NodeBase {
-  [NODE_TYPE] = SCALAR
-
   value: T
 
   declare type?: Scalar.Type
@@ -39,7 +37,7 @@ export class Scalar<T = unknown> extends NodeBase {
   declare source?: string
 
   constructor(value: T) {
-    super()
+    super(SCALAR)
     this.value = value
   }
 
