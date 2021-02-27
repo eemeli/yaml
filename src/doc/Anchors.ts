@@ -1,4 +1,6 @@
-import { Alias, Merge, Node, Scalar, YAMLMap, YAMLSeq } from '../ast/index.js'
+import { Alias } from '../ast/Alias.js'
+import { Merge } from '../ast/Merge.js'
+import { isAlias, isCollection, isMap, isScalar, Node } from '../ast/Node.js'
 
 export class Anchors {
   map: Record<string, Node> = Object.create(null)
@@ -24,9 +26,9 @@ export class Anchors {
   createMergePair(...sources: Node[]) {
     const merge = new Merge()
     merge.value.items = sources.map(s => {
-      if (s instanceof Alias) {
-        if (s.source instanceof YAMLMap) return s
-      } else if (s instanceof YAMLMap) {
+      if (isAlias(s)) {
+        if (isMap(s.source)) return s
+      } else if (isMap(s)) {
         return this.createAlias(s)
       }
       throw new Error('Merge sources must be Map nodes or their Aliases')
@@ -74,11 +76,7 @@ export class Anchors {
       return name
     }
 
-    const valid =
-      node instanceof Scalar ||
-      node instanceof YAMLSeq ||
-      node instanceof YAMLMap
-    if (!valid)
+    if (!isScalar(node) && !isCollection(node))
       throw new Error('Anchors may only be set for Scalar, Seq and Map nodes')
     if (name) {
       if (/[\x00-\x19\s,[\]{}]/.test(name))

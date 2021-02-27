@@ -1,12 +1,13 @@
 import { Type } from '../constants.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { Collection } from './Collection.js'
-import { Node } from './Node.js'
-import { Scalar, isScalarValue } from './Scalar.js'
+import { Node, NODE_TYPE, SEQ, isScalar } from './Node.js'
+import type { Pair } from './Pair.js'
+import { isScalarValue } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
 
 export declare namespace YAMLSeq {
-  interface Parsed<T extends Node = Node> extends YAMLSeq<T> {
+  interface Parsed<T extends Node | Pair = Node> extends YAMLSeq<T> {
     items: T[]
     range: [number, number]
   }
@@ -17,6 +18,8 @@ export class YAMLSeq<T = unknown> extends Collection {
     return 'tag:yaml.org,2002:seq'
   }
 
+  [NODE_TYPE] = SEQ
+
   items: T[] = []
 
   type?: Type.FLOW_SEQ | Type.SEQ
@@ -25,31 +28,60 @@ export class YAMLSeq<T = unknown> extends Collection {
     this.items.push(value)
   }
 
-  delete(key: number | string | Scalar) {
+  /**
+   * Removes a value from the collection.
+   *
+   * `key` must contain a representation of an integer for this to succeed.
+   * It may be wrapped in a `Scalar`.
+   *
+   * @returns `true` if the item was found and removed.
+   */
+  delete(key: unknown) {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number') return false
     const del = this.items.splice(idx, 1)
     return del.length > 0
   }
 
-  get(key: number | string | Scalar, keepScalar?: boolean) {
+  /**
+   * Returns item at `key`, or `undefined` if not found. By default unwraps
+   * scalar values from their surrounding node; to disable set `keepScalar` to
+   * `true` (collections are always returned intact).
+   *
+   * `key` must contain a representation of an integer for this to succeed.
+   * It may be wrapped in a `Scalar`.
+   */
+  get(key: unknown, keepScalar?: boolean) {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number') return undefined
     const it = this.items[idx]
-    return !keepScalar && it instanceof Scalar ? it.value : it
+    return !keepScalar && isScalar(it) ? it.value : it
   }
 
-  has(key: number | string | Scalar) {
+  /**
+   * Checks if the collection includes a value with the key `key`.
+   *
+   * `key` must contain a representation of an integer for this to succeed.
+   * It may be wrapped in a `Scalar`.
+   */
+  has(key: unknown) {
     const idx = asItemIndex(key)
     return typeof idx === 'number' && idx < this.items.length
   }
 
-  set(key: number | string | Scalar, value: T) {
+  /**
+   * Sets a value in this collection. For `!!set`, `value` needs to be a
+   * boolean to add/remove the item from the set.
+   *
+   * If `key` does not contain a representation of an integer, this will throw.
+   * It may be wrapped in a `Scalar`.
+   */
+  set(key: unknown, value: T) {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number')
       throw new Error(`Expected a valid index, not ${key}.`)
     const prev = this.items[idx]
-    if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
+    if (isScalar(prev) && isScalarValue(value)) prev.value = value
     else this.items[idx] = value
   }
 
@@ -81,7 +113,7 @@ export class YAMLSeq<T = unknown> extends Collection {
 }
 
 function asItemIndex(key: unknown): number | null {
-  let idx = key instanceof Scalar ? key.value : key
+  let idx = isScalar(key) ? key.value : key
   if (idx && typeof idx === 'string') idx = Number(idx)
   return typeof idx === 'number' && Number.isInteger(idx) && idx >= 0
     ? idx

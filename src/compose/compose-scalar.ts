@@ -1,3 +1,4 @@
+import { isScalar } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
 import type { Document } from '../doc/Document.js'
 import type { Schema } from '../doc/Schema.js'
@@ -23,13 +24,13 @@ export function composeScalar(
     ? findScalarTagByName(doc.schema, value, tagName, onError)
     : findScalarTagByTest(doc.schema, value, token.type === 'scalar')
 
-  let scalar: Scalar.Parsed
+  let scalar: Scalar
   try {
     const res = tag ? tag.resolve(value, msg => onError(offset, msg)) : value
-    scalar = (res instanceof Scalar ? res : new Scalar(res)) as Scalar.Parsed
+    scalar = isScalar(res) ? res : new Scalar(res)
   } catch (error) {
     onError(offset, error.message)
-    scalar = new Scalar(value) as Scalar.Parsed
+    scalar = new Scalar(value)
   }
   scalar.range = [offset, offset + length]
   scalar.source = value
@@ -39,7 +40,7 @@ export function composeScalar(
   if (comment) scalar.comment = comment
 
   if (anchor) doc.anchors.setAnchor(scalar, anchor)
-  return scalar
+  return scalar as Scalar.Parsed
 }
 
 const defaultScalarTag = (schema: Schema) =>

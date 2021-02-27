@@ -1,16 +1,23 @@
+import { Alias } from '../ast/Alias.js'
 import {
-  Alias,
-  Collection,
-  Node,
-  Pair,
-  Scalar,
-  YAMLMap,
-  YAMLSeq,
   collectionFromPath,
   isEmptyPath,
   toJS,
   ToJSContext
 } from '../ast/index.js'
+import { ToJSAnchorValue } from '../ast/toJS.js'
+import {
+  DOC,
+  isCollection,
+  isNode,
+  isScalar,
+  Node,
+  NODE_TYPE,
+  ParsedNode
+} from '../ast/Node.js'
+import { Pair } from '../ast/Pair.js'
+import type { YAMLMap } from '../ast/YAMLMap.js'
+import type { YAMLSeq } from '../ast/YAMLSeq.js'
 import { Type } from '../constants.js'
 import type { YAMLError, YAMLWarning } from '../errors.js'
 import {
@@ -28,7 +35,6 @@ import { Schema, SchemaName, SchemaOptions } from './Schema.js'
 import { Reviver, applyReviver } from './applyReviver.js'
 import { createNode, CreateNodeContext } from './createNode.js'
 import { Directives } from './directives.js'
-import { ToJSAnchorValue } from '../ast/toJS.js'
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)
 export type { Anchors, Reviver }
@@ -62,7 +68,7 @@ export interface ToJSOptions {
 
 export declare namespace Document {
   interface Parsed extends Document {
-    contents: Node.Parsed | null
+    contents: ParsedNode | null
     range: [number, number]
     /** The schema used with the document. */
     schema: Schema
@@ -75,7 +81,9 @@ export declare namespace Document {
 }
 
 export class Document {
-  static defaults = documentOptions
+  static defaults = documentOptions;
+
+  [NODE_TYPE] = DOC
 
   /**
    * Anchors associated with the document's nodes;
@@ -265,7 +273,7 @@ export class Document {
    * `true` (collections are always returned intact).
    */
   get(key: unknown, keepScalar?: boolean) {
-    return this.contents instanceof Collection
+    return isCollection(this.contents)
       ? this.contents.get(key, keepScalar)
       : undefined
   }
@@ -277,10 +285,10 @@ export class Document {
    */
   getIn(path: Iterable<unknown>, keepScalar?: boolean) {
     if (isEmptyPath(path))
-      return !keepScalar && this.contents instanceof Scalar
+      return !keepScalar && isScalar(this.contents)
         ? this.contents.value
         : this.contents
-    return this.contents instanceof Collection
+    return isCollection(this.contents)
       ? this.contents.getIn(path, keepScalar)
       : undefined
   }
@@ -289,7 +297,7 @@ export class Document {
    * Checks if the document includes a value with the key `key`.
    */
   has(key: unknown) {
-    return this.contents instanceof Collection ? this.contents.has(key) : false
+    return isCollection(this.contents) ? this.contents.has(key) : false
   }
 
   /**
@@ -297,9 +305,7 @@ export class Document {
    */
   hasIn(path: Iterable<unknown>) {
     if (isEmptyPath(path)) return this.contents !== undefined
-    return this.contents instanceof Collection
-      ? this.contents.hasIn(path)
-      : false
+    return isCollection(this.contents) ? this.contents.hasIn(path) : false
   }
 
   /**
@@ -444,7 +450,7 @@ export class Document {
     let chompKeep = false
     let contentComment = null
     if (this.contents) {
-      if (this.contents instanceof Node) {
+      if (isNode(this.contents)) {
         if (
           this.contents.spaceBefore &&
           (hasDirectives || this.directivesEndMarker)
@@ -485,6 +491,6 @@ export class Document {
 }
 
 function assertCollection(contents: unknown): contents is YAMLMap | YAMLSeq {
-  if (contents instanceof Collection) return true
+  if (isCollection(contents)) return true
   throw new Error('Expected a YAML collection as document contents')
 }

@@ -1,3 +1,4 @@
+import { isSeq } from '../../ast/Node.js'
 import { YAMLSeq } from '../../ast/YAMLSeq.js'
 import { CreateNodeContext, createNode } from '../../doc/createNode.js'
 import type { Schema } from '../../doc/Schema.js'
@@ -26,7 +27,7 @@ export const seq: CollectionTag = {
   nodeClass: YAMLSeq,
   tag: 'tag:yaml.org,2002:seq',
   resolve(seq, onError) {
-    if (!(seq instanceof YAMLSeq)) onError('Expected a sequence for this tag')
+    if (!isSeq(seq)) onError('Expected a sequence for this tag')
     return seq
   }
 }

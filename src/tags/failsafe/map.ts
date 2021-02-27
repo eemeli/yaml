@@ -1,3 +1,4 @@
+import { isMap } from '../../ast/Node.js'
 import { createPair } from '../../ast/Pair.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
 import type { CreateNodeContext } from '../../doc/createNode.js'
@@ -31,7 +32,7 @@ export const map: CollectionTag = {
   nodeClass: YAMLMap,
   tag: 'tag:yaml.org,2002:map',
   resolve(map, onError) {
-    if (!(map instanceof YAMLMap)) onError('Expected a mapping for this tag')
+    if (!isMap(map)) onError('Expected a mapping for this tag')
     return map
   }
 }

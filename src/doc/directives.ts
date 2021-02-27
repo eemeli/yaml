@@ -1,4 +1,4 @@
-import { Node } from '../ast/Node.js'
+import { isNode } from '../ast/Node.js'
 import { visit } from '../visit.js'
 import type { Document } from './Document.js'
 
@@ -157,10 +157,10 @@ export class Directives {
     const tagEntries = Object.entries(this.tags)
 
     let tagNames: string[]
-    if (doc && tagEntries.length > 0 && doc.contents instanceof Node) {
+    if (doc && tagEntries.length > 0 && isNode(doc.contents)) {
       const tags: Record<string, boolean> = {}
       visit(doc.contents, (_key, node) => {
-        if (node instanceof Node && node.tag) tags[node.tag] = true
+        if (isNode(node) && node.tag) tags[node.tag] = true
       })
       tagNames = Object.keys(tags)
     } else tagNames = []

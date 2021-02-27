@@ -1,5 +1,5 @@
 import { Alias } from '../ast/Alias.js'
-import type { Node } from '../ast/Node.js'
+import type { Node, ParsedNode } from '../ast/index.js'
 import type { Document } from '../doc/Document.js'
 import type { FlowScalar, Token } from '../parse/tokens.js'
 import { composeCollection } from './compose-collection.js'
@@ -24,7 +24,7 @@ export function composeNode(
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const { spaceBefore, comment, anchor, tagName } = props
-  let node: Node.Parsed
+  let node: ParsedNode
   switch (token.type) {
     case 'alias':
       node = composeAlias(doc, token, onError)

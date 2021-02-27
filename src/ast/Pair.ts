@@ -4,11 +4,18 @@ import { warn } from '../log.js'
 import { addComment } from '../stringify/addComment.js'
 import { StringifyContext } from '../stringify/stringify.js'
 
-import { Collection } from './Collection.js'
-import { Node } from './Node.js'
 import { Scalar } from './Scalar.js'
-import { YAMLSeq } from './YAMLSeq.js'
 import { toJS, ToJSContext } from './toJS.js'
+import {
+  isCollection,
+  isNode,
+  isScalar,
+  isSeq,
+  Node,
+  NodeBase,
+  NODE_TYPE,
+  PAIR
+} from './Node.js'
 
 export function createPair(
   key: unknown,
@@ -25,7 +32,9 @@ export enum PairType {
   MERGE_PAIR = 'MERGE_PAIR'
 }
 
-export class Pair<K = unknown, V = unknown> extends Node {
+export class Pair<K = unknown, V = unknown> extends NodeBase {
+  [NODE_TYPE] = PAIR
+
   /** Always Node or null when parsed, but can be set to anything. */
   key: K
 
@@ -43,12 +52,12 @@ export class Pair<K = unknown, V = unknown> extends Node {
 
   // @ts-ignore This is fine.
   get commentBefore() {
-    return this.key instanceof Node ? this.key.commentBefore : undefined
+    return isNode(this.key) ? this.key.commentBefore : undefined
   }
 
   set commentBefore(cb) {
     if (this.key == null) this.key = new Scalar(null) as any // FIXME
-    if (this.key instanceof Node) this.key.commentBefore = cb
+    if (isNode(this.key)) this.key.commentBefore = cb
     else {
       const msg =
         'Pair.commentBefore is an alias for Pair.key.commentBefore. To set it, the key must be a Node.'
@@ -58,12 +67,12 @@ export class Pair<K = unknown, V = unknown> extends Node {
 
   // @ts-ignore This is fine.
   get spaceBefore() {
-    return this.key instanceof Node ? this.key.spaceBefore : undefined
+    return isNode(this.key) ? this.key.spaceBefore : undefined
   }
 
   set spaceBefore(sb) {
     if (this.key == null) this.key = new Scalar(null) as any // FIXME
-    if (this.key instanceof Node) this.key.spaceBefore = sb
+    if (isNode(this.key)) this.key.spaceBefore = sb
     else {
       const msg =
         'Pair.spaceBefore is an alias for Pair.key.spaceBefore. To set it, the key must be a Node.'
@@ -112,12 +121,12 @@ export class Pair<K = unknown, V = unknown> extends Node {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
     const { indent: indentSize, indentSeq, simpleKeys } = ctx.doc.options
     let { key, value }: { key: K; value: V | Node | null } = this
-    let keyComment = (key instanceof Node && key.comment) || null
+    let keyComment = (isNode(key) && key.comment) || null
     if (simpleKeys) {
       if (keyComment) {
         throw new Error('With simple keys, key nodes cannot have comments')
       }
-      if (key instanceof Collection) {
+      if (isCollection(key)) {
         const msg = 'With simple keys, collection cannot be used as a key value'
         throw new Error(msg)
       }
@@ -126,10 +135,9 @@ export class Pair<K = unknown, V = unknown> extends Node {
       !simpleKeys &&
       (!key ||
         (keyComment && value == null) ||
-        (key instanceof Node
-          ? key instanceof Collection ||
-            key.type === Type.BLOCK_FOLDED ||
-            key.type === Type.BLOCK_LITERAL
+        isCollection(key) ||
+        (isScalar(key)
+          ? key.type === Type.BLOCK_FOLDED || key.type === Type.BLOCK_LITERAL
           : typeof key === 'object'))
     const { allNullValues, doc, indent, indentStep, stringify } = ctx
     ctx = Object.assign({}, ctx, {
@@ -178,7 +186,7 @@ export class Pair<K = unknown, V = unknown> extends Node {
 
     let vcb = ''
     let valueComment = null
-    if (value instanceof Node) {
+    if (isNode(value)) {
       if (value.spaceBefore) vcb = '\n'
       if (value.commentBefore) {
         const cs = value.commentBefore.replace(/^/gm, `${ctx.indent}#`)
@@ -189,7 +197,7 @@ export class Pair<K = unknown, V = unknown> extends Node {
       value = doc.createNode(value)
     }
     ctx.implicitKey = false
-    if (!explicitKey && !keyComment && !this.comment && value instanceof Scalar)
+    if (!explicitKey && !keyComment && !this.comment && isScalar(value))
       ctx.indentAtStart = str.length + 1
     chompKeep = false
     if (
@@ -197,7 +205,7 @@ export class Pair<K = unknown, V = unknown> extends Node {
       indentSize >= 2 &&
       !ctx.inFlow &&
       !explicitKey &&
-      value instanceof YAMLSeq &&
+      isSeq(value) &&
       value.type !== Type.FLOW_SEQ &&
       !value.tag &&
       !doc.anchors.getName(value)
@@ -214,7 +222,7 @@ export class Pair<K = unknown, V = unknown> extends Node {
     let ws = ' '
     if (vcb || keyComment || this.comment) {
       ws = `${vcb}\n${ctx.indent}`
-    } else if (!explicitKey && value instanceof Collection) {
+    } else if (!explicitKey && isCollection(value)) {
       const flow = valueStr[0] === '[' || valueStr[0] === '{'
       if (!flow || valueStr.includes('\n')) ws = `\n${ctx.indent}`
     } else if (valueStr[0] === '\n') ws = ''
@@ -230,7 +238,7 @@ function stringifyKey(
 ) {
   if (jsKey === null) return ''
   if (typeof jsKey !== 'object') return String(jsKey)
-  if (key instanceof Node && ctx && ctx.doc) {
+  if (isNode(key) && ctx && ctx.doc) {
     const strKey = key.toString({
       anchors: Object.create(null),
       doc: ctx.doc,

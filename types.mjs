@@ -10,7 +10,6 @@ export const Schema = types.Schema
 export const Alias = types.Alias
 export const Collection = types.Collection
 export const Merge = types.Merge
-export const Node = types.Node
 export const Pair = types.Pair
 export const Scalar = types.Scalar
 export const YAMLMap = types.YAMLMap

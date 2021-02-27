@@ -1,10 +1,9 @@
 import { StringifyContext } from '../stringify/stringify.js'
 import type { Alias } from './index.js'
-import { Node } from './Node.js'
+import { isMap, isNode, isPair, isSeq } from './Node.js'
 import { Pair, PairType } from './Pair.js'
 import { Scalar } from './Scalar.js'
 import type { ToJSContext } from './toJS.js'
-import { YAMLMap } from './YAMLMap.js'
 import { YAMLSeq } from './YAMLSeq.js'
 
 export class Merge extends Pair<Scalar, YAMLSeq<Alias>> {
@@ -15,8 +14,8 @@ export class Merge extends Pair<Scalar, YAMLSeq<Alias>> {
   declare value: YAMLSeq<Alias>
 
   constructor(pair?: Pair<Scalar, Alias | YAMLSeq<Alias>>) {
-    if (pair instanceof Pair && pair.value instanceof Node) {
-      if (pair.value instanceof YAMLSeq) super(pair.key, pair.value)
+    if (isPair(pair) && isNode(pair.value)) {
+      if (isSeq(pair.value)) super(pair.key, pair.value)
       else {
         const seq = new YAMLSeq<Alias>()
         seq.items.push(pair.value)
@@ -45,8 +44,7 @@ export class Merge extends Pair<Scalar, YAMLSeq<Alias>> {
       | Record<string | number | symbol, unknown>
   ) {
     for (const { source } of this.value.items) {
-      if (!(source instanceof YAMLMap))
-        throw new Error('Merge sources must be maps')
+      if (!isMap(source)) throw new Error('Merge sources must be maps')
       const srcMap = source.toJSON(null, ctx, Map)
       for (const [key, value] of srcMap) {
         if (map instanceof Map) {

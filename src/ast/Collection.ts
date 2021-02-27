@@ -3,10 +3,8 @@ import { createNode } from '../doc/createNode.js'
 import type { Schema } from '../doc/Schema.js'
 import { addComment } from '../stringify/addComment.js'
 import type { StringifyContext } from '../stringify/stringify.js'
-
-import { Node } from './Node.js'
+import { isCollection, isNode, isPair, isScalar, NodeBase, NODE_TYPE } from './Node.js'
 import type { Pair } from './Pair.js'
-import { Scalar } from './Scalar.js'
 
 export function collectionFromPath(
   schema: Schema,
@@ -57,10 +55,12 @@ export declare namespace Collection {
     str: string
   }
 }
-export abstract class Collection extends Node {
+export abstract class Collection extends NodeBase {
   static maxFlowStringSingleLineLength = 60
 
-  schema: Schema | undefined
+  schema: Schema | undefined;
+
+  declare [NODE_TYPE]: symbol
 
   declare items: unknown[]
 
@@ -118,7 +118,7 @@ export abstract class Collection extends Node {
     else {
       const [key, ...rest] = path
       const node = this.get(key, true)
-      if (node instanceof Collection) node.addIn(rest, value)
+      if (isCollection(node)) node.addIn(rest, value)
       else if (node === undefined && this.schema)
         this.set(key, collectionFromPath(this.schema, rest, value))
       else
@@ -135,7 +135,7 @@ export abstract class Collection extends Node {
   deleteIn([key, ...rest]: Iterable<unknown>): boolean {
     if (rest.length === 0) return this.delete(key)
     const node = this.get(key, true)
-    if (node instanceof Collection) return node.deleteIn(rest)
+    if (isCollection(node)) return node.deleteIn(rest)
     else
       throw new Error(
         `Expected YAML collection at ${key}. Remaining path: ${rest}`
@@ -150,21 +150,18 @@ export abstract class Collection extends Node {
   getIn([key, ...rest]: Iterable<unknown>, keepScalar?: boolean): unknown {
     const node = this.get(key, true)
     if (rest.length === 0)
-      return !keepScalar && node instanceof Scalar ? node.value : node
-    else
-      return node instanceof Collection
-        ? node.getIn(rest, keepScalar)
-        : undefined
+      return !keepScalar && isScalar(node) ? node.value : node
+    else return isCollection(node) ? node.getIn(rest, keepScalar) : undefined
   }
 
   hasAllNullValues(allowScalar?: boolean) {
     return this.items.every(node => {
-      if (!node || (node as Node).type !== 'PAIR') return false
+      if (!node || isNode(node)) return false
       const n = (node as Pair).value
       return (
         n == null ||
         (allowScalar &&
-          n instanceof Scalar &&
+          isScalar(n) &&
           n.value == null &&
           !n.commentBefore &&
           !n.comment &&
@@ -179,7 +176,7 @@ export abstract class Collection extends Node {
   hasIn([key, ...rest]: Iterable<unknown>): boolean {
     if (rest.length === 0) return this.has(key)
     const node = this.get(key, true)
-    return node instanceof Collection ? node.hasIn(rest) : false
+    return isCollection(node) ? node.hasIn(rest) : false
   }
 
   /**
@@ -191,7 +188,7 @@ export abstract class Collection extends Node {
       this.set(key, value)
     } else {
       const node = this.get(key, true)
-      if (node instanceof Collection) node.setIn(rest, value)
+      if (isCollection(node)) node.setIn(rest, value)
       else if (node === undefined && this.schema)
         this.set(key, collectionFromPath(this.schema, rest, value))
       else
@@ -217,7 +214,7 @@ export abstract class Collection extends Node {
     const nodes = this.items.reduce<Collection.StringifyNode[]>(
       (nodes: Collection.StringifyNode[], item, i) => {
         let comment: string | null = null
-        if (item instanceof Node) {
+        if (isNode(item) || isPair(item)) {
           if (!chompKeep && item.spaceBefore)
             nodes.push({ type: 'comment', str: '' })
 

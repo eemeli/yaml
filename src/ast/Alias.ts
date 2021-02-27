@@ -1,8 +1,14 @@
 import { Type } from '../constants.js'
 import { StringifyContext } from '../stringify/stringify.js'
-import { Collection } from './Collection.js'
-import { Node } from './Node.js'
-import { Pair } from './Pair.js'
+import {
+  ALIAS,
+  isAlias,
+  isCollection,
+  isPair,
+  Node,
+  NodeBase,
+  NODE_TYPE
+} from './Node.js'
 import { toJS, ToJSContext } from './toJS.js'
 
 export declare namespace Alias {
@@ -11,7 +17,8 @@ export declare namespace Alias {
   }
 }
 
-export class Alias<T extends Node = Node> extends Node {
+export class Alias<T extends Node = Node> extends NodeBase {
+  [NODE_TYPE] = ALIAS
   source: T
   type: Type.ALIAS = Type.ALIAS
 
@@ -50,7 +57,11 @@ export class Alias<T extends Node = Node> extends Node {
 
   // Only called when stringifying an alias mapping key while constructing
   // Object output.
-  toString({ anchors, doc, implicitKey, inStringifyKey }: StringifyContext) {
+  toString(
+    { anchors, doc, implicitKey, inStringifyKey }: StringifyContext,
+    _onComment?: () => void,
+    _onChompKeep?: () => void
+  ) {
     let anchor = Object.keys(anchors).find(a => anchors[a] === this.source)
     if (!anchor && inStringifyKey)
       anchor = doc.anchors.getName(this.source) || doc.anchors.newName()
@@ -63,17 +74,17 @@ export class Alias<T extends Node = Node> extends Node {
 }
 
 function getAliasCount(node: unknown, anchors: ToJSContext['anchors']): number {
-  if (node instanceof Alias) {
+  if (isAlias(node)) {
     const anchor = anchors && anchors.get(node.source)
     return anchor ? anchor.count * anchor.aliasCount : 0
-  } else if (node instanceof Collection) {
+  } else if (isCollection(node)) {
     let count = 0
     for (const item of node.items) {
       const c = getAliasCount(item, anchors)
       if (c > count) count = c
     }
     return count
-  } else if (node instanceof Pair) {
+  } else if (isPair(node)) {
     const kc = getAliasCount(node.key, anchors)
     const vc = getAliasCount(node.value, anchors)
     return Math.max(kc, vc)

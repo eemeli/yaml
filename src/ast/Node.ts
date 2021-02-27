@@ -1,14 +1,21 @@
 import type { Type } from '../constants.js'
-import { StringifyContext } from '../stringify/stringify.js'
-import type { PairType } from './Pair.js'
+import type { Document } from '../doc/Document.js'
+import type { StringifyContext } from '../stringify/stringify.js'
+import type { Alias } from './Alias.js'
+import type { Pair, PairType } from './Pair.js'
+import type { Scalar } from './Scalar.js'
+import type { YAMLMap } from './YAMLMap.js'
+import type { YAMLSeq } from './YAMLSeq.js'
 
-export declare namespace Node {
-  interface Parsed extends Node {
-    range: [number, number]
-  }
-}
+export type Node = Alias | Scalar | YAMLMap | YAMLSeq
 
-export abstract class Node {
+export type ParsedNode =
+  | Alias.Parsed
+  | Scalar.Parsed
+  | YAMLMap.Parsed
+  | YAMLSeq.Parsed
+
+export abstract class NodeBase {
   /** A comment on or immediately after this */
   declare comment?: string | null
 
@@ -41,4 +48,52 @@ export abstract class Node {
 
   /** The type of this node */
   declare type?: Type | PairType
+}
+
+export const ALIAS = Symbol.for('yaml.alias')
+export const DOC = Symbol.for('yaml.document')
+export const MAP = Symbol.for('yaml.map')
+export const PAIR = Symbol.for('yaml.pair')
+export const SCALAR = Symbol.for('yaml.scalar')
+export const SEQ = Symbol.for('yaml.seq')
+export const NODE_TYPE = Symbol.for('yaml.node.type')
+
+export const isAlias = (node: any): node is Alias =>
+  !!node && typeof node === 'object' && node[NODE_TYPE] === ALIAS
+
+export const isDocument = (node: any): node is Document =>
+  !!node && typeof node === 'object' && node[NODE_TYPE] === DOC
+
+export const isMap = (node: any): node is YAMLMap =>
+  !!node && typeof node === 'object' && node[NODE_TYPE] === MAP
+
+export const isPair = (node: any): node is Pair =>
+  !!node && typeof node === 'object' && node[NODE_TYPE] === PAIR
+
+export const isScalar = (node: any): node is Scalar =>
+  !!node && typeof node === 'object' && node[NODE_TYPE] === SCALAR
+
+export const isSeq = (node: any): node is YAMLSeq =>
+  !!node && typeof node === 'object' && node[NODE_TYPE] === SEQ
+
+export function isCollection(node: any): node is YAMLMap | YAMLSeq {
+  if (node && typeof node === 'object')
+    switch (node[NODE_TYPE]) {
+      case MAP:
+      case SEQ:
+        return true
+    }
+  return false
+}
+
+export function isNode(node: any): node is Node {
+  if (node && typeof node === 'object')
+    switch (node[NODE_TYPE]) {
+      case ALIAS:
+      case MAP:
+      case SCALAR:
+      case SEQ:
+        return true
+    }
+  return false
 }

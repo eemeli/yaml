@@ -4,9 +4,10 @@ export {
   Alias,
   Collection,
   Merge,
-  Node,
   Pair,
+  ParsedNode,
   Scalar,
   YAMLMap,
-  YAMLSeq
+  YAMLSeq,
+  isNode
 } from './ast/index.js'

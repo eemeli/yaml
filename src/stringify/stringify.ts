@@ -1,7 +1,5 @@
-import { Alias } from '../ast/Alias.js'
-import { Node } from '../ast/Node.js'
-import { Pair } from '../ast/Pair.js'
-import { Scalar } from '../ast/Scalar.js'
+import { isAlias, isNode, isPair, isScalar, Node } from '../ast/Node.js'
+import type { Scalar } from '../ast/Scalar.js'
 import type { Document } from '../doc/Document.js'
 import type { TagObj } from '../tags/types.js'
 import { stringifyString } from './stringifyString.js'
@@ -28,7 +26,7 @@ function getTagObject(tags: TagObj[], item: Node) {
 
   let tagObj: TagObj | undefined = undefined
   let obj: unknown
-  if (item instanceof Scalar) {
+  if (isScalar(item)) {
     obj = item.value
     const match = tags.filter(t => t.identify && t.identify(obj))
     tagObj =
@@ -72,14 +70,13 @@ export function stringify(
   onComment?: () => void,
   onChompKeep?: () => void
 ): string {
-  if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
-  if (item instanceof Alias) return item.toString(ctx)
+  if (isPair(item)) return item.toString(ctx, onComment, onChompKeep)
+  if (isAlias(item)) return item.toString(ctx)
 
   let tagObj: TagObj | undefined = undefined
-  const node: Node =
-    item instanceof Node
-      ? item
-      : ctx.doc.createNode(item, { onTagObj: o => (tagObj = o) })
+  const node = isNode(item)
+    ? item
+    : ctx.doc.createNode(item, { onTagObj: o => (tagObj = o) })
 
   if (!tagObj) tagObj = getTagObject(ctx.doc.schema.tags, node)
 
@@ -90,11 +87,11 @@ export function stringify(
   const str =
     typeof tagObj.stringify === 'function'
       ? tagObj.stringify(node as Scalar, ctx, onComment, onChompKeep)
-      : node instanceof Scalar
+      : isScalar(node)
       ? stringifyString(node, ctx, onComment, onChompKeep)
       : node.toString(ctx, onComment, onChompKeep)
   if (!props) return str
-  return node instanceof Scalar || str[0] === '{' || str[0] === '['
+  return isScalar(node) || str[0] === '{' || str[0] === '['
     ? `${props} ${str}`
     : `${props}\n${ctx.indent}${str}`
 }

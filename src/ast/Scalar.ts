@@ -1,5 +1,5 @@
 import { Type } from '../constants.js'
-import { Node } from './Node.js'
+import { NodeBase, NODE_TYPE, SCALAR } from './Node.js'
 import { toJS, ToJSContext } from './toJS.js'
 
 export const isScalarValue = (value: unknown) =>
@@ -19,7 +19,9 @@ export declare namespace Scalar {
     | Type.QUOTE_SINGLE
 }
 
-export class Scalar<T = unknown> extends Node {
+export class Scalar<T = unknown> extends NodeBase {
+  [NODE_TYPE] = SCALAR
+
   value: T
 
   declare type?: Scalar.Type

@@ -1,4 +1,4 @@
-import { Node } from '../ast/Node.js'
+import { isNode, ParsedNode } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
 import type { YAMLMap } from '../ast/YAMLMap.js'
 import type { YAMLSeq } from '../ast/YAMLSeq.js'
@@ -80,10 +80,9 @@ export function composeCollection(
   }
 
   const res = tag.resolve(coll, msg => onError(coll.range[0], msg))
-  const node =
-    res instanceof Node
-      ? (res as Node.Parsed)
-      : (new Scalar(res) as Scalar.Parsed)
+  const node = isNode(res)
+    ? (res as ParsedNode)
+    : (new Scalar(res) as Scalar.Parsed)
   node.range = coll.range
   node.tag = tagName
   if (tag?.format) (node as Scalar).format = tag.format

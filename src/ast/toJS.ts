@@ -1,6 +1,6 @@
 import type { Document } from '../doc/Document.js'
 import type { stringify } from '../stringify/stringify.js'
-import { Node } from './index.js'
+import type { Node } from './Node.js'
 
 export interface ToJSAnchorValue {
   alias: string[]

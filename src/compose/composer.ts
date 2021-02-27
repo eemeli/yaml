@@ -1,5 +1,4 @@
-import { Collection } from '../ast/Collection.js'
-import type { Node } from '../ast/Node.js'
+import { isCollection } from '../ast/Node.js'
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { YAMLParseError, YAMLWarning } from '../errors.js'
@@ -80,11 +79,11 @@ export class Composer {
       } else if (afterEmptyLine || doc.directivesEndMarker || !dc) {
         doc.commentBefore = comment
       } else if (
-        dc instanceof Collection &&
+        isCollection(dc) &&
         (dc.type === 'MAP' || dc.type === 'SEQ') &&
         dc.items.length > 0
       ) {
-        const it = dc.items[0] as Node
+        const it = dc.items[0]
         const cb = it.commentBefore
         it.commentBefore = cb ? `${comment}\n${cb}` : comment
       } else {

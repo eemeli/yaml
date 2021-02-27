@@ -1,17 +1,21 @@
 import { Type } from '../constants.js'
 import { StringifyContext } from '../stringify/stringify.js'
 import { Collection } from './Collection.js'
-import { Node } from './Node.js'
+import type { Node } from './index.js'
+import { isPair, isScalar, MAP, NODE_TYPE } from './Node.js'
 import { Pair } from './Pair.js'
-import { Scalar, isScalarValue } from './Scalar.js'
+import { isScalarValue } from './Scalar.js'
 import { ToJSContext } from './toJS.js'
 
-export function findPair(items: Iterable<unknown>, key: unknown) {
-  const k = key instanceof Scalar ? key.value : key
+export function findPair<K = unknown, V = unknown>(
+  items: Iterable<Pair<K, V>>,
+  key: unknown
+) {
+  const k = isScalar(key) ? key.value : key
   for (const it of items) {
-    if (it instanceof Pair) {
+    if (isPair(it)) {
       if (it.key === key || it.key === k) return it
-      if (it.key instanceof Scalar && it.key.value === k) return it
+      if (isScalar(it.key) && it.key.value === k) return it
     }
   }
   return undefined
@@ -30,6 +34,8 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     return 'tag:yaml.org,2002:map'
   }
 
+  [NODE_TYPE] = MAP
+
   items: Pair<K, V>[] = []
 
   type?: Type.FLOW_MAP | Type.MAP
@@ -42,7 +48,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
    */
   add(pair: Pair<K, V> | { key: K; value: V }, overwrite?: boolean) {
     let _pair: Pair<K, V>
-    if (pair instanceof Pair) _pair = pair
+    if (isPair(pair)) _pair = pair
     else if (!pair || typeof pair !== 'object' || !('key' in pair)) {
       // In TypeScript, this never happens.
       _pair = new Pair<K, V>(pair as any, (pair as any).value)
@@ -53,7 +59,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     if (prev) {
       if (!overwrite) throw new Error(`Key ${_pair.key} already set`)
       // For scalars, keep the old node & its comments and anchors
-      if (prev.value instanceof Scalar && isScalarValue(_pair.value))
+      if (isScalar(prev.value) && isScalarValue(_pair.value))
         prev.value.value = _pair.value
       else prev.value = _pair.value
     } else if (sortEntries) {
@@ -75,7 +81,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
   get(key: K, keepScalar?: boolean) {
     const it = findPair(this.items, key)
     const node = it && it.value
-    return !keepScalar && node instanceof Scalar ? node.value : node
+    return !keepScalar && isScalar(node) ? node.value : node
   }
 
   has(key: K) {
@@ -105,7 +111,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
   ) {
     if (!ctx) return JSON.stringify(this)
     for (const item of this.items) {
-      if (!(item instanceof Pair))
+      if (!isPair(item))
         throw new Error(
           `Map items must all be pairs; found ${JSON.stringify(item)} instead`
         )

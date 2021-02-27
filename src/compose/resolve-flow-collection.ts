@@ -1,4 +1,4 @@
-import { Node } from '../ast/Node.js'
+import { isNode, isPair, ParsedNode } from '../ast/Node.js'
 import { Pair } from '../ast/Pair.js'
 import { YAMLMap } from '../ast/YAMLMap.js'
 import { YAMLSeq } from '../ast/YAMLSeq.js'
@@ -22,8 +22,8 @@ export function resolveFlowCollection(
   coll.type = isMap ? Type.FLOW_MAP : Type.FLOW_SEQ
   if (_anchor) doc.anchors.setAnchor(coll, _anchor)
 
-  let key: Node.Parsed | null = null
-  let value: Node.Parsed | null = null
+  let key: ParsedNode | null = null
+  let value: ParsedNode | null = null
 
   let spaceBefore = false
   let comment = ''
@@ -98,9 +98,9 @@ export function resolveFlowCollection(
         if (atValueEnd) {
           if (hasComment) {
             let node = coll.items[coll.items.length - 1]
-            if (node instanceof Pair) node = node.value || node.key
+            if (isPair(node)) node = node.value || node.key
             /* istanbul ignore else should not happen */
-            if (node instanceof Node) node.comment = comment
+            if (isNode(node)) node.comment = comment
             else onError(offset, 'Error adding trailing comment to node')
             comment = ''
             hasComment = false

@@ -1,8 +1,7 @@
-import { Pair } from '../../ast/Pair.js'
-import { Scalar } from '../../ast/Scalar.js'
-import { YAMLMap } from '../../ast/YAMLMap.js'
 import { YAMLSeq } from '../../ast/YAMLSeq.js'
 import { toJS, ToJSContext } from '../../ast/toJS.js'
+import { isPair, isScalar } from '../../ast/Node.js'
+import { YAMLMap } from '../../ast/YAMLMap.js'
 import { createPairs, resolvePairs } from './pairs.js'
 import { CollectionTag } from '../types.js'
 
@@ -30,7 +29,7 @@ export class YAMLOMap extends YAMLSeq {
     if (ctx && ctx.onCreate) ctx.onCreate(map)
     for (const pair of this.items) {
       let key, value
-      if (pair instanceof Pair) {
+      if (isPair(pair)) {
         key = toJS(pair.key, '', ctx)
         value = toJS(pair.value, key, ctx)
       } else {
@@ -55,7 +54,7 @@ export const omap: CollectionTag = {
     const pairs = resolvePairs(seq, onError)
     const seenKeys: unknown[] = []
     for (const { key } of pairs.items) {
-      if (key instanceof Scalar) {
+      if (isScalar(key)) {
         if (seenKeys.includes(key.value)) {
           onError(`Ordered maps must not include duplicate keys: ${key.value}`)
         } else {

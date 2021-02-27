@@ -1,6 +1,7 @@
 import type { Alias } from '../ast/Alias.js'
-import { Node } from '../ast/Node.js'
+import { isNode, isPair, Node } from '../ast/Node.js'
 import { Scalar } from '../ast/Scalar.js'
+import type { YAMLMap } from '../ast/YAMLMap.js'
 import { defaultTagPrefix } from '../constants.js'
 import type { TagObj } from '../tags/types.js'
 import type { Replacer } from './Document.js'
@@ -39,7 +40,12 @@ export function createNode(
   tagName: string | undefined,
   ctx: CreateNodeContext
 ): Node {
-  if (value instanceof Node) return value
+  if (isNode(value)) return value as Node
+  if (isPair(value)) {
+    const map = ctx.schema.map.createNode?.(ctx.schema, null, ctx) as YAMLMap
+    map.items.push(value)
+    return map
+  }
   const { onAlias, onTagObj, prevObjects } = ctx
   const { map, seq, tags } = ctx.schema
   if (tagName && tagName.startsWith('!!'))

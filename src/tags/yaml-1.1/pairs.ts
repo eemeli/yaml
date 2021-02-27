@@ -1,3 +1,4 @@
+import { isMap, isPair, isSeq } from '../../ast/Node.js'
 import { createPair, Pair } from '../../ast/Pair.js'
 import { YAMLMap } from '../../ast/YAMLMap.js'
 import { YAMLSeq } from '../../ast/YAMLSeq.js'
@@ -9,11 +10,11 @@ export function resolvePairs(
   seq: YAMLSeq | YAMLMap,
   onError: (message: string) => void
 ) {
-  if (seq instanceof YAMLSeq) {
+  if (isSeq(seq)) {
     for (let i = 0; i < seq.items.length; ++i) {
       let item = seq.items[i]
-      if (item instanceof Pair) continue
-      else if (item instanceof YAMLMap) {
+      if (isPair(item)) continue
+      else if (isMap(item)) {
         if (item.items.length > 1)
           onError('Each pair must have its own sequence indicator')
         const pair = item.items[0] || new Pair(null)
@@ -27,7 +28,7 @@ export function resolvePairs(
             : item.comment
         item = pair
       }
-      seq.items[i] = item instanceof Pair ? item : new Pair(item)
+      seq.items[i] = isPair(item) ? item : new Pair(item)
     }
   } else onError('Expected a sequence for this tag')
   return seq as YAMLSeq<Pair>

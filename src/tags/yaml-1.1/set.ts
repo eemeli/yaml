@@ -1,3 +1,4 @@
+import { isMap, isPair, isScalar } from '../../ast/Node.js'
 import { createPair, Pair } from '../../ast/Pair.js'
 import { Scalar } from '../../ast/Scalar.js'
 import { ToJSContext } from '../../ast/toJS.js'
@@ -21,7 +22,7 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
       | { key: T; value: Scalar<null> | null }
   ) {
     let pair: Pair<T, Scalar<null> | null>
-    if (key instanceof Pair) pair = key
+    if (isPair(key)) pair = key
     else if (
       typeof key === 'object' &&
       'key' in key &&
@@ -36,8 +37,8 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
 
   get(key?: T, keepPair?: boolean) {
     const pair = findPair(this.items, key)
-    return !keepPair && pair instanceof Pair
-      ? pair.key instanceof Scalar
+    return !keepPair && isPair(pair)
+      ? isScalar(pair.key)
         ? pair.key.value
         : pair.key
       : pair
@@ -88,7 +89,7 @@ export const set: CollectionTag = {
   tag: 'tag:yaml.org,2002:set',
 
   resolve(map, onError) {
-    if (map instanceof YAMLMap) {
+    if (isMap(map)) {
       if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map)
       else onError('Set items must all have null values')
     } else onError('Expected a mapping for this tag')
