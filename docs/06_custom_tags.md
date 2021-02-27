@@ -127,10 +127,13 @@ Finally, `stringify(item, ctx, ...): string` defines how your data should be rep
 <!-- prettier-ignore -->
 ```js
 import {
+  debug, // (logLevel, ...messages) => void -- Log debug messages to console
   findPair, // (items, key) => Pair? -- Given a key, find a matching Pair
+  foldFlowLines, // (text, indent, mode, options) => string -- Fold long lines
   stringifyNumber, // (node) => string
   stringifyString, // (node, ctx, ...) => string
-  toJS // (value, arg, ctx) => any -- Recursively convert to plain JS
+  toJS, // (value, arg, ctx) => any -- Recursively convert to plain JS
+  warn // (logLevel, warning) => void -- Emit a warning
 } from 'yaml/util'
 ```
 

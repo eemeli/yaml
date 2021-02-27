@@ -1,5 +1,3 @@
-/* global console, process */
-
 import { LogLevel, LogLevelId } from './constants.js'
 
 export function debug(logLevel: LogLevelId, ...messages: any[]) {
