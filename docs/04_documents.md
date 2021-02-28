@@ -127,7 +127,7 @@ In addition to the above, the document object also provides the same **accessor 
 
 To define a tag prefix to use when stringifying, use **`setTagPrefix(handle, prefix)`** rather than setting a value directly in `tagPrefixes`. This will guarantee that the `handle` is valid (by throwing an error), and will overwrite any previous definition for the `handle`. Use an empty `prefix` value to remove a prefix.
 
-#### `Document#toJS()`, `Document#toJSON()` and `Document#toString()`
+#### `Document#toJS()` and `Document#toJSON()`
 
 ```js
 const src = '1969-07-21T02:56:15Z'
@@ -159,7 +159,19 @@ The following options are also available when calling `YAML.parse()`:
 [exponential entity expansion attacks]: https://en.wikipedia.org/wiki/Billion_laughs_attack
 [reviver function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter
 
-To stringify a document as YAML, use **`toString()`**. This will also be called by `String(doc)`. This method will throw if the `errors` array is not empty.
+#### `Document#toString()`
+
+To stringify a document as YAML, use **`toString(options = {})`**.
+This will also be called by `String(doc)` (with no options).
+This method will throw if the `errors` array is not empty.
+
+The following options are also available when calling `YAML.stringify()`:
+
+| `toString()` Option | Type      | Description                                                                                           |
+| ------------------- | --------- | ----------------------------------------------------------------------------------------------------- |
+| indent              | `number`  | The number of spaces to use when indenting code. By default `2`.                                      |
+| indentSeq           | `boolean` | Whether block sequences should be indented. By default `true`.                                        |
+| simpleKeys          | `boolean` | Require keys to be scalars and always use implicit rather than explicit notation. By default `false`. |
 
 ## Working with Anchors
 

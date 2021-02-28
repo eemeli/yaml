@@ -181,7 +181,7 @@ export type ToStringOptions = {
   simpleKeys?: boolean
 }
 
-export type Options = ParseOptions & DocumentOptions & SchemaOptions & ToStringOptions
+export type Options = ParseOptions & DocumentOptions & SchemaOptions
 
 /**
  * `yaml` defines document-specific options in three places: as an argument of
@@ -190,15 +190,12 @@ export type Options = ParseOptions & DocumentOptions & SchemaOptions & ToStringO
  * `YAML.defaultOptions` override version-dependent defaults, and argument
  * options override both.
  */
-export const defaultOptions: Required<ParseOptions & DocumentOptions & ToStringOptions> = {
+export const defaultOptions: Required<ParseOptions & DocumentOptions> = {
   anchorPrefix: 'a',
-  indent: 2,
-  indentSeq: true,
   keepUndefined: false,
   lineCounter: null,
   logLevel: 'warn',
   prettyErrors: true,
-  simpleKeys: false,
   strict: true,
   version: '1.2'
 }

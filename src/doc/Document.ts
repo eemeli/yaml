@@ -77,8 +77,7 @@ export class Document<T = unknown> {
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []
 
-  options: Required<ParseOptions & DocumentOptions & ToStringOptions> &
-    SchemaOptions
+  options: Required<ParseOptions & DocumentOptions> & SchemaOptions
 
   /** The schema used with the document. Use `setSchema()` to change. */
   schema: Schema
@@ -404,11 +403,13 @@ export class Document<T = unknown> {
   toString({ indent, indentSeq, simpleKeys }: ToStringOptions = {}) {
     if (this.errors.length > 0)
       throw new Error('Document with errors cannot be stringified')
-    const indentSize = indent ?? this.options.indent
+
+    const indentSize = typeof indent === 'number' ? indent : 2
     if (!Number.isInteger(indentSize) || indentSize <= 0) {
       const s = JSON.stringify(indentSize)
       throw new Error(`"indent" option must be a positive integer, not ${s}`)
     }
+
     const lines = []
     let hasDirectives = false
     const dir = this.directives.toString(this)
@@ -425,9 +426,9 @@ export class Document<T = unknown> {
       anchors: Object.create(null),
       doc: this,
       indent: '',
-      indentSeq: indentSeq ?? this.options.indentSeq,
+      indentSeq: indentSeq !== false, // default true
       indentStep: ' '.repeat(indentSize),
-      simpleKeys: simpleKeys ?? this.options.simpleKeys,
+      simpleKeys: simpleKeys === true, // default false
       stringify // Requiring directly in nodes would create circular dependencies
     }
     let chompKeep = false

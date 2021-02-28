@@ -595,34 +595,34 @@ describe('scalar styles', () => {
 describe('simple keys', () => {
   test('key with no value', () => {
     const doc = YAML.parseDocument('? ~')
-    expect(String(doc)).toBe('? ~\n')
+    expect(doc.toString()).toBe('? ~\n')
     doc.options.simpleKeys = true
-    expect(String(doc)).toBe('~: null\n')
+    expect(doc.toString({ simpleKeys: true })).toBe('~: null\n')
   })
 
   test('key with block scalar value', () => {
     const doc = YAML.parseDocument('foo: bar')
     doc.contents.items[0].key.type = 'BLOCK_LITERAL'
-    expect(String(doc)).toBe('? |-\n  foo\n: bar\n')
+    expect(doc.toString()).toBe('? |-\n  foo\n: bar\n')
     doc.options.simpleKeys = true
-    expect(String(doc)).toBe('"foo": bar\n')
+    expect(doc.toString({ simpleKeys: true })).toBe('"foo": bar\n')
   })
 
   test('key with comment', () => {
     const doc = YAML.parseDocument('foo: bar')
     doc.contents.items[0].key.comment = 'FOO'
-    expect(String(doc)).toBe('foo: #FOO\n  bar\n')
+    expect(doc.toString()).toBe('foo: #FOO\n  bar\n')
     doc.options.simpleKeys = true
-    expect(() => String(doc)).toThrow(
+    expect(() => doc.toString({ simpleKeys: true })).toThrow(
       /With simple keys, key nodes cannot have comments/
     )
   })
 
   test('key with collection value', () => {
     const doc = YAML.parseDocument('[foo]: bar')
-    expect(String(doc)).toBe('? [ foo ]\n: bar\n')
+    expect(doc.toString()).toBe('? [ foo ]\n: bar\n')
     doc.options.simpleKeys = true
-    expect(() => String(doc)).toThrow(
+    expect(() => doc.toString({ simpleKeys: true })).toThrow(
       /With simple keys, collection cannot be used as a key value/
     )
   })
@@ -632,9 +632,9 @@ describe('simple keys', () => {
     ? ${new Array(1026).join('a')}
     : longkey`
     const doc = YAML.parseDocument(str)
-    expect(String(doc)).toBe(`? ${new Array(1026).join('a')}\n: longkey\n`)
+    expect(doc.toString()).toBe(`? ${new Array(1026).join('a')}\n: longkey\n`)
     doc.options.simpleKeys = true
-    expect(() => String(doc)).toThrow(
+    expect(() => doc.toString({ simpleKeys: true })).toThrow(
       /With simple keys, single line scalar must not span more than 1024 characters/
     )
   })

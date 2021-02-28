@@ -3,13 +3,10 @@
 ```js
 YAML.defaultOptions
 // { anchorPrefix: 'a',
-//   indent: 2,
-//   indentSeq: true,
 //   keepUndefined: false,
 //   lineCounter: null,
 //   logLevel: 'warn',
 //   prettyErrors: true,
-//   simpleKeys: false,
 //   strict: true,
 //   version: '1.2' }
 
@@ -31,15 +28,12 @@ The `version` option value (`'1.2'` by default) may be overridden by any documen
 | ---------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | anchorPrefix     | `string`                                      | Default prefix for anchors. By default `'a'`, resulting in anchors `a1`, `a2`, etc.                                                                                     |
 | customTags       | `Tag[] ⎮ function`                            | Array of [additional tags](#custom-data-types) to include in the schema                                                                                                 |
-| indent           | `number`                                      | The number of spaces to use when indenting code. By default `2`.                                                                                                        |
-| indentSeq        | `boolean`                                     | Whether block sequences should be indented. By default `true`.                                                                                                          |
 | keepUndefined    | `boolean`                                     | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`. By default `false`.                                       |
 | logLevel         | `'warn' ⎮ 'error' ⎮ 'silent'`                 | Control the verbosity of `YAML.parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors. By default `'warn'`.                      |
 | merge            | `boolean`                                     | Enable support for `<<` merge keys. By default `false` for YAML 1.2 and `true` for earlier versions.                                                                    |
 | prettyErrors     | `boolean`                                     | Include line position & node type directly in errors; drop their verbose source and context. By default `false`.                                                        |
 | resolveKnownTags | `boolean`                                     | When using the `'core'` schema, support parsing values with these explicit [YAML 1.1 tags]: `!!binary`, `!!omap`, `!!pairs`, `!!set`, `!!timestamp`. By default `true`. |
 | schema           | `'core' ⎮ 'failsafe' ⎮` `'json' ⎮ 'yaml-1.1'` | The base schema to use. By default `'core'` for YAML 1.2 and `'yaml-1.1'` for earlier versions.                                                                         |
-| simpleKeys       | `boolean`                                     | When stringifying, require keys to be scalars and to use implicit rather than explicit notation. By default `false`.                                                    |
 | sortMapEntries   | `boolean ⎮` `(a, b: Pair) => number`          | When stringifying, sort map entries. If `true`, sort by comparing key values with `<`. By default `false`.                                                              |
 | strict           | `boolean`                                     | When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content. By default `true`.                                                 |
 | version          | `'1.0' ⎮ '1.1' ⎮ '1.2'`                       | The YAML version used by documents without a `%YAML` directive. By default `'1.2'`.                                                                                     |

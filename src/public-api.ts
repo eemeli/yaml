@@ -5,7 +5,7 @@ import { Document, Replacer } from './doc/Document.js'
 import { YAMLParseError } from './errors.js'
 import { warn } from './log.js'
 import type { ParsedNode } from './nodes/Node.js'
-import type { Options, ToJSOptions } from './options.js'
+import type { Options, ToJSOptions, ToStringOptions } from './options.js'
 import { Parser } from './parse/parser.js'
 
 export interface EmptyStream
@@ -114,16 +114,16 @@ export function parse(
  * @param replacer - A replacer array or function, as in `JSON.stringify()`
  * @returns Will always include `\n` as the last character, as is expected of YAML documents.
  */
-export function stringify(value: any, options?: Options): string
+export function stringify(value: any, options?: Options & ToStringOptions): string
 export function stringify(
   value: any,
   replacer?: Replacer | null,
-  options?: string | number | Options
+  options?: string | number | Options & ToStringOptions
 ): string
 export function stringify(
   value: any,
-  replacer?: Replacer | Options | null,
-  options?: string | number | Options
+  replacer?: Replacer | Options & ToStringOptions | null,
+  options?: string | number | Options & ToStringOptions
 ) {
   let _replacer: Replacer | null = null
   if (typeof replacer === 'function' || Array.isArray(replacer)) {
@@ -138,8 +138,8 @@ export function stringify(
     options = indent < 1 ? undefined : indent > 8 ? { indent: 8 } : { indent }
   }
   if (value === undefined) {
-    const { keepUndefined } = options || (replacer as Options) || {}
+    const { keepUndefined } = options || (replacer as Options & ToStringOptions) || {}
     if (!keepUndefined) return undefined
   }
-  return new Document(value, _replacer, options).toString()
+  return new Document(value, _replacer, options).toString(options)
 }
