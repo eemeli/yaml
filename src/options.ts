@@ -14,6 +14,29 @@ import {
 } from './tags/options.js'
 import type { CollectionTag, ScalarTag, TagValue } from './tags/types.js'
 
+export interface ParseOptions {
+  /**
+   * If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)`
+   * to provide the `{ line, col }` positions within the input.
+   */
+  lineCounter?: LineCounter | null
+
+  /**
+   * Include line/col position & node type directly in parse errors.
+   *
+   * Default: `true`
+   */
+  prettyErrors?: boolean
+
+  /**
+   * Detect and report errors that are required by the YAML 1.2 spec,
+   * but are caused by unambiguous content.
+   *
+   * Default: `true`
+   */
+  strict?: boolean
+}
+
 export interface DocumentOptions {
   /**
    * Default prefix for anchors.
@@ -29,13 +52,6 @@ export interface DocumentOptions {
    * Default: `false`
    */
   keepUndefined?: boolean
-
-  /**
-   * If set, newlines will be tracked while parsing, to allow for
-   * `lineCounter.linePos(offset)` to provide the `{ line, col }` positions
-   * within the input.
-   */
-  lineCounter?: LineCounter | null
 
   /**
    * Control the logging level during parsing
@@ -56,19 +72,7 @@ export interface DocumentOptions {
    * Default: `100`
    */
   maxAliasCount?: number
-  /**
-   * Include line position & node type directly in errors; drop their verbose source and context.
-   *
-   * Default: `true`
-   */
-  prettyErrors?: boolean
 
-  /**
-   * When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.
-   *
-   * Default: `true`
-   */
-  strict?: boolean
   /**
    * The YAML version used by documents without a `%YAML` directive.
    *
@@ -135,8 +139,6 @@ export interface CreateNodeOptions {
    * corresponding tag to be available in this document's schema.
    */
   tag?: string
-
-  [key: string]: unknown
 }
 
 export interface ToJSOptions {
@@ -159,8 +161,6 @@ export interface ToJSOptions {
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#using_the_reviver_parameter
    */
   reviver?: Reviver
-
-  [key: string]: unknown
 }
 
 export interface ToStringOptions {
@@ -184,11 +184,9 @@ export interface ToStringOptions {
    * Default: `false`
    */
   simpleKeys?: boolean
-
-  [key: string]: unknown
 }
 
-export type Options = DocumentOptions & SchemaOptions & ToStringOptions
+export type Options = ParseOptions & DocumentOptions & SchemaOptions & ToStringOptions
 
 /**
  * `yaml` defines document-specific options in three places: as an argument of
@@ -197,7 +195,7 @@ export type Options = DocumentOptions & SchemaOptions & ToStringOptions
  * `YAML.defaultOptions` override version-dependent defaults, and argument
  * options override both.
  */
-export const defaultOptions: Required<DocumentOptions & ToStringOptions> = {
+export const defaultOptions: Required<ParseOptions & DocumentOptions & ToStringOptions> = {
   anchorPrefix: 'a',
   indent: 2,
   indentSeq: true,

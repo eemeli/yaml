@@ -21,6 +21,7 @@ import {
   documentOptions,
   DocumentOptions,
   Options,
+  ParseOptions,
   SchemaOptions,
   ToJSOptions,
   ToStringOptions
@@ -76,7 +77,8 @@ export class Document<T = unknown> {
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []
 
-  options: Required<DocumentOptions & ToStringOptions> & SchemaOptions
+  options: Required<ParseOptions & DocumentOptions & ToStringOptions> &
+    SchemaOptions
 
   /** The schema used with the document. Use `setSchema()` to change. */
   schema: Schema
@@ -351,7 +353,7 @@ export class Document<T = unknown> {
   }
 
   /** A plain JavaScript representation of the document `contents`. */
-  toJS(opt?: ToJSOptions): any
+  toJS(opt?: ToJSOptions & { [ignored: string]: unknown }): any
 
   // json & jsonArg are only used from toJSON()
   toJS({
