@@ -2,8 +2,16 @@
 
 ```js
 YAML.defaultOptions
-// { indent: 2,
-//   mapAsMap: false,
+// { anchorPrefix: 'a',
+//   indent: 2,
+//   indentSeq: true,
+//   keepUndefined: false,
+//   lineCounter: null,
+//   logLevel: 'warn',
+//   maxAliasCount: 100,
+//   prettyErrors: true,
+//   simpleKeys: false,
+//   strict: true,
 //   version: '1.2' }
 
 YAML.Document.defaults
@@ -28,7 +36,6 @@ The `version` option value (`'1.2'` by default) may be overridden by any documen
 | indentSeq        | `boolean`                                     | Whether block sequences should be indented. By default `true`.                                                                                                          |
 | keepUndefined    | `boolean`                                     | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`. By default `false`.                                       |
 | logLevel         | `'warn' ⎮ 'error' ⎮ 'silent'`                 | Control the verbosity of `YAML.parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors. By default `'warn'`.                      |
-| mapAsMap         | `boolean`                                     | When outputting JS, use Map rather than Object to represent mappings. By default `false`.                                                                               |
 | maxAliasCount    | `number`                                      | Prevent [exponential entity expansion attacks] by limiting data aliasing count; set to `-1` to disable checks; `0` disallows all alias nodes. By default `100`.         |
 | merge            | `boolean`                                     | Enable support for `<<` merge keys. By default `false` for YAML 1.2 and `true` for earlier versions.                                                                    |
 | prettyErrors     | `boolean`                                     | Include line position & node type directly in errors; drop their verbose source and context. By default `false`.                                                        |

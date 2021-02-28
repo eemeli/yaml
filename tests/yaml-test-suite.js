@@ -107,10 +107,10 @@ testDirs.forEach(dir => {
 
       if (outYaml) {
         _test('out.yaml', () => {
-          const resDocs = YAML.parseAllDocuments(yaml, { mapAsMap: true })
-          const resJson = resDocs.map(doc => doc.toJS())
-          const expDocs = YAML.parseAllDocuments(outYaml, { mapAsMap: true })
-          const expJson = expDocs.map(doc => doc.toJS())
+          const resDocs = YAML.parseAllDocuments(yaml)
+          const resJson = resDocs.map(doc => doc.toJS({ mapAsMap: true }))
+          const expDocs = YAML.parseAllDocuments(outYaml)
+          const expJson = expDocs.map(doc => doc.toJS({ mapAsMap: true }))
           expect(resJson).toMatchObject(expJson)
         })
       }

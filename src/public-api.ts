@@ -5,7 +5,7 @@ import { Document, Replacer } from './doc/Document.js'
 import { YAMLParseError } from './errors.js'
 import { warn } from './log.js'
 import type { ParsedNode } from './nodes/Node.js'
-import type { Options } from './options.js'
+import type { Options, ToJSOptions } from './options.js'
 import { Parser } from './parse/parser.js'
 
 export interface EmptyStream
@@ -78,13 +78,17 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
  *   document, so Maps become objects, Sequences arrays, and scalars result in
  *   nulls, booleans, numbers and strings.
  */
-export function parse(src: string, options?: Options): any
-export function parse(src: string, reviver: Reviver, options?: Options): any
+export function parse(src: string, options?: Options & ToJSOptions): any
+export function parse(
+  src: string,
+  reviver: Reviver,
+  options?: Options & ToJSOptions
+): any
 
 export function parse(
   src: string,
-  reviver?: Reviver | Options,
-  options?: Options
+  reviver?: Reviver | (Options & ToJSOptions),
+  options?: Options & ToJSOptions
 ) {
   let _reviver: Reviver | undefined = undefined
   if (typeof reviver === 'function') {
@@ -101,7 +105,7 @@ export function parse(
       throw doc.errors[0]
     else doc.errors = []
   }
-  return doc.toJS({ reviver: _reviver })
+  return doc.toJS(Object.assign({ reviver: _reviver }, options))
 }
 
 /**

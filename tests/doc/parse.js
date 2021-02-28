@@ -633,8 +633,8 @@ describe('handling complex keys', () => {
 
   test('do not add warning when using mapIsMap: true', () => {
     process.emitWarning = jest.fn()
-    const doc = YAML.parseDocument('[foo]: bar', { mapAsMap: true })
-    doc.toJS()
+    const doc = YAML.parseDocument('[foo]: bar')
+    doc.toJS({ mapAsMap: true })
     expect(doc.warnings).toMatchObject([])
     expect(process.emitWarning).not.toHaveBeenCalled()
   })

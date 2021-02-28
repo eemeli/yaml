@@ -376,8 +376,7 @@ export class Document<T = unknown> {
       doc: this,
       indentStep: '  ',
       keep: !json,
-      mapAsMap:
-        typeof mapAsMap === 'boolean' ? mapAsMap : !!this.options.mapAsMap,
+      mapAsMap: mapAsMap === true,
       mapKeyWarned: false,
       maxAliasCount: this.options.maxAliasCount,
       stringify

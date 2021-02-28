@@ -59,12 +59,7 @@ export type DocumentOptions = {
    * Default: `'warn'`
    */
   logLevel?: LogLevelId
-  /**
-   * When outputting JS, use Map rather than Object to represent mappings.
-   *
-   * Default: `false`
-   */
-  mapAsMap?: boolean
+
   /**
    * Prevent exponential entity expansion attacks by limiting data aliasing count;
    * set to `-1` to disable checks; `0` disallows all alias nodes.
@@ -202,7 +197,6 @@ export const defaultOptions: Required<ParseOptions & DocumentOptions & ToStringO
   keepUndefined: false,
   lineCounter: null,
   logLevel: 'warn',
-  mapAsMap: false,
   maxAliasCount: 100,
   prettyErrors: true,
   simpleKeys: false,

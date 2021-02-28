@@ -145,7 +145,7 @@ String(doc)
 
 For a plain JavaScript representation of the document, **`toJS()`** is your friend. Its output may include `Map` and `Set` collections (e.g. if the `mapAsMap` option is true) and complex scalar values like `Date` for `!!timestamp`, but all YAML nodes will be resolved. For a representation consisting only of JSON values, use **`toJSON()`**.
 
-Use `toJS({ mapAsMap, onAnchor, reviver })` to explicitly set the `mapAsMap` option, define an `onAnchor` callback `(value: any, count: number) => void` for each aliased anchor in the document, or to apply a [reviver function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter) to the output.
+Use `toJS({ mapAsMap, onAnchor, reviver })` to set the `mapAsMap` option, define an `onAnchor` callback `(value: any, count: number) => void` for each aliased anchor in the document, or to apply a [reviver function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter) to the output.
 
 Conversely, to stringify a document as YAML, use **`toString()`**. This will also be called by `String(doc)`. This method will throw if the `errors` array is not empty.
 

@@ -209,8 +209,8 @@ one: 1
 one: 1
 2: two
 { 3: 4 }: many\n`
-      const doc = YAML.parseDocument(src, { mapAsMap: true })
-      expect(doc.toJS()).toMatchObject(
+      const doc = YAML.parseDocument(src)
+      expect(doc.toJS({ mapAsMap: true })).toMatchObject(
         new Map([
           ['one', 1],
           [2, 'two'],
@@ -219,7 +219,7 @@ one: 1
       )
       expect(doc.errors).toHaveLength(0)
       doc.contents.items[2].key = { 3: 4 }
-      expect(doc.toJS()).toMatchObject(
+      expect(doc.toJS({ mapAsMap: true })).toMatchObject(
         new Map([
           ['one', 1],
           [2, 'two'],
