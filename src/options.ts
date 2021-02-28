@@ -8,13 +8,21 @@ import type { LineCounter } from './parse/line-counter.js'
 import {
   binaryOptions,
   boolOptions,
-  intOptions,
   nullOptions,
   strOptions
 } from './tags/options.js'
 import type { CollectionTag, ScalarTag, TagValue } from './tags/types.js'
 
 export type ParseOptions = {
+  /**
+   * Whether integers should be parsed into BigInt rather than number values.
+   *
+   * Default: `false`
+   *
+   * https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt
+   */
+  intAsBigInt?: boolean
+
   /**
    * If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)`
    * to provide the `{ line, col }` positions within the input.
@@ -199,6 +207,7 @@ export const defaultOptions: Required<
   Omit<ParseOptions, 'lineCounter'> & Omit<DocumentOptions, 'directives'>
 > = {
   anchorPrefix: 'a',
+  intAsBigInt: false,
   keepUndefined: false,
   logLevel: 'warn',
   prettyErrors: true,
@@ -222,12 +231,6 @@ export const scalarOptions = {
   },
   set bool(opt) {
     Object.assign(boolOptions, opt)
-  },
-  get int() {
-    return intOptions
-  },
-  set int(opt) {
-    Object.assign(intOptions, opt)
   },
   get null() {
     return nullOptions

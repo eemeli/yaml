@@ -39,15 +39,6 @@ export const boolOptions = {
   falseStr: 'false'
 }
 
-export const intOptions = {
-  /**
-   * Whether integers should be parsed into BigInt values.
-   *
-   * Default: `false`
-   */
-  asBigInt: false
-}
-
 export const nullOptions = {
   /**
    * String representation for `null`.

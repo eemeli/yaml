@@ -79,7 +79,7 @@ export function composeCollection(
     }
   }
 
-  const res = tag.resolve(coll, msg => onError(coll.range[0], msg))
+  const res = tag.resolve(coll, msg => onError(coll.range[0], msg), doc.options)
   const node = isNode(res)
     ? (res as ParsedNode)
     : (new Scalar(res) as Scalar.Parsed)

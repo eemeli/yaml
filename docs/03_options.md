@@ -16,9 +16,12 @@ Parse options affect the parsing and composition of a YAML Document from it sour
 
 | Parse Option | Type          | Description                                                                                                                             |
 | ------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| intAsBigInt  | `boolean`     | Whether integers should be parsed into [BigInt] rather than `number` values. By default `false`.                                        |
 | lineCounter  | `LineCounter` | If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)` to provide the `{ line, col }` positions within the input. |
 | prettyErrors | `boolean`     | Include line position & node type directly in errors. By default `false`.                                                               |
 | strict       | `boolean`     | When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content. By default `true`.                 |
+
+[bigint]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt
 
 Document options are relevant for operations on the `Document` object.
 
@@ -94,20 +97,17 @@ YAML.stringify({ this: null, that: 'value' })
 
 Some customization options are availabe to control the parsing and stringification of scalars. Note that these values are used by all documents.
 
-| Option             | Type      | Default value                                       | Description                                                                                                                                                                |
-| ------------------ | --------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| binary.defaultType | `Type`    | `'BLOCK_LITERAL'`                                   | The type of string literal used to stringify `!!binary` values                                                                                                             |
-| binary.lineWidth   | `number`  | `76`                                                | Maximum line width for `!!binary` values                                                                                                                                   |
-| bool.trueStr       | `string`  | `'true'`                                            | String representation for `true` values                                                                                                                                    |
-| bool.falseStr      | `string`  | `'false'`                                           | String representation for `false` values                                                                                                                                   |
-| int.asBigInt       | `boolean` | `false`                                             | Whether integers should be parsed into [BigInt] values                                                                                                                     |
-| null.nullStr       | `string`  | `'null'`                                            | String representation for `null` values                                                                                                                                    |
-| str.defaultType    | `Type`    | `'PLAIN'`                                           | The default type of string literal used to stringify values in general                                                                                                     |
-| str.defaultKeyType | `Type`    | `'PLAIN'`                                           | The default type of string literal used to stringify implicit key values                                                                                                   |
-| str.doubleQuoted   | `object`  | `{ jsonEncoding: false,` `minMultiLineLength: 40 }` | `jsonEncoding`: Whether to restrict double-quoted strings to use JSON-compatible syntax; `minMultiLineLength`: Minimum length to use multiple lines to represent the value |
-| str.fold           | `object`  | `{ lineWidth: 80,` `minContentWidth: 20 }`          | `lineWidth`: Maximum line width (set to `0` to disable folding); `minContentWidth`: Minimum width for highly-indented content                                              |
-
-[bigint]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt
+| Option             | Type     | Default value                                       | Description                                                                                                                                                                |
+| ------------------ | -------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| binary.defaultType | `Type`   | `'BLOCK_LITERAL'`                                   | The type of string literal used to stringify `!!binary` values                                                                                                             |
+| binary.lineWidth   | `number` | `76`                                                | Maximum line width for `!!binary` values                                                                                                                                   |
+| bool.trueStr       | `string` | `'true'`                                            | String representation for `true` values                                                                                                                                    |
+| bool.falseStr      | `string` | `'false'`                                           | String representation for `false` values                                                                                                                                   |
+| null.nullStr       | `string` | `'null'`                                            | String representation for `null` values                                                                                                                                    |
+| str.defaultType    | `Type`   | `'PLAIN'`                                           | The default type of string literal used to stringify values in general                                                                                                     |
+| str.defaultKeyType | `Type`   | `'PLAIN'`                                           | The default type of string literal used to stringify implicit key values                                                                                                   |
+| str.doubleQuoted   | `object` | `{ jsonEncoding: false,` `minMultiLineLength: 40 }` | `jsonEncoding`: Whether to restrict double-quoted strings to use JSON-compatible syntax; `minMultiLineLength`: Minimum length to use multiple lines to represent the value |
+| str.fold           | `object` | `{ lineWidth: 80,` `minContentWidth: 20 }`          | `lineWidth`: Maximum line width (set to `0` to disable folding); `minContentWidth`: Minimum width for highly-indented content                                              |
 
 ## Silencing Warnings
 

@@ -26,7 +26,9 @@ export function composeScalar(
 
   let scalar: Scalar
   try {
-    const res = tag ? tag.resolve(value, msg => onError(offset, msg)) : value
+    const res = tag
+      ? tag.resolve(value, msg => onError(offset, msg), doc.options)
+      : value
     scalar = isScalar(res) ? res : new Scalar(res)
   } catch (error) {
     onError(offset, error.message)

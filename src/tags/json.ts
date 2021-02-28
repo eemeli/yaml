@@ -3,10 +3,9 @@
 import { Scalar } from '../nodes/Scalar.js'
 import { map } from './failsafe/map.js'
 import { seq } from './failsafe/seq.js'
-import { intOptions } from './options.js'
 import { CollectionTag, ScalarTag } from './types.js'
 
-function intIdentify(value: unknown): value is number | BigInt {
+function intIdentify(value: unknown): value is number | bigint {
   return typeof value === 'bigint' || Number.isInteger(value)
 }
 
@@ -42,7 +41,8 @@ const jsonScalars: ScalarTag[] = [
     default: true,
     tag: 'tag:yaml.org,2002:int',
     test: /^-?(?:0|[1-9][0-9]*)$/,
-    resolve: str => (intOptions.asBigInt ? BigInt(str) : parseInt(str, 10)),
+    resolve: (str, _onError, { intAsBigInt }) =>
+      intAsBigInt ? BigInt(str) : parseInt(str, 10),
     stringify: ({ value }) =>
       intIdentify(value) ? value.toString() : JSON.stringify(value)
   },
