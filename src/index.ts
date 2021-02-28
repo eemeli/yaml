@@ -1,7 +1,7 @@
 export { Composer } from './compose/composer.js'
 export { Type } from './constants.js'
 
-export { CreateNodeOptions, Document } from './doc/Document.js'
+export { Document } from './doc/Document.js'
 export { Schema } from './doc/Schema.js'
 
 export { YAMLError, YAMLParseError, YAMLWarning } from './errors.js'
@@ -25,7 +25,15 @@ export { Scalar } from './nodes/Scalar.js'
 export { YAMLMap } from './nodes/YAMLMap.js'
 export { YAMLSeq } from './nodes/YAMLSeq.js'
 
-export { Options, defaultOptions, scalarOptions } from './options.js'
+export {
+  CreateNodeOptions,
+  defaultOptions,
+  Options,
+  scalarOptions,
+  SchemaOptions,
+  ToJSOptions,
+  ToStringOptions
+} from './options.js'
 
 export { Lexer } from './parse/lexer.js'
 export { LineCounter } from './parse/line-counter.js'

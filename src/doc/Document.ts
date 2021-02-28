@@ -16,93 +16,25 @@ import { toJS, ToJSAnchorValue, ToJSContext } from '../nodes/toJS.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
 import {
+  CreateNodeOptions,
+  defaultOptions,
+  documentOptions,
   DocumentOptions,
   Options,
-  defaultOptions,
-  documentOptions
+  SchemaOptions,
+  ToJSOptions,
+  ToStringOptions
 } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
 import { stringify, StringifyContext } from '../stringify/stringify.js'
-import type { TagId, TagObj } from '../tags/types.js'
+import type { TagValue } from '../tags/types.js'
 import { Anchors } from './Anchors.js'
-import { Schema, SchemaName, SchemaOptions } from './Schema.js'
-import { Reviver, applyReviver } from './applyReviver.js'
+import { Schema, SchemaName } from './Schema.js'
+import { applyReviver } from './applyReviver.js'
 import { createNode, CreateNodeContext } from './createNode.js'
 import { Directives } from './directives.js'
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)
-export type { Anchors, Reviver }
-
-export interface CreateNodeOptions {
-  keepUndefined?: boolean | null
-
-  onTagObj?: (tagObj: TagObj) => void
-
-  /**
-   * Filter or modify values while creating a node.
-   *
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter
-   */
-  replacer?: Replacer
-
-  /**
-   * Specify the collection type, e.g. `"!!omap"`. Note that this requires the
-   * corresponding tag to be available in this document's schema.
-   */
-  tag?: string
-}
-
-export interface ToJSOptions {
-  json?: boolean
-  jsonArg?: string | null
-
-  /**
-   * Use Map rather than Object to represent mappings.
-   *
-   * Default: `false`
-   */
-  mapAsMap?: boolean
-
-  /**
-   * If defined, called with the resolved `value` and reference `count` for
-   * each anchor in the document.
-   */
-  onAnchor?: (value: unknown, count: number) => void
-
-  /**
-   * Optional function that may filter or modify the output JS value
-   *
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#using_the_reviver_parameter
-   */
-  reviver?: Reviver
-
-  [key: string]: unknown
-}
-
-export interface ToStringOptions {
-  /**
-   * The number of spaces to use when indenting code.
-   *
-   * Default: `2`
-   */
-  indent?: number
-
-  /**
-   * Whether block sequences should be indented.
-   *
-   * Default: `true`
-   */
-  indentSeq?: boolean
-
-  /**
-   * Require keys to be scalars and to use implicit rather than explicit notation.
-   *
-   * Default: `false`
-   */
-  simpleKeys?: boolean
-
-  [key: string]: unknown
-}
 
 export declare namespace Document {
   interface Parsed<T extends ParsedNode = ParsedNode> extends Document<T> {
@@ -387,7 +319,7 @@ export class Document<T = unknown> {
    */
   setSchema(
     id: Options['version'] | SchemaName | null,
-    customTags?: (TagId | TagObj)[]
+    customTags?: TagValue[]
   ) {
     if (!id && !customTags) return
 
@@ -419,7 +351,16 @@ export class Document<T = unknown> {
   }
 
   /** A plain JavaScript representation of the document `contents`. */
-  toJS({ json, jsonArg, mapAsMap, onAnchor, reviver }: ToJSOptions = {}) {
+  toJS(opt?: ToJSOptions): any
+
+  // json & jsonArg are only used from toJSON()
+  toJS({
+    json,
+    jsonArg,
+    mapAsMap,
+    onAnchor,
+    reviver
+  }: ToJSOptions & { json?: boolean; jsonArg?: string | null } = {}) {
     const anchorNodes = Object.values(this.anchors.map).map(
       node =>
         [node, { alias: [], aliasCount: 0, count: 1 }] as [

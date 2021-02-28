@@ -122,3 +122,5 @@ export interface CollectionTag extends TagBase {
 }
 
 export type TagObj = ScalarTag | CollectionTag
+
+export type TagValue = TagId | ScalarTag | CollectionTag

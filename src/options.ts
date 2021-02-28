@@ -1,6 +1,9 @@
 import { LogLevelId, defaultTagPrefix } from './constants.js'
-import { ToStringOptions } from './doc/Document.js'
-import type { SchemaOptions } from './doc/Schema.js'
+import type { Reviver } from './doc/applyReviver.js'
+import type { Directives } from './doc/directives.js'
+import type { Replacer } from './doc/Document.js'
+import type { SchemaName } from './doc/Schema.js'
+import type { Pair } from './nodes/Pair.js'
 import type { LineCounter } from './parse/line-counter.js'
 import {
   binaryOptions,
@@ -9,6 +12,7 @@ import {
   nullOptions,
   strOptions
 } from './tags/options.js'
+import type { CollectionTag, ScalarTag, TagValue } from './tags/types.js'
 
 export interface DocumentOptions {
   /**
@@ -83,6 +87,117 @@ export interface DocumentOptions {
    * Default: `"1.2"`
    */
   version?: '1.1' | '1.2'
+}
+
+export interface SchemaOptions {
+  /**
+   * Array of additional tags to include in the schema, or a function that may
+   * modify the schema's base tag array.
+   */
+  customTags?: TagValue[] | ((tags: TagValue[]) => TagValue[]) | null
+
+  directives?: Directives
+
+  /**
+   * Enable support for `<<` merge keys.
+   *
+   * Default: `false` for YAML 1.2, `true` for earlier versions
+   */
+  merge?: boolean
+
+  /**
+   * When using the `'core'` schema, support parsing values with these
+   * explicit YAML 1.1 tags:
+   *
+   * `!!binary`, `!!omap`, `!!pairs`, `!!set`, `!!timestamp`.
+   *
+   * Default `true`
+   */
+  resolveKnownTags?: boolean
+
+  /**
+   * The base schema to use.
+   *
+   * Default: `"core"` for YAML 1.2, `"yaml-1.1"` for earlier versions
+   */
+  schema?: SchemaName
+
+  /**
+   * When stringifying, sort map entries. If `true`, sort by comparing key values with `<`.
+   *
+   * Default: `false`
+   */
+  sortMapEntries?: boolean | ((a: Pair, b: Pair) => number)
+}
+
+export interface CreateNodeOptions {
+  keepUndefined?: boolean | null
+
+  onTagObj?: (tagObj: ScalarTag | CollectionTag) => void
+
+  /**
+   * Filter or modify values while creating a node.
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter
+   */
+  replacer?: Replacer
+
+  /**
+   * Specify the collection type, e.g. `"!!omap"`. Note that this requires the
+   * corresponding tag to be available in this document's schema.
+   */
+  tag?: string
+
+  [key: string]: unknown
+}
+
+export interface ToJSOptions {
+  /**
+   * Use Map rather than Object to represent mappings.
+   *
+   * Default: `false`
+   */
+  mapAsMap?: boolean
+
+  /**
+   * If defined, called with the resolved `value` and reference `count` for
+   * each anchor in the document.
+   */
+  onAnchor?: (value: unknown, count: number) => void
+
+  /**
+   * Optional function that may filter or modify the output JS value
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#using_the_reviver_parameter
+   */
+  reviver?: Reviver
+
+  [key: string]: unknown
+}
+
+export interface ToStringOptions {
+  /**
+   * The number of spaces to use when indenting code.
+   *
+   * Default: `2`
+   */
+  indent?: number
+
+  /**
+   * Whether block sequences should be indented.
+   *
+   * Default: `true`
+   */
+  indentSeq?: boolean
+
+  /**
+   * Require keys to be scalars and to use implicit rather than explicit notation.
+   *
+   * Default: `false`
+   */
+  simpleKeys?: boolean
+
+  [key: string]: unknown
 }
 
 export type Options = DocumentOptions & SchemaOptions & ToStringOptions

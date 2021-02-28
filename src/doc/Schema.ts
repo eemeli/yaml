@@ -1,53 +1,10 @@
 import type { Pair } from '../nodes/Pair.js'
+import type { SchemaOptions } from '../options.js'
 import { schemas, tags } from '../tags/index.js'
-import type { CollectionTag, ScalarTag, TagId, TagObj } from '../tags/types.js'
-import { Directives } from './directives.js'
+import type { CollectionTag, ScalarTag } from '../tags/types.js'
 import { getSchemaTags } from './getSchemaTags.js'
 
 export type SchemaName = 'core' | 'failsafe' | 'json' | 'yaml-1.1'
-
-type TagValue = TagId | ScalarTag | CollectionTag
-
-export interface SchemaOptions {
-  /**
-   * Array of additional tags to include in the schema, or a function that may
-   * modify the schema's base tag array.
-   */
-  customTags?: TagValue[] | ((tags: TagValue[]) => TagValue[]) | null
-
-  directives?: Directives
-
-  /**
-   * Enable support for `<<` merge keys.
-   *
-   * Default: `false` for YAML 1.2, `true` for earlier versions
-   */
-  merge?: boolean
-
-  /**
-   * When using the `'core'` schema, support parsing values with these
-   * explicit YAML 1.1 tags:
-   *
-   * `!!binary`, `!!omap`, `!!pairs`, `!!set`, `!!timestamp`.
-   *
-   * Default `true`
-   */
-  resolveKnownTags?: boolean
-
-  /**
-   * The base schema to use.
-   *
-   * Default: `"core"` for YAML 1.2, `"yaml-1.1"` for earlier versions
-   */
-  schema?: SchemaName
-
-  /**
-   * When stringifying, sort map entries. If `true`, sort by comparing key values with `<`.
-   *
-   * Default: `false`
-   */
-  sortMapEntries?: boolean | ((a: Pair, b: Pair) => number)
-}
 
 const sortMapEntriesByKey = (a: Pair<any>, b: Pair<any>) =>
   a.key < b.key ? -1 : a.key > b.key ? 1 : 0
@@ -61,7 +18,7 @@ const coreKnownTags = {
 }
 
 export class Schema {
-  knownTags: Record<string, TagObj>
+  knownTags: Record<string, CollectionTag | ScalarTag>
   merge: boolean
   name: SchemaName
   sortMapEntries: ((a: Pair, b: Pair) => number) | null

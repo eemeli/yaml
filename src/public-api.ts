@@ -1,10 +1,11 @@
 import { Composer } from './compose/composer.js'
 import { LogLevel } from './constants.js'
-import { Document, Replacer, Reviver } from './doc/Document.js'
+import type { Reviver } from './doc/applyReviver.js'
+import { Document, Replacer } from './doc/Document.js'
 import { YAMLParseError } from './errors.js'
 import { warn } from './log.js'
-import { ParsedNode } from './nodes/Node.js'
-import { Options } from './options.js'
+import type { ParsedNode } from './nodes/Node.js'
+import type { Options } from './options.js'
 import { Parser } from './parse/parser.js'
 
 export interface EmptyStream
