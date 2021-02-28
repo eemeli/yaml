@@ -7,7 +7,7 @@ import { parseAllDocuments } from './public-api.js'
 
 // test harness for yaml-test-suite event tests
 export function testEvents(src: string, options?: Options) {
-  const opt = Object.assign({ keepNodeTypes: true, version: '1.2' }, options)
+  const opt = Object.assign({ version: '1.2' }, options)
   const docs = parseAllDocuments(src, opt)
   const errDoc = docs.find(doc => doc.errors.length > 0)
   const error = errDoc ? errDoc.errors[0].message : null

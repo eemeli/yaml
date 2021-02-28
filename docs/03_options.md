@@ -3,7 +3,6 @@
 ```js
 YAML.defaultOptions
 // { indent: 2,
-//   keepNodeTypes: true,
 //   mapAsMap: false,
 //   version: '1.2' }
 
@@ -27,8 +26,6 @@ The `version` option value (`'1.2'` by default) may be overridden by any documen
 | customTags       | `Tag[] ⎮ function`                            | Array of [additional tags](#custom-data-types) to include in the schema                                                                                                 |
 | indent           | `number`                                      | The number of spaces to use when indenting code. By default `2`.                                                                                                        |
 | indentSeq        | `boolean`                                     | Whether block sequences should be indented. By default `true`.                                                                                                          |
-| keepCstNodes     | `boolean`                                     | Include references in the AST to each node's corresponding CST node. By default `false`.                                                                                |
-| keepNodeTypes    | `boolean`                                     | Store the original node type when parsing documents. By default `true`.                                                                                                 |
 | keepUndefined    | `boolean`                                     | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`. By default `false`.                                       |
 | logLevel         | `'warn' ⎮ 'error' ⎮ 'silent'`                 | Control the verbosity of `YAML.parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors. By default `'warn'`.                      |
 | mapAsMap         | `boolean`                                     | When outputting JS, use Map rather than Object to represent mappings. By default `false`.                                                                               |

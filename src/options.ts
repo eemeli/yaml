@@ -23,18 +23,6 @@ export interface DocumentOptions {
   anchorPrefix?: string
 
   /**
-   * Include references in the AST to each node's corresponding CST node.
-   *
-   * Default: `false`
-   */
-  keepCstNodes?: boolean
-  /**
-   * Store the original node type when parsing documents.
-   *
-   * Default: `true`
-   */
-  keepNodeTypes?: boolean
-  /**
    * Keep `undefined` object values when creating mappings and return a Scalar
    * node when calling `YAML.stringify(undefined)`, rather than `undefined`.
    *
@@ -213,8 +201,6 @@ export const defaultOptions: Required<DocumentOptions & ToStringOptions> = {
   anchorPrefix: 'a',
   indent: 2,
   indentSeq: true,
-  keepCstNodes: false,
-  keepNodeTypes: true,
   keepUndefined: false,
   lineCounter: null,
   logLevel: 'warn',
