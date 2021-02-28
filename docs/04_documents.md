@@ -166,18 +166,21 @@ This method will throw if the `errors` array is not empty.
 
 The following options are also available when calling `YAML.stringify()`:
 
-| `toString()` Option            | Type      | Default value | Description                                                                                                                                                         |
-| ------------------------------ | --------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| doubleQuotedAsJSON             | `boolean` | `false`       | Restrict double-quoted strings to use JSON-compatible syntax.                                                                                                       |
-| doubleQuotedMinMultiLineLength | `number`  | `40`          | Minimum length for double-quoted strings to use multiple lines to represent the value.                                                                              |
-| falseStr                       | `string`  | `'false'`     | String representation for `false` values.                                                                                                                           |
-| indent                         | `number`  | `2`           | The number of spaces to use when indenting code. Should be a strictly positive integer.                                                                             |
-| indentSeq                      | `boolean` | `true`        | Whether block sequences should be indented.                                                                                                                         |
-| lineWidth                      | `number`  | `80`          | Maximum line width (set to `0` to disable folding). This is a soft limit, as only double-quoted semantics allow for inserting a line break in the middle of a word. |
-| minContentWidth                | `number`  | `20`          | Minimum line width for highly-indented content (set to `0` to disable).                                                                                             |
-| nullStr                        | `string`  | `'null'`      | String representation for `null` values.                                                                                                                            |
-| simpleKeys                     | `boolean` | `false`       | Require keys to be scalars and always use implicit rather than explicit notation.                                                                                   |
-| trueStr                        | `string`  | `'true'`      | String representation for `true` values.                                                                                                                            |
+| `toString()` Option            | Type          | Default value | Description                                                                                                                                                         |
+| ------------------------------ | ------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| defaultKeyType                 | `Type ⎮ null` | `null`        | If not `null`, overrides `defaultStringType` for implicit key values.                                                                                               |
+| defaultStringType              | `Type`        | `'PLAIN'`     | The default type of string literal used to stringify values.                                                                                                        |
+| doubleQuotedAsJSON             | `boolean`     | `false`       | Restrict double-quoted strings to use JSON-compatible syntax.                                                                                                       |
+| doubleQuotedMinMultiLineLength | `number`      | `40`          | Minimum length for double-quoted strings to use multiple lines to represent the value.                                                                              |
+| falseStr                       | `string`      | `'false'`     | String representation for `false` values.                                                                                                                           |
+| indent                         | `number`      | `2`           | The number of spaces to use when indenting code. Should be a strictly positive integer.                                                                             |
+| indentSeq                      | `boolean`     | `true`        | Whether block sequences should be indented.                                                                                                                         |
+| lineWidth                      | `number`      | `80`          | Maximum line width (set to `0` to disable folding). This is a soft limit, as only double-quoted semantics allow for inserting a line break in the middle of a word. |
+| minContentWidth                | `number`      | `20`          | Minimum line width for highly-indented content (set to `0` to disable).                                                                                             |
+| nullStr                        | `string`      | `'null'`      | String representation for `null` values.                                                                                                                            |
+| simpleKeys                     | `boolean`     | `false`       | Require keys to be scalars and always use implicit rather than explicit notation.                                                                                   |
+| singleQuote                    | `boolean`     | `false`       | Prefer 'single quote' rather than "double quote" where applicable.                                                                                                  |
+| trueStr                        | `string`      | `'true'`      | String representation for `true` values.                                                                                                                            |
 
 ## Working with Anchors
 

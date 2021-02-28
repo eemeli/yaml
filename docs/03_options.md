@@ -86,20 +86,14 @@ mergeResult.target
 YAML.stringify({ 'this is': null }, { simpleKeys: true })
 // this is: null
 
-YAML.scalarOptions.str.defaultType = 'QUOTE_SINGLE'
-YAML.stringify({ this: null, that: 'value' }, { nullStr: '~' })
-// this: ~
-// that: 'value'
+YAML.stringify({ this: null, that: 'value' }, { defaultStringType: 'QUOTE_SINGLE', nullStr: '~' })
+// 'this': ~
+// 'that': 'value'
 ```
 
 #### `YAML.scalarOptions`
 
 Some customization options are availabe to control the parsing and stringification of scalars. Note that these values are used by all documents.
-
-| Option             | Type     | Default value                                       | Description                                                                                                                                                                |
-| ------------------ | -------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| str.defaultType    | `Type`   | `'PLAIN'`                                           | The default type of string literal used to stringify values in general                                                                                                     |
-| str.defaultKeyType | `Type`   | `'PLAIN'`                                           | The default type of string literal used to stringify implicit key values                                                                                                   |
 
 ## Silencing Warnings
 

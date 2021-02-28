@@ -1,11 +1,10 @@
-import { LogLevelId } from './constants.js'
+import { LogLevelId, Type } from './constants.js'
 import type { Reviver } from './doc/applyReviver.js'
 import type { Directives } from './doc/directives.js'
 import type { Replacer } from './doc/Document.js'
 import type { SchemaName } from './doc/Schema.js'
 import type { Pair } from './nodes/Pair.js'
 import type { LineCounter } from './parse/line-counter.js'
-import { strOptions } from './tags/options.js'
 import type { CollectionTag, ScalarTag, TagValue } from './tags/types.js'
 
 export type ParseOptions = {
@@ -168,6 +167,35 @@ export type ToJSOptions = {
 
 export type ToStringOptions = {
   /**
+   * The default type of string literal used to stringify implicit key values.
+   * Output may use other types if required to fully represent the value.
+   *
+   * If `null`, the value of `defaultStringType` is used.
+   *
+   * Default: `null`
+   */
+  defaultKeyType?:
+    | null
+    | Type.BLOCK_FOLDED
+    | Type.BLOCK_LITERAL
+    | Type.PLAIN
+    | Type.QUOTE_DOUBLE
+    | Type.QUOTE_SINGLE
+
+  /**
+   * The default type of string literal used to stringify values in general.
+   * Output may use other types if required to fully represent the value.
+   *
+   * Default: `'PLAIN'`
+   */
+  defaultStringType?:
+    | Type.BLOCK_FOLDED
+    | Type.BLOCK_LITERAL
+    | Type.PLAIN
+    | Type.QUOTE_DOUBLE
+    | Type.QUOTE_SINGLE
+
+  /**
    * Restrict double-quoted strings to use JSON-compatible syntax.
    *
    * Default: `false`
@@ -239,6 +267,13 @@ export type ToStringOptions = {
   simpleKeys?: boolean
 
   /**
+   * Prefer 'single quote' rather than "double quote" where applicable.
+   *
+   * Default: `false`
+   */
+  singleQuote?: boolean
+
+  /**
    * String representation for `true`.
    * With the core schema, use `'true'`, `'True'`, or `'TRUE'`.
    *
@@ -273,10 +308,4 @@ export const defaultOptions: Required<
  * stringification of scalars. Note that these values are used by all documents.
  */
 export const scalarOptions = {
-  get str() {
-    return strOptions
-  },
-  set str(opt) {
-    Object.assign(strOptions, opt)
-  }
 }

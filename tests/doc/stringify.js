@@ -761,105 +761,77 @@ describe('indentSeq: false', () => {
 })
 
 describe('Scalar options', () => {
-  describe('str.defaultType & str.defaultKeyType', () => {
-    let origDefaultType, origDefaultKeyType
-    beforeAll(() => {
-      origDefaultType = YAML.scalarOptions.str.defaultType
-      origDefaultKeyType = YAML.scalarOptions.str.defaultKeyType
-    })
-    afterAll(() => {
-      YAML.scalarOptions.str.defaultType = origDefaultType
-      YAML.scalarOptions.str.defaultKeyType = origDefaultKeyType
-    })
-
+  describe('defaultStringType & defaultKeyType', () => {
     test('PLAIN, PLAIN', () => {
-      YAML.scalarOptions.str.defaultType = Type.PLAIN
-      YAML.scalarOptions.str.defaultKeyType = Type.PLAIN
-      expect(YAML.stringify({ foo: 'bar' })).toBe('foo: bar\n')
+      const opt = { defaultStringType: Type.PLAIN, defaultKeyType: Type.PLAIN }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('foo: bar\n')
     })
 
     test('BLOCK_FOLDED, BLOCK_FOLDED', () => {
-      YAML.scalarOptions.str.defaultType = Type.BLOCK_FOLDED
-      YAML.scalarOptions.str.defaultKeyType = Type.BLOCK_FOLDED
-      expect(YAML.stringify({ foo: 'bar' })).toBe('"foo": |-\n  bar\n')
+      const opt = {
+        defaultStringType: Type.BLOCK_FOLDED,
+        defaultKeyType: Type.BLOCK_FOLDED
+      }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('"foo": |-\n  bar\n')
     })
 
     test('QUOTE_DOUBLE, PLAIN', () => {
-      YAML.scalarOptions.str.defaultType = Type.QUOTE_DOUBLE
-      YAML.scalarOptions.str.defaultKeyType = Type.PLAIN
-      expect(YAML.stringify({ foo: 'bar' })).toBe('foo: "bar"\n')
+      const opt = {
+        defaultStringType: Type.QUOTE_DOUBLE,
+        defaultKeyType: Type.PLAIN
+      }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('foo: "bar"\n')
     })
 
     test('QUOTE_DOUBLE, QUOTE_SINGLE', () => {
-      YAML.scalarOptions.str.defaultType = Type.QUOTE_DOUBLE
-      YAML.scalarOptions.str.defaultKeyType = Type.QUOTE_SINGLE
-      expect(YAML.stringify({ foo: 'bar' })).toBe('\'foo\': "bar"\n')
+      const opt = {
+        defaultStringType: Type.QUOTE_DOUBLE,
+        defaultKeyType: Type.QUOTE_SINGLE
+      }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('\'foo\': "bar"\n')
+    })
+
+    test('QUOTE_DOUBLE, null', () => {
+      const opt = { defaultStringType: Type.QUOTE_DOUBLE, defaultKeyType: null }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('"foo": "bar"\n')
     })
 
     test('Use defaultType for explicit keys', () => {
-      YAML.scalarOptions.str.defaultType = Type.QUOTE_DOUBLE
-      YAML.scalarOptions.str.defaultKeyType = Type.QUOTE_SINGLE
+      const opt = {
+        defaultStringType: Type.QUOTE_DOUBLE,
+        defaultKeyType: Type.QUOTE_SINGLE
+      }
       const doc = new YAML.Document({ foo: null })
       doc.contents.items[0].value = null
-      expect(String(doc)).toBe('? "foo"\n')
+      expect(doc.toString(opt)).toBe('? "foo"\n')
     })
   })
 
-  describe('str.defaultQuoteSingle', () => {
-    let origDefaultQuoteOption
-    beforeAll(() => {
-      origDefaultQuoteOption = YAML.scalarOptions.str.defaultQuoteSingle
-    })
-    afterAll(() => {
-      YAML.scalarOptions.str.defaultQuoteSingle = origDefaultQuoteOption
-    })
+  for (const { bool, exp } of [
+    { bool: false, exp: '"foo #bar"\n' },
+    { bool: true, exp: "'foo #bar'\n" }
+  ]) {
+    describe(`singleQuote: ${bool}`, () => {
+      const opt = { singleQuote: bool }
 
-    const testSingleQuote = str => {
-      const expected = `'${str}'\n`
-      const actual = YAML.stringify(str)
-      expect(actual).toBe(expected)
-      expect(YAML.parse(actual)).toBe(str)
-    }
-    const testDoubleQuote = str => {
-      const expected = `"${str}"\n`
-      const actual = YAML.stringify(str)
-      expect(actual).toBe(expected)
-      expect(YAML.parse(actual)).toBe(str)
-    }
+      test('plain', () => {
+        expect(YAML.stringify('foo bar', opt)).toBe('foo bar\n')
+      })
 
-    const testPlainStyle = () => {
-      const str = YAML.stringify('foo bar')
-      expect(str).toBe('foo bar\n')
-    }
-    const testForcedQuotes = () => {
-      let str = YAML.stringify('foo: "bar"')
-      expect(str).toBe(`'foo: "bar"'\n`)
-      str = YAML.stringify("foo: 'bar'")
-      expect(str).toBe(`"foo: 'bar'"\n`)
-    }
+      test('forced', () => {
+        expect(YAML.stringify('foo: "bar"', opt)).toBe(`'foo: "bar"'\n`)
+        expect(YAML.stringify("foo: 'bar'", opt)).toBe(`"foo: 'bar'"\n`)
+      })
 
-    test('default', () => {
-      YAML.scalarOptions.str.defaultQuoteSingle = origDefaultQuoteOption
-      testPlainStyle()
-      testForcedQuotes()
-      testDoubleQuote('123')
-      testDoubleQuote('foo #bar')
+      test('numerical string', () => {
+        expect(YAML.stringify('123', opt)).toBe('"123"\n')
+      })
+
+      test('upgrade from plain', () => {
+        expect(YAML.stringify('foo #bar', opt)).toBe(exp)
+      })
     })
-    test("'", () => {
-      YAML.scalarOptions.str.defaultQuoteSingle = true
-      testPlainStyle()
-      testForcedQuotes()
-      testDoubleQuote('123') // number-as-string is double-quoted
-      testSingleQuote('foo #bar')
-    })
-    test('"', () => {
-      YAML.scalarOptions.str.defaultQuoteSingle = false
-      testPlainStyle()
-      testForcedQuotes()
-      testDoubleQuote('123')
-      testDoubleQuote('foo #bar')
-    })
-  })
+  }
 })
 
 describe('Document markers in top-level scalars', () => {

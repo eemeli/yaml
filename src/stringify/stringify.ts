@@ -1,3 +1,4 @@
+import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import { isAlias, isNode, isPair, isScalar, Node } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
@@ -31,6 +32,8 @@ export const createStringifyContext = (
     typeof options.indent === 'number' ? ' '.repeat(options.indent) : '  ',
   options: Object.assign(
     {
+      defaultKeyType: null,
+      defaultStringType: Type.PLAIN,
       doubleQuotedAsJSON: false,
       doubleQuotedMinMultiLineLength: 40,
       falseStr: 'false',
@@ -39,6 +42,7 @@ export const createStringifyContext = (
       minContentWidth: 20,
       nullStr: 'null',
       simpleKeys: false,
+      singleQuote: false,
       trueStr: 'true'
     },
     options

@@ -1,6 +1,5 @@
 import { Type } from '../constants.js'
 import type { Scalar } from '../nodes/Scalar.js'
-import { strOptions } from '../tags/options.js'
 import { addCommentBefore } from './addComment.js'
 import {
   foldFlowLines,
@@ -246,7 +245,7 @@ function plainString(
       quotedString = singleQuotedString
     } else if (hasSingle && !hasDouble) {
       quotedString = doubleQuotedString
-    } else if (strOptions.defaultQuoteSingle) {
+    } else if (ctx.options.singleQuote) {
       quotedString = singleQuotedString
     } else {
       quotedString = doubleQuotedString
@@ -308,7 +307,6 @@ export function stringifyString(
   onComment?: () => void,
   onChompKeep?: () => void
 ) {
-  const { defaultKeyType, defaultType } = strOptions
   const { implicitKey, inFlow } = ctx
   const ss: Scalar<string> =
     typeof item.value === 'string'
@@ -342,7 +340,8 @@ export function stringifyString(
 
   let res = _stringify(type)
   if (res === null) {
-    const t = implicitKey ? defaultKeyType : defaultType
+    const { defaultKeyType, defaultStringType } = ctx.options
+    const t = (implicitKey && defaultKeyType) || defaultStringType
     res = _stringify(t)
     if (res === null) throw new Error(`Unsupported default string type ${t}`)
   }
