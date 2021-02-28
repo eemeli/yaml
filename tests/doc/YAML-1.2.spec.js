@@ -1851,15 +1851,10 @@ matches %: 20`,
   }
 }
 
-let origFoldOptions, origPrettyErrors
+let origPrettyErrors
 const mockWarn = jest.spyOn(global.process, 'emitWarning').mockImplementation()
 
 beforeAll(() => {
-  origFoldOptions = YAML.scalarOptions.str.fold
-  YAML.scalarOptions.str.fold = {
-    lineWidth: 20,
-    minContentWidth: 0
-  }
   origPrettyErrors = YAML.defaultOptions.prettyErrors
   YAML.defaultOptions.prettyErrors = false
 })
@@ -1867,7 +1862,6 @@ beforeAll(() => {
 beforeEach(() => mockWarn.mockClear())
 
 afterAll(() => {
-  YAML.scalarOptions.str.fold = origFoldOptions
   YAML.defaultOptions.prettyErrors = origPrettyErrors
   mockWarn.mockRestore()
 })

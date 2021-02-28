@@ -57,21 +57,5 @@ export const strOptions = {
      * Default: `40`
      */
     minMultiLineLength: 40
-  },
-
-  fold: {
-    /**
-     * Maximum line width (set to `0` to disable folding).
-     *
-     * Default: `80`
-     */
-    lineWidth: 80,
-
-    /**
-     * Minimum width for highly-indented content.
-     *
-     * Default: `20`
-     */
-    minContentWidth: 20
   }
 }

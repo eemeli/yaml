@@ -102,39 +102,32 @@ for (const [name, version] of [
     })
 
     describe('string', () => {
-      let origFoldOptions
-      beforeAll(() => {
-        origFoldOptions = YAML.scalarOptions.str.fold
-        YAML.scalarOptions.str.fold = {
-          lineWidth: 20,
-          minContentWidth: 0
-        }
-      })
-      afterAll(() => {
-        YAML.scalarOptions.str.fold = origFoldOptions
-      })
+      const foldOptions = { lineWidth: 20, minContentWidth: 0 }
 
       test('plain', () => {
-        expect(YAML.stringify('STR')).toBe('STR\n')
+        expect(YAML.stringify('STR', foldOptions)).toBe('STR\n')
       })
       test('double-quoted', () => {
-        expect(YAML.stringify('"x"')).toBe('\'"x"\'\n')
+        expect(YAML.stringify('"x"', foldOptions)).toBe('\'"x"\'\n')
       })
       test('single-quoted', () => {
-        expect(YAML.stringify("'x'")).toBe('"\'x\'"\n')
+        expect(YAML.stringify("'x'", foldOptions)).toBe('"\'x\'"\n')
       })
       test('escaped', () => {
-        expect(YAML.stringify('null: \u0000')).toBe('"null: \\0"\n')
+        expect(YAML.stringify('null: \u0000', foldOptions)).toBe(
+          '"null: \\0"\n'
+        )
       })
       test('short multiline', () => {
-        expect(YAML.stringify('blah\nblah\nblah')).toBe(
+        expect(YAML.stringify('blah\nblah\nblah', foldOptions)).toBe(
           '|-\nblah\nblah\nblah\n'
         )
       })
       test('long multiline', () => {
         expect(
           YAML.stringify(
-            'blah blah\nblah blah blah blah blah blah blah blah blah blah\n'
+            'blah blah\nblah blah blah blah blah blah blah blah blah blah\n',
+            foldOptions
           )
         ).toBe(`>
 blah blah
@@ -150,7 +143,8 @@ blah blah\n`)
         for (const node of doc.contents.items)
           node.value.type = Type.QUOTE_DOUBLE
         expect(
-          String(doc)
+          doc
+            .toString(foldOptions)
             .split('\n')
             .map(line => line.length)
         ).toMatchObject([20, 20, 20, 20, 0])
@@ -161,7 +155,8 @@ blah blah\n`)
         const doc = new YAML.Document([foo])
         for (const node of doc.contents.items) node.type = Type.QUOTE_DOUBLE
         expect(
-          String(doc)
+          doc
+            .toString(foldOptions)
             .split('\n')
             .map(line => line.length)
         ).toMatchObject([20, 20, 20, 17, 0])
@@ -173,7 +168,8 @@ blah blah\n`)
         const seq = doc.contents.items[0].value
         for (const node of seq.items) node.type = Type.QUOTE_DOUBLE
         expect(
-          String(doc)
+          doc
+            .toString(foldOptions)
             .split('\n')
             .map(line => line.length)
         ).toMatchObject([4, 20, 20, 20, 20, 10, 0])

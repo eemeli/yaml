@@ -4,20 +4,14 @@ import { binary } from '../../src/tags/yaml-1.1/binary.js'
 import { YAMLOMap } from '../../src/tags/yaml-1.1/omap.js'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
-let origFoldOptions, origPrettyErrors
+let origPrettyErrors
 
 beforeAll(() => {
-  origFoldOptions = YAML.scalarOptions.str.fold
-  YAML.scalarOptions.str.fold = {
-    lineWidth: 20,
-    minContentWidth: 0
-  }
   origPrettyErrors = YAML.defaultOptions.prettyErrors
   YAML.defaultOptions.prettyErrors = false
 })
 
 afterAll(() => {
-  YAML.scalarOptions.str.fold = origFoldOptions
   YAML.defaultOptions.prettyErrors = origPrettyErrors
 })
 
@@ -260,7 +254,6 @@ description:
       genericStr += String.fromCharCode(generic[i])
     expect(canonicalStr).toBe(genericStr)
     expect(canonicalStr.substr(0, 5)).toBe('GIF89')
-    YAML.scalarOptions.str.fold.lineWidth = 80
     expect(String(doc))
       .toBe(`canonical: !!binary "R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J\\
   +fn5OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/\\
@@ -272,7 +265,6 @@ generic: !!binary |-
   ZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLCAgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYN
   G84BwwEeECcgggoBADs=
 description: The binary value above is a tiny arrow encoded as a gif image.\n`)
-    YAML.scalarOptions.str.fold.lineWidth = 20
   })
 
   test('!!bool', () => {

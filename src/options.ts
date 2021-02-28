@@ -190,6 +190,24 @@ export type ToStringOptions = {
   indentSeq?: boolean
 
   /**
+   * Maximum line width (set to `0` to disable folding).
+   *
+   * This is a soft limit, as only double-quoted semantics allow for inserting
+   * a line break in the middle of a word, as well as being influenced by the
+   * `minContentWidth` option.
+   *
+   * Default: `80`
+   */
+  lineWidth?: number
+
+  /**
+   * Minimum line width for highly-indented content (set to `0` to disable).
+   *
+   * Default: `20`
+   */
+  minContentWidth?: number
+
+  /**
    * String representation for `null`.
    * With the core schema, use `'null'`, `'Null'`, `'NULL'`, `'~'`, or an empty
    * string `''`.

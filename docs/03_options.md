@@ -103,7 +103,6 @@ Some customization options are availabe to control the parsing and stringificati
 | str.defaultType    | `Type`   | `'PLAIN'`                                           | The default type of string literal used to stringify values in general                                                                                                     |
 | str.defaultKeyType | `Type`   | `'PLAIN'`                                           | The default type of string literal used to stringify implicit key values                                                                                                   |
 | str.doubleQuoted   | `object` | `{ jsonEncoding: false,` `minMultiLineLength: 40 }` | `jsonEncoding`: Whether to restrict double-quoted strings to use JSON-compatible syntax; `minMultiLineLength`: Minimum length to use multiple lines to represent the value |
-| str.fold           | `object` | `{ lineWidth: 80,` `minContentWidth: 20 }`          | `lineWidth`: Maximum line width (set to `0` to disable folding); `minContentWidth`: Minimum width for highly-indented content                                              |
 
 ## Silencing Warnings
 

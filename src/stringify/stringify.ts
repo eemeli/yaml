@@ -33,6 +33,8 @@ export const createStringifyContext = (
     {
       falseStr: 'false',
       indentSeq: true,
+      lineWidth: 80,
+      minContentWidth: 20,
       nullStr: 'null',
       simpleKeys: false,
       trueStr: 'true'

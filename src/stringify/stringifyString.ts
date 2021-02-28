@@ -4,6 +4,7 @@ import { strOptions } from '../tags/options.js'
 import { addCommentBefore } from './addComment.js'
 import {
   foldFlowLines,
+  FoldOptions,
   FOLD_BLOCK,
   FOLD_FLOW,
   FOLD_QUOTED
@@ -14,10 +15,11 @@ interface StringifyScalar extends Scalar {
   value: string
 }
 
-const getFoldOptions = ({ indentAtStart }: StringifyContext) =>
-  indentAtStart
-    ? Object.assign({ indentAtStart }, strOptions.fold)
-    : strOptions.fold
+const getFoldOptions = (ctx: StringifyContext): FoldOptions => ({
+  indentAtStart: ctx.indentAtStart,
+  lineWidth: ctx.options.lineWidth,
+  minContentWidth: ctx.options.minContentWidth
+})
 
 // Also checks for lines starting with %, as parsing the output as YAML 1.1 will
 // presume that's starting a new document.
@@ -163,7 +165,7 @@ function blockString(
       ? false
       : type === Type.BLOCK_LITERAL
       ? true
-      : !lineLengthOverLimit(value, strOptions.fold.lineWidth, indent.length)
+      : !lineLengthOverLimit(value, ctx.options.lineWidth, indent.length)
   let header = literal ? '|' : '>'
   if (!value) return header + '\n'
   let wsStart = ''
@@ -211,7 +213,7 @@ function blockString(
     `${wsStart}${value}${wsEnd}`,
     indent,
     FOLD_BLOCK,
-    strOptions.fold
+    getFoldOptions(ctx)
   )
   return `${header}\n${indent}${body}`
 }
