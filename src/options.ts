@@ -61,14 +61,6 @@ export type DocumentOptions = {
   logLevel?: LogLevelId
 
   /**
-   * Prevent exponential entity expansion attacks by limiting data aliasing count;
-   * set to `-1` to disable checks; `0` disallows all alias nodes.
-   *
-   * Default: `100`
-   */
-  maxAliasCount?: number
-
-  /**
    * The YAML version used by documents without a `%YAML` directive.
    *
    * Default: `"1.2"`
@@ -145,6 +137,14 @@ export type ToJSOptions = {
   mapAsMap?: boolean
 
   /**
+   * Prevent exponential entity expansion attacks by limiting data aliasing count;
+   * set to `-1` to disable checks; `0` disallows all alias nodes.
+   *
+   * Default: `100`
+   */
+  maxAliasCount?: number
+
+  /**
    * If defined, called with the resolved `value` and reference `count` for
    * each anchor in the document.
    */
@@ -197,7 +197,6 @@ export const defaultOptions: Required<ParseOptions & DocumentOptions & ToStringO
   keepUndefined: false,
   lineCounter: null,
   logLevel: 'warn',
-  maxAliasCount: 100,
   prettyErrors: true,
   simpleKeys: false,
   strict: true,

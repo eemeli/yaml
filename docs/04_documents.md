@@ -143,11 +143,23 @@ String(doc)
 // '1969-07-21T02:56:15\n'
 ```
 
-For a plain JavaScript representation of the document, **`toJS()`** is your friend. Its output may include `Map` and `Set` collections (e.g. if the `mapAsMap` option is true) and complex scalar values like `Date` for `!!timestamp`, but all YAML nodes will be resolved. For a representation consisting only of JSON values, use **`toJSON()`**.
+For a plain JavaScript representation of the document, **`toJS(options = {})`** is your friend.
+Its output may include `Map` and `Set` collections (e.g. if the `mapAsMap` option is true) and complex scalar values like `Date` for `!!timestamp`, but all YAML nodes will be resolved.
+For a representation consisting only of JSON values, use **`toJSON()`**.
 
-Use `toJS({ mapAsMap, onAnchor, reviver })` to set the `mapAsMap` option, define an `onAnchor` callback `(value: any, count: number) => void` for each aliased anchor in the document, or to apply a [reviver function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter) to the output.
+The following options are also available when calling `YAML.parse()`:
 
-Conversely, to stringify a document as YAML, use **`toString()`**. This will also be called by `String(doc)`. This method will throw if the `errors` array is not empty.
+| `toJS()` Option | Type                                  | Description                                                                                                                                               |
+| --------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| mapAsMap        | `boolean`                             | Use Map rather than Object to represent mappings. By default `false`.                                                                                     |
+| maxAliasCount   | `number`                              | Prevent [exponential entity expansion attacks] by limiting data aliasing; set to `-1` to disable checks; `0` disallows all alias nodes. By default `100`. |
+| onAnchor        | `(value: any, count: number) => void` | Optional callback for each aliased anchor in the document.                                                                                                |
+| reviver         | `(key: any, value: any) => any`       | Optionally apply a [reviver function] to the output, following the JSON specification but with appropriate extensions for handling `Map` and `Set`.       |
+
+[exponential entity expansion attacks]: https://en.wikipedia.org/wiki/Billion_laughs_attack
+[reviver function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter
+
+To stringify a document as YAML, use **`toString()`**. This will also be called by `String(doc)`. This method will throw if the `errors` array is not empty.
 
 ## Working with Anchors
 

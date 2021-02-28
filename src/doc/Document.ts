@@ -360,6 +360,7 @@ export class Document<T = unknown> {
     json,
     jsonArg,
     mapAsMap,
+    maxAliasCount,
     onAnchor,
     reviver
   }: ToJSOptions & { json?: boolean; jsonArg?: string | null } = {}) {
@@ -378,7 +379,7 @@ export class Document<T = unknown> {
       keep: !json,
       mapAsMap: mapAsMap === true,
       mapKeyWarned: false,
-      maxAliasCount: this.options.maxAliasCount,
+      maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100,
       stringify
     }
     const res = toJS(this.contents, jsonArg || '', ctx)

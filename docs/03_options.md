@@ -8,7 +8,6 @@ YAML.defaultOptions
 //   keepUndefined: false,
 //   lineCounter: null,
 //   logLevel: 'warn',
-//   maxAliasCount: 100,
 //   prettyErrors: true,
 //   simpleKeys: false,
 //   strict: true,
@@ -36,7 +35,6 @@ The `version` option value (`'1.2'` by default) may be overridden by any documen
 | indentSeq        | `boolean`                                     | Whether block sequences should be indented. By default `true`.                                                                                                          |
 | keepUndefined    | `boolean`                                     | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`. By default `false`.                                       |
 | logLevel         | `'warn' ⎮ 'error' ⎮ 'silent'`                 | Control the verbosity of `YAML.parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors. By default `'warn'`.                      |
-| maxAliasCount    | `number`                                      | Prevent [exponential entity expansion attacks] by limiting data aliasing count; set to `-1` to disable checks; `0` disallows all alias nodes. By default `100`.         |
 | merge            | `boolean`                                     | Enable support for `<<` merge keys. By default `false` for YAML 1.2 and `true` for earlier versions.                                                                    |
 | prettyErrors     | `boolean`                                     | Include line position & node type directly in errors; drop their verbose source and context. By default `false`.                                                        |
 | resolveKnownTags | `boolean`                                     | When using the `'core'` schema, support parsing values with these explicit [YAML 1.1 tags]: `!!binary`, `!!omap`, `!!pairs`, `!!set`, `!!timestamp`. By default `true`. |
@@ -46,7 +44,6 @@ The `version` option value (`'1.2'` by default) may be overridden by any documen
 | strict           | `boolean`                                     | When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content. By default `true`.                                                 |
 | version          | `'1.0' ⎮ '1.1' ⎮ '1.2'`                       | The YAML version used by documents without a `%YAML` directive. By default `'1.2'`.                                                                                     |
 
-[exponential entity expansion attacks]: https://en.wikipedia.org/wiki/Billion_laughs_attack
 [yaml 1.1 tags]: https://yaml.org/type/
 
 ## Data Schemas
