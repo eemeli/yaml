@@ -2,7 +2,6 @@ import { Scalar } from '../nodes/Scalar.js'
 import { ParseOptions } from '../options.js'
 import { stringifyNumber } from '../stringify/stringifyNumber.js'
 import { failsafe } from './failsafe/index.js'
-import { boolOptions, nullOptions } from './options.js'
 import { ScalarTag } from './types.js'
 
 const intIdentify = (value: unknown): value is number | bigint =>
@@ -28,9 +27,8 @@ export const nullObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:null',
   test: /^(?:~|[Nn]ull|NULL)?$/,
   resolve: () => new Scalar(null),
-  options: nullOptions,
-  stringify: ({ source }) =>
-    source && nullObj.test.test(source) ? source : nullOptions.nullStr
+  stringify: ({ source }, { nullStr }) =>
+    source && nullObj.test.test(source) ? source : nullStr
 }
 
 export const boolObj: ScalarTag & { test: RegExp } = {
@@ -39,13 +37,12 @@ export const boolObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:[Tt]rue|TRUE|[Ff]alse|FALSE)$/,
   resolve: str => new Scalar(str[0] === 't' || str[0] === 'T'),
-  options: boolOptions,
-  stringify({ source, value }) {
+  stringify({ source, value }, { falseStr, trueStr }) {
     if (source && boolObj.test.test(source)) {
       const sv = source[0] === 't' || source[0] === 'T'
       if (value === sv) return source
     }
-    return value ? boolOptions.trueStr : boolOptions.falseStr
+    return value ? trueStr : falseStr
   }
 }
 

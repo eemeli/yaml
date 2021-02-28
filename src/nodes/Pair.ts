@@ -248,13 +248,16 @@ function stringifyKey(
     const strKey = key.toString({
       anchors: Object.create(null),
       doc: ctx.doc,
+      falseStr: 'false',
       indent: '',
       indentSeq: false,
       indentStep: ctx.indentStep,
       inFlow: true,
       inStringifyKey: true,
+      nullStr: 'null',
       simpleKeys: false,
-      stringify: ctx.stringify
+      stringify: ctx.stringify,
+      trueStr: 'true'
     })
     if (!ctx.mapKeyWarned) {
       let jsonStr = JSON.stringify(strKey)

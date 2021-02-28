@@ -1,9 +1,9 @@
 import { Scalar } from '../../nodes/Scalar.js'
-import { ParseOptions } from '../../options.js'
+import type { ParseOptions } from '../../options.js'
+import type { StringifyContext } from '../../stringify/stringify.js'
 import { stringifyNumber } from '../../stringify/stringifyNumber.js'
 import { failsafe } from '../failsafe/index.js'
-import { boolOptions, nullOptions } from '../options.js'
-import { ScalarTag } from '../types.js'
+import type { ScalarTag } from '../types.js'
 import { binary } from './binary.js'
 import { omap } from './omap.js'
 import { pairs } from './pairs.js'
@@ -17,15 +17,17 @@ const nullObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:null',
   test: /^(?:~|[Nn]ull|NULL)?$/,
   resolve: () => new Scalar(null),
-  options: nullOptions,
-  stringify: ({ source }) =>
-    source && nullObj.test.test(source) ? source : nullOptions.nullStr
+  stringify: ({ source }, { nullStr }) =>
+    source && nullObj.test.test(source) ? source : nullStr
 }
 
-const boolStringify = ({ value, source }: Scalar) => {
+function boolStringify(
+  { value, source }: Scalar,
+  { falseStr, trueStr }: StringifyContext
+) {
   const boolObj = value ? trueObj : falseObj
   if (source && boolObj.test.test(source)) return source
-  return value ? boolOptions.trueStr : boolOptions.falseStr
+  return value ? trueStr : falseStr
 }
 
 const trueObj: ScalarTag & { test: RegExp } = {
@@ -34,7 +36,6 @@ const trueObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:Y|y|[Yy]es|YES|[Tt]rue|TRUE|[Oo]n|ON)$/,
   resolve: () => new Scalar(true),
-  options: boolOptions,
   stringify: boolStringify
 }
 
@@ -44,7 +45,6 @@ const falseObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
   resolve: () => new Scalar(false),
-  options: boolOptions,
   stringify: boolStringify
 }
 

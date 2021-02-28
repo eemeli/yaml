@@ -86,9 +86,8 @@ mergeResult.target
 YAML.stringify({ 'this is': null }, { simpleKeys: true })
 // this is: null
 
-YAML.scalarOptions.null.nullStr = '~'
 YAML.scalarOptions.str.defaultType = 'QUOTE_SINGLE'
-YAML.stringify({ this: null, that: 'value' })
+YAML.stringify({ this: null, that: 'value' }, { nullStr: '~' })
 // this: ~
 // that: 'value'
 ```
@@ -101,9 +100,6 @@ Some customization options are availabe to control the parsing and stringificati
 | ------------------ | -------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | binary.defaultType | `Type`   | `'BLOCK_LITERAL'`                                   | The type of string literal used to stringify `!!binary` values                                                                                                             |
 | binary.lineWidth   | `number` | `76`                                                | Maximum line width for `!!binary` values                                                                                                                                   |
-| bool.trueStr       | `string` | `'true'`                                            | String representation for `true` values                                                                                                                                    |
-| bool.falseStr      | `string` | `'false'`                                           | String representation for `false` values                                                                                                                                   |
-| null.nullStr       | `string` | `'null'`                                            | String representation for `null` values                                                                                                                                    |
 | str.defaultType    | `Type`   | `'PLAIN'`                                           | The default type of string literal used to stringify values in general                                                                                                     |
 | str.defaultKeyType | `Type`   | `'PLAIN'`                                           | The default type of string literal used to stringify implicit key values                                                                                                   |
 | str.doubleQuoted   | `object` | `{ jsonEncoding: false,` `minMultiLineLength: 40 }` | `jsonEncoding`: Whether to restrict double-quoted strings to use JSON-compatible syntax; `minMultiLineLength`: Minimum length to use multiple lines to represent the value |

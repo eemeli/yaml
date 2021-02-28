@@ -89,17 +89,15 @@ describe('tags', () => {
 
 describe('custom string on node', () => {
   test('tiled null', () => {
-    YAML.scalarOptions.null.nullStr = '~'
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { simpleKeys: true })
+    const str = YAML.stringify(doc, { nullStr: '~', simpleKeys: true })
     expect(str).toBe('a: ~\n')
     expect(YAML.parse(str)).toEqual({ a: null })
   })
 
   test('empty string null', () => {
-    YAML.scalarOptions.null.nullStr = ''
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { simpleKeys: true })
+    const str = YAML.stringify(doc, { nullStr: '', simpleKeys: true })
     expect(str).toBe('a: \n')
     expect(YAML.parse(str)).toEqual({ a: null })
   })
@@ -375,17 +373,17 @@ aliases:
   })
 })
 
-describe('eemeli/yaml#l19', () => {
+describe('eemeli/yaml#19', () => {
   test('map', () => {
     const src = 'a:\n  # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('a: # 123\n')
+    expect(String(doc)).toBe('a: null # 123\n')
   })
 
   test('seq', () => {
     const src = '- a: # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('- a: # 123\n')
+    expect(String(doc)).toBe('- a: null # 123\n')
   })
 })
 

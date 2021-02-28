@@ -444,47 +444,30 @@ test('eemeli/yaml#87', () => {
 })
 
 describe('emitter custom null/bool string', () => {
-  let origNullOptions
-  let origBoolOptions
-  beforeAll(() => {
-    origNullOptions = YAML.scalarOptions.null.nullStr
-    origBoolOptions = YAML.scalarOptions.bool
-  })
-  afterAll(() => {
-    YAML.scalarOptions.null.nullStr = origNullOptions
-    YAML.scalarOptions.bool = origBoolOptions
-  })
-
   test('tiled null', () => {
-    YAML.scalarOptions.null.nullStr = '~'
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { simpleKeys: true })
+    const str = YAML.stringify(doc, { nullStr: '~', simpleKeys: true })
     expect(str).toBe('a: ~\n')
     expect(YAML.parse(str)).toEqual({ a: null })
   })
 
   test('empty string null', () => {
-    YAML.scalarOptions.null.nullStr = ''
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { simpleKeys: true })
+    const str = YAML.stringify(doc, { nullStr: '', simpleKeys: true })
     expect(str).toBe('a: \n')
     expect(YAML.parse(str)).toEqual({ a: null })
   })
 
   test('empty string camelBool', () => {
-    YAML.scalarOptions.bool.trueStr = 'True'
-    YAML.scalarOptions.bool.falseStr = 'False'
     const doc = YAML.parse('[true, false]')
-    const str = YAML.stringify(doc)
+    const str = YAML.stringify(doc, { trueStr: 'True', falseStr: 'False' })
     expect(str).toBe('- True\n- False\n')
     expect(YAML.parse(str)).toEqual([true, false])
   })
 
   test('empty string upperBool', () => {
-    YAML.scalarOptions.bool.trueStr = 'TRUE'
-    YAML.scalarOptions.bool.falseStr = 'FALSE'
     const doc = YAML.parse('[true, false]')
-    const str = YAML.stringify(doc)
+    const str = YAML.stringify(doc, { trueStr: 'TRUE', falseStr: 'FALSE' })
     expect(str).toBe('- TRUE\n- FALSE\n')
     expect(YAML.parse(str)).toEqual([true, false])
   })

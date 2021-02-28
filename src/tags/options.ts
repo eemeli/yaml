@@ -21,34 +21,6 @@ export const binaryOptions = {
   lineWidth: 76
 }
 
-export const boolOptions = {
-  /**
-   * String representation for `true`.
-   * With the core schema, use `true`, `True`, or `TRUE`.
-   *
-   * Default: `'true'`
-   */
-  trueStr: 'true',
-
-  /**
-   * String representation for `false`.
-   * With the core schema, use `false`, `False`, or `FALSE`.
-   *
-   * Default: `'false'`
-   */
-  falseStr: 'false'
-}
-
-export const nullOptions = {
-  /**
-   * String representation for `null`.
-   * With the core schema, use `null`, `Null`, `NULL`, `~`, or an empty string.
-   *
-   * Default: `'null'`
-   */
-  nullStr: 'null'
-}
-
 export const strOptions = {
   /**
    * The default type of string literal used to stringify values in general

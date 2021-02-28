@@ -1,20 +1,19 @@
 import type { Document } from '../doc/Document.js'
 import { isAlias, isNode, isPair, isScalar, Node } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
+import type { ToStringOptions } from '../options.js'
 import type { TagObj } from '../tags/types.js'
 import { stringifyString } from './stringifyString.js'
 
-export interface StringifyContext {
+export type StringifyContext = Required<Omit<ToStringOptions, 'indent'>> & {
   anchors: Record<string, Node>
   doc: Document
   forceBlockIndent?: boolean
   implicitKey?: boolean
   indent: string
-  indentSeq: boolean
   indentStep: string
   indentAtStart?: number
   inFlow?: boolean
-  simpleKeys: boolean
   stringify: typeof stringify
   [key: string]: unknown
 }

@@ -397,11 +397,11 @@ export class Document<T = unknown> {
   }
 
   /** A YAML representation of the document. */
-  toString({ indent, indentSeq, simpleKeys }: ToStringOptions = {}) {
+  toString(options: ToStringOptions = {}) {
     if (this.errors.length > 0)
       throw new Error('Document with errors cannot be stringified')
 
-    const indentSize = typeof indent === 'number' ? indent : 2
+    const indentSize = typeof options.indent === 'number' ? options.indent : 2
     if (!Number.isInteger(indentSize) || indentSize <= 0) {
       const s = JSON.stringify(indentSize)
       throw new Error(`"indent" option must be a positive integer, not ${s}`)
@@ -419,15 +419,24 @@ export class Document<T = unknown> {
       if (hasDirectives || !this.directivesEndMarker) lines.unshift('')
       lines.unshift(this.commentBefore.replace(/^/gm, '#'))
     }
-    const ctx: StringifyContext = {
-      anchors: Object.create(null),
-      doc: this,
-      indent: '',
-      indentSeq: indentSeq !== false, // default true
-      indentStep: ' '.repeat(indentSize),
-      simpleKeys: simpleKeys === true, // default false
-      stringify // Requiring directly in nodes would create circular dependencies
-    }
+
+    const ctx: StringifyContext = Object.assign(
+      {
+        falseStr: 'false',
+        indentSeq: true,
+        nullStr: 'null',
+        simpleKeys: false,
+        trueStr: 'true'
+      },
+      options,
+      {
+        anchors: Object.create(null),
+        doc: this,
+        indent: '',
+        indentStep: ' '.repeat(indentSize),
+        stringify // Requiring directly in nodes would create circular dependencies
+      }
+    )
     let chompKeep = false
     let contentComment = null
     if (this.contents) {

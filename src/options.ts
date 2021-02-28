@@ -5,12 +5,7 @@ import type { Replacer } from './doc/Document.js'
 import type { SchemaName } from './doc/Schema.js'
 import type { Pair } from './nodes/Pair.js'
 import type { LineCounter } from './parse/line-counter.js'
-import {
-  binaryOptions,
-  boolOptions,
-  nullOptions,
-  strOptions
-} from './tags/options.js'
+import { binaryOptions, strOptions } from './tags/options.js'
 import type { CollectionTag, ScalarTag, TagValue } from './tags/types.js'
 
 export type ParseOptions = {
@@ -173,6 +168,14 @@ export type ToJSOptions = {
 
 export type ToStringOptions = {
   /**
+   * String representation for `false`.
+   * With the core schema, use `'false'`, `'False'`, or `'FALSE'`.
+   *
+   * Default: `'false'`
+   */
+  falseStr?: string
+
+  /**
    * The number of spaces to use when indenting code.
    *
    * Default: `2`
@@ -187,11 +190,28 @@ export type ToStringOptions = {
   indentSeq?: boolean
 
   /**
+   * String representation for `null`.
+   * With the core schema, use `'null'`, `'Null'`, `'NULL'`, `'~'`, or an empty
+   * string `''`.
+   *
+   * Default: `'null'`
+   */
+  nullStr?: string
+
+  /**
    * Require keys to be scalars and to use implicit rather than explicit notation.
    *
    * Default: `false`
    */
   simpleKeys?: boolean
+
+  /**
+   * String representation for `true`.
+   * With the core schema, use `'true'`, `'True'`, or `'TRUE'`.
+   *
+   * Default: `'true'`
+   */
+  trueStr?: string
 }
 
 export type Options = ParseOptions & DocumentOptions & SchemaOptions
@@ -225,18 +245,6 @@ export const scalarOptions = {
   },
   set binary(opt) {
     Object.assign(binaryOptions, opt)
-  },
-  get bool() {
-    return boolOptions
-  },
-  set bool(opt) {
-    Object.assign(boolOptions, opt)
-  },
-  get null() {
-    return nullOptions
-  },
-  set null(opt) {
-    Object.assign(nullOptions, opt)
   },
   get str() {
     return strOptions

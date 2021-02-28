@@ -148,12 +148,12 @@ For a representation consisting only of JSON values, use **`toJSON()`**.
 
 The following options are also available when calling `YAML.parse()`:
 
-| `toJS()` Option | Type                                  | Description                                                                                                                                               |
-| --------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| mapAsMap        | `boolean`                             | Use Map rather than Object to represent mappings. By default `false`.                                                                                     |
-| maxAliasCount   | `number`                              | Prevent [exponential entity expansion attacks] by limiting data aliasing; set to `-1` to disable checks; `0` disallows all alias nodes. By default `100`. |
-| onAnchor        | `(value: any, count: number) => void` | Optional callback for each aliased anchor in the document.                                                                                                |
-| reviver         | `(key: any, value: any) => any`       | Optionally apply a [reviver function] to the output, following the JSON specification but with appropriate extensions for handling `Map` and `Set`.       |
+| `toJS()` Option | Type                                  | Default value | Description                                                                                                                                         |
+| --------------- | ------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| mapAsMap        | `boolean`                             | `false`       | Use Map rather than Object to represent mappings.                                                                                                   |
+| maxAliasCount   | `number`                              | `100`         | Prevent [exponential entity expansion attacks] by limiting data aliasing; set to `-1` to disable checks; `0` disallows all alias nodes.             |
+| onAnchor        | `(value: any, count: number) => void` |               | Optional callback for each aliased anchor in the document.                                                                                          |
+| reviver         | `(key: any, value: any) => any`       |               | Optionally apply a [reviver function] to the output, following the JSON specification but with appropriate extensions for handling `Map` and `Set`. |
 
 [exponential entity expansion attacks]: https://en.wikipedia.org/wiki/Billion_laughs_attack
 [reviver function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter
@@ -166,11 +166,14 @@ This method will throw if the `errors` array is not empty.
 
 The following options are also available when calling `YAML.stringify()`:
 
-| `toString()` Option | Type      | Description                                                                                           |
-| ------------------- | --------- | ----------------------------------------------------------------------------------------------------- |
-| indent              | `number`  | The number of spaces to use when indenting code. By default `2`.                                      |
-| indentSeq           | `boolean` | Whether block sequences should be indented. By default `true`.                                        |
-| simpleKeys          | `boolean` | Require keys to be scalars and always use implicit rather than explicit notation. By default `false`. |
+| `toString()` Option | Type      | Default value | Description                                                                       |
+| ------------------- | --------- | ------------- | --------------------------------------------------------------------------------- |
+| falseStr            | `string`  | `'false'`     | String representation for `false` values.                                         |
+| indent              | `number`  | `2`           | The number of spaces to use when indenting code. Should be at least 2.            |
+| indentSeq           | `boolean` | `true`        | Whether block sequences should be indented.                                       |
+| nullStr             | `string`  | `'null'`      | String representation for `null` values.                                          |
+| simpleKeys          | `boolean` | `false`       | Require keys to be scalars and always use implicit rather than explicit notation. |
+| trueStr             | `string`  | `'true'`      | String representation for `true` values.                                          |
 
 ## Working with Anchors
 
