@@ -4,39 +4,40 @@
 YAML.defaultOptions
 // { anchorPrefix: 'a',
 //   keepUndefined: false,
-//   lineCounter: null,
 //   logLevel: 'warn',
 //   prettyErrors: true,
 //   strict: true,
 //   version: '1.2' }
-
-YAML.Document.defaults
-// { '1.0': { merge: true, schema: 'yaml-1.1' },
-//   '1.1': { merge: true, schema: 'yaml-1.1' },
-//   '1.2': { merge: false, schema: 'core' } }
 ```
 
-#### `YAML.defaultOptions`
+In addition to the `options` arguments of functions, the values of `YAML.defaultOptions` are used as default values.
 
-#### `YAML.Document.defaults`
+Parse options affect the parsing and composition of a YAML Document from it source.
 
-`yaml` defines document-specific options in three places: as an argument of parse, create and stringify calls, in the values of `YAML.defaultOptions`, and in the version-dependent `YAML.Document.defaults` object. Values set in `YAML.defaultOptions` override version-dependent defaults, and argument options override both.
+| Parse Option | Type          | Description                                                                                                                             |
+| ------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| lineCounter  | `LineCounter` | If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)` to provide the `{ line, col }` positions within the input. |
+| prettyErrors | `boolean`     | Include line position & node type directly in errors. By default `false`.                                                               |
+| strict       | `boolean`     | When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content. By default `true`.                 |
 
-The `version` option value (`'1.2'` by default) may be overridden by any document-specific `%YAML` directive.
+Document options are relevant for operations on the `Document` object.
 
-| Option           | Type                                          | Description                                                                                                                                                             |
+| Document Option | Type                          | Description                                                                                                                                        |
+| --------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| anchorPrefix    | `string`                      | Default prefix for anchors. By default `'a'`, resulting in anchors `a1`, `a2`, etc.                                                                |
+| keepUndefined   | `boolean`                     | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`. By default `false`.                  |
+| logLevel        | `'warn' ⎮ 'error' ⎮ 'silent'` | Control the verbosity of `YAML.parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors. By default `'warn'`. |
+| version         | `'1.1' ⎮ '1.2'`               | The YAML version used by documents without a `%YAML` directive. By default `'1.2'`.                                                                |
+
+Schema options determine the types of values that the document is expected and able to support.
+
+| Schema Option    | Type                                          | Description                                                                                                                                                             |
 | ---------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| anchorPrefix     | `string`                                      | Default prefix for anchors. By default `'a'`, resulting in anchors `a1`, `a2`, etc.                                                                                     |
 | customTags       | `Tag[] ⎮ function`                            | Array of [additional tags](#custom-data-types) to include in the schema                                                                                                 |
-| keepUndefined    | `boolean`                                     | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`. By default `false`.                                       |
-| logLevel         | `'warn' ⎮ 'error' ⎮ 'silent'`                 | Control the verbosity of `YAML.parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors. By default `'warn'`.                      |
 | merge            | `boolean`                                     | Enable support for `<<` merge keys. By default `false` for YAML 1.2 and `true` for earlier versions.                                                                    |
-| prettyErrors     | `boolean`                                     | Include line position & node type directly in errors; drop their verbose source and context. By default `false`.                                                        |
 | resolveKnownTags | `boolean`                                     | When using the `'core'` schema, support parsing values with these explicit [YAML 1.1 tags]: `!!binary`, `!!omap`, `!!pairs`, `!!set`, `!!timestamp`. By default `true`. |
 | schema           | `'core' ⎮ 'failsafe' ⎮` `'json' ⎮ 'yaml-1.1'` | The base schema to use. By default `'core'` for YAML 1.2 and `'yaml-1.1'` for earlier versions.                                                                         |
 | sortMapEntries   | `boolean ⎮` `(a, b: Pair) => number`          | When stringifying, sort map entries. If `true`, sort by comparing key values with `<`. By default `false`.                                                              |
-| strict           | `boolean`                                     | When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content. By default `true`.                                                 |
-| version          | `'1.0' ⎮ '1.1' ⎮ '1.2'`                       | The YAML version used by documents without a `%YAML` directive. By default `'1.2'`.                                                                                     |
 
 [yaml 1.1 tags]: https://yaml.org/type/
 

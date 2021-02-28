@@ -1,4 +1,4 @@
-import { LogLevelId, defaultTagPrefix } from './constants.js'
+import { LogLevelId } from './constants.js'
 import type { Reviver } from './doc/applyReviver.js'
 import type { Directives } from './doc/directives.js'
 import type { Replacer } from './doc/Document.js'
@@ -19,7 +19,7 @@ export type ParseOptions = {
    * If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)`
    * to provide the `{ line, col }` positions within the input.
    */
-  lineCounter?: LineCounter | null
+  lineCounter?: LineCounter
 
   /**
    * Include line/col position & node type directly in parse errors.
@@ -44,6 +44,12 @@ export type DocumentOptions = {
    * Default: `'a'`, resulting in anchors `a1`, `a2`, etc.
    */
   anchorPrefix?: string
+
+  /**
+   * Used internally by Composer. If set and includes an explicit version,
+   * that overrides the `version` option.
+   */
+  directives?: Directives
 
   /**
    * Keep `undefined` object values when creating mappings and return a Scalar
@@ -75,8 +81,6 @@ export type SchemaOptions = {
    */
   customTags?: TagValue[] | ((tags: TagValue[]) => TagValue[]) | null
 
-  directives?: Directives
-
   /**
    * Enable support for `<<` merge keys.
    *
@@ -102,7 +106,8 @@ export type SchemaOptions = {
   schema?: SchemaName
 
   /**
-   * When stringifying, sort map entries. If `true`, sort by comparing key values with `<`.
+   * When adding to or stringifying a map, sort the entries.
+   * If `true`, sort by comparing key values with `<`.
    *
    * Default: `false`
    */
@@ -190,10 +195,11 @@ export type Options = ParseOptions & DocumentOptions & SchemaOptions
  * `YAML.defaultOptions` override version-dependent defaults, and argument
  * options override both.
  */
-export const defaultOptions: Required<ParseOptions & DocumentOptions> = {
+export const defaultOptions: Required<
+  Omit<ParseOptions, 'lineCounter'> & Omit<DocumentOptions, 'directives'>
+> = {
   anchorPrefix: 'a',
   keepUndefined: false,
-  lineCounter: null,
   logLevel: 'warn',
   prettyErrors: true,
   strict: true,
@@ -234,33 +240,5 @@ export const scalarOptions = {
   },
   set str(opt) {
     Object.assign(strOptions, opt)
-  }
-}
-
-export const documentOptions = {
-  '1.0': {
-    schema: 'yaml-1.1',
-    merge: true,
-    tagPrefixes: [
-      { handle: '!', prefix: defaultTagPrefix },
-      { handle: '!!', prefix: 'tag:private.yaml.org,2002:' }
-    ]
-  },
-  1.1: {
-    schema: 'yaml-1.1',
-    merge: true,
-    tagPrefixes: [
-      { handle: '!', prefix: '!' },
-      { handle: '!!', prefix: defaultTagPrefix }
-    ]
-  },
-  1.2: {
-    schema: 'core',
-    merge: false,
-    resolveKnownTags: true,
-    tagPrefixes: [
-      { handle: '!', prefix: '!' },
-      { handle: '!!', prefix: defaultTagPrefix }
-    ]
   }
 }

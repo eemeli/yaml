@@ -685,9 +685,9 @@ describe('custom tags', () => {
 describe('schema changes', () => {
   test('write as json', () => {
     const doc = YAML.parseDocument('foo: bar', { schema: 'core' })
-    expect(doc.options.schema).toBe('core')
-    doc.setSchema('json')
-    expect(doc.options.schema).toBe('json')
+    expect(doc.schema.name).toBe('core')
+    doc.setSchema('1.2', { schema: 'json' })
+    expect(doc.schema.name).toBe('json')
     expect(String(doc)).toBe('"foo": "bar"\n')
   })
 
@@ -695,7 +695,6 @@ describe('schema changes', () => {
     const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
     })
-    expect(doc.options.version).toBe('1.1')
     expect(doc.directives.yaml).toMatchObject({
       version: '1.1',
       explicit: false
@@ -705,8 +704,7 @@ describe('schema changes', () => {
       version: '1.2',
       explicit: false
     })
-    expect(doc.options.version).toBe('1.1')
-    expect(doc.options.schema).toBeUndefined()
+    expect(doc.schema.name).toBe('core')
     expect(() => String(doc)).toThrow(/Tag not resolved for Date value/)
   })
 
@@ -714,7 +712,7 @@ describe('schema changes', () => {
     const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
     })
-    doc.setSchema('json', ['timestamp'])
+    doc.setSchema('1.1', { customTags: ['timestamp'], schema: 'json' })
     expect(String(doc)).toBe('"foo": 1971-02-03T12:13:14\n')
   })
 
@@ -722,7 +720,7 @@ describe('schema changes', () => {
     const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
     })
-    doc.setSchema(1.2, ['timestamp'])
+    doc.setSchema(1.2, { customTags: ['timestamp'] })
     expect(String(doc)).toBe('foo: 1971-02-03T12:13:14\n')
   })
 
@@ -730,7 +728,7 @@ describe('schema changes', () => {
     const doc = YAML.parseDocument('[y, yes, on, n, no, off]', {
       version: '1.1'
     })
-    doc.setSchema('core')
+    doc.setSchema('1.1', { schema: 'core' })
     expect(String(doc)).toBe('[ true, true, true, false, false, false ]\n')
     doc.setSchema('1.1')
     expect(String(doc)).toBe('[ y, yes, on, n, no, off ]\n')

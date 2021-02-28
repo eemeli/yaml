@@ -18,7 +18,6 @@ import type { YAMLSeq } from '../nodes/YAMLSeq.js'
 import {
   CreateNodeOptions,
   defaultOptions,
-  documentOptions,
   DocumentOptions,
   Options,
   ParseOptions,
@@ -28,9 +27,8 @@ import {
 } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
 import { stringify, StringifyContext } from '../stringify/stringify.js'
-import type { TagValue } from '../tags/types.js'
 import { Anchors } from './Anchors.js'
-import { Schema, SchemaName } from './Schema.js'
+import { Schema } from './Schema.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode, CreateNodeContext } from './createNode.js'
 import { Directives } from './directives.js'
@@ -51,8 +49,6 @@ export declare namespace Document {
 }
 
 export class Document<T = unknown> {
-  static defaults = documentOptions;
-
   readonly [NODE_TYPE]: symbol
 
   /**
@@ -77,10 +73,16 @@ export class Document<T = unknown> {
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []
 
-  options: Required<ParseOptions & DocumentOptions> & SchemaOptions
+  options: Required<
+    Omit<
+      ParseOptions & DocumentOptions,
+      'lineCounter' | 'directives' | 'version'
+    >
+  >
 
+  // TS can't figure out that setSchema() will set this, or throw
   /** The schema used with the document. Use `setSchema()` to change. */
-  schema: Schema
+  declare schema: Schema
 
   /**
    * Array of prefixes; each will have a string `handle` that
@@ -119,16 +121,15 @@ export class Document<T = unknown> {
       replacer = undefined
     }
 
-    this.options = Object.assign({}, defaultOptions, options)
+    const opt = Object.assign({}, defaultOptions, options)
+    this.options = opt
     this.anchors = new Anchors(this.options.anchorPrefix)
+    let { version } = opt
     if (options?.directives) {
       this.directives = options.directives.atDocument()
-      if (options.version && !this.directives.yaml.explicit)
-        this.directives.yaml.version = options.version
-    } else this.directives = new Directives({ version: this.options.version })
-
-    const schemaOpts = Object.assign({}, this.getDefaults(), this.options)
-    this.schema = new Schema(schemaOpts)
+      if (this.directives.yaml.explicit) version = this.directives.yaml.version
+    } else this.directives = new Directives({ version })
+    this.setSchema(version, options)
 
     this.contents =
       value === undefined
@@ -230,14 +231,6 @@ export class Document<T = unknown> {
       : false
   }
 
-  getDefaults() {
-    return (
-      Document.defaults[this.directives.yaml.version] ||
-      Document.defaults[this.options.version] ||
-      {}
-    )
-  }
-
   /**
    * Returns item at `key`, or `undefined` if not found. By default unwraps
    * scalar values from their surrounding node; to disable set `keepScalar` to
@@ -313,29 +306,33 @@ export class Document<T = unknown> {
   }
 
   /**
-   * When a document is created with `new YAML.Document()`, the schema object is
-   * not set as it may be influenced by parsed directives; call this with no
-   * arguments to set it manually, or with arguments to change the schema used
-   * by the document.
+   * Change the YAML version and schema used by the document.
+   *
+   * Overrides all previously set schema options
    */
-  setSchema(
-    id: Options['version'] | SchemaName | null,
-    customTags?: TagValue[]
-  ) {
-    if (!id && !customTags) return
-
-    // @ts-ignore Never happens in TypeScript
-    if (typeof id === 'number') id = id.toFixed(1)
-
-    if (id === '1.1' || id === '1.2') {
-      this.directives.yaml.version = id
-      delete this.options.schema
-    } else if (id && typeof id === 'string') {
-      this.options.schema = id
+  setSchema(version: '1.1' | '1.2', options?: SchemaOptions) {
+    let _options: SchemaOptions
+    switch (String(version)) {
+      case '1.1':
+        this.directives.yaml.version = '1.1'
+        _options = Object.assign(
+          { merge: true, resolveKnownTags: false, schema: 'yaml-1.1' },
+          options
+        )
+        break
+      case '1.2':
+        this.directives.yaml.version = '1.2'
+        _options = Object.assign(
+          { merge: false, resolveKnownTags: true, schema: 'core' },
+          options
+        )
+        break
+      default: {
+        const sv = JSON.stringify(version)
+        throw new Error(`Expected '1.1' or '1.2' as version, but found: ${sv}`)
+      }
     }
-    if (Array.isArray(customTags)) this.options.customTags = customTags
-    const schemaOpts = Object.assign({}, this.getDefaults(), this.options)
-    this.schema = new Schema(schemaOpts)
+    this.schema = new Schema(_options)
   }
 
   /** Set `handle` as a shorthand string for the `prefix` tag namespace. */

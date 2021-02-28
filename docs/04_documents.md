@@ -102,16 +102,15 @@ During stringification, a document with a true-ish `version` value will include 
 
 ## Document Methods
 
-| Method                                     | Returns    | Description                                                                                                                                                                                    |
-| ------------------------------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| createNode(value,&nbsp;options?)           | `Node`     | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.                                                                     |
-| createPair(key,&nbsp;value,&nbsp;options?) | `Pair`     | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.                                                                           |
-| parse(cst)                                 | `Document` | Parse a CST into this document. Mostly an internal method, modifying the document according to the contents of the parsed `cst`. Calling this multiple times on a Document is not recommended. |
-| setSchema(id?, customTags?)                | `void`     | Set the schema used by the document. `id` may either be a YAML version, or the identifier of a YAML 1.2 schema; if set, `customTags` should have the same shape as the similarly-named option. |
-| setTagPrefix(handle, prefix)               | `void`     | Set `handle` as a shorthand string for the `prefix` tag namespace.                                                                                                                             |
-| toJS(options?)                             | `any`      | A plain JavaScript representation of the document `contents`.                                                                                                                                  |
-| toJSON()                                   | `any`      | A JSON representation of the document `contents`.                                                                                                                                              |
-| toString()                                 | `string`   | A YAML representation of the document.                                                                                                                                                         |
+| Method                                     | Returns  | Description                                                                                                                       |
+| ------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| createNode(value,&nbsp;options?)           | `Node`   | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.        |
+| createPair(key,&nbsp;value,&nbsp;options?) | `Pair`   | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.              |
+| setSchema(version,&nbsp;options?)          | `void`   | Change the YAML version and schema used by the document. `version` must be either `'1.1'` or `'1.2'`; accepts all Schema options. |
+| setTagPrefix(handle,&nbsp;prefix)          | `void`   | Set `handle` as a shorthand string for the `prefix` tag namespace.                                                                |
+| toJS(options?)                             | `any`    | A plain JavaScript representation of the document `contents`.                                                                     |
+| toJSON()                                   | `any`    | A JSON representation of the document `contents`.                                                                                 |
+| toString(options?)                         | `string` | A YAML representation of the document.                                                                                            |
 
 ```js
 const doc = YAML.parseDocument('a: 1\nb: [2, 3]\n')

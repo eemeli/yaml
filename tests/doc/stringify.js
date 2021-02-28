@@ -371,36 +371,28 @@ describe('eemeli/yaml#80: custom tags', () => {
     }
   }
 
-  beforeAll(() => {
-    YAML.defaultOptions.customTags = [regexp, sharedSymbol]
-  })
-
-  afterAll(() => {
-    YAML.defaultOptions.customTags = []
-  })
-
   describe('RegExp', () => {
     test('stringify as plain scalar', () => {
-      const str = YAML.stringify(/re/g)
+      const str = YAML.stringify(/re/g, { customTags: [regexp] })
       expect(str).toBe('!re /re/g\n')
-      const res = YAML.parse(str)
+      const res = YAML.parse(str, { customTags: [regexp] })
       expect(res).toBeInstanceOf(RegExp)
     })
 
     test('stringify as quoted scalar', () => {
-      const str = YAML.stringify(/re: /g)
+      const str = YAML.stringify(/re: /g, { customTags: [regexp] })
       expect(str).toBe('!re "/re: /g"\n')
-      const res = YAML.parse(str)
+      const res = YAML.parse(str, { customTags: [regexp] })
       expect(res).toBeInstanceOf(RegExp)
     })
 
     test('parse plain string as string', () => {
-      const res = YAML.parse('/re/g')
+      const res = YAML.parse('/re/g', { customTags: [regexp] })
       expect(res).toBe('/re/g')
     })
 
     test('parse quoted string as string', () => {
-      const res = YAML.parse('"/re/g"')
+      const res = YAML.parse('"/re/g"', { customTags: [regexp] })
       expect(res).toBe('/re/g')
     })
   })
@@ -408,17 +400,17 @@ describe('eemeli/yaml#80: custom tags', () => {
   describe('Symbol', () => {
     test('stringify as plain scalar', () => {
       const symbol = Symbol.for('foo')
-      const str = YAML.stringify(symbol)
+      const str = YAML.stringify(symbol, { customTags: [sharedSymbol] })
       expect(str).toBe('!symbol/shared foo\n')
-      const res = YAML.parse(str)
+      const res = YAML.parse(str, { customTags: [sharedSymbol] })
       expect(res).toBe(symbol)
     })
 
     test('stringify as block scalar', () => {
       const symbol = Symbol.for('foo\nbar')
-      const str = YAML.stringify(symbol)
+      const str = YAML.stringify(symbol, { customTags: [sharedSymbol] })
       expect(str).toBe('!symbol/shared |-\nfoo\nbar\n')
-      const res = YAML.parse(str)
+      const res = YAML.parse(str, { customTags: [sharedSymbol] })
       expect(res).toBe(symbol)
     })
   })
