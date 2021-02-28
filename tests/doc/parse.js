@@ -491,6 +491,22 @@ describe('maps with no values', () => {
     doc.set('b', 'x')
     expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n    x\n}\n`)
   })
+
+  test('implicit scalar key after explicit key with no value', () => {
+    const doc = YAML.parseDocument('? - 1\nx:\n')
+    expect(doc.contents.items).toMatchObject([
+      { key: { items: [{ value: 1 }] }, value: null },
+      { key: { value: 'x' }, value: { value: null } }
+    ])
+  })
+
+  test('implicit flow collection key after explicit key with no value', () => {
+    const doc = YAML.parseDocument('? - 1\n[x]: y\n')
+    expect(doc.contents.items).toMatchObject([
+      { key: { items: [{ value: 1 }] }, value: null },
+      { key: { items: [{ value: 'x' }] }, value: { value: 'y' } }
+    ])
+  })
 })
 
 describe('Excessive entity expansion attacks', () => {

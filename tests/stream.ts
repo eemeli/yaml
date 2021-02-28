@@ -19,6 +19,7 @@ aa: AA
    DD
 
   DD
+? EE
 [ ee , ff ] : {
  "gg
    gg":[GG]
@@ -43,6 +44,7 @@ describe('Input in parts', () => {
         bb: 'BB BB',
         cc: 'CC',
         'dd\n': '\nDD\n DD\n\nDD\n',
+        EE: null,
         '[ ee, ff ]': { 'gg gg': ['GG'] },
         '{ hh }': ['HH', 'II\rII II']
       })

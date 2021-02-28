@@ -110,7 +110,9 @@ function getFirstKeyStartProps(prev: SourceToken[]) {
         break loop
     }
   }
-  while (prev[++i]?.type === 'space') { /* loop */ }
+  while (prev[++i]?.type === 'space') {
+    /* loop */
+  }
   return prev.splice(i, prev.length)
 }
 
@@ -322,7 +324,7 @@ export class Parser {
             it.value = token
           } else {
             Object.assign(it, { key: token, sep: [] })
-            this.onKeyLine = true
+            this.onKeyLine = !includesToken(it.start, 'explicit-key-ind')
             return
           }
           break
@@ -588,6 +590,12 @@ export class Parser {
         default: {
           const bv = this.startBlockValue(map)
           if (bv) {
+            if (
+              atNextItem &&
+              bv.type !== 'block-seq' &&
+              includesToken(it.start, 'explicit-key-ind')
+            )
+              map.items.push({ start: [] })
             this.stack.push(bv)
             return
           }
