@@ -14,7 +14,7 @@ import {
 } from './tags/options.js'
 import type { CollectionTag, ScalarTag, TagValue } from './tags/types.js'
 
-export interface ParseOptions {
+export type ParseOptions = {
   /**
    * If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)`
    * to provide the `{ line, col }` positions within the input.
@@ -37,7 +37,7 @@ export interface ParseOptions {
   strict?: boolean
 }
 
-export interface DocumentOptions {
+export type DocumentOptions = {
   /**
    * Default prefix for anchors.
    *
@@ -81,7 +81,7 @@ export interface DocumentOptions {
   version?: '1.1' | '1.2'
 }
 
-export interface SchemaOptions {
+export type SchemaOptions = {
   /**
    * Array of additional tags to include in the schema, or a function that may
    * modify the schema's base tag array.
@@ -122,7 +122,7 @@ export interface SchemaOptions {
   sortMapEntries?: boolean | ((a: Pair, b: Pair) => number)
 }
 
-export interface CreateNodeOptions {
+export type CreateNodeOptions = {
   keepUndefined?: boolean | null
 
   onTagObj?: (tagObj: ScalarTag | CollectionTag) => void
@@ -141,7 +141,7 @@ export interface CreateNodeOptions {
   tag?: string
 }
 
-export interface ToJSOptions {
+export type ToJSOptions = {
   /**
    * Use Map rather than Object to represent mappings.
    *
@@ -163,7 +163,7 @@ export interface ToJSOptions {
   reviver?: Reviver
 }
 
-export interface ToStringOptions {
+export type ToStringOptions = {
   /**
    * The number of spaces to use when indenting code.
    *
