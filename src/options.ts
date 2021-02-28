@@ -168,6 +168,21 @@ export type ToJSOptions = {
 
 export type ToStringOptions = {
   /**
+   * Restrict double-quoted strings to use JSON-compatible syntax.
+   *
+   * Default: `false`
+   */
+  doubleQuotedAsJSON?: boolean
+
+  /**
+   * Minimum length for double-quoted strings to use multiple lines to
+   * represent the value. Ignored if `doubleQuotedAsJSON` is set.
+   *
+   * Default: `40`
+   */
+  doubleQuotedMinMultiLineLength?: number
+
+  /**
    * String representation for `false`.
    * With the core schema, use `'false'`, `'False'`, or `'FALSE'`.
    *

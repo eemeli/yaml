@@ -21,20 +21,4 @@ export const strOptions = {
    * Default: `false`
    */
   defaultQuoteSingle: false,
-
-  doubleQuoted: {
-    /**
-     * Whether to restrict double-quoted strings to use JSON-compatible syntax.
-     *
-     * Default: `false`
-     */
-    jsonEncoding: false,
-
-    /**
-     * Minimum length to use multiple lines to represent the value.
-     *
-     * Default: `40`
-     */
-    minMultiLineLength: 40
-  }
 }

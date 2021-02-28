@@ -41,10 +41,11 @@ function lineLengthOverLimit(str: string, lineWidth: number, indentLength: numbe
 }
 
 function doubleQuotedString(value: string, ctx: StringifyContext) {
-  const { implicitKey } = ctx
-  const { jsonEncoding, minMultiLineLength } = strOptions.doubleQuoted
   const json = JSON.stringify(value)
-  if (jsonEncoding) return json
+  if (ctx.options.doubleQuotedAsJSON) return json
+
+  const { implicitKey } = ctx
+  const minMultiLineLength = ctx.options.doubleQuotedMinMultiLineLength
   const indent = ctx.indent || (containsDocumentMarker(value) ? '  ' : '')
   let str = ''
   let start = 0

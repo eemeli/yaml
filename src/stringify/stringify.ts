@@ -31,6 +31,8 @@ export const createStringifyContext = (
     typeof options.indent === 'number' ? ' '.repeat(options.indent) : '  ',
   options: Object.assign(
     {
+      doubleQuotedAsJSON: false,
+      doubleQuotedMinMultiLineLength: 40,
       falseStr: 'false',
       indentSeq: true,
       lineWidth: 80,
