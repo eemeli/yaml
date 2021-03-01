@@ -1,4 +1,3 @@
-import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import { isNode, isPair, ParsedNode } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
@@ -19,7 +18,7 @@ export function resolveFlowCollection(
 ) {
   const isMap = fc.start.source === '{'
   const coll = isMap ? new YAMLMap(doc.schema) : new YAMLSeq(doc.schema)
-  coll.type = isMap ? Type.FLOW_MAP : Type.FLOW_SEQ
+  coll.flow = true
   if (_anchor) doc.anchors.setAnchor(coll, _anchor)
 
   let key: ParsedNode | null = null
@@ -66,7 +65,7 @@ export function resolveFlowCollection(
       const seq = coll as YAMLSeq
       if (key) {
         const map = new YAMLMap(doc.schema)
-        map.type = Type.FLOW_MAP
+        map.flow = true
         map.items.push(new Pair(key, value))
         seq.items.push(map)
       } else seq.items.push(value)
@@ -143,7 +142,7 @@ export function resolveFlowCollection(
           if (value) {
             onError(offset, 'Missing {} around pair used as mapping key')
             const map = new YAMLMap(doc.schema)
-            map.type = Type.FLOW_MAP
+            map.flow = true
             map.items.push(new Pair(key, value))
             map.range = [key.range[0], value.range[1]]
             key = map as YAMLMap.Parsed

@@ -78,11 +78,7 @@ export class Composer {
         doc.comment = doc.comment ? `${doc.comment}\n${comment}` : comment
       } else if (afterEmptyLine || doc.directives.marker || !dc) {
         doc.commentBefore = comment
-      } else if (
-        isCollection(dc) &&
-        (dc.type === 'MAP' || dc.type === 'SEQ') &&
-        dc.items.length > 0
-      ) {
+      } else if (isCollection(dc) && !dc.flow && dc.items.length > 0) {
         const it = dc.items[0]
         const cb = it.commentBefore
         it.commentBefore = cb ? `${comment}\n${cb}` : comment

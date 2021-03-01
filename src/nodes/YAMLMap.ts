@@ -1,4 +1,3 @@
-import type { Type } from '../constants.js'
 import type { Schema } from '../doc/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { Collection } from './Collection.js'
@@ -37,8 +36,6 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
   }
 
   items: Pair<K, V>[] = []
-
-  type?: Type.FLOW_MAP | Type.MAP
 
   constructor(schema?: Schema) {
     super(MAP, schema)

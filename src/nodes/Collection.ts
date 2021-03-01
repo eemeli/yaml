@@ -1,9 +1,15 @@
-import { Type } from '../constants.js'
 import { createNode } from '../doc/createNode.js'
 import type { Schema } from '../doc/Schema.js'
 import { addComment } from '../stringify/addComment.js'
 import { stringify, StringifyContext } from '../stringify/stringify.js'
-import { isCollection, isNode, isPair, isScalar, NodeBase, NODE_TYPE } from './Node.js'
+import {
+  isCollection,
+  isNode,
+  isPair,
+  isScalar,
+  NodeBase,
+  NODE_TYPE
+} from './Node.js'
 import type { Pair } from './Pair.js'
 
 export function collectionFromPath(
@@ -64,12 +70,11 @@ export abstract class Collection extends NodeBase {
 
   declare items: unknown[]
 
-  declare type?:
-    | Type.MAP
-    | Type.FLOW_MAP
-    | Type.SEQ
-    | Type.FLOW_SEQ
-    | Type.DOCUMENT
+  /**
+   * If true, stringify this and all child nodes using flow rather than
+   * block styles.
+   */
+  declare flow?: boolean
 
   constructor(type: symbol, schema?: Schema) {
     super(type)
@@ -205,8 +210,7 @@ export abstract class Collection extends NodeBase {
     onChompKeep?: () => void
   ) {
     const { indent, indentStep } = ctx
-    const inFlow =
-      this.type === Type.FLOW_MAP || this.type === Type.FLOW_SEQ || ctx.inFlow
+    const inFlow = this.flow || ctx.inFlow
     if (inFlow) itemIndent += indentStep
     ctx = Object.assign({}, ctx, { indent: itemIndent, inFlow, type: null })
     let chompKeep = false

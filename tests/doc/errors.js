@@ -81,7 +81,6 @@ describe('block collections', () => {
       { message: 'All mapping items must start at the same column' }
     ])
     expect(doc.contents).toMatchObject({
-      type: 'MAP',
       items: [
         { key: { value: 'foo' }, value: { value: '1' } },
         { key: { value: 'bar' }, value: { value: 2 } }
@@ -96,7 +95,6 @@ describe('block collections', () => {
       { message: 'All sequence items must start at the same column' }
     ])
     expect(doc.contents).toMatchObject({
-      type: 'SEQ',
       items: [{ value: 'foo' }, { items: [{ value: 'bar' }] }]
     })
   })
@@ -110,7 +108,6 @@ describe('block collections', () => {
       { message: 'Implicit map keys need to be followed by map values' }
     ])
     expect(doc.contents).toMatchObject({
-      type: 'MAP',
       items: [
         { key: { value: 'foo' }, value: { value: '1' } },
         { key: { items: [{ value: 'bar' }] }, value: null }

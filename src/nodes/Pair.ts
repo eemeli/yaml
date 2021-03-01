@@ -214,7 +214,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
       !ctx.inFlow &&
       !explicitKey &&
       isSeq(value) &&
-      value.type !== Type.FLOW_SEQ &&
+      !value.flow &&
       !value.tag &&
       !doc.anchors.getName(value)
     ) {
