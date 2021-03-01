@@ -1,15 +1,15 @@
 # Documents
 
-In order to work with YAML features not directly supported by native JavaScript data types, such as comments, anchors and aliases, `yaml` provides the `YAML.Document` API.
+In order to work with YAML features not directly supported by native JavaScript data types, such as comments, anchors and aliases, `yaml` provides the `Document` API.
 
 ## Parsing Documents
 
 ```js
 import fs from 'fs'
-import YAML from 'yaml'
+import { parseAllDocuments, parseDocument } from 'yaml'
 
 const file = fs.readFileSync('./file.yml', 'utf8')
-const doc = YAML.parseDocument(file)
+const doc = parseDocument(file)
 doc.contents
 // YAMLMap {
 //   items:
@@ -43,15 +43,19 @@ doc.contents
 //   range: [ 0, 180 ] }
 ```
 
-#### `YAML.parseDocument(str, options = {}): YAML.Document`
+#### `parseDocument(str, options = {}): Document`
 
-Parses a single `YAML.Document` from the input `str`; used internally by `YAML.parse`. Will include an error if `str` contains more than one document. See [Options](#options) for more information on the second parameter.
+Parses a single `Document` from the input `str`; used internally by `parse`.
+Will include an error if `str` contains more than one document.
+See [Options](#options) for more information on the second parameter.
 
 <br/>
 
-#### `YAML.parseAllDocuments(str, options = {}): YAML.Document[]`
+#### `parseAllDocuments(str, options = {}): Document[]`
 
-When parsing YAML, the input string `str` may consist of a stream of documents separated from each other by `...` document end marker lines. `YAML.parseAllDocuments` will return an array of `Document` objects that allow these documents to be parsed and manipulated with more control. See [Options](#options) for more information on the second parameter.
+When parsing YAML, the input string `str` may consist of a stream of documents separated from each other by `...` document end marker lines.
+`parseAllDocuments` will return an array of `Document` objects that allow these documents to be parsed and manipulated with more control.
+See [Options](#options) for more information on the second parameter.
 
 <br/>
 
@@ -61,7 +65,7 @@ The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq
 
 ## Creating Documents
 
-#### `new YAML.Document(value, replacer?, options = {})`
+#### `new Document(value, replacer?, options = {})`
 
 Creates a new document.
 If `value` is defined, the document `contents` are initialised with that value, wrapped recursively in appropriate [content nodes](#content-nodes).
@@ -83,7 +87,9 @@ See [Options](#options) for more information on the last argument.
 | warnings            | `Error[]`                           | Warnings encountered during parsing.                                                                                                                                     |
 
 ```js
-const doc = new YAML.Document(['some', 'values', { balloons: 99 }])
+import { Document } from 'yaml'
+
+const doc = new Document(['some', 'values', { balloons: 99 }])
 doc.version = true
 doc.commentBefore = ' A commented document'
 
@@ -96,7 +102,9 @@ String(doc)
 // - balloons: 99
 ```
 
-The Document members are all modifiable, though it's unlikely that you'll have reason to change `errors`, `schema` or `warnings`. In particular you may be interested in both reading and writing **`contents`**. Although `YAML.parseDocument()` and `YAML.parseAllDocuments()` will leave it with `Map`, `Seq`, `Scalar` or `null` contents, it can be set to anything.
+The Document members are all modifiable, though it's unlikely that you'll have reason to change `errors`, `schema` or `warnings`.
+In particular you may be interested in both reading and writing **`contents`**.
+Although `parseDocument()` and `parseAllDocuments()` will leave it with `Map`, `Seq`, `Scalar` or `null` contents, it can be set to anything.
 
 During stringification, a document with a true-ish `version` value will include a `%YAML` directive; the version number will be set to `1.2` unless the `yaml-1.1` schema is in use.
 
@@ -113,7 +121,7 @@ During stringification, a document with a true-ish `version` value will include 
 | toString(options?)                         | `string` | A YAML representation of the document.                                                                                            |
 
 ```js
-const doc = YAML.parseDocument('a: 1\nb: [2, 3]\n')
+const doc = parseDocument('a: 1\nb: [2, 3]\n')
 doc.get('a') // 1
 doc.getIn([]) // YAMLMap { items: [Pair, Pair], ... }
 doc.hasIn(['b', 0]) // true
@@ -122,15 +130,18 @@ doc.deleteIn(['b', 1]) // true
 doc.getIn(['b', 1]) // 4
 ```
 
-In addition to the above, the document object also provides the same **accessor methods** as [collections](#collections), based on the top-level collection: `add`, `delete`, `get`, `has`, and `set`, along with their deeper variants `addIn`, `deleteIn`, `getIn`, `hasIn`, and `setIn`. For the `*In` methods using an empty `path` value (i.e. `null`, `undefined`, or `[]`) will refer to the document's top-level `contents`.
+In addition to the above, the document object also provides the same **accessor methods** as [collections](#collections), based on the top-level collection: `add`, `delete`, `get`, `has`, and `set`, along with their deeper variants `addIn`, `deleteIn`, `getIn`, `hasIn`, and `setIn`.
+For the `*In` methods using an empty `path` value (i.e. `null`, `undefined`, or `[]`) will refer to the document's top-level `contents`.
 
-To define a tag prefix to use when stringifying, use **`setTagPrefix(handle, prefix)`** rather than setting a value directly in `tagPrefixes`. This will guarantee that the `handle` is valid (by throwing an error), and will overwrite any previous definition for the `handle`. Use an empty `prefix` value to remove a prefix.
+To define a tag prefix to use when stringifying, use **`setTagPrefix(handle, prefix)`** rather than setting a value directly in `tagPrefixes`.
+This will guarantee that the `handle` is valid (by throwing an error), and will overwrite any previous definition for the `handle`.
+Use an empty `prefix` value to remove a prefix.
 
-#### `Document#toJS()` and `Document#toJSON()`
+#### `Document#toJS()`, `Document#toJSON()` and `Document#toString()`
 
 ```js
 const src = '1969-07-21T02:56:15Z'
-const doc = YAML.parseDocument(src, { customTags: ['timestamp'] })
+const doc = parseDocument(src, { customTags: ['timestamp'] })
 
 doc.toJS()
 // Date { 1969-07-21T02:56:15.000Z }
@@ -144,43 +155,14 @@ String(doc)
 
 For a plain JavaScript representation of the document, **`toJS(options = {})`** is your friend.
 Its output may include `Map` and `Set` collections (e.g. if the `mapAsMap` option is true) and complex scalar values like `Date` for `!!timestamp`, but all YAML nodes will be resolved.
+See [Options](#options) for more information on the optional parameter.
+
 For a representation consisting only of JSON values, use **`toJSON()`**.
-
-The following options are also available when calling `YAML.parse()`:
-
-| `toJS()` Option | Type                                  | Default value | Description                                                                                                                                         |
-| --------------- | ------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| mapAsMap        | `boolean`                             | `false`       | Use Map rather than Object to represent mappings.                                                                                                   |
-| maxAliasCount   | `number`                              | `100`         | Prevent [exponential entity expansion attacks] by limiting data aliasing; set to `-1` to disable checks; `0` disallows all alias nodes.             |
-| onAnchor        | `(value: any, count: number) => void` |               | Optional callback for each aliased anchor in the document.                                                                                          |
-| reviver         | `(key: any, value: any) => any`       |               | Optionally apply a [reviver function] to the output, following the JSON specification but with appropriate extensions for handling `Map` and `Set`. |
-
-[exponential entity expansion attacks]: https://en.wikipedia.org/wiki/Billion_laughs_attack
-[reviver function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter
-
-#### `Document#toString()`
 
 To stringify a document as YAML, use **`toString(options = {})`**.
 This will also be called by `String(doc)` (with no options).
 This method will throw if the `errors` array is not empty.
-
-The following options are also available when calling `YAML.stringify()`:
-
-| `toString()` Option            | Type          | Default value | Description                                                                                                                                                         |
-| ------------------------------ | ------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| defaultKeyType                 | `Type ⎮ null` | `null`        | If not `null`, overrides `defaultStringType` for implicit key values.                                                                                               |
-| defaultStringType              | `Type`        | `'PLAIN'`     | The default type of string literal used to stringify values.                                                                                                        |
-| doubleQuotedAsJSON             | `boolean`     | `false`       | Restrict double-quoted strings to use JSON-compatible syntax.                                                                                                       |
-| doubleQuotedMinMultiLineLength | `number`      | `40`          | Minimum length for double-quoted strings to use multiple lines to represent the value.                                                                              |
-| falseStr                       | `string`      | `'false'`     | String representation for `false` values.                                                                                                                           |
-| indent                         | `number`      | `2`           | The number of spaces to use when indenting code. Should be a strictly positive integer.                                                                             |
-| indentSeq                      | `boolean`     | `true`        | Whether block sequences should be indented.                                                                                                                         |
-| lineWidth                      | `number`      | `80`          | Maximum line width (set to `0` to disable folding). This is a soft limit, as only double-quoted semantics allow for inserting a line break in the middle of a word. |
-| minContentWidth                | `number`      | `20`          | Minimum line width for highly-indented content (set to `0` to disable).                                                                                             |
-| nullStr                        | `string`      | `'null'`      | String representation for `null` values.                                                                                                                            |
-| simpleKeys                     | `boolean`     | `false`       | Require keys to be scalars and always use implicit rather than explicit notation.                                                                                   |
-| singleQuote                    | `boolean`     | `false`       | Prefer 'single quote' rather than "double quote" where applicable.                                                                                                  |
-| trueStr                        | `string`      | `'true'`      | String representation for `true` values.                                                                                                                            |
+See [Options](#options) for more information on the optional parameter.
 
 ## Working with Anchors
 
@@ -188,7 +170,7 @@ A description of [alias and merge nodes](#alias-nodes) is included in the next s
 
 <br/>
 
-#### `YAML.Document#anchors`
+#### `Document#anchors`
 
 | Method                                 | Returns    | Description                                                                                                                |
 | -------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -202,7 +184,7 @@ A description of [alias and merge nodes](#alias-nodes) is included in the next s
 
 ```js
 const src = '[{ a: A }, { b: B }]'
-const doc = YAML.parseDocument(src)
+const doc = parseDocument(src)
 doc.anchors.setAnchor(doc.getIn([0, 'a'], true)) // 'a1'
 doc.anchors.setAnchor(doc.getIn([1, 'b'], true)) // 'a2'
 doc.anchors.setAnchor(null, 'a1') // 'a1'
