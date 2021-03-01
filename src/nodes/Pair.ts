@@ -2,7 +2,11 @@ import { Type } from '../constants.js'
 import { createNode, CreateNodeContext } from '../doc/createNode.js'
 import { warn } from '../log.js'
 import { addComment } from '../stringify/addComment.js'
-import { StringifyContext } from '../stringify/stringify.js'
+import {
+  createStringifyContext,
+  stringify,
+  StringifyContext
+} from '../stringify/stringify.js'
 
 import { Scalar } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
@@ -120,10 +124,8 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
       allNullValues,
       doc,
       indent,
-      indentSeq,
       indentStep,
-      simpleKeys,
-      stringify
+      options: { indentSeq, simpleKeys }
     } = ctx
     let { key, value }: { key: K; value: V | Node | null } = this
     let keyComment = (isNode(key) && key.comment) || null
@@ -245,20 +247,10 @@ function stringifyKey(
   if (jsKey === null) return ''
   if (typeof jsKey !== 'object') return String(jsKey)
   if (isNode(key) && ctx && ctx.doc) {
-    const strKey = key.toString({
-      anchors: Object.create(null),
-      doc: ctx.doc,
-      falseStr: 'false',
-      indent: '',
-      indentSeq: false,
-      indentStep: ctx.indentStep,
-      inFlow: true,
-      inStringifyKey: true,
-      nullStr: 'null',
-      simpleKeys: false,
-      stringify: ctx.stringify,
-      trueStr: 'true'
-    })
+    const strCtx = createStringifyContext(ctx.doc, {})
+    strCtx.inFlow = true
+    strCtx.inStringifyKey = true
+    const strKey = key.toString(strCtx)
     if (!ctx.mapKeyWarned) {
       let jsonStr = JSON.stringify(strKey)
       if (jsonStr.length > 40) jsonStr = jsonStr.substring(0, 36) + '..."'

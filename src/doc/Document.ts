@@ -26,7 +26,11 @@ import {
   ToStringOptions
 } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
-import { stringify, StringifyContext } from '../stringify/stringify.js'
+import {
+  createStringifyContext,
+  stringify,
+  StringifyContext
+} from '../stringify/stringify.js'
 import { Anchors } from './Anchors.js'
 import { Schema } from './Schema.js'
 import { applyReviver } from './applyReviver.js'
@@ -371,7 +375,6 @@ export class Document<T = unknown> {
     const ctx: ToJSContext = {
       anchors,
       doc: this,
-      indentStep: '  ',
       keep: !json,
       mapAsMap: mapAsMap === true,
       mapKeyWarned: false,
@@ -400,10 +403,11 @@ export class Document<T = unknown> {
   toString(options: ToStringOptions = {}) {
     if (this.errors.length > 0)
       throw new Error('Document with errors cannot be stringified')
-
-    const indentSize = typeof options.indent === 'number' ? options.indent : 2
-    if (!Number.isInteger(indentSize) || indentSize <= 0) {
-      const s = JSON.stringify(indentSize)
+    if (
+      'indent' in options &&
+      (!Number.isInteger(options.indent) || Number(options.indent) <= 0)
+    ) {
+      const s = JSON.stringify(options.indent)
       throw new Error(`"indent" option must be a positive integer, not ${s}`)
     }
 
@@ -420,23 +424,7 @@ export class Document<T = unknown> {
       lines.unshift(this.commentBefore.replace(/^/gm, '#'))
     }
 
-    const ctx: StringifyContext = Object.assign(
-      {
-        falseStr: 'false',
-        indentSeq: true,
-        nullStr: 'null',
-        simpleKeys: false,
-        trueStr: 'true'
-      },
-      options,
-      {
-        anchors: Object.create(null),
-        doc: this,
-        indent: '',
-        indentStep: ' '.repeat(indentSize),
-        stringify // Requiring directly in nodes would create circular dependencies
-      }
-    )
+    const ctx: StringifyContext = createStringifyContext(this, options)
     let chompKeep = false
     let contentComment = null
     if (this.contents) {

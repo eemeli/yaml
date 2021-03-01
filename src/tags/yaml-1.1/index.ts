@@ -17,17 +17,14 @@ const nullObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:null',
   test: /^(?:~|[Nn]ull|NULL)?$/,
   resolve: () => new Scalar(null),
-  stringify: ({ source }, { nullStr }) =>
-    source && nullObj.test.test(source) ? source : nullStr
+  stringify: ({ source }, ctx) =>
+    source && nullObj.test.test(source) ? source : ctx.options.nullStr
 }
 
-function boolStringify(
-  { value, source }: Scalar,
-  { falseStr, trueStr }: StringifyContext
-) {
+function boolStringify({ value, source }: Scalar, ctx: StringifyContext) {
   const boolObj = value ? trueObj : falseObj
   if (source && boolObj.test.test(source)) return source
-  return value ? trueStr : falseStr
+  return value ? ctx.options.trueStr : ctx.options.falseStr
 }
 
 const trueObj: ScalarTag & { test: RegExp } = {

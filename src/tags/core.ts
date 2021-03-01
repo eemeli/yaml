@@ -27,8 +27,8 @@ export const nullObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:null',
   test: /^(?:~|[Nn]ull|NULL)?$/,
   resolve: () => new Scalar(null),
-  stringify: ({ source }, { nullStr }) =>
-    source && nullObj.test.test(source) ? source : nullStr
+  stringify: ({ source }, ctx) =>
+    source && nullObj.test.test(source) ? source : ctx.options.nullStr
 }
 
 export const boolObj: ScalarTag & { test: RegExp } = {
@@ -37,12 +37,12 @@ export const boolObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:[Tt]rue|TRUE|[Ff]alse|FALSE)$/,
   resolve: str => new Scalar(str[0] === 't' || str[0] === 'T'),
-  stringify({ source, value }, { falseStr, trueStr }) {
+  stringify({ source, value }, ctx) {
     if (source && boolObj.test.test(source)) {
       const sv = source[0] === 't' || source[0] === 'T'
       if (value === sv) return source
     }
-    return value ? trueStr : falseStr
+    return value ? ctx.options.trueStr : ctx.options.falseStr
   }
 }
 

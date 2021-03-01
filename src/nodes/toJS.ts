@@ -12,7 +12,6 @@ export interface ToJSAnchorValue {
 export interface ToJSContext {
   anchors: Map<Node, ToJSAnchorValue> | null
   doc: Document
-  indentStep: string
   keep: boolean
   mapAsMap: boolean
   mapKeyWarned: boolean

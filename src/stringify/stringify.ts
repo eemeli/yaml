@@ -5,7 +5,9 @@ import type { ToStringOptions } from '../options.js'
 import type { TagObj } from '../tags/types.js'
 import { stringifyString } from './stringifyString.js'
 
-export type StringifyContext = Required<Omit<ToStringOptions, 'indent'>> & {
+export type StringifyContext = {
+  actualString?: boolean
+  allNullValues?: boolean
   anchors: Record<string, Node>
   doc: Document
   forceBlockIndent?: boolean
@@ -14,9 +16,30 @@ export type StringifyContext = Required<Omit<ToStringOptions, 'indent'>> & {
   indentStep: string
   indentAtStart?: number
   inFlow?: boolean
-  stringify: typeof stringify
-  [key: string]: unknown
+  inStringifyKey?: boolean
+  options: Readonly<Required<Omit<ToStringOptions, 'indent'>>>
 }
+
+export const createStringifyContext = (
+  doc: Document,
+  options: ToStringOptions
+): StringifyContext => ({
+  anchors: Object.create(null),
+  doc,
+  indent: '',
+  indentStep:
+    typeof options.indent === 'number' ? ' '.repeat(options.indent) : '  ',
+  options: Object.assign(
+    {
+      falseStr: 'false',
+      indentSeq: true,
+      nullStr: 'null',
+      simpleKeys: false,
+      trueStr: 'true'
+    },
+    options
+  )
+})
 
 function getTagObject(tags: TagObj[], item: Node) {
   if (item.tag) {
