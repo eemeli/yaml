@@ -164,13 +164,23 @@ String(doc)
 
 #### `YAML.Document#createNode(value, options?): Node`
 
-To create a new node, use the `createNode(value, options?)` document method. This will recursively wrap any input with appropriate `Node` containers. Generic JS `Object` values as well as `Map` and its descendants become mappings, while arrays and other iterable objects result in sequences. With `Object`, entries that have an `undefined` value are dropped.
+To create a new node, use the `createNode(value, options?)` document method.
+This will recursively wrap any input with appropriate `Node` containers.
+Generic JS `Object` values as well as `Map` and its descendants become mappings, while arrays and other iterable objects result in sequences.
+With `Object`, entries that have an `undefined` value are dropped.
 
-Use `options.replacer` to apply a replacer array or function, following the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter). To specify the collection type, set `options.tag` to its identifying string, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available in the document's schema. If `options.wrapScalars` is undefined or `true`, plain values are wrapped in `Scalar` objects.
+To force flow styling on a collection, use `options.flow = true`
+Use `options.replacer` to apply a replacer array or function, following the [JSON implementation][replacer].
+To specify the collection type, set `options.tag` to its identifying string, e.g. `"!!omap"`.
+Note that this requires the corresponding tag to be available in the document's schema.
 
-As a possible side effect, this method may add entries to the document's [`anchors`](#working-with-anchors)
+[replacer]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter
 
-The primary purpose of this method is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output. To that end, you'll need to assign its return value to the `contents` of a document (or somewhere within said contents), as the document's schema is required for YAML string output. If you're not interested in working with such metadata, document `contents` may also include non-`Node` values at any level.
+As a possible side effect, this method may add entries to the document's [`anchors`](#working-with-anchors).
+
+The primary purpose of this method is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output.
+To that end, you'll need to assign its return value to the `contents` of a document (or somewhere within said contents), as the document's schema is required for YAML string output.
+If you're not interested in working with such metadata, document `contents` may also include non-`Node` values at any level.
 
 <h4 style="clear:both"><code>new YAMLMap(), new YAMLSeq(), doc.createPair(key, value)</code></h4>
 

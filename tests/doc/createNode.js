@@ -54,11 +54,23 @@ describe('arrays', () => {
     expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toHaveLength(0)
   })
+
   test('createNode([true])', () => {
     const s = doc.createNode([true])
     expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toMatchObject([{ value: true }])
+    doc.contents = s
+    expect(String(doc)).toBe('- true\n')
   })
+
+  test('flow: true', () => {
+    const s = doc.createNode([true], { flow: true })
+    expect(s).toBeInstanceOf(YAMLSeq)
+    expect(s.items).toMatchObject([{ value: true }])
+    doc.contents = s
+    expect(String(doc)).toBe('[ true ]\n')
+  })
+
   describe('[3, ["four", 5]]', () => {
     const array = [3, ['four', 5]]
     test('createNode(value)', () => {
@@ -89,13 +101,27 @@ describe('objects', () => {
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toHaveLength(0)
   })
+
   test('createNode({ x: true })', () => {
     const s = doc.createNode({ x: true })
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toMatchObject([
       { key: { value: 'x' }, value: { value: true } }
     ])
+    doc.contents = s
+    expect(String(doc)).toBe('x: true\n')
   })
+
+  test('flow: true', () => {
+    const s = doc.createNode({ x: true }, { flow: true })
+    expect(s).toBeInstanceOf(YAMLMap)
+    expect(s.items).toMatchObject([
+      { key: { value: 'x' }, value: { value: true } }
+    ])
+    doc.contents = s
+    expect(String(doc)).toBe('{ x: true }\n')
+  })
+
   test('createNode({ x: true, y: undefined })', () => {
     const s = doc.createNode({ x: true, y: undefined })
     expect(s).toBeInstanceOf(YAMLMap)
@@ -103,6 +129,7 @@ describe('objects', () => {
       { type: PairType.PAIR, key: { value: 'x' }, value: { value: true } }
     ])
   })
+
   test('createNode({ x: true, y: undefined }, { keepUndefined: true })', () => {
     const s = doc.createNode({ x: true, y: undefined }, { keepUndefined: true })
     expect(s).toBeInstanceOf(YAMLMap)
@@ -111,6 +138,7 @@ describe('objects', () => {
       { type: PairType.PAIR, key: { value: 'y' }, value: { value: null } }
     ])
   })
+
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {
     const object = { x: 3, y: [4], z: { w: 'five', v: 6 } }
     test('createNode(value)', () => {

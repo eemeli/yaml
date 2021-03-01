@@ -5,8 +5,10 @@ import { collectionFromPath, isEmptyPath } from '../nodes/Collection.js'
 import {
   DOC,
   isCollection,
+  isMap,
   isNode,
   isScalar,
+  isSeq,
   Node,
   NODE_TYPE,
   ParsedNode
@@ -157,7 +159,7 @@ export class Document<T = unknown> {
    */
   createNode(
     value: unknown,
-    { keepUndefined, onTagObj, replacer, tag }: CreateNodeOptions = {}
+    { flow, keepUndefined, onTagObj, replacer, tag }: CreateNodeOptions = {}
   ): Node {
     if (typeof replacer === 'function')
       value = replacer.call({ '': value }, '', value)
@@ -183,6 +185,7 @@ export class Document<T = unknown> {
       replacer,
       schema: this.schema
     }
+
     const node = createNode(value, tag, ctx)
     for (const alias of aliasNodes) {
       // With circular references, the source node is only resolved after all of
@@ -195,6 +198,11 @@ export class Document<T = unknown> {
         this.anchors.map[name] = alias.source
       }
     }
+    if (flow) {
+      if (isMap(node)) node.type = Type.FLOW_MAP
+      else if (isSeq(node)) node.type = Type.FLOW_SEQ
+    }
+
     return node
   }
 

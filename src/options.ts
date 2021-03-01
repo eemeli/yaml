@@ -1,9 +1,10 @@
-import { LogLevelId, Type } from './constants.js'
+import type { LogLevelId } from './constants.js'
 import type { Reviver } from './doc/applyReviver.js'
 import type { Directives } from './doc/directives.js'
 import type { Replacer } from './doc/Document.js'
 import type { SchemaName } from './doc/Schema.js'
 import type { Pair } from './nodes/Pair.js'
+import type { Scalar } from './nodes/Scalar.js'
 import type { LineCounter } from './parse/line-counter.js'
 import type { CollectionTag, ScalarTag, TagValue } from './tags/types.js'
 
@@ -117,6 +118,15 @@ export type SchemaOptions = {
 }
 
 export type CreateNodeOptions = {
+  /** Force the top-level collection node to use flow style. */
+  flow?: boolean
+
+  /**
+   * Keep `undefined` object values when creating mappings, rather than
+   * discarding them.
+   *
+   * Default: `false`
+   */
   keepUndefined?: boolean | null
 
   onTagObj?: (tagObj: ScalarTag | CollectionTag) => void
@@ -174,13 +184,7 @@ export type ToStringOptions = {
    *
    * Default: `null`
    */
-  defaultKeyType?:
-    | null
-    | Type.BLOCK_FOLDED
-    | Type.BLOCK_LITERAL
-    | Type.PLAIN
-    | Type.QUOTE_DOUBLE
-    | Type.QUOTE_SINGLE
+  defaultKeyType?: Scalar.Type | null
 
   /**
    * The default type of string literal used to stringify values in general.
@@ -188,12 +192,7 @@ export type ToStringOptions = {
    *
    * Default: `'PLAIN'`
    */
-  defaultStringType?:
-    | Type.BLOCK_FOLDED
-    | Type.BLOCK_LITERAL
-    | Type.PLAIN
-    | Type.QUOTE_DOUBLE
-    | Type.QUOTE_SINGLE
+  defaultStringType?: Scalar.Type
 
   /**
    * Restrict double-quoted strings to use JSON-compatible syntax.

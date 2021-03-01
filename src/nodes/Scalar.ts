@@ -31,6 +31,7 @@ export class Scalar<T = unknown> extends NodeBase {
    */
   declare format?: string
 
+  /** If `value` is a number, use this value when stringifying this node. */
   declare minFractionDigits?: number
 
   /** Set during parsing to the source string value */
