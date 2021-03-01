@@ -18,7 +18,9 @@ const getFoldOptions = ({ indentAtStart }) =>
 // presume that's starting a new document.
 const containsDocumentMarker = str => /^(%|---|\.\.\.)/m.test(str)
 
-function lineLengthOverLimit(str, limit) {
+function lineLengthOverLimit(str, lineWidth, indentLength) {
+  if (!lineWidth || lineWidth < 0) return false
+  const limit = lineWidth - indentLength
   const strLen = str.length
   if (strLen <= limit) return false
   for (let i = 0, start = 0; i < strLen; ++i) {
@@ -151,7 +153,7 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
       ? false
       : type === Type.BLOCK_LITERAL
       ? true
-      : !lineLengthOverLimit(value, strOptions.fold.lineWidth - indent.length)
+      : !lineLengthOverLimit(value, strOptions.fold.lineWidth, indent.length)
   let header = literal ? '|' : '>'
   if (!value) return header + '\n'
   let wsStart = ''
