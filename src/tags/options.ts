@@ -1,26 +1,5 @@
 import { Type } from '../constants.js'
 
-export const binaryOptions = {
-  /**
-   * The type of string literal used to stringify `!!binary` values.
-   *
-   * Default: `'BLOCK_LITERAL'`
-   */
-  defaultType: Type.BLOCK_LITERAL as
-    | Type.BLOCK_FOLDED
-    | Type.BLOCK_LITERAL
-    | Type.PLAIN
-    | Type.QUOTE_DOUBLE
-    | Type.QUOTE_SINGLE,
-
-  /**
-   * Maximum line width for `!!binary`.
-   *
-   * Default: `76`
-   */
-  lineWidth: 76
-}
-
 export const strOptions = {
   /**
    * The default type of string literal used to stringify values in general

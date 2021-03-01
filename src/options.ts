@@ -5,7 +5,7 @@ import type { Replacer } from './doc/Document.js'
 import type { SchemaName } from './doc/Schema.js'
 import type { Pair } from './nodes/Pair.js'
 import type { LineCounter } from './parse/line-counter.js'
-import { binaryOptions, strOptions } from './tags/options.js'
+import { strOptions } from './tags/options.js'
 import type { CollectionTag, ScalarTag, TagValue } from './tags/types.js'
 
 export type ParseOptions = {
@@ -258,12 +258,6 @@ export const defaultOptions: Required<
  * stringification of scalars. Note that these values are used by all documents.
  */
 export const scalarOptions = {
-  get binary() {
-    return binaryOptions
-  },
-  set binary(opt) {
-    Object.assign(binaryOptions, opt)
-  },
   get str() {
     return strOptions
   },
