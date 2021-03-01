@@ -52,11 +52,6 @@ interface TagBase {
   identify?: (value: unknown) => boolean
 
   /**
-   * Used by some tags to configure their stringification, where applicable.
-   */
-  options?: Record<string, unknown>
-
-  /**
    * The identifier for your data type, with which its stringified form will be
    * prefixed. Should either be a !-prefixed local `!tag`, or a fully qualified
    * `tag:domain,date:foo`.

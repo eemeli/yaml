@@ -29,7 +29,6 @@ export {
   CreateNodeOptions,
   defaultOptions,
   Options,
-  scalarOptions,
   SchemaOptions,
   ToJSOptions,
   ToStringOptions

@@ -1,18 +1,15 @@
 # Custom Data Types
 
 ```js
-YAML.parse('!!timestamp 2001-12-15 2:59:43')
-// YAMLWarning:
-//   The tag tag:yaml.org,2002:timestamp is unavailable,
-//   falling back to tag:yaml.org,2002:str
+import { parse, parseDocument } from 'yaml'
+
+parse('2001-12-15 2:59:43')
 // '2001-12-15 2:59:43'
 
-YAML.defaultOptions.customTags = ['timestamp']
+parse('!!timestamp 2001-12-15 2:59:43')
+// 2001-12-15T02:59:43.000Z (Date instance)
 
-YAML.parse('2001-12-15 2:59:43') // returns a Date instance
-// 2001-12-15T02:59:43.000Z
-
-const doc = YAML.parseDocument('2001-12-15 2:59:43')
+const doc = parseDocument('2001-12-15 2:59:43', { customTags: ['timestamp'] })
 doc.contents.value.toDateString()
 // 'Sat Dec 15 2001'
 ```
@@ -24,16 +21,14 @@ For further customisation, `customTags` may also be a function `(Tag[]) => (Tag[
 ## Built-in Custom Tags
 
 ```js
-YAML.parse('[ one, true, 42 ]').map(v => typeof v)
-// [ 'string', 'boolean', 'number' ]
+parse('[ one, true, 42 ]')
+// [ 'one', true, 42 ]
 
-let opt = { schema: 'failsafe' }
-YAML.parse('[ one, true, 42 ]', opt).map(v => typeof v)
-// [ 'string', 'string', 'string' ]
+parse('[ one, true, 42 ]', { schema: 'failsafe' })
+// [ 'one', 'true', '42' ]
 
-opt = { schema: 'failsafe', customTags: ['int'] }
-YAML.parse('[ one, true, 42 ]', opt).map(v => typeof v)
-// [ 'string', 'string', 'number' ]
+parse('[ one, true, 42 ]', { schema: 'failsafe', customTags: ['int'] })
+// [ 'one', 'true', 42 ]
 ```
 
 ### YAML 1.2 Core Schema
@@ -70,6 +65,7 @@ These tags are a part of the YAML 1.1 [language-independent types](https://yaml.
 ## Writing Custom Tags
 
 ```js
+import { stringify } from 'yaml'
 import { stringifyString } from 'yaml/util'
 
 const regexp = {
@@ -92,12 +88,10 @@ const sharedSymbol = {
   }
 }
 
-YAML.defaultOptions.customTags = [regexp, sharedSymbol]
-
-YAML.stringify({
-  regexp: /foo/gi,
-  symbol: Symbol.for('bar')
-})
+stringify(
+  { regexp: /foo/gi, symbol: Symbol.for('bar') },
+  { customTags: [regexp, sharedSymbol] }
+)
 // regexp: !re /foo/gi
 // symbol: !symbol/shared bar
 ```
@@ -143,7 +137,6 @@ To define your own tag, you'll need to define an object comprising of some of th
 - `format: string` If a tag has multiple forms that should be parsed and/or stringified differently, use `format` to identify them. Used by `!!int` and `!!float`.
 - **`identify(value): boolean`** is used by `doc.createNode()` to detect your data type, e.g. using `typeof` or `instanceof`. Required.
 - `nodeClass: Node` is the `Node` child class that implements this tag. Required for collections and tags that have overlapping JS representations.
-- `options: Object` is used by some tags to configure their stringification.
 - **`resolve(value, onError): Node | any`** turns a parsed value into an AST node; `value` is either a `string`, a `YAMLMap` or a `YAMLSeq`. `onError(msg)` should be called with an error message string when encountering errors, as it'll allow you to still return some value for the node. If returning a non-`Node` value, the output will be wrapped as a `Scalar`. Required.
 - `stringify(item, ctx, onComment, onChompKeep): string` is an optional function stringifying the `item` AST node in the current context `ctx`. `onComment` and `onChompKeep` are callback functions for a couple of special cases. If your data includes a suitable `.toString()` method, you can probably leave this undefined and use the default stringifier.
 - **`tag: string`** is the identifier for your data type, with which its stringified form will be prefixed. Should either be a !-prefixed local `!tag`, or a fully qualified `tag:domain,date:foo`. Required.

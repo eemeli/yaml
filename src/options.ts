@@ -302,10 +302,3 @@ export const defaultOptions: Required<
   strict: true,
   version: '1.2'
 }
-
-/**
- * Some customization options are availabe to control the parsing and
- * stringification of scalars. Note that these values are used by all documents.
- */
-export const scalarOptions = {
-}

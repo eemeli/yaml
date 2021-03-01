@@ -4,17 +4,6 @@ import { binary } from '../../src/tags/yaml-1.1/binary.js'
 import { YAMLOMap } from '../../src/tags/yaml-1.1/omap.js'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
-let origPrettyErrors
-
-beforeAll(() => {
-  origPrettyErrors = YAML.defaultOptions.prettyErrors
-  YAML.defaultOptions.prettyErrors = false
-})
-
-afterAll(() => {
-  YAML.defaultOptions.prettyErrors = origPrettyErrors
-})
-
 describe('json schema', () => {
   test('!!bool', () => {
     const src = `"canonical": true
