@@ -1,6 +1,5 @@
-import * as YAML from '../../src/index.js'
-import { Scalar } from '../../src/nodes/Scalar.js'
-import { YAMLSeq } from '../../src/nodes/YAMLSeq.js'
+import * as YAML from 'yaml'
+import { Scalar, YAMLSeq } from 'yaml'
 import { binary } from '../../src/tags/yaml-1.1/binary.js'
 import { YAMLOMap } from '../../src/tags/yaml-1.1/omap.js'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'

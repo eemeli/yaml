@@ -47,7 +47,7 @@ const YAML = require('yaml')
 - [`YAML.visit(node, visitor)`](https://eemeli.org/yaml/#modifying-nodes)
 
 ```js
-import { Pair, YAMLMap, YAMLSeq } from 'yaml/types'
+import { Pair, YAMLMap, YAMLSeq } from 'yaml'
 ```
 
 - [`new Pair(key, value)`](https://eemeli.org/yaml/#creating-nodes)

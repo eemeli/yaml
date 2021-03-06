@@ -1,4 +1,4 @@
-import { Composer, Document, Parser, parseDocument } from '../index.js'
+import { Composer, Document, Parser, parseDocument } from 'yaml'
 
 const src = `
 #c0\n \n
@@ -48,7 +48,7 @@ describe('Input in parts', () => {
         '[ ee, ff ]': { 'gg gg': ['GG'] },
         '{ hh }': ['HH', 'II\rII II']
       })
-      const cb = [doc.commentBefore, doc.contents.commentBefore]
+      const cb = [doc.commentBefore, doc.contents?.commentBefore]
       expect(cb).toMatchObject(['c0\n\nc1', 'c2'])
 
       for (let i = 1; i < src.length - 1; ++i) {
@@ -67,7 +67,7 @@ describe('Input in parts', () => {
         try {
           expect(res.map(doc => doc.toJS())).toMatchObject(exp)
           expect(res[0].commentBefore).toBe(cb[0])
-          expect(res[0].contents.commentBefore).toBe(cb[1])
+          expect(res[0].contents?.commentBefore).toBe(cb[1])
         } catch (error) {
           console.log({ start, end, res })
           throw error

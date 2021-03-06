@@ -1,5 +1,5 @@
-import { Alias, Pair, Scalar, YAMLMap, YAMLSeq } from '../types.js'
 import {
+  Alias,
   Document,
   isAlias,
   isCollection,
@@ -9,8 +9,12 @@ import {
   isPair,
   isScalar,
   isSeq,
-  parseDocument
-} from '../index.js'
+  Pair,
+  parseDocument,
+  Scalar,
+  YAMLMap,
+  YAMLSeq
+} from 'yaml'
 
 for (const { fn, exp } of [
   {
@@ -125,12 +129,12 @@ for (const { fn, exp } of [
 
     test('parsed alias', () => {
       const doc = parseDocument<YAMLSeq.Parsed>('[ &a foo, *a ]')
-      expect(fn(doc.contents.items[1])).toBe(exp.alias)
+      expect(fn(doc.contents?.items[1])).toBe(exp.alias)
     })
 
     test('parsed pair', () => {
       const doc = parseDocument<YAMLMap.Parsed>('foo: bar')
-      expect(fn(doc.contents.items[0])).toBe(exp.pair)
+      expect(fn(doc.contents?.items[0])).toBe(exp.pair)
     })
 
     test('created doc', () => {

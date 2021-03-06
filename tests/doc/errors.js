@@ -1,11 +1,10 @@
-import { YAMLError } from '../../src/errors.js'
-import * as YAML from '../../src/index.js'
+import * as YAML from 'yaml'
 
 test('require a message and source for all errors', () => {
   const exp = /Invalid arguments/
-  expect(() => new YAMLError()).toThrow(exp)
-  expect(() => new YAMLError('Foo')).toThrow(exp)
-  expect(() => new YAMLError('Foo', {})).toThrow(exp)
+  expect(() => new YAML.YAMLError()).toThrow(exp)
+  expect(() => new YAML.YAMLError('Foo')).toThrow(exp)
+  expect(() => new YAML.YAMLError('Foo', {})).toThrow(exp)
 })
 
 test('fail on map value indented with tab', () => {

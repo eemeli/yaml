@@ -64,7 +64,7 @@ export type visitor =
  * `Alias` and `Scalar` node.
  */
 export function visit(
-  node: Node | Document,
+  node: Node | Document | null,
   visitor:
     | visitorFn<unknown>
     | {

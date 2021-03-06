@@ -13,55 +13,38 @@
   "homepage": "https://eemeli.org/yaml/",
   "files": [
     "browser/",
-    "dist/",
-    "types/",
-    "*.d.ts",
-    "*.js",
-    "*.mjs",
-    "!*config.js"
+    "dist/"
   ],
   "type": "commonjs",
-  "main": "./index.js",
+  "main": "./dist/index.js",
   "browser": {
     "./index.js": "./browser/index.js",
-    "./types.js": "./browser/dist/types.js",
-    "./types.mjs": "./browser/dist/types.js",
     "./util.js": "./browser/dist/util.js",
     "./util.mjs": "./browser/dist/util.js"
   },
   "exports": {
     ".": {
-      "node": "./index.js",
+      "node": "./dist/index.js",
       "default": "./browser/index.js"
     },
     "./package.json": "./package.json",
-    "./types": {
-      "node": {
-        "import": "./types.mjs",
-        "require": "./types.js"
-      },
-      "default": "./browser/dist/types.js"
-    },
     "./util": {
-      "node": {
-        "import": "./util.mjs",
-        "require": "./util.js"
-      },
+      "node": "./dist/util.js",
       "default": "./browser/dist/util.js"
     }
   },
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
-    "build:browser": "rollup -c rollup.browser-config.js",
-    "build:node": "rollup -c rollup.node-config.js",
+    "build:browser": "rollup -c config/rollup.browser-config.js",
+    "build:node": "rollup -c config/rollup.node-config.js",
     "clean": "git clean -fdxe node_modules",
     "lint": "eslint src/",
     "prettier": "prettier --write .",
     "prestart": "npm run build:node",
     "start": "node -i -e 'YAML=require(\"./dist/index.js\")'",
-    "test": "jest",
+    "test": "jest --config config/jest.config.js",
     "test:browsers": "cd playground && npm test",
-    "test:dist": "npm run build:node && jest",
+    "test:dist": "npm run build:node && jest --config config/jest.config.js",
     "test:types": "tsc --noEmit",
     "docs:install": "cd docs-slate && bundle install",
     "docs:deploy": "cd docs-slate && ./deploy.sh",

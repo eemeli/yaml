@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": false,
+    "paths": {
+      "yaml": ["../src/index.ts"]
+    },
+    "rootDir": "..",
+    "target": "ES3"
+  },
+  "include": ["**/*.ts"]
+}

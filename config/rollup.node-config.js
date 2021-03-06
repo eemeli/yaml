@@ -6,7 +6,6 @@ export default {
   input: {
     index: 'src/index.ts',
     'test-events': 'src/test-events.ts',
-    types: 'src/types.ts',
     util: 'src/util.ts'
   },
   output: {
@@ -18,6 +17,7 @@ export default {
   plugins: [
     babel({
       babelHelpers: 'bundled',
+      configFile: './config/babel.config.js',
       presets: [['@babel/env', { modules: false, targets: { node: '10.0' } }]]
     }),
     typescript(),

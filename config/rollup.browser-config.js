@@ -5,7 +5,6 @@ import typescript from '@rollup/plugin-typescript'
 export default {
   input: {
     index: 'src/index.ts',
-    types: 'src/types.ts',
     util: 'src/util.ts'
   },
   output: { dir: 'browser/dist', format: 'esm', preserveModules: true },
@@ -16,6 +15,7 @@ export default {
     }),
     babel({
       babelHelpers: 'bundled',
+      configFile: './config/babel.config.js',
       presets: [['@babel/env', { modules: false }]]
     }),
     typescript({ declaration: false, outDir: 'browser/dist' })

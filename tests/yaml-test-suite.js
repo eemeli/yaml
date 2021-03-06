@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
-import * as YAML from '../index.js'
-import { testEvents } from '../dist/test-events.js'
+import * as YAML from 'yaml'
+import { testEvents } from 'yaml/test-events'
 
 const skip = {
   B63P: ['errors'], // allow ... after directives

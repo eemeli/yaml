@@ -1,9 +1,9 @@
 /* global BigInt */
 
 import { source } from 'common-tags'
-import * as YAML from '../../index.js'
-import { Pair, Scalar } from '../../types.js'
-import { Type, stringifyString } from '../../util.js'
+import * as YAML from 'yaml'
+import { Pair, Scalar, Type } from 'yaml'
+import { stringifyString } from 'yaml/util'
 
 for (const [name, version] of [
   ['YAML 1.1', '1.1'],

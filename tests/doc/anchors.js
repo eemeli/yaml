@@ -1,5 +1,4 @@
-import * as YAML from '../../index.js'
-import { Merge, YAMLMap } from '../../types.js'
+import * as YAML from 'yaml'
 
 test('basic', () => {
   const src = `- &a 1\n- *a\n`
@@ -162,9 +161,9 @@ describe('merge <<', () => {
     ])
     doc.contents.items.slice(5).forEach(({ items }) => {
       const merge = items[0]
-      expect(merge).toBeInstanceOf(Merge)
+      expect(merge).toBeInstanceOf(YAML.Merge)
       merge.value.items.forEach(({ source }) => {
-        expect(source).toBeInstanceOf(YAMLMap)
+        expect(source).toBeInstanceOf(YAML.YAMLMap)
       })
     })
   })

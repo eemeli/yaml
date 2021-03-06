@@ -1,9 +1,8 @@
-import {
-  foldFlowLines as fold,
-  FOLD_FLOW,
-  FOLD_QUOTED
-} from '../../src/stringify/foldFlowLines.js'
-import * as YAML from '../../src/index.js'
+import * as YAML from 'yaml'
+import { foldFlowLines as fold } from 'yaml/util'
+
+const FOLD_FLOW = 'flow'
+const FOLD_QUOTED = 'quoted'
 
 describe('plain', () => {
   const src = 'abc def ghi jkl mno pqr stu vwx yz\n'
