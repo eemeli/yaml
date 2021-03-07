@@ -73,18 +73,18 @@ If `value` is `undefined`, the document's `contents` is initialised as `null`.
 If defined, a `replacer` may filter or modify the initial document contents, following the same algorithm as the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter).
 See [Options](#options) for more information on the last argument.
 
-| Member              | Type                                | Description                                                                                                                                                              |
-| ------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| anchors             | [`Anchors`](#anchors)               | Anchors associated with the document's nodes; also provides alias & merge node creators.                                                                                 |
-| commentBefore       | `string?`                           | A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line or the directives-end indicator when stringified. |
-| comment             | `string?`                           | A comment at the end of the document. If not empty, separated from the rest of the document by a blank line when stringified.                                            |
-| contents            | [`Node`](#content-nodes)&vert;`any` | The document contents.                                                                                                                                                   |
-| directivesEndMarker | `boolean?`                          | Whether the document should always include a directives-end marker `---` at its start, even if it includes no directives.                                                |
-| errors              | `Error[]`                           | Errors encountered during parsing.                                                                                                                                       |
-| schema              | `Schema`                            | The schema used with the document.                                                                                                                                       |
-| tagPrefixes         | `Prefix[]`                          | Array of prefixes; each will have a string `handle` that starts and ends with `!` and a string `prefix` that the handle will be replaced by.                             |
-| version             | `string?`                           | The parsed version of the source document; if true-ish, stringified output will include a `%YAML` directive.                                                             |
-| warnings            | `Error[]`                           | Warnings encountered during parsing.                                                                                                                                     |
+| Member        | Type                             | Description                                                                                                                                                         |
+| ------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| anchors       | [`Anchors`](#anchors)            | Anchors associated with the document's nodes; also provides alias & merge node creators.                                                                            |
+| commentBefore | `string?`                        | A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line or the doc-start indicator when stringified. |
+| comment       | `string?`                        | A comment at the end of the document. If not empty, separated from the rest of the document by a blank line when stringified.                                       |
+| contents      | [`Node`](#content-nodes) `⎮ any` | The document contents.                                                                                                                                              |
+| directives    | `Directives`                     | Document directives `%YAML` and `%TAG`, as well as the doc-start marker `---`.                                                                                      |
+| errors        | `Error[]`                        | Errors encountered during parsing.                                                                                                                                  |
+| schema        | `Schema`                         | The schema used with the document.                                                                                                                                  |
+| tagPrefixes   | `Prefix[]`                       | Array of prefixes; each will have a string `handle` that starts and ends with `!` and a string `prefix` that the handle will be replaced by.                        |
+| version       | `string?`                        | The parsed version of the source document; if true-ish, stringified output will include a `%YAML` directive.                                                        |
+| warnings      | `Error[]`                        | Warnings encountered during parsing.                                                                                                                                |
 
 ```js
 import { Document } from 'yaml'

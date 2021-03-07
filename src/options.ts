@@ -195,6 +195,21 @@ export type ToStringOptions = {
   defaultStringType?: Scalar.Type
 
   /**
+   * Include directives in the output.
+   *
+   * - If `true`, at least the document-start marker `---` is always included.
+   *   This does not force the `%YAML` directive to be included. To do that,
+   *   set `doc.directives.yaml.explicit = true`.
+   * - If `false`, no directives or marker is ever included. If using the `%TAG`
+   *   directive, you are expected to include it manually in the stream before
+   *   its use.
+   * - If `null`, directives and marker may be included if required.
+   *
+   * Default: `null`
+   */
+  directives?: boolean | null
+
+  /**
    * Restrict double-quoted strings to use JSON-compatible syntax.
    *
    * Default: `false`

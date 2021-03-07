@@ -34,6 +34,7 @@ export const createStringifyContext = (
     {
       defaultKeyType: null,
       defaultStringType: Type.PLAIN,
+      directives: null,
       doubleQuotedAsJSON: false,
       doubleQuotedMinMultiLineLength: 40,
       falseStr: 'false',

@@ -74,8 +74,6 @@ export class Document<T = unknown> {
 
   directives: Directives
 
-  directivesEndMarker = false
-
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []
 
@@ -97,12 +95,6 @@ export class Document<T = unknown> {
   tagPrefixes: Document.TagPrefix[] = []
 
   type: Type.DOCUMENT = Type.DOCUMENT
-
-  /**
-   * The parsed version of the source document;
-   * if true-ish, stringified output will include a `%YAML` directive.
-   */
-  version?: string
 
   /** Warnings encountered during parsing. */
   warnings: YAMLWarning[] = []
@@ -420,15 +412,17 @@ export class Document<T = unknown> {
     }
 
     const lines = []
-    let hasDirectives = false
-    const dir = this.directives.toString(this)
-    if (dir) {
-      lines.push(dir)
-      hasDirectives = true
+    let hasDirectives = options.directives === true
+    if (options.directives !== false) {
+      const dir = this.directives.toString(this)
+      if (dir) {
+        lines.push(dir)
+        hasDirectives = true
+      } else if (this.directives.marker) hasDirectives = true
     }
-    if (hasDirectives || this.directivesEndMarker) lines.push('---')
+    if (hasDirectives) lines.push('---')
     if (this.commentBefore) {
-      if (hasDirectives || !this.directivesEndMarker) lines.unshift('')
+      if (lines.length !== 1) lines.unshift('')
       lines.unshift(this.commentBefore.replace(/^/gm, '#'))
     }
 
@@ -437,11 +431,7 @@ export class Document<T = unknown> {
     let contentComment = null
     if (this.contents) {
       if (isNode(this.contents)) {
-        if (
-          this.contents.spaceBefore &&
-          (hasDirectives || this.directivesEndMarker)
-        )
-          lines.push('')
+        if (this.contents.spaceBefore && hasDirectives) lines.push('')
         if (this.contents.commentBefore)
           lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
         // top-level block scalars need to be indented if followed by a comment

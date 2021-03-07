@@ -14,10 +14,8 @@ export function composeDoc(
 ) {
   const opts = Object.assign({ directives }, options)
   const doc = new Document(undefined, opts) as Document.Parsed
-
   const props = resolveProps(doc, start, true, 'doc-start', offset, onError)
-  if (props.found) doc.directivesEndMarker = true
-
+  if (props.found) doc.directives.marker = true
   doc.contents = value
     ? composeNode(doc, value, props, onError)
     : composeEmptyNode(doc, offset + props.length, start, null, props, onError)

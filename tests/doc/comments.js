@@ -503,9 +503,8 @@ describe('blank lines', () => {
 
   test('before first node in document with directives', () => {
     const doc = YAML.parseDocument('str\n')
-    doc.directivesEndMarker = true
     doc.contents.spaceBefore = true
-    expect(String(doc)).toBe('---\n\nstr\n')
+    expect(doc.toString({ directives: true })).toBe('---\n\nstr\n')
   })
 
   test('between seq items', () => {

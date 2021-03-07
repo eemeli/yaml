@@ -22,7 +22,7 @@ export function testEvents(src: string, options?: Options) {
       if (error && (!error.offset || error.offset < rootStart))
         throw new Error()
       let docStart = '+DOC'
-      if (doc.directivesEndMarker) docStart += ' ---'
+      if (doc.directives.marker) docStart += ' ---'
       else if (doc.contents && doc.contents.range[1] === doc.contents.range[0])
         continue
       events.push(docStart)
