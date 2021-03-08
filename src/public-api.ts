@@ -1,10 +1,11 @@
 import { Composer } from './compose/composer.js'
 import { LogLevel } from './constants.js'
-import { Document, Replacer, Reviver } from './doc/Document.js'
+import type { Reviver } from './doc/applyReviver.js'
+import { Document, Replacer } from './doc/Document.js'
 import { YAMLParseError } from './errors.js'
 import { warn } from './log.js'
-import { ParsedNode } from './nodes/Node.js'
-import { Options } from './options.js'
+import type { ParsedNode } from './nodes/Node.js'
+import type { Options, ToJSOptions, ToStringOptions } from './options.js'
 import { Parser } from './parse/parser.js'
 
 export interface EmptyStream
@@ -77,13 +78,17 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
  *   document, so Maps become objects, Sequences arrays, and scalars result in
  *   nulls, booleans, numbers and strings.
  */
-export function parse(src: string, options?: Options): any
-export function parse(src: string, reviver: Reviver, options?: Options): any
+export function parse(src: string, options?: Options & ToJSOptions): any
+export function parse(
+  src: string,
+  reviver: Reviver,
+  options?: Options & ToJSOptions
+): any
 
 export function parse(
   src: string,
-  reviver?: Reviver | Options,
-  options?: Options
+  reviver?: Reviver | (Options & ToJSOptions),
+  options?: Options & ToJSOptions
 ) {
   let _reviver: Reviver | undefined = undefined
   if (typeof reviver === 'function') {
@@ -100,7 +105,7 @@ export function parse(
       throw doc.errors[0]
     else doc.errors = []
   }
-  return doc.toJS({ reviver: _reviver })
+  return doc.toJS(Object.assign({ reviver: _reviver }, options))
 }
 
 /**
@@ -109,16 +114,16 @@ export function parse(
  * @param replacer - A replacer array or function, as in `JSON.stringify()`
  * @returns Will always include `\n` as the last character, as is expected of YAML documents.
  */
-export function stringify(value: any, options?: Options): string
+export function stringify(value: any, options?: Options & ToStringOptions): string
 export function stringify(
   value: any,
   replacer?: Replacer | null,
-  options?: string | number | Options
+  options?: string | number | Options & ToStringOptions
 ): string
 export function stringify(
   value: any,
-  replacer?: Replacer | Options | null,
-  options?: string | number | Options
+  replacer?: Replacer | Options & ToStringOptions | null,
+  options?: string | number | Options & ToStringOptions
 ) {
   let _replacer: Replacer | null = null
   if (typeof replacer === 'function' || Array.isArray(replacer)) {
@@ -133,8 +138,8 @@ export function stringify(
     options = indent < 1 ? undefined : indent > 8 ? { indent: 8 } : { indent }
   }
   if (value === undefined) {
-    const { keepUndefined } = options || (replacer as Options) || {}
+    const { keepUndefined } = options || (replacer as Options & ToStringOptions) || {}
     if (!keepUndefined) return undefined
   }
-  return new Document(value, _replacer, options).toString()
+  return new Document(value, _replacer, options).toString(options)
 }

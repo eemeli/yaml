@@ -2,7 +2,11 @@ import { Type } from '../constants.js'
 import { createNode, CreateNodeContext } from '../doc/createNode.js'
 import { warn } from '../log.js'
 import { addComment } from '../stringify/addComment.js'
-import { StringifyContext } from '../stringify/stringify.js'
+import {
+  createStringifyContext,
+  stringify,
+  StringifyContext
+} from '../stringify/stringify.js'
 
 import { Scalar } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
@@ -116,7 +120,13 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
     onChompKeep?: () => void
   ) {
     if (!ctx || !ctx.doc) return JSON.stringify(this)
-    const { indent: indentSize, indentSeq, simpleKeys } = ctx.doc.options
+    const {
+      allNullValues,
+      doc,
+      indent,
+      indentStep,
+      options: { indentSeq, simpleKeys }
+    } = ctx
     let { key, value }: { key: K; value: V | Node | null } = this
     let keyComment = (isNode(key) && key.comment) || null
     if (simpleKeys) {
@@ -136,7 +146,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
         (isScalar(key)
           ? key.type === Type.BLOCK_FOLDED || key.type === Type.BLOCK_LITERAL
           : typeof key === 'object'))
-    const { allNullValues, doc, indent, indentStep, stringify } = ctx
+
     ctx = Object.assign({}, ctx, {
       allNullValues: false,
       implicitKey: !explicitKey && (simpleKeys || !allNullValues),
@@ -149,6 +159,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
       () => (keyComment = null),
       () => (chompKeep = true)
     )
+
     if (!explicitKey && !ctx.inFlow && str.length > 1024) {
       if (simpleKeys)
         throw new Error(
@@ -199,7 +210,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
     chompKeep = false
     if (
       !indentSeq &&
-      indentSize >= 2 &&
+      indentStep.length >= 2 &&
       !ctx.inFlow &&
       !explicitKey &&
       isSeq(value) &&
@@ -236,15 +247,10 @@ function stringifyKey(
   if (jsKey === null) return ''
   if (typeof jsKey !== 'object') return String(jsKey)
   if (isNode(key) && ctx && ctx.doc) {
-    const strKey = key.toString({
-      anchors: Object.create(null),
-      doc: ctx.doc,
-      indent: '',
-      indentStep: ctx.indentStep,
-      inFlow: true,
-      inStringifyKey: true,
-      stringify: ctx.stringify
-    })
+    const strCtx = createStringifyContext(ctx.doc, {})
+    strCtx.inFlow = true
+    strCtx.inStringifyKey = true
+    const strKey = key.toString(strCtx)
     if (!ctx.mapKeyWarned) {
       let jsonStr = JSON.stringify(strKey)
       if (jsonStr.length > 40) jsonStr = jsonStr.substring(0, 36) + '..."'

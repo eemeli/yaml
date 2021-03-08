@@ -34,7 +34,6 @@ const YAML = require('yaml')
 
 ### YAML Documents
 
-- [`YAML.defaultOptions`](https://eemeli.org/yaml/#options)
 - [`YAML.Document`](https://eemeli.org/yaml/#yaml-documents)
   - [`constructor(value, replacer?, options?)`](https://eemeli.org/yaml/#creating-documents)
   - [`defaults`](https://eemeli.org/yaml/#options)

@@ -22,6 +22,12 @@ export class Directives {
   tags: Record<string, string>
 
   /**
+   * The directives-end/doc-start marker `---`. If `null`, a marker may still be
+   * included in the document's stringified representation.
+   */
+  marker: true | null = null
+
+  /**
    * Used when parsing YAML 1.1, where:
    * > If the document specifies no directives, it is parsed using the same
    * > settings as the previous document. If the document does specify any

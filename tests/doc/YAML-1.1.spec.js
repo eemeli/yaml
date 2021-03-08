@@ -1,17 +1,5 @@
 import { source } from 'common-tags'
-import * as YAML from 'yaml'
-
-const orig = {}
-beforeAll(() => {
-  orig.prettyErrors = YAML.defaultOptions.prettyErrors
-  orig.version = YAML.defaultOptions.version
-  YAML.defaultOptions.prettyErrors = true
-  YAML.defaultOptions.version = '1.1'
-})
-afterAll(() => {
-  YAML.defaultOptions.prettyErrors = orig.prettyErrors
-  YAML.defaultOptions.version = orig.version
-})
+import { parseAllDocuments } from 'yaml'
 
 test('Use preceding directives if none defined', () => {
   const src = source`
@@ -29,7 +17,7 @@ test('Use preceding directives if none defined', () => {
     ---
     !bar "Using previous YAML directive"
   `
-  const docs = YAML.parseAllDocuments(src, { prettyErrors: false })
+  const docs = parseAllDocuments(src, { prettyErrors: false, version: '1.1' })
   const warn = tag => ({ message: `Unresolved tag: ${tag}` })
   expect(docs).toMatchObject([
     {

@@ -1,14 +1,18 @@
 import { Scalar } from '../nodes/Scalar.js'
+import { ParseOptions } from '../options.js'
 import { stringifyNumber } from '../stringify/stringifyNumber.js'
 import { failsafe } from './failsafe/index.js'
-import { boolOptions, intOptions, nullOptions } from './options.js'
 import { ScalarTag } from './types.js'
 
 const intIdentify = (value: unknown): value is number | bigint =>
   typeof value === 'bigint' || Number.isInteger(value)
 
-const intResolve = (str: string, offset: number, radix: number) =>
-  intOptions.asBigInt ? BigInt(str) : parseInt(str.substring(offset), radix)
+const intResolve = (
+  str: string,
+  offset: number,
+  radix: number,
+  { intAsBigInt }: ParseOptions
+) => (intAsBigInt ? BigInt(str) : parseInt(str.substring(offset), radix))
 
 function intStringify(node: Scalar, radix: number, prefix: string) {
   const { value } = node
@@ -23,9 +27,8 @@ export const nullObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:null',
   test: /^(?:~|[Nn]ull|NULL)?$/,
   resolve: () => new Scalar(null),
-  options: nullOptions,
-  stringify: ({ source }) =>
-    source && nullObj.test.test(source) ? source : nullOptions.nullStr
+  stringify: ({ source }, ctx) =>
+    source && nullObj.test.test(source) ? source : ctx.options.nullStr
 }
 
 export const boolObj: ScalarTag & { test: RegExp } = {
@@ -34,13 +37,12 @@ export const boolObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:[Tt]rue|TRUE|[Ff]alse|FALSE)$/,
   resolve: str => new Scalar(str[0] === 't' || str[0] === 'T'),
-  options: boolOptions,
-  stringify({ source, value }) {
+  stringify({ source, value }, ctx) {
     if (source && boolObj.test.test(source)) {
       const sv = source[0] === 't' || source[0] === 'T'
       if (value === sv) return source
     }
-    return value ? boolOptions.trueStr : boolOptions.falseStr
+    return value ? ctx.options.trueStr : ctx.options.falseStr
   }
 }
 
@@ -50,8 +52,7 @@ export const octObj: ScalarTag = {
   tag: 'tag:yaml.org,2002:int',
   format: 'OCT',
   test: /^0o[0-7]+$/,
-  resolve: str => intResolve(str, 2, 8),
-  options: intOptions,
+  resolve: (str, _onError, opt) => intResolve(str, 2, 8, opt),
   stringify: node => intStringify(node, 8, '0o')
 }
 
@@ -60,8 +61,7 @@ export const intObj: ScalarTag = {
   default: true,
   tag: 'tag:yaml.org,2002:int',
   test: /^[-+]?[0-9]+$/,
-  resolve: str => intResolve(str, 0, 10),
-  options: intOptions,
+  resolve: (str, _onError, opt) => intResolve(str, 0, 10, opt),
   stringify: stringifyNumber
 }
 
@@ -71,8 +71,7 @@ export const hexObj: ScalarTag = {
   tag: 'tag:yaml.org,2002:int',
   format: 'HEX',
   test: /^0x[0-9a-fA-F]+$/,
-  resolve: str => intResolve(str, 2, 16),
-  options: intOptions,
+  resolve: (str, _onError, opt) => intResolve(str, 2, 16, opt),
   stringify: node => intStringify(node, 16, '0x')
 }
 

@@ -251,19 +251,7 @@ describe('double-quoted', () => {
 })
 
 describe('end-to-end', () => {
-  let origFoldOptions
-
-  beforeAll(() => {
-    origFoldOptions = YAML.scalarOptions.str.fold
-    YAML.scalarOptions.str.fold = {
-      lineWidth: 20,
-      minContentWidth: 0
-    }
-  })
-
-  afterAll(() => {
-    YAML.scalarOptions.str.fold = origFoldOptions
-  })
+  const foldOptions = { lineWidth: 20, minContentWidth: 0 }
 
   test('more-indented folded block', () => {
     const src = `> # comment with an excessive length that won't get folded
@@ -291,12 +279,12 @@ folded but is not.
 
 Unfolded paragraph.\n`
     )
-    expect(String(doc)).toBe(src)
+    expect(doc.toString(foldOptions)).toBe(src)
   })
 
   test('eemeli/yaml#55', () => {
     const str = ' first more-indented line\nnext line\n'
-    const ys = YAML.stringify(str)
+    const ys = YAML.stringify(str, foldOptions)
     expect(ys).toBe('>1\n first more-indented line\nnext line\n')
   })
 
@@ -310,28 +298,20 @@ Unfolded paragraph.\n`
       'plain value with enough length to fold twice'
     )
     expect(doc.contents.items[1].value).toBe('plain with comment')
-    expect(String(doc)).toBe(src)
+    expect(doc.toString(foldOptions)).toBe(src)
   })
 
   test('long line width', () => {
-    const src = {
-      lorem: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In laoreet massa eros, dignissim aliquam nunc elementum sit amet. Mauris pulvinar nunc eget ante sodales viverra. Vivamus quis convallis sapien, ut auctor magna. Cras volutpat erat eu lacus luctus facilisis. Aenean sapien leo, auctor sed tincidunt at, scelerisque a urna. Nunc ullamcorper, libero non mollis aliquet, nulla diam lobortis neque, ac rutrum dui nibh iaculis lectus. Aenean lobortis interdum arcu eget sollicitudin.\n\nDuis quam enim, ultricies a enim non, tincidunt lobortis ipsum. Mauris condimentum ultrices eros rutrum euismod. Fusce et mi eget quam dapibus blandit. Maecenas sodales tempor euismod. Phasellus vulputate purus felis, eleifend ullamcorper tortor semper sit amet. Sed nunc quam, iaculis et neque sit amet, consequat egestas lectus. Aenean dapibus lorem sed accumsan porttitor. Curabitur eu magna congue, mattis urna ac, lacinia eros. In in iaculis justo, nec faucibus enim. Fusce id viverra purus, nec ultricies mi. Aliquam eu risus risus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse potenti. \n'
-    }
+    const src = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. In laoreet massa eros, dignissim aliquam nunc elementum sit amet. Mauris pulvinar nunc eget ante sodales viverra. Vivamus quis convallis sapien, ut auctor magna. Cras volutpat erat eu lacus luctus facilisis. Aenean sapien leo, auctor sed tincidunt at, scelerisque a urna. Nunc ullamcorper, libero non mollis aliquet, nulla diam lobortis neque, ac rutrum dui nibh iaculis lectus. Aenean lobortis interdum arcu eget sollicitudin.
 
-    YAML.scalarOptions.str.fold.lineWidth = 1000
-    const ysWithLineWidthGreater = YAML.stringify(src)
+Duis quam enim, ultricies a enim non, tincidunt lobortis ipsum. Mauris condimentum ultrices eros rutrum euismod. Fusce et mi eget quam dapibus blandit. Maecenas sodales tempor euismod. Phasellus vulputate purus felis, eleifend ullamcorper tortor semper sit amet. Sed nunc quam, iaculis et neque sit amet, consequat egestas lectus. Aenean dapibus lorem sed accumsan porttitor. Curabitur eu magna congue, mattis urna ac, lacinia eros. In in iaculis justo, nec faucibus enim. Fusce id viverra purus, nec ultricies mi. Aliquam eu risus risus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse potenti. \n`
 
-    YAML.scalarOptions.str.fold.lineWidth = 0
-    const ysWithUnlimitedLength = YAML.stringify(src)
+    const exp = `|
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. In laoreet massa eros, dignissim aliquam nunc elementum sit amet. Mauris pulvinar nunc eget ante sodales viverra. Vivamus quis convallis sapien, ut auctor magna. Cras volutpat erat eu lacus luctus facilisis. Aenean sapien leo, auctor sed tincidunt at, scelerisque a urna. Nunc ullamcorper, libero non mollis aliquet, nulla diam lobortis neque, ac rutrum dui nibh iaculis lectus. Aenean lobortis interdum arcu eget sollicitudin.
 
-    YAML.scalarOptions.str.fold.lineWidth = -1
-    const ysWithUnlimitedLength2 = YAML.stringify(src)
+Duis quam enim, ultricies a enim non, tincidunt lobortis ipsum. Mauris condimentum ultrices eros rutrum euismod. Fusce et mi eget quam dapibus blandit. Maecenas sodales tempor euismod. Phasellus vulputate purus felis, eleifend ullamcorper tortor semper sit amet. Sed nunc quam, iaculis et neque sit amet, consequat egestas lectus. Aenean dapibus lorem sed accumsan porttitor. Curabitur eu magna congue, mattis urna ac, lacinia eros. In in iaculis justo, nec faucibus enim. Fusce id viverra purus, nec ultricies mi. Aliquam eu risus risus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse potenti. \n`
 
-    expect(ysWithLineWidthGreater).toBe('lorem: |\n' +
-      '  Lorem ipsum dolor sit amet, consectetur adipiscing elit. In laoreet massa eros, dignissim aliquam nunc elementum sit amet. Mauris pulvinar nunc eget ante sodales viverra. Vivamus quis convallis sapien, ut auctor magna. Cras volutpat erat eu lacus luctus facilisis. Aenean sapien leo, auctor sed tincidunt at, scelerisque a urna. Nunc ullamcorper, libero non mollis aliquet, nulla diam lobortis neque, ac rutrum dui nibh iaculis lectus. Aenean lobortis interdum arcu eget sollicitudin.\n' +
-      '\n' +
-      '  Duis quam enim, ultricies a enim non, tincidunt lobortis ipsum. Mauris condimentum ultrices eros rutrum euismod. Fusce et mi eget quam dapibus blandit. Maecenas sodales tempor euismod. Phasellus vulputate purus felis, eleifend ullamcorper tortor semper sit amet. Sed nunc quam, iaculis et neque sit amet, consequat egestas lectus. Aenean dapibus lorem sed accumsan porttitor. Curabitur eu magna congue, mattis urna ac, lacinia eros. In in iaculis justo, nec faucibus enim. Fusce id viverra purus, nec ultricies mi. Aliquam eu risus risus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse potenti. \n')
-    expect(ysWithUnlimitedLength).toBe(ysWithLineWidthGreater)
-    expect(ysWithUnlimitedLength2).toBe(ysWithLineWidthGreater)
+    for (const lineWidth of [1000, 0, -1])
+      expect(YAML.stringify(src, { lineWidth })).toBe(exp)
   })
 })

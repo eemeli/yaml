@@ -39,7 +39,6 @@ const YAML = require('yaml')
 
 <h3>Documents</h3>
 
-- [`YAML.defaultOptions`](#options)
 - [`YAML.Document`](#documents)
   - [`constructor(value, replacer?, options?)`](#creating-documents)
   - [`defaults`](#options)

@@ -1,8 +1,9 @@
 import { Scalar } from '../../nodes/Scalar.js'
+import type { ParseOptions } from '../../options.js'
+import type { StringifyContext } from '../../stringify/stringify.js'
 import { stringifyNumber } from '../../stringify/stringifyNumber.js'
 import { failsafe } from '../failsafe/index.js'
-import { boolOptions, intOptions, nullOptions } from '../options.js'
-import { ScalarTag } from '../types.js'
+import type { ScalarTag } from '../types.js'
 import { binary } from './binary.js'
 import { omap } from './omap.js'
 import { pairs } from './pairs.js'
@@ -16,15 +17,14 @@ const nullObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:null',
   test: /^(?:~|[Nn]ull|NULL)?$/,
   resolve: () => new Scalar(null),
-  options: nullOptions,
-  stringify: ({ source }) =>
-    source && nullObj.test.test(source) ? source : nullOptions.nullStr
+  stringify: ({ source }, ctx) =>
+    source && nullObj.test.test(source) ? source : ctx.options.nullStr
 }
 
-const boolStringify = ({ value, source }: Scalar) => {
+function boolStringify({ value, source }: Scalar, ctx: StringifyContext) {
   const boolObj = value ? trueObj : falseObj
   if (source && boolObj.test.test(source)) return source
-  return value ? boolOptions.trueStr : boolOptions.falseStr
+  return value ? ctx.options.trueStr : ctx.options.falseStr
 }
 
 const trueObj: ScalarTag & { test: RegExp } = {
@@ -33,7 +33,6 @@ const trueObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:Y|y|[Yy]es|YES|[Tt]rue|TRUE|[Oo]n|ON)$/,
   resolve: () => new Scalar(true),
-  options: boolOptions,
   stringify: boolStringify
 }
 
@@ -43,18 +42,22 @@ const falseObj: ScalarTag & { test: RegExp } = {
   tag: 'tag:yaml.org,2002:bool',
   test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
   resolve: () => new Scalar(false),
-  options: boolOptions,
   stringify: boolStringify
 }
 
 const intIdentify = (value: unknown): value is number | bigint =>
   typeof value === 'bigint' || Number.isInteger(value)
 
-function intResolve(str: string, offset: number, radix: number) {
+function intResolve(
+  str: string,
+  offset: number,
+  radix: number,
+  { intAsBigInt }: ParseOptions
+) {
   const sign = str[0]
   if (sign === '-' || sign === '+') offset += 1
   str = str.substring(offset).replace(/_/g, '')
-  if (intOptions.asBigInt) {
+  if (intAsBigInt) {
     switch (radix) {
       case 2:
         str = `0b${str}`
@@ -93,7 +96,8 @@ export const yaml11 = failsafe.concat(
       tag: 'tag:yaml.org,2002:int',
       format: 'BIN',
       test: /^[-+]?0b[0-1_]+$/,
-      resolve: (str: string) => intResolve(str, 2, 2),
+      resolve: (str: string, _onError: unknown, opt: ParseOptions) =>
+        intResolve(str, 2, 2, opt),
       stringify: node => intStringify(node, 2, '0b')
     },
     {
@@ -102,7 +106,8 @@ export const yaml11 = failsafe.concat(
       tag: 'tag:yaml.org,2002:int',
       format: 'OCT',
       test: /^[-+]?0[0-7_]+$/,
-      resolve: (str: string) => intResolve(str, 1, 8),
+      resolve: (str: string, _onError: unknown, opt: ParseOptions) =>
+        intResolve(str, 1, 8, opt),
       stringify: node => intStringify(node, 8, '0')
     },
     {
@@ -110,7 +115,8 @@ export const yaml11 = failsafe.concat(
       default: true,
       tag: 'tag:yaml.org,2002:int',
       test: /^[-+]?[0-9][0-9_]*$/,
-      resolve: (str: string) => intResolve(str, 0, 10),
+      resolve: (str: string, _onError: unknown, opt: ParseOptions) =>
+        intResolve(str, 0, 10, opt),
       stringify: stringifyNumber
     },
     {
@@ -119,7 +125,8 @@ export const yaml11 = failsafe.concat(
       tag: 'tag:yaml.org,2002:int',
       format: 'HEX',
       test: /^[-+]?0x[0-9a-fA-F_]+$/,
-      resolve: (str: string) => intResolve(str, 2, 16),
+      resolve: (str: string, _onError: unknown, opt: ParseOptions) =>
+        intResolve(str, 2, 16, opt),
       stringify: node => intStringify(node, 16, '0x')
     },
     {

@@ -89,24 +89,22 @@ describe('tags', () => {
 
 describe('custom string on node', () => {
   test('tiled null', () => {
-    YAML.scalarOptions.null.nullStr = '~'
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { simpleKeys: true })
+    const str = YAML.stringify(doc, { nullStr: '~', simpleKeys: true })
     expect(str).toBe('a: ~\n')
     expect(YAML.parse(str)).toEqual({ a: null })
   })
 
   test('empty string null', () => {
-    YAML.scalarOptions.null.nullStr = ''
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { simpleKeys: true })
+    const str = YAML.stringify(doc, { nullStr: '', simpleKeys: true })
     expect(str).toBe('a: \n')
     expect(YAML.parse(str)).toEqual({ a: null })
   })
 })
 
 describe('number types', () => {
-  describe('asBigInt: false', () => {
+  describe('intAsBigInt: false', () => {
     test('Version 1.1', () => {
       const src = `
 - 0b10_10
@@ -119,7 +117,10 @@ describe('number types', () => {
 - 4.20
 - .42
 - 00.4`
-      const doc = YAML.parseDocument(src, { version: '1.1' })
+      const doc = YAML.parseDocument(src, {
+        intAsBigInt: false,
+        version: '1.1'
+      })
       expect(doc.contents.items).toMatchObject([
         { value: 10, format: 'BIN' },
         { value: 83, format: 'OCT' },
@@ -149,7 +150,10 @@ describe('number types', () => {
 - 4.20
 - .42
 - 00.4`
-      const doc = YAML.parseDocument(src, { version: '1.2' })
+      const doc = YAML.parseDocument(src, {
+        intAsBigInt: false,
+        version: '1.2'
+      })
       expect(doc.contents.items).toMatchObject([
         { value: 83, format: 'OCT' },
         { value: 0, format: 'OCT' },
@@ -168,16 +172,7 @@ describe('number types', () => {
     })
   })
 
-  describe('asBigInt: true', () => {
-    let prevAsBigInt
-    beforeAll(() => {
-      prevAsBigInt = YAML.scalarOptions.int.asBigInt
-      YAML.scalarOptions.int.asBigInt = true
-    })
-    afterAll(() => {
-      YAML.scalarOptions.int.asBigInt = prevAsBigInt
-    })
-
+  describe('intAsBigInt: true', () => {
     test('Version 1.1', () => {
       const src = `
 - 0b10_10
@@ -187,7 +182,7 @@ describe('number types', () => {
 - 3.1e+2
 - 5.1_2_3E-1
 - 4.02`
-      const doc = YAML.parseDocument(src, { version: '1.1' })
+      const doc = YAML.parseDocument(src, { intAsBigInt: true, version: '1.1' })
       expect(doc.contents.items).toMatchObject([
         { value: 10n, format: 'BIN' },
         { value: 83n, format: 'OCT' },
@@ -210,7 +205,7 @@ describe('number types', () => {
 - 3.1e+2
 - 5.123E-1
 - 4.02`
-      const doc = YAML.parseDocument(src, { version: '1.2' })
+      const doc = YAML.parseDocument(src, { intAsBigInt: true, version: '1.2' })
       expect(doc.contents.items).toMatchObject([
         { value: 83n, format: 'OCT' },
         { value: 0n, format: 'OCT' },
@@ -378,17 +373,17 @@ aliases:
   })
 })
 
-describe('eemeli/yaml#l19', () => {
+describe('eemeli/yaml#19', () => {
   test('map', () => {
     const src = 'a:\n  # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('a: # 123\n')
+    expect(String(doc)).toBe('a: null # 123\n')
   })
 
   test('seq', () => {
     const src = '- a: # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('- a: # 123\n')
+    expect(String(doc)).toBe('- a: null # 123\n')
   })
 })
 
@@ -633,8 +628,8 @@ describe('handling complex keys', () => {
 
   test('do not add warning when using mapIsMap: true', () => {
     process.emitWarning = jest.fn()
-    const doc = YAML.parseDocument('[foo]: bar', { mapAsMap: true })
-    doc.toJS()
+    const doc = YAML.parseDocument('[foo]: bar')
+    doc.toJS({ mapAsMap: true })
     expect(doc.warnings).toMatchObject([])
     expect(process.emitWarning).not.toHaveBeenCalled()
   })

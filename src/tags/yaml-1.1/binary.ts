@@ -1,14 +1,12 @@
 import { Type } from '../../constants.js'
 import type { Scalar } from '../../nodes/Scalar.js'
 import { stringifyString } from '../../stringify/stringifyString.js'
-import { binaryOptions as options } from '../options.js'
 import type { ScalarTag } from '../types.js'
 
 export const binary: ScalarTag = {
   identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array
   default: false,
   tag: 'tag:yaml.org,2002:binary',
-  options,
 
   /**
    * Returns a Buffer in node and an Uint8Array in browsers
@@ -53,9 +51,12 @@ export const binary: ScalarTag = {
       )
     }
 
-    if (!type) type = options.defaultType
+    if (!type) type = Type.BLOCK_LITERAL
     if (type !== Type.QUOTE_DOUBLE) {
-      const { lineWidth } = options
+      const lineWidth = Math.max(
+        ctx.options.lineWidth - ctx.indent.length,
+        ctx.options.minContentWidth
+      )
       const n = Math.ceil(str.length / lineWidth)
       const lines = new Array(n)
       for (let i = 0, o = 0; i < n; ++i, o += lineWidth) {

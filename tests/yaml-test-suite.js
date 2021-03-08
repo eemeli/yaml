@@ -30,20 +30,6 @@ const matchJson = (docs, json) => {
   }
 }
 
-let origFoldOptions
-
-beforeAll(() => {
-  origFoldOptions = YAML.scalarOptions.str.fold
-  YAML.scalarOptions.str.fold = {
-    lineWidth: 20,
-    minContentWidth: 0
-  }
-})
-
-afterAll(() => {
-  YAML.scalarOptions.str.fold = origFoldOptions
-})
-
 testDirs.forEach(dir => {
   const root = path.resolve(__dirname, 'yaml-test-suite', dir)
   const name = fs.readFileSync(path.resolve(root, '==='), 'utf8').trim()
@@ -107,10 +93,10 @@ testDirs.forEach(dir => {
 
       if (outYaml) {
         _test('out.yaml', () => {
-          const resDocs = YAML.parseAllDocuments(yaml, { mapAsMap: true })
-          const resJson = resDocs.map(doc => doc.toJS())
-          const expDocs = YAML.parseAllDocuments(outYaml, { mapAsMap: true })
-          const expJson = expDocs.map(doc => doc.toJS())
+          const resDocs = YAML.parseAllDocuments(yaml)
+          const resJson = resDocs.map(doc => doc.toJS({ mapAsMap: true }))
+          const expDocs = YAML.parseAllDocuments(outYaml)
+          const expJson = expDocs.map(doc => doc.toJS({ mapAsMap: true }))
           expect(resJson).toMatchObject(expJson)
         })
       }

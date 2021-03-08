@@ -2,7 +2,7 @@ import { Type } from '../constants.js'
 import { createNode } from '../doc/createNode.js'
 import type { Schema } from '../doc/Schema.js'
 import { addComment } from '../stringify/addComment.js'
-import type { StringifyContext } from '../stringify/stringify.js'
+import { stringify, StringifyContext } from '../stringify/stringify.js'
 import { isCollection, isNode, isPair, isScalar, NodeBase, NODE_TYPE } from './Node.js'
 import type { Pair } from './Pair.js'
 
@@ -204,7 +204,7 @@ export abstract class Collection extends NodeBase {
     onComment?: () => void,
     onChompKeep?: () => void
   ) {
-    const { indent, indentStep, stringify } = ctx
+    const { indent, indentStep } = ctx
     const inFlow =
       this.type === Type.FLOW_MAP || this.type === Type.FLOW_SEQ || ctx.inFlow
     if (inFlow) itemIndent += indentStep

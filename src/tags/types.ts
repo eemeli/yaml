@@ -4,6 +4,7 @@ import type { Node } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
+import { ParseOptions } from '../options.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 
 export type SchemaId = 'core' | 'failsafe' | 'json' | 'yaml11'
@@ -51,11 +52,6 @@ interface TagBase {
   identify?: (value: unknown) => boolean
 
   /**
-   * Used by some tags to configure their stringification, where applicable.
-   */
-  options?: Record<string, unknown>
-
-  /**
    * The identifier for your data type, with which its stringified form will be
    * prefixed. Should either be a !-prefixed local `!tag`, or a fully qualified
    * `tag:domain,date:foo`.
@@ -71,7 +67,11 @@ export interface ScalarTag extends TagBase {
    * Turns a value into an AST node.
    * If returning a non-`Node` value, the output will be wrapped as a `Scalar`.
    */
-  resolve(value: string, onError: (message: string) => void): unknown
+  resolve(
+    value: string,
+    onError: (message: string) => void,
+    options: ParseOptions
+  ): unknown
 
   /**
    * Optional function stringifying a Scalar node. If your data includes a
@@ -118,7 +118,13 @@ export interface CollectionTag extends TagBase {
    * Turns a value into an AST node.
    * If returning a non-`Node` value, the output will be wrapped as a `Scalar`.
    */
-  resolve(value: YAMLMap | YAMLSeq, onError: (message: string) => void): unknown
+  resolve(
+    value: YAMLMap | YAMLSeq,
+    onError: (message: string) => void,
+    options: ParseOptions
+  ): unknown
 }
 
 export type TagObj = ScalarTag | CollectionTag
+
+export type TagValue = TagId | ScalarTag | CollectionTag

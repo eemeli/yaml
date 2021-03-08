@@ -1,9 +1,9 @@
 import { Type } from '../constants.js'
 import type { Scalar } from '../nodes/Scalar.js'
-import { strOptions } from '../tags/options.js'
 import { addCommentBefore } from './addComment.js'
 import {
   foldFlowLines,
+  FoldOptions,
   FOLD_BLOCK,
   FOLD_FLOW,
   FOLD_QUOTED
@@ -14,10 +14,11 @@ interface StringifyScalar extends Scalar {
   value: string
 }
 
-const getFoldOptions = ({ indentAtStart }: StringifyContext) =>
-  indentAtStart
-    ? Object.assign({ indentAtStart }, strOptions.fold)
-    : strOptions.fold
+const getFoldOptions = (ctx: StringifyContext): FoldOptions => ({
+  indentAtStart: ctx.indentAtStart,
+  lineWidth: ctx.options.lineWidth,
+  minContentWidth: ctx.options.minContentWidth
+})
 
 // Also checks for lines starting with %, as parsing the output as YAML 1.1 will
 // presume that's starting a new document.
@@ -39,10 +40,11 @@ function lineLengthOverLimit(str: string, lineWidth: number, indentLength: numbe
 }
 
 function doubleQuotedString(value: string, ctx: StringifyContext) {
-  const { implicitKey } = ctx
-  const { jsonEncoding, minMultiLineLength } = strOptions.doubleQuoted
   const json = JSON.stringify(value)
-  if (jsonEncoding) return json
+  if (ctx.options.doubleQuotedAsJSON) return json
+
+  const { implicitKey } = ctx
+  const minMultiLineLength = ctx.options.doubleQuotedMinMultiLineLength
   const indent = ctx.indent || (containsDocumentMarker(value) ? '  ' : '')
   let str = ''
   let start = 0
@@ -163,7 +165,7 @@ function blockString(
       ? false
       : type === Type.BLOCK_LITERAL
       ? true
-      : !lineLengthOverLimit(value, strOptions.fold.lineWidth, indent.length)
+      : !lineLengthOverLimit(value, ctx.options.lineWidth, indent.length)
   let header = literal ? '|' : '>'
   if (!value) return header + '\n'
   let wsStart = ''
@@ -211,7 +213,7 @@ function blockString(
     `${wsStart}${value}${wsEnd}`,
     indent,
     FOLD_BLOCK,
-    strOptions.fold
+    getFoldOptions(ctx)
   )
   return `${header}\n${indent}${body}`
 }
@@ -243,7 +245,7 @@ function plainString(
       quotedString = singleQuotedString
     } else if (hasSingle && !hasDouble) {
       quotedString = doubleQuotedString
-    } else if (strOptions.defaultQuoteSingle) {
+    } else if (ctx.options.singleQuote) {
       quotedString = singleQuotedString
     } else {
       quotedString = doubleQuotedString
@@ -305,7 +307,6 @@ export function stringifyString(
   onComment?: () => void,
   onChompKeep?: () => void
 ) {
-  const { defaultKeyType, defaultType } = strOptions
   const { implicitKey, inFlow } = ctx
   const ss: Scalar<string> =
     typeof item.value === 'string'
@@ -339,7 +340,8 @@ export function stringifyString(
 
   let res = _stringify(type)
   if (res === null) {
-    const t = implicitKey ? defaultKeyType : defaultType
+    const { defaultKeyType, defaultStringType } = ctx.options
+    const t = (implicitKey && defaultKeyType) || defaultStringType
     res = _stringify(t)
     if (res === null) throw new Error(`Unsupported default string type ${t}`)
   }

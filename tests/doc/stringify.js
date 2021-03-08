@@ -10,91 +10,82 @@ for (const [name, version] of [
   ['YAML 1.2', '1.2']
 ]) {
   describe(name, () => {
-    let origVersion
-    beforeAll(() => {
-      origVersion = YAML.defaultOptions.version
-      YAML.defaultOptions.version = version
-    })
-    afterAll(() => {
-      YAML.defaultOptions.version = origVersion
-    })
-
     test('undefined', () => {
-      expect(YAML.stringify()).toBeUndefined()
+      expect(YAML.stringify(undefined, { version })).toBeUndefined()
     })
 
     test('null', () => {
-      expect(YAML.stringify(null)).toBe('null\n')
+      expect(YAML.stringify(null, { version })).toBe('null\n')
     })
 
     describe('boolean', () => {
       test('true', () => {
-        expect(YAML.stringify(true)).toBe('true\n')
+        expect(YAML.stringify(true, { version })).toBe('true\n')
       })
       test('false', () => {
-        expect(YAML.stringify(false)).toBe('false\n')
+        expect(YAML.stringify(false, { version })).toBe('false\n')
       })
     })
 
     describe('number', () => {
       test('integer', () => {
-        expect(YAML.stringify(3)).toBe('3\n')
+        expect(YAML.stringify(3, { version })).toBe('3\n')
       })
       test('float', () => {
-        expect(YAML.stringify(3.141)).toBe('3.141\n')
+        expect(YAML.stringify(3.141, { version })).toBe('3.141\n')
       })
       test('zero', () => {
-        expect(YAML.stringify(0)).toBe('0\n')
+        expect(YAML.stringify(0, { version })).toBe('0\n')
       })
       test('NaN', () => {
-        expect(YAML.stringify(NaN)).toBe('.nan\n')
+        expect(YAML.stringify(NaN, { version })).toBe('.nan\n')
       })
 
       test('float with trailing zeros', () => {
-        const doc = new YAML.Document(3)
+        const doc = new YAML.Document(3, { version })
         doc.contents.minFractionDigits = 2
         expect(String(doc)).toBe('3.00\n')
       })
       test('scientific float ignores minFractionDigits', () => {
-        const doc = new YAML.Document(3)
+        const doc = new YAML.Document(3, { version })
         doc.contents.format = 'EXP'
         doc.contents.minFractionDigits = 2
         expect(String(doc)).toBe('3e+0\n')
       })
 
       test('integer with HEX format', () => {
-        const doc = new YAML.Document(42)
+        const doc = new YAML.Document(42, { version })
         doc.contents.format = 'HEX'
         expect(String(doc)).toBe('0x2a\n')
       })
       test('float with HEX format', () => {
-        const doc = new YAML.Document(4.2)
+        const doc = new YAML.Document(4.2, { version })
         doc.contents.format = 'HEX'
         expect(String(doc)).toBe('4.2\n')
       })
       test('negative integer with HEX format', () => {
-        const doc = new YAML.Document(-42)
+        const doc = new YAML.Document(-42, { version })
         doc.contents.format = 'HEX'
         const exp = version === '1.2' ? '-42\n' : '-0x2a\n'
         expect(String(doc)).toBe(exp)
       })
 
       test('BigInt', () => {
-        expect(YAML.stringify(BigInt('-42'))).toBe('-42\n')
+        expect(YAML.stringify(BigInt('-42'), { version })).toBe('-42\n')
       })
       test('BigInt with HEX format', () => {
-        const doc = new YAML.Document(BigInt('42'))
+        const doc = new YAML.Document(BigInt('42'), { version })
         doc.contents.format = 'HEX'
         expect(String(doc)).toBe('0x2a\n')
       })
       test('BigInt with OCT format', () => {
-        const doc = new YAML.Document(BigInt('42'))
+        const doc = new YAML.Document(BigInt('42'), { version })
         doc.contents.format = 'OCT'
         const exp = version === '1.2' ? '0o52\n' : '052\n'
         expect(String(doc)).toBe(exp)
       })
       test('negative BigInt with OCT format', () => {
-        const doc = new YAML.Document(BigInt('-42'))
+        const doc = new YAML.Document(BigInt('-42'), { version })
         doc.contents.format = 'OCT'
         const exp = version === '1.2' ? '-42\n' : '-052\n'
         expect(String(doc)).toBe(exp)
@@ -102,39 +93,30 @@ for (const [name, version] of [
     })
 
     describe('string', () => {
-      let origFoldOptions
-      beforeAll(() => {
-        origFoldOptions = YAML.scalarOptions.str.fold
-        YAML.scalarOptions.str.fold = {
-          lineWidth: 20,
-          minContentWidth: 0
-        }
-      })
-      afterAll(() => {
-        YAML.scalarOptions.str.fold = origFoldOptions
-      })
+      const opt = { lineWidth: 20, minContentWidth: 0, version }
 
       test('plain', () => {
-        expect(YAML.stringify('STR')).toBe('STR\n')
+        expect(YAML.stringify('STR', opt)).toBe('STR\n')
       })
       test('double-quoted', () => {
-        expect(YAML.stringify('"x"')).toBe('\'"x"\'\n')
+        expect(YAML.stringify('"x"', opt)).toBe('\'"x"\'\n')
       })
       test('single-quoted', () => {
-        expect(YAML.stringify("'x'")).toBe('"\'x\'"\n')
+        expect(YAML.stringify("'x'", opt)).toBe('"\'x\'"\n')
       })
       test('escaped', () => {
-        expect(YAML.stringify('null: \u0000')).toBe('"null: \\0"\n')
+        expect(YAML.stringify('null: \u0000', opt)).toBe('"null: \\0"\n')
       })
       test('short multiline', () => {
-        expect(YAML.stringify('blah\nblah\nblah')).toBe(
+        expect(YAML.stringify('blah\nblah\nblah', opt)).toBe(
           '|-\nblah\nblah\nblah\n'
         )
       })
       test('long multiline', () => {
         expect(
           YAML.stringify(
-            'blah blah\nblah blah blah blah blah blah blah blah blah blah\n'
+            'blah blah\nblah blah blah blah blah blah blah blah blah blah\n',
+            opt
           )
         ).toBe(`>
 blah blah
@@ -146,11 +128,12 @@ blah blah\n`)
 
       test('long line in map', () => {
         const foo = 'fuzz'.repeat(16)
-        const doc = new YAML.Document({ foo })
+        const doc = new YAML.Document({ foo }, version)
         for (const node of doc.contents.items)
           node.value.type = Type.QUOTE_DOUBLE
         expect(
-          String(doc)
+          doc
+            .toString(opt)
             .split('\n')
             .map(line => line.length)
         ).toMatchObject([20, 20, 20, 20, 0])
@@ -158,10 +141,11 @@ blah blah\n`)
 
       test('long line in sequence', () => {
         const foo = 'fuzz'.repeat(16)
-        const doc = new YAML.Document([foo])
+        const doc = new YAML.Document([foo], version)
         for (const node of doc.contents.items) node.type = Type.QUOTE_DOUBLE
         expect(
-          String(doc)
+          doc
+            .toString(opt)
             .split('\n')
             .map(line => line.length)
         ).toMatchObject([20, 20, 20, 17, 0])
@@ -169,11 +153,12 @@ blah blah\n`)
 
       test('long line in sequence in map', () => {
         const foo = 'fuzz'.repeat(16)
-        const doc = new YAML.Document({ foo: [foo] })
+        const doc = new YAML.Document({ foo: [foo] }, version)
         const seq = doc.contents.items[0].value
         for (const node of seq.items) node.type = Type.QUOTE_DOUBLE
         expect(
-          String(doc)
+          doc
+            .toString(opt)
             .split('\n')
             .map(line => line.length)
         ).toMatchObject([4, 20, 20, 20, 20, 10, 0])
@@ -371,36 +356,28 @@ describe('eemeli/yaml#80: custom tags', () => {
     }
   }
 
-  beforeAll(() => {
-    YAML.defaultOptions.customTags = [regexp, sharedSymbol]
-  })
-
-  afterAll(() => {
-    YAML.defaultOptions.customTags = []
-  })
-
   describe('RegExp', () => {
     test('stringify as plain scalar', () => {
-      const str = YAML.stringify(/re/g)
+      const str = YAML.stringify(/re/g, { customTags: [regexp] })
       expect(str).toBe('!re /re/g\n')
-      const res = YAML.parse(str)
+      const res = YAML.parse(str, { customTags: [regexp] })
       expect(res).toBeInstanceOf(RegExp)
     })
 
     test('stringify as quoted scalar', () => {
-      const str = YAML.stringify(/re: /g)
+      const str = YAML.stringify(/re: /g, { customTags: [regexp] })
       expect(str).toBe('!re "/re: /g"\n')
-      const res = YAML.parse(str)
+      const res = YAML.parse(str, { customTags: [regexp] })
       expect(res).toBeInstanceOf(RegExp)
     })
 
     test('parse plain string as string', () => {
-      const res = YAML.parse('/re/g')
+      const res = YAML.parse('/re/g', { customTags: [regexp] })
       expect(res).toBe('/re/g')
     })
 
     test('parse quoted string as string', () => {
-      const res = YAML.parse('"/re/g"')
+      const res = YAML.parse('"/re/g"', { customTags: [regexp] })
       expect(res).toBe('/re/g')
     })
   })
@@ -408,17 +385,17 @@ describe('eemeli/yaml#80: custom tags', () => {
   describe('Symbol', () => {
     test('stringify as plain scalar', () => {
       const symbol = Symbol.for('foo')
-      const str = YAML.stringify(symbol)
+      const str = YAML.stringify(symbol, { customTags: [sharedSymbol] })
       expect(str).toBe('!symbol/shared foo\n')
-      const res = YAML.parse(str)
+      const res = YAML.parse(str, { customTags: [sharedSymbol] })
       expect(res).toBe(symbol)
     })
 
     test('stringify as block scalar', () => {
       const symbol = Symbol.for('foo\nbar')
-      const str = YAML.stringify(symbol)
+      const str = YAML.stringify(symbol, { customTags: [sharedSymbol] })
       expect(str).toBe('!symbol/shared |-\nfoo\nbar\n')
-      const res = YAML.parse(str)
+      const res = YAML.parse(str, { customTags: [sharedSymbol] })
       expect(res).toBe(symbol)
     })
   })
@@ -452,47 +429,30 @@ test('eemeli/yaml#87', () => {
 })
 
 describe('emitter custom null/bool string', () => {
-  let origNullOptions
-  let origBoolOptions
-  beforeAll(() => {
-    origNullOptions = YAML.scalarOptions.null.nullStr
-    origBoolOptions = YAML.scalarOptions.bool
-  })
-  afterAll(() => {
-    YAML.scalarOptions.null.nullStr = origNullOptions
-    YAML.scalarOptions.bool = origBoolOptions
-  })
-
   test('tiled null', () => {
-    YAML.scalarOptions.null.nullStr = '~'
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { simpleKeys: true })
+    const str = YAML.stringify(doc, { nullStr: '~', simpleKeys: true })
     expect(str).toBe('a: ~\n')
     expect(YAML.parse(str)).toEqual({ a: null })
   })
 
   test('empty string null', () => {
-    YAML.scalarOptions.null.nullStr = ''
     const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { simpleKeys: true })
+    const str = YAML.stringify(doc, { nullStr: '', simpleKeys: true })
     expect(str).toBe('a: \n')
     expect(YAML.parse(str)).toEqual({ a: null })
   })
 
   test('empty string camelBool', () => {
-    YAML.scalarOptions.bool.trueStr = 'True'
-    YAML.scalarOptions.bool.falseStr = 'False'
     const doc = YAML.parse('[true, false]')
-    const str = YAML.stringify(doc)
+    const str = YAML.stringify(doc, { trueStr: 'True', falseStr: 'False' })
     expect(str).toBe('- True\n- False\n')
     expect(YAML.parse(str)).toEqual([true, false])
   })
 
   test('empty string upperBool', () => {
-    YAML.scalarOptions.bool.trueStr = 'TRUE'
-    YAML.scalarOptions.bool.falseStr = 'FALSE'
     const doc = YAML.parse('[true, false]')
-    const str = YAML.stringify(doc)
+    const str = YAML.stringify(doc, { trueStr: 'TRUE', falseStr: 'FALSE' })
     expect(str).toBe('- TRUE\n- FALSE\n')
     expect(YAML.parse(str)).toEqual([true, false])
   })
@@ -595,34 +555,34 @@ describe('scalar styles', () => {
 describe('simple keys', () => {
   test('key with no value', () => {
     const doc = YAML.parseDocument('? ~')
-    expect(String(doc)).toBe('? ~\n')
+    expect(doc.toString()).toBe('? ~\n')
     doc.options.simpleKeys = true
-    expect(String(doc)).toBe('~: null\n')
+    expect(doc.toString({ simpleKeys: true })).toBe('~: null\n')
   })
 
   test('key with block scalar value', () => {
     const doc = YAML.parseDocument('foo: bar')
     doc.contents.items[0].key.type = 'BLOCK_LITERAL'
-    expect(String(doc)).toBe('? |-\n  foo\n: bar\n')
+    expect(doc.toString()).toBe('? |-\n  foo\n: bar\n')
     doc.options.simpleKeys = true
-    expect(String(doc)).toBe('"foo": bar\n')
+    expect(doc.toString({ simpleKeys: true })).toBe('"foo": bar\n')
   })
 
   test('key with comment', () => {
     const doc = YAML.parseDocument('foo: bar')
     doc.contents.items[0].key.comment = 'FOO'
-    expect(String(doc)).toBe('foo: #FOO\n  bar\n')
+    expect(doc.toString()).toBe('foo: #FOO\n  bar\n')
     doc.options.simpleKeys = true
-    expect(() => String(doc)).toThrow(
+    expect(() => doc.toString({ simpleKeys: true })).toThrow(
       /With simple keys, key nodes cannot have comments/
     )
   })
 
   test('key with collection value', () => {
     const doc = YAML.parseDocument('[foo]: bar')
-    expect(String(doc)).toBe('? [ foo ]\n: bar\n')
+    expect(doc.toString()).toBe('? [ foo ]\n: bar\n')
     doc.options.simpleKeys = true
-    expect(() => String(doc)).toThrow(
+    expect(() => doc.toString({ simpleKeys: true })).toThrow(
       /With simple keys, collection cannot be used as a key value/
     )
   })
@@ -632,9 +592,9 @@ describe('simple keys', () => {
     ? ${new Array(1026).join('a')}
     : longkey`
     const doc = YAML.parseDocument(str)
-    expect(String(doc)).toBe(`? ${new Array(1026).join('a')}\n: longkey\n`)
+    expect(doc.toString()).toBe(`? ${new Array(1026).join('a')}\n: longkey\n`)
     doc.options.simpleKeys = true
-    expect(() => String(doc)).toThrow(
+    expect(() => doc.toString({ simpleKeys: true })).toThrow(
       /With simple keys, single line scalar must not span more than 1024 characters/
     )
   })
@@ -790,120 +750,80 @@ describe('indentSeq: false', () => {
 })
 
 describe('Scalar options', () => {
-  describe('str.defaultType & str.defaultKeyType', () => {
-    let origDefaultType, origDefaultKeyType
-    beforeAll(() => {
-      origDefaultType = YAML.scalarOptions.str.defaultType
-      origDefaultKeyType = YAML.scalarOptions.str.defaultKeyType
-    })
-    afterAll(() => {
-      YAML.scalarOptions.str.defaultType = origDefaultType
-      YAML.scalarOptions.str.defaultKeyType = origDefaultKeyType
-    })
-
+  describe('defaultStringType & defaultKeyType', () => {
     test('PLAIN, PLAIN', () => {
-      YAML.scalarOptions.str.defaultType = Type.PLAIN
-      YAML.scalarOptions.str.defaultKeyType = Type.PLAIN
-      expect(YAML.stringify({ foo: 'bar' })).toBe('foo: bar\n')
+      const opt = { defaultStringType: Type.PLAIN, defaultKeyType: Type.PLAIN }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('foo: bar\n')
     })
 
     test('BLOCK_FOLDED, BLOCK_FOLDED', () => {
-      YAML.scalarOptions.str.defaultType = Type.BLOCK_FOLDED
-      YAML.scalarOptions.str.defaultKeyType = Type.BLOCK_FOLDED
-      expect(YAML.stringify({ foo: 'bar' })).toBe('"foo": |-\n  bar\n')
+      const opt = {
+        defaultStringType: Type.BLOCK_FOLDED,
+        defaultKeyType: Type.BLOCK_FOLDED
+      }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('"foo": |-\n  bar\n')
     })
 
     test('QUOTE_DOUBLE, PLAIN', () => {
-      YAML.scalarOptions.str.defaultType = Type.QUOTE_DOUBLE
-      YAML.scalarOptions.str.defaultKeyType = Type.PLAIN
-      expect(YAML.stringify({ foo: 'bar' })).toBe('foo: "bar"\n')
+      const opt = {
+        defaultStringType: Type.QUOTE_DOUBLE,
+        defaultKeyType: Type.PLAIN
+      }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('foo: "bar"\n')
     })
 
     test('QUOTE_DOUBLE, QUOTE_SINGLE', () => {
-      YAML.scalarOptions.str.defaultType = Type.QUOTE_DOUBLE
-      YAML.scalarOptions.str.defaultKeyType = Type.QUOTE_SINGLE
-      expect(YAML.stringify({ foo: 'bar' })).toBe('\'foo\': "bar"\n')
+      const opt = {
+        defaultStringType: Type.QUOTE_DOUBLE,
+        defaultKeyType: Type.QUOTE_SINGLE
+      }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('\'foo\': "bar"\n')
+    })
+
+    test('QUOTE_DOUBLE, null', () => {
+      const opt = { defaultStringType: Type.QUOTE_DOUBLE, defaultKeyType: null }
+      expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('"foo": "bar"\n')
     })
 
     test('Use defaultType for explicit keys', () => {
-      YAML.scalarOptions.str.defaultType = Type.QUOTE_DOUBLE
-      YAML.scalarOptions.str.defaultKeyType = Type.QUOTE_SINGLE
+      const opt = {
+        defaultStringType: Type.QUOTE_DOUBLE,
+        defaultKeyType: Type.QUOTE_SINGLE
+      }
       const doc = new YAML.Document({ foo: null })
       doc.contents.items[0].value = null
-      expect(String(doc)).toBe('? "foo"\n')
+      expect(doc.toString(opt)).toBe('? "foo"\n')
     })
   })
 
-  describe('str.defaultQuoteSingle', () => {
-    let origDefaultQuoteOption
-    beforeAll(() => {
-      origDefaultQuoteOption = YAML.scalarOptions.str.defaultQuoteSingle
-    })
-    afterAll(() => {
-      YAML.scalarOptions.str.defaultQuoteSingle = origDefaultQuoteOption
-    })
+  for (const { bool, exp } of [
+    { bool: false, exp: '"foo #bar"\n' },
+    { bool: true, exp: "'foo #bar'\n" }
+  ]) {
+    describe(`singleQuote: ${bool}`, () => {
+      const opt = { singleQuote: bool }
 
-    const testSingleQuote = str => {
-      const expected = `'${str}'\n`
-      const actual = YAML.stringify(str)
-      expect(actual).toBe(expected)
-      expect(YAML.parse(actual)).toBe(str)
-    }
-    const testDoubleQuote = str => {
-      const expected = `"${str}"\n`
-      const actual = YAML.stringify(str)
-      expect(actual).toBe(expected)
-      expect(YAML.parse(actual)).toBe(str)
-    }
+      test('plain', () => {
+        expect(YAML.stringify('foo bar', opt)).toBe('foo bar\n')
+      })
 
-    const testPlainStyle = () => {
-      const str = YAML.stringify('foo bar')
-      expect(str).toBe('foo bar\n')
-    }
-    const testForcedQuotes = () => {
-      let str = YAML.stringify('foo: "bar"')
-      expect(str).toBe(`'foo: "bar"'\n`)
-      str = YAML.stringify("foo: 'bar'")
-      expect(str).toBe(`"foo: 'bar'"\n`)
-    }
+      test('forced', () => {
+        expect(YAML.stringify('foo: "bar"', opt)).toBe(`'foo: "bar"'\n`)
+        expect(YAML.stringify("foo: 'bar'", opt)).toBe(`"foo: 'bar'"\n`)
+      })
 
-    test('default', () => {
-      YAML.scalarOptions.str.defaultQuoteSingle = origDefaultQuoteOption
-      testPlainStyle()
-      testForcedQuotes()
-      testDoubleQuote('123')
-      testDoubleQuote('foo #bar')
+      test('numerical string', () => {
+        expect(YAML.stringify('123', opt)).toBe('"123"\n')
+      })
+
+      test('upgrade from plain', () => {
+        expect(YAML.stringify('foo #bar', opt)).toBe(exp)
+      })
     })
-    test("'", () => {
-      YAML.scalarOptions.str.defaultQuoteSingle = true
-      testPlainStyle()
-      testForcedQuotes()
-      testDoubleQuote('123') // number-as-string is double-quoted
-      testSingleQuote('foo #bar')
-    })
-    test('"', () => {
-      YAML.scalarOptions.str.defaultQuoteSingle = false
-      testPlainStyle()
-      testForcedQuotes()
-      testDoubleQuote('123')
-      testDoubleQuote('foo #bar')
-    })
-  })
+  }
 })
 
 describe('Document markers in top-level scalars', () => {
-  let origDoubleQuotedOptions
-  beforeAll(() => {
-    origDoubleQuotedOptions = YAML.scalarOptions.str.doubleQuoted
-    YAML.scalarOptions.str.doubleQuoted = {
-      jsonEncoding: false,
-      minMultiLineLength: 0
-    }
-  })
-  afterAll(() => {
-    YAML.scalarOptions.str.doubleQuoted = origDoubleQuotedOptions
-  })
-
   test('---', () => {
     const str = YAML.stringify('---')
     expect(str).toBe('|-\n  ---\n')
@@ -933,7 +853,7 @@ describe('Document markers in top-level scalars', () => {
   test('"foo\\n..."', () => {
     const doc = new YAML.Document('foo\n...')
     doc.contents.type = Type.QUOTE_DOUBLE
-    const str = String(doc)
+    const str = doc.toString({ doubleQuotedMinMultiLineLength: 0 })
     expect(str).toBe('"foo\n\n  ..."\n')
     expect(YAML.parse(str)).toBe('foo\n...')
   })
@@ -946,8 +866,7 @@ describe('Document markers in top-level scalars', () => {
 
   test('use marker line for block scalar header', () => {
     const doc = YAML.parseDocument('|\nfoo\n')
-    doc.directivesEndMarker = true
-    expect(String(doc)).toBe('--- |\nfoo\n')
+    expect(doc.toString({ directives: true })).toBe('--- |\nfoo\n')
   })
 })
 

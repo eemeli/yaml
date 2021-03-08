@@ -1,16 +1,13 @@
 import type { Scalar } from '../../nodes/Scalar.js'
 import { stringifyNumber } from '../../stringify/stringifyNumber.js'
-import { intOptions } from '../options.js'
 import type { ScalarTag } from '../types.js'
 
 /** Internal types handle bigint as number, because TS can't figure it out. */
-function parseSexagesimal<B extends boolean>(str: string, isInt: B) {
+function parseSexagesimal<B extends boolean>(str: string, asBigInt?: B) {
   const sign = str[0]
   const parts = sign === '-' || sign === '+' ? str.substring(1) : str
   const num = (n: unknown) =>
-    isInt && intOptions.asBigInt
-      ? ((BigInt(n) as unknown) as number)
-      : Number(n)
+    asBigInt ? ((BigInt(n) as unknown) as number) : Number(n)
   const res = parts
     .replace(/_/g, '')
     .split(':')
@@ -62,7 +59,8 @@ export const intTime: ScalarTag = {
   tag: 'tag:yaml.org,2002:int',
   format: 'TIME',
   test: /^[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+$/,
-  resolve: str => parseSexagesimal(str, true),
+  resolve: (str, _onError, { intAsBigInt }) =>
+    parseSexagesimal(str, intAsBigInt),
   stringify: stringifySexagesimal
 }
 

@@ -16,8 +16,6 @@ describe('properties', () => {
     const yamlArbitrary = fc.anything({ key: key, values: values })
     const optionsArbitrary = fc.record(
       {
-        keepCstNodes: fc.boolean(),
-        keepNodeTypes: fc.boolean(),
         mapAsMap: fc.constant(false),
         merge: fc.boolean(),
         schema: fc.constantFrom<('core' | 'yaml-1.1')[]>('core', 'yaml-1.1') // ignore 'failsafe', 'json'

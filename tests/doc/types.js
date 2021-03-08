@@ -4,23 +4,6 @@ import { binary } from '../../src/tags/yaml-1.1/binary.js'
 import { YAMLOMap } from '../../src/tags/yaml-1.1/omap.js'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
-let origFoldOptions, origPrettyErrors
-
-beforeAll(() => {
-  origFoldOptions = YAML.scalarOptions.str.fold
-  YAML.scalarOptions.str.fold = {
-    lineWidth: 20,
-    minContentWidth: 0
-  }
-  origPrettyErrors = YAML.defaultOptions.prettyErrors
-  YAML.defaultOptions.prettyErrors = false
-})
-
-afterAll(() => {
-  YAML.scalarOptions.str.fold = origFoldOptions
-  YAML.defaultOptions.prettyErrors = origPrettyErrors
-})
-
 describe('json schema', () => {
   test('!!bool', () => {
     const src = `"canonical": true
@@ -209,8 +192,8 @@ one: 1
 one: 1
 2: two
 { 3: 4 }: many\n`
-      const doc = YAML.parseDocument(src, { mapAsMap: true })
-      expect(doc.toJS()).toMatchObject(
+      const doc = YAML.parseDocument(src)
+      expect(doc.toJS({ mapAsMap: true })).toMatchObject(
         new Map([
           ['one', 1],
           [2, 'two'],
@@ -219,7 +202,7 @@ one: 1
       )
       expect(doc.errors).toHaveLength(0)
       doc.contents.items[2].key = { 3: 4 }
-      expect(doc.toJS()).toMatchObject(
+      expect(doc.toJS({ mapAsMap: true })).toMatchObject(
         new Map([
           ['one', 1],
           [2, 'two'],
@@ -260,19 +243,17 @@ description:
       genericStr += String.fromCharCode(generic[i])
     expect(canonicalStr).toBe(genericStr)
     expect(canonicalStr.substr(0, 5)).toBe('GIF89')
-    YAML.scalarOptions.str.fold.lineWidth = 80
     expect(String(doc))
       .toBe(`canonical: !!binary "R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J\\
   +fn5OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/\\
   ++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLCAgjoEwnuNAFOhpEMTRiggcz4BN\\
   JHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs="
 generic: !!binary |-
-  R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5OTk6enp56enmlp
-  aWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++SH+Dk1h
-  ZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLCAgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYN
-  G84BwwEeECcgggoBADs=
+  R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5OTk6enp56enmlpaW
+  NjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++SH+Dk1hZGUg
+  d2l0aCBHSU1QACwAAAAADAAMAAAFLCAgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84Bww
+  EeECcgggoBADs=
 description: The binary value above is a tiny arrow encoded as a gif image.\n`)
-    YAML.scalarOptions.str.fold.lineWidth = 20
   })
 
   test('!!bool', () => {
@@ -363,18 +344,16 @@ hexadecimal: 0x_0A_74_AE
 binary: 0b1010_0111_0100_1010_1110
 sexagesimal: 190:20:30`
 
-    try {
-      YAML.scalarOptions.int.asBigInt = true
-      const doc = YAML.parseDocument(src)
-      expect(doc.toJS()).toMatchObject({
-        canonical: 685230n,
-        decimal: 685230n,
-        octal: 685230n,
-        hexadecimal: 685230n,
-        binary: 685230n,
-        sexagesimal: 685230n
-      })
-      expect(String(doc)).toBe(`%YAML 1.1
+    const doc = YAML.parseDocument(src, { intAsBigInt: true })
+    expect(doc.toJS()).toMatchObject({
+      canonical: 685230n,
+      decimal: 685230n,
+      octal: 685230n,
+      hexadecimal: 685230n,
+      binary: 685230n,
+      sexagesimal: 685230n
+    })
+    expect(String(doc)).toBe(`%YAML 1.1
 ---
 canonical: 685230
 decimal: 685230
@@ -382,9 +361,6 @@ octal: 02472256
 hexadecimal: 0xa74ae
 binary: 0b10100111010010101110
 sexagesimal: 190:20:30\n`)
-    } finally {
-      YAML.scalarOptions.int.asBigInt = false
-    }
   })
 
   test('!!null', () => {
@@ -685,9 +661,9 @@ describe('custom tags', () => {
 describe('schema changes', () => {
   test('write as json', () => {
     const doc = YAML.parseDocument('foo: bar', { schema: 'core' })
-    expect(doc.options.schema).toBe('core')
-    doc.setSchema('json')
-    expect(doc.options.schema).toBe('json')
+    expect(doc.schema.name).toBe('core')
+    doc.setSchema('1.2', { schema: 'json' })
+    expect(doc.schema.name).toBe('json')
     expect(String(doc)).toBe('"foo": "bar"\n')
   })
 
@@ -695,7 +671,6 @@ describe('schema changes', () => {
     const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
     })
-    expect(doc.options.version).toBe('1.1')
     expect(doc.directives.yaml).toMatchObject({
       version: '1.1',
       explicit: false
@@ -705,8 +680,7 @@ describe('schema changes', () => {
       version: '1.2',
       explicit: false
     })
-    expect(doc.options.version).toBe('1.1')
-    expect(doc.options.schema).toBeUndefined()
+    expect(doc.schema.name).toBe('core')
     expect(() => String(doc)).toThrow(/Tag not resolved for Date value/)
   })
 
@@ -714,7 +688,7 @@ describe('schema changes', () => {
     const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
     })
-    doc.setSchema('json', ['timestamp'])
+    doc.setSchema('1.1', { customTags: ['timestamp'], schema: 'json' })
     expect(String(doc)).toBe('"foo": 1971-02-03T12:13:14\n')
   })
 
@@ -722,7 +696,7 @@ describe('schema changes', () => {
     const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
     })
-    doc.setSchema(1.2, ['timestamp'])
+    doc.setSchema(1.2, { customTags: ['timestamp'] })
     expect(String(doc)).toBe('foo: 1971-02-03T12:13:14\n')
   })
 
@@ -730,7 +704,7 @@ describe('schema changes', () => {
     const doc = YAML.parseDocument('[y, yes, on, n, no, off]', {
       version: '1.1'
     })
-    doc.setSchema('core')
+    doc.setSchema('1.1', { schema: 'core' })
     expect(String(doc)).toBe('[ true, true, true, false, false, false ]\n')
     doc.setSchema('1.1')
     expect(String(doc)).toBe('[ y, yes, on, n, no, off ]\n')

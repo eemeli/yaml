@@ -5,8 +5,10 @@ import { collectionFromPath, isEmptyPath } from '../nodes/Collection.js'
 import {
   DOC,
   isCollection,
+  isMap,
   isNode,
   isScalar,
+  isSeq,
   Node,
   NODE_TYPE,
   ParsedNode
@@ -16,49 +18,28 @@ import { toJS, ToJSAnchorValue, ToJSContext } from '../nodes/toJS.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
 import {
+  CreateNodeOptions,
+  defaultOptions,
   DocumentOptions,
   Options,
-  defaultOptions,
-  documentOptions
+  ParseOptions,
+  SchemaOptions,
+  ToJSOptions,
+  ToStringOptions
 } from '../options.js'
 import { addComment } from '../stringify/addComment.js'
-import { stringify, StringifyContext } from '../stringify/stringify.js'
-import type { TagId, TagObj } from '../tags/types.js'
+import {
+  createStringifyContext,
+  stringify,
+  StringifyContext
+} from '../stringify/stringify.js'
 import { Anchors } from './Anchors.js'
-import { Schema, SchemaName, SchemaOptions } from './Schema.js'
-import { Reviver, applyReviver } from './applyReviver.js'
+import { Schema } from './Schema.js'
+import { applyReviver } from './applyReviver.js'
 import { createNode, CreateNodeContext } from './createNode.js'
 import { Directives } from './directives.js'
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)
-export type { Anchors, Reviver }
-
-export interface CreateNodeOptions {
-  keepUndefined?: boolean | null
-
-  onTagObj?: (tagObj: TagObj) => void
-
-  /**
-   * Filter or modify values while creating a node.
-   *
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter
-   */
-  replacer?: Replacer
-
-  /**
-   * Specify the collection type, e.g. `"!!omap"`. Note that this requires the
-   * corresponding tag to be available in this document's schema.
-   */
-  tag?: string
-}
-
-export interface ToJSOptions {
-  json?: boolean
-  jsonArg?: string | null
-  mapAsMap?: boolean
-  onAnchor?: (value: unknown, count: number) => void
-  reviver?: Reviver
-}
 
 export declare namespace Document {
   interface Parsed<T extends ParsedNode = ParsedNode> extends Document<T> {
@@ -74,8 +55,6 @@ export declare namespace Document {
 }
 
 export class Document<T = unknown> {
-  static defaults = documentOptions;
-
   readonly [NODE_TYPE]: symbol
 
   /**
@@ -95,15 +74,19 @@ export class Document<T = unknown> {
 
   directives: Directives
 
-  directivesEndMarker = false
-
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []
 
-  options: Required<DocumentOptions> & SchemaOptions
+  options: Required<
+    Omit<
+      ParseOptions & DocumentOptions,
+      'lineCounter' | 'directives' | 'version'
+    >
+  >
 
+  // TS can't figure out that setSchema() will set this, or throw
   /** The schema used with the document. Use `setSchema()` to change. */
-  schema: Schema
+  declare schema: Schema
 
   /**
    * Array of prefixes; each will have a string `handle` that
@@ -112,12 +95,6 @@ export class Document<T = unknown> {
   tagPrefixes: Document.TagPrefix[] = []
 
   type: Type.DOCUMENT = Type.DOCUMENT
-
-  /**
-   * The parsed version of the source document;
-   * if true-ish, stringified output will include a `%YAML` directive.
-   */
-  version?: string
 
   /** Warnings encountered during parsing. */
   warnings: YAMLWarning[] = []
@@ -142,16 +119,15 @@ export class Document<T = unknown> {
       replacer = undefined
     }
 
-    this.options = Object.assign({}, defaultOptions, options)
+    const opt = Object.assign({}, defaultOptions, options)
+    this.options = opt
     this.anchors = new Anchors(this.options.anchorPrefix)
+    let { version } = opt
     if (options?.directives) {
       this.directives = options.directives.atDocument()
-      if (options.version && !this.directives.yaml.explicit)
-        this.directives.yaml.version = options.version
-    } else this.directives = new Directives({ version: this.options.version })
-
-    const schemaOpts = Object.assign({}, this.getDefaults(), this.options)
-    this.schema = new Schema(schemaOpts)
+      if (this.directives.yaml.explicit) version = this.directives.yaml.version
+    } else this.directives = new Directives({ version })
+    this.setSchema(version, options)
 
     this.contents =
       value === undefined
@@ -175,7 +151,7 @@ export class Document<T = unknown> {
    */
   createNode(
     value: unknown,
-    { keepUndefined, onTagObj, replacer, tag }: CreateNodeOptions = {}
+    { flow, keepUndefined, onTagObj, replacer, tag }: CreateNodeOptions = {}
   ): Node {
     if (typeof replacer === 'function')
       value = replacer.call({ '': value }, '', value)
@@ -201,6 +177,7 @@ export class Document<T = unknown> {
       replacer,
       schema: this.schema
     }
+
     const node = createNode(value, tag, ctx)
     for (const alias of aliasNodes) {
       // With circular references, the source node is only resolved after all of
@@ -213,6 +190,11 @@ export class Document<T = unknown> {
         this.anchors.map[name] = alias.source
       }
     }
+    if (flow) {
+      if (isMap(node)) node.type = Type.FLOW_MAP
+      else if (isSeq(node)) node.type = Type.FLOW_SEQ
+    }
+
     return node
   }
 
@@ -251,14 +233,6 @@ export class Document<T = unknown> {
     return assertCollection(this.contents)
       ? this.contents.deleteIn(path)
       : false
-  }
-
-  getDefaults() {
-    return (
-      Document.defaults[this.directives.yaml.version] ||
-      Document.defaults[this.options.version] ||
-      {}
-    )
   }
 
   /**
@@ -336,29 +310,33 @@ export class Document<T = unknown> {
   }
 
   /**
-   * When a document is created with `new YAML.Document()`, the schema object is
-   * not set as it may be influenced by parsed directives; call this with no
-   * arguments to set it manually, or with arguments to change the schema used
-   * by the document.
+   * Change the YAML version and schema used by the document.
+   *
+   * Overrides all previously set schema options
    */
-  setSchema(
-    id: Options['version'] | SchemaName | null,
-    customTags?: (TagId | TagObj)[]
-  ) {
-    if (!id && !customTags) return
-
-    // @ts-ignore Never happens in TypeScript
-    if (typeof id === 'number') id = id.toFixed(1)
-
-    if (id === '1.1' || id === '1.2') {
-      this.directives.yaml.version = id
-      delete this.options.schema
-    } else if (id && typeof id === 'string') {
-      this.options.schema = id
+  setSchema(version: '1.1' | '1.2', options?: SchemaOptions) {
+    let _options: SchemaOptions
+    switch (String(version)) {
+      case '1.1':
+        this.directives.yaml.version = '1.1'
+        _options = Object.assign(
+          { merge: true, resolveKnownTags: false, schema: 'yaml-1.1' },
+          options
+        )
+        break
+      case '1.2':
+        this.directives.yaml.version = '1.2'
+        _options = Object.assign(
+          { merge: false, resolveKnownTags: true, schema: 'core' },
+          options
+        )
+        break
+      default: {
+        const sv = JSON.stringify(version)
+        throw new Error(`Expected '1.1' or '1.2' as version, but found: ${sv}`)
+      }
     }
-    if (Array.isArray(customTags)) this.options.customTags = customTags
-    const schemaOpts = Object.assign({}, this.getDefaults(), this.options)
-    this.schema = new Schema(schemaOpts)
+    this.schema = new Schema(_options)
   }
 
   /** Set `handle` as a shorthand string for the `prefix` tag namespace. */
@@ -374,16 +352,18 @@ export class Document<T = unknown> {
     }
   }
 
-  /**
-   * A plain JavaScript representation of the document `contents`.
-   *
-   * @param mapAsMap - Use Map rather than Object to represent mappings.
-   *   Overrides values set in Document or global options.
-   * @param onAnchor - If defined, called with the resolved `value` and
-   *   reference `count` for each anchor in the document.
-   * @param reviver - A function that may filter or modify the output JS value
-   */
-  toJS({ json, jsonArg, mapAsMap, onAnchor, reviver }: ToJSOptions = {}) {
+  /** A plain JavaScript representation of the document `contents`. */
+  toJS(opt?: ToJSOptions & { [ignored: string]: unknown }): any
+
+  // json & jsonArg are only used from toJSON()
+  toJS({
+    json,
+    jsonArg,
+    mapAsMap,
+    maxAliasCount,
+    onAnchor,
+    reviver
+  }: ToJSOptions & { json?: boolean; jsonArg?: string | null } = {}) {
     const anchorNodes = Object.values(this.anchors.map).map(
       node =>
         [node, { alias: [], aliasCount: 0, count: 1 }] as [
@@ -395,12 +375,10 @@ export class Document<T = unknown> {
     const ctx: ToJSContext = {
       anchors,
       doc: this,
-      indentStep: '  ',
       keep: !json,
-      mapAsMap:
-        typeof mapAsMap === 'boolean' ? mapAsMap : !!this.options.mapAsMap,
+      mapAsMap: mapAsMap === true,
       mapKeyWarned: false,
-      maxAliasCount: this.options.maxAliasCount,
+      maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100,
       stringify
     }
     const res = toJS(this.contents, jsonArg || '', ctx)
@@ -422,42 +400,38 @@ export class Document<T = unknown> {
   }
 
   /** A YAML representation of the document. */
-  toString() {
+  toString(options: ToStringOptions = {}) {
     if (this.errors.length > 0)
       throw new Error('Document with errors cannot be stringified')
-    const indentSize = this.options.indent
-    if (!Number.isInteger(indentSize) || indentSize <= 0) {
-      const s = JSON.stringify(indentSize)
+    if (
+      'indent' in options &&
+      (!Number.isInteger(options.indent) || Number(options.indent) <= 0)
+    ) {
+      const s = JSON.stringify(options.indent)
       throw new Error(`"indent" option must be a positive integer, not ${s}`)
     }
+
     const lines = []
-    let hasDirectives = false
-    const dir = this.directives.toString(this)
-    if (dir) {
-      lines.push(dir)
-      hasDirectives = true
+    let hasDirectives = options.directives === true
+    if (options.directives !== false) {
+      const dir = this.directives.toString(this)
+      if (dir) {
+        lines.push(dir)
+        hasDirectives = true
+      } else if (this.directives.marker) hasDirectives = true
     }
-    if (hasDirectives || this.directivesEndMarker) lines.push('---')
+    if (hasDirectives) lines.push('---')
     if (this.commentBefore) {
-      if (hasDirectives || !this.directivesEndMarker) lines.unshift('')
+      if (lines.length !== 1) lines.unshift('')
       lines.unshift(this.commentBefore.replace(/^/gm, '#'))
     }
-    const ctx: StringifyContext = {
-      anchors: Object.create(null),
-      doc: this,
-      indent: '',
-      indentStep: ' '.repeat(indentSize),
-      stringify // Requiring directly in nodes would create circular dependencies
-    }
+
+    const ctx: StringifyContext = createStringifyContext(this, options)
     let chompKeep = false
     let contentComment = null
     if (this.contents) {
       if (isNode(this.contents)) {
-        if (
-          this.contents.spaceBefore &&
-          (hasDirectives || this.directivesEndMarker)
-        )
-          lines.push('')
+        if (this.contents.spaceBefore && hasDirectives) lines.push('')
         if (this.contents.commentBefore)
           lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
         // top-level block scalars need to be indented if followed by a comment

@@ -7,7 +7,7 @@ import { parseAllDocuments } from './public-api.js'
 
 // test harness for yaml-test-suite event tests
 export function testEvents(src: string, options?: Options) {
-  const opt = Object.assign({ keepNodeTypes: true, version: '1.2' }, options)
+  const opt = Object.assign({ version: '1.2' }, options)
   const docs = parseAllDocuments(src, opt)
   const errDoc = docs.find(doc => doc.errors.length > 0)
   const error = errDoc ? errDoc.errors[0].message : null
@@ -22,7 +22,7 @@ export function testEvents(src: string, options?: Options) {
       if (error && (!error.offset || error.offset < rootStart))
         throw new Error()
       let docStart = '+DOC'
-      if (doc.directivesEndMarker) docStart += ' ---'
+      if (doc.directives.marker) docStart += ' ---'
       else if (doc.contents && doc.contents.range[1] === doc.contents.range[0])
         continue
       events.push(docStart)

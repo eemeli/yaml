@@ -76,7 +76,7 @@ export class Composer {
       const dc = doc.contents
       if (afterDoc) {
         doc.comment = doc.comment ? `${doc.comment}\n${comment}` : comment
-      } else if (afterEmptyLine || doc.directivesEndMarker || !dc) {
+      } else if (afterEmptyLine || doc.directives.marker || !dc) {
         doc.commentBefore = comment
       } else if (
         isCollection(dc) &&

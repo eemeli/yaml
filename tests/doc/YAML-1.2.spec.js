@@ -1851,26 +1851,9 @@ matches %: 20`,
   }
 }
 
-let origFoldOptions, origPrettyErrors
 const mockWarn = jest.spyOn(global.process, 'emitWarning').mockImplementation()
-
-beforeAll(() => {
-  origFoldOptions = YAML.scalarOptions.str.fold
-  YAML.scalarOptions.str.fold = {
-    lineWidth: 20,
-    minContentWidth: 0
-  }
-  origPrettyErrors = YAML.defaultOptions.prettyErrors
-  YAML.defaultOptions.prettyErrors = false
-})
-
 beforeEach(() => mockWarn.mockClear())
-
-afterAll(() => {
-  YAML.scalarOptions.str.fold = origFoldOptions
-  YAML.defaultOptions.prettyErrors = origPrettyErrors
-  mockWarn.mockRestore()
-})
+afterAll(() => mockWarn.mockRestore())
 
 for (const section in spec) {
   describe(section, () => {
@@ -1879,7 +1862,7 @@ for (const section in spec) {
         const { src, tgt, errors, special, jsWarnings, warnings } = spec[
           section
         ][name]
-        const documents = YAML.parseAllDocuments(src)
+        const documents = YAML.parseAllDocuments(src, { prettyErrors: false })
         const json = documents.map(doc => doc.toJS())
         expect(json).toMatchObject(tgt)
         documents.forEach((doc, i) => {
@@ -1900,7 +1883,9 @@ for (const section in spec) {
         if (special) special(src)
         if (!errors) {
           const src2 = documents.map(doc => String(doc)).join('\n...\n')
-          const documents2 = YAML.parseAllDocuments(src2)
+          const documents2 = YAML.parseAllDocuments(src2, {
+            prettyErrors: false
+          })
           const json2 = documents2.map(doc => doc.toJS())
           expect(json2).toMatchObject(tgt)
         }
