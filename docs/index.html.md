@@ -13,7 +13,7 @@ includes:
   - 04_documents
   - 05_content_nodes
   - 06_custom_tags
-  - 07_cst_parser
+  - 07_parsing_yaml
   - 08_errors
   - 09_yaml_syntax
 
