@@ -21,6 +21,7 @@ test('block scalar', () => {
   parseDocument('foo: |\n a\n b\n c\nbar:\n baz\n', { lineCounter })
   expect(lineCounter.lineStarts).toMatchObject([0, 7, 10, 13, 16, 21, 26])
   for (const { offset, line, col } of [
+    { offset: 0, line: 1, col: 1 },
     { offset: 10, line: 3, col: 1 },
     { offset: 11, line: 3, col: 2 },
     { offset: 12, line: 3, col: 3 },
