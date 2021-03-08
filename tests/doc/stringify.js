@@ -25,6 +25,9 @@ for (const [name, version] of [
       test('false', () => {
         expect(YAML.stringify(false, { version })).toBe('false\n')
       })
+      test('Boolean', () => {
+        expect(YAML.stringify(new Boolean(true), { version })).toBe('true\n')
+      })
     })
 
     describe('number', () => {
@@ -39,6 +42,9 @@ for (const [name, version] of [
       })
       test('NaN', () => {
         expect(YAML.stringify(NaN, { version })).toBe('.nan\n')
+      })
+      test('Number', () => {
+        expect(YAML.stringify(new Number(3.141), { version })).toBe('3.141\n')
       })
 
       test('float with trailing zeros', () => {
@@ -70,8 +76,11 @@ for (const [name, version] of [
         expect(String(doc)).toBe(exp)
       })
 
-      test('BigInt', () => {
+      test('bigint', () => {
         expect(YAML.stringify(BigInt('-42'), { version })).toBe('-42\n')
+      })
+      test('BigInt', () => {
+        expect(YAML.stringify(Object(BigInt('-42')), { version })).toBe('-42\n')
       })
       test('BigInt with HEX format', () => {
         const doc = new YAML.Document(BigInt('42'), { version })
@@ -124,6 +133,9 @@ blah blah
 blah blah blah blah
 blah blah blah blah
 blah blah\n`)
+      })
+      test('String', () => {
+        expect(YAML.stringify(new String('STR'), opt)).toBe('STR\n')
       })
 
       test('long line in map', () => {

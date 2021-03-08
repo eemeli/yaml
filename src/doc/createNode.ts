@@ -46,6 +46,16 @@ export function createNode(
     map.items.push(value)
     return map
   }
+  if (
+    value instanceof String ||
+    value instanceof Number ||
+    value instanceof Boolean ||
+    value instanceof BigInt
+  ) {
+    // https://tc39.es/ecma262/#sec-serializejsonproperty
+    value = value.valueOf()
+  }
+
   const { onAlias, onTagObj, prevObjects } = ctx
   const { map, seq, tags } = ctx.schema
   if (tagName && tagName.startsWith('!!'))
