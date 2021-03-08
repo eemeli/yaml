@@ -50,7 +50,7 @@ export function createNode(
     value instanceof String ||
     value instanceof Number ||
     value instanceof Boolean ||
-    value instanceof BigInt
+    (typeof BigInt === 'function' && value instanceof BigInt) // not supported everywhere
   ) {
     // https://tc39.es/ecma262/#sec-serializejsonproperty
     value = value.valueOf()
