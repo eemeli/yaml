@@ -1,4 +1,4 @@
-import { source } from 'common-tags'
+import { source } from '../_utils'
 import * as YAML from 'yaml'
 
 describe('parse comments', () => {
@@ -19,7 +19,7 @@ describe('parse comments', () => {
       `
       const doc = YAML.parseDocument(src)
       expect(doc.contents.commentBefore).toBe('comment\ncomment')
-      expect(String(doc)).toBe(src + '\n')
+      expect(String(doc)).toBe(src)
     })
 
     test('body start comments with empty comment line', () => {
@@ -32,7 +32,7 @@ describe('parse comments', () => {
       `
       const doc = YAML.parseDocument(src)
       expect(doc.contents.commentBefore).toBe('comment\n\ncomment')
-      expect(String(doc)).toBe(src + '\n')
+      expect(String(doc)).toBe(src)
     })
 
     test('body end comments', () => {
@@ -77,13 +77,15 @@ describe('parse comments', () => {
 
   describe('seq entry comments', () => {
     test('plain', () => {
-      const src = `#c0
-- value 1
-#c1
+      const src = source`
+        #c0
+        - value 1
+        #c1
 
-- value 2
+        - value 2
 
-#c2`
+        #c2
+      `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
         contents: {
@@ -98,16 +100,17 @@ describe('parse comments', () => {
     })
 
     test('multiline', () => {
-      const src = `
-- value 1
-#c0
-#c1
+      const src = source`
+        - value 1
+        #c0
+        #c1
 
-#c2
-- value 2
+        #c2
+        - value 2
 
-#c3
-#c4`
+        #c3
+        #c4
+      `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
         contents: {
@@ -120,13 +123,15 @@ describe('parse comments', () => {
 
   describe('map entry comments', () => {
     test('plain', () => {
-      const src = `#c0
-key1: value 1
-#c1
+      const src = source`
+        #c0
+        key1: value 1
+        #c1
 
-key2: value 2
+        key2: value 2
 
-#c2`
+        #c2
+      `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
         contents: {
@@ -140,15 +145,17 @@ key2: value 2
     })
 
     test('multiline', () => {
-      const src = `key1: value 1
-#c0
-#c1
+      const src = source`
+        key1: value 1
+        #c0
+        #c1
 
-#c2
-key2: value 2
+        #c2
+        key2: value 2
 
-#c3
-#c4`
+        #c3
+        #c4
+      `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
         contents: {
@@ -164,14 +171,16 @@ key2: value 2
 
   describe('map-in-seq comments', () => {
     test('plain', () => {
-      const src = `#c0
-- #c1
-  k1: v1
-  #c2
-  k2: v2 #c3
-#c4
-  k3: v3
-#c5\n`
+      const src = source`
+        #c0
+        - #c1
+          k1: v1
+          #c2
+          k2: v2 #c3
+        #c4
+          k3: v3
+        #c5
+      `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
         contents: {
@@ -188,29 +197,33 @@ key2: value 2
         },
         comment: 'c5'
       })
-      expect(String(doc)).toBe(`#c0
-#c1
-- k1: v1
-  #c2
-  k2: v2 #c3
-  #c4
-  k3: v3
+      expect(String(doc)).toBe(source`
+        #c0
+        #c1
+        - k1: v1
+          #c2
+          k2: v2 #c3
+          #c4
+          k3: v3
 
-#c5\n`)
+        #c5
+      `)
     })
   })
 
   describe('seq-in-map comments', () => {
     test('plain', () => {
-      const src = `#c0
-k1: #c1
-  - v1
-#c2
-  - v2
-  #c3
-k2:
-  - v3 #c4
-#c5\n`
+      const src = source`
+        #c0
+        k1: #c1
+          - v1
+        #c2
+          - v2
+          #c3
+        k2:
+          - v3 #c4
+        #c5
+      `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
         contents: {
@@ -231,17 +244,19 @@ k2:
         },
         comment: 'c5'
       })
-      expect(String(doc)).toBe(`#c0
-k1:
-  #c1
-  - v1
-  #c2
-  - v2
-  #c3
-k2:
-  - v3 #c4
+      expect(String(doc)).toBe(source`
+        #c0
+        k1:
+          #c1
+          - v1
+          #c2
+          - v2
+          #c3
+        k2:
+          - v3 #c4
 
-#c5\n`)
+        #c5
+      `)
     })
   })
 
@@ -313,14 +328,12 @@ describe('stringify comments', () => {
       const doc = YAML.parseDocument(src)
       expect(doc.commentBefore).toBe('c0')
       doc.commentBefore += '\nc1'
-      expect(String(doc)).toBe(
-        source`
-          #c0
-          #c1
-          ---
-          string
-        ` + '\n'
-      )
+      expect(String(doc)).toBe(source`
+        #c0
+        #c1
+        ---
+        string
+      `)
     })
   })
 
@@ -332,15 +345,14 @@ describe('stringify comments', () => {
       doc.contents.items[0].commentBefore = 'c1'
       doc.contents.items[1].commentBefore = 'c2'
       doc.contents.comment = 'c3'
-      expect(String(doc)).toBe(
-        `#c0
-#c1
-- value 1
-#c2
-- value 2
-#c3
-`
-      )
+      expect(String(doc)).toBe(source`
+        #c0
+        #c1
+        - value 1
+        #c2
+        - value 2
+        #c3
+      `)
     })
 
     test('multiline', () => {
@@ -349,19 +361,18 @@ describe('stringify comments', () => {
       doc.contents.items[0].commentBefore = 'c0\nc1'
       doc.contents.items[1].commentBefore = '\nc2\n\nc3'
       doc.contents.comment = 'c4\nc5'
-      expect(String(doc)).toBe(
-        `#c0
-#c1
-- value 1
-#
-#c2
-#
-#c3
-- value 2
-#c4
-#c5
-`
-      )
+      expect(String(doc)).toBe(source`
+        #c0
+        #c1
+        - value 1
+        #
+        #c2
+        #
+        #c3
+        - value 2
+        #c4
+        #c5
+      `)
     })
 
     test('seq-in-map', () => {
@@ -374,16 +385,16 @@ describe('stringify comments', () => {
       seq.items[0].commentBefore = 'c3'
       seq.items[1].commentBefore = 'c4'
       seq.comment = 'c5'
-      expect(String(doc)).toBe(
-        `#c0
-map: #c1
-  #c2
-  #c3
-  - value 1
-  #c4
-  - value 2
-  #c5\n`
-      )
+      expect(String(doc)).toBe(source`
+        #c0
+        map: #c1
+          #c2
+          #c3
+          - value 1
+          #c4
+          - value 2
+          #c5
+        `)
     })
   })
 
@@ -396,13 +407,15 @@ map: #c1
       doc.contents.items[1].comment = 'c2'
       doc.contents.items[1].value.spaceBefore = true
       doc.contents.comment = 'c3'
-      expect(String(doc)).toBe(`#c0
-key1: value 1
-#c1
-key2: #c2
+      expect(String(doc)).toBe(source`
+        #c0
+        key1: value 1
+        #c1
+        key2: #c2
 
-  value 2
-#c3\n`)
+          value 2
+        #c3
+      `)
     })
 
     test('multiline', () => {
@@ -414,24 +427,23 @@ key2: #c2
       doc.contents.items[1].value.spaceBefore = true
       doc.contents.items[1].value.commentBefore = 'c6'
       doc.contents.comment = 'c7\nc8'
-      expect(String(doc)).toBe(
-        `#c0
-#c1
-key1: value 1
-#
-#c2
-#
-#c3
-key2:
-  #c4
-  #c5
+      expect(String(doc)).toBe(source`
+        #c0
+        #c1
+        key1: value 1
+        #
+        #c2
+        #
+        #c3
+        key2:
+          #c4
+          #c5
 
-  #c6
-  value 2
-#c7
-#c8
-`
-      )
+          #c6
+          value 2
+        #c7
+        #c8
+      `)
     })
   })
 })

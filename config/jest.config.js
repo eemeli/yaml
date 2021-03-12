@@ -1,5 +1,5 @@
 let moduleNameMapper
-const testPathIgnorePatterns = ['tests/_import', 'cst/common']
+const testPathIgnorePatterns = ['tests/_utils']
 
 // The npm script name is significant.
 switch (process.env.npm_lifecycle_event) {

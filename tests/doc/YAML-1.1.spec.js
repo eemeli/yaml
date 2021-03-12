@@ -1,4 +1,4 @@
-import { source } from 'common-tags'
+import { source } from '../_utils'
 import { parseAllDocuments } from 'yaml'
 
 test('Use preceding directives if none defined', () => {

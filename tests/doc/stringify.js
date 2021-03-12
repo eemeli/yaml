@@ -1,6 +1,6 @@
 /* global BigInt */
 
-import { source } from 'common-tags'
+import { source } from '../_utils'
 import * as YAML from 'yaml'
 import { Pair, Scalar, Type } from 'yaml'
 import { stringifyString } from 'yaml/util'
@@ -619,18 +619,16 @@ test('eemeli/yaml#128: YAML node inside object', () => {
   const map = doc.createNode({ foo: 'bar', seq })
   map.commentBefore = 'mc'
   const obj = { array: [1], map }
-  expect(YAML.stringify(obj)).toBe(
-    source`
-      array:
-        - 1
-      map:
-        #mc
-        foo: bar
-        seq:
-          #sc
-          - a
-    ` + '\n'
-  )
+  expect(YAML.stringify(obj)).toBe(source`
+    array:
+      - 1
+    map:
+      #mc
+      foo: bar
+      seq:
+        #sc
+        - a
+  `)
 })
 
 describe('sortMapEntries', () => {
@@ -678,35 +676,31 @@ describe('custom indent', () => {
   })
 
   test('indent: 1', () => {
-    expect(YAML.stringify(obj, { indent: 1 })).toBe(
-      source`
-       array:
-        - a: 1
-          b: 2
-       map:
-        #mc
-        foo: bar
-        seq:
-         #sc
-         - a
-      ` + '\n'
-    )
+    expect(YAML.stringify(obj, { indent: 1 })).toBe(source`
+      array:
+       - a: 1
+         b: 2
+      map:
+       #mc
+       foo: bar
+       seq:
+        #sc
+        - a
+    `)
   })
 
   test('indent: 4', () => {
-    expect(YAML.stringify(obj, { indent: 4 })).toBe(
-      source`
-          array:
-              - a: 1
-                b: 2
-          map:
-              #mc
-              foo: bar
-              seq:
-                  #sc
-                  - a
-      ` + '\n'
-    )
+    expect(YAML.stringify(obj, { indent: 4 })).toBe(source`
+      array:
+          - a: 1
+            b: 2
+      map:
+          #mc
+          foo: bar
+          seq:
+              #sc
+              - a
+    `)
   })
 })
 
@@ -719,45 +713,39 @@ describe('indentSeq: false', () => {
   })
 
   test('indent: 1', () => {
-    expect(YAML.stringify(obj, { indent: 1, indentSeq: false })).toBe(
-      source`
-        array:
-         - a: 1
-           b: 2
-        map:
-         seq:
-          #sc
-          - a
-      ` + '\n'
-    )
+    expect(YAML.stringify(obj, { indent: 1, indentSeq: false })).toBe(source`
+      array:
+       - a: 1
+         b: 2
+      map:
+       seq:
+        #sc
+        - a
+    `)
   })
 
   test('indent: 2', () => {
-    expect(YAML.stringify(obj, { indent: 2, indentSeq: false })).toBe(
-      source`
-        array:
-        - a: 1
-          b: 2
-        map:
-          seq:
-            #sc
-          - a
-      ` + '\n'
-    )
+    expect(YAML.stringify(obj, { indent: 2, indentSeq: false })).toBe(source`
+      array:
+      - a: 1
+        b: 2
+      map:
+        seq:
+          #sc
+        - a
+    `)
   })
 
   test('indent: 4', () => {
-    expect(YAML.stringify(obj, { indent: 4, indentSeq: false })).toBe(
-      source`
-        array:
-          - a: 1
-            b: 2
-        map:
-            seq:
-                #sc
-              - a
-      ` + '\n'
-    )
+    expect(YAML.stringify(obj, { indent: 4, indentSeq: false })).toBe(source`
+      array:
+        - a: 1
+          b: 2
+      map:
+          seq:
+              #sc
+            - a
+    `)
   })
 })
 
