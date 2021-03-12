@@ -1,4 +1,4 @@
-import { Type } from '../constants.js'
+import { Scalar } from '../nodes/Scalar.js'
 import type { FlowScalar } from '../parse/tokens.js'
 import { resolveEnd } from './resolve-end.js'
 
@@ -8,26 +8,26 @@ export function resolveFlowScalar(
   onError: (offset: number, message: string) => void
 ): {
   value: string
-  type: Type.PLAIN | Type.QUOTE_DOUBLE | Type.QUOTE_SINGLE | null
+  type: Scalar.PLAIN | Scalar.QUOTE_DOUBLE | Scalar.QUOTE_SINGLE | null
   comment: string
   length: number
 } {
-  let _type: Type.PLAIN | Type.QUOTE_DOUBLE | Type.QUOTE_SINGLE
+  let _type: Scalar.PLAIN | Scalar.QUOTE_DOUBLE | Scalar.QUOTE_SINGLE
   let value: string
   const _onError = (rel: number, msg: string) => onError(offset + rel, msg)
   switch (type) {
     case 'scalar':
-      _type = Type.PLAIN
+      _type = Scalar.PLAIN
       value = plainValue(source, _onError)
       break
 
     case 'single-quoted-scalar':
-      _type = Type.QUOTE_SINGLE
+      _type = Scalar.QUOTE_SINGLE
       value = singleQuotedValue(source, _onError)
       break
 
     case 'double-quoted-scalar':
-      _type = Type.QUOTE_DOUBLE
+      _type = Scalar.QUOTE_DOUBLE
       value = doubleQuotedValue(source, _onError)
       break
 

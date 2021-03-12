@@ -1,8 +1,7 @@
-import type { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import type { Alias } from './Alias.js'
-import type { Pair, PairType } from './Pair.js'
+import type { Pair } from './Pair.js'
 import type { Scalar } from './Scalar.js'
 import type { YAMLMap } from './YAMLMap.js'
 import type { YAMLSeq } from './YAMLSeq.js'
@@ -92,9 +91,6 @@ export abstract class NodeBase {
     onComment?: () => void,
     onChompKeep?: () => void
   ): string
-
-  /** The type of this node */
-  declare type?: Type | PairType
 
   constructor(type: symbol) {
     Object.defineProperty(this, NODE_TYPE, { value: type })

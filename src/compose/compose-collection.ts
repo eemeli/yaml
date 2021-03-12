@@ -1,6 +1,5 @@
-import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
-import { isNode, ParsedNode } from '../nodes/Node.js'
+import { isMap, isNode, ParsedNode } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
@@ -48,22 +47,7 @@ export function composeCollection(
     return coll
   }
 
-  let expType: 'map' | 'seq' // | null = null
-  switch (coll.type) {
-    case Type.FLOW_MAP:
-    case Type.MAP:
-      expType = 'map'
-      break
-    case Type.FLOW_SEQ:
-    case Type.SEQ:
-      expType = 'seq'
-      break
-    default:
-      onError(coll.range[0], `Unexpected collection type: ${coll.type}`)
-      coll.tag = tagName
-      return coll
-  }
-
+  const expType = isMap(coll) ? 'map' : 'seq'
   let tag = doc.schema.tags.find(
     t => t.collection === expType && t.tag === tagName
   ) as CollectionTag | undefined

@@ -5,62 +5,84 @@ After parsing, the `contents` value of each `YAML.Document` is the root of an [A
 ## Scalar Values
 
 ```js
-class Node {
-  comment: ?string,   // a comment on or immediately after this
-  commentBefore: ?string, // a comment before this
-  range: ?[number, number],
+class NodeBase {
+  comment?: string,   // a comment on or immediately after this
+  commentBefore?: string, // a comment before this
+  range?: [number, number],
       // the [start, end] range of characters of the source parsed
       // into this node (undefined for pairs or if not parsed)
-  spaceBefore: ?boolean,
+  spaceBefore?: boolean,
       // a blank line before this node and its commentBefore
-  tag: ?string,       // a fully qualified tag, if required
+  tag?: string,       // a fully qualified tag, if required
   toJSON(): any       // a plain JS or JSON representation of this node
 }
 ```
 
-For scalar values, the `tag` will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, `Map`, or `Seq`).
+For scalar values, the `tag` will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, `YAMLMap`, or `YAMLSeq`).
 
 ```js
-class Scalar extends Node {
-  format: 'BIN' | 'HEX' | 'OCT' | 'TIME' | undefined,
+class Scalar<T = unknown> extends NodeBase {
+  format?: 'BIN' | 'HEX' | 'OCT' | 'TIME' | undefined,
       // By default (undefined), numbers use decimal notation.
       // The YAML 1.2 core schema only supports 'HEX' and 'OCT'.
-  type:
+  type?:
     'BLOCK_FOLDED' | 'BLOCK_LITERAL' | 'PLAIN' |
     'QUOTE_DOUBLE' | 'QUOTE_SINGLE' | undefined,
-  value: any
+  value: T
 }
 ```
 
-A parsed document's contents will have all of its non-object values wrapped in `Scalar` objects, which themselves may be in some hierarchy of `Map` and `Seq` collections. However, this is not a requirement for the document's stringification, which is rather tolerant regarding its input values, and will use [`doc.createNode()`](#creating-nodes) when encountering an unwrapped value.
+A parsed document's contents will have all of its non-object values wrapped in `Scalar` objects, which themselves may be in some hierarchy of `YAMLMap` and `YAMLSeq` collections.
+However, this is not a requirement for the document's stringification, which is rather tolerant regarding its input values, and will use [`doc.createNode()`](#creating-nodes) when encountering an unwrapped value.
 
-When stringifying, the node `type` will be taken into account by `!!str` and `!!binary` values, and ignored by other scalars. On the other hand, `!!int` and `!!float` stringifiers will take `format` into account.
+When stringifying, the node `type` will be taken into account by `!!str` and `!!binary` values, and ignored by other scalars.
+On the other hand, `!!int` and `!!float` stringifiers will take `format` into account.
 
 ## Collections
 
 ```js
-class Pair extends Node {
-  key: Node | any,    // key and value are always Node or null
-  value: Node | any,  // when parsed, but can be set to anything
-  type: 'PAIR'
+class Pair<K = unknown, V = unknown> extends NodeBase {
+  key: K,   // When parsed, key and value are always
+  value: V  // Node or null, but can be set to anything
 }
 
-class Map extends Node {
-  items: Array<Pair>,
-  type: 'FLOW_MAP' | 'MAP' | undefined
+class Collection extends NodeBase {
+  flow?: boolean // use flow style when stringifying this
+  schema?: Schema
+  addIn(path: Iterable<unknown>, value: unknown): void
+  deleteIn(path: Iterable<unknown>): boolean
+  getIn(path: Iterable<unknown>, keepScalar?: boolean): unknown
+  hasIn(path: Iterable<unknown>): boolean
+  setIn(path: Iterable<unknown>, value: unknown): void
 }
 
-class Seq extends Node {
-  items: Array<Node | any>,
-  type: 'FLOW_SEQ' | 'SEQ' | undefined
+class YAMLMap<K = unknown, V = unknown> extends Collection {
+  items: Pair<K, V>[]
+  add(pair: Pair<K, V> | { key: K; value: V }, overwrite?: boolean): void
+  delete(key: K): boolean
+  get(key: K, keepScalar?: boolean): unknown
+  has(key: K): boolean
+  set(key: K, value: V): void
+}
+
+class YAMLSeq<T = unknown> extends Collection {
+  items: T[]
+  add(value: T): void
+  delete(key: number | Scalar<number>): boolean
+  get(key: number | Scalar<number>, keepScalar?: boolean): unknown
+  has(key: number | Scalar<number>): boolean
+  set(key: number | Scalar<number>, value: T): void
 }
 ```
 
-Within all YAML documents, two forms of collections are supported: sequential `Seq` collections and key-value `Map` collections. The JavaScript representations of these collections both have an `items` array, which may (`Seq`) or must (`Map`) consist of `Pair` objects that contain a `key` and a `value` of any type, including `null`. The `items` array of a `Seq` object may contain values of any type.
+Within all YAML documents, two forms of collections are supported: sequential `YAMLSeq` collections and key-value `YAMLMap` collections.
+The JavaScript representations of these collections both have an `items` array, which may (`YAMLSeq`) or must (`YAMLMap`) consist of `Pair` objects that contain a `key` and a `value` of any type, including `null`.
+The `items` array of a `YAMLSeq` object may contain values of any type.
 
-When stringifying collections, by default block notation will be used. Flow notation will be selected if `type` is `FLOW_MAP` or `FLOW_SEQ`, the collection is within a surrounding flow collection, or if the collection is in an implicit key.
+When stringifying collections, by default block notation will be used.
+Flow notation will be selected if `flow` is `true`, the collection is within a surrounding flow collection, or if the collection is in an implicit key.
 
-The `yaml-1.1` schema includes [additional collections](https://yaml.org/type/index.html) that are based on `Map` and `Seq`: `OMap` and `Pairs` are sequences of `Pair` objects (`OMap` requires unique keys & corresponds to the JS Map object), and `Set` is a map of keys with null values that corresponds to the JS Set object.
+The `yaml-1.1` schema includes [additional collections](https://yaml.org/type/index.html) that are based on `YAMLMap` and `YAMLSeq`: `OMap` and `Pairs` are sequences of `Pair` objects (`OMap` requires unique keys & corresponds to the JS Map object), and `Set` is a map of keys with null values that corresponds to the JS Set object.
 
 All of the collections provide the following accessor methods:
 
@@ -90,9 +112,13 @@ doc.has('c') // false
 doc.hasIn(['b', '0']) // true
 ```
 
-For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. `42` will match `Scalar { value: 42 }`) . Keys for `!!seq` should be positive integers, or their string representations. `add()` and `set()` do not automatically call `doc.createNode()` to wrap the value.
+For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. `42` will match `Scalar { value: 42 }`).
+Keys for `!!seq` should be positive integers, or their string representations.
+`add()` and `set()` do not automatically call `doc.createNode()` to wrap the value.
 
-Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections. If any intermediate node in `path` is a scalar rather than a collection, an error will be thrown. If any of the intermediate collections is not found:
+Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections.
+If any intermediate node in `path` is a scalar rather than a collection, an error will be thrown.
+If any of the intermediate collections is not found:
 
 - `getIn` and `hasIn` will return `undefined` or `false` (respectively)
 - `addIn` and `setIn` will create missing collections; non-negative integer keys will create sequences, all other keys create maps
@@ -103,9 +129,8 @@ Note that for `addIn` the path argument points to the collection rather than the
 ## Alias Nodes
 
 ```js
-class Alias extends Node {
-  source: Scalar | Map | Seq,
-  type: 'ALIAS'
+class Alias extends NodeBase {
+  source: Scalar | YAMLMap | YAMLSeq
 }
 
 const obj = YAML.parse('[ &x { X: 42 }, Y, *x ]')
@@ -127,8 +152,7 @@ When nodes are constructed from JS structures (e.g. during `YAML.stringify()`), 
 ```js
 class Merge extends Pair {
   key: Scalar('<<'),      // defined by the type specification
-  value: Seq<Alias(Map)>, // stringified as *A if length = 1
-  type: 'MERGE_PAIR'
+  value: Seq<Alias(Map)>  // stringified as *A if length = 1
 }
 ```
 
@@ -205,7 +229,9 @@ doc.toString()
 
 To construct a `YAMLSeq` or `YAMLMap`, use `new Document()` or `doc.createNode()` with array, object or iterable input, or create the collections directly by importing the classes from `yaml`.
 
-Once created, normal array operations may be used to modify the `items` array. New `Pair` objects may created either by importing the class from `yaml` and using its `new Pair(key, value)` constructor, or by using the `doc.createPair(key, value, options?)` method. The latter will recursively wrap the `key` and `value` as nodes, and accepts the same options as `doc.createNode()`
+Once created, normal array operations may be used to modify the `items` array.
+New `Pair` objects may created either by importing the class from `yaml` and using its `new Pair(key, value)` constructor, or by using the `doc.createPair(key, value, options?)` method.
+The latter will recursively wrap the `key` and `value` as nodes, and accepts the same options as `doc.createNode()`
 
 ## Modifying Nodes
 
@@ -243,7 +269,7 @@ String(doc)
 // - 1: 'a number'
 ```
 
-In general, it's safe to modify nodes manually, e.g. splicing the `items` array of a `YAMLMap` or changing its `type` from `'MAP'` to `'FLOW_MAP'`.
+In general, it's safe to modify nodes manually, e.g. splicing the `items` array of a `YAMLMap` or setting its `flow` value to `true`.
 For operations on nodes at a known location in the tree, it's probably easiest to use `doc.getIn(path, true)` to access them.
 For more complex or general operations, a visitor API is provided:
 

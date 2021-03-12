@@ -1,5 +1,4 @@
-export type { LogLevelId } from './constants.js'
-export { debug, warn } from './log.js'
+export { debug, LogLevelId, warn } from './log.js'
 export { findPair } from './nodes/YAMLMap.js'
 export { toJS, ToJSAnchorValue, ToJSContext } from './nodes/toJS.js'
 export { foldFlowLines } from './stringify/foldFlowLines'

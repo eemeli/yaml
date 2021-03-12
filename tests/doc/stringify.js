@@ -2,7 +2,7 @@
 
 import { source } from '../_utils'
 import * as YAML from 'yaml'
-import { Pair, Scalar, Type } from 'yaml'
+import { Pair, Scalar } from 'yaml'
 import { stringifyString } from 'yaml/util'
 
 for (const [name, version] of [
@@ -142,7 +142,7 @@ blah blah\n`)
         const foo = 'fuzz'.repeat(16)
         const doc = new YAML.Document({ foo }, version)
         for (const node of doc.contents.items)
-          node.value.type = Type.QUOTE_DOUBLE
+          node.value.type = Scalar.QUOTE_DOUBLE
         expect(
           doc
             .toString(opt)
@@ -154,7 +154,7 @@ blah blah\n`)
       test('long line in sequence', () => {
         const foo = 'fuzz'.repeat(16)
         const doc = new YAML.Document([foo], version)
-        for (const node of doc.contents.items) node.type = Type.QUOTE_DOUBLE
+        for (const node of doc.contents.items) node.type = Scalar.QUOTE_DOUBLE
         expect(
           doc
             .toString(opt)
@@ -167,7 +167,7 @@ blah blah\n`)
         const foo = 'fuzz'.repeat(16)
         const doc = new YAML.Document({ foo: [foo] }, version)
         const seq = doc.contents.items[0].value
-        for (const node of seq.items) node.type = Type.QUOTE_DOUBLE
+        for (const node of seq.items) node.type = Scalar.QUOTE_DOUBLE
         expect(
           doc
             .toString(opt)
@@ -752,43 +752,49 @@ describe('indentSeq: false', () => {
 describe('Scalar options', () => {
   describe('defaultStringType & defaultKeyType', () => {
     test('PLAIN, PLAIN', () => {
-      const opt = { defaultStringType: Type.PLAIN, defaultKeyType: Type.PLAIN }
+      const opt = {
+        defaultStringType: Scalar.PLAIN,
+        defaultKeyType: Scalar.PLAIN
+      }
       expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('foo: bar\n')
     })
 
     test('BLOCK_FOLDED, BLOCK_FOLDED', () => {
       const opt = {
-        defaultStringType: Type.BLOCK_FOLDED,
-        defaultKeyType: Type.BLOCK_FOLDED
+        defaultStringType: Scalar.BLOCK_FOLDED,
+        defaultKeyType: Scalar.BLOCK_FOLDED
       }
       expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('"foo": |-\n  bar\n')
     })
 
     test('QUOTE_DOUBLE, PLAIN', () => {
       const opt = {
-        defaultStringType: Type.QUOTE_DOUBLE,
-        defaultKeyType: Type.PLAIN
+        defaultStringType: Scalar.QUOTE_DOUBLE,
+        defaultKeyType: Scalar.PLAIN
       }
       expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('foo: "bar"\n')
     })
 
     test('QUOTE_DOUBLE, QUOTE_SINGLE', () => {
       const opt = {
-        defaultStringType: Type.QUOTE_DOUBLE,
-        defaultKeyType: Type.QUOTE_SINGLE
+        defaultStringType: Scalar.QUOTE_DOUBLE,
+        defaultKeyType: Scalar.QUOTE_SINGLE
       }
       expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('\'foo\': "bar"\n')
     })
 
     test('QUOTE_DOUBLE, null', () => {
-      const opt = { defaultStringType: Type.QUOTE_DOUBLE, defaultKeyType: null }
+      const opt = {
+        defaultStringType: Scalar.QUOTE_DOUBLE,
+        defaultKeyType: null
+      }
       expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('"foo": "bar"\n')
     })
 
     test('Use defaultType for explicit keys', () => {
       const opt = {
-        defaultStringType: Type.QUOTE_DOUBLE,
-        defaultKeyType: Type.QUOTE_SINGLE
+        defaultStringType: Scalar.QUOTE_DOUBLE,
+        defaultKeyType: Scalar.QUOTE_SINGLE
       }
       const doc = new YAML.Document({ foo: null })
       doc.contents.items[0].value = null
@@ -844,7 +850,7 @@ describe('Document markers in top-level scalars', () => {
 
   test("'foo\\n...'", () => {
     const doc = new YAML.Document('foo\n...')
-    doc.contents.type = Type.QUOTE_SINGLE
+    doc.contents.type = Scalar.QUOTE_SINGLE
     const str = String(doc)
     expect(str).toBe("'foo\n\n  ...'\n")
     expect(YAML.parse(str)).toBe('foo\n...')
@@ -852,7 +858,7 @@ describe('Document markers in top-level scalars', () => {
 
   test('"foo\\n..."', () => {
     const doc = new YAML.Document('foo\n...')
-    doc.contents.type = Type.QUOTE_DOUBLE
+    doc.contents.type = Scalar.QUOTE_DOUBLE
     const str = doc.toString({ doubleQuotedMinMultiLineLength: 0 })
     expect(str).toBe('"foo\n\n  ..."\n')
     expect(YAML.parse(str)).toBe('foo\n...')

@@ -1,4 +1,3 @@
-import type { Type } from '../constants.js'
 import type { Schema } from '../doc/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { Collection } from './Collection.js'
@@ -22,8 +21,6 @@ export class YAMLSeq<T = unknown> extends Collection {
   }
 
   items: T[] = []
-
-  type?: Type.FLOW_SEQ | Type.SEQ
 
   constructor(schema?: Schema) {
     super(SEQ, schema)

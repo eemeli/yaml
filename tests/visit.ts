@@ -1,15 +1,17 @@
-import { Document, Pair, ParsedNode, parseDocument, Scalar, visit } from 'yaml'
+import { Document, isSeq, parseDocument, Scalar, visit } from 'yaml'
+
+const coll = { items: {} }
 
 test('Map', () => {
   const doc = parseDocument('{ one: 1, two }')
   const fn = jest.fn()
   visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
   expect(fn.mock.calls).toMatchObject([
-    [null, { type: 'FLOW_MAP' }, [{}]],
-    [0, { type: 'PAIR' }, [{}, {}]],
+    [null, coll, [{}]],
+    [0, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
     ['value', { type: 'PLAIN', value: 1 }, [{}, {}, {}]],
-    [1, { type: 'PAIR' }, [{}, {}]],
+    [1, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'two' }, [{}, {}, {}]]
   ])
 })
@@ -19,13 +21,9 @@ test('Seq', () => {
   const fn = jest.fn()
   visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
   expect(fn.mock.calls).toMatchObject([
-    [null, { type: 'SEQ' }, [{ type: 'DOCUMENT' }]],
-    [0, { type: 'PLAIN', value: 1 }, [{ type: 'DOCUMENT' }, { type: 'SEQ' }]],
-    [
-      1,
-      { type: 'PLAIN', value: 'two' },
-      [{ type: 'DOCUMENT' }, { type: 'SEQ' }]
-    ]
+    [null, coll, [{ contents: {} }]],
+    [0, { type: 'PLAIN', value: 1 }, [{ contents: {} }, coll]],
+    [1, { type: 'PLAIN', value: 'two' }, [{ contents: {} }, coll]]
   ])
 })
 
@@ -34,9 +32,9 @@ test('Alias', () => {
   const fn = jest.fn()
   visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
   expect(fn.mock.calls).toMatchObject([
-    [null, { type: 'SEQ' }, [{}]],
+    [null, coll, [{}]],
     [0, { type: 'PLAIN', value: 1 }, [{}, {}]],
-    [1, { type: 'ALIAS', source: { value: 1 } }, [{}, {}]]
+    [1, { source: { value: 1 } }, [{}, {}]]
   ])
 })
 
@@ -45,10 +43,10 @@ test('Seq in Map', () => {
   const fn = jest.fn()
   visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
   expect(fn.mock.calls).toMatchObject([
-    [null, { type: 'MAP' }, [{}]],
-    [0, { type: 'PAIR' }, [{}, {}]],
+    [null, coll, [{}]],
+    [0, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
-    ['value', { type: 'SEQ' }, [{}, {}, {}]],
+    ['value', coll, [{}, {}, {}]],
     [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [{}, {}, {}, {}]],
     [1, { type: 'QUOTE_SINGLE', value: 'two' }, [{}, {}, {}, {}]]
   ])
@@ -59,9 +57,9 @@ test('Visit called with non-Document root', () => {
   const fn = jest.fn()
   visit(doc.get('foo') as Scalar, fn)
   expect(fn.mock.calls).toMatchObject([
-    [null, { type: 'SEQ' }, []],
-    [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [{ type: 'SEQ' }]],
-    [1, { type: 'QUOTE_SINGLE', value: 'two' }, [{ type: 'SEQ' }]]
+    [null, coll, []],
+    [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [coll]],
+    [1, { type: 'QUOTE_SINGLE', value: 'two' }, [coll]]
   ])
 })
 
@@ -93,11 +91,11 @@ test('Function as visitor', () => {
   const fn = jest.fn()
   visit(doc, fn)
   expect(fn.mock.calls).toMatchObject([
-    [null, { type: 'FLOW_MAP' }, [{}]],
-    [0, { type: 'PAIR' }, [{}, {}]],
+    [null, coll, [{}]],
+    [0, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
     ['value', { type: 'PLAIN', value: 1 }, [{}, {}, {}]],
-    [1, { type: 'PAIR' }, [{}, {}]],
+    [1, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'two' }, [{}, {}, {}]],
     ['value', null, [{}, {}, {}]]
   ])
@@ -143,16 +141,14 @@ test('Add item to Seq', () => {
 
 test('Do not visit block seq items', () => {
   const doc = parseDocument('foo:\n  - one\n  - two\nbar:\n')
-  const fn = jest.fn((_, node) =>
-    node.type === 'SEQ' ? visit.SKIP : undefined
-  )
+  const fn = jest.fn((_, node) => (isSeq(node) ? visit.SKIP : undefined))
   visit(doc, { Map: fn, Pair: fn, Seq: fn, Scalar: fn })
   expect(fn.mock.calls).toMatchObject([
-    [null, { type: 'MAP' }, [{}]],
-    [0, { type: 'PAIR' }, [{}, {}]],
+    [null, coll, [{}]],
+    [0, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
-    ['value', { type: 'SEQ' }, [{}, {}, {}]],
-    [1, { type: 'PAIR' }, [{}, {}]],
+    ['value', coll, [{}, {}, {}]],
+    [1, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'bar' }, [{}, {}, {}]],
     ['value', { type: 'PLAIN', value: null }, [{}, {}, {}]]
   ])
@@ -228,6 +224,6 @@ test('Fail to replace root node', () => {
   const doc = parseDocument('- one\n- two\n- three\n')
   const Seq = jest.fn(() => doc.createNode(42))
   expect(() => visit(doc.contents, { Seq })).toThrow(
-    'Cannot replace node with undefined parent'
+    'Cannot replace node with scalar parent'
   )
 })

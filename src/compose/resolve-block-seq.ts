@@ -1,4 +1,3 @@
-import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { BlockSequence } from '../parse/tokens.js'
@@ -14,7 +13,6 @@ export function resolveBlockSeq(
 ) {
   const start = offset
   const seq = new YAMLSeq(doc.schema)
-  seq.type = Type.SEQ
   if (anchor) doc.anchors.setAnchor(seq, anchor)
   for (const { start, value } of items) {
     const props = resolveProps(

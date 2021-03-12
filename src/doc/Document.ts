@@ -1,14 +1,11 @@
-import { Type } from '../constants.js'
 import type { YAMLError, YAMLWarning } from '../errors.js'
 import { Alias } from '../nodes/Alias.js'
 import { collectionFromPath, isEmptyPath } from '../nodes/Collection.js'
 import {
   DOC,
   isCollection,
-  isMap,
   isNode,
   isScalar,
-  isSeq,
   Node,
   NODE_TYPE,
   ParsedNode
@@ -93,8 +90,6 @@ export class Document<T = unknown> {
    * starts and ends with `!` and a string `prefix` that the handle will be replaced by.
    */
   tagPrefixes: Document.TagPrefix[] = []
-
-  type: Type.DOCUMENT = Type.DOCUMENT
 
   /** Warnings encountered during parsing. */
   warnings: YAMLWarning[] = []
@@ -190,10 +185,7 @@ export class Document<T = unknown> {
         this.anchors.map[name] = alias.source
       }
     }
-    if (flow) {
-      if (isMap(node)) node.type = Type.FLOW_MAP
-      else if (isSeq(node)) node.type = Type.FLOW_SEQ
-    }
+    if (flow && isCollection(node)) node.flow = true
 
     return node
   }

@@ -1,4 +1,4 @@
-import { Type } from '../constants.js'
+import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar } from '../parse/tokens.js'
 
 export function resolveBlockScalar(
@@ -7,13 +7,13 @@ export function resolveBlockScalar(
   onError: (offset: number, message: string) => void
 ): {
   value: string
-  type: Type.BLOCK_FOLDED | Type.BLOCK_LITERAL | null
+  type: Scalar.BLOCK_FOLDED | Scalar.BLOCK_LITERAL | null
   comment: string
   length: number
 } {
   const header = parseBlockScalarHeader(scalar, strict, onError)
   if (!header) return { value: '', type: null, comment: '', length: 0 }
-  const type = header.mode === '>' ? Type.BLOCK_FOLDED : Type.BLOCK_LITERAL
+  const type = header.mode === '>' ? Scalar.BLOCK_FOLDED : Scalar.BLOCK_LITERAL
   const lines = scalar.source ? splitLines(scalar.source) : []
 
   // determine the end of content & start of chomping
@@ -79,7 +79,7 @@ export function resolveBlockScalar(
       indent = ''
     }
 
-    if (type === Type.BLOCK_LITERAL) {
+    if (type === Scalar.BLOCK_LITERAL) {
       value += sep + indent.slice(trimIndent) + content
       sep = '\n'
     } else if (indent.length > trimIndent || content[0] === '\t') {

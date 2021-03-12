@@ -1,5 +1,4 @@
 export { Composer } from './compose/composer.js'
-export { Type } from './constants.js'
 
 export { Document } from './doc/Document.js'
 export { Schema } from './doc/Schema.js'
@@ -7,7 +6,6 @@ export { Schema } from './doc/Schema.js'
 export { YAMLError, YAMLParseError, YAMLWarning } from './errors.js'
 
 export { Alias } from './nodes/Alias.js'
-export { Merge } from './nodes/Merge.js'
 export {
   isAlias,
   isCollection,
@@ -20,7 +18,7 @@ export {
   Node,
   ParsedNode
 } from './nodes/Node.js'
-export { Pair, PairType } from './nodes/Pair.js'
+export { Pair } from './nodes/Pair.js'
 export { Scalar } from './nodes/Scalar.js'
 export { YAMLMap } from './nodes/YAMLMap.js'
 export { YAMLSeq } from './nodes/YAMLSeq.js'

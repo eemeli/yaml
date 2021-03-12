@@ -161,16 +161,18 @@ describe('merge <<', () => {
     ])
     doc.contents.items.slice(5).forEach(({ items }) => {
       const merge = items[0]
-      expect(merge).toBeInstanceOf(YAML.Merge)
-      merge.value.items.forEach(({ source }) => {
-        expect(source).toBeInstanceOf(YAML.YAMLMap)
-      })
+      expect(YAML.isPair(merge)).toBe(true)
+      if (YAML.isSeq(merge.value))
+        merge.value.items.forEach(({ source }) => {
+          expect(source).toBeInstanceOf(YAML.YAMLMap)
+        })
+      else expect(merge.value.source).toBeInstanceOf(YAML.YAMLMap)
     })
   })
 
   describe('doc.anchors.createMergePair', () => {
     test('simple case', () => {
-      const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+      const doc = YAML.parseDocument('[{ a: A }, { b: B }]', { merge: true })
       const [a, b] = doc.contents.items
       const merge = doc.anchors.createMergePair(a)
       b.items.push(merge)
@@ -179,7 +181,7 @@ describe('merge <<', () => {
     })
 
     test('merge pair of an alias', () => {
-      const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+      const doc = YAML.parseDocument('[{ a: A }, { b: B }]', { merge: true })
       const [a, b] = doc.contents.items
       const alias = doc.anchors.createAlias(a, 'AA')
       const merge = doc.anchors.createMergePair(alias)
@@ -190,7 +192,7 @@ describe('merge <<', () => {
 
     test('require map node', () => {
       const exp = 'Merge sources must be Map nodes or their Aliases'
-      const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+      const doc = YAML.parseDocument('[{ a: A }, { b: B }]', { merge: true })
       const [a] = doc.contents.items
       const merge = doc.anchors.createMergePair(a)
       expect(() => doc.anchors.createMergePair(merge)).toThrow(exp)
@@ -287,14 +289,14 @@ y:
     test('non-alias merge value', () => {
       const src = '{ <<: A, B: b }'
       expect(() => YAML.parse(src, { merge: true })).toThrow(
-        'Merge nodes can only have Alias nodes as values'
+        'Merge sources must be map aliases'
       )
     })
 
     test('non-map alias', () => {
       const src = '- &A a\n- { <<: *A, B: b }'
       expect(() => YAML.parse(src, { merge: true })).toThrow(
-        'Merge nodes aliases can only point to maps'
+        'Merge sources must be map aliases'
       )
     })
 

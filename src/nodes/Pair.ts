@@ -1,4 +1,3 @@
-import { Type } from '../constants.js'
 import { createNode, CreateNodeContext } from '../doc/createNode.js'
 import { warn } from '../log.js'
 import { addComment } from '../stringify/addComment.js'
@@ -11,7 +10,9 @@ import {
 import { Scalar } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
 import {
+  isAlias,
   isCollection,
+  isMap,
   isNode,
   isScalar,
   isSeq,
@@ -30,25 +31,60 @@ export function createPair(
   return new Pair(k, v)
 }
 
-export enum PairType {
-  PAIR = 'PAIR',
-  MERGE_PAIR = 'MERGE_PAIR'
+const isMergeKey = (key: unknown) =>
+  key === Pair.MERGE_KEY ||
+  (isScalar(key) &&
+    key.value === Pair.MERGE_KEY &&
+    (!key.type || key.type === Scalar.PLAIN))
+
+// If the value associated with a merge key is a single mapping node, each of
+// its key/value pairs is inserted into the current mapping, unless the key
+// already exists in it. If the value associated with the merge key is a
+// sequence, then this sequence is expected to contain mapping nodes and each
+// of these nodes is merged in turn according to its order in the sequence.
+// Keys in mapping nodes earlier in the sequence override keys specified in
+// later mapping nodes. -- http://yaml.org/type/merge.html
+function mergeToJSMap(
+  ctx: ToJSContext | undefined,
+  map:
+    | Map<unknown, unknown>
+    | Set<unknown>
+    | Record<string | number | symbol, unknown>,
+  value: unknown
+) {
+  if (!isAlias(value) || !isMap(value.source))
+    throw new Error('Merge sources must be map aliases')
+  const srcMap = value.source.toJSON(null, ctx, Map)
+  for (const [key, value] of srcMap) {
+    if (map instanceof Map) {
+      if (!map.has(key)) map.set(key, value)
+    } else if (map instanceof Set) {
+      map.add(key)
+    } else if (!Object.prototype.hasOwnProperty.call(map, key)) {
+      Object.defineProperty(map, key, {
+        value,
+        writable: true,
+        enumerable: true,
+        configurable: true
+      })
+    }
+  }
+  return map
 }
 
 export class Pair<K = unknown, V = unknown> extends NodeBase {
+  static readonly MERGE_KEY = '<<'
+
   /** Always Node or null when parsed, but can be set to anything. */
   key: K
 
   /** Always Node or null when parsed, but can be set to anything. */
   value: V | null
 
-  type: PairType
-
   constructor(key: K, value: V | null = null) {
     super(PAIR)
     this.key = key
     this.value = value
-    this.type = PairType.PAIR
   }
 
   // @ts-ignore This is fine.
@@ -88,23 +124,31 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
       | Set<unknown>
       | Record<string | number | symbol, unknown>
   ) {
-    const key = toJS(this.key, '', ctx)
-    if (map instanceof Map) {
-      const value = toJS(this.value, key, ctx)
-      map.set(key, value)
-    } else if (map instanceof Set) {
-      map.add(key)
+    if (ctx && ctx.doc.schema.merge && isMergeKey(this.key)) {
+      if (isSeq(this.value))
+        for (const it of this.value.items) mergeToJSMap(ctx, map, it)
+      else if (Array.isArray(this.value))
+        for (const it of this.value) mergeToJSMap(ctx, map, it)
+      else mergeToJSMap(ctx, map, this.value)
     } else {
-      const stringKey = stringifyKey(this.key, key, ctx)
-      const value = toJS(this.value, stringKey, ctx)
-      if (stringKey in map)
-        Object.defineProperty(map, stringKey, {
-          value,
-          writable: true,
-          enumerable: true,
-          configurable: true
-        })
-      else map[stringKey] = value
+      const key = toJS(this.key, '', ctx)
+      if (map instanceof Map) {
+        const value = toJS(this.value, key, ctx)
+        map.set(key, value)
+      } else if (map instanceof Set) {
+        map.add(key)
+      } else {
+        const stringKey = stringifyKey(this.key, key, ctx)
+        const value = toJS(this.value, stringKey, ctx)
+        if (stringKey in map)
+          Object.defineProperty(map, stringKey, {
+            value,
+            writable: true,
+            enumerable: true,
+            configurable: true
+          })
+        else map[stringKey] = value
+      }
     }
     return map
   }
@@ -144,7 +188,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
         (keyComment && value == null) ||
         isCollection(key) ||
         (isScalar(key)
-          ? key.type === Type.BLOCK_FOLDED || key.type === Type.BLOCK_LITERAL
+          ? key.type === Scalar.BLOCK_FOLDED || key.type === Scalar.BLOCK_LITERAL
           : typeof key === 'object'))
 
     ctx = Object.assign({}, ctx, {
@@ -214,7 +258,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
       !ctx.inFlow &&
       !explicitKey &&
       isSeq(value) &&
-      value.type !== Type.FLOW_SEQ &&
+      !value.flow &&
       !value.tag &&
       !doc.anchors.getName(value)
     ) {

@@ -1,5 +1,4 @@
 import { Composer } from './compose/composer.js'
-import { LogLevel } from './constants.js'
 import type { Reviver } from './doc/applyReviver.js'
 import { Document, Replacer } from './doc/Document.js'
 import { YAMLParseError } from './errors.js'
@@ -52,7 +51,7 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
   let doc: Document.Parsed<T> | null = null
   const composer = new Composer(_doc => {
     if (!doc) doc = _doc as Document.Parsed<T>
-    else if (LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR) {
+    else if (doc.options.logLevel !== 'silent') {
       const errMsg =
         'Source contains multiple documents; please use YAML.parseAllDocuments()'
       doc.errors.push(new YAMLParseError(_doc.range[0], errMsg))
@@ -101,8 +100,7 @@ export function parse(
   if (!doc) return null
   doc.warnings.forEach(warning => warn(doc.options.logLevel, warning))
   if (doc.errors.length > 0) {
-    if (LogLevel.indexOf(doc.options.logLevel) >= LogLevel.ERROR)
-      throw doc.errors[0]
+    if (doc.options.logLevel !== 'silent') throw doc.errors[0]
     else doc.errors = []
   }
   return doc.toJS(Object.assign({ reviver: _reviver }, options))
@@ -114,16 +112,19 @@ export function parse(
  * @param replacer - A replacer array or function, as in `JSON.stringify()`
  * @returns Will always include `\n` as the last character, as is expected of YAML documents.
  */
-export function stringify(value: any, options?: Options & ToStringOptions): string
 export function stringify(
   value: any,
-  replacer?: Replacer | null,
-  options?: string | number | Options & ToStringOptions
+  options?: Options & ToStringOptions
 ): string
 export function stringify(
   value: any,
-  replacer?: Replacer | Options & ToStringOptions | null,
-  options?: string | number | Options & ToStringOptions
+  replacer?: Replacer | null,
+  options?: string | number | (Options & ToStringOptions)
+): string
+export function stringify(
+  value: any,
+  replacer?: Replacer | (Options & ToStringOptions) | null,
+  options?: string | number | (Options & ToStringOptions)
 ) {
   let _replacer: Replacer | null = null
   if (typeof replacer === 'function' || Array.isArray(replacer)) {
@@ -138,7 +139,8 @@ export function stringify(
     options = indent < 1 ? undefined : indent > 8 ? { indent: 8 } : { indent }
   }
   if (value === undefined) {
-    const { keepUndefined } = options || (replacer as Options & ToStringOptions) || {}
+    const { keepUndefined } =
+      options || (replacer as Options & ToStringOptions) || {}
     if (!keepUndefined) return undefined
   }
   return new Document(value, _replacer, options).toString(options)

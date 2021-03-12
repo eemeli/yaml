@@ -1,5 +1,4 @@
-import { Type } from '../../constants.js'
-import type { Scalar } from '../../nodes/Scalar.js'
+import { Scalar } from '../../nodes/Scalar.js'
 import { stringifyString } from '../../stringify/stringifyString.js'
 import type { ScalarTag } from '../types.js'
 
@@ -51,8 +50,8 @@ export const binary: ScalarTag = {
       )
     }
 
-    if (!type) type = Type.BLOCK_LITERAL
-    if (type !== Type.QUOTE_DOUBLE) {
+    if (!type) type = Scalar.BLOCK_LITERAL
+    if (type !== Scalar.QUOTE_DOUBLE) {
       const lineWidth = Math.max(
         ctx.options.lineWidth - ctx.indent.length,
         ctx.options.minContentWidth
@@ -62,7 +61,7 @@ export const binary: ScalarTag = {
       for (let i = 0, o = 0; i < n; ++i, o += lineWidth) {
         lines[i] = str.substr(o, lineWidth)
       }
-      str = lines.join(type === Type.BLOCK_LITERAL ? '\n' : ' ')
+      str = lines.join(type === Scalar.BLOCK_LITERAL ? '\n' : ' ')
     }
 
     return stringifyString(

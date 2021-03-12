@@ -1,5 +1,4 @@
-import { Type } from '../constants.js'
-import type { Scalar } from '../nodes/Scalar.js'
+import { Scalar } from '../nodes/Scalar.js'
 import { addCommentBefore } from './addComment.js'
 import {
   foldFlowLines,
@@ -161,9 +160,9 @@ function blockString(
     (ctx.forceBlockIndent || containsDocumentMarker(value) ? '  ' : '')
   const indentSize = indent ? '2' : '1' // root is at -1
   const literal =
-    type === Type.BLOCK_FOLDED
+    type === Scalar.BLOCK_FOLDED
       ? false
-      : type === Type.BLOCK_LITERAL
+      : type === Scalar.BLOCK_LITERAL
       ? true
       : !lineLengthOverLimit(value, ctx.options.lineWidth, indent.length)
   let header = literal ? '|' : '>'
@@ -263,7 +262,7 @@ function plainString(
   if (
     !implicitKey &&
     !inFlow &&
-    type !== Type.PLAIN &&
+    type !== Scalar.PLAIN &&
     value.indexOf('\n') !== -1
   ) {
     // Where allowed & type not set explicitly, prefer block style for multiline strings
@@ -314,24 +313,24 @@ export function stringifyString(
       : Object.assign({}, item, { value: String(item.value) })
 
   let { type } = item
-  if (type !== Type.QUOTE_DOUBLE) {
+  if (type !== Scalar.QUOTE_DOUBLE) {
     // force double quotes on control characters & unpaired surrogates
     if (/[\x00-\x08\x0b-\x1f\x7f-\x9f\u{D800}-\u{DFFF}]/u.test(ss.value))
-      type = Type.QUOTE_DOUBLE
+      type = Scalar.QUOTE_DOUBLE
   }
 
-  const _stringify = (_type: Type | undefined) => {
+  const _stringify = (_type: Scalar.Type | undefined) => {
     switch (_type) {
-      case Type.BLOCK_FOLDED:
-      case Type.BLOCK_LITERAL:
+      case Scalar.BLOCK_FOLDED:
+      case Scalar.BLOCK_LITERAL:
         return implicitKey || inFlow
           ? doubleQuotedString(ss.value, ctx) // blocks are not valid inside flow containers
           : blockString(ss, ctx, onComment, onChompKeep)
-      case Type.QUOTE_DOUBLE:
+      case Scalar.QUOTE_DOUBLE:
         return doubleQuotedString(ss.value, ctx)
-      case Type.QUOTE_SINGLE:
+      case Scalar.QUOTE_SINGLE:
         return singleQuotedString(ss.value, ctx)
-      case Type.PLAIN:
+      case Scalar.PLAIN:
         return plainString(ss, ctx, onComment, onChompKeep)
       default:
         return null

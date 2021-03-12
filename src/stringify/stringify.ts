@@ -1,4 +1,3 @@
-import { Type } from '../constants.js'
 import type { Document } from '../doc/Document.js'
 import { isAlias, isNode, isPair, isScalar, Node } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
@@ -33,7 +32,7 @@ export const createStringifyContext = (
   options: Object.assign(
     {
       defaultKeyType: null,
-      defaultStringType: Type.PLAIN,
+      defaultStringType: 'PLAIN',
       directives: null,
       doubleQuotedAsJSON: false,
       doubleQuotedMinMultiLineLength: 40,
