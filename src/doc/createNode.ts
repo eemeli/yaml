@@ -1,4 +1,3 @@
-import { defaultTagPrefix } from '../constants.js'
 import type { Alias } from '../nodes/Alias.js'
 import { isNode, isPair, Node } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
@@ -6,6 +5,8 @@ import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { TagObj } from '../tags/types.js'
 import type { Replacer } from './Document.js'
 import type { Schema } from './Schema.js'
+
+const defaultTagPrefix = 'tag:yaml.org,2002:'
 
 export interface CreateNodeAliasRef {
   node: Node | undefined
