@@ -42,9 +42,8 @@ On the other hand, `!!int` and `!!float` stringifiers will take `format` into ac
 
 ```js
 class Pair<K = unknown, V = unknown> extends NodeBase {
-  key: K,    // When parsed, key and value are always
-  value: V,  // Node or null, but can be set to anything
-  type: 'PAIR'
+  key: K,   // When parsed, key and value are always
+  value: V  // Node or null, but can be set to anything
 }
 
 class Collection extends NodeBase {
@@ -154,8 +153,7 @@ When nodes are constructed from JS structures (e.g. during `YAML.stringify()`), 
 ```js
 class Merge extends Pair {
   key: Scalar('<<'),      // defined by the type specification
-  value: Seq<Alias(Map)>, // stringified as *A if length = 1
-  type: 'MERGE_PAIR'
+  value: Seq<Alias(Map)>  // stringified as *A if length = 1
 }
 ```
 

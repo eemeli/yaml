@@ -1,15 +1,13 @@
 import { StringifyContext } from '../stringify/stringify.js'
 import type { Alias } from './Alias.js'
 import { isMap, isNode, isPair, isSeq } from './Node.js'
-import { Pair, PairType } from './Pair.js'
+import { Pair } from './Pair.js'
 import { Scalar } from './Scalar.js'
 import type { ToJSContext } from './toJS.js'
 import { YAMLSeq } from './YAMLSeq.js'
 
 export class Merge extends Pair<Scalar, YAMLSeq<Alias>> {
   static KEY = '<<'
-
-  type: PairType.MERGE_PAIR
 
   declare value: YAMLSeq<Alias>
 
@@ -26,7 +24,6 @@ export class Merge extends Pair<Scalar, YAMLSeq<Alias>> {
     } else {
       super(new Scalar(Merge.KEY), new YAMLSeq())
     }
-    this.type = PairType.MERGE_PAIR
   }
 
   // If the value associated with a merge key is a single mapping node, each of

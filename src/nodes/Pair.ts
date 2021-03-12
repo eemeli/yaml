@@ -30,11 +30,6 @@ export function createPair(
   return new Pair(k, v)
 }
 
-export enum PairType {
-  PAIR = 'PAIR',
-  MERGE_PAIR = 'MERGE_PAIR'
-}
-
 export class Pair<K = unknown, V = unknown> extends NodeBase {
   /** Always Node or null when parsed, but can be set to anything. */
   key: K
@@ -42,13 +37,10 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
   /** Always Node or null when parsed, but can be set to anything. */
   value: V | null
 
-  type: PairType
-
   constructor(key: K, value: V | null = null) {
     super(PAIR)
     this.key = key
     this.value = value
-    this.type = PairType.PAIR
   }
 
   // @ts-ignore This is fine.

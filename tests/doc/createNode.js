@@ -1,4 +1,4 @@
-import { Document, PairType, Scalar, YAMLMap, YAMLSeq } from 'yaml'
+import { Document, Scalar, YAMLMap, YAMLSeq } from 'yaml'
 import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
 let doc
@@ -126,7 +126,7 @@ describe('objects', () => {
     const s = doc.createNode({ x: true, y: undefined })
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toMatchObject([
-      { type: PairType.PAIR, key: { value: 'x' }, value: { value: true } }
+      { key: { value: 'x' }, value: { value: true } }
     ])
   })
 
@@ -134,8 +134,8 @@ describe('objects', () => {
     const s = doc.createNode({ x: true, y: undefined }, { keepUndefined: true })
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toMatchObject([
-      { type: PairType.PAIR, key: { value: 'x' }, value: { value: true } },
-      { type: PairType.PAIR, key: { value: 'y' }, value: { value: null } }
+      { key: { value: 'x' }, value: { value: true } },
+      { key: { value: 'y' }, value: { value: null } }
     ])
   })
 

@@ -8,10 +8,10 @@ test('Map', () => {
   visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
   expect(fn.mock.calls).toMatchObject([
     [null, coll, [{}]],
-    [0, { type: 'PAIR' }, [{}, {}]],
+    [0, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
     ['value', { type: 'PLAIN', value: 1 }, [{}, {}, {}]],
-    [1, { type: 'PAIR' }, [{}, {}]],
+    [1, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'two' }, [{}, {}, {}]]
   ])
 })
@@ -44,7 +44,7 @@ test('Seq in Map', () => {
   visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
   expect(fn.mock.calls).toMatchObject([
     [null, coll, [{}]],
-    [0, { type: 'PAIR' }, [{}, {}]],
+    [0, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
     ['value', coll, [{}, {}, {}]],
     [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [{}, {}, {}, {}]],
@@ -92,10 +92,10 @@ test('Function as visitor', () => {
   visit(doc, fn)
   expect(fn.mock.calls).toMatchObject([
     [null, coll, [{}]],
-    [0, { type: 'PAIR' }, [{}, {}]],
+    [0, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
     ['value', { type: 'PLAIN', value: 1 }, [{}, {}, {}]],
-    [1, { type: 'PAIR' }, [{}, {}]],
+    [1, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'two' }, [{}, {}, {}]],
     ['value', null, [{}, {}, {}]]
   ])
@@ -145,10 +145,10 @@ test('Do not visit block seq items', () => {
   visit(doc, { Map: fn, Pair: fn, Seq: fn, Scalar: fn })
   expect(fn.mock.calls).toMatchObject([
     [null, coll, [{}]],
-    [0, { type: 'PAIR' }, [{}, {}]],
+    [0, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
     ['value', coll, [{}, {}, {}]],
-    [1, { type: 'PAIR' }, [{}, {}]],
+    [1, { key: {}, value: {} }, [{}, {}]],
     ['key', { type: 'PLAIN', value: 'bar' }, [{}, {}, {}]],
     ['value', { type: 'PLAIN', value: null }, [{}, {}, {}]]
   ])
