@@ -3,7 +3,6 @@ import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import type { BlockMap } from '../parse/tokens.js'
 import type { ComposeNode } from './compose-node.js'
-import { resolveMergePair } from './resolve-merge-pair.js'
 import { resolveProps } from './resolve-props.js'
 import { containsNewline } from './util-contains-newline.js'
 
@@ -90,8 +89,7 @@ export function resolveBlockMap(
         ? composeNode(doc, value, valueProps, onError)
         : composeEmptyNode(doc, offset, sep, null, valueProps, onError)
       offset = valueNode.range[1]
-      const pair = new Pair(keyNode, valueNode)
-      map.items.push(doc.schema.merge ? resolveMergePair(pair, onError) : pair)
+      map.items.push(new Pair(keyNode, valueNode))
     } else {
       // key with no value
       if (implicitKey)

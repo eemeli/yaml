@@ -7,7 +7,6 @@ export { Schema } from './doc/Schema.js'
 export { YAMLError, YAMLParseError, YAMLWarning } from './errors.js'
 
 export { Alias } from './nodes/Alias.js'
-export { Merge } from './nodes/Merge.js'
 export {
   isAlias,
   isCollection,

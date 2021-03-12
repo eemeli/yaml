@@ -6,7 +6,6 @@ import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { FlowCollection, SourceToken, Token } from '../parse/tokens.js'
 import type { ComposeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
-import { resolveMergePair } from './resolve-merge-pair.js'
 import { containsNewline } from './util-contains-newline.js'
 
 export function resolveFlowCollection(
@@ -59,8 +58,7 @@ export function resolveFlowCollection(
       value = composeEmptyNode(doc, offset, fc.items, pos, getProps(), onError)
     }
     if (isMap || atExplicitKey) {
-      const pair = key ? new Pair(key, value) : new Pair(value)
-      coll.items.push(doc.schema.merge ? resolveMergePair(pair, onError) : pair)
+      coll.items.push(key ? new Pair(key, value) : new Pair(value))
     } else {
       const seq = coll as YAMLSeq
       if (key) {
