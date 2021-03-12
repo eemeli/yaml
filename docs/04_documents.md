@@ -82,7 +82,6 @@ See [Options](#options) for more information on the last argument.
 | directives    | `Directives`                     | Document directives `%YAML` and `%TAG`, as well as the doc-start marker `---`.                                                                                      |
 | errors        | `Error[]`                        | Errors encountered during parsing.                                                                                                                                  |
 | schema        | `Schema`                         | The schema used with the document.                                                                                                                                  |
-| tagPrefixes   | `Prefix[]`                       | Array of prefixes; each will have a string `handle` that starts and ends with `!` and a string `prefix` that the handle will be replaced by.                        |
 | version       | `string?`                        | The parsed version of the source document; if true-ish, stringified output will include a `%YAML` directive.                                                        |
 | warnings      | `Error[]`                        | Warnings encountered during parsing.                                                                                                                                |
 
@@ -115,7 +114,6 @@ During stringification, a document with a true-ish `version` value will include 
 | createNode(value,&nbsp;options?)           | `Node`   | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.        |
 | createPair(key,&nbsp;value,&nbsp;options?) | `Pair`   | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.              |
 | setSchema(version,&nbsp;options?)          | `void`   | Change the YAML version and schema used by the document. `version` must be either `'1.1'` or `'1.2'`; accepts all Schema options. |
-| setTagPrefix(handle,&nbsp;prefix)          | `void`   | Set `handle` as a shorthand string for the `prefix` tag namespace.                                                                |
 | toJS(options?)                             | `any`    | A plain JavaScript representation of the document `contents`.                                                                     |
 | toJSON()                                   | `any`    | A JSON representation of the document `contents`.                                                                                 |
 | toString(options?)                         | `string` | A YAML representation of the document.                                                                                            |
@@ -132,10 +130,6 @@ doc.getIn(['b', 1]) // 4
 
 In addition to the above, the document object also provides the same **accessor methods** as [collections](#collections), based on the top-level collection: `add`, `delete`, `get`, `has`, and `set`, along with their deeper variants `addIn`, `deleteIn`, `getIn`, `hasIn`, and `setIn`.
 For the `*In` methods using an empty `path` value (i.e. `null`, `undefined`, or `[]`) will refer to the document's top-level `contents`.
-
-To define a tag prefix to use when stringifying, use **`setTagPrefix(handle, prefix)`** rather than setting a value directly in `tagPrefixes`.
-This will guarantee that the `handle` is valid (by throwing an error), and will overwrite any previous definition for the `handle`.
-Use an empty `prefix` value to remove a prefix.
 
 #### `Document#toJS()`, `Document#toJSON()` and `Document#toString()`
 

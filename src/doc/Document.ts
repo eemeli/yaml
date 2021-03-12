@@ -44,11 +44,6 @@ export declare namespace Document {
     /** The schema used with the document. */
     schema: Schema
   }
-
-  interface TagPrefix {
-    handle: string
-    prefix: string
-  }
 }
 
 export class Document<T = unknown> {
@@ -84,12 +79,6 @@ export class Document<T = unknown> {
   // TS can't figure out that setSchema() will set this, or throw
   /** The schema used with the document. Use `setSchema()` to change. */
   declare schema: Schema
-
-  /**
-   * Array of prefixes; each will have a string `handle` that
-   * starts and ends with `!` and a string `prefix` that the handle will be replaced by.
-   */
-  tagPrefixes: Document.TagPrefix[] = []
 
   /** Warnings encountered during parsing. */
   warnings: YAMLWarning[] = []
@@ -329,19 +318,6 @@ export class Document<T = unknown> {
       }
     }
     this.schema = new Schema(_options)
-  }
-
-  /** Set `handle` as a shorthand string for the `prefix` tag namespace. */
-  setTagPrefix(handle: string, prefix: string | null) {
-    if (handle[0] !== '!' || handle[handle.length - 1] !== '!')
-      throw new Error('Handle must start and end with !')
-    if (prefix) {
-      const prev = this.tagPrefixes.find(p => p.handle === handle)
-      if (prev) prev.prefix = prefix
-      else this.tagPrefixes.push({ handle, prefix })
-    } else {
-      this.tagPrefixes = this.tagPrefixes.filter(p => p.handle !== handle)
-    }
   }
 
   /** A plain JavaScript representation of the document `contents`. */
