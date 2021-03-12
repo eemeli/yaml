@@ -1,4 +1,3 @@
-import { Type } from '../constants.js'
 import { createNode, CreateNodeContext } from '../doc/createNode.js'
 import { warn } from '../log.js'
 import { addComment } from '../stringify/addComment.js'
@@ -36,7 +35,7 @@ const isMergeKey = (key: unknown) =>
   key === Pair.MERGE_KEY ||
   (isScalar(key) &&
     key.value === Pair.MERGE_KEY &&
-    (!key.type || key.type === Type.PLAIN))
+    (!key.type || key.type === Scalar.PLAIN))
 
 // If the value associated with a merge key is a single mapping node, each of
 // its key/value pairs is inserted into the current mapping, unless the key
@@ -189,7 +188,7 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
         (keyComment && value == null) ||
         isCollection(key) ||
         (isScalar(key)
-          ? key.type === Type.BLOCK_FOLDED || key.type === Type.BLOCK_LITERAL
+          ? key.type === Scalar.BLOCK_FOLDED || key.type === Scalar.BLOCK_LITERAL
           : typeof key === 'object'))
 
     ctx = Object.assign({}, ctx, {

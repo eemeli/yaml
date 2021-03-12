@@ -1,5 +1,4 @@
 export { Composer } from './compose/composer.js'
-export { Type } from './constants.js'
 
 export { Document } from './doc/Document.js'
 export { Schema } from './doc/Schema.js'

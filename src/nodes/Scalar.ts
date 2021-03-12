@@ -1,4 +1,3 @@
-import type { Type } from '../constants.js'
 import { NodeBase, SCALAR } from './Node.js'
 import { toJS, ToJSContext } from './toJS.js'
 
@@ -11,15 +10,22 @@ export declare namespace Scalar {
     source: string
   }
 
-  type Type =
-    | Type.BLOCK_FOLDED
-    | Type.BLOCK_LITERAL
-    | Type.PLAIN
-    | Type.QUOTE_DOUBLE
-    | Type.QUOTE_SINGLE
+  type BLOCK_FOLDED = 'BLOCK_FOLDED'
+  type BLOCK_LITERAL = 'BLOCK_LITERAL'
+  type PLAIN = 'PLAIN'
+  type QUOTE_DOUBLE = 'QUOTE_DOUBLE'
+  type QUOTE_SINGLE = 'QUOTE_SINGLE'
+
+  type Type = BLOCK_FOLDED | BLOCK_LITERAL | PLAIN | QUOTE_DOUBLE | QUOTE_SINGLE
 }
 
 export class Scalar<T = unknown> extends NodeBase {
+  static readonly BLOCK_FOLDED = 'BLOCK_FOLDED'
+  static readonly BLOCK_LITERAL = 'BLOCK_LITERAL'
+  static readonly PLAIN = 'PLAIN'
+  static readonly QUOTE_DOUBLE = 'QUOTE_DOUBLE'
+  static readonly QUOTE_SINGLE = 'QUOTE_SINGLE'
+
   value: T
 
   declare type?: Scalar.Type

@@ -10,12 +10,4 @@ export const LogLevel = Object.assign<
   DEBUG: 3
 })
 
-export enum Type {
-  BLOCK_FOLDED = 'BLOCK_FOLDED',
-  BLOCK_LITERAL = 'BLOCK_LITERAL',
-  PLAIN = 'PLAIN',
-  QUOTE_DOUBLE = 'QUOTE_DOUBLE',
-  QUOTE_SINGLE = 'QUOTE_SINGLE',
-}
-
 export const defaultTagPrefix = 'tag:yaml.org,2002:'
