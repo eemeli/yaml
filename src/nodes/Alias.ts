@@ -1,4 +1,3 @@
-import { Type } from '../constants.js'
 import { StringifyContext } from '../stringify/stringify.js'
 import { ALIAS, isAlias, isCollection, isPair, Node, NodeBase } from './Node.js'
 import { toJS, ToJSContext } from './toJS.js'
@@ -11,7 +10,6 @@ export declare namespace Alias {
 
 export class Alias<T extends Node = Node> extends NodeBase {
   source: T
-  type: Type.ALIAS = Type.ALIAS
 
   constructor(source: T) {
     super(ALIAS)

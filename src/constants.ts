@@ -11,7 +11,6 @@ export const LogLevel = Object.assign<
 })
 
 export enum Type {
-  ALIAS = 'ALIAS',
   BLOCK_FOLDED = 'BLOCK_FOLDED',
   BLOCK_LITERAL = 'BLOCK_LITERAL',
   PLAIN = 'PLAIN',

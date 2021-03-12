@@ -124,7 +124,7 @@ function _visit(
     } else if (isDocument(parent)) {
       parent.contents = ctrl
     } else {
-      const pt = parent && parent.type
+      const pt = isAlias(parent) ? 'alias' : 'scalar'
       throw new Error(`Cannot replace node with ${pt} parent`)
     }
     return _visit(key, ctrl, visitor, path)

@@ -130,8 +130,7 @@ Note that for `addIn` the path argument points to the collection rather than the
 
 ```js
 class Alias extends NodeBase {
-  source: Scalar | YAMLMap | YAMLSeq,
-  type: 'ALIAS'
+  source: Scalar | YAMLMap | YAMLSeq
 }
 
 const obj = YAML.parse('[ &x { X: 42 }, Y, *x ]')

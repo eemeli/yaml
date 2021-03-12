@@ -34,7 +34,7 @@ test('Alias', () => {
   expect(fn.mock.calls).toMatchObject([
     [null, coll, [{}]],
     [0, { type: 'PLAIN', value: 1 }, [{}, {}]],
-    [1, { type: 'ALIAS', source: { value: 1 } }, [{}, {}]]
+    [1, { source: { value: 1 } }, [{}, {}]]
   ])
 })
 
@@ -224,6 +224,6 @@ test('Fail to replace root node', () => {
   const doc = parseDocument('- one\n- two\n- three\n')
   const Seq = jest.fn(() => doc.createNode(42))
   expect(() => visit(doc.contents, { Seq })).toThrow(
-    'Cannot replace node with undefined parent'
+    'Cannot replace node with scalar parent'
   )
 })
