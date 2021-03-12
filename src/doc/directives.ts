@@ -33,7 +33,7 @@ export class Directives {
    * > settings as the previous document. If the document does specify any
    * > directives, all directives of previous documents, if any, are ignored.
    */
-  private atNextDocument = false
+  private atNextDocument?: boolean
 
   constructor(yaml?: Directives['yaml'], tags?: Directives['tags']) {
     this.yaml = Object.assign({}, Directives.defaultYaml, yaml)

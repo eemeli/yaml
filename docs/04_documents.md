@@ -73,18 +73,17 @@ If `value` is `undefined`, the document's `contents` is initialised as `null`.
 If defined, a `replacer` may filter or modify the initial document contents, following the same algorithm as the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter).
 See [Options](#options) for more information on the last argument.
 
-| Member        | Type                             | Description                                                                                                                                                         |
-| ------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| anchors       | [`Anchors`](#anchors)            | Anchors associated with the document's nodes; also provides alias & merge node creators.                                                                            |
-| commentBefore | `string?`                        | A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line or the doc-start indicator when stringified. |
-| comment       | `string?`                        | A comment at the end of the document. If not empty, separated from the rest of the document by a blank line when stringified.                                       |
-| contents      | [`Node`](#content-nodes) `⎮ any` | The document contents.                                                                                                                                              |
-| directives    | `Directives`                     | Document directives `%YAML` and `%TAG`, as well as the doc-start marker `---`.                                                                                      |
-| errors        | `Error[]`                        | Errors encountered during parsing.                                                                                                                                  |
-| schema        | `Schema`                         | The schema used with the document.                                                                                                                                  |
-| tagPrefixes   | `Prefix[]`                       | Array of prefixes; each will have a string `handle` that starts and ends with `!` and a string `prefix` that the handle will be replaced by.                        |
-| version       | `string?`                        | The parsed version of the source document; if true-ish, stringified output will include a `%YAML` directive.                                                        |
-| warnings      | `Error[]`                        | Warnings encountered during parsing.                                                                                                                                |
+| Member        | Type                               | Description                                                                                                                                                         |
+| ------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| anchors       | [`Anchors`](#anchors)              | Anchors associated with the document's nodes; also provides alias & merge node creators.                                                                            |
+| commentBefore | `string?`                          | A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line or the doc-start indicator when stringified. |
+| comment       | `string?`                          | A comment at the end of the document. If not empty, separated from the rest of the document by a blank line when stringified.                                       |
+| contents      | [`Node`](#content-nodes) `⎮ any`   | The document contents.                                                                                                                                              |
+| directives    | [`Directives`](#stream-directives) | Controls for the `%YAML` and `%TAG` directives, as well as the doc-start marker `---`.                                                                              |
+| errors        | `Error[]`                          | Errors encountered during parsing.                                                                                                                                  |
+| schema        | `Schema`                           | The schema used with the document.                                                                                                                                  |
+| version       | `string?`                          | The parsed version of the source document; if true-ish, stringified output will include a `%YAML` directive.                                                        |
+| warnings      | `Error[]`                          | Warnings encountered during parsing.                                                                                                                                |
 
 ```js
 import { Document } from 'yaml'
@@ -115,7 +114,6 @@ During stringification, a document with a true-ish `version` value will include 
 | createNode(value,&nbsp;options?)           | `Node`   | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.        |
 | createPair(key,&nbsp;value,&nbsp;options?) | `Pair`   | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.              |
 | setSchema(version,&nbsp;options?)          | `void`   | Change the YAML version and schema used by the document. `version` must be either `'1.1'` or `'1.2'`; accepts all Schema options. |
-| setTagPrefix(handle,&nbsp;prefix)          | `void`   | Set `handle` as a shorthand string for the `prefix` tag namespace.                                                                |
 | toJS(options?)                             | `any`    | A plain JavaScript representation of the document `contents`.                                                                     |
 | toJSON()                                   | `any`    | A JSON representation of the document `contents`.                                                                                 |
 | toString(options?)                         | `string` | A YAML representation of the document.                                                                                            |
@@ -132,10 +130,6 @@ doc.getIn(['b', 1]) // 4
 
 In addition to the above, the document object also provides the same **accessor methods** as [collections](#collections), based on the top-level collection: `add`, `delete`, `get`, `has`, and `set`, along with their deeper variants `addIn`, `deleteIn`, `getIn`, `hasIn`, and `setIn`.
 For the `*In` methods using an empty `path` value (i.e. `null`, `undefined`, or `[]`) will refer to the document's top-level `contents`.
-
-To define a tag prefix to use when stringifying, use **`setTagPrefix(handle, prefix)`** rather than setting a value directly in `tagPrefixes`.
-This will guarantee that the `handle` is valid (by throwing an error), and will overwrite any previous definition for the `handle`.
-Use an empty `prefix` value to remove a prefix.
 
 #### `Document#toJS()`, `Document#toJSON()` and `Document#toString()`
 
@@ -163,6 +157,29 @@ To stringify a document as YAML, use **`toString(options = {})`**.
 This will also be called by `String(doc)` (with no options).
 This method will throw if the `errors` array is not empty.
 See [Options](#options) for more information on the optional parameter.
+
+## Stream Directives
+
+<!-- prettier-ignore -->
+```js
+const doc = new Document()
+doc.directives
+> {
+    marker: null, // set true to force the doc-start marker
+    tags: { '!!': 'tag:yaml.org,2002:' }, // Record<handle, prefix>
+    yaml: { explicit: false, version: '1.2' }
+  }
+```
+
+A YAML document may be preceded by `%YAML` and `%TAG` directives; their state is accessible via the `directives` member of a `Document`.
+After parsing or other creation, the contents of `doc.directives` are mutable, and will influence the YAML string representation of the document.
+
+The contents of `doc.directives.tags` are used both for the `%TAG` directives and when stringifying tags within the document.
+Each of the handles must start and end with a `!` character; `!` is by default the local tag and `!!` is used for default tags.
+See the section on [custom tags](#writing-custom-tags) for more on this topic.
+
+`doc.contents.yaml` determines if an explicit `%YAML` directive should be included in the output, and what version it should use.
+If changing the version after the document's creation, you'll probably want to use `doc.setSchema()` as it will also update the schema accordingly.
 
 ## Working with Anchors
 
