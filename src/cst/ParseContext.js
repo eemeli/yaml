@@ -135,6 +135,7 @@ export class ParseContext {
         const noIndicatorAsIndent =
           parent.type === Type.SEQ_ITEM && parent.context.atLineStart
         if (
+          src[inEnd] !== '#' &&
           !Node.nextNodeIsIndented(src[inEnd], indentDiff, !noIndicatorAsIndent)
         )
           break

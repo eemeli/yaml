@@ -496,6 +496,20 @@ key2:
     })
   })
 
+  test('reported 3', () => {
+    const src = `
+key1: &default
+# This key ...
+  subkey1: value1
+
+key2:
+  <<: *default\n`
+    expect(YAML.parse(src, { merge: true })).toMatchObject({
+      key1: { subkey1: 'value1' },
+      key2: { subkey1: 'value1' }
+    })
+  })
+
   test('minimal with anchor', () => {
     const src = '- &a\n\n  foo'
     expect(YAML.parse(src)).toMatchObject(['foo'])
