@@ -9,9 +9,14 @@
 </tr>
 </thead><tbody>
 <tr>
+<td>linePos</td>
+<td><code>{ line: number, col: number } ⎮</code> <code>undefined</code></td>
+<td>If <code>prettyErrors</code> is enabled and <code>offset</code> is known, the one-indexed human-friendly source location.</td>
+</tr>
+<tr>
 <td>name</td>
-<td><code>string</code></td>
-<td>One of <code>YAMLReferenceError</code>, <code>YAMLSemanticError</code>, <code>YAMLSyntaxError</code>, or <code>YAMLWarning</code></td>
+<td><code>&#39;YAMLParseError&#39; ⎮</code> <code>&#39;YAMLWarning&#39;</code></td>
+<td></td>
 </tr>
 <tr>
 <td>message</td>
@@ -19,44 +24,29 @@
 <td>A human-readable description of the error</td>
 </tr>
 <tr>
-<td>source</td>
-<td><code>CST Node</code></td>
-<td>The CST node at which this error or warning was encountered. Note that in particular <code>source.context</code> is likely to be a complex object and include some circular references.</td>
+<td>offset</td>
+<td><code>number</code></td>
+<td>The offset in the source at which this error or warning was encountered. May be <code>-1</code> if the offset could not be determined.</td>
 </tr>
 </tbody></table>
 
-<p>If the <code>prettyErrors</code> option is enabled, <code>source</code> is dropped from the errors and the following fields are added with summary information regarding the error&#39;s source node, if available:</p>
+<p>A <code>YAMLParseError</code> is an error encountered while parsing a source as YAML.
+They are included in the <code>doc.errors</code> array.
+If that array is not empty when constructing a native representation of a document, the first error will be thrown.</p>
 
-<table><thead>
-<tr>
-<th>Member</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>nodeType</td>
-<td><code>string</code></td>
-<td>A string constant identifying the type of node</td>
-</tr>
-<tr>
-<td>range</td>
-<td><code>{ start: number, end: ?number }</code></td>
-<td>Character offset in the input string</td>
-</tr>
-<tr>
-<td>linePos</td>
-<td><code>{ start: LinePos, end: ?LinePos }</code></td>
-<td>One-indexed human-friendly source location. <code>LinePos</code> here is <code>{ line: number, col: number }</code></td>
-</tr>
-</tbody></table>
+<p>A <code>YAMLWarning</code> is not an error, but a spec-mandated warning about unsupported directives or a fallback resolution being used for a node with an unavailable tag.
+They are included in the <code>doc.warnings</code> array.</p>
 
 <p>In rare cases, the library may produce a more generic error. In particular, <code>TypeError</code> may occur when parsing invalid input using the <code>json</code> schema, and <code>ReferenceError</code> when the <code>maxAliasCount</code> limit is enountered.</p>
-<h2 id='yamlreferenceerror'>YAMLReferenceError</h2>
-<p>An error resolving a tag or an anchor that is referred to in the source. It is likely that the contents of the <code>source</code> node have not been completely parsed into the document. Not used by the CST parser.</p>
-<h2 id='yamlsemanticerror'>YAMLSemanticError</h2>
-<p>An error related to the metadata of the document, or an error with limitations imposed by the YAML spec. The data contents of the document should be valid, but the metadata may be broken.</p>
-<h2 id='yamlsyntaxerror'>YAMLSyntaxError</h2>
-<p>A serious parsing error; the document contents will not be complete, and the CST is likely to be rather broken.</p>
-<h2 id='yamlwarning'>YAMLWarning</h2>
-<p>Not an error, but a spec-mandated warning about unsupported directives or a fallback resolution being used for a node with an unavailable tag. Not used by the CST parser.</p>
+<h2 id='silencing-errors-and-warnings'>Silencing Errors and Warnings</h2>
+<p>Some of the errors encountered during parsing are required by the spec, but are caused by content that may be parsed unambiguously.
+To ignore these errors, use the <code>strict: false</code> option:</p>
+
+<ul>
+<li>Comments must be separated from other tokens by white space characters (only when preceding node is known to have ended)</li>
+<li>Implicit keys of flow sequence pairs need to be on a single line</li>
+<li>The : indicator must be at most 1024 chars after the start of an implicit block mapping key</li>
+</ul>
+
+<p>For additional control, set the <code>logLevel</code> option to <code>&#39;error&#39;</code> (default: <code>&#39;warn&#39;</code>) to silence all warnings.
+Setting <code>logLevel: &#39;silent&#39;</code> will ignore parsing errors completely, resulting in output that may well be rather broken.</p>
