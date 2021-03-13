@@ -10,6 +10,7 @@ export default {
   output: { dir: 'browser/dist', format: 'esm', preserveModules: true },
   plugins: [
     replace({
+      preventAssignment: true,
       'process.env.LOG_TOKENS': String(!!process.env.LOG_TOKENS),
       'process.env.LOG_STREAM': String(!!process.env.LOG_STREAM)
     }),
