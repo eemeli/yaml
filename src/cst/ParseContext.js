@@ -125,8 +125,12 @@ export class ParseContext {
       ch === '\n'
     ) {
       if (ch === '\n') {
-        const lineStart = offset + 1
-        const inEnd = Node.endOfIndent(src, lineStart)
+        let inEnd = offset
+        let lineStart
+        do {
+          lineStart = inEnd + 1
+          inEnd = Node.endOfIndent(src, lineStart)
+        } while (src[inEnd] === '\n')
         const indentDiff = inEnd - (lineStart + this.indent)
         const noIndicatorAsIndent =
           parent.type === Type.SEQ_ITEM && parent.context.atLineStart

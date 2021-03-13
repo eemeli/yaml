@@ -466,6 +466,47 @@ describe('maps with no values', () => {
   })
 })
 
+describe('collection item with anchor followed by empty line (#242)', () => {
+  test('reported 1', () => {
+    const src = `
+key1: &default
+
+  subkey1: value1
+
+key2:
+  <<: *default\n`
+    expect(YAML.parse(src, { merge: true })).toMatchObject({
+      key1: { subkey1: 'value1' },
+      key2: { subkey1: 'value1' }
+    })
+  })
+
+  test('reported 2', () => {
+    const src = `
+key1: &default
+
+  # This key ...
+  subkey1: value1
+
+key2:
+  <<: *default\n`
+    expect(YAML.parse(src, { merge: true })).toMatchObject({
+      key1: { subkey1: 'value1' },
+      key2: { subkey1: 'value1' }
+    })
+  })
+
+  test('minimal with anchor', () => {
+    const src = '- &a\n\n  foo'
+    expect(YAML.parse(src)).toMatchObject(['foo'])
+  })
+
+  test('minimal with tag', () => {
+    const src = '- !!str\n\n  foo'
+    expect(YAML.parse(src)).toMatchObject(['foo'])
+  })
+})
+
 describe('Excessive entity expansion attacks', () => {
   const root = path.resolve(__dirname, '../artifacts/pr104')
   const src1 = fs.readFileSync(path.resolve(root, 'case1.yml'), 'utf8')
