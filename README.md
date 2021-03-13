@@ -26,8 +26,8 @@ npm install yaml@next
 
 ## API Overview
 
-The API provided by `yaml` has three layers, depending on how deep you need to go: [Parse & Stringify](#parse-amp-stringify), [Documents](#documents), and the underlying [Lexer/Parser/Composer](#parsing-yaml).
-The first has the simplest API and "just works", the second gets you all the bells and whistles supported by the library along with a decent [AST](#content-nodes), and the third lets you get progressively closer to YAML source, if that's your thing.
+The API provided by `yaml` has three layers, depending on how deep you need to go: [Parse & Stringify](https://eemeli.org/yaml/#parse-amp-stringify), [Documents](https://eemeli.org/yaml/#documents), and the underlying [Lexer/Parser/Composer](https://eemeli.org/yaml/#parsing-yaml).
+The first has the simplest API and "just works", the second gets you all the bells and whistles supported by the library along with a decent [AST](https://eemeli.org/yaml/#content-nodes), and the third lets you get progressively closer to YAML source, if that's your thing.
 
 ```js
 import { parse, stringify } from 'yaml'
