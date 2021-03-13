@@ -396,7 +396,10 @@ test('eemeli/yaml#38', () => {
   expect(YAML.parse(src)).toEqual({
     content: {
       arrayOfArray: [
-        [{ first: 'John', last: 'Black' }, { first: 'Brian', last: 'Green' }],
+        [
+          { first: 'John', last: 'Black' },
+          { first: 'Brian', last: 'Green' }
+        ],
         [{ first: 'Mark', last: 'Orange' }],
         [{ first: 'Adam', last: 'Grey' }]
       ]
@@ -604,7 +607,10 @@ test('Document.toJSON(null, onAnchor)', () => {
   const doc = YAML.parseDocument(src)
   const onAnchor = jest.fn()
   const res = doc.toJSON(null, onAnchor)
-  expect(onAnchor.mock.calls).toMatchObject([[res.foo, 3], ['foo', 1]])
+  expect(onAnchor.mock.calls).toMatchObject([
+    [res.foo, 3],
+    ['foo', 1]
+  ])
 })
 
 describe('__proto__ as mapping key', () => {
