@@ -10,7 +10,7 @@
     "parser",
     "stringifier"
   ],
-  "homepage": "https://eemeli.org/yaml/",
+  "homepage": "https://eemeli.org/yaml/v1/",
   "files": [
     "browser/",
     "dist/",
