@@ -1,6 +1,8 @@
 # YAML Syntax
 
-A YAML _schema_ is a combination of a set of tags and a mechanism for resolving non-specific tags, i.e. values that do not have an explicit tag such as `!!int`. The [default schema](#data-schemas) is the `'core'` schema, which is the recommended one for YAML 1.2. For YAML 1.0 and YAML 1.1 documents the default is `'yaml-1.1'`.
+A YAML _schema_ is a combination of a set of tags and a mechanism for resolving non-specific tags, i.e. values that do not have an explicit tag such as `!!int`.
+The [default schema](#data-schemas) is the `'core'` schema, which is the recommended one for YAML 1.2.
+For YAML 1.1 documents the default is `'yaml-1.1'`.
 
 ## Tags
 
@@ -22,17 +24,21 @@ YAML.parse(`
 // '42'
 ```
 
-The default prefix for YAML tags is `tag:yaml.org,2002:`, for which the shorthand `!!` is used when stringified. Shorthands for other prefixes may also be defined by document-specific directives, e.g. `!e!` or just `!` for `tag:example.com,2018:app/`, but this is not required to use a tag with a different prefix.
+The default prefix for YAML tags is `tag:yaml.org,2002:`, for which the shorthand `!!` is used when stringified.
+Shorthands for other prefixes may also be defined by document-specific directives, e.g. `!e!` or just `!` for `tag:example.com,2018:app/`, but this is not required to use a tag with a different prefix.
 
-During parsing, unresolved tags should not result in errors (though they will be noted as `warnings`), with the tagged value being parsed according to the data type that it would have under automatic tag resolution rules. This should not result in any data loss, allowing such tags to be handled by the calling app.
+During parsing, unresolved tags should not result in errors (though they will be noted as `warnings`), with the tagged value being parsed according to the data type that it would have under automatic tag resolution rules.
+This should not result in any data loss, allowing such tags to be handled by the calling app.
 
-In order to have `yaml` provide you with automatic parsing and stringification of non-standard data types, it will need to be configured with a suitable tag object. For more information, see [Custom Tags](#custom-tags).
+In order to have `yaml` provide you with automatic parsing and stringification of non-standard data types, it will need to be configured with a suitable tag object.
+For more information, see [Custom Tags](#custom-tags).
 
 The YAML 1.0 tag specification is [slightly different](#changes-from-yaml-1-0-to-1-1) from that used in later versions, and implements prefixing shorthands rather differently.
 
 ## Version Differences
 
-This library's parser is based on the 1.2 version of the [YAML spec](http://yaml.org/spec/1.2/spec.html), which is mostly backwards-compatible with [YAML 1.1](http://yaml.org/spec/1.1/) as well as [YAML 1.0](http://yaml.org/spec/1.0/). Some specific relaxations have been added for backwards compatibility, but if you encounter an issue please [report it](https://github.com/eemeli/yaml/issues).
+This library's parser is based on the 1.2 version of the [YAML spec](http://yaml.org/spec/1.2/spec.html), which is almost completely backwards-compatible with [YAML 1.1](http://yaml.org/spec/1.1/) as well as [YAML 1.0](http://yaml.org/spec/1.0/).
+Some specific relaxations have been added for backwards compatibility, but if you encounter an issue please [report it](https://github.com/eemeli/yaml/issues).
 
 ### Changes from YAML 1.1 to 1.2
 
@@ -97,23 +103,6 @@ invoice: !domain.tld,2002/^invoice
       family : Dumars
 ```
 
-```js
-// YAMLWarning:
-//   The tag tag:private.yaml.org,2002:ball is unavailable,
-//   falling back to tag:yaml.org,2002:map
-// YAMLWarning:
-//   The tag tag:domain.tld,2002/^invoice is unavailable,
-//   falling back to tag:yaml.org,2002:map
-// YAMLWarning:
-//   The tag ^customer is unavailable,
-//   falling back to tag:yaml.org,2002:map
-{ date: '2001-01-23T00:00:00.000Z',
-  number: 123,
-  string: '123',
-  pool: { number: 8 },
-  invoice: { customers: [ { given: 'Chris', family: 'Dumars' } ] } }
-```
-
 The most significant difference between these versions is the complete refactoring of the tag syntax:
 
 - The `%TAG` directive has been added, along with the `!foo!` tag prefix shorthand notation.
@@ -128,4 +117,5 @@ Additionally, the formal description of the language describing the document str
 - The `\^` escape has been removed
 - Directives now use a blank space `' '` rather than `:` as the separator between the name and its parameter/value.
 
-`yaml` supports parsing and stringifying YAML 1.0 tags, but does not expand tags using the `^` notation. If this is something you'd find useful, please file a [GitHub issue](https://github.com/eemeli/yaml/issues) about it.
+`yaml@1` supports parsing and stringifying YAML 1.0 documents, but does not expand tags using the `^` notation.
+As there is no indication that _anyone_ is still using YAML 1.0, explicit support has been dropped in `yaml@2`.

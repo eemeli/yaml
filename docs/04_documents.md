@@ -80,22 +80,19 @@ See [Options](#options) for more information on the last argument.
 | comment       | `string?`                          | A comment at the end of the document. If not empty, separated from the rest of the document by a blank line when stringified.                                       |
 | contents      | [`Node`](#content-nodes) `⎮ any`   | The document contents.                                                                                                                                              |
 | directives    | [`Directives`](#stream-directives) | Controls for the `%YAML` and `%TAG` directives, as well as the doc-start marker `---`.                                                                              |
-| errors        | `Error[]`                          | Errors encountered during parsing.                                                                                                                                  |
+| errors        | [`Error[]`](#errors)               | Errors encountered during parsing.                                                                                                                                  |
 | schema        | `Schema`                           | The schema used with the document.                                                                                                                                  |
-| version       | `string?`                          | The parsed version of the source document; if true-ish, stringified output will include a `%YAML` directive.                                                        |
-| warnings      | `Error[]`                          | Warnings encountered during parsing.                                                                                                                                |
+| warnings      | [`Error[]`](#errors)               | Warnings encountered during parsing.                                                                                                                                |
 
 ```js
 import { Document } from 'yaml'
 
 const doc = new Document(['some', 'values', { balloons: 99 }])
-doc.version = true
 doc.commentBefore = ' A commented document'
 
 String(doc)
 // # A commented document
-// %YAML 1.2
-// ---
+//
 // - some
 // - values
 // - balloons: 99
@@ -103,9 +100,7 @@ String(doc)
 
 The Document members are all modifiable, though it's unlikely that you'll have reason to change `errors`, `schema` or `warnings`.
 In particular you may be interested in both reading and writing **`contents`**.
-Although `parseDocument()` and `parseAllDocuments()` will leave it with `Map`, `Seq`, `Scalar` or `null` contents, it can be set to anything.
-
-During stringification, a document with a true-ish `version` value will include a `%YAML` directive; the version number will be set to `1.2` unless the `yaml-1.1` schema is in use.
+Although `parseDocument()` and `parseAllDocuments()` will leave it with `YAMLMap`, `YAMLSeq`, `Scalar` or `null` contents, it can be set to anything.
 
 ## Document Methods
 
@@ -128,7 +123,8 @@ doc.deleteIn(['b', 1]) // true
 doc.getIn(['b', 1]) // 4
 ```
 
-In addition to the above, the document object also provides the same **accessor methods** as [collections](#collections), based on the top-level collection: `add`, `delete`, `get`, `has`, and `set`, along with their deeper variants `addIn`, `deleteIn`, `getIn`, `hasIn`, and `setIn`.
+In addition to the above, the document object also provides the same **accessor methods** as [collections](#collections), based on the top-level collection:
+`add`, `delete`, `get`, `has`, and `set`, along with their deeper variants `addIn`, `deleteIn`, `getIn`, `hasIn`, and `setIn`.
 For the `*In` methods using an empty `path` value (i.e. `null`, `undefined`, or `[]`) will refer to the document's top-level `contents`.
 
 #### `Document#toJS()`, `Document#toJSON()` and `Document#toString()`
@@ -192,7 +188,7 @@ A description of [alias and merge nodes](#alias-nodes) is included in the next s
 | Method                                 | Returns    | Description                                                                                                                |
 | -------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
 | createAlias(node: Node, name?: string) | `Alias`    | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated. |
-| createMergePair(...Node)               | `Merge`    | Create a new `Merge` node with the given source nodes. Non-`Alias` sources will be automatically wrapped.                  |
+| createMergePair(...Node)               | `Pair`     | Create a new merge pair with the given source nodes. Non-`Alias` sources will be automatically wrapped.                    |
 | getName(node: Node)                    | `string?`  | The anchor name associated with `node`, if set.                                                                            |
 | getNames()                             | `string[]` | List of all defined anchor names.                                                                                          |
 | getNode(name: string)                  | `Node?`    | The node associated with the anchor `name`, if set.                                                                        |
@@ -218,10 +214,11 @@ doc.toJS()
 String(doc)
 // [ &AA { a: A }, { b: &a2 B }, *AA ]
 
+doc.setSchema('1.2', { merge: true })
 const merge = doc.anchors.createMergePair(alias)
-// Merge {
+// Pair {
 //   key: Scalar { value: '<<' },
-//   value: YAMLSeq { items: [ [Alias] ] } }
+//   value: Alias { source: YAMLMap { ... } } }
 doc.addIn([1], merge)
 doc.toJS()
 // [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]
@@ -229,21 +226,16 @@ String(doc)
 // [ &AA { a: A }, { b: &a2 B, <<: *AA }, *AA ]
 
 // This creates a circular reference
-merge.value.add(doc.anchors.createAlias(doc.get(1, true)))
+merge.value = doc.anchors.createAlias(doc.get(1, true))
 doc.toJS() // [RangeError: Maximum call stack size exceeded]
 String(doc)
 // [
 //   &AA { a: A },
-//   &a3 {
-//       b: &a2 B,
-//       <<:
-//         [ *AA, *a3 ]
-//     },
+//   &a1 { b: &a2 B, <<: *a1 },
 //   *AA
 // ]
 ```
 
-The constructors for `Alias` and `Merge` are not directly exported by the library, as they depend on the document's anchors; instead you'll need to use **`createAlias(node, name)`** and **`createMergePair(...sources)`**.
 You should make sure to only add alias and merge nodes to the document after the nodes to which they refer, or the document's YAML stringification will fail.
 
 It is valid to have an anchor associated with a node even if it has no aliases.
@@ -253,4 +245,4 @@ The second parameter is optional, and if left out either the pre-existing anchor
 To remove an anchor, use `setAnchor(null, name)`.
 The function will return the new anchor's name, or `null` if both of its arguments are `null`.
 
-While the `merge` option needs to be true to parse `Merge` nodes as such, this is not required during stringification.
+While the `merge` option needs to be true to parse merge pairs as such, this is not required during stringification.

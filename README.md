@@ -1,11 +1,18 @@
 # YAML <a href="https://www.npmjs.com/package/yaml"><img align="right" src="https://badge.fury.io/js/yaml.svg" title="npm package" /></a>
 
-`yaml` is a JavaScript parser and stringifier for [YAML](http://yaml.org/), a human friendly data serialization standard. It supports both parsing and stringifying data using all versions of YAML, along with all common data schemas. As a particularly distinguishing feature, `yaml` fully supports reading and writing comments and blank lines in YAML documents.
+`yaml` is a definitive library for [YAML](http://yaml.org/), the human friendly data serialization standard.
+This library:
+
+- Supports both YAML 1.1 and YAML 1.2 and all common data schemas,
+- Passes all of the [yaml-test-suite](https://github.com/yaml/yaml-test-suite) tests,
+- Can accept any string as input without throwing, parsing as much YAML out of it as it can, and
+- Supports parsing, modifying, and writing YAML comments and blank lines.
 
 The library is released under the ISC open source license, and the code is [available on GitHub](https://github.com/eemeli/yaml/).
 It has no external dependencies and runs on Node.js as well as modern browsers.
 
-For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes. Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).
+For the purposes of versioning, any changes that break any of the documented endpoints or APIs will be considered semver-major breaking changes.
+Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).
 
 For more information, see the project's documentation site: [**eemeli.org/yaml**](https://eemeli.org/yaml/)
 
@@ -19,9 +26,12 @@ npm install yaml@next
 
 ## API Overview
 
-The API provided by `yaml` has three layers, depending on how deep you need to go: [Parse & Stringify](https://eemeli.org/yaml/#parse-amp-stringify), [Documents](https://eemeli.org/yaml/#documents), and the [CST Parser](https://eemeli.org/yaml/#cst-parser). The first has the simplest API and "just works", the second gets you all the bells and whistles supported by the library along with a decent [AST](https://eemeli.org/yaml/#content-nodes), and the third is the closest to YAML source, making it fast, raw, and crude.
+The API provided by `yaml` has three layers, depending on how deep you need to go: [Parse & Stringify](#parse-amp-stringify), [Documents](#documents), and the underlying [Lexer/Parser/Composer](#parsing-yaml).
+The first has the simplest API and "just works", the second gets you all the bells and whistles supported by the library along with a decent [AST](#content-nodes), and the third lets you get progressively closer to YAML source, if that's your thing.
 
 ```js
+import { parse, stringify } from 'yaml'
+// or
 import YAML from 'yaml'
 // or
 const YAML = require('yaml')
@@ -29,33 +39,44 @@ const YAML = require('yaml')
 
 ### Parse & Stringify
 
-- [`YAML.parse(str, reviver?, options?): value`](https://eemeli.org/yaml/#yaml-parse)
-- [`YAML.stringify(value, replacer?, options?): string`](https://eemeli.org/yaml/#yaml-stringify)
+- [`parse(str, reviver?, options?): value`](https://eemeli.org/yaml/#yaml-parse)
+- [`stringify(value, replacer?, options?): string`](https://eemeli.org/yaml/#yaml-stringify)
 
-### YAML Documents
+### Documents
 
-- [`YAML.Document`](https://eemeli.org/yaml/#yaml-documents)
+- [`Document`](https://eemeli.org/yaml/#documents)
   - [`constructor(value, replacer?, options?)`](https://eemeli.org/yaml/#creating-documents)
-  - [`defaults`](https://eemeli.org/yaml/#options)
-  - [`#createNode(value, options?): Node`](https://eemeli.org/yaml/#creating-nodes)
   - [`#anchors`](https://eemeli.org/yaml/#working-with-anchors)
   - [`#contents`](https://eemeli.org/yaml/#content-nodes)
+  - [`#directives`](https://eemeli.org/yaml/#stream-directives)
   - [`#errors`](https://eemeli.org/yaml/#errors)
-- [`YAML.parseAllDocuments(str, options?): YAML.Document[]`](https://eemeli.org/yaml/#parsing-documents)
-- [`YAML.parseDocument(str, options?): YAML.Document`](https://eemeli.org/yaml/#parsing-documents)
-- [`YAML.visit(node, visitor)`](https://eemeli.org/yaml/#modifying-nodes)
+  - [`#warnings`](https://eemeli.org/yaml/#errors)
+- [`isDocument(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`parseAllDocuments(str, options?): Document[]`](https://eemeli.org/yaml/#parsing-documents)
+- [`parseDocument(str, options?): Document`](https://eemeli.org/yaml/#parsing-documents)
 
-```js
-import { Pair, YAMLMap, YAMLSeq } from 'yaml'
-```
+### Content Nodes
 
-- [`new Pair(key, value)`](https://eemeli.org/yaml/#creating-nodes)
-- [`new YAMLMap()`](https://eemeli.org/yaml/#creating-nodes)
-- [`new YAMLSeq()`](https://eemeli.org/yaml/#creating-nodes)
+- [`isAlias(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`isCollection(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`isMap(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`isNode(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`isPair(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`isScalar(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`isSeq(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`new Scalar(value)`](https://eemeli.org/yaml/#scalar-values)
+- [`new YAMLMap()`](https://eemeli.org/yaml/#collections)
+- [`new YAMLSeq()`](https://eemeli.org/yaml/#collections)
+- [`doc.anchors.createAlias(node, name?): Alias`](https://eemeli.org/yaml/#working-with-anchors)
+- [`doc.createNode(value, options?): Node`](https://eemeli.org/yaml/#creating-nodes)
+- [`doc.createPair(key, value): Pair`](https://eemeli.org/yaml/#creating-nodes)
+- [`visit(node, visitor)`](https://eemeli.org/yaml/#modifying-nodes)
 
-### CST Parser
+### Parsing YAML
 
-- [`YAML.parseCST(str): CSTDocument[]`](https://eemeli.org/yaml/#parsecst)
+- [`new Lexer(push)`](https://eemeli.org/yaml/#lexer)
+- [`new Parser(push, onNewLine?)`](https://eemeli.org/yaml/#parser)
+- [`new Composer(push, options?)`](https://eemeli.org/yaml/#composer)
 
 ## YAML.parse
 

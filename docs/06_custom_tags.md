@@ -102,23 +102,36 @@ If you wish to implement your own custom tags, the [`!!binary`](https://github.c
 
 ### Parsing Custom Data
 
-At the lowest level, [`YAML.parseCST()`](#cst-parser) will take care of turning string input into a concrete syntax tree (CST). In the CST all scalar values are available as strings, and maps & sequences as collections of nodes. Each schema includes a set of default data types, which handle converting at least strings, maps and sequences into their AST nodes. These are considered to have _implicit_ tags, and are autodetected. Custom tags, on the other hand, should almost always define an _explicit_ `tag` with which their value will be prefixed. This may be application-specific local `!tag`, a shorthand `!ns!tag`, or a verbatim `!<tag:example.com,2019:tag>`.
+At the lowest level, the [`Lexer`](#lexer) and [`Parser`](#parser) will take care of turning string input into a concrete syntax tree (CST).
+In the CST all scalar values are available as strings, and maps & sequences as collections of nodes.
+Each schema includes a set of default data types, which handle converting at least strings, maps and sequences into their AST nodes.
+These are considered to have _implicit_ tags, and are autodetected.
+Custom tags, on the other hand, should almost always define an _explicit_ `tag` with which their value will be prefixed.
+This may be application-specific local `!tag`, a shorthand `!ns!tag`, or a verbatim `!<tag:example.com,2019:tag>`.
 
-Once identified by matching the `tag`, the `resolve(value, onError): Node | any` function will turn a parsed value into an AST node. `value` may be either a `string`, a `YAMLMap` or a `YAMLSeq`, depending on the node's shape. A custom tag should verify that value is of its expected type.
+Once identified by matching the `tag`, the `resolve(value, onError): Node | any` function will turn a parsed value into an AST node.
+`value` may be either a `string`, a `YAMLMap` or a `YAMLSeq`, depending on the node's shape.
+A custom tag should verify that value is of its expected type.
 
-Note that during the CST -> AST parsing, the anchors and comments attached to each node are also resolved for each node. This metadata will unfortunately be lost when converting the values to JS objects, so collections should have values that extend one of the existing collection classes. Collections should therefore either fall back to their parent classes' `toJSON()` methods, or define their own in order to allow their contents to be expressed as the appropriate JS object.
+Note that during the CST -> AST composition, the anchors and comments attached to each node are also resolved for each node.
+This metadata will unfortunately be lost when converting the values to JS objects, so collections should have values that extend one of the existing collection classes.
+Collections should therefore either fall back to their parent classes' `toJSON()` methods, or define their own in order to allow their contents to be expressed as the appropriate JS object.
 
 ### Creating Nodes and Stringifying Custom Data
 
-As with parsing, turning input data into its YAML string representation is a two-stage process as the input is first turned into an AST tree before stringifying it. This allows for metadata and comments to be attached to each node, and for e.g. circular references to be resolved. For scalar values, this means just wrapping the value within a `Scalar` class while keeping it unchanged.
+As with parsing, turning input data into its YAML string representation is a two-stage process as the input is first turned into an AST tree before stringifying it.
+This allows for metadata and comments to be attached to each node, and for e.g. circular references to be resolved.
+For scalar values, this means just wrapping the value within a `Scalar` class while keeping it unchanged.
 
-As values may be wrapped within objects and arrays, `doc.createNode()` uses each tag's `identify(value): boolean` function to detect custom data types. For the same reason, collections need to define their own `createNode(schema, value, ctx): Collection` functions that may recursively construct their equivalent collection class instances.
+As values may be wrapped within objects and arrays, `doc.createNode()` uses each tag's `identify(value): boolean` function to detect custom data types.
+For the same reason, collections need to define their own `createNode(schema, value, ctx): Collection` functions that may recursively construct their equivalent collection class instances.
 
-Finally, `stringify(item, ctx, ...): string` defines how your data should be represented as a YAML string, in case the default stringifiers aren't enough. For collections in particular, the default stringifier should be perfectly sufficient. `'yaml/util'` exports `stringifyNumber(item)` and `stringifyString(item, ctx, ...)`, which may be of use for custom scalar data.
+Finally, `stringify(item, ctx, ...): string` defines how your data should be represented as a YAML string, in case the default stringifiers aren't enough.
+For collections in particular, the default stringifier should be perfectly sufficient.
+`'yaml/util'` exports `stringifyNumber(item)` and `stringifyString(item, ctx, ...)`, which may be of use for custom scalar data.
 
 ### Custom Tag API
 
-<!-- prettier-ignore -->
 ```js
 import {
   debug, // (logLevel, ...messages) => void -- Log debug messages to console
