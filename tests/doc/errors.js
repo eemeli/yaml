@@ -1,12 +1,5 @@
 import * as YAML from 'yaml'
 
-test('require a message and source for all errors', () => {
-  const exp = /Invalid arguments/
-  expect(() => new YAML.YAMLError()).toThrow(exp)
-  expect(() => new YAML.YAMLError('Foo')).toThrow(exp)
-  expect(() => new YAML.YAMLError('Foo', {})).toThrow(exp)
-})
-
 test('fail on map value indented with tab', () => {
   const src = 'a:\n\t1\nb:\n\t2\n'
   const doc = YAML.parseDocument(src)
@@ -19,57 +12,39 @@ test('fail on map value indented with tab', () => {
 test('eemeli/yaml#6', () => {
   const src = 'abc: 123\ndef'
   const doc = YAML.parseDocument(src)
-  expect(doc.errors).toMatchObject([{ name: 'YAMLParseError', offset: 9 }])
+  expect(doc.errors).toMatchObject([{ offset: 9 }])
 })
 
-describe.skip('eemeli/yaml#7', () => {
+describe('eemeli/yaml#7', () => {
   test('map', () => {
     const src = '{ , }\n---\n{ 123,,, }\n'
     const docs = YAML.parseAllDocuments(src)
-    expect(docs[0].errors).toMatchObject([
-      { name: 'YAMLParseError', offset: 2 }
-    ])
-    expect(docs[1].errors).toMatchObject([
-      { name: 'YAMLParseError', offset: 16 },
-      { name: 'YAMLParseError', offset: 17 }
-    ])
-    // const node = docs[0].errors[0].source
-    // expect(node).toBeInstanceOf(Node)
-    // expect(node.rangeAsLinePos).toMatchObject({
-    //   start: { line: 1, col: 1 },
-    //   end: { line: 1, col: 6 }
-    // })
+    expect(docs[0].errors).toMatchObject([{ offset: 2 }])
+    expect(docs[1].errors).toMatchObject([{ offset: 16 }, { offset: 17 }])
   })
+
   test('seq', () => {
     const src = '[ , ]\n---\n[ 123,,, ]\n'
     const docs = YAML.parseAllDocuments(src)
-    expect(docs[0].errors).toMatchObject([
-      { name: 'YAMLParseError', offset: 2 }
-    ])
-    expect(docs[1].errors).toMatchObject([
-      { name: 'YAMLParseError', offset: 16 },
-      { name: 'YAMLParseError', offset: 17 }
-    ])
-    // const node = docs[1].errors[0].source
-    // expect(node).toBeInstanceOf(Node)
-    // expect(node.rangeAsLinePos).toMatchObject({
-    //   start: { line: 3, col: 1 },
-    //   end: { line: 3, col: 11 }
-    // })
+    expect(docs[0].errors).toMatchObject([{ offset: 2 }])
+    expect(docs[1].errors).toMatchObject([{ offset: 16 }, { offset: 17 }])
   })
 })
 
 describe('block scalars', () => {
   test('invalid header', () => {
     const doc = YAML.parseDocument('>99\n foo\n')
-    expect(doc.errors).toMatchObject([
-      { message: 'Block scalar header includes extra characters: >99' },
-      { message: 'Unexpected scalar at node end' }
-    ])
+    expect(doc.errors).toMatchObject(
+      [
+        'Block scalar header includes extra characters: >99',
+        'Unexpected scalar at node end'
+      ].map(msg => ({ message: expect.stringContaining(msg) }))
+    )
   })
   test('missing newline at header end', () => {
     const doc = YAML.parseDocument('> foo\n')
-    expect(doc.errors).toMatchObject([{ message: 'Not a YAML token: foo' }])
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0].message).toMatch('Not a YAML token: foo')
   })
 })
 
@@ -77,9 +52,10 @@ describe('block collections', () => {
   test('mapping with bad indentation', () => {
     const src = 'foo: "1"\n bar: 2\n'
     const doc = YAML.parseDocument(src)
-    expect(doc.errors).toMatchObject([
-      { message: 'All mapping items must start at the same column' }
-    ])
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0].message).toMatch(
+      'All mapping items must start at the same column'
+    )
     expect(doc.contents).toMatchObject({
       items: [
         { key: { value: 'foo' }, value: { value: '1' } },
@@ -91,9 +67,10 @@ describe('block collections', () => {
   test('sequence with bad indentation', () => {
     const src = '- "foo"\n - bar\n'
     const doc = YAML.parseDocument(src)
-    expect(doc.errors).toMatchObject([
-      { message: 'All sequence items must start at the same column' }
-    ])
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0].message).toMatch(
+      'All sequence items must start at the same column'
+    )
     expect(doc.contents).toMatchObject({
       items: [{ value: 'foo' }, { items: [{ value: 'bar' }] }]
     })
@@ -102,11 +79,13 @@ describe('block collections', () => {
   test('seq item in mapping', () => {
     const src = 'foo: "1"\n- bar\n'
     const doc = YAML.parseDocument(src)
-    expect(doc.errors).toMatchObject([
-      { message: 'A block sequence may not be used as an implicit map key' },
-      { message: 'Implicit keys need to be on a single line' },
-      { message: 'Implicit map keys need to be followed by map values' }
-    ])
+    expect(doc.errors).toMatchObject(
+      [
+        'A block sequence may not be used as an implicit map key',
+        'Implicit keys need to be on a single line',
+        'Implicit map keys need to be followed by map values'
+      ].map(msg => ({ message: expect.stringContaining(msg) }))
+    )
     expect(doc.contents).toMatchObject({
       items: [
         { key: { value: 'foo' }, value: { value: '1' } },
@@ -118,7 +97,12 @@ describe('block collections', () => {
   test('doubled value indicator', () => {
     const doc = YAML.parseDocument('foo : : bar\n')
     expect(doc.errors).toMatchObject([
-      { message: 'Nested mappings are not allowed in compact mappings' }
+      {
+        message:
+          'Nested mappings are not allowed in compact mappings at line 1, column 7:\n\n' +
+          'foo : : bar\n' +
+          '      ^\n'
+      }
     ])
   })
 
@@ -127,7 +111,9 @@ describe('block collections', () => {
     expect(doc.errors).toMatchObject([
       {
         message:
-          'The : indicator must be at most 1024 chars after the start of an implicit block mapping key'
+          'The : indicator must be at most 1024 chars after the start of an implicit block mapping key at line 1, column 1032:\n\n' +
+          '…xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : bar\n' +
+          '                                                                             ^\n'
       }
     ])
   })
@@ -136,39 +122,30 @@ describe('block collections', () => {
 describe('flow collections', () => {
   test('start only of flow map (eemeli/yaml#8)', () => {
     const doc = YAML.parseDocument('{')
-    expect(doc.errors).toMatchObject([
-      {
-        name: 'YAMLParseError',
-        message: 'Expected flow map to end with }',
-        offset: 1
-      }
-    ])
+    const message = expect.stringContaining('Expected flow map to end with }')
+    expect(doc.errors).toMatchObject([{ message, offset: 1 }])
   })
 
   test('start only of flow sequence (eemeli/yaml#8)', () => {
     const doc = YAML.parseDocument('[')
-    expect(doc.errors).toMatchObject([
-      {
-        name: 'YAMLParseError',
-        message: 'Expected flow sequence to end with ]',
-        offset: 1
-      }
-    ])
+    const message = expect.stringContaining(
+      'Expected flow sequence to end with ]'
+    )
+    expect(doc.errors).toMatchObject([{ message, offset: 1 }])
   })
 
   test('flow sequence without end', () => {
     const doc = YAML.parseDocument('[ foo, bar,')
-    expect(doc.errors).toMatchObject([
-      {
-        name: 'YAMLParseError',
-        message: 'Expected flow sequence to end with ]',
-        offset: 11
-      }
-    ])
+    const message = expect.stringContaining(
+      'Expected flow sequence to end with ]'
+    )
+    expect(doc.errors).toMatchObject([{ message, offset: 11 }])
   })
 
   test('doc-end within flow sequence', () => {
-    const doc = YAML.parseDocument('[ foo, bar,\n...\n]')
+    const doc = YAML.parseDocument('[ foo, bar,\n...\n]', {
+      prettyErrors: false
+    })
     expect(doc.errors).toMatchObject([
       { message: 'Expected flow sequence to end with ]' },
       { message: 'Unexpected flow-seq-end token in YAML document: "]"' },
@@ -181,59 +158,57 @@ describe('flow collections', () => {
 
   test('block scalar in flow collection', () => {
     const doc = YAML.parseDocument('{ |\n foo\n}')
-    expect(doc.errors).toMatchObject([
-      { message: 'Plain value cannot start with block scalar indicator |' }
-    ])
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0].message).toMatch(
+      'Plain value cannot start with block scalar indicator |'
+    )
   })
 
   test('block seq in flow collection', () => {
     const doc = YAML.parseDocument('{\n- foo\n}')
-    expect(doc.errors).toMatchObject([
-      { message: 'Block collections are not allowed within flow collections' }
-    ])
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0].message).toMatch(
+      'Block collections are not allowed within flow collections'
+    )
   })
 
   test('anchor before explicit key indicator', () => {
     const doc = YAML.parseDocument('{ &a ? A }')
-    expect(doc.errors).toMatchObject([
-      { message: 'Anchors and tags must be after the ? indicator' }
-    ])
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0].message).toMatch(
+      'Anchors and tags must be after the ? indicator'
+    )
   })
 })
 
 describe('comments', () => {
   test('comment without whitespace after tag', () => {
     const doc = YAML.parseDocument('!<a>#cc\nA')
-    expect(doc.errors).toMatchObject([
-      {
-        message:
-          'Comments must be separated from other tokens by white space characters'
-      }
-    ])
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0].message).toMatch(
+      'Comments must be separated from other tokens by white space characters'
+    )
   })
 
   test('comment without whitespace after value', () => {
     const doc = YAML.parseDocument('foo: "bar"#cc')
-    expect(doc.errors).toMatchObject([
-      {
-        message:
-          'Comments must be separated from other tokens by white space characters'
-      }
-    ])
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0].message).toMatch(
+      'Comments must be separated from other tokens by white space characters'
+    )
   })
 })
 
-describe.skip('pretty errors', () => {
+describe('pretty errors', () => {
   test('eemeli/yaml#6', () => {
     const src = 'abc: 123\ndef'
     const doc = YAML.parseDocument(src, { prettyErrors: true })
     expect(doc.errors).toMatchObject([
       {
-        name: 'YAMLParseError',
         message:
-          'Implicit map keys need to be followed by map values at line 2, column 1:\n\ndef\n^^^\n',
+          'Implicit map keys need to be followed by map values at line 2, column 1:\n\nabc: 123\ndef\n^\n',
         offset: 9,
-        linePos: { start: { line: 2, col: 1 }, end: { line: 2, col: 4 } }
+        linePos: { line: 2, col: 1 }
       }
     ])
     expect(doc.errors[0]).not.toHaveProperty('source')
@@ -244,25 +219,25 @@ describe.skip('pretty errors', () => {
     const docs = YAML.parseAllDocuments(src, { prettyErrors: true })
     expect(docs[0].errors).toMatchObject([
       {
-        name: 'YAMLParseError',
-        message: 'Unexpected , in flow map',
+        message:
+          'Unexpected , in flow map at line 1, column 3:\n\n{ , }\n  ^\n',
         offset: 2,
-        linePos: { start: { line: 1, col: 3 }, end: { line: 1, col: 4 } }
+        linePos: { line: 1, col: 3 }
       }
     ])
     expect(docs[0].errors[0]).not.toHaveProperty('source')
     expect(docs[1].errors).toMatchObject([
       {
-        name: 'YAMLParseError',
-        message: 'Unexpected , in flow map',
+        message:
+          'Unexpected , in flow map at line 3, column 7:\n\n{ 123,,, }\n      ^\n',
         offset: 16,
-        linePos: { start: { line: 3, col: 7 }, end: { line: 3, col: 8 } }
+        linePos: { line: 3, col: 7 }
       },
       {
-        name: 'YAMLParseError',
-        message: 'Unexpected , in flow map',
+        message:
+          'Unexpected , in flow map at line 3, column 8:\n\n{ 123,,, }\n       ^\n',
         offset: 17,
-        linePos: { start: { line: 3, col: 8 }, end: { line: 3, col: 9 } }
+        linePos: { line: 3, col: 8 }
       }
     ])
     expect(docs[1].errors[0]).not.toHaveProperty('source')
@@ -279,17 +254,19 @@ describe.skip('pretty errors', () => {
 describe('tags on invalid nodes', () => {
   test('!!map on scalar', () => {
     const doc = YAML.parseDocument('!!map foo')
-    expect(doc.warnings).toMatchObject([
-      { message: 'Unresolved tag: tag:yaml.org,2002:map' }
-    ])
+    expect(doc.warnings).toHaveLength(1)
+    expect(doc.warnings[0].message).toMatch(
+      'Unresolved tag: tag:yaml.org,2002:map'
+    )
     expect(doc.toJS()).toBe('foo')
   })
 
   test('!!str on map', () => {
     const doc = YAML.parseDocument('!!str { answer: 42 }')
-    expect(doc.warnings).toMatchObject([
-      { message: 'Unresolved tag: tag:yaml.org,2002:str' }
-    ])
+    expect(doc.warnings).toHaveLength(1)
+    expect(doc.warnings[0].message).toMatch(
+      'Unresolved tag: tag:yaml.org,2002:str'
+    )
     expect(doc.toJS()).toMatchObject({ answer: 42 })
   })
 })
@@ -309,10 +286,10 @@ describe('invalid options', () => {
 })
 
 test('broken document with comment before first node', () => {
-  const doc = YAML.parseDocument('#c\n*x\nfoo\n')
+  const doc = YAML.parseDocument('#c\n*x\nfoo\n', { prettyErrors: false })
   expect(doc.errors).toMatchObject([
-    { name: 'YAMLParseError', message: 'Aliased anchor not found: x' },
-    { name: 'YAMLParseError', message: 'Unexpected scalar at node end' }
+    { message: 'Aliased anchor not found: x' },
+    { message: 'Unexpected scalar at node end' }
   ])
 })
 
@@ -320,20 +297,20 @@ describe('broken directives', () => {
   for (const tag of ['%TAG', '%YAML'])
     test(`incomplete ${tag} directive`, () => {
       const doc = YAML.parseDocument(`${tag}\n---\n`)
-      expect(doc.errors).toMatchObject([{ name: 'YAMLParseError', offset: 0 }])
+      expect(doc.errors).toMatchObject([{ offset: 0 }])
     })
 
   test('missing separator', () => {
     const doc = YAML.parseDocument(`%YAML 1.2\n`)
-    expect(doc.errors).toMatchObject([{ name: 'YAMLParseError', offset: 10 }])
+    expect(doc.errors).toMatchObject([{ offset: 10 }])
   })
 })
 
 test('multiple tags on one node', () => {
   const doc = YAML.parseDocument('!foo !bar baz\n')
   expect(doc.contents).toMatchObject({ value: 'baz', type: 'PLAIN' })
-  expect(doc.errors).toMatchObject([{ name: 'YAMLParseError' }])
-  expect(doc.warnings).toMatchObject([{}])
+  expect(doc.errors).toHaveLength(1)
+  expect(doc.warnings).toHaveLength(1)
 })
 
 describe('logLevel', () => {
@@ -346,7 +323,8 @@ describe('logLevel', () => {
 
   test('by default, warn for tag fallback', () => {
     YAML.parse('!foo bar')
-    const message = 'Unresolved tag: !foo'
+    const message =
+      'Unresolved tag: !foo at line 1, column 1:\n\n' + '!foo bar\n^\n'
     expect(mock.mock.calls).toMatchObject([[{ message }]])
   })
 

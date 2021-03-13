@@ -479,7 +479,7 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('require unique keys', () => {
       const src = `!!omap\n- a: 1\n- b: 2\n- b: 9\n`
-      const doc = YAML.parseDocument(src, { version: '1.1' })
+      const doc = YAML.parseDocument(src, { prettyErrors: false, version: '1.1' })
       expect(doc.errors).toMatchObject([
         {
           name: 'YAMLParseError',
@@ -530,7 +530,7 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('require null values', () => {
       const src = `!!set\n? a\n? b\nc: d\n`
-      const doc = YAML.parseDocument(src, { version: '1.1' })
+      const doc = YAML.parseDocument(src, { prettyErrors: false, version: '1.1' })
       expect(doc.errors).toMatchObject([
         {
           name: 'YAMLParseError',
