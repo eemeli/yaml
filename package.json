@@ -18,9 +18,9 @@
   "type": "commonjs",
   "main": "./dist/index.js",
   "browser": {
-    "./index.js": "./browser/index.js",
-    "./util.js": "./browser/dist/util.js",
-    "./util.mjs": "./browser/dist/util.js"
+    "./dist/index.js": "./browser/index.js",
+    "./dist/util.js": "./browser/dist/util.js",
+    "./util.js": "./browser/dist/util.js"
   },
   "exports": {
     ".": {
