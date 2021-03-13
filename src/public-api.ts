@@ -1,16 +1,26 @@
 import { Composer } from './compose/composer.js'
 import type { Reviver } from './doc/applyReviver.js'
 import { Document, Replacer } from './doc/Document.js'
-import { YAMLParseError } from './errors.js'
+import { prettifyError, YAMLParseError } from './errors.js'
 import { warn } from './log.js'
 import type { ParsedNode } from './nodes/Node.js'
 import type { Options, ToJSOptions, ToStringOptions } from './options.js'
+import { LineCounter } from './parse/line-counter.js'
 import { Parser } from './parse/parser.js'
 
 export interface EmptyStream
   extends Array<Document.Parsed>,
     ReturnType<Composer['streamInfo']> {
   empty: true
+}
+
+function parseOptions(options: Options | undefined) {
+  const prettyErrors = !options || options.prettyErrors !== false
+  const lineCounter =
+    (options && options.lineCounter) ||
+    (prettyErrors && new LineCounter()) ||
+    null
+  return { lineCounter, prettyErrors }
 }
 
 /**
@@ -26,14 +36,22 @@ export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
   source: string,
   options?: Options
 ): Document.Parsed<T>[] | EmptyStream {
+  const { lineCounter, prettyErrors } = parseOptions(options)
+
   const docs: Document.Parsed<T>[] = []
   const composer = new Composer(
     doc => docs.push(doc as Document.Parsed<T>),
     options
   )
-  const parser = new Parser(composer.next, options?.lineCounter?.addNewLine)
+  const parser = new Parser(composer.next, lineCounter?.addNewLine)
   parser.parse(source)
   composer.end()
+
+  if (prettyErrors && lineCounter)
+    for (const doc of docs) {
+      doc.errors.forEach(prettifyError(source, lineCounter))
+      doc.warnings.forEach(prettifyError(source, lineCounter))
+    }
 
   if (docs.length > 0) return docs
   return Object.assign<
@@ -48,7 +66,10 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
   source: string,
   options?: Options
 ) {
-  let doc: Document.Parsed<T> | null = null
+  const { lineCounter, prettyErrors } = parseOptions(options)
+
+  // `doc` is always set by compose.end(true) at the very latest
+  let doc: Document.Parsed<T> = null as any
   const composer = new Composer(_doc => {
     if (!doc) doc = _doc as Document.Parsed<T>
     else if (doc.options.logLevel !== 'silent') {
@@ -57,11 +78,15 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
       doc.errors.push(new YAMLParseError(_doc.range[0], errMsg))
     }
   }, options)
-  const parser = new Parser(composer.next, options?.lineCounter?.addNewLine)
+  const parser = new Parser(composer.next, lineCounter?.addNewLine)
   parser.parse(source)
   composer.end(true, source.length)
-  // `doc` is always set by compose.end(true) at the very latest
-  return (doc as unknown) as Document.Parsed<T>
+
+  if (prettyErrors && lineCounter) {
+    doc.errors.forEach(prettifyError(source, lineCounter))
+    doc.warnings.forEach(prettifyError(source, lineCounter))
+  }
+  return doc
 }
 
 /**

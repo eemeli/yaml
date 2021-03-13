@@ -26,7 +26,7 @@ Used by: `parse()`, `parseDocument()`, `parseAllDocuments()`, `new Composer()`, 
 | ------------ | ------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | intAsBigInt  | `boolean`     | `false` | Whether integers should be parsed into [BigInt] rather than `number` values.                                                            |
 | lineCounter  | `LineCounter` |         | If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)` to provide the `{ line, col }` positions within the input. |
-| prettyErrors | `boolean`     | `false` | Include line position & node type directly in errors.                                                                                   |
+| prettyErrors | `boolean`     | `true`  | Include line/col position in errors, along with an extract of the source string.                                                        |
 | strict       | `boolean`     | `true`  | When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.                                    |
 
 [bigint]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt

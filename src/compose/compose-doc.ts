@@ -7,7 +7,7 @@ import { resolveEnd } from './resolve-end.js'
 import { resolveProps } from './resolve-props.js'
 
 export function composeDoc(
-  options: Options | undefined,
+  options: Options,
   directives: Directives,
   { offset, start, value, end }: Tokens.Document,
   onError: (offset: number, message: string, warning?: boolean) => void
