@@ -13,7 +13,8 @@
   "homepage": "https://eemeli.org/yaml/",
   "files": [
     "browser/",
-    "dist/"
+    "dist/",
+    "util.js"
   ],
   "type": "commonjs",
   "main": "./dist/index.js",
