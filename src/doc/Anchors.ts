@@ -26,7 +26,7 @@ export class Anchors {
    * Non-`Alias` sources will be automatically wrapped.
    */
   createMergePair(...sources: Node[]) {
-    const key = new Scalar(Pair.MERGE_KEY)
+    const key = new Scalar('<<')
     const items = sources.map(s => {
       if (isAlias(s)) {
         if (isMap(s.source)) return s

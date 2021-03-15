@@ -1,6 +1,7 @@
 import type { Schema } from '../schema/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyCollection } from '../stringify/stringifyCollection.js'
+import { addPairToJSMap } from './addPairToJSMap.js'
 import { Collection } from './Collection.js'
 import { isPair, isScalar, MAP, ParsedNode } from './Node.js'
 import { Pair } from './Pair.js'
@@ -102,7 +103,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
   toJSON(_?: unknown, ctx?: ToJSContext, Type?: any) {
     const map = Type ? new Type() : ctx && ctx.mapAsMap ? new Map() : {}
     if (ctx && ctx.onCreate) ctx.onCreate(map)
-    for (const item of this.items) item.addToJSMap(ctx, map)
+    for (const item of this.items) addPairToJSMap(ctx, map, item)
     return map
   }
 
