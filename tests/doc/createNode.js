@@ -1,5 +1,4 @@
 import { Document, Scalar, YAMLMap, YAMLSeq } from 'yaml'
-import { YAMLSet } from '../../src/tags/yaml-1.1/set.js'
 
 let doc
 beforeEach(() => {
@@ -220,7 +219,7 @@ describe('Set', () => {
     test('Schema#createNode() - YAML 1.1', () => {
       const doc = new Document(null, { version: '1.1' })
       const s = doc.createNode(set)
-      expect(s).toBeInstanceOf(YAMLSet)
+      expect(s.constructor.tag).toBe('tag:yaml.org,2002:set')
       expect(s.items).toMatchObject([
         { key: { value: 3 } },
         { key: { items: [{ key: { value: 'four' } }, { key: { value: 5 } }] } }

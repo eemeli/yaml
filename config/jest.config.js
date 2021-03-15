@@ -9,7 +9,7 @@ switch (process.env.npm_lifecycle_event) {
       '^yaml/util$': '<rootDir>/dist/util.js',
       '^yaml/test-events$': '<rootDir>/dist/test-events.js'
     }
-    testPathIgnorePatterns.push('doc/createNode', 'doc/types')
+    //testPathIgnorePatterns.push('doc/createNode', 'doc/types')
     break
 
   case 'test':
