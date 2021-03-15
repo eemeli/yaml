@@ -1,5 +1,6 @@
 import type { Schema } from '../schema/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
+import { stringifyCollection } from '../stringify/stringifyCollection.js'
 import { Collection } from './Collection.js'
 import { isPair, isScalar, MAP, ParsedNode } from './Node.js'
 import { Pair } from './Pair.js'
@@ -109,7 +110,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     ctx?: StringifyContext,
     onComment?: () => void,
     onChompKeep?: () => void
-  ) {
+  ): string {
     if (!ctx) return JSON.stringify(this)
     for (const item of this.items) {
       if (!isPair(item))
@@ -119,15 +120,12 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     }
     if (!ctx.allNullValues && this.hasAllNullValues(false))
       ctx = Object.assign({}, ctx, { allNullValues: true })
-    return super._toString(
-      ctx,
-      {
-        blockItem: n => n.str,
-        flowChars: { start: '{', end: '}' },
-        itemIndent: ctx.indent || ''
-      },
-      onComment,
-      onChompKeep
-    )
+    return stringifyCollection(this, ctx, {
+      blockItem: n => n.str,
+      flowChars: { start: '{', end: '}' },
+      itemIndent: ctx.indent || '',
+      onChompKeep,
+      onComment
+    })
   }
 }

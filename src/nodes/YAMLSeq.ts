@@ -1,5 +1,6 @@
 import type { Schema } from '../schema/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
+import { stringifyCollection } from '../stringify/stringifyCollection.js'
 import { Collection } from './Collection.js'
 import { isScalar, ParsedNode, SEQ } from './Node.js'
 import type { Pair } from './Pair.js'
@@ -99,18 +100,15 @@ export class YAMLSeq<T = unknown> extends Collection {
     ctx?: StringifyContext,
     onComment?: () => void,
     onChompKeep?: () => void
-  ) {
+  ): string {
     if (!ctx) return JSON.stringify(this)
-    return super._toString(
-      ctx,
-      {
-        blockItem: n => (n.type === 'comment' ? n.str : `- ${n.str}`),
-        flowChars: { start: '[', end: ']' },
-        itemIndent: (ctx.indent || '') + '  '
-      },
-      onComment,
-      onChompKeep
-    )
+    return stringifyCollection(this, ctx, {
+      blockItem: n => (n.comment ? n.str : `- ${n.str}`),
+      flowChars: { start: '[', end: ']' },
+      itemIndent: (ctx.indent || '') + '  ',
+      onChompKeep,
+      onComment
+    })
   }
 }
 
