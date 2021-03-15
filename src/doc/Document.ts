@@ -4,7 +4,6 @@ import { collectionFromPath, isEmptyPath } from '../nodes/Collection.js'
 import {
   DOC,
   isCollection,
-  isNode,
   isScalar,
   Node,
   NODE_TYPE,
@@ -25,12 +24,8 @@ import {
   ToStringOptions
 } from '../options.js'
 import { Schema } from '../schema/Schema.js'
-import { addComment } from '../stringify/addComment.js'
-import {
-  createStringifyContext,
-  stringify,
-  StringifyContext
-} from '../stringify/stringify.js'
+import { stringify } from '../stringify/stringify.js'
+import { stringifyDocument } from '../stringify/stringifyDocument.js'
 import { Anchors } from './Anchors.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode, CreateNodeContext } from './createNode.js'
@@ -368,7 +363,7 @@ export class Document<T = unknown> {
   }
 
   /** A YAML representation of the document. */
-  toString(options: ToStringOptions = {}) {
+  toString(options: ToStringOptions = {}): string {
     if (this.errors.length > 0)
       throw new Error('Document with errors cannot be stringified')
     if (
@@ -378,59 +373,7 @@ export class Document<T = unknown> {
       const s = JSON.stringify(options.indent)
       throw new Error(`"indent" option must be a positive integer, not ${s}`)
     }
-
-    const lines = []
-    let hasDirectives = options.directives === true
-    if (options.directives !== false) {
-      const dir = this.directives.toString(this)
-      if (dir) {
-        lines.push(dir)
-        hasDirectives = true
-      } else if (this.directives.marker) hasDirectives = true
-    }
-    if (hasDirectives) lines.push('---')
-    if (this.commentBefore) {
-      if (lines.length !== 1) lines.unshift('')
-      lines.unshift(this.commentBefore.replace(/^/gm, '#'))
-    }
-
-    const ctx: StringifyContext = createStringifyContext(this, options)
-    let chompKeep = false
-    let contentComment = null
-    if (this.contents) {
-      if (isNode(this.contents)) {
-        if (this.contents.spaceBefore && hasDirectives) lines.push('')
-        if (this.contents.commentBefore)
-          lines.push(this.contents.commentBefore.replace(/^/gm, '#'))
-        // top-level block scalars need to be indented if followed by a comment
-        ctx.forceBlockIndent = !!this.comment
-        contentComment = this.contents.comment
-      }
-      const onChompKeep = contentComment ? undefined : () => (chompKeep = true)
-      let body = stringify(
-        this.contents,
-        ctx,
-        () => (contentComment = null),
-        onChompKeep
-      )
-      if (contentComment) body = addComment(body, '', contentComment)
-      if (
-        (body[0] === '|' || body[0] === '>') &&
-        lines[lines.length - 1] === '---'
-      ) {
-        // Top-level block scalars with a preceding doc marker ought to use the
-        // same line for their header.
-        lines[lines.length - 1] = `--- ${body}`
-      } else lines.push(body)
-    } else {
-      lines.push(stringify(this.contents, ctx))
-    }
-    if (this.comment) {
-      if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')
-        lines.push('')
-      lines.push(this.comment.replace(/^/gm, '#'))
-    }
-    return lines.join('\n') + '\n'
+    return stringifyDocument(this, options)
   }
 }
 
