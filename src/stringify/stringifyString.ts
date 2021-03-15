@@ -23,7 +23,11 @@ const getFoldOptions = (ctx: StringifyContext): FoldOptions => ({
 // presume that's starting a new document.
 const containsDocumentMarker = (str: string) => /^(%|---|\.\.\.)/m.test(str)
 
-function lineLengthOverLimit(str: string, lineWidth: number, indentLength: number) {
+function lineLengthOverLimit(
+  str: string,
+  lineWidth: number,
+  indentLength: number
+) {
   if (!lineWidth || lineWidth < 0) return false
   const limit = lineWidth - indentLength
   const strLen = str.length

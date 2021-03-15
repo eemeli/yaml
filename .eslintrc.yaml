@@ -1,10 +1,10 @@
 root: true
-parser: "@typescript-eslint/parser"
+parser: '@typescript-eslint/parser'
 env:
   node: true
 
 plugins:
-  - "@typescript-eslint"
+  - '@typescript-eslint'
 
 extends:
   - eslint:recommended
@@ -15,7 +15,7 @@ rules:
   array-callback-return: error
   camelcase: error
   consistent-return: 0
-  eqeqeq: [error, always, "null": ignore]
+  eqeqeq: [error, always, 'null': ignore]
   no-constant-condition: [error, checkLoops: false]
   no-control-regex: 0
   no-fallthrough: [error, commentPattern: fallthrough]
@@ -23,12 +23,12 @@ rules:
   no-template-curly-in-string: warn
   no-var: error
   prefer-const: [warn, destructuring: all]
-  "@typescript-eslint/ban-ts-comment": off
-  "@typescript-eslint/explicit-module-boundary-types": off
-  "@typescript-eslint/no-explicit-any": off
-  "@typescript-eslint/no-namespace": off
-  "@typescript-eslint/no-unused-vars": off
-  "@typescript-eslint/no-unused-vars-experimental": warn
+  '@typescript-eslint/ban-ts-comment': off
+  '@typescript-eslint/explicit-module-boundary-types': off
+  '@typescript-eslint/no-explicit-any': off
+  '@typescript-eslint/no-namespace': off
+  '@typescript-eslint/no-unused-vars': off
+  '@typescript-eslint/no-unused-vars-experimental': warn
 
 overrides:
   - files: [tests/**]

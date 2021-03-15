@@ -188,7 +188,8 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
         (keyComment && value == null) ||
         isCollection(key) ||
         (isScalar(key)
-          ? key.type === Scalar.BLOCK_FOLDED || key.type === Scalar.BLOCK_LITERAL
+          ? key.type === Scalar.BLOCK_FOLDED ||
+            key.type === Scalar.BLOCK_LITERAL
           : typeof key === 'object'))
 
     ctx = Object.assign({}, ctx, {
