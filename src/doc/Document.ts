@@ -24,6 +24,7 @@ import {
   ToJSOptions,
   ToStringOptions
 } from '../options.js'
+import { Schema } from '../schema/Schema.js'
 import { addComment } from '../stringify/addComment.js'
 import {
   createStringifyContext,
@@ -31,7 +32,6 @@ import {
   StringifyContext
 } from '../stringify/stringify.js'
 import { Anchors } from './Anchors.js'
-import { Schema } from './Schema.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode, CreateNodeContext } from './createNode.js'
 import { Directives } from './directives.js'

@@ -52,7 +52,7 @@ npm test # just to be sure
 - **`src/`** - Source files for the library:
   - **`src/compose/`** - The AST composer. Consumes CST, produces documents while validating its inputs.
   - **`src/parse/`** - The lexer and CST parser. Does not depend on other parts of the library.
-  - **`src/tags/`** - Implementations of the standard schemas' tags
+  - **`src/schema/`** - Implementations of the standard schemas
 - **`tests/`** - Tests for the library:
   - **`tests/artifacts/`** - YAML files used by some of the tests
   - **`tests/doc/`** - Tests for the AST level of the library

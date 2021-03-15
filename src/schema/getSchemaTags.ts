@@ -1,4 +1,4 @@
-import type { SchemaId, TagId, TagObj, TagValue } from '../tags/types.js'
+import type { SchemaId, TagId, TagObj, TagValue } from './types.js'
 import type { SchemaName } from './Schema.js'
 
 export function getSchemaTags(

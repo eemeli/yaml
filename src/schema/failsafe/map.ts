@@ -2,7 +2,7 @@ import { isMap } from '../../nodes/Node.js'
 import { createPair } from '../../nodes/Pair.js'
 import { YAMLMap } from '../../nodes/YAMLMap.js'
 import type { CreateNodeContext } from '../../doc/createNode.js'
-import type { Schema } from '../../doc/Schema.js'
+import type { Schema } from '../Schema.js'
 import type { CollectionTag } from '../types.js'
 
 function createMap(schema: Schema, obj: unknown, ctx: CreateNodeContext) {

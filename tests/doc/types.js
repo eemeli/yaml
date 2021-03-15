@@ -1,7 +1,7 @@
 import * as YAML from 'yaml'
 import { Scalar, YAMLSeq } from 'yaml'
 
-const BIN_PATH = '../../src/tags/yaml-1.1/binary.js'
+const BIN_PATH = '../../src/schema/yaml-1.1/binary.js'
 
 describe('json schema', () => {
   test('!!bool', () => {

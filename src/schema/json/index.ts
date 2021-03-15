@@ -1,9 +1,9 @@
 /* global BigInt */
 
-import { Scalar } from '../nodes/Scalar.js'
-import { map } from './failsafe/map.js'
-import { seq } from './failsafe/seq.js'
-import { CollectionTag, ScalarTag } from './types.js'
+import { Scalar } from '../../nodes/Scalar.js'
+import { map } from '../failsafe/map.js'
+import { seq } from '../failsafe/seq.js'
+import { CollectionTag, ScalarTag } from '../types.js'
 
 function intIdentify(value: unknown): value is number | bigint {
   return typeof value === 'bigint' || Number.isInteger(value)

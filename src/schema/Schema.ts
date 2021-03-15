@@ -1,7 +1,7 @@
 import type { Pair } from '../nodes/Pair.js'
 import type { SchemaOptions } from '../options.js'
-import { schemas, tags } from '../tags/index.js'
-import type { CollectionTag, ScalarTag } from '../tags/types.js'
+import { schemas, tags } from './index.js'
+import type { CollectionTag, ScalarTag } from './types.js'
 import { getSchemaTags } from './getSchemaTags.js'
 
 export type SchemaName = 'core' | 'failsafe' | 'json' | 'yaml-1.1'

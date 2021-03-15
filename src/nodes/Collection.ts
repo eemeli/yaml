@@ -1,5 +1,5 @@
 import { createNode } from '../doc/createNode.js'
-import type { Schema } from '../doc/Schema.js'
+import type { Schema } from '../schema/Schema.js'
 import { addComment } from '../stringify/addComment.js'
 import { stringify, StringifyContext } from '../stringify/stringify.js'
 import {

@@ -8,7 +8,7 @@ import type {
   BlockSequence,
   FlowCollection
 } from '../parse/tokens.js'
-import { CollectionTag } from '../tags/types.js'
+import { CollectionTag } from '../schema/types.js'
 import type { ComposeNode } from './compose-node.js'
 import { resolveBlockMap } from './resolve-block-map.js'
 import { resolveBlockSeq } from './resolve-block-seq.js'

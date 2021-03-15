@@ -1,8 +1,8 @@
-import { Scalar } from '../nodes/Scalar.js'
-import { ParseOptions } from '../options.js'
-import { stringifyNumber } from '../stringify/stringifyNumber.js'
-import { failsafe } from './failsafe/index.js'
-import { ScalarTag } from './types.js'
+import { Scalar } from '../../nodes/Scalar.js'
+import { ParseOptions } from '../../options.js'
+import { stringifyNumber } from '../../stringify/stringifyNumber.js'
+import { failsafe } from '../failsafe/index.js'
+import { ScalarTag } from '../types.js'
 
 const intIdentify = (value: unknown): value is number | bigint =>
   typeof value === 'bigint' || Number.isInteger(value)

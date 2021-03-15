@@ -2,7 +2,7 @@ import type { Document } from '../doc/Document.js'
 import { isAlias, isNode, isPair, isScalar, Node } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { ToStringOptions } from '../options.js'
-import type { TagObj } from '../tags/types.js'
+import type { TagObj } from '../schema/types.js'
 import { stringifyString } from './stringifyString.js'
 
 export type StringifyContext = {

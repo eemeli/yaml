@@ -1,5 +1,5 @@
 import type { CreateNodeContext } from '../../doc/createNode.js'
-import type { Schema } from '../../doc/Schema.js'
+import type { Schema } from '../../schema/Schema.js'
 import { isMap, isPair, isSeq } from '../../nodes/Node.js'
 import { createPair, Pair } from '../../nodes/Pair.js'
 import { YAMLMap } from '../../nodes/YAMLMap.js'

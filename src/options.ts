@@ -1,12 +1,12 @@
 import type { Reviver } from './doc/applyReviver.js'
 import type { Directives } from './doc/directives.js'
 import type { Replacer } from './doc/Document.js'
-import type { SchemaName } from './doc/Schema.js'
+import type { SchemaName } from './schema/Schema.js'
 import type { LogLevelId } from './log.js'
 import type { Pair } from './nodes/Pair.js'
 import type { Scalar } from './nodes/Scalar.js'
 import type { LineCounter } from './parse/line-counter.js'
-import type { CollectionTag, ScalarTag, TagValue } from './tags/types.js'
+import type { CollectionTag, ScalarTag, TagValue } from './schema/types.js'
 
 export type ParseOptions = {
   /**

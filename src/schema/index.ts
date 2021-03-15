@@ -8,9 +8,9 @@ import {
   nanObj,
   expObj,
   floatObj
-} from './core.js'
+} from './core/index.js'
 import { failsafe } from './failsafe/index.js'
-import { json } from './json.js'
+import { json } from './json/index.js'
 import { yaml11 } from './yaml-1.1/index.js'
 
 import { map } from './failsafe/map.js'

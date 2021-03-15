@@ -1,7 +1,7 @@
 import { isSeq } from '../../nodes/Node.js'
 import { YAMLSeq } from '../../nodes/YAMLSeq.js'
 import { CreateNodeContext, createNode } from '../../doc/createNode.js'
-import type { Schema } from '../../doc/Schema.js'
+import type { Schema } from '../Schema.js'
 import type { CollectionTag } from '../types.js'
 
 function createSeq(schema: Schema, obj: unknown, ctx: CreateNodeContext) {

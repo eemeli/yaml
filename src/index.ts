@@ -1,7 +1,7 @@
 export { Composer } from './compose/composer.js'
 
 export { Document } from './doc/Document.js'
-export { Schema } from './doc/Schema.js'
+export { Schema } from './schema/Schema.js'
 
 export { YAMLError, YAMLParseError, YAMLWarning } from './errors.js'
 
