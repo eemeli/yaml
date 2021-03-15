@@ -1,8 +1,6 @@
-/* global BigInt */
-
 import { Scalar } from '../../nodes/Scalar.js'
-import { map } from '../failsafe/map.js'
-import { seq } from '../failsafe/seq.js'
+import { map } from '../common/map.js'
+import { seq } from '../common/seq.js'
 import { CollectionTag, ScalarTag } from '../types.js'
 
 function intIdentify(value: unknown): value is number | bigint {
@@ -66,7 +64,7 @@ const jsonError: ScalarTag = {
   }
 }
 
-export const json = ([map, seq] as Array<CollectionTag | ScalarTag>).concat(
+export const schema = ([map, seq] as Array<CollectionTag | ScalarTag>).concat(
   jsonScalars,
   jsonError
 )

@@ -4,27 +4,8 @@ import type { Node } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
-import { ParseOptions } from '../options.js'
+import type { ParseOptions } from '../options.js'
 import type { StringifyContext } from '../stringify/stringify.js'
-
-export type SchemaId = 'core' | 'failsafe' | 'json' | 'yaml11'
-
-export type TagId =
-  | 'binary'
-  | 'bool'
-  | 'float'
-  | 'floatExp'
-  | 'floatNaN'
-  | 'floatTime'
-  | 'int'
-  | 'intHex'
-  | 'intOct'
-  | 'intTime'
-  | 'null'
-  | 'omap'
-  | 'pairs'
-  | 'set'
-  | 'timestamp'
 
 interface TagBase {
   /**
@@ -124,7 +105,3 @@ export interface CollectionTag extends TagBase {
     options: ParseOptions
   ): unknown
 }
-
-export type TagObj = ScalarTag | CollectionTag
-
-export type TagValue = TagId | ScalarTag | CollectionTag

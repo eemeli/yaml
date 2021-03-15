@@ -45,4 +45,7 @@ export {
   stringify
 } from './public-api.js'
 
+export type { TagId, Tags } from './schema/tags'
+export type { CollectionTag, ScalarTag } from './schema/types'
+
 export { visit, visitor, visitorFn } from './visit.js'

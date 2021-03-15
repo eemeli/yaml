@@ -1,12 +1,13 @@
 import type { Reviver } from './doc/applyReviver.js'
 import type { Directives } from './doc/directives.js'
 import type { Replacer } from './doc/Document.js'
-import type { SchemaName } from './schema/Schema.js'
 import type { LogLevelId } from './log.js'
 import type { Pair } from './nodes/Pair.js'
 import type { Scalar } from './nodes/Scalar.js'
 import type { LineCounter } from './parse/line-counter.js'
-import type { CollectionTag, ScalarTag, TagValue } from './schema/types.js'
+import type { SchemaName } from './schema/Schema.js'
+import type { Tags } from './schema/tags.js'
+import type { CollectionTag, ScalarTag } from './schema/types.js'
 
 export type ParseOptions = {
   /**
@@ -82,7 +83,7 @@ export type SchemaOptions = {
    * Array of additional tags to include in the schema, or a function that may
    * modify the schema's base tag array.
    */
-  customTags?: TagValue[] | ((tags: TagValue[]) => TagValue[]) | null
+  customTags?: Tags | ((tags: Tags) => Tags) | null
 
   /**
    * Enable support for `<<` merge keys.

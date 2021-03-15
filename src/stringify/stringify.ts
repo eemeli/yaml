@@ -2,7 +2,7 @@ import type { Document } from '../doc/Document.js'
 import { isAlias, isNode, isPair, isScalar, Node } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { ToStringOptions } from '../options.js'
-import type { TagObj } from '../schema/types.js'
+import type { CollectionTag, ScalarTag } from '../schema/types.js'
 import { stringifyString } from './stringifyString.js'
 
 export type StringifyContext = {
@@ -49,14 +49,14 @@ export const createStringifyContext = (
   )
 })
 
-function getTagObject(tags: TagObj[], item: Node) {
+function getTagObject(tags: Array<ScalarTag | CollectionTag>, item: Node) {
   if (item.tag) {
     const match = tags.filter(t => t.tag === item.tag)
     if (match.length > 0)
       return match.find(t => t.format === (item as Scalar).format) || match[0]
   }
 
-  let tagObj: TagObj | undefined = undefined
+  let tagObj: ScalarTag | CollectionTag | undefined = undefined
   let obj: unknown
   if (isScalar(item)) {
     obj = item.value
@@ -79,7 +79,7 @@ function getTagObject(tags: TagObj[], item: Node) {
 // needs to be called before value stringifier to allow for circular anchor refs
 function stringifyProps(
   node: Node,
-  tagObj: TagObj,
+  tagObj: ScalarTag | CollectionTag,
   { anchors, doc }: StringifyContext
 ) {
   const props = []
@@ -105,7 +105,7 @@ export function stringify(
   if (isPair(item)) return item.toString(ctx, onComment, onChompKeep)
   if (isAlias(item)) return item.toString(ctx)
 
-  let tagObj: TagObj | undefined = undefined
+  let tagObj: ScalarTag | CollectionTag | undefined = undefined
   const node = isNode(item)
     ? item
     : ctx.doc.createNode(item, { onTagObj: o => (tagObj = o) })

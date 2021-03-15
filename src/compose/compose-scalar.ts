@@ -1,6 +1,6 @@
 import type { Document } from '../doc/Document.js'
 import type { Schema } from '../schema/Schema.js'
-import { isScalar } from '../nodes/Node.js'
+import { isScalar, SCALAR } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
 import type { ScalarTag } from '../schema/types.js'
@@ -26,9 +26,7 @@ export function composeScalar(
 
   let scalar: Scalar
   try {
-    const res = tag
-      ? tag.resolve(value, msg => onError(offset, msg), doc.options)
-      : value
+    const res = tag.resolve(value, msg => onError(offset, msg), doc.options)
     scalar = isScalar(res) ? res : new Scalar(res)
   } catch (error) {
     onError(offset, error.message)
@@ -38,17 +36,12 @@ export function composeScalar(
   scalar.source = value
   if (type) scalar.type = type
   if (tagName) scalar.tag = tagName
-  if (tag?.format) scalar.format = tag.format
+  if (tag.format) scalar.format = tag.format
   if (comment) scalar.comment = comment
 
   if (anchor) doc.anchors.setAnchor(scalar, anchor)
   return scalar as Scalar.Parsed
 }
-
-const defaultScalarTag = (schema: Schema) =>
-  schema.tags.find(
-    tag => !tag.collection && tag.tag === 'tag:yaml.org,2002:str'
-  ) as ScalarTag | undefined
 
 function findScalarTagByName(
   schema: Schema,
@@ -56,7 +49,7 @@ function findScalarTagByName(
   tagName: string,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
-  if (tagName === '!') return defaultScalarTag(schema) // non-specific tag
+  if (tagName === '!') return schema[SCALAR] // non-specific tag
   const matchWithTest: ScalarTag[] = []
   for (const tag of schema.tags) {
     if (!tag.collection && tag.tag === tagName) {
@@ -73,7 +66,7 @@ function findScalarTagByName(
     return kt
   }
   onError(0, `Unresolved tag: ${tagName}`, tagName !== 'tag:yaml.org,2002:str')
-  return defaultScalarTag(schema)
+  return schema[SCALAR]
 }
 
 function findScalarTagByTest(schema: Schema, value: string, apply: boolean) {
@@ -82,5 +75,5 @@ function findScalarTagByTest(schema: Schema, value: string, apply: boolean) {
       if (tag.default && tag.test?.test(value)) return tag
     }
   }
-  return defaultScalarTag(schema)
+  return schema[SCALAR]
 }
