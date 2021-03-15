@@ -1,4 +1,3 @@
-import { Alias } from '../nodes/Alias.js'
 import { isCollection, isScalar, Node } from '../nodes/Node.js'
 
 export class Anchors {
@@ -7,15 +6,6 @@ export class Anchors {
 
   constructor(prefix: string) {
     this.prefix = prefix
-  }
-
-  /**
-   * Create a new `Alias` node, adding the required anchor for `node`.
-   * If `name` is empty, a new anchor name will be generated.
-   */
-  createAlias(node: Node, name?: string) {
-    this.setAnchor(node, name)
-    return new Alias(node)
   }
 
   /** The anchor name associated with `node`, if set. */

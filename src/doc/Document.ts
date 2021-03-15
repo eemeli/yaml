@@ -125,6 +125,15 @@ export class Document<T = unknown> {
   }
 
   /**
+   * Create a new `Alias` node, adding the required anchor for `node`.
+   * If `name` is empty, a new anchor name will be generated.
+   */
+  createAlias(node: Node, name?: string) {
+    this.anchors.setAnchor(node, name)
+    return new Alias(node)
+  }
+
+  /**
    * Convert any value into a `Node` using the current schema, recursively
    * turning objects into collections.
    */

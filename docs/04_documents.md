@@ -106,6 +106,7 @@ Although `parseDocument()` and `parseAllDocuments()` will leave it with `YAMLMap
 
 | Method                                     | Returns  | Description                                                                                                                       |
 | ------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| createAlias(node: Node, name?: string)     | `Alias`  | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated.        |
 | createNode(value,&nbsp;options?)           | `Node`   | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.        |
 | createPair(key,&nbsp;value,&nbsp;options?) | `Pair`   | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.              |
 | setSchema(version,&nbsp;options?)          | `void`   | Change the YAML version and schema used by the document. `version` must be either `'1.1'` or `'1.2'`; accepts all Schema options. |
@@ -185,14 +186,13 @@ A description of [alias and merge nodes](#alias-nodes) is included in the next s
 
 #### `Document#anchors`
 
-| Method                                 | Returns    | Description                                                                                                                |
-| -------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
-| createAlias(node: Node, name?: string) | `Alias`    | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated. |
-| getName(node: Node)                    | `string?`  | The anchor name associated with `node`, if set.                                                                            |
-| getNames()                             | `string[]` | List of all defined anchor names.                                                                                          |
-| getNode(name: string)                  | `Node?`    | The node associated with the anchor `name`, if set.                                                                        |
-| newName(prefix: string)                | `string`   | Find an available anchor name with the given `prefix` and a numerical suffix.                                              |
-| setAnchor(node?: Node, name?: string)  | `string?`  | Associate an anchor with `node`. If `name` is empty, a new name will be generated.                                         |
+| Method                                | Returns    | Description                                                                        |
+| ------------------------------------- | ---------- | ---------------------------------------------------------------------------------- |
+| getName(node: Node)                   | `string?`  | The anchor name associated with `node`, if set.                                    |
+| getNames()                            | `string[]` | List of all defined anchor names.                                                  |
+| getNode(name: string)                 | `Node?`    | The node associated with the anchor `name`, if set.                                |
+| newName(prefix: string)               | `string`   | Find an available anchor name with the given `prefix` and a numerical suffix.      |
+| setAnchor(node?: Node, name?: string) | `string?`  | Associate an anchor with `node`. If `name` is empty, a new name will be generated. |
 
 ```js
 const src = '[{ a: A }, { b: B }]'
@@ -205,7 +205,7 @@ doc.anchors.getNode('a2')
 String(doc)
 // [ { a: A }, { b: &a2 B } ]
 
-const alias = doc.anchors.createAlias(doc.get(0, true), 'AA')
+const alias = doc.createAlias(doc.get(0, true), 'AA')
 // Alias { source: YAMLMap { items: [ [Pair] ] } }
 doc.add(alias)
 doc.toJS()
@@ -225,7 +225,7 @@ String(doc)
 // [ &AA { a: A }, { b: &a2 B, <<: *AA }, *AA ]
 
 // This creates a circular reference
-merge.value = doc.anchors.createAlias(doc.get(1, true))
+merge.value = doc.createAlias(doc.get(1, true))
 doc.toJS() // [RangeError: Maximum call stack size exceeded]
 String(doc)
 // [
