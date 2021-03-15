@@ -188,7 +188,6 @@ A description of [alias and merge nodes](#alias-nodes) is included in the next s
 | Method                                 | Returns    | Description                                                                                                                |
 | -------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
 | createAlias(node: Node, name?: string) | `Alias`    | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated. |
-| createMergePair(...Node)               | `Pair`     | Create a new merge pair with the given source nodes. Non-`Alias` sources will be automatically wrapped.                    |
 | getName(node: Node)                    | `string?`  | The anchor name associated with `node`, if set.                                                                            |
 | getNames()                             | `string[]` | List of all defined anchor names.                                                                                          |
 | getNode(name: string)                  | `Node?`    | The node associated with the anchor `name`, if set.                                                                        |
@@ -215,7 +214,7 @@ String(doc)
 // [ &AA { a: A }, { b: &a2 B }, *AA ]
 
 doc.setSchema('1.2', { merge: true })
-const merge = doc.anchors.createMergePair(alias)
+const merge = doc.createPair('<<', alias)
 // Pair {
 //   key: Scalar { value: '<<' },
 //   value: Alias { source: YAMLMap { ... } } }

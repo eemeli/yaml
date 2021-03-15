@@ -170,11 +170,11 @@ describe('merge <<', () => {
     })
   })
 
-  describe('doc.anchors.createMergePair', () => {
+  describe('create', () => {
     test('simple case', () => {
       const doc = YAML.parseDocument('[{ a: A }, { b: B }]', { merge: true })
       const [a, b] = doc.contents.items
-      const merge = doc.anchors.createMergePair(a)
+      const merge = doc.createPair('<<', doc.anchors.createAlias(a))
       b.items.push(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
@@ -184,20 +184,18 @@ describe('merge <<', () => {
       const doc = YAML.parseDocument('[{ a: A }, { b: B }]', { merge: true })
       const [a, b] = doc.contents.items
       const alias = doc.anchors.createAlias(a, 'AA')
-      const merge = doc.anchors.createMergePair(alias)
+      const merge = doc.createPair('<<', alias)
       b.items.push(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &AA { a: A }, { b: B, <<: *AA } ]\n')
     })
 
     test('require map node', () => {
-      const exp = 'Merge sources must be Map nodes or their Aliases'
       const doc = YAML.parseDocument('[{ a: A }, { b: B }]', { merge: true })
-      const [a] = doc.contents.items
-      const merge = doc.anchors.createMergePair(a)
-      expect(() => doc.anchors.createMergePair(merge)).toThrow(exp)
-      const alias = doc.anchors.createAlias(a.items[0].value)
-      expect(() => doc.anchors.createMergePair(alias)).toThrow(exp)
+      const alias = doc.anchors.createAlias(doc.getIn([0, 'a'], true))
+      doc.addIn([1], doc.createPair('<<', alias))
+      expect(String(doc)).toBe('[ { a: &a1 A }, { b: B, <<: *a1 } ]\n')
+      expect(() => doc.toJS()).toThrow('Merge sources must be map aliases')
     })
   })
 

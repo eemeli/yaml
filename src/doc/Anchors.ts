@@ -1,8 +1,5 @@
 import { Alias } from '../nodes/Alias.js'
-import { isAlias, isCollection, isMap, isScalar, Node } from '../nodes/Node.js'
-import { Pair } from '../nodes/Pair.js'
-import { Scalar } from '../nodes/Scalar.js'
-import { YAMLSeq } from '../nodes/YAMLSeq.js'
+import { isCollection, isScalar, Node } from '../nodes/Node.js'
 
 export class Anchors {
   map: Record<string, Node> = Object.create(null)
@@ -19,26 +16,6 @@ export class Anchors {
   createAlias(node: Node, name?: string) {
     this.setAnchor(node, name)
     return new Alias(node)
-  }
-
-  /**
-   * Create a new merge `Pair` with the given source nodes.
-   * Non-`Alias` sources will be automatically wrapped.
-   */
-  createMergePair(...sources: Node[]) {
-    const key = new Scalar('<<')
-    const items = sources.map(s => {
-      if (isAlias(s)) {
-        if (isMap(s.source)) return s
-      } else if (isMap(s)) {
-        return this.createAlias(s)
-      }
-      throw new Error('Merge sources must be Map nodes or their Aliases')
-    })
-    if (items.length === 1) return new Pair(key, items[0])
-    const seq = new YAMLSeq<Alias>()
-    seq.items = items
-    return new Pair(key, seq)
   }
 
   /** The anchor name associated with `node`, if set. */
