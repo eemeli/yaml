@@ -1,7 +1,7 @@
 import * as YAML from 'yaml'
 import { Scalar, YAMLSeq } from 'yaml'
-
-const BIN_PATH = '../../src/schema/yaml-1.1/binary.js'
+import { stringifyString } from 'yaml/util'
+import { source } from '../_utils'
 
 describe('json schema', () => {
   test('!!bool', () => {
@@ -609,69 +609,73 @@ date (00:00:00Z): 2002-12-14\n`)
 })
 
 describe('custom tags', () => {
-  const src = `%TAG !e! tag:example.com,2000:test/
----
-!e!x
-- !y 2
-- !e!z 3
-- !<tag:example.com,2000:other/w> 4
-- '5'`
+  describe('local', () => {
+    const src = source`
+      %TAG !e! tag:example.com,2000:test/
+      ---
+      !e!x
+      - !y 2
+      - !e!z 3
+      - !<tag:example.com,2000:other/w> 4
+      - '5'
+    `
 
-  test('parse', () => {
-    const doc = YAML.parseDocument(src)
-    expect(doc.contents).toBeInstanceOf(YAMLSeq)
-    expect(doc.contents.tag).toBe('tag:example.com,2000:test/x')
-    const { items } = doc.contents
-    expect(items).toHaveLength(4)
-    items.forEach(item => expect(typeof item.value).toBe('string'))
-    expect(items[0].tag).toBe('!y')
-    expect(items[1].tag).toBe('tag:example.com,2000:test/z')
-    expect(items[2].tag).toBe('tag:example.com,2000:other/w')
-  })
-
-  test('stringify', () => {
-    const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(
-      `%TAG !e! tag:example.com,2000:test/
----
-!e!x
-- !y "2"
-- !e!z "3"
-- !<tag:example.com,2000:other/w> "4"
-- '5'\n`
-    )
-  })
-
-  test('modify', () => {
-    const doc = YAML.parseDocument(src)
-    const prefix = 'tag:example.com,2000:other/'
-    doc.directives.tags['!f!'] = prefix
-    expect(doc.directives.tags).toMatchObject({
-      '!!': 'tag:yaml.org,2002:',
-      '!e!': 'tag:example.com,2000:test/',
-      '!f!': prefix
+    test('parse', () => {
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).toBeInstanceOf(YAMLSeq)
+      expect(doc.contents.tag).toBe('tag:example.com,2000:test/x')
+      const { items } = doc.contents
+      expect(items).toHaveLength(4)
+      items.forEach(item => expect(typeof item.value).toBe('string'))
+      expect(items[0].tag).toBe('!y')
+      expect(items[1].tag).toBe('tag:example.com,2000:test/z')
+      expect(items[2].tag).toBe('tag:example.com,2000:other/w')
     })
 
-    doc.contents.commentBefore = 'c'
-    doc.contents.items[3].comment = 'cc'
-    const s = new Scalar(6)
-    s.tag = '!g'
-    doc.contents.items.splice(1, 1, s, '7')
-    expect(String(doc)).toBe(
-      `%TAG !e! tag:example.com,2000:test/
-%TAG !f! tag:example.com,2000:other/
----
-#c
-!e!x
-- !y "2"
-- !g 6
-- "7"
-- !f!w "4"
-- '5' #cc\n`
-    )
+    test('stringify', () => {
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(source`
+        %TAG !e! tag:example.com,2000:test/
+        ---
+        !e!x
+        - !y "2"
+        - !e!z "3"
+        - !<tag:example.com,2000:other/w> "4"
+        - '5'
+      `)
+    })
+
+    test('modify', () => {
+      const doc = YAML.parseDocument(src)
+      const prefix = 'tag:example.com,2000:other/'
+      doc.directives.tags['!f!'] = prefix
+      expect(doc.directives.tags).toMatchObject({
+        '!!': 'tag:yaml.org,2002:',
+        '!e!': 'tag:example.com,2000:test/',
+        '!f!': prefix
+      })
+
+      doc.contents.commentBefore = 'c'
+      doc.contents.items[3].comment = 'cc'
+      const s = new Scalar(6)
+      s.tag = '!g'
+      doc.contents.items.splice(1, 1, s, '7')
+      expect(String(doc)).toBe(source`
+        %TAG !e! tag:example.com,2000:test/
+        %TAG !f! tag:example.com,2000:other/
+        ---
+        #c
+        !e!x
+        - !y "2"
+        - !g 6
+        - "7"
+        - !f!w "4"
+        - '5' #cc
+      `)
+    })
   })
 
-  describe('custom tag objects', () => {
+  describe('!!binary', () => {
     const src = `!!binary |
       R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5
       OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+
@@ -698,27 +702,77 @@ describe('custom tags', () => {
       const bin = YAML.parse(src)
       expect(bin).toBeInstanceOf(Uint8Array)
     })
+  })
 
-    test('tag object in tags', async () => {
-      try {
-        const { binary } = await import(BIN_PATH)
-        const bin = YAML.parse(src, { customTags: [binary] })
-        expect(bin).toBeInstanceOf(Uint8Array)
-      } catch (error) {
-        if (error.code !== 'MODULE_NOT_FOUND') throw error
-        console.log('!!binary object not available')
-      }
+  const regexp = {
+    identify: value => value instanceof RegExp,
+    tag: '!re',
+    resolve(str) {
+      const match = str.match(/^\/([\s\S]+)\/([gimuy]*)$/)
+      return new RegExp(match[1], match[2])
+    }
+  }
+
+  const sharedSymbol = {
+    identify: value => value.constructor === Symbol,
+    tag: '!symbol/shared',
+    resolve: str => Symbol.for(str),
+    stringify(item, ctx, onComment, onChompKeep) {
+      const key = Symbol.keyFor(item.value)
+      if (key === undefined)
+        throw new Error('Only shared symbols are supported')
+      return stringifyString({ value: key }, ctx, onComment, onChompKeep)
+    }
+  }
+
+  describe('RegExp', () => {
+    test('stringify as plain scalar', () => {
+      const str = YAML.stringify(/re/g, { customTags: [regexp] })
+      expect(str).toBe('!re /re/g\n')
+      const res = YAML.parse(str, { customTags: [regexp] })
+      expect(res).toBeInstanceOf(RegExp)
     })
 
-    test('tag array in tags', async () => {
-      try {
-        const { binary } = await import(BIN_PATH)
-        const bin = YAML.parse(src, { customTags: [[binary]] })
-        expect(bin).toBeInstanceOf(Uint8Array)
-      } catch (error) {
-        if (error.code !== 'MODULE_NOT_FOUND') throw error
-      }
+    test('stringify as quoted scalar', () => {
+      const str = YAML.stringify(/re: /g, { customTags: [regexp] })
+      expect(str).toBe('!re "/re: /g"\n')
+      const res = YAML.parse(str, { customTags: [regexp] })
+      expect(res).toBeInstanceOf(RegExp)
     })
+
+    test('parse plain string as string', () => {
+      const res = YAML.parse('/re/g', { customTags: [regexp] })
+      expect(res).toBe('/re/g')
+    })
+
+    test('parse quoted string as string', () => {
+      const res = YAML.parse('"/re/g"', { customTags: [regexp] })
+      expect(res).toBe('/re/g')
+    })
+  })
+
+  describe('Symbol', () => {
+    test('stringify as plain scalar', () => {
+      const symbol = Symbol.for('foo')
+      const str = YAML.stringify(symbol, { customTags: [sharedSymbol] })
+      expect(str).toBe('!symbol/shared foo\n')
+      const res = YAML.parse(str, { customTags: [sharedSymbol] })
+      expect(res).toBe(symbol)
+    })
+
+    test('stringify as block scalar', () => {
+      const symbol = Symbol.for('foo\nbar')
+      const str = YAML.stringify(symbol, { customTags: [sharedSymbol] })
+      expect(str).toBe('!symbol/shared |-\nfoo\nbar\n')
+      const res = YAML.parse(str, { customTags: [sharedSymbol] })
+      expect(res).toBe(symbol)
+    })
+  })
+
+  test('array within customTags', () => {
+    const obj = { re: /re/g, symbol: Symbol.for('foo') }
+    const str = YAML.stringify(obj, { customTags: [[regexp, sharedSymbol]] })
+    expect(str).toBe('re: !re /re/g\nsymbol: !symbol/shared foo\n')
   })
 })
 
