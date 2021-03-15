@@ -73,7 +73,7 @@ function plainValue(
       break
     }
   }
-  return foldLines(source.trim())
+  return foldLines(source)
 }
 
 function singleQuotedValue(

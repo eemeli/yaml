@@ -8,7 +8,7 @@ const spec = {
     'Example 2.1. Sequence of Scalars': {
       src: `- Mark McGwire\r
 - Sammy Sosa\r
-- Ken Griffey\r`,
+- Ken Griffey\r\n`,
       tgt: [['Mark McGwire', 'Sammy Sosa', 'Ken Griffey']]
     },
 
