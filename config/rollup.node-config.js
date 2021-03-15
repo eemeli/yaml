@@ -1,5 +1,3 @@
-import babel from '@rollup/plugin-babel'
-import copy from 'rollup-plugin-copy'
 import typescript from '@rollup/plugin-typescript'
 
 export default {
@@ -14,16 +12,6 @@ export default {
     esModule: false,
     preserveModules: true
   },
-  plugins: [
-    babel({
-      babelHelpers: 'bundled',
-      configFile: './config/babel.config.js',
-      presets: [['@babel/env', { modules: false, targets: { node: '10.0' } }]]
-    }),
-    typescript(),
-    copy({
-      targets: [{ src: 'src/tags/*.d.ts', dest: 'dist/tags' }]
-    })
-  ],
+  plugins: [typescript()],
   treeshake: { moduleSideEffects: false, propertyReadSideEffects: false }
 }

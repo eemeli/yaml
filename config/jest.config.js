@@ -1,15 +1,20 @@
 let moduleNameMapper
-const testPathIgnorePatterns = ['tests/_utils']
+const transform = {
+  '/tests/.*\\.(js|ts)$': [
+    'babel-jest',
+    { configFile: './config/babel.config.js' }
+  ]
+}
 
 // The npm script name is significant.
 switch (process.env.npm_lifecycle_event) {
   case 'test:dist':
+    console.log('Testing build output from dist/')
     moduleNameMapper = {
       '^yaml$': '<rootDir>/dist/index.js',
       '^yaml/util$': '<rootDir>/dist/util.js',
       '^yaml/test-events$': '<rootDir>/dist/test-events.js'
     }
-    //testPathIgnorePatterns.push('doc/createNode', 'doc/types')
     break
 
   case 'test':
@@ -20,6 +25,10 @@ switch (process.env.npm_lifecycle_event) {
       '^yaml/util$': '<rootDir>/src/util.ts',
       '^yaml/test-events$': '<rootDir>/src/test-events.ts'
     }
+    transform['/src/.*\\.ts$'] = [
+      'babel-jest',
+      { configFile: './config/babel.config.js' }
+    ]
 }
 
 module.exports = {
@@ -29,11 +38,6 @@ module.exports = {
   rootDir: '..',
   testEnvironment: 'node',
   testMatch: ['**/tests/**/*.{js,ts}'],
-  testPathIgnorePatterns,
-  transform: {
-    '/(src|tests)/.*\\.(js|ts)$': [
-      'babel-jest',
-      { configFile: './config/babel.config.js' }
-    ]
-  }
+  testPathIgnorePatterns: ['tests/_utils'],
+  transform
 }
