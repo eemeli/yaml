@@ -1,8 +1,8 @@
-import type { Document } from '../doc/Document.js'
 import type { SourceToken } from '../parse/tokens.js'
+import type { ComposeContext } from './compose-node.js'
 
 export function resolveProps(
-  doc: Document.Parsed,
+  ctx: ComposeContext,
   tokens: SourceToken[],
   startOnNewline: boolean,
   indicator:
@@ -35,7 +35,7 @@ export function resolveProps(
         hasSpace = true
         break
       case 'comment': {
-        if (doc.options.strict && !hasSpace)
+        if (ctx.options.strict && !hasSpace)
           onError(
             offset + length,
             'Comments must be separated from other tokens by white space characters'
@@ -64,7 +64,7 @@ export function resolveProps(
         break
       case 'tag': {
         if (tagName) onError(offset + length, 'A node can have at most one tag')
-        const tn = doc.directives.tagName(token.source, msg =>
+        const tn = ctx.directives.tagName(token.source, msg =>
           onError(offset, msg)
         )
         if (tn) tagName = tn

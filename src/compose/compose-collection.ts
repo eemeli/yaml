@@ -1,4 +1,3 @@
-import type { Document } from '../doc/Document.js'
 import { isMap, isNode, ParsedNode } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
@@ -9,14 +8,14 @@ import type {
   FlowCollection
 } from '../parse/tokens.js'
 import { CollectionTag } from '../schema/types.js'
-import type { ComposeNode } from './compose-node.js'
+import type { ComposeContext, ComposeNode } from './compose-node.js'
 import { resolveBlockMap } from './resolve-block-map.js'
 import { resolveBlockSeq } from './resolve-block-seq.js'
 import { resolveFlowCollection } from './resolve-flow-collection.js'
 
 export function composeCollection(
   CN: ComposeNode,
-  doc: Document.Parsed,
+  ctx: ComposeContext,
   token: BlockMap | BlockSequence | FlowCollection,
   anchor: string | null,
   tagName: string | null,
@@ -25,15 +24,15 @@ export function composeCollection(
   let coll: YAMLMap.Parsed | YAMLSeq.Parsed
   switch (token.type) {
     case 'block-map': {
-      coll = resolveBlockMap(CN, doc, token, anchor, onError)
+      coll = resolveBlockMap(CN, ctx, token, anchor, onError)
       break
     }
     case 'block-seq': {
-      coll = resolveBlockSeq(CN, doc, token, anchor, onError)
+      coll = resolveBlockSeq(CN, ctx, token, anchor, onError)
       break
     }
     case 'flow-collection': {
-      coll = resolveFlowCollection(CN, doc, token, anchor, onError)
+      coll = resolveFlowCollection(CN, ctx, token, anchor, onError)
       break
     }
   }
@@ -48,13 +47,13 @@ export function composeCollection(
   }
 
   const expType = isMap(coll) ? 'map' : 'seq'
-  let tag = doc.schema.tags.find(
+  let tag = ctx.schema.tags.find(
     t => t.collection === expType && t.tag === tagName
   ) as CollectionTag | undefined
   if (!tag) {
-    const kt = doc.schema.knownTags[tagName]
+    const kt = ctx.schema.knownTags[tagName]
     if (kt && kt.collection === expType) {
-      doc.schema.tags.push(Object.assign({}, kt, { default: false }))
+      ctx.schema.tags.push(Object.assign({}, kt, { default: false }))
       tag = kt
     } else {
       onError(coll.range[0], `Unresolved tag: ${tagName}`, true)
@@ -63,7 +62,7 @@ export function composeCollection(
     }
   }
 
-  const res = tag.resolve(coll, msg => onError(coll.range[0], msg), doc.options)
+  const res = tag.resolve(coll, msg => onError(coll.range[0], msg), ctx.options)
   const node = isNode(res)
     ? (res as ParsedNode)
     : (new Scalar(res) as Scalar.Parsed)

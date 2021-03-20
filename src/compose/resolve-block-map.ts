@@ -1,8 +1,7 @@
-import type { Document } from '../doc/Document.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import type { BlockMap } from '../parse/tokens.js'
-import type { ComposeNode } from './compose-node.js'
+import type { ComposeContext, ComposeNode } from './compose-node.js'
 import { resolveProps } from './resolve-props.js'
 import { containsNewline } from './util-contains-newline.js'
 
@@ -10,19 +9,19 @@ const startColMsg = 'All mapping items must start at the same column'
 
 export function resolveBlockMap(
   { composeNode, composeEmptyNode }: ComposeNode,
-  doc: Document.Parsed,
+  ctx: ComposeContext,
   { indent, items, offset }: BlockMap,
   anchor: string | null,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const start = offset
-  const map = new YAMLMap(doc.schema)
-  if (anchor) doc.anchors.setAnchor(map, anchor)
+  const map = new YAMLMap(ctx.schema)
+  if (anchor) ctx.anchors.setAnchor(map, anchor)
 
   for (const { start, key, sep, value } of items) {
     // key properties
     const keyProps = resolveProps(
-      doc,
+      ctx,
       start,
       true,
       'explicit-key-ind',
@@ -56,13 +55,13 @@ export function resolveBlockMap(
     // key value
     const keyStart = offset
     const keyNode = key
-      ? composeNode(doc, key, keyProps, onError)
-      : composeEmptyNode(doc, offset, start, null, keyProps, onError)
+      ? composeNode(ctx, key, keyProps, onError)
+      : composeEmptyNode(ctx, offset, start, null, keyProps, onError)
     offset = keyNode.range[1]
 
     // value properties
     const valueProps = resolveProps(
-      doc,
+      ctx,
       sep || [],
       !key || key.type === 'block-scalar',
       'map-value-ind',
@@ -76,7 +75,7 @@ export function resolveBlockMap(
         if (value?.type === 'block-map' && !valueProps.hasNewline)
           onError(offset, 'Nested mappings are not allowed in compact mappings')
         if (
-          doc.options.strict &&
+          ctx.options.strict &&
           keyProps.start < valueProps.found.offset - 1024
         )
           onError(
@@ -86,8 +85,8 @@ export function resolveBlockMap(
       }
       // value value
       const valueNode = value
-        ? composeNode(doc, value, valueProps, onError)
-        : composeEmptyNode(doc, offset, sep, null, valueProps, onError)
+        ? composeNode(ctx, value, valueProps, onError)
+        : composeEmptyNode(ctx, offset, sep, null, valueProps, onError)
       offset = valueNode.range[1]
       map.items.push(new Pair(keyNode, valueNode))
     } else {
