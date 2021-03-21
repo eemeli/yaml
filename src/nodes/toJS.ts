@@ -1,16 +1,15 @@
 import type { Document } from '../doc/Document.js'
 import type { stringify } from '../stringify/stringify.js'
-import type { Node } from './Node.js'
+import { hasAnchor, Node } from './Node.js'
 
-export interface ToJSAnchorValue {
-  alias: string[]
+export interface AnchorData {
   aliasCount: number
   count: number
-  res?: unknown
+  res: unknown
 }
 
 export interface ToJSContext {
-  anchors: Map<Node, ToJSAnchorValue> | null
+  anchors: Map<Node, AnchorData>
   doc: Document
   keep: boolean
   mapAsMap: boolean
@@ -35,17 +34,17 @@ export interface ToJSContext {
 export function toJS(value: any, arg: string | null, ctx?: ToJSContext): any {
   if (Array.isArray(value)) return value.map((v, i) => toJS(v, String(i), ctx))
   if (value && typeof value.toJSON === 'function') {
-    if (!ctx) return value.toJSON(arg)
-    const anchor = ctx.anchors && ctx.anchors.get(value)
-    if (anchor)
-      ctx.onCreate = res => {
-        anchor.res = res
-        delete ctx.onCreate
-      }
+    if (!ctx || !hasAnchor(value)) return value.toJSON(arg, ctx)
+    const data: AnchorData = { aliasCount: 0, count: 1, res: undefined }
+    ctx.anchors.set(value, data)
+    ctx.onCreate = res => {
+      data.res = res
+      delete ctx.onCreate
+    }
     const res = value.toJSON(arg, ctx)
-    if (anchor && ctx.onCreate) ctx.onCreate(res)
+    if (ctx.onCreate) ctx.onCreate(res)
     return res
   }
-  if (!(ctx && ctx.keep) && typeof value === 'bigint') return Number(value)
+  if (typeof value === 'bigint' && !(ctx && ctx.keep)) return Number(value)
   return value
 }

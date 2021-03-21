@@ -10,7 +10,8 @@ import {
   ParsedNode
 } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
-import { toJS, ToJSAnchorValue, ToJSContext } from '../nodes/toJS.js'
+import type { Scalar } from '../nodes/Scalar.js'
+import { toJS, ToJSContext } from '../nodes/toJS.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
 import {
@@ -26,7 +27,7 @@ import {
 import { Schema } from '../schema/Schema.js'
 import { stringify } from '../stringify/stringify.js'
 import { stringifyDocument } from '../stringify/stringifyDocument.js'
-import { Anchors } from './Anchors.js'
+import { createNodeAnchors, findNewAnchor } from './anchors.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode, CreateNodeContext } from './createNode.js'
 import { Directives } from './directives.js'
@@ -43,12 +44,6 @@ export declare namespace Document {
 
 export class Document<T = unknown> {
   readonly [NODE_TYPE]: symbol
-
-  /**
-   * Anchors associated with the document's nodes;
-   * also provides alias & merge node creators.
-   */
-  anchors: Anchors
 
   /** A comment before this Document */
   commentBefore: string | null = null
@@ -100,7 +95,6 @@ export class Document<T = unknown> {
 
     const opt = Object.assign({}, defaultOptions, options)
     this.options = opt
-    this.anchors = new Anchors(this.options.anchorPrefix)
     let { version } = opt
     if (options?.directives) {
       this.directives = options.directives.atDocument()
@@ -126,11 +120,14 @@ export class Document<T = unknown> {
 
   /**
    * Create a new `Alias` node, adding the required anchor for `node`.
-   * If `name` is empty, a new anchor name will be generated.
+   * If `name` is empty, a new anchor name will be generated. If `node`
+   * already has an anchor, that will be used instead of `name`.
    */
-  createAlias(node: Node, name?: string) {
-    this.anchors.setAnchor(node, name)
-    return new Alias(node)
+  createAlias(node: Scalar | YAMLMap | YAMLSeq, name?: string): Alias {
+    if (!node.anchor) {
+      node.anchor = name || findNewAnchor(this.options.anchorPrefix, this)
+    }
+    return new Alias(node.anchor)
   }
 
   /**
@@ -139,7 +136,14 @@ export class Document<T = unknown> {
    */
   createNode(
     value: unknown,
-    { flow, keepUndefined, onTagObj, replacer, tag }: CreateNodeOptions = {}
+    {
+      anchorPrefix,
+      flow,
+      keepUndefined,
+      onTagObj,
+      replacer,
+      tag
+    }: CreateNodeOptions = {}
   ): Node {
     if (typeof replacer === 'function')
       value = replacer.call({ '': value }, '', value)
@@ -149,37 +153,22 @@ export class Document<T = unknown> {
       const asStr = replacer.filter(keyToStr).map(String)
       if (asStr.length > 0) replacer = replacer.concat(asStr)
     }
-    if (typeof keepUndefined !== 'boolean')
-      keepUndefined = !!this.options.keepUndefined
-    const aliasNodes: Alias[] = []
+
+    const { onAnchor, setAnchors, sourceObjects } = createNodeAnchors(
+      this,
+      anchorPrefix || this.options.anchorPrefix
+    )
     const ctx: CreateNodeContext = {
-      keepUndefined,
-      onAlias(source) {
-        // These get fixed later in createNode()
-        const alias = new Alias((source as unknown) as Node)
-        aliasNodes.push(alias)
-        return alias
-      },
+      keepUndefined: keepUndefined ?? this.options.keepUndefined,
+      onAnchor,
       onTagObj,
-      prevObjects: new Map(),
       replacer,
-      schema: this.schema
+      schema: this.schema,
+      sourceObjects
     }
-
     const node = createNode(value, tag, ctx)
-    for (const alias of aliasNodes) {
-      // With circular references, the source node is only resolved after all of
-      // its child nodes are. This is why anchors are set only after all of the
-      // nodes have been created.
-      alias.source = (alias.source as any).node as Node
-      let name = this.anchors.getName(alias.source)
-      if (!name) {
-        name = this.anchors.newName()
-        this.anchors.map[name] = alias.source
-      }
-    }
     if (flow && isCollection(node)) node.flow = true
-
+    setAnchors()
     return node
   }
 
@@ -336,16 +325,8 @@ export class Document<T = unknown> {
     onAnchor,
     reviver
   }: ToJSOptions & { json?: boolean; jsonArg?: string | null } = {}) {
-    const anchorNodes = Object.values(this.anchors.map).map(
-      node =>
-        [node, { alias: [], aliasCount: 0, count: 1 }] as [
-          Node,
-          ToJSAnchorValue
-        ]
-    )
-    const anchors = anchorNodes.length > 0 ? new Map(anchorNodes) : null
     const ctx: ToJSContext = {
-      anchors,
+      anchors: new Map(),
       doc: this,
       keep: !json,
       mapAsMap: mapAsMap === true,
@@ -354,8 +335,8 @@ export class Document<T = unknown> {
       stringify
     }
     const res = toJS(this.contents, jsonArg || '', ctx)
-    if (typeof onAnchor === 'function' && anchors)
-      for (const { count, res } of anchors.values()) onAnchor(res, count)
+    if (typeof onAnchor === 'function')
+      for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
     return typeof reviver === 'function'
       ? applyReviver(reviver, { '': res }, '', res)
       : res

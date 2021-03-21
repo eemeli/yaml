@@ -11,13 +11,11 @@ export function resolveFlowCollection(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   fc: FlowCollection,
-  _anchor: string | null,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const isMap = fc.start.source === '{'
   const coll = isMap ? new YAMLMap(ctx.schema) : new YAMLSeq(ctx.schema)
   coll.flow = true
-  if (_anchor) ctx.anchors.setAnchor(coll, _anchor)
 
   let key: ParsedNode | null = null
   let value: ParsedNode | null = null

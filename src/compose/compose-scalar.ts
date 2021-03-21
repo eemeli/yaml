@@ -1,7 +1,7 @@
-import type { Schema } from '../schema/Schema.js'
 import { isScalar, SCALAR } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
+import type { Schema } from '../schema/Schema.js'
 import type { ScalarTag } from '../schema/types.js'
 import { resolveBlockScalar } from './resolve-block-scalar.js'
 import { resolveFlowScalar } from './resolve-flow-scalar.js'
@@ -10,7 +10,6 @@ import type { ComposeContext } from './compose-node.js'
 export function composeScalar(
   ctx: ComposeContext,
   token: FlowScalar | BlockScalar,
-  anchor: string | null,
   tagName: string | null,
   onError: (offset: number, message: string) => void
 ) {
@@ -39,7 +38,6 @@ export function composeScalar(
   if (tag.format) scalar.format = tag.format
   if (comment) scalar.comment = comment
 
-  if (anchor) ctx.anchors.setAnchor(scalar, anchor)
   return scalar as Scalar.Parsed
 }
 

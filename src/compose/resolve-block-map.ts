@@ -11,12 +11,10 @@ export function resolveBlockMap(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   { indent, items, offset }: BlockMap,
-  anchor: string | null,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const start = offset
   const map = new YAMLMap(ctx.schema)
-  if (anchor) ctx.anchors.setAnchor(map, anchor)
 
   for (const { start, key, sep, value } of items) {
     // key properties

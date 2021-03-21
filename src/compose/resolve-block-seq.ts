@@ -7,12 +7,10 @@ export function resolveBlockSeq(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   { items, offset }: BlockSequence,
-  anchor: string | null,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const start = offset
   const seq = new YAMLSeq(ctx.schema)
-  if (anchor) ctx.anchors.setAnchor(seq, anchor)
   for (const { start, value } of items) {
     const props = resolveProps(
       ctx,

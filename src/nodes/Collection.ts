@@ -27,11 +27,11 @@ export function collectionFromPath(
     }
   }
   return createNode(v, undefined, {
-    onAlias() {
+    onAnchor() {
       throw new Error('Repeated objects are not supported here')
     },
-    prevObjects: new Map(),
-    schema
+    schema,
+    sourceObjects: new Map()
   })
 }
 
@@ -48,6 +48,9 @@ export abstract class Collection extends NodeBase {
   declare [NODE_TYPE]: symbol
 
   declare items: unknown[]
+
+  /** An optional anchor on this node. Used by alias nodes. */
+  declare anchor?: string
 
   /**
    * If true, stringify this and all child nodes using flow rather than

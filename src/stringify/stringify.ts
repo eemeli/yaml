@@ -1,5 +1,13 @@
+import { anchorIsValid } from '../doc/anchors.js'
 import type { Document } from '../doc/Document.js'
-import { isAlias, isNode, isPair, isScalar, Node } from '../nodes/Node.js'
+import {
+  isAlias,
+  isCollection,
+  isNode,
+  isPair,
+  isScalar,
+  Node
+} from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { ToStringOptions } from '../options.js'
 import type { CollectionTag, ScalarTag } from '../schema/types.js'
@@ -8,7 +16,7 @@ import { stringifyString } from './stringifyString.js'
 export type StringifyContext = {
   actualString?: boolean
   allNullValues?: boolean
-  anchors: Record<string, Node>
+  anchors: Set<string>
   doc: Document
   forceBlockIndent?: boolean
   implicitKey?: boolean
@@ -24,7 +32,7 @@ export const createStringifyContext = (
   doc: Document,
   options: ToStringOptions
 ): StringifyContext => ({
-  anchors: Object.create(null),
+  anchors: new Set(),
   doc,
   indent: '',
   indentStep:
@@ -43,7 +51,8 @@ export const createStringifyContext = (
       nullStr: 'null',
       simpleKeys: false,
       singleQuote: false,
-      trueStr: 'true'
+      trueStr: 'true',
+      verifyAliasOrder: true
     },
     options
   )
@@ -83,9 +92,9 @@ function stringifyProps(
   { anchors, doc }: StringifyContext
 ) {
   const props = []
-  const anchor = doc.anchors.getName(node)
-  if (anchor) {
-    anchors[anchor] = node
+  const anchor = (isScalar(node) || isCollection(node)) && node.anchor
+  if (anchor && anchorIsValid(anchor)) {
+    anchors.add(anchor)
     props.push(`&${anchor}`)
   }
   if (node.tag) {

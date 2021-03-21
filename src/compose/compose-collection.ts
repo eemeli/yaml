@@ -17,22 +17,21 @@ export function composeCollection(
   CN: ComposeNode,
   ctx: ComposeContext,
   token: BlockMap | BlockSequence | FlowCollection,
-  anchor: string | null,
   tagName: string | null,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   let coll: YAMLMap.Parsed | YAMLSeq.Parsed
   switch (token.type) {
     case 'block-map': {
-      coll = resolveBlockMap(CN, ctx, token, anchor, onError)
+      coll = resolveBlockMap(CN, ctx, token, onError)
       break
     }
     case 'block-seq': {
-      coll = resolveBlockSeq(CN, ctx, token, anchor, onError)
+      coll = resolveBlockSeq(CN, ctx, token, onError)
       break
     }
     case 'flow-collection': {
-      coll = resolveFlowCollection(CN, ctx, token, anchor, onError)
+      coll = resolveFlowCollection(CN, ctx, token, onError)
       break
     }
   }
@@ -69,8 +68,5 @@ export function composeCollection(
   node.range = coll.range
   node.tag = tagName
   if (tag?.format) (node as Scalar).format = tag.format
-  if (anchor && node !== coll) {
-    // FIXME: handle anchor for non-failsafe collections
-  }
   return node
 }

@@ -75,7 +75,6 @@ See [Options](#options) for more information on the last argument.
 
 | Member        | Type                               | Description                                                                                                                                                         |
 | ------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| anchors       | [`Anchors`](#anchors)              | Anchors associated with the document's nodes; also provides alias & merge node creators.                                                                            |
 | commentBefore | `string?`                          | A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line or the doc-start indicator when stringified. |
 | comment       | `string?`                          | A comment at the end of the document. If not empty, separated from the rest of the document by a blank line when stringified.                                       |
 | contents      | [`Node`](#content-nodes) `⎮ any`   | The document contents.                                                                                                                                              |
@@ -177,71 +176,3 @@ See the section on [custom tags](#writing-custom-tags) for more on this topic.
 
 `doc.contents.yaml` determines if an explicit `%YAML` directive should be included in the output, and what version it should use.
 If changing the version after the document's creation, you'll probably want to use `doc.setSchema()` as it will also update the schema accordingly.
-
-## Working with Anchors
-
-A description of [alias and merge nodes](#alias-nodes) is included in the next section.
-
-<br/>
-
-#### `Document#anchors`
-
-| Method                                | Returns    | Description                                                                        |
-| ------------------------------------- | ---------- | ---------------------------------------------------------------------------------- |
-| getName(node: Node)                   | `string?`  | The anchor name associated with `node`, if set.                                    |
-| getNames()                            | `string[]` | List of all defined anchor names.                                                  |
-| getNode(name: string)                 | `Node?`    | The node associated with the anchor `name`, if set.                                |
-| newName(prefix: string)               | `string`   | Find an available anchor name with the given `prefix` and a numerical suffix.      |
-| setAnchor(node?: Node, name?: string) | `string?`  | Associate an anchor with `node`. If `name` is empty, a new name will be generated. |
-
-```js
-const src = '[{ a: A }, { b: B }]'
-const doc = parseDocument(src)
-doc.anchors.setAnchor(doc.getIn([0, 'a'], true)) // 'a1'
-doc.anchors.setAnchor(doc.getIn([1, 'b'], true)) // 'a2'
-doc.anchors.setAnchor(null, 'a1') // 'a1'
-doc.anchors.getNode('a2')
-// { value: 'B', range: [ 16, 18 ], type: 'PLAIN' }
-String(doc)
-// [ { a: A }, { b: &a2 B } ]
-
-const alias = doc.createAlias(doc.get(0, true), 'AA')
-// Alias { source: YAMLMap { items: [ [Pair] ] } }
-doc.add(alias)
-doc.toJS()
-// [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]
-String(doc)
-// [ &AA { a: A }, { b: &a2 B }, *AA ]
-
-doc.setSchema('1.2', { merge: true })
-const merge = doc.createPair('<<', alias)
-// Pair {
-//   key: Scalar { value: '<<' },
-//   value: Alias { source: YAMLMap { ... } } }
-doc.addIn([1], merge)
-doc.toJS()
-// [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]
-String(doc)
-// [ &AA { a: A }, { b: &a2 B, <<: *AA }, *AA ]
-
-// This creates a circular reference
-merge.value = doc.createAlias(doc.get(1, true))
-doc.toJS() // [RangeError: Maximum call stack size exceeded]
-String(doc)
-// [
-//   &AA { a: A },
-//   &a1 { b: &a2 B, <<: *a1 },
-//   *AA
-// ]
-```
-
-You should make sure to only add alias and merge nodes to the document after the nodes to which they refer, or the document's YAML stringification will fail.
-
-It is valid to have an anchor associated with a node even if it has no aliases.
-`yaml` will not allow you to associate the same name with more than one node, even though this is allowed by the YAML spec (all but the last instance will have numerical suffixes added).
-To add or reassign an anchor, use **`setAnchor(node, name)`**.
-The second parameter is optional, and if left out either the pre-existing anchor name of the node will be used, or a new one generated.
-To remove an anchor, use `setAnchor(null, name)`.
-The function will return the new anchor's name, or `null` if both of its arguments are `null`.
-
-While the `merge` option needs to be true to parse merge pairs as such, this is not required during stringification.

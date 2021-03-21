@@ -1,4 +1,5 @@
 import { Document, Scalar, YAMLMap, YAMLSeq } from 'yaml'
+import { source } from '../_utils'
 
 let doc
 beforeEach(() => {
@@ -300,57 +301,64 @@ describe('circular references', () => {
   test('parent at root', () => {
     const map = { foo: 'bar' }
     map.map = map
-    const doc = new Document(null)
-    expect(doc.createNode(map)).toMatchObject({
+    const doc = new Document(map)
+    expect(doc.contents).toMatchObject({
+      anchor: 'a1',
       items: [
         { key: { value: 'foo' }, value: { value: 'bar' } },
         {
           key: { value: 'map' },
-          value: {
-            source: {
-              items: [{ key: { value: 'foo' } }, { key: { value: 'map' } }]
-            }
-          }
+          value: { source: 'a1' }
         }
       ]
     })
-    expect(doc.anchors.map).toMatchObject({
-      a1: { items: [{ key: { value: 'foo' } }, { key: { value: 'map' } }] }
-    })
+    expect(doc.toString()).toBe(source`
+      &a1
+      foo: bar
+      map: *a1
+    `)
   })
 
   test('ancestor at root', () => {
     const baz = {}
     const map = { foo: { bar: { baz } } }
     baz.map = map
-    const doc = new Document(null)
-    const node = doc.createNode(map)
-    expect(node.getIn(['foo', 'bar', 'baz', 'map'])).toMatchObject({
-      source: { items: [{ key: { value: 'foo' } }] }
+    const doc = new Document(map)
+    expect(doc.getIn(['foo', 'bar', 'baz', 'map'])).toMatchObject({
+      source: 'a1'
     })
-    expect(doc.anchors.map).toMatchObject({
-      a1: { items: [{ key: { value: 'foo' } }] }
-    })
+    expect(doc.toString()).toBe(source`
+      &a1
+      foo:
+        bar:
+          baz:
+            map: *a1
+    `)
   })
 
   test('sibling sequences', () => {
     const one = ['one']
     const two = ['two']
     const seq = [one, two, one, one, two]
-    const doc = new Document(null)
-    expect(doc.createNode(seq)).toMatchObject({
+    const doc = new Document(seq)
+    expect(doc.contents).toMatchObject({
       items: [
         { items: [{ value: 'one' }] },
         { items: [{ value: 'two' }] },
-        { source: { items: [{ value: 'one' }] } },
-        { source: { items: [{ value: 'one' }] } },
-        { source: { items: [{ value: 'two' }] } }
+        { source: 'a1' },
+        { source: 'a1' },
+        { source: 'a2' }
       ]
     })
-    expect(doc.anchors.map).toMatchObject({
-      a1: { items: [{ value: 'one' }] },
-      a2: { items: [{ value: 'two' }] }
-    })
+    expect(doc.toString()).toBe(source`
+      - &a1
+        - one
+      - &a2
+        - two
+      - *a1
+      - *a1
+      - *a2
+    `)
   })
 
   test('further relatives', () => {
@@ -363,6 +371,6 @@ describe('circular references', () => {
     expect(source).toMatchObject({
       items: [{ key: { value: 'a' }, value: { value: 1 } }]
     })
-    expect(alias.source).toBe(source)
+    expect(alias.source).toBe(source.anchor)
   })
 })

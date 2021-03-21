@@ -119,6 +119,13 @@ export type SchemaOptions = {
 }
 
 export type CreateNodeOptions = {
+  /**
+   * Default prefix for anchors.
+   *
+   * Default: `'a'`, resulting in anchors `a1`, `a2`, etc.
+   */
+  anchorPrefix?: string
+
   /** Force the top-level collection node to use flow style. */
   flow?: boolean
 
@@ -295,6 +302,15 @@ export type ToStringOptions = {
    * Default: `'true'`
    */
   trueStr?: string
+
+  /**
+   * The anchor used by an alias must be defined before the alias node. As it's
+   * possible for the document to be modified manually, the order may be
+   * verified during stringification.
+   *
+   * Default: `'true'`
+   */
+  verifyAliasOrder?: boolean
 }
 
 export type Options = ParseOptions & DocumentOptions & SchemaOptions

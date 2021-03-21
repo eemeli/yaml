@@ -1,16 +1,20 @@
 import { Document } from './doc/Document.js'
 import {
   isAlias,
+  isCollection,
   isMap,
   isNode,
   isPair,
+  isScalar,
   isSeq,
+  Node,
   ParsedNode
 } from './nodes/Node.js'
-import { Pair } from './nodes/Pair.js'
-import { Scalar } from './nodes/Scalar.js'
+import type { Pair } from './nodes/Pair.js'
+import type { Scalar } from './nodes/Scalar.js'
 import type { Options } from './options.js'
 import { parseAllDocuments } from './public-api.js'
+import { visit } from './visit.js'
 
 const scalarChar: Record<string, string> = {
   BLOCK_FOLDED: '>',
@@ -18,6 +22,18 @@ const scalarChar: Record<string, string> = {
   PLAIN: ':',
   QUOTE_DOUBLE: '"',
   QUOTE_SINGLE: "'"
+}
+
+function anchorExists(doc: Document, anchor: string): boolean {
+  let found = false
+  const find = (_key: unknown, node: Node) => {
+    if (node.anchor === anchor) {
+      found = true
+      return visit.BREAK
+    }
+  }
+  visit(doc, { Scalar: find, Map: find, Seq: find })
+  return found
 }
 
 // test harness for yaml-test-suite event tests
@@ -70,11 +86,11 @@ function addEvents(
   if (errPos !== -1 && isNode(node) && node.range[0] >= errPos)
     throw new Error()
   let props = ''
-  let anchor = isNode(node) ? doc.anchors.getName(node) : undefined
+  let anchor = isScalar(node) || isCollection(node) ? node.anchor : undefined
   if (anchor) {
     if (/\d$/.test(anchor)) {
       const alt = anchor.replace(/\d$/, '')
-      if (doc.anchors.getNode(alt)) anchor = alt
+      if (anchorExists(doc, alt)) anchor = alt
     }
     props = ` &${anchor}`
   }
@@ -99,10 +115,10 @@ function addEvents(
     addEvents(events, doc, errPos, node.value)
     events.push('-MAP')
   } else if (isAlias(node)) {
-    let alias = doc.anchors.getName(node.source)
+    let alias = node.source
     if (alias && /\d$/.test(alias)) {
       const alt = alias.replace(/\d$/, '')
-      if (doc.anchors.getNode(alt)) alias = alt
+      if (anchorExists(doc, alt)) alias = alt
     }
     events.push(`=ALI${props} *${alias}`)
   } else {

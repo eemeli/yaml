@@ -1,4 +1,4 @@
-import type { Alias } from '../nodes/Alias.js'
+import { Alias } from '../nodes/Alias.js'
 import { isNode, isPair, MAP, Node, SEQ } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
@@ -8,16 +8,11 @@ import type { Replacer } from './Document.js'
 
 const defaultTagPrefix = 'tag:yaml.org,2002:'
 
-export interface CreateNodeAliasRef {
-  node: Node | undefined
-  value: unknown
-}
-
 export interface CreateNodeContext {
   keepUndefined?: boolean
-  onAlias(source: CreateNodeAliasRef): Alias
+  onAnchor(source: unknown): string
   onTagObj?: (tagObj: ScalarTag | CollectionTag) => void
-  prevObjects: Map<unknown, CreateNodeAliasRef>
+  sourceObjects: Map<unknown, { anchor: string | null; node: Node | null }>
   replacer?: Replacer
   schema: Schema
 }
@@ -57,7 +52,22 @@ export function createNode(
     value = value.valueOf()
   }
 
-  const { onAlias, onTagObj, prevObjects, schema } = ctx
+  const { onAnchor, onTagObj, schema, sourceObjects } = ctx
+
+  // Detect duplicate references to the same object & use Alias nodes for all
+  // after first. The `ref` wrapper allows for circular references to resolve.
+  let ref: { anchor: string | null; node: Node | null } | undefined = undefined
+  if (value && typeof value === 'object') {
+    ref = sourceObjects.get(value)
+    if (ref) {
+      if (!ref.anchor) ref.anchor = onAnchor(value)
+      return new Alias(ref.anchor)
+    } else {
+      ref = { anchor: null, node: null }
+      sourceObjects.set(value, ref)
+    }
+  }
+
   if (tagName && tagName.startsWith('!!'))
     tagName = defaultTagPrefix + tagName.slice(2)
 
@@ -78,21 +88,11 @@ export function createNode(
     delete ctx.onTagObj
   }
 
-  // Detect duplicate references to the same object & use Alias nodes for all
-  // after first. The `ref` wrapper allows for circular references to resolve.
-  const ref: CreateNodeAliasRef = { value: undefined, node: undefined }
-  if (value && typeof value === 'object') {
-    const prev = prevObjects.get(value)
-    if (prev) return onAlias(prev)
-    ref.value = value
-    prevObjects.set(value, ref)
-  }
-
   const node = tagObj?.createNode
     ? tagObj.createNode(ctx.schema, value, ctx)
     : new Scalar(value)
   if (tagName) node.tag = tagName
-  ref.node = node
 
+  if (ref) ref.node = node
   return node
 }

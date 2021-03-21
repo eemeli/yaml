@@ -28,7 +28,8 @@ export class Scalar<T = unknown> extends NodeBase {
 
   value: T
 
-  declare type?: Scalar.Type
+  /** An optional anchor on this node. Used by alias nodes. */
+  declare anchor?: string
 
   /**
    * By default (undefined), numbers use decimal notation.
@@ -42,6 +43,9 @@ export class Scalar<T = unknown> extends NodeBase {
 
   /** Set during parsing to the source string value */
   declare source?: string
+
+  /** The scalar style used for the node's string representation */
+  declare type?: Scalar.Type
 
   constructor(value: T) {
     super(SCALAR)

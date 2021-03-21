@@ -1,6 +1,12 @@
-import { StringifyContext } from '../stringify/stringify.js'
+import { anchorIsValid } from '../doc/anchors'
+import type { Document } from '../doc/Document'
+import type { StringifyContext } from '../stringify/stringify.js'
+import { visit } from '../visit'
 import { ALIAS, isAlias, isCollection, isPair, Node, NodeBase } from './Node.js'
-import { toJS, ToJSContext } from './toJS.js'
+import type { Scalar } from './Scalar'
+import type { ToJSContext } from './toJS.js'
+import type { YAMLMap } from './YAMLMap'
+import type { YAMLSeq } from './YAMLSeq'
 
 export declare namespace Alias {
   interface Parsed extends Alias {
@@ -8,10 +14,12 @@ export declare namespace Alias {
   }
 }
 
-export class Alias<T extends Node = Node> extends NodeBase {
-  source: T
+export class Alias extends NodeBase {
+  source: string
 
-  constructor(source: T) {
+  declare anchor?: never
+
+  constructor(source: string) {
     super(ALIAS)
     this.source = source
     Object.defineProperty(this, 'tag', {
@@ -21,61 +29,84 @@ export class Alias<T extends Node = Node> extends NodeBase {
     })
   }
 
-  toJSON(arg?: unknown, ctx?: ToJSContext) {
-    if (!ctx)
-      return toJS(this.source, typeof arg === 'string' ? arg : null, ctx)
-    const { anchors, maxAliasCount } = ctx
-    const anchor = anchors && anchors.get(this.source)
+  /**
+   * Resolve the value of this alias within `doc`, finding the last
+   * instance of the `source` anchor before this node.
+   */
+  resolve(doc: Document): Scalar | YAMLMap | YAMLSeq | undefined {
+    let found: Scalar | YAMLMap | YAMLSeq | undefined = undefined
+    const find = (_key: unknown, node: Node) => {
+      if (node === this) return visit.BREAK
+      if (node.anchor === this.source) found = node
+    }
+    visit(doc, { Alias: find, Scalar: find, Map: find, Seq: find })
+    return found
+  }
+
+  toJSON(_arg?: unknown, ctx?: ToJSContext) {
+    if (!ctx) return { source: this.source }
+    const { anchors, doc, maxAliasCount } = ctx
+    const source = this.resolve(doc)
+    if (!source) {
+      const msg = `Unresolved alias (the anchor must be set before the alias): ${this.source}`
+      throw new ReferenceError(msg)
+    }
+    const data = anchors.get(source)
     /* istanbul ignore if */
-    if (!anchor || anchor.res === undefined) {
+    if (!data || data.res === undefined) {
       const msg = 'This should not happen: Alias anchor was not resolved?'
       throw new ReferenceError(msg)
     }
     if (maxAliasCount >= 0) {
-      anchor.count += 1
-      if (anchor.aliasCount === 0)
-        anchor.aliasCount = getAliasCount(this.source, anchors)
-      if (anchor.count * anchor.aliasCount > maxAliasCount) {
+      data.count += 1
+      if (data.aliasCount === 0)
+        data.aliasCount = getAliasCount(doc, source, anchors)
+      if (data.count * data.aliasCount > maxAliasCount) {
         const msg =
           'Excessive alias count indicates a resource exhaustion attack'
         throw new ReferenceError(msg)
       }
     }
-    return anchor.res
+    return data.res
   }
 
-  // Only called when stringifying an alias mapping key while constructing
-  // Object output.
   toString(
-    { anchors, doc, implicitKey, inStringifyKey }: StringifyContext,
+    ctx?: StringifyContext,
     _onComment?: () => void,
     _onChompKeep?: () => void
   ) {
-    let anchor = Object.keys(anchors).find(a => anchors[a] === this.source)
-    if (!anchor && inStringifyKey)
-      anchor = doc.anchors.getName(this.source) || doc.anchors.newName()
-    if (anchor) return `*${anchor}${implicitKey ? ' ' : ''}`
-    const msg = doc.anchors.getName(this.source)
-      ? 'Alias node must be after source node'
-      : 'Source node not found for alias node'
-    throw new Error(`${msg} [${this.range}]`)
+    const src = `*${this.source}`
+    if (ctx) {
+      anchorIsValid(this.source)
+      if (ctx.options.verifyAliasOrder && !ctx.anchors.has(this.source)) {
+        const msg = `Unresolved alias (the anchor must be set before the alias): ${this.source}`
+        throw new Error(msg)
+      }
+      if (ctx.implicitKey) return `${src} `
+    }
+    return src
   }
 }
 
-function getAliasCount(node: unknown, anchors: ToJSContext['anchors']): number {
+function getAliasCount(
+  doc: Document,
+  node: unknown,
+  anchors: ToJSContext['anchors']
+): number {
   if (isAlias(node)) {
-    const anchor = anchors && anchors.get(node.source)
+    const source = node.resolve(doc)
+    const anchor = anchors && source && anchors.get(source)
     return anchor ? anchor.count * anchor.aliasCount : 0
   } else if (isCollection(node)) {
     let count = 0
     for (const item of node.items) {
-      const c = getAliasCount(item, anchors)
+      const c = getAliasCount(doc, item, anchors)
       if (c > count) count = c
     }
     return count
   } else if (isPair(node)) {
-    const kc = getAliasCount(node.key, anchors)
-    const vc = getAliasCount(node.value, anchors)
+    const kc = getAliasCount(doc, node.key, anchors)
+    const vc = getAliasCount(doc, node.value, anchors)
     return Math.max(kc, vc)
   }
   return 1

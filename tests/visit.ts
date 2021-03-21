@@ -33,8 +33,8 @@ test('Alias', () => {
   visit(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
   expect(fn.mock.calls).toMatchObject([
     [null, coll, [{}]],
-    [0, { type: 'PLAIN', value: 1 }, [{}, {}]],
-    [1, { source: { value: 1 } }, [{}, {}]]
+    [0, { type: 'PLAIN', value: 1, anchor: 'a' }, [{}, {}]],
+    [1, { source: 'a' }, [{}, {}]]
   ])
 })
 

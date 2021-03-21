@@ -4,9 +4,10 @@ test('basic', () => {
   const src = `- &a 1\n- *a\n`
   const doc = YAML.parseDocument(src)
   expect(doc.errors).toHaveLength(0)
-  const { items } = doc.contents
-  expect(items).toMatchObject([{ value: 1 }, { source: { value: 1 } }])
-  expect(items[1].source).toBe(items[0])
+  expect(doc.contents.items).toMatchObject([
+    { anchor: 'a', value: 1 },
+    { source: 'a' }
+  ])
   expect(String(doc)).toBe(src)
 })
 
@@ -14,14 +15,13 @@ test('re-defined anchor', () => {
   const src = '- &a 1\n- &a 2\n- *a\n'
   const doc = YAML.parseDocument(src)
   expect(doc.errors).toHaveLength(0)
-  const { items } = doc.contents
-  expect(items).toMatchObject([
-    { value: 1 },
-    { value: 2 },
-    { source: { value: 2 } }
+  expect(doc.contents.items).toMatchObject([
+    { anchor: 'a', value: 1 },
+    { anchor: 'a', value: 2 },
+    { source: 'a' }
   ])
-  expect(items[2].source).toBe(items[1])
-  expect(String(doc)).toBe('- &a1 1\n- &a 2\n- *a\n')
+  expect(doc.toJS()).toMatchObject([1, 2, 2])
+  expect(String(doc)).toBe('- &a 1\n- &a 2\n- *a\n')
 })
 
 test('circular reference', () => {
@@ -29,38 +29,23 @@ test('circular reference', () => {
   const doc = YAML.parseDocument(src)
   expect(doc.errors).toHaveLength(0)
   expect(doc.warnings).toHaveLength(0)
-  const { items } = doc.contents
-  expect(items).toHaveLength(2)
-  expect(items[1].source).toBe(doc.contents)
+  expect(doc.contents).toMatchObject({
+    anchor: 'a',
+    items: [{ value: 1 }, { source: 'a' }]
+  })
   const res = doc.toJS()
   expect(res[1]).toBe(res)
   expect(String(doc)).toBe(src)
 })
 
 describe('create', () => {
-  test('doc.anchors.setAnchor', () => {
+  test('node.anchor', () => {
     const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
-    const [a, b] = doc.contents.items
-    expect(doc.anchors.setAnchor(null, null)).toBe(null)
-    expect(doc.anchors.setAnchor(a, 'XX')).toBe('XX')
-    expect(doc.anchors.setAnchor(a, 'AA')).toBe('AA')
-    expect(doc.anchors.setAnchor(a, 'AA')).toBe('AA')
-    expect(doc.anchors.setAnchor(a)).toBe('AA')
-    expect(doc.anchors.setAnchor(a.items[0].value)).toBe('a1')
-    expect(doc.anchors.setAnchor(b.items[0].value)).toBe('a2')
-    expect(doc.anchors.setAnchor(null, 'a1')).toBe('a1')
-    expect(doc.anchors.getName(a)).toBe('AA')
-    expect(doc.anchors.getNode('a2').value).toBe('B')
-    expect(String(doc)).toBe('[ &AA { a: A }, { b: &a2 B } ]\n')
-    expect(() => doc.anchors.setAnchor(a.items[0])).toThrow(
-      'Anchors may only be set for Scalar, Seq and Map nodes'
-    )
-    expect(() => doc.anchors.setAnchor(a, 'A A')).toThrow(
-      'Anchor names must not contain whitespace or control characters'
-    )
-    expect(doc.anchors.setAnchor(a.items[0].value, 'AA')).toBe('AA')
-    expect(String(doc)).toBe('[ &AA1 { a: &AA A }, { b: &a2 B } ]\n')
-    expect(doc.anchors.getNames()).toMatchObject(['AA', 'a2', 'AA1'])
+    doc.get(0).anchor = 'AA'
+    doc.getIn([0, 'a'], true).anchor = 'a'
+    doc.getIn([0, 'a'], true).anchor = ''
+    doc.getIn([1, 'b'], true).anchor = 'BB'
+    expect(String(doc)).toBe('[ &AA { a: A }, { b: &BB B } ]\n')
   })
 
   test('doc.createAlias', () => {
@@ -70,16 +55,33 @@ describe('create', () => {
     expect(doc.toJS()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
     expect(String(doc)).toMatch('[ &AA { a: A }, { b: B }, *AA ]\n')
   })
+})
 
-  test('errors', () => {
+describe('errors', () => {
+  test('invalid anchor characters', () => {
+    const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+    doc.get(0).anchor = 'A A'
+    expect(() => String(doc)).toThrow(
+      'Anchor must not contain whitespace or control characters: "A A"'
+    )
+  })
+
+  test('set tag on alias', () => {
     const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
     const node = doc.contents.items[0]
     const alias = doc.createAlias(node, 'AA')
-    doc.contents.items.unshift(alias)
-    expect(() => String(doc)).toThrow('Alias node must be after source node')
     expect(() => {
       alias.tag = 'tag:yaml.org,2002:alias'
     }).toThrow('Alias nodes cannot have tags')
+  })
+
+  test('alias before anchor', () => {
+    const doc = YAML.parseDocument('[{ a: A }, { b: B }]')
+    const alias = doc.createAlias(doc.get(0), 'AA')
+    doc.contents.items.unshift(alias)
+    expect(() => String(doc)).toThrow(
+      'Unresolved alias (the anchor must be set before the alias): AA'
+    )
   })
 })
 
@@ -88,9 +90,11 @@ describe('__proto__ as anchor name', () => {
     const src = `- &__proto__ 1\n- *__proto__\n`
     const doc = YAML.parseDocument(src)
     expect(doc.errors).toHaveLength(0)
-    const { items } = doc.contents
-    expect(items).toMatchObject([{ value: 1 }, { source: { value: 1 } }])
-    expect(items[1].source).toBe(items[0])
+    expect(doc.contents.items).toMatchObject([
+      { anchor: '__proto__', value: 1 },
+      { source: '__proto__' }
+    ])
+    expect(doc.toJS()).toMatchObject([1, 1])
     expect(String(doc)).toBe(src)
   })
 
@@ -150,24 +154,15 @@ describe('merge <<', () => {
     }
   })
 
-  test('YAML.parseAllDocuments', () => {
+  test('YAML.parseDocument', () => {
     const doc = YAML.parseDocument(src, { merge: true })
-    expect(doc.contents.items).toHaveLength(8)
-    expect(Object.keys(doc.anchors.map)).toMatchObject([
-      'CENTER',
-      'LEFT',
-      'BIG',
-      'SMALL'
+    expect(
+      doc.contents.items.slice(5).map(it => it.items[0].value)
+    ).toMatchObject([
+      { source: 'CENTER' },
+      { items: [{ source: 'CENTER' }, { source: 'BIG' }] },
+      { items: [{ source: 'BIG' }, { source: 'LEFT' }, { source: 'SMALL' }] }
     ])
-    doc.contents.items.slice(5).forEach(({ items }) => {
-      const merge = items[0]
-      expect(YAML.isPair(merge)).toBe(true)
-      if (YAML.isSeq(merge.value))
-        merge.value.items.forEach(({ source }) => {
-          expect(source).toBeInstanceOf(YAML.YAMLMap)
-        })
-      else expect(merge.value.source).toBeInstanceOf(YAML.YAMLMap)
-    })
   })
 
   describe('create', () => {
