@@ -1,6 +1,5 @@
 import type { Reviver } from './doc/applyReviver.js'
 import type { Directives } from './doc/directives.js'
-import type { Replacer } from './doc/Document.js'
 import type { LogLevelId } from './log.js'
 import type { Pair } from './nodes/Pair.js'
 import type { Scalar } from './nodes/Scalar.js'
@@ -54,14 +53,6 @@ export type DocumentOptions = {
    * that overrides the `version` option.
    */
   directives?: Directives
-
-  /**
-   * Keep `undefined` object values when creating mappings and return a Scalar
-   * node when calling `YAML.stringify(undefined)`, rather than `undefined`.
-   *
-   * Default: `false`
-   */
-  keepUndefined?: boolean
 
   /**
    * Control the logging level during parsing
@@ -140,15 +131,8 @@ export type CreateNodeOptions = {
   onTagObj?: (tagObj: ScalarTag | CollectionTag) => void
 
   /**
-   * Filter or modify values while creating a node.
-   *
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter
-   */
-  replacer?: Replacer
-
-  /**
-   * Specify the collection type, e.g. `"!!omap"`. Note that this requires the
-   * corresponding tag to be available in this document's schema.
+   * Specify the top-level collection type, e.g. `"!!omap"`. Note that this
+   * requires the corresponding tag to be available in this document's schema.
    */
   tag?: string
 }
@@ -327,7 +311,6 @@ export const defaultOptions: Required<
 > = {
   anchorPrefix: 'a',
   intAsBigInt: false,
-  keepUndefined: false,
   logLevel: 'warn',
   prettyErrors: true,
   strict: true,

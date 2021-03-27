@@ -4,7 +4,12 @@ import { Document, Replacer } from './doc/Document.js'
 import { prettifyError, YAMLParseError } from './errors.js'
 import { warn } from './log.js'
 import type { ParsedNode } from './nodes/Node.js'
-import type { Options, ToJSOptions, ToStringOptions } from './options.js'
+import type {
+  CreateNodeOptions,
+  Options,
+  ToJSOptions,
+  ToStringOptions
+} from './options.js'
 import { LineCounter } from './parse/line-counter.js'
 import { Parser } from './parse/parser.js'
 
@@ -139,17 +144,17 @@ export function parse(
  */
 export function stringify(
   value: any,
-  options?: Options & ToStringOptions
+  options?: Options & CreateNodeOptions & ToStringOptions
 ): string
 export function stringify(
   value: any,
   replacer?: Replacer | null,
-  options?: string | number | (Options & ToStringOptions)
+  options?: string | number | (Options & CreateNodeOptions & ToStringOptions)
 ): string
 export function stringify(
   value: any,
-  replacer?: Replacer | (Options & ToStringOptions) | null,
-  options?: string | number | (Options & ToStringOptions)
+  replacer?: Replacer | (Options & CreateNodeOptions & ToStringOptions) | null,
+  options?: string | number | (Options & CreateNodeOptions & ToStringOptions)
 ) {
   let _replacer: Replacer | null = null
   if (typeof replacer === 'function' || Array.isArray(replacer)) {
@@ -164,8 +169,7 @@ export function stringify(
     options = indent < 1 ? undefined : indent > 8 ? { indent: 8 } : { indent }
   }
   if (value === undefined) {
-    const { keepUndefined } =
-      options || (replacer as Options & ToStringOptions) || {}
+    const { keepUndefined } = options || (replacer as CreateNodeOptions) || {}
     if (!keepUndefined) return undefined
   }
   return new Document(value, _replacer, options).toString(options)

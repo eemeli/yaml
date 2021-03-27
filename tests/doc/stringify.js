@@ -942,10 +942,10 @@ describe('replacer', () => {
   })
 
   test('createNode, !!set', () => {
-    const replacer = jest.fn((key, value) => value)
+    const replacer = jest.fn((_key, value) => value)
     const doc = new YAML.Document(null, { customTags: ['set'] })
     const set = new Set(['a', 'b', 1, [2]])
-    doc.createNode(set, { replacer })
+    doc.createNode(set, replacer)
     expect(replacer.mock.calls).toMatchObject([
       ['', set],
       ['a', 'a'],
@@ -965,13 +965,13 @@ describe('replacer', () => {
   })
 
   test('createNode, !!omap', () => {
-    const replacer = jest.fn((key, value) => value)
+    const replacer = jest.fn((_key, value) => value)
     const doc = new YAML.Document(null, { customTags: ['omap'] })
     const omap = [
       ['a', 1],
       [1, 'a']
     ]
-    doc.createNode(omap, { replacer, tag: '!!omap' })
+    doc.createNode(omap, replacer, { tag: '!!omap' })
     expect(replacer.mock.calls).toMatchObject([
       ['', omap],
       ['0', omap[0]],

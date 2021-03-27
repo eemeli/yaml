@@ -85,7 +85,7 @@ export class Document<T = unknown> {
     options?: Options
   ) {
     Object.defineProperty(this, NODE_TYPE, { value: DOC })
-    let _replacer: Replacer | undefined = undefined
+    let _replacer: Replacer | null = null
     if (typeof replacer === 'function' || Array.isArray(replacer)) {
       _replacer = replacer
     } else if (options === undefined && replacer) {
@@ -102,10 +102,14 @@ export class Document<T = unknown> {
     } else this.directives = new Directives({ version })
     this.setSchema(version, options)
 
-    this.contents =
-      value === undefined
-        ? null
-        : ((this.createNode(value, { replacer: _replacer }) as unknown) as T)
+    if (value === undefined) this.contents = null
+    else {
+      this.contents = (this.createNode(
+        value,
+        _replacer,
+        options
+      ) as unknown) as T
+    }
   }
 
   /** Adds a value to the document. */
@@ -134,35 +138,42 @@ export class Document<T = unknown> {
    * Convert any value into a `Node` using the current schema, recursively
    * turning objects into collections.
    */
+  createNode(value: unknown, options?: CreateNodeOptions): Node
   createNode(
     value: unknown,
-    {
-      anchorPrefix,
-      flow,
-      keepUndefined,
-      onTagObj,
-      replacer,
-      tag
-    }: CreateNodeOptions = {}
+    replacer: Replacer | CreateNodeOptions | null,
+    options?: CreateNodeOptions
+  ): Node
+  createNode(
+    value: unknown,
+    replacer?: Replacer | CreateNodeOptions | null,
+    options?: CreateNodeOptions
   ): Node {
-    if (typeof replacer === 'function')
+    let _replacer: Replacer | undefined = undefined
+    if (typeof replacer === 'function') {
       value = replacer.call({ '': value }, '', value)
-    else if (Array.isArray(replacer)) {
+      _replacer = replacer
+    } else if (Array.isArray(replacer)) {
       const keyToStr = (v: unknown) =>
         typeof v === 'number' || v instanceof String || v instanceof Number
       const asStr = replacer.filter(keyToStr).map(String)
       if (asStr.length > 0) replacer = replacer.concat(asStr)
+      _replacer = replacer
+    } else if (options === undefined && replacer) {
+      options = replacer
+      replacer = undefined
     }
 
+    const { anchorPrefix, flow, keepUndefined, onTagObj, tag } = options || {}
     const { onAnchor, setAnchors, sourceObjects } = createNodeAnchors(
       this,
-      anchorPrefix || this.options.anchorPrefix
+      anchorPrefix || 'a'
     )
     const ctx: CreateNodeContext = {
-      keepUndefined: keepUndefined ?? this.options.keepUndefined,
+      keepUndefined: keepUndefined ?? false,
       onAnchor,
       onTagObj,
-      replacer,
+      replacer: _replacer,
       schema: this.schema,
       sourceObjects
     }
@@ -181,8 +192,8 @@ export class Document<T = unknown> {
     value: unknown,
     options: CreateNodeOptions = {}
   ) {
-    const k = this.createNode(key, options) as K
-    const v = this.createNode(value, options) as V
+    const k = this.createNode(key, null, options) as K
+    const v = this.createNode(value, null, options) as V
     return new Pair(k, v)
   }
 
