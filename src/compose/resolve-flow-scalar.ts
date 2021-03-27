@@ -1,3 +1,4 @@
+import type { ErrorCode } from '../errors.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { FlowScalar } from '../parse/tokens.js'
 import { resolveEnd } from './resolve-end.js'
@@ -5,7 +6,7 @@ import { resolveEnd } from './resolve-end.js'
 export function resolveFlowScalar(
   { offset, type, source, end }: FlowScalar,
   strict: boolean,
-  onError: (offset: number, message: string) => void
+  onError: (offset: number, code: ErrorCode, message: string) => void
 ): {
   value: string
   type: Scalar.PLAIN | Scalar.QUOTE_DOUBLE | Scalar.QUOTE_SINGLE | null
@@ -14,7 +15,8 @@ export function resolveFlowScalar(
 } {
   let _type: Scalar.PLAIN | Scalar.QUOTE_DOUBLE | Scalar.QUOTE_SINGLE
   let value: string
-  const _onError = (rel: number, msg: string) => onError(offset + rel, msg)
+  const _onError = (rel: number, code: ErrorCode, msg: string) =>
+    onError(offset + rel, code, msg)
   switch (type) {
     case 'scalar':
       _type = Scalar.PLAIN
@@ -33,7 +35,11 @@ export function resolveFlowScalar(
 
     /* istanbul ignore next should not happen */
     default:
-      onError(offset, `Expected a flow scalar value, but found: ${type}`)
+      onError(
+        offset,
+        'UNEXPECTED_TOKEN',
+        `Expected a flow scalar value, but found: ${type}`
+      )
       return {
         value: '',
         type: null,
@@ -53,23 +59,27 @@ export function resolveFlowScalar(
 
 function plainValue(
   source: string,
-  onError: (relOffset: number, message: string) => void
+  onError: (relOffset: number, code: ErrorCode, message: string) => void
 ) {
   switch (source[0]) {
     /* istanbul ignore next should not happen */
     case '\t':
-      onError(0, 'Plain value cannot start with a tab character')
+      onError(
+        0,
+        'BAD_SCALAR_START',
+        'Plain value cannot start with a tab character'
+      )
       break
     case '|':
     case '>': {
       const message = `Plain value cannot start with block scalar indicator ${source[0]}`
-      onError(0, message)
+      onError(0, 'BAD_SCALAR_START', message)
       break
     }
     case '@':
     case '`': {
       const message = `Plain value cannot start with reserved character ${source[0]}`
-      onError(0, message)
+      onError(0, 'BAD_SCALAR_START', message)
       break
     }
   }
@@ -78,10 +88,10 @@ function plainValue(
 
 function singleQuotedValue(
   source: string,
-  onError: (relOffset: number, message: string) => void
+  onError: (relOffset: number, code: ErrorCode, message: string) => void
 ) {
   if (source[source.length - 1] !== "'" || source.length === 1)
-    onError(source.length, "Missing closing 'quote")
+    onError(source.length, 'MISSING_CHAR', "Missing closing 'quote")
   return foldLines(source.slice(1, -1)).replace(/''/g, "'")
 }
 
@@ -105,7 +115,7 @@ function foldLines(source: string) {
 
 function doubleQuotedValue(
   source: string,
-  onError: (relOffset: number, message: string) => void
+  onError: (relOffset: number, code: ErrorCode, message: string) => void
 ) {
   let res = ''
   for (let i = 1; i < source.length - 1; ++i) {
@@ -129,7 +139,7 @@ function doubleQuotedValue(
         i += length
       } else {
         const raw = source.substr(i - 1, 2)
-        onError(i - 1, `Invalid escape sequence ${raw}`)
+        onError(i - 1, 'BAD_DQ_ESCAPE', `Invalid escape sequence ${raw}`)
         res += raw
       }
     } else if (ch === ' ' || ch === '\t') {
@@ -143,7 +153,7 @@ function doubleQuotedValue(
     }
   }
   if (source[source.length - 1] !== '"' || source.length === 1)
-    onError(source.length, 'Missing closing "quote')
+    onError(source.length, 'MISSING_CHAR', 'Missing closing "quote')
   return res
 }
 
@@ -189,14 +199,14 @@ function parseCharCode(
   source: string,
   offset: number,
   length: number,
-  onError: (offset: number, message: string) => void
+  onError: (offset: number, code: ErrorCode, message: string) => void
 ) {
   const cc = source.substr(offset, length)
   const ok = cc.length === length && /^[0-9a-fA-F]+$/.test(cc)
   const code = ok ? parseInt(cc, 16) : NaN
   if (isNaN(code)) {
     const raw = source.substr(offset - 2, length + 2)
-    onError(offset - 2, `Invalid escape sequence ${raw}`)
+    onError(offset - 2, 'BAD_DQ_ESCAPE', `Invalid escape sequence ${raw}`)
     return raw
   }
   return String.fromCodePoint(code)

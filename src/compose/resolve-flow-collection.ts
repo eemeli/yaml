@@ -1,3 +1,4 @@
+import type { ErrorCode } from '../errors.js'
 import { isNode, isPair, ParsedNode } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
@@ -11,7 +12,12 @@ export function resolveFlowCollection(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   fc: FlowCollection,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (
+    offset: number,
+    code: ErrorCode,
+    message: string,
+    warning?: boolean
+  ) => void
 ) {
   const isMap = fc.start.source === '{'
   const coll = isMap ? new YAMLMap(ctx.schema) : new YAMLSeq(ctx.schema)
@@ -78,6 +84,7 @@ export function resolveFlowCollection(
         if (ctx.options.strict && !hasSpace)
           onError(
             offset,
+            'COMMENT_SPACE',
             'Comments must be separated from other tokens by white space characters'
           )
         const cb = token.source.substring(1)
@@ -96,7 +103,12 @@ export function resolveFlowCollection(
             if (isPair(node)) node = node.value || node.key
             /* istanbul ignore else should not happen */
             if (isNode(node)) node.comment = comment
-            else onError(offset, 'Error adding trailing comment to node')
+            else
+              onError(
+                offset,
+                'IMPOSSIBLE',
+                'Error adding trailing comment to node'
+              )
             comment = ''
             hasComment = false
           }
@@ -109,15 +121,23 @@ export function resolveFlowCollection(
         hasSpace = true
         break
       case 'anchor':
-        if (anchor) onError(offset, 'A node can have at most one anchor')
+        if (anchor)
+          onError(
+            offset,
+            'MULTIPLE_ANCHORS',
+            'A node can have at most one anchor'
+          )
         anchor = token.source.substring(1)
         atLineStart = false
         atValueEnd = false
         hasSpace = false
         break
       case 'tag': {
-        if (tagName) onError(offset, 'A node can have at most one tag')
-        const tn = ctx.directives.tagName(token.source, m => onError(offset, m))
+        if (tagName)
+          onError(offset, 'MULTIPLE_TAGS', 'A node can have at most one tag')
+        const tn = ctx.directives.tagName(token.source, m =>
+          onError(offset, 'TAG_RESOLVE_FAILED', m)
+        )
         if (tn) tagName = tn
         atLineStart = false
         atValueEnd = false
@@ -126,7 +146,11 @@ export function resolveFlowCollection(
       }
       case 'explicit-key-ind':
         if (anchor || tagName)
-          onError(offset, 'Anchors and tags must be after the ? indicator')
+          onError(
+            offset,
+            'PROP_BEFORE_SEP',
+            'Anchors and tags must be after the ? indicator'
+          )
         atExplicitKey = true
         atLineStart = false
         atValueEnd = false
@@ -135,7 +159,11 @@ export function resolveFlowCollection(
       case 'map-value-ind': {
         if (key) {
           if (value) {
-            onError(offset, 'Missing {} around pair used as mapping key')
+            onError(
+              offset,
+              'BLOCK_AS_IMPLICIT_KEY',
+              'Missing {} around pair used as mapping key'
+            )
             const map = new YAMLMap(ctx.schema)
             map.flow = true
             map.items.push(new Pair(key, value))
@@ -147,12 +175,15 @@ export function resolveFlowCollection(
           if (ctx.options.strict) {
             const slMsg =
               'Implicit keys of flow sequence pairs need to be on a single line'
-            if (nlAfterValueInSeq) onError(offset, slMsg)
+            if (nlAfterValueInSeq)
+              onError(offset, 'MULTILINE_IMPLICIT_KEY', slMsg)
             else if (seqKeyToken) {
-              if (containsNewline(seqKeyToken)) onError(offset, slMsg)
+              if (containsNewline(seqKeyToken))
+                onError(offset, 'MULTILINE_IMPLICIT_KEY', slMsg)
               if (seqKeyToken.offset < offset - 1024)
                 onError(
                   offset,
+                  'KEY_OVER_1024_CHARS',
                   'The : indicator must be at most 1024 chars after the start of an implicit flow sequence key'
                 )
               seqKeyToken = null
@@ -176,7 +207,11 @@ export function resolveFlowCollection(
       case 'comma':
         if (key || value || anchor || tagName || atExplicitKey) addItem(i)
         else
-          onError(offset, `Unexpected , in flow ${isMap ? 'map' : 'sequence'}`)
+          onError(
+            offset,
+            'UNEXPECTED_TOKEN',
+            `Unexpected , in flow ${isMap ? 'map' : 'sequence'}`
+          )
         key = null
         value = null
         atExplicitKey = false
@@ -189,11 +224,17 @@ export function resolveFlowCollection(
       case 'block-seq':
         onError(
           offset,
+          'BLOCK_IN_FLOW',
           'Block collections are not allowed within flow collections'
         )
       // fallthrough
       default: {
-        if (value) onError(offset, 'Missing , between flow collection items')
+        if (value)
+          onError(
+            offset,
+            'MISSING_CHAR',
+            'Missing , between flow collection items'
+          )
         if (!isMap && !key && !atExplicitKey) seqKeyToken = token
         value = composeNode(ctx, token, getProps(), onError)
         offset = value.range[1]
@@ -212,7 +253,11 @@ export function resolveFlowCollection(
   const [ce, ...ee] = fc.end
   if (!ce || ce.source !== expectedEnd) {
     const cs = isMap ? 'map' : 'sequence'
-    onError(offset, `Expected flow ${cs} to end with ${expectedEnd}`)
+    onError(
+      offset,
+      'MISSING_CHAR',
+      `Expected flow ${cs} to end with ${expectedEnd}`
+    )
   }
   if (ce) offset += ce.source.length
   if (ee.length > 0) {

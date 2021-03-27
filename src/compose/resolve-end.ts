@@ -1,10 +1,11 @@
+import type { ErrorCode } from '../errors.js'
 import type { SourceToken } from '../parse/tokens.js'
 
 export function resolveEnd(
   end: SourceToken[] | undefined,
   offset: number,
   reqSpace: boolean,
-  onError: (offset: number, message: string) => void
+  onError: (offset: number, code: ErrorCode, message: string) => void
 ) {
   let comment = ''
   if (end) {
@@ -20,6 +21,7 @@ export function resolveEnd(
           if (reqSpace && !hasSpace)
             onError(
               offset,
+              'COMMENT_SPACE',
               'Comments must be separated from other tokens by white space characters'
             )
           const cb = source.substring(1)
@@ -34,7 +36,7 @@ export function resolveEnd(
           hasSpace = true
           break
         default:
-          onError(offset, `Unexpected ${type} at node end`)
+          onError(offset, 'UNEXPECTED_TOKEN', `Unexpected ${type} at node end`)
       }
       offset += source.length
     }

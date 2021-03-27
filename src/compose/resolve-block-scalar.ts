@@ -1,10 +1,11 @@
+import type { ErrorCode } from '../errors.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar } from '../parse/tokens.js'
 
 export function resolveBlockScalar(
   scalar: BlockScalar,
   strict: boolean,
-  onError: (offset: number, message: string) => void
+  onError: (offset: number, code: ErrorCode, message: string) => void
 ): {
   value: string
   type: Scalar.BLOCK_FOLDED | Scalar.BLOCK_LITERAL | null
@@ -46,7 +47,7 @@ export function resolveBlockScalar(
       if (indent.length < trimIndent) {
         const message =
           'Block scalars with more-indented leading empty lines must use an explicit indentation indicator'
-        onError(offset + indent.length, message)
+        onError(offset + indent.length, 'MISSING_CHAR', message)
       }
       if (header.indent === 0) trimIndent = indent.length
       contentStart = i
@@ -75,7 +76,7 @@ export function resolveBlockScalar(
         ? 'explicit indentation indicator'
         : 'first line'
       const message = `Block scalar lines must not be less indented than their ${src}`
-      onError(offset - content.length - (crlf ? 2 : 1), message)
+      onError(offset - content.length - (crlf ? 2 : 1), 'BAD_INDENT', message)
       indent = ''
     }
 
@@ -123,11 +124,11 @@ export function resolveBlockScalar(
 function parseBlockScalarHeader(
   { offset, props }: BlockScalar,
   strict: boolean,
-  onError: (offset: number, message: string) => void
+  onError: (offset: number, code: ErrorCode, message: string) => void
 ) {
   /* istanbul ignore if should not happen */
   if (props[0].type !== 'block-scalar-header') {
-    onError(offset, 'Block scalar header not found')
+    onError(offset, 'IMPOSSIBLE', 'Block scalar header not found')
     return null
   }
   const { source } = props[0]
@@ -145,7 +146,11 @@ function parseBlockScalarHeader(
     }
   }
   if (error !== -1)
-    onError(error, `Block scalar header includes extra characters: ${source}`)
+    onError(
+      error,
+      'UNEXPECTED_TOKEN',
+      `Block scalar header includes extra characters: ${source}`
+    )
   let hasSpace = false
   let comment = ''
   let length = source.length
@@ -162,19 +167,19 @@ function parseBlockScalarHeader(
         if (strict && !hasSpace) {
           const message =
             'Comments must be separated from other tokens by white space characters'
-          onError(offset + length, message)
+          onError(offset + length, 'COMMENT_SPACE', message)
         }
         length += token.source.length
         comment = token.source.substring(1)
         break
       case 'error':
-        onError(offset + length, token.message)
+        onError(offset + length, 'UNEXPECTED_TOKEN', token.message)
         length += token.source.length
         break
       /* istanbul ignore next should not happen */
       default: {
         const message = `Unexpected token in block scalar header: ${token.type}`
-        onError(offset + length, message)
+        onError(offset + length, 'UNEXPECTED_TOKEN', message)
         const ts = (token as any).source
         if (ts && typeof ts === 'string') length += ts.length
       }

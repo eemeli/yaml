@@ -1,4 +1,5 @@
 import type { Directives } from '../doc/directives.js'
+import type { ErrorCode } from '../errors.js'
 import { Alias } from '../nodes/Alias.js'
 import type { ParsedNode } from '../nodes/Node.js'
 import type { ParseOptions } from '../options.js'
@@ -29,7 +30,12 @@ export function composeNode(
   ctx: ComposeContext,
   token: Token,
   props: Props,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (
+    offset: number,
+    code: ErrorCode,
+    message: string,
+    warning?: boolean
+  ) => void
 ) {
   const { spaceBefore, comment, anchor, tagName } = props
   let node: ParsedNode
@@ -37,7 +43,11 @@ export function composeNode(
     case 'alias':
       node = composeAlias(ctx, token, onError)
       if (anchor || tagName)
-        onError(token.offset, 'An alias node must not specify any properties')
+        onError(
+          token.offset,
+          'ALIAS_PROPS',
+          'An alias node must not specify any properties'
+        )
       break
     case 'scalar':
     case 'single-quoted-scalar':
@@ -74,7 +84,12 @@ export function composeEmptyNode(
   before: Token[] | undefined,
   pos: number | null,
   { spaceBefore, comment, anchor, tagName }: Props,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (
+    offset: number,
+    code: ErrorCode,
+    message: string,
+    warning?: boolean
+  ) => void
 ) {
   const token: FlowScalar = {
     type: 'scalar',
@@ -94,7 +109,12 @@ export function composeEmptyNode(
 function composeAlias(
   { options }: ComposeContext,
   { offset, source, end }: FlowScalar,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (
+    offset: number,
+    code: ErrorCode,
+    message: string,
+    warning?: boolean
+  ) => void
 ) {
   const alias = new Alias(source.substring(1))
   const re = resolveEnd(

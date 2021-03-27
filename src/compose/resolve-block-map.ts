@@ -1,3 +1,4 @@
+import type { ErrorCode } from '../errors.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import type { BlockMap } from '../parse/tokens.js'
@@ -11,7 +12,12 @@ export function resolveBlockMap(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   { indent, items, offset }: BlockMap,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (
+    offset: number,
+    code: ErrorCode,
+    message: string,
+    warning?: boolean
+  ) => void
 ) {
   const start = offset
   const map = new YAMLMap(ctx.schema)
@@ -32,10 +38,11 @@ export function resolveBlockMap(
         if (key.type === 'block-seq')
           onError(
             offset,
+            'BLOCK_AS_IMPLICIT_KEY',
             'A block sequence may not be used as an implicit map key'
           )
         else if ('indent' in key && key.indent !== indent)
-          onError(offset, startColMsg)
+          onError(offset, 'BAD_INDENT', startColMsg)
       }
       if (!keyProps.anchor && !keyProps.tagName && !sep) {
         // TODO: assert being at last item?
@@ -45,10 +52,15 @@ export function resolveBlockMap(
         }
         continue
       }
-    } else if (keyProps.found?.indent !== indent) onError(offset, startColMsg)
+    } else if (keyProps.found?.indent !== indent)
+      onError(offset, 'BAD_INDENT', startColMsg)
     offset += keyProps.length
     if (implicitKey && containsNewline(key))
-      onError(offset, 'Implicit keys need to be on a single line')
+      onError(
+        offset,
+        'MULTILINE_IMPLICIT_KEY',
+        'Implicit keys need to be on a single line'
+      )
 
     // key value
     const keyStart = offset
@@ -71,13 +83,18 @@ export function resolveBlockMap(
     if (valueProps.found) {
       if (implicitKey) {
         if (value?.type === 'block-map' && !valueProps.hasNewline)
-          onError(offset, 'Nested mappings are not allowed in compact mappings')
+          onError(
+            offset,
+            'BLOCK_AS_IMPLICIT_KEY',
+            'Nested mappings are not allowed in compact mappings'
+          )
         if (
           ctx.options.strict &&
           keyProps.start < valueProps.found.offset - 1024
         )
           onError(
             offset,
+            'KEY_OVER_1024_CHARS',
             'The : indicator must be at most 1024 chars after the start of an implicit block mapping key'
           )
       }
@@ -90,7 +107,11 @@ export function resolveBlockMap(
     } else {
       // key with no value
       if (implicitKey)
-        onError(keyStart, 'Implicit map keys need to be followed by map values')
+        onError(
+          keyStart,
+          'MISSING_CHAR',
+          'Implicit map keys need to be followed by map values'
+        )
       if (valueProps.comment) {
         if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
         else keyNode.comment = valueProps.comment

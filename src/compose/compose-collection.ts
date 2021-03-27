@@ -1,3 +1,4 @@
+import type { ErrorCode } from '../errors.js'
 import { isMap, isNode, ParsedNode } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
@@ -18,7 +19,12 @@ export function composeCollection(
   ctx: ComposeContext,
   token: BlockMap | BlockSequence | FlowCollection,
   tagName: string | null,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (
+    offset: number,
+    code: ErrorCode,
+    message: string,
+    warning?: boolean
+  ) => void
 ) {
   let coll: YAMLMap.Parsed | YAMLSeq.Parsed
   switch (token.type) {
@@ -55,13 +61,22 @@ export function composeCollection(
       ctx.schema.tags.push(Object.assign({}, kt, { default: false }))
       tag = kt
     } else {
-      onError(coll.range[0], `Unresolved tag: ${tagName}`, true)
+      onError(
+        coll.range[0],
+        'TAG_RESOLVE_FAILED',
+        `Unresolved tag: ${tagName}`,
+        true
+      )
       coll.tag = tagName
       return coll
     }
   }
 
-  const res = tag.resolve(coll, msg => onError(coll.range[0], msg), ctx.options)
+  const res = tag.resolve(
+    coll,
+    msg => onError(coll.range[0], 'TAG_RESOLVE_FAILED', msg),
+    ctx.options
+  )
   const node = isNode(res)
     ? (res as ParsedNode)
     : (new Scalar(res) as Scalar.Parsed)

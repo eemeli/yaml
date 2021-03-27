@@ -1,5 +1,6 @@
 import type { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
+import type { ErrorCode } from '../errors.js'
 import type {
   DocumentOptions,
   ParseOptions,
@@ -18,7 +19,12 @@ export function composeDoc(
   options: ParseOptions & DocumentOptions & SchemaOptions,
   directives: Directives,
   { offset, start, value, end }: Tokens.Document,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (
+    offset: number,
+    code: ErrorCode,
+    message: string,
+    warning?: boolean
+  ) => void
 ) {
   const opts = Object.assign({ directives }, options)
   const doc = new Document(undefined, opts) as Document.Parsed

@@ -1,17 +1,18 @@
+import type { ErrorCode } from '../errors.js'
 import { isScalar, SCALAR } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
 import type { Schema } from '../schema/Schema.js'
 import type { ScalarTag } from '../schema/types.js'
+import type { ComposeContext } from './compose-node.js'
 import { resolveBlockScalar } from './resolve-block-scalar.js'
 import { resolveFlowScalar } from './resolve-flow-scalar.js'
-import type { ComposeContext } from './compose-node.js'
 
 export function composeScalar(
   ctx: ComposeContext,
   token: FlowScalar | BlockScalar,
   tagName: string | null,
-  onError: (offset: number, message: string) => void
+  onError: (offset: number, code: ErrorCode, message: string) => void
 ) {
   const { offset } = token
   const { value, type, comment, length } =
@@ -25,10 +26,14 @@ export function composeScalar(
 
   let scalar: Scalar
   try {
-    const res = tag.resolve(value, msg => onError(offset, msg), ctx.options)
+    const res = tag.resolve(
+      value,
+      msg => onError(offset, 'TAG_RESOLVE_FAILED', msg),
+      ctx.options
+    )
     scalar = isScalar(res) ? res : new Scalar(res)
   } catch (error) {
-    onError(offset, error.message)
+    onError(offset, 'TAG_RESOLVE_FAILED', error.message)
     scalar = new Scalar(value)
   }
   scalar.range = [offset, offset + length]
@@ -45,7 +50,12 @@ function findScalarTagByName(
   schema: Schema,
   value: string,
   tagName: string,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (
+    offset: number,
+    code: ErrorCode,
+    message: string,
+    warning?: boolean
+  ) => void
 ) {
   if (tagName === '!') return schema[SCALAR] // non-specific tag
   const matchWithTest: ScalarTag[] = []
@@ -63,7 +73,12 @@ function findScalarTagByName(
     schema.tags.push(Object.assign({}, kt, { default: false, test: undefined }))
     return kt
   }
-  onError(0, `Unresolved tag: ${tagName}`, tagName !== 'tag:yaml.org,2002:str')
+  onError(
+    0,
+    'TAG_RESOLVE_FAILED',
+    `Unresolved tag: ${tagName}`,
+    tagName !== 'tag:yaml.org,2002:str'
+  )
   return schema[SCALAR]
 }
 

@@ -1,3 +1,4 @@
+import type { ErrorCode } from '../errors.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { BlockSequence } from '../parse/tokens.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
@@ -7,7 +8,12 @@ export function resolveBlockSeq(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   { items, offset }: BlockSequence,
-  onError: (offset: number, message: string, warning?: boolean) => void
+  onError: (
+    offset: number,
+    code: ErrorCode,
+    message: string,
+    warning?: boolean
+  ) => void
 ) {
   const start = offset
   const seq = new YAMLSeq(ctx.schema)
@@ -23,11 +29,14 @@ export function resolveBlockSeq(
     offset += props.length
     if (!props.found) {
       if (props.anchor || props.tagName || value) {
-        const msg =
-          value && value.type === 'block-seq'
-            ? 'All sequence items must start at the same column'
-            : 'Sequence item without - indicator'
-        onError(offset, msg)
+        if (value && value.type === 'block-seq')
+          onError(
+            offset,
+            'BAD_INDENT',
+            'All sequence items must start at the same column'
+          )
+        else
+          onError(offset, 'MISSING_CHAR', 'Sequence item without - indicator')
       } else {
         // TODO: assert being at last item?
         if (props.comment) seq.comment = props.comment

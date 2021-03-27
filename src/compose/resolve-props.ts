@@ -1,3 +1,4 @@
+import type { ErrorCode } from '../errors.js'
 import type { SourceToken } from '../parse/tokens.js'
 import type { ComposeContext } from './compose-node.js'
 
@@ -11,7 +12,7 @@ export function resolveProps(
     | 'map-value-ind'
     | 'seq-item-ind',
   offset: number,
-  onError: (offset: number, message: string) => void
+  onError: (offset: number, code: ErrorCode, message: string) => void
 ) {
   let length = 0
   let spaceBefore = false
@@ -31,13 +32,18 @@ export function resolveProps(
         // At the doc level, tabs at line start may be parsed as leading
         // white space rather than indentation.
         if (atNewline && indicator !== 'doc-start' && token.source[0] === '\t')
-          onError(offset + length, 'Tabs are not allowed as indentation')
+          onError(
+            offset + length,
+            'TAB_AS_INDENT',
+            'Tabs are not allowed as indentation'
+          )
         hasSpace = true
         break
       case 'comment': {
         if (ctx.options.strict && !hasSpace)
           onError(
             offset + length,
+            'COMMENT_SPACE',
             'Comments must be separated from other tokens by white space characters'
           )
         const cb = token.source.substring(1)
@@ -56,16 +62,25 @@ export function resolveProps(
         break
       case 'anchor':
         if (anchor)
-          onError(offset + length, 'A node can have at most one anchor')
+          onError(
+            offset + length,
+            'MULTIPLE_ANCHORS',
+            'A node can have at most one anchor'
+          )
         anchor = token.source.substring(1)
         if (start === null) start = offset + length
         atNewline = false
         hasSpace = false
         break
       case 'tag': {
-        if (tagName) onError(offset + length, 'A node can have at most one tag')
+        if (tagName)
+          onError(
+            offset + length,
+            'MULTIPLE_TAGS',
+            'A node can have at most one tag'
+          )
         const tn = ctx.directives.tagName(token.source, msg =>
-          onError(offset, msg)
+          onError(offset, 'TAG_RESOLVE_FAILED', msg)
         )
         if (tn) tagName = tn
         if (start === null) start = offset + length
@@ -80,7 +95,11 @@ export function resolveProps(
         hasSpace = false
         break
       default:
-        onError(offset + length, `Unexpected ${token.type} token`)
+        onError(
+          offset + length,
+          'UNEXPECTED_TOKEN',
+          `Unexpected ${token.type} token`
+        )
         atNewline = false
         hasSpace = false
     }

@@ -1,29 +1,57 @@
 import type { LineCounter } from './parse/line-counter'
 
+export type ErrorCode =
+  | 'ALIAS_PROPS'
+  | 'BAD_DIRECTIVE'
+  | 'BAD_DQ_ESCAPE'
+  | 'BAD_INDENT'
+  | 'BAD_SCALAR_START'
+  | 'BLOCK_AS_IMPLICIT_KEY'
+  | 'BLOCK_IN_FLOW'
+  | 'COMMENT_SPACE'
+  | 'IMPOSSIBLE'
+  | 'KEY_OVER_1024_CHARS'
+  | 'MISSING_ANCHOR'
+  | 'MISSING_CHAR'
+  | 'MULTILINE_IMPLICIT_KEY'
+  | 'MULTIPLE_ANCHORS'
+  | 'MULTIPLE_DOCS'
+  | 'MULTIPLE_TAGS'
+  | 'PROP_BEFORE_SEP'
+  | 'TAB_AS_INDENT'
+  | 'TAG_RESOLVE_FAILED'
+  | 'UNEXPECTED_TOKEN'
+
 export class YAMLError extends Error {
   name: 'YAMLParseError' | 'YAMLWarning'
+  code: ErrorCode
   message: string
   offset: number
   linePos?: { line: number; col: number }
 
-  constructor(name: YAMLError['name'], offset: number, message: string) {
-    if (!message) throw new Error(`Invalid arguments for new ${name}`)
+  constructor(
+    name: YAMLError['name'],
+    offset: number,
+    code: ErrorCode,
+    message: string
+  ) {
     super()
     this.name = name
+    this.code = code
     this.message = message
     this.offset = offset
   }
 }
 
 export class YAMLParseError extends YAMLError {
-  constructor(offset: number, message: string) {
-    super('YAMLParseError', offset, message)
+  constructor(offset: number, code: ErrorCode, message: string) {
+    super('YAMLParseError', offset, code, message)
   }
 }
 
 export class YAMLWarning extends YAMLError {
-  constructor(offset: number, message: string) {
-    super('YAMLWarning', offset, message)
+  constructor(offset: number, code: ErrorCode, message: string) {
+    super('YAMLWarning', offset, code, message)
   }
 }
 

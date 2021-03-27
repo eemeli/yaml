@@ -80,9 +80,13 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
   const composer = new Composer(_doc => {
     if (!doc) doc = _doc as Document.Parsed<T>
     else if (doc.options.logLevel !== 'silent') {
-      const errMsg =
-        'Source contains multiple documents; please use YAML.parseAllDocuments()'
-      doc.errors.push(new YAMLParseError(_doc.range[0], errMsg))
+      doc.errors.push(
+        new YAMLParseError(
+          _doc.range[0],
+          'MULTIPLE_DOCS',
+          'Source contains multiple documents; please use YAML.parseAllDocuments()'
+        )
+      )
     }
   }, options)
   const parser = new Parser(composer.next, lineCounter?.addNewLine)
