@@ -26,7 +26,7 @@ import {
 import { Schema } from '../schema/Schema.js'
 import { stringify } from '../stringify/stringify.js'
 import { stringifyDocument } from '../stringify/stringifyDocument.js'
-import { createNodeAnchors, findNewAnchor } from './anchors.js'
+import { anchorNames, createNodeAnchors, findNewAnchor } from './anchors.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode, CreateNodeContext } from './createNode.js'
 import { Directives } from './directives.js'
@@ -132,13 +132,19 @@ export class Document<T = unknown> {
   }
 
   /**
-   * Create a new `Alias` node, adding the required anchor for `node`.
-   * If `name` is empty, a new anchor name will be generated. If `node`
-   * already has an anchor, that will be used instead of `name`.
+   * Create a new `Alias` node, ensuring that the target `node` has the required anchor.
+   *
+   * If `node` already has an anchor, `name` is ignored.
+   * Otherwise, the `node.anchor` value will be set to `name`,
+   * or if an anchor with that name is already present in the document,
+   * `name` will be used as a prefix for a new unique anchor.
+   * If `name` is undefined, the generated anchor will use 'a' as a prefix.
    */
   createAlias(node: Scalar | YAMLMap | YAMLSeq, name?: string): Alias {
     if (!node.anchor) {
-      node.anchor = name || findNewAnchor(this.options.anchorPrefix, this)
+      const prev = anchorNames(this)
+      node.anchor =
+        !name || prev.has(name) ? findNewAnchor(name || 'a', prev) : name
     }
     return new Alias(node.anchor)
   }

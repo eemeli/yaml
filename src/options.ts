@@ -42,13 +42,6 @@ export type ParseOptions = {
 
 export type DocumentOptions = {
   /**
-   * Default prefix for anchors.
-   *
-   * Default: `'a'`, resulting in anchors `a1`, `a2`, etc.
-   */
-  anchorPrefix?: string
-
-  /**
    * Used internally by Composer. If set and includes an explicit version,
    * that overrides the `version` option.
    */
@@ -307,7 +300,6 @@ export type ToStringOptions = {
 export const defaultOptions: Required<
   Omit<ParseOptions, 'lineCounter'> & Omit<DocumentOptions, 'directives'>
 > = {
-  anchorPrefix: 'a',
   intAsBigInt: false,
   logLevel: 'warn',
   prettyErrors: true,

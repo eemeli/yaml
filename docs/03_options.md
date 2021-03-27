@@ -37,11 +37,10 @@ Document options are relevant for operations on the `Document` object, which mak
 
 Used by: `parse()`, `parseDocument()`, `parseAllDocuments()`, `stringify()`, `new Composer()`, and `new Document()`
 
-| Name          | Type                            | Default  | Description                                                                                                                                |
-| ------------- | ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| anchorPrefix  | `string`                        | `'a'`    | Default prefix for anchors, resulting in anchors `a1`, `a2`, ... by default.                                                               |
-| logLevel      | `'warn' ⎮ 'error' ⎮` `'silent'` | `'warn'` | Control the verbosity of `parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors (not recommended). |
-| version       | `'1.1' ⎮ '1.2'`                 | `'1.2'`  | The YAML version used by documents without a `%YAML` directive.                                                                            |
+| Name     | Type                            | Default  | Description                                                                                                                                |
+| -------- | ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| logLevel | `'warn' ⎮ 'error' ⎮` `'silent'` | `'warn'` | Control the verbosity of `parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors (not recommended). |
+| version  | `'1.1' ⎮ '1.2'`                 | `'1.2'`  | The YAML version used by documents without a `%YAML` directive.                                                                            |
 
 By default, the library will emit warnings as required by the YAML spec during parsing.
 If you'd like to silence these, set the `logLevel` option to `'error'`.

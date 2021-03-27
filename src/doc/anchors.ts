@@ -29,17 +29,8 @@ export function anchorNames(root: Document | Node) {
   return anchors
 }
 
-/**
- * Find a new anchor name with the given `prefix` and a one-indexed suffix.
- *
- * The second argument may either be a YAML Document, or a Set of strings
- * against which generated anchors are tested; this is intended to allow for
- * caching, should multiple new anchors be needed within a single operation.
- */
-export function findNewAnchor(prefix: string, doc: Document): string
-export function findNewAnchor(prefix: string, cache: Set<string>): string
-export function findNewAnchor(prefix: string, cache: Document | Set<string>) {
-  const exclude = cache instanceof Set ? cache : anchorNames(cache)
+/** Find a new anchor name with the given `prefix` and a one-indexed suffix. */
+export function findNewAnchor(prefix: string, exclude: Set<string>) {
   for (let i = 1; true; ++i) {
     const name = `${prefix}${i}`
     if (!exclude.has(name)) return name

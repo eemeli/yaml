@@ -214,9 +214,10 @@ String(doc)
 // - *foo
 ```
 
-Create a new `Alias` node, adding the required anchor for `node`.
-If `name` is empty, a new anchor name will be generated.
-If `node` already has an anchor, that will be used instead of `name`.
+Create a new `Alias` node, ensuring that the target `node` has the required anchor.
+If `node` already has an anchor, `name` is ignored.
+Otherwise, the `node.anchor` value will be set to `name`, or if an anchor with that name is already present in the document, `name` will be used as a prefix for a new unique anchor.
+If `name` is undefined, the generated anchor will use 'a' as a prefix.
 
 You should make sure to only add alias nodes to the document after the nodes to which they refer, or the document's YAML stringification will fail.
 
