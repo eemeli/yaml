@@ -1,6 +1,10 @@
 import type { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
-import type { Options } from '../options.js'
+import type {
+  DocumentOptions,
+  ParseOptions,
+  SchemaOptions
+} from '../options.js'
 import type * as Tokens from '../parse/tokens.js'
 import {
   ComposeContext,
@@ -11,7 +15,7 @@ import { resolveEnd } from './resolve-end.js'
 import { resolveProps } from './resolve-props.js'
 
 export function composeDoc(
-  options: Options,
+  options: ParseOptions & DocumentOptions & SchemaOptions,
   directives: Directives,
   { offset, start, value, end }: Tokens.Document,
   onError: (offset: number, message: string, warning?: boolean) => void

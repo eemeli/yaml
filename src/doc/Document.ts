@@ -18,7 +18,6 @@ import {
   CreateNodeOptions,
   defaultOptions,
   DocumentOptions,
-  Options,
   ParseOptions,
   SchemaOptions,
   ToJSOptions,
@@ -77,12 +76,22 @@ export class Document<T = unknown> {
    * @param value - The initial value for the document, which will be wrapped
    *   in a Node container.
    */
-  constructor(value?: any, options?: Options)
-  constructor(value: any, replacer: null | Replacer, options?: Options)
+  constructor(
+    value?: any,
+    options?: DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions
+  )
+  constructor(
+    value: any,
+    replacer: null | Replacer,
+    options?: DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions
+  )
   constructor(
     value?: unknown,
-    replacer?: Replacer | Options | null,
-    options?: Options
+    replacer?:
+      | Replacer
+      | (DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions)
+      | null,
+    options?: DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions
   ) {
     Object.defineProperty(this, NODE_TYPE, { value: DOC })
     let _replacer: Replacer | null = null

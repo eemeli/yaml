@@ -2,7 +2,12 @@ import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { YAMLParseError, YAMLWarning } from '../errors.js'
 import { isCollection } from '../nodes/Node.js'
-import { defaultOptions, Options } from '../options.js'
+import {
+  defaultOptions,
+  DocumentOptions,
+  ParseOptions,
+  SchemaOptions
+} from '../options.js'
 import type { Token } from '../parse/tokens.js'
 import { composeDoc } from './compose-doc.js'
 import { resolveEnd } from './resolve-end.js'
@@ -38,7 +43,7 @@ function parsePrelude(prelude: string[]) {
  * Compose a stream of CST nodes into a stream of YAML Documents.
  *
  * ```ts
- * const options: Options = { ... }
+ * const options = { ... }
  * const docs: Document.Parsed[] = []
  * const composer = new Composer(doc => docs.push(doc), options)
  * const parser = new Parser(composer.next)
@@ -50,13 +55,16 @@ export class Composer {
   private directives: Directives
   private doc: Document.Parsed | null = null
   private onDocument: (doc: Document.Parsed) => void
-  private options: Options
+  private options: ParseOptions & DocumentOptions & SchemaOptions
   private atDirectives = false
   private prelude: string[] = []
   private errors: YAMLParseError[] = []
   private warnings: YAMLWarning[] = []
 
-  constructor(onDocument: Composer['onDocument'], options: Options = {}) {
+  constructor(
+    onDocument: Composer['onDocument'],
+    options: ParseOptions & DocumentOptions & SchemaOptions = {}
+  ) {
     this.directives = new Directives({
       version: options?.version || defaultOptions.version
     })

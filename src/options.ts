@@ -297,8 +297,6 @@ export type ToStringOptions = {
   verifyAliasOrder?: boolean
 }
 
-export type Options = ParseOptions & DocumentOptions & SchemaOptions
-
 /**
  * `yaml` defines document-specific options in three places: as an argument of
  * parse, create and stringify calls, in the values of `YAML.defaultOptions`,
