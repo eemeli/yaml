@@ -4,7 +4,14 @@ import { Document, Replacer } from './doc/Document.js'
 import { prettifyError, YAMLParseError } from './errors.js'
 import { warn } from './log.js'
 import type { ParsedNode } from './nodes/Node.js'
-import type { Options, ToJSOptions, ToStringOptions } from './options.js'
+import type {
+  CreateNodeOptions,
+  DocumentOptions,
+  ParseOptions,
+  SchemaOptions,
+  ToJSOptions,
+  ToStringOptions
+} from './options.js'
 import { LineCounter } from './parse/line-counter.js'
 import { Parser } from './parse/parser.js'
 
@@ -14,7 +21,7 @@ export interface EmptyStream
   empty: true
 }
 
-function parseOptions(options: Options | undefined) {
+function parseOptions(options: ParseOptions | undefined) {
   const prettyErrors = !options || options.prettyErrors !== false
   const lineCounter =
     (options && options.lineCounter) ||
@@ -34,7 +41,7 @@ function parseOptions(options: Options | undefined) {
  */
 export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
   source: string,
-  options?: Options
+  options?: ParseOptions & DocumentOptions & SchemaOptions
 ): Document.Parsed<T>[] | EmptyStream {
   const { lineCounter, prettyErrors } = parseOptions(options)
 
@@ -64,7 +71,7 @@ export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
 /** Parse an input string into a single YAML.Document */
 export function parseDocument<T extends ParsedNode = ParsedNode>(
   source: string,
-  options?: Options
+  options?: ParseOptions & DocumentOptions & SchemaOptions
 ) {
   const { lineCounter, prettyErrors } = parseOptions(options)
 
@@ -102,17 +109,22 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
  *   document, so Maps become objects, Sequences arrays, and scalars result in
  *   nulls, booleans, numbers and strings.
  */
-export function parse(src: string, options?: Options & ToJSOptions): any
+export function parse(
+  src: string,
+  options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
+): any
 export function parse(
   src: string,
   reviver: Reviver,
-  options?: Options & ToJSOptions
+  options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
 ): any
 
 export function parse(
   src: string,
-  reviver?: Reviver | (Options & ToJSOptions),
-  options?: Options & ToJSOptions
+  reviver?:
+    | Reviver
+    | (ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions),
+  options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
 ) {
   let _reviver: Reviver | undefined = undefined
   if (typeof reviver === 'function') {
@@ -139,17 +151,43 @@ export function parse(
  */
 export function stringify(
   value: any,
-  options?: Options & ToStringOptions
+  options?: DocumentOptions &
+    SchemaOptions &
+    ParseOptions &
+    CreateNodeOptions &
+    ToStringOptions
 ): string
 export function stringify(
   value: any,
   replacer?: Replacer | null,
-  options?: string | number | (Options & ToStringOptions)
+  options?:
+    | string
+    | number
+    | (DocumentOptions &
+        SchemaOptions &
+        ParseOptions &
+        CreateNodeOptions &
+        ToStringOptions)
 ): string
+
 export function stringify(
   value: any,
-  replacer?: Replacer | (Options & ToStringOptions) | null,
-  options?: string | number | (Options & ToStringOptions)
+  replacer?:
+    | Replacer
+    | (DocumentOptions &
+        SchemaOptions &
+        ParseOptions &
+        CreateNodeOptions &
+        ToStringOptions)
+    | null,
+  options?:
+    | string
+    | number
+    | (DocumentOptions &
+        SchemaOptions &
+        ParseOptions &
+        CreateNodeOptions &
+        ToStringOptions)
 ) {
   let _replacer: Replacer | null = null
   if (typeof replacer === 'function' || Array.isArray(replacer)) {
@@ -164,8 +202,7 @@ export function stringify(
     options = indent < 1 ? undefined : indent > 8 ? { indent: 8 } : { indent }
   }
   if (value === undefined) {
-    const { keepUndefined } =
-      options || (replacer as Options & ToStringOptions) || {}
+    const { keepUndefined } = options || (replacer as CreateNodeOptions) || {}
     if (!keepUndefined) return undefined
   }
   return new Document(value, _replacer, options).toString(options)

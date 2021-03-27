@@ -1,22 +1,19 @@
-import type { Document } from '../doc/Document.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { BlockSequence } from '../parse/tokens.js'
-import type { ComposeNode } from './compose-node.js'
+import type { ComposeContext, ComposeNode } from './compose-node.js'
 import { resolveProps } from './resolve-props.js'
 
 export function resolveBlockSeq(
   { composeNode, composeEmptyNode }: ComposeNode,
-  doc: Document.Parsed,
+  ctx: ComposeContext,
   { items, offset }: BlockSequence,
-  anchor: string | null,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const start = offset
-  const seq = new YAMLSeq(doc.schema)
-  if (anchor) doc.anchors.setAnchor(seq, anchor)
+  const seq = new YAMLSeq(ctx.schema)
   for (const { start, value } of items) {
     const props = resolveProps(
-      doc,
+      ctx,
       start,
       true,
       'seq-item-ind',
@@ -38,8 +35,8 @@ export function resolveBlockSeq(
       }
     }
     const node = value
-      ? composeNode(doc, value, props, onError)
-      : composeEmptyNode(doc, offset, start, null, props, onError)
+      ? composeNode(ctx, value, props, onError)
+      : composeEmptyNode(ctx, offset, start, null, props, onError)
     offset = node.range[1]
     seq.items.push(node)
   }

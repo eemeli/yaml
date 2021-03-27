@@ -63,9 +63,9 @@ function mergeToJSMap(
     | Record<string | number | symbol, unknown>,
   value: unknown
 ) {
-  if (!isAlias(value) || !isMap(value.source))
-    throw new Error('Merge sources must be map aliases')
-  const srcMap = value.source.toJSON(null, ctx, Map)
+  const source = ctx && isAlias(value) ? value.resolve(ctx.doc) : null
+  if (!isMap(source)) throw new Error('Merge sources must be map aliases')
+  const srcMap = source.toJSON(null, ctx, Map)
   for (const [key, value] of srcMap) {
     if (map instanceof Map) {
       if (!map.has(key)) map.set(key, value)
@@ -92,6 +92,9 @@ function stringifyKey(
   if (typeof jsKey !== 'object') return String(jsKey)
   if (isNode(key) && ctx && ctx.doc) {
     const strCtx = createStringifyContext(ctx.doc, {})
+    strCtx.anchors = new Set()
+    for (const node of ctx.anchors.keys())
+      strCtx.anchors.add(node.anchor as 'string')
     strCtx.inFlow = true
     strCtx.inStringifyKey = true
     const strKey = key.toString(strCtx)

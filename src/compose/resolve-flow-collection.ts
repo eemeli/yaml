@@ -1,24 +1,21 @@
-import type { Document } from '../doc/Document.js'
 import { isNode, isPair, ParsedNode } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { FlowCollection, SourceToken, Token } from '../parse/tokens.js'
-import type { ComposeNode } from './compose-node.js'
+import type { ComposeContext, ComposeNode } from './compose-node.js'
 import { resolveEnd } from './resolve-end.js'
 import { containsNewline } from './util-contains-newline.js'
 
 export function resolveFlowCollection(
   { composeNode, composeEmptyNode }: ComposeNode,
-  doc: Document.Parsed,
+  ctx: ComposeContext,
   fc: FlowCollection,
-  _anchor: string | null,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
   const isMap = fc.start.source === '{'
-  const coll = isMap ? new YAMLMap(doc.schema) : new YAMLSeq(doc.schema)
+  const coll = isMap ? new YAMLMap(ctx.schema) : new YAMLSeq(ctx.schema)
   coll.flow = true
-  if (_anchor) doc.anchors.setAnchor(coll, _anchor)
 
   let key: ParsedNode | null = null
   let value: ParsedNode | null = null
@@ -55,14 +52,14 @@ export function resolveFlowCollection(
     if (value) {
       if (hasComment) value.comment = comment
     } else {
-      value = composeEmptyNode(doc, offset, fc.items, pos, getProps(), onError)
+      value = composeEmptyNode(ctx, offset, fc.items, pos, getProps(), onError)
     }
     if (isMap || atExplicitKey) {
       coll.items.push(key ? new Pair(key, value) : new Pair(value))
     } else {
       const seq = coll as YAMLSeq
       if (key) {
-        const map = new YAMLMap(doc.schema)
+        const map = new YAMLMap(ctx.schema)
         map.flow = true
         map.items.push(new Pair(key, value))
         seq.items.push(map)
@@ -78,7 +75,7 @@ export function resolveFlowCollection(
         hasSpace = true
         break
       case 'comment': {
-        if (doc.options.strict && !hasSpace)
+        if (ctx.options.strict && !hasSpace)
           onError(
             offset,
             'Comments must be separated from other tokens by white space characters'
@@ -120,7 +117,7 @@ export function resolveFlowCollection(
         break
       case 'tag': {
         if (tagName) onError(offset, 'A node can have at most one tag')
-        const tn = doc.directives.tagName(token.source, m => onError(offset, m))
+        const tn = ctx.directives.tagName(token.source, m => onError(offset, m))
         if (tn) tagName = tn
         atLineStart = false
         atValueEnd = false
@@ -139,7 +136,7 @@ export function resolveFlowCollection(
         if (key) {
           if (value) {
             onError(offset, 'Missing {} around pair used as mapping key')
-            const map = new YAMLMap(doc.schema)
+            const map = new YAMLMap(ctx.schema)
             map.flow = true
             map.items.push(new Pair(key, value))
             map.range = [key.range[0], value.range[1]]
@@ -147,7 +144,7 @@ export function resolveFlowCollection(
             value = null
           } // else explicit key
         } else if (value) {
-          if (doc.options.strict) {
+          if (ctx.options.strict) {
             const slMsg =
               'Implicit keys of flow sequence pairs need to be on a single line'
             if (nlAfterValueInSeq) onError(offset, slMsg)
@@ -165,7 +162,7 @@ export function resolveFlowCollection(
           key = value
           value = null
         } else {
-          key = composeEmptyNode(doc, offset, fc.items, i, getProps(), onError)
+          key = composeEmptyNode(ctx, offset, fc.items, i, getProps(), onError)
         }
         if (hasComment) {
           key.comment = comment
@@ -199,7 +196,7 @@ export function resolveFlowCollection(
       default: {
         if (value) onError(offset, 'Missing , between flow collection items')
         if (!isMap && !key && !atExplicitKey) seqKeyToken = token
-        value = composeNode(doc, token, getProps(), onError)
+        value = composeNode(ctx, token, getProps(), onError)
         offset = value.range[1]
         atLineStart = false
         isSourceToken = false
@@ -220,7 +217,7 @@ export function resolveFlowCollection(
   }
   if (ce) offset += ce.source.length
   if (ee.length > 0) {
-    const end = resolveEnd(ee, offset, doc.options.strict, onError)
+    const end = resolveEnd(ee, offset, ctx.options.strict, onError)
     if (end.comment) coll.comment = comment
     offset = end.offset
   }

@@ -10,14 +10,14 @@ import {
   ParsedNode
 } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
-import { toJS, ToJSAnchorValue, ToJSContext } from '../nodes/toJS.js'
+import type { Scalar } from '../nodes/Scalar.js'
+import { toJS, ToJSContext } from '../nodes/toJS.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
 import {
   CreateNodeOptions,
   defaultOptions,
   DocumentOptions,
-  Options,
   ParseOptions,
   SchemaOptions,
   ToJSOptions,
@@ -26,7 +26,7 @@ import {
 import { Schema } from '../schema/Schema.js'
 import { stringify } from '../stringify/stringify.js'
 import { stringifyDocument } from '../stringify/stringifyDocument.js'
-import { Anchors } from './Anchors.js'
+import { anchorNames, createNodeAnchors, findNewAnchor } from './anchors.js'
 import { applyReviver } from './applyReviver.js'
 import { createNode, CreateNodeContext } from './createNode.js'
 import { Directives } from './directives.js'
@@ -43,12 +43,6 @@ export declare namespace Document {
 
 export class Document<T = unknown> {
   readonly [NODE_TYPE]: symbol
-
-  /**
-   * Anchors associated with the document's nodes;
-   * also provides alias & merge node creators.
-   */
-  anchors: Anchors
 
   /** A comment before this Document */
   commentBefore: string | null = null
@@ -82,15 +76,25 @@ export class Document<T = unknown> {
    * @param value - The initial value for the document, which will be wrapped
    *   in a Node container.
    */
-  constructor(value?: any, options?: Options)
-  constructor(value: any, replacer: null | Replacer, options?: Options)
+  constructor(
+    value?: any,
+    options?: DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions
+  )
+  constructor(
+    value: any,
+    replacer: null | Replacer,
+    options?: DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions
+  )
   constructor(
     value?: unknown,
-    replacer?: Replacer | Options | null,
-    options?: Options
+    replacer?:
+      | Replacer
+      | (DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions)
+      | null,
+    options?: DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions
   ) {
     Object.defineProperty(this, NODE_TYPE, { value: DOC })
-    let _replacer: Replacer | undefined = undefined
+    let _replacer: Replacer | null = null
     if (typeof replacer === 'function' || Array.isArray(replacer)) {
       _replacer = replacer
     } else if (options === undefined && replacer) {
@@ -100,7 +104,6 @@ export class Document<T = unknown> {
 
     const opt = Object.assign({}, defaultOptions, options)
     this.options = opt
-    this.anchors = new Anchors(this.options.anchorPrefix)
     let { version } = opt
     if (options?.directives) {
       this.directives = options.directives.atDocument()
@@ -108,10 +111,14 @@ export class Document<T = unknown> {
     } else this.directives = new Directives({ version })
     this.setSchema(version, options)
 
-    this.contents =
-      value === undefined
-        ? null
-        : ((this.createNode(value, { replacer: _replacer }) as unknown) as T)
+    if (value === undefined) this.contents = null
+    else {
+      this.contents = (this.createNode(
+        value,
+        _replacer,
+        options
+      ) as unknown) as T
+    }
   }
 
   /** Adds a value to the document. */
@@ -125,52 +132,69 @@ export class Document<T = unknown> {
   }
 
   /**
+   * Create a new `Alias` node, ensuring that the target `node` has the required anchor.
+   *
+   * If `node` already has an anchor, `name` is ignored.
+   * Otherwise, the `node.anchor` value will be set to `name`,
+   * or if an anchor with that name is already present in the document,
+   * `name` will be used as a prefix for a new unique anchor.
+   * If `name` is undefined, the generated anchor will use 'a' as a prefix.
+   */
+  createAlias(node: Scalar | YAMLMap | YAMLSeq, name?: string): Alias {
+    if (!node.anchor) {
+      const prev = anchorNames(this)
+      node.anchor =
+        !name || prev.has(name) ? findNewAnchor(name || 'a', prev) : name
+    }
+    return new Alias(node.anchor)
+  }
+
+  /**
    * Convert any value into a `Node` using the current schema, recursively
    * turning objects into collections.
    */
+  createNode(value: unknown, options?: CreateNodeOptions): Node
   createNode(
     value: unknown,
-    { flow, keepUndefined, onTagObj, replacer, tag }: CreateNodeOptions = {}
+    replacer: Replacer | CreateNodeOptions | null,
+    options?: CreateNodeOptions
+  ): Node
+  createNode(
+    value: unknown,
+    replacer?: Replacer | CreateNodeOptions | null,
+    options?: CreateNodeOptions
   ): Node {
-    if (typeof replacer === 'function')
+    let _replacer: Replacer | undefined = undefined
+    if (typeof replacer === 'function') {
       value = replacer.call({ '': value }, '', value)
-    else if (Array.isArray(replacer)) {
+      _replacer = replacer
+    } else if (Array.isArray(replacer)) {
       const keyToStr = (v: unknown) =>
         typeof v === 'number' || v instanceof String || v instanceof Number
       const asStr = replacer.filter(keyToStr).map(String)
       if (asStr.length > 0) replacer = replacer.concat(asStr)
+      _replacer = replacer
+    } else if (options === undefined && replacer) {
+      options = replacer
+      replacer = undefined
     }
-    if (typeof keepUndefined !== 'boolean')
-      keepUndefined = !!this.options.keepUndefined
-    const aliasNodes: Alias[] = []
+
+    const { anchorPrefix, flow, keepUndefined, onTagObj, tag } = options || {}
+    const { onAnchor, setAnchors, sourceObjects } = createNodeAnchors(
+      this,
+      anchorPrefix || 'a'
+    )
     const ctx: CreateNodeContext = {
-      keepUndefined,
-      onAlias(source) {
-        // These get fixed later in createNode()
-        const alias = new Alias((source as unknown) as Node)
-        aliasNodes.push(alias)
-        return alias
-      },
+      keepUndefined: keepUndefined ?? false,
+      onAnchor,
       onTagObj,
-      prevObjects: new Map(),
-      replacer,
-      schema: this.schema
+      replacer: _replacer,
+      schema: this.schema,
+      sourceObjects
     }
-
     const node = createNode(value, tag, ctx)
-    for (const alias of aliasNodes) {
-      // With circular references, the source node is only resolved after all of
-      // its child nodes are. This is why anchors are set only after all of the
-      // nodes have been created.
-      alias.source = (alias.source as any).node as Node
-      let name = this.anchors.getName(alias.source)
-      if (!name) {
-        name = this.anchors.newName()
-        this.anchors.map[name] = alias.source
-      }
-    }
     if (flow && isCollection(node)) node.flow = true
-
+    setAnchors()
     return node
   }
 
@@ -183,8 +207,8 @@ export class Document<T = unknown> {
     value: unknown,
     options: CreateNodeOptions = {}
   ) {
-    const k = this.createNode(key, options) as K
-    const v = this.createNode(value, options) as V
+    const k = this.createNode(key, null, options) as K
+    const v = this.createNode(value, null, options) as V
     return new Pair(k, v)
   }
 
@@ -327,16 +351,8 @@ export class Document<T = unknown> {
     onAnchor,
     reviver
   }: ToJSOptions & { json?: boolean; jsonArg?: string | null } = {}) {
-    const anchorNodes = Object.values(this.anchors.map).map(
-      node =>
-        [node, { alias: [], aliasCount: 0, count: 1 }] as [
-          Node,
-          ToJSAnchorValue
-        ]
-    )
-    const anchors = anchorNodes.length > 0 ? new Map(anchorNodes) : null
     const ctx: ToJSContext = {
-      anchors,
+      anchors: new Map(),
       doc: this,
       keep: !json,
       mapAsMap: mapAsMap === true,
@@ -345,8 +361,8 @@ export class Document<T = unknown> {
       stringify
     }
     const res = toJS(this.contents, jsonArg || '', ctx)
-    if (typeof onAnchor === 'function' && anchors)
-      for (const { count, res } of anchors.values()) onAnchor(res, count)
+    if (typeof onAnchor === 'function')
+      for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
     return typeof reviver === 'function'
       ? applyReviver(reviver, { '': res }, '', res)
       : res

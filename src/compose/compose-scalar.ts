@@ -1,32 +1,31 @@
-import type { Document } from '../doc/Document.js'
-import type { Schema } from '../schema/Schema.js'
 import { isScalar, SCALAR } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
+import type { Schema } from '../schema/Schema.js'
 import type { ScalarTag } from '../schema/types.js'
 import { resolveBlockScalar } from './resolve-block-scalar.js'
 import { resolveFlowScalar } from './resolve-flow-scalar.js'
+import type { ComposeContext } from './compose-node.js'
 
 export function composeScalar(
-  doc: Document.Parsed,
+  ctx: ComposeContext,
   token: FlowScalar | BlockScalar,
-  anchor: string | null,
   tagName: string | null,
   onError: (offset: number, message: string) => void
 ) {
   const { offset } = token
   const { value, type, comment, length } =
     token.type === 'block-scalar'
-      ? resolveBlockScalar(token, doc.options.strict, onError)
-      : resolveFlowScalar(token, doc.options.strict, onError)
+      ? resolveBlockScalar(token, ctx.options.strict, onError)
+      : resolveFlowScalar(token, ctx.options.strict, onError)
 
   const tag = tagName
-    ? findScalarTagByName(doc.schema, value, tagName, onError)
-    : findScalarTagByTest(doc.schema, value, token.type === 'scalar')
+    ? findScalarTagByName(ctx.schema, value, tagName, onError)
+    : findScalarTagByTest(ctx.schema, value, token.type === 'scalar')
 
   let scalar: Scalar
   try {
-    const res = tag.resolve(value, msg => onError(offset, msg), doc.options)
+    const res = tag.resolve(value, msg => onError(offset, msg), ctx.options)
     scalar = isScalar(res) ? res : new Scalar(res)
   } catch (error) {
     onError(offset, error.message)
@@ -39,7 +38,6 @@ export function composeScalar(
   if (tag.format) scalar.format = tag.format
   if (comment) scalar.comment = comment
 
-  if (anchor) doc.anchors.setAnchor(scalar, anchor)
   return scalar as Scalar.Parsed
 }
 

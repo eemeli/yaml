@@ -26,7 +26,8 @@ export { YAMLSeq } from './nodes/YAMLSeq.js'
 export {
   CreateNodeOptions,
   defaultOptions,
-  Options,
+  DocumentOptions,
+  ParseOptions,
   SchemaOptions,
   ToJSOptions,
   ToStringOptions

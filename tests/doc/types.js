@@ -585,8 +585,8 @@ date (00:00:00Z): 2002-12-14\n`)
     test('explicit creation', () => {
       const src = '- { a: A, b: B }\n- { b: X }\n'
       const doc = YAML.parseDocument(src, { version: '1.1' })
-      const alias = doc.anchors.createAlias(doc.get(0), 'a')
-      doc.addIn([1], doc.anchors.createMergePair(alias))
+      const alias = doc.createAlias(doc.get(0), 'a')
+      doc.addIn([1], doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
@@ -597,7 +597,7 @@ date (00:00:00Z): 2002-12-14\n`)
     test('creation by duck typing', () => {
       const src = '- { a: A, b: B }\n- { b: X }\n'
       const doc = YAML.parseDocument(src, { version: '1.1' })
-      const alias = doc.anchors.createAlias(doc.get(0), 'a')
+      const alias = doc.createAlias(doc.get(0), 'a')
       doc.addIn([1], doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([

@@ -62,6 +62,9 @@ export function isNode(node: any): node is Node {
   return false
 }
 
+export const hasAnchor = (node: unknown): node is Scalar | YAMLMap | YAMLSeq =>
+  (isScalar(node) || isCollection(node)) && !!node.anchor
+
 export abstract class NodeBase {
   readonly [NODE_TYPE]: symbol
 

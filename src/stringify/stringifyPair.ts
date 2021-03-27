@@ -105,7 +105,7 @@ export function stringifyPair(
     isSeq(value) &&
     !value.flow &&
     !value.tag &&
-    !doc.anchors.getName(value)
+    !value.anchor
   ) {
     // If indentSeq === false, consider '- ' as part of indentation where possible
     ctx.indent = ctx.indent.substr(2)

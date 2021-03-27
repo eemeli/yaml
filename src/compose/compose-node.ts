@@ -1,11 +1,19 @@
-import type { Document } from '../doc/Document.js'
+import type { Directives } from '../doc/directives.js'
 import { Alias } from '../nodes/Alias.js'
-import type { Node, ParsedNode } from '../nodes/Node.js'
+import type { ParsedNode } from '../nodes/Node.js'
+import type { ParseOptions } from '../options.js'
 import type { FlowScalar, Token } from '../parse/tokens.js'
+import type { Schema } from '../schema/Schema.js'
 import { composeCollection } from './compose-collection.js'
 import { composeScalar } from './compose-scalar.js'
 import { resolveEnd } from './resolve-end.js'
 import { emptyScalarPosition } from './util-empty-scalar-position.js'
+
+export interface ComposeContext {
+  directives: Directives
+  options: Readonly<Required<Omit<ParseOptions, 'lineCounter'>>>
+  schema: Readonly<Schema>
+}
 
 export interface Props {
   spaceBefore: boolean
@@ -18,7 +26,7 @@ const CN = { composeNode, composeEmptyNode }
 export type ComposeNode = typeof CN
 
 export function composeNode(
-  doc: Document.Parsed,
+  ctx: ComposeContext,
   token: Token,
   props: Props,
   onError: (offset: number, message: string, warning?: boolean) => void
@@ -27,7 +35,7 @@ export function composeNode(
   let node: ParsedNode
   switch (token.type) {
     case 'alias':
-      node = composeAlias(doc, token, onError)
+      node = composeAlias(ctx, token, onError)
       if (anchor || tagName)
         onError(token.offset, 'An alias node must not specify any properties')
       break
@@ -35,12 +43,18 @@ export function composeNode(
     case 'single-quoted-scalar':
     case 'double-quoted-scalar':
     case 'block-scalar':
-      node = composeScalar(doc, token, anchor, tagName, onError)
+      node = composeScalar(ctx, token, tagName, onError)
+      if (anchor) {
+        node.anchor = anchor
+      }
       break
     case 'block-map':
     case 'block-seq':
     case 'flow-collection':
-      node = composeCollection(CN, doc, token, anchor, tagName, onError)
+      node = composeCollection(CN, ctx, token, tagName, onError)
+      if (anchor) {
+        node.anchor = anchor
+      }
       break
     default:
       console.log(token)
@@ -55,7 +69,7 @@ export function composeNode(
 }
 
 export function composeEmptyNode(
-  doc: Document.Parsed,
+  ctx: ComposeContext,
   offset: number,
   before: Token[] | undefined,
   pos: number | null,
@@ -68,26 +82,25 @@ export function composeEmptyNode(
     indent: -1,
     source: ''
   }
-  const node = composeScalar(doc, token, anchor, tagName, onError)
+  const node = composeScalar(ctx, token, tagName, onError)
+  if (anchor) {
+    node.anchor = anchor
+  }
   if (spaceBefore) node.spaceBefore = true
   if (comment) node.comment = comment
   return node
 }
 
 function composeAlias(
-  doc: Document.Parsed,
+  { options }: ComposeContext,
   { offset, source, end }: FlowScalar,
   onError: (offset: number, message: string, warning?: boolean) => void
 ) {
-  const name = source.substring(1)
-  const src = doc.anchors.getNode(name)
-  if (!src) onError(offset, `Aliased anchor not found: ${name}`)
-  const alias = new Alias(src as Node)
-
+  const alias = new Alias(source.substring(1))
   const re = resolveEnd(
     end,
     offset + source.length,
-    doc.options.strict,
+    options.strict,
     onError
   )
   alias.range = [offset, re.offset]

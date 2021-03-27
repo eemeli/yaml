@@ -85,7 +85,7 @@ import {
 - [`new Scalar(value)`](#scalar-values)
 - [`new YAMLMap()`](#collections)
 - [`new YAMLSeq()`](#collections)
-- [`doc.anchors.createAlias(node, name?): Alias`](#working-with-anchors)
+- [`doc.createAlias(node, name?): Alias`](#working-with-anchors)
 - [`doc.createNode(value, options?): Node`](#creating-nodes)
 - [`doc.createPair(key, value): Pair`](#creating-nodes)
 - [`visit(node, visitor)`](#modifying-nodes)

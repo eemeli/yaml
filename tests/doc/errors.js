@@ -288,7 +288,6 @@ describe('invalid options', () => {
 test('broken document with comment before first node', () => {
   const doc = YAML.parseDocument('#c\n*x\nfoo\n', { prettyErrors: false })
   expect(doc.errors).toMatchObject([
-    { message: 'Aliased anchor not found: x' },
     { message: 'Unexpected scalar at node end' }
   ])
 })

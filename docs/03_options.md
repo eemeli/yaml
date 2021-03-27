@@ -37,12 +37,10 @@ Document options are relevant for operations on the `Document` object, which mak
 
 Used by: `parse()`, `parseDocument()`, `parseAllDocuments()`, `stringify()`, `new Composer()`, and `new Document()`
 
-| Name          | Type                            | Default  | Description                                                                                                                                |
-| ------------- | ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| anchorPrefix  | `string`                        | `'a'`    | Default prefix for anchors, resulting in anchors `a1`, `a2`, ... by default.                                                               |
-| keepUndefined | `boolean`                       | `false`  | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`.                              |
-| logLevel      | `'warn' ⎮ 'error' ⎮` `'silent'` | `'warn'` | Control the verbosity of `parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors (not recommended). |
-| version       | `'1.1' ⎮ '1.2'`                 | `'1.2'`  | The YAML version used by documents without a `%YAML` directive.                                                                            |
+| Name     | Type                            | Default  | Description                                                                                                                                |
+| -------- | ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| logLevel | `'warn' ⎮ 'error' ⎮` `'silent'` | `'warn'` | Control the verbosity of `parse()`. Set to `'error'` to silence warnings, and to `'silent'` to also silence most errors (not recommended). |
+| version  | `'1.1' ⎮ '1.2'`                 | `'1.2'`  | The YAML version used by documents without a `%YAML` directive.                                                                            |
 
 By default, the library will emit warnings as required by the YAML spec during parsing.
 If you'd like to silence these, set the `logLevel` option to `'error'`.
@@ -94,6 +92,17 @@ mergeResult.target
 
 **Merge** keys are a [YAML 1.1 feature](http://yaml.org/type/merge.html) that is not a part of the 1.2 spec.
 To use a merge key, assign an alias node or an array of alias nodes as the value of a `<<` key in a mapping.
+
+## CreateNode Options
+
+Used by: `stringify()`, `new Document()`, `doc.createNode()`, and `doc.createPair()`
+
+| Name          | Type      | Default | Description                                                                                                                                      |
+| ------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| anchorPrefix  | `string`  | `'a'`   | Default prefix for anchors, resulting in anchors `a1`, `a2`, ... by default.                                                                     |
+| flow          | `boolean` | `false` | Force the top-level collection node to use flow style.                                                                                           |
+| keepUndefined | `boolean` | `false` | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`.                                    |
+| tag           | `string`  |         | Specify the top-level collection type, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available in this document's schema. |
 
 ## ToJS Options
 
