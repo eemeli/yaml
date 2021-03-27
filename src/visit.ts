@@ -30,10 +30,13 @@ export type visitor =
   | visitorFn<unknown>
   | {
       Alias?: visitorFn<Alias>
+      Collection?: visitorFn<YAMLMap | YAMLSeq>
       Map?: visitorFn<YAMLMap>
+      Node?: visitorFn<Alias | Scalar | YAMLMap | YAMLSeq>
       Pair?: visitorFn<Pair>
       Scalar?: visitorFn<Scalar>
       Seq?: visitorFn<YAMLSeq>
+      Value?: visitorFn<Scalar | YAMLMap | YAMLSeq>
     }
 
 /**
@@ -61,7 +64,10 @@ export type visitor =
  * If `visitor` is a single function, it will be called with all values
  * encountered in the tree, including e.g. `null` values. Alternatively,
  * separate visitor functions may be defined for each `Map`, `Pair`, `Seq`,
- * `Alias` and `Scalar` node.
+ * `Alias` and `Scalar` node. To define the same visitor function for more than
+ * one node type, use the `Collection` (map and seq), `Value` (map, seq & scalar)
+ * and `Node` (alias, map, seq & scalar) targets. Of all these, only the most
+ * specific defined one will be used for each node.
  */
 export function visit(
   node: Node | Document | null,
@@ -69,12 +75,38 @@ export function visit(
     | visitorFn<unknown>
     | {
         Alias?: visitorFn<Alias>
+        Collection?: visitorFn<YAMLMap | YAMLSeq>
         Map?: visitorFn<YAMLMap>
+        Node?: visitorFn<Alias | Scalar | YAMLMap | YAMLSeq>
         Pair?: visitorFn<Pair>
         Scalar?: visitorFn<Scalar>
         Seq?: visitorFn<YAMLSeq>
+        Value?: visitorFn<Scalar | YAMLMap | YAMLSeq>
       }
 ) {
+  if (
+    typeof visitor === 'object' &&
+    (visitor.Collection || visitor.Node || visitor.Value)
+  ) {
+    visitor = Object.assign(
+      {
+        Alias: visitor.Node,
+        Map: visitor.Node,
+        Scalar: visitor.Node,
+        Seq: visitor.Node
+      },
+      visitor.Value && {
+        Map: visitor.Value,
+        Scalar: visitor.Value,
+        Seq: visitor.Value
+      },
+      visitor.Collection && {
+        Map: visitor.Collection,
+        Seq: visitor.Collection
+      },
+      visitor
+    )
+  }
   if (isDocument(node)) {
     const cd = _visit(null, node.contents, visitor, Object.freeze([node]))
     if (cd === REMOVE) node.contents = null

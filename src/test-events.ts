@@ -25,13 +25,14 @@ const scalarChar: Record<string, string> = {
 
 function anchorExists(doc: Document, anchor: string): boolean {
   let found = false
-  const find = (_key: unknown, node: Node) => {
-    if (node.anchor === anchor) {
-      found = true
-      return visit.BREAK
+  visit(doc, {
+    Value(_key: unknown, node: Node) {
+      if (node.anchor === anchor) {
+        found = true
+        return visit.BREAK
+      }
     }
-  }
-  visit(doc, { Scalar: find, Map: find, Seq: find })
+  })
   return found
 }
 

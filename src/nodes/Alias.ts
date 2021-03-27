@@ -35,11 +35,12 @@ export class Alias extends NodeBase {
    */
   resolve(doc: Document): Scalar | YAMLMap | YAMLSeq | undefined {
     let found: Scalar | YAMLMap | YAMLSeq | undefined = undefined
-    const find = (_key: unknown, node: Node) => {
-      if (node === this) return visit.BREAK
-      if (node.anchor === this.source) found = node
-    }
-    visit(doc, { Alias: find, Scalar: find, Map: find, Seq: find })
+    visit(doc, {
+      Node: (_key: unknown, node: Node) => {
+        if (node === this) return visit.BREAK
+        if (node.anchor === this.source) found = node
+      }
+    })
     return found
   }
 

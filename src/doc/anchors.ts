@@ -22,10 +22,11 @@ export function anchorIsValid(anchor: string): true {
 
 export function anchorNames(root: Document | Node) {
   const anchors = new Set<string>()
-  const addNode = (_key: unknown, node: Scalar | YAMLMap | YAMLSeq) => {
-    if (node.anchor) anchors.add(node.anchor)
-  }
-  visit(root, { Scalar: addNode, Map: addNode, Seq: addNode })
+  visit(root, {
+    Value(_key: unknown, node: Scalar | YAMLMap | YAMLSeq) {
+      if (node.anchor) anchors.add(node.anchor)
+    }
+  })
   return anchors
 }
 
