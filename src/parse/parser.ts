@@ -1,7 +1,6 @@
 import { Lexer } from './lexer.js'
 import {
   SourceToken,
-  SourceTokenType,
   Token,
   FlowScalar,
   FlowCollection,
@@ -11,7 +10,8 @@ import {
   BlockSequence,
   DocumentEnd,
   prettyToken,
-  tokenType
+  tokenType,
+  TokenType
 } from './tokens.js'
 
 function includesToken(list: SourceToken[], type: SourceToken['type']) {
@@ -159,7 +159,7 @@ export class Parser {
   private source = ''
 
   /** The type of the current token, set in parse() */
-  private type = '' as SourceTokenType
+  private type = '' as TokenType
 
   /**
    * @param push - Called separately with each parsed token

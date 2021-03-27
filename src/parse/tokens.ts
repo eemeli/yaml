@@ -1,31 +1,24 @@
-export type SourceTokenType =
-  | 'byte-order-mark'
-  | 'doc-mode'
-  | 'scalar'
-  | 'doc-start'
-  | 'doc-end'
-  | 'space'
-  | 'comment'
-  | 'newline'
-  | 'directive-line'
-  | 'alias'
-  | 'anchor'
-  | 'tag'
-  | 'seq-item-ind'
-  | 'explicit-key-ind'
-  | 'map-value-ind'
-  | 'flow-map-start'
-  | 'flow-map-end'
-  | 'flow-seq-start'
-  | 'flow-seq-end'
-  | 'flow-error-end'
-  | 'comma'
-  | 'single-quoted-scalar'
-  | 'double-quoted-scalar'
-  | 'block-scalar-header'
-
 export interface SourceToken {
-  type: Exclude<SourceTokenType, DocumentEnd['type'] | FlowScalar['type']>
+  type:
+    | 'byte-order-mark'
+    | 'doc-mode'
+    | 'doc-start'
+    | 'space'
+    | 'comment'
+    | 'newline'
+    | 'directive-line'
+    | 'anchor'
+    | 'tag'
+    | 'seq-item-ind'
+    | 'explicit-key-ind'
+    | 'map-value-ind'
+    | 'flow-map-start'
+    | 'flow-map-end'
+    | 'flow-seq-start'
+    | 'flow-seq-end'
+    | 'flow-error-end'
+    | 'comma'
+    | 'block-scalar-header'
   indent: number
   source: string
 }
@@ -116,6 +109,11 @@ export type Token =
   | BlockSequence
   | FlowCollection
 
+export type TokenType =
+  | SourceToken['type']
+  | DocumentEnd['type']
+  | FlowScalar['type']
+
 /** The byte order mark */
 export const BOM = '\u{FEFF}'
 
@@ -146,7 +144,7 @@ export function prettyToken(token: string) {
 }
 
 /** Identify the type of a lexer token. May return `null` for unknown tokens. */
-export function tokenType(source: string): SourceTokenType | null {
+export function tokenType(source: string): TokenType | null {
   switch (source) {
     case BOM:
       return 'byte-order-mark'
