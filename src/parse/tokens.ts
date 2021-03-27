@@ -19,19 +19,21 @@ export interface SourceToken {
     | 'flow-error-end'
     | 'comma'
     | 'block-scalar-header'
+  offset: number
   indent: number
   source: string
 }
 
 export interface ErrorToken {
   type: 'error'
-  offset?: number
+  offset: number
   source: string
   message: string
 }
 
 export interface Directive {
   type: 'directive'
+  offset: number
   source: string
 }
 

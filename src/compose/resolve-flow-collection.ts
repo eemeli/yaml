@@ -150,8 +150,7 @@ export function resolveFlowCollection(
             if (nlAfterValueInSeq) onError(offset, slMsg)
             else if (seqKeyToken) {
               if (containsNewline(seqKeyToken)) onError(offset, slMsg)
-              const start = 'offset' in seqKeyToken && seqKeyToken.offset
-              if (typeof start === 'number' && start < offset - 1024)
+              if (seqKeyToken.offset < offset - 1024)
                 onError(
                   offset,
                   'The : indicator must be at most 1024 chars after the start of an implicit flow sequence key'

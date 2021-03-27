@@ -113,17 +113,17 @@ parser.parse('foo: [24,"42"]\n', false)
           start: [],
           key: { type: 'scalar', offset: 0, indent: 0, source: 'foo' },
           sep: [
-            { type: 'map-value-ind', indent: 0, source: ':' },
-            { type: 'space', indent: 0, source: ' ' }
+            { type: 'map-value-ind', offset: 3, indent: 0, source: ':' },
+            { type: 'space', offset: 4, indent: 0, source: ' ' }
           ],
           value: {
             type: 'flow-collection',
             offset: 5,
             indent: 0,
-            start: { type: 'flow-seq-start', indent: 0, source: '[' },
+            start: { type: 'flow-seq-start', offset: 5, indent: 0, source: '[' },
             items: [
               { type: 'scalar', offset: 6, indent: 0, source: '24' },
-              { type: 'comma', indent: 0, source: ',' },
+              { type: 'comma', offset: 8, indent: 0, source: ',' },
               {
                 type: 'double-quoted-scalar',
                 offset: 9,
@@ -132,8 +132,8 @@ parser.parse('foo: [24,"42"]\n', false)
               }
             ],
             end: [
-              { type: 'flow-seq-end', indent: 0, source: ']' },
-              { type: 'newline', indent: 0, source: '\n' }
+              { type: 'flow-seq-end', offset: 13, indent: 0, source: ']' },
+              { type: 'newline', offset: 14, indent: 0, source: '\n' }
             ]
           }
         }
@@ -164,7 +164,7 @@ If defined, `onNewLine` is called separately with the start position of each new
 Parse `source` as a YAML stream, calling `push` with each directive, document and other structure as it is completely parsed.
 If `incomplete`, a part of the last line may be left as a buffer for the next call.
 
-Errors are not thrown, but pushed out as `{ type: 'error', message }` tokens.
+Errors are not thrown, but pushed out as `{ type: 'error', offset, message }` tokens.
 
 #### `parser.next(lexToken: string)`
 

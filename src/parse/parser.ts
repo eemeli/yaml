@@ -248,11 +248,13 @@ export class Parser {
   }
 
   private get sourceToken() {
-    return {
-      type: this.type,
+    const st: SourceToken = {
+      type: this.type as SourceToken['type'],
+      offset: this.offset,
       indent: this.indent,
       source: this.source
-    } as SourceToken
+    }
+    return st
   }
 
   private step() {
@@ -299,7 +301,7 @@ export class Parser {
     /* istanbul ignore if should not happen */
     if (!token) {
       const message = 'Tried to pop an empty stack'
-      this.push({ type: 'error', source: '', message })
+      this.push({ type: 'error', offset: this.offset, source: '', message })
     } else if (this.stack.length === 0) {
       this.push(token)
     } else {
@@ -373,7 +375,11 @@ export class Parser {
   private stream() {
     switch (this.type) {
       case 'directive-line':
-        this.push({ type: 'directive', source: this.source })
+        this.push({
+          type: 'directive',
+          offset: this.offset,
+          source: this.source
+        })
         return
       case 'byte-order-mark':
       case 'space':
