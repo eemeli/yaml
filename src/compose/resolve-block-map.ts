@@ -1,8 +1,8 @@
-import type { ErrorCode } from '../errors.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import type { BlockMap } from '../parse/tokens.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
+import type { ComposeErrorHandler } from './composer.js'
 import { resolveProps } from './resolve-props.js'
 import { containsNewline } from './util-contains-newline.js'
 
@@ -12,12 +12,7 @@ export function resolveBlockMap(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   bm: BlockMap,
-  onError: (
-    offset: number,
-    code: ErrorCode,
-    message: string,
-    warning?: boolean
-  ) => void
+  onError: ComposeErrorHandler
 ) {
   const map = new YAMLMap(ctx.schema)
 

@@ -1,11 +1,11 @@
-import type { ErrorCode } from '../errors.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar } from '../parse/tokens.js'
+import type { ComposeErrorHandler } from './composer.js'
 
 export function resolveBlockScalar(
   scalar: BlockScalar,
   strict: boolean,
-  onError: (offset: number, code: ErrorCode, message: string) => void
+  onError: ComposeErrorHandler
 ): {
   value: string
   type: Scalar.BLOCK_FOLDED | Scalar.BLOCK_LITERAL | null
@@ -124,7 +124,7 @@ export function resolveBlockScalar(
 function parseBlockScalarHeader(
   { offset, props }: BlockScalar,
   strict: boolean,
-  onError: (offset: number, code: ErrorCode, message: string) => void
+  onError: ComposeErrorHandler
 ) {
   /* istanbul ignore if should not happen */
   if (props[0].type !== 'block-scalar-header') {

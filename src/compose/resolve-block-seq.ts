@@ -1,19 +1,14 @@
-import type { ErrorCode } from '../errors.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { BlockSequence } from '../parse/tokens.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
+import type { ComposeErrorHandler } from './composer.js'
 import { resolveProps } from './resolve-props.js'
 
 export function resolveBlockSeq(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   bs: BlockSequence,
-  onError: (
-    offset: number,
-    code: ErrorCode,
-    message: string,
-    warning?: boolean
-  ) => void
+  onError: ComposeErrorHandler
 ) {
   const seq = new YAMLSeq(ctx.schema)
   let offset = bs.offset

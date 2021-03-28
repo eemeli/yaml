@@ -1,10 +1,10 @@
-import type { ErrorCode } from '../errors.js'
 import { isNode, isPair, ParsedNode } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { FlowCollection, SourceToken, Token } from '../parse/tokens.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
+import type { ComposeErrorHandler } from './composer.js'
 import { resolveEnd } from './resolve-end.js'
 import { containsNewline } from './util-contains-newline.js'
 
@@ -12,12 +12,7 @@ export function resolveFlowCollection(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   fc: FlowCollection,
-  onError: (
-    offset: number,
-    code: ErrorCode,
-    message: string,
-    warning?: boolean
-  ) => void
+  onError: ComposeErrorHandler
 ) {
   const isMap = fc.start.source === '{'
   const coll = isMap ? new YAMLMap(ctx.schema) : new YAMLSeq(ctx.schema)

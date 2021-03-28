@@ -1,4 +1,3 @@
-import type { ErrorCode } from '../errors.js'
 import { isMap, isNode, ParsedNode } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
@@ -10,6 +9,7 @@ import type {
 } from '../parse/tokens.js'
 import { CollectionTag } from '../schema/types.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
+import type { ComposeErrorHandler } from './composer.js'
 import { resolveBlockMap } from './resolve-block-map.js'
 import { resolveBlockSeq } from './resolve-block-seq.js'
 import { resolveFlowCollection } from './resolve-flow-collection.js'
@@ -19,12 +19,7 @@ export function composeCollection(
   ctx: ComposeContext,
   token: BlockMap | BlockSequence | FlowCollection,
   tagName: string | null,
-  onError: (
-    offset: number,
-    code: ErrorCode,
-    message: string,
-    warning?: boolean
-  ) => void
+  onError: ComposeErrorHandler
 ) {
   let coll: YAMLMap.Parsed | YAMLSeq.Parsed
   switch (token.type) {

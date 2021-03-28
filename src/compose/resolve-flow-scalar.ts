@@ -1,12 +1,12 @@
-import type { ErrorCode } from '../errors.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { FlowScalar } from '../parse/tokens.js'
+import type { ComposeErrorHandler } from './composer.js'
 import { resolveEnd } from './resolve-end.js'
 
 export function resolveFlowScalar(
   { offset, type, source, end }: FlowScalar,
   strict: boolean,
-  onError: (offset: number, code: ErrorCode, message: string) => void
+  onError: ComposeErrorHandler
 ): {
   value: string
   type: Scalar.PLAIN | Scalar.QUOTE_DOUBLE | Scalar.QUOTE_SINGLE | null
@@ -15,7 +15,7 @@ export function resolveFlowScalar(
 } {
   let _type: Scalar.PLAIN | Scalar.QUOTE_DOUBLE | Scalar.QUOTE_SINGLE
   let value: string
-  const _onError = (rel: number, code: ErrorCode, msg: string) =>
+  const _onError: ComposeErrorHandler = (rel, code, msg) =>
     onError(offset + rel, code, msg)
   switch (type) {
     case 'scalar':
@@ -57,10 +57,7 @@ export function resolveFlowScalar(
   }
 }
 
-function plainValue(
-  source: string,
-  onError: (relOffset: number, code: ErrorCode, message: string) => void
-) {
+function plainValue(source: string, onError: ComposeErrorHandler) {
   switch (source[0]) {
     /* istanbul ignore next should not happen */
     case '\t':
@@ -86,10 +83,7 @@ function plainValue(
   return foldLines(source)
 }
 
-function singleQuotedValue(
-  source: string,
-  onError: (relOffset: number, code: ErrorCode, message: string) => void
-) {
+function singleQuotedValue(source: string, onError: ComposeErrorHandler) {
   if (source[source.length - 1] !== "'" || source.length === 1)
     onError(source.length, 'MISSING_CHAR', "Missing closing 'quote")
   return foldLines(source.slice(1, -1)).replace(/''/g, "'")
@@ -113,10 +107,7 @@ function foldLines(source: string) {
   return res
 }
 
-function doubleQuotedValue(
-  source: string,
-  onError: (relOffset: number, code: ErrorCode, message: string) => void
-) {
+function doubleQuotedValue(source: string, onError: ComposeErrorHandler) {
   let res = ''
   for (let i = 1; i < source.length - 1; ++i) {
     const ch = source[i]
@@ -199,7 +190,7 @@ function parseCharCode(
   source: string,
   offset: number,
   length: number,
-  onError: (offset: number, code: ErrorCode, message: string) => void
+  onError: ComposeErrorHandler
 ) {
   const cc = source.substr(offset, length)
   const ok = cc.length === length && /^[0-9a-fA-F]+$/.test(cc)

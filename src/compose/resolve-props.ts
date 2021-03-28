@@ -1,6 +1,6 @@
-import type { ErrorCode } from '../errors.js'
 import type { SourceToken } from '../parse/tokens.js'
 import type { ComposeContext } from './compose-node.js'
+import type { ComposeErrorHandler } from './composer.js'
 
 export function resolveProps(
   ctx: ComposeContext,
@@ -12,7 +12,7 @@ export function resolveProps(
     | 'map-value-ind'
     | 'seq-item-ind',
   offset: number,
-  onError: (offset: number, code: ErrorCode, message: string) => void
+  onError: ComposeErrorHandler
 ) {
   let spaceBefore = false
   let atNewline = startOnNewline

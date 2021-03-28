@@ -1,10 +1,10 @@
-import type { ErrorCode } from '../errors.js'
 import { isScalar, SCALAR } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
 import type { Schema } from '../schema/Schema.js'
 import type { ScalarTag } from '../schema/types.js'
 import type { ComposeContext } from './compose-node.js'
+import type { ComposeErrorHandler } from './composer.js'
 import { resolveBlockScalar } from './resolve-block-scalar.js'
 import { resolveFlowScalar } from './resolve-flow-scalar.js'
 
@@ -12,7 +12,7 @@ export function composeScalar(
   ctx: ComposeContext,
   token: FlowScalar | BlockScalar,
   tagName: string | null,
-  onError: (offset: number, code: ErrorCode, message: string) => void
+  onError: ComposeErrorHandler
 ) {
   const { offset } = token
   const { value, type, comment, length } =
@@ -50,12 +50,7 @@ function findScalarTagByName(
   schema: Schema,
   value: string,
   tagName: string,
-  onError: (
-    offset: number,
-    code: ErrorCode,
-    message: string,
-    warning?: boolean
-  ) => void
+  onError: ComposeErrorHandler
 ) {
   if (tagName === '!') return schema[SCALAR] // non-specific tag
   const matchWithTest: ScalarTag[] = []

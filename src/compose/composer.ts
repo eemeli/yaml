@@ -12,6 +12,13 @@ import type { Token } from '../parse/tokens.js'
 import { composeDoc } from './compose-doc.js'
 import { resolveEnd } from './resolve-end.js'
 
+export type ComposeErrorHandler = (
+  offset: number,
+  code: ErrorCode,
+  message: string,
+  warning?: boolean
+) => void
+
 function parsePrelude(prelude: string[]) {
   let comment = ''
   let atComment = false

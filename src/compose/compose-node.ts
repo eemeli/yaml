@@ -1,5 +1,4 @@
 import type { Directives } from '../doc/directives.js'
-import type { ErrorCode } from '../errors.js'
 import { Alias } from '../nodes/Alias.js'
 import type { ParsedNode } from '../nodes/Node.js'
 import type { ParseOptions } from '../options.js'
@@ -7,6 +6,7 @@ import type { FlowScalar, Token } from '../parse/tokens.js'
 import type { Schema } from '../schema/Schema.js'
 import { composeCollection } from './compose-collection.js'
 import { composeScalar } from './compose-scalar.js'
+import type { ComposeErrorHandler } from './composer.js'
 import { resolveEnd } from './resolve-end.js'
 import { emptyScalarPosition } from './util-empty-scalar-position.js'
 
@@ -30,12 +30,7 @@ export function composeNode(
   ctx: ComposeContext,
   token: Token,
   props: Props,
-  onError: (
-    offset: number,
-    code: ErrorCode,
-    message: string,
-    warning?: boolean
-  ) => void
+  onError: ComposeErrorHandler
 ) {
   const { spaceBefore, comment, anchor, tagName } = props
   let node: ParsedNode
@@ -84,12 +79,7 @@ export function composeEmptyNode(
   before: Token[] | undefined,
   pos: number | null,
   { spaceBefore, comment, anchor, tagName }: Props,
-  onError: (
-    offset: number,
-    code: ErrorCode,
-    message: string,
-    warning?: boolean
-  ) => void
+  onError: ComposeErrorHandler
 ) {
   const token: FlowScalar = {
     type: 'scalar',
@@ -109,20 +99,10 @@ export function composeEmptyNode(
 function composeAlias(
   { options }: ComposeContext,
   { offset, source, end }: FlowScalar,
-  onError: (
-    offset: number,
-    code: ErrorCode,
-    message: string,
-    warning?: boolean
-  ) => void
+  onError: ComposeErrorHandler
 ) {
   const alias = new Alias(source.substring(1))
-  const re = resolveEnd(
-    end,
-    offset + source.length,
-    options.strict,
-    onError
-  )
+  const re = resolveEnd(end, offset + source.length, options.strict, onError)
   alias.range = [offset, re.offset]
   if (re.comment) alias.comment = re.comment
   return alias as Alias.Parsed
