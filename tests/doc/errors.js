@@ -162,7 +162,7 @@ describe('flow collections', () => {
     expect(doc.errors).toMatchObject([{ code: 'BLOCK_IN_FLOW' }])
   })
 
-  test.skip('anchor before explicit key indicator in block map', () => {
+  test('anchor before explicit key indicator in block map', () => {
     const doc = YAML.parseDocument('&a ? A')
     expect(doc.errors).toMatchObject([{ code: 'BAD_PROP_ORDER' }])
   })

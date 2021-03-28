@@ -813,14 +813,18 @@ export class Parser {
           indent: this.indent,
           items: [{ start: [this.sourceToken] }]
         } as BlockSequence
-      case 'explicit-key-ind':
+      case 'explicit-key-ind': {
         this.onKeyLine = true
+        const prev = getPrevProps(parent)
+        const start = getFirstKeyStartProps(prev)
+        start.push(this.sourceToken)
         return {
           type: 'block-map',
           offset: this.offset,
           indent: this.indent,
-          items: [{ start: [this.sourceToken] }]
+          items: [{ start }]
         } as BlockMap
+      }
       case 'map-value-ind': {
         this.onKeyLine = true
         const prev = getPrevProps(parent)
