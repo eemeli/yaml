@@ -10,7 +10,6 @@ export function resolveEnd(
   let comment = ''
   if (end) {
     let hasSpace = false
-    let hasComment = false
     let sep = ''
     for (const { source, type } of end) {
       switch (type) {
@@ -25,14 +24,13 @@ export function resolveEnd(
               'Comments must be separated from other tokens by white space characters'
             )
           const cb = source.substring(1)
-          if (!hasComment) comment = cb
+          if (!comment) comment = cb
           else comment += sep + cb
-          hasComment = true
           sep = ''
           break
         }
         case 'newline':
-          if (hasComment) sep += source
+          if (comment) sep += source
           hasSpace = true
           break
         default:

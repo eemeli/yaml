@@ -24,7 +24,6 @@ export function resolveFlowCollection(
   let spaceBefore = false
   let comment = ''
   let hasSpace = false
-  let hasComment = false
   let newlines = ''
   let anchor = ''
   let tagName = ''
@@ -41,7 +40,6 @@ export function resolveFlowCollection(
 
     spaceBefore = false
     comment = ''
-    hasComment = false
     newlines = ''
     anchor = ''
     tagName = ''
@@ -51,7 +49,7 @@ export function resolveFlowCollection(
 
   function addItem(pos: number) {
     if (value) {
-      if (hasComment) value.comment = comment
+      if (comment) value.comment = comment
     } else {
       value = composeEmptyNode(ctx, offset, fc.items, pos, getProps(), onError)
     }
@@ -83,17 +81,16 @@ export function resolveFlowCollection(
             'Comments must be separated from other tokens by white space characters'
           )
         const cb = token.source.substring(1)
-        if (!hasComment) comment = cb
+        if (!comment) comment = cb
         else comment += newlines + cb
         atLineStart = false
-        hasComment = true
         newlines = ''
         break
       }
       case 'newline':
-        if (atLineStart && !hasComment) spaceBefore = true
+        if (atLineStart && !comment) spaceBefore = true
         if (atValueEnd) {
-          if (hasComment) {
+          if (comment) {
             let node = coll.items[coll.items.length - 1]
             if (isPair(node)) node = node.value || node.key
             /* istanbul ignore else should not happen */
@@ -105,7 +102,6 @@ export function resolveFlowCollection(
                 'Error adding trailing comment to node'
               )
             comment = ''
-            hasComment = false
           }
           atValueEnd = false
         } else {
@@ -189,10 +185,9 @@ export function resolveFlowCollection(
         } else {
           key = composeEmptyNode(ctx, offset, fc.items, i, getProps(), onError)
         }
-        if (hasComment) {
+        if (comment) {
           key.comment = comment
           comment = ''
-          hasComment = false
         }
         atExplicitKey = false
         atValueEnd = false

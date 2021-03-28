@@ -18,9 +18,8 @@ export function resolveProps(
   let atNewline = startOnNewline
   let hasSpace = startOnNewline
   let comment = ''
-  let hasComment = false
+  let commentSep = ''
   let hasNewline = false
-  let sep = ''
   let anchor = ''
   let tagName = ''
   let found: SourceToken | null = null
@@ -46,18 +45,17 @@ export function resolveProps(
             'Comments must be separated from other tokens by white space characters'
           )
         const cb = token.source.substring(1)
-        if (!hasComment) comment = cb
-        else comment += sep + cb
-        hasComment = true
-        sep = ''
+        if (!comment) comment = cb
+        else comment += commentSep + cb
+        commentSep = ''
         break
       }
       case 'newline':
-        if (atNewline && !hasComment) spaceBefore = true
+        if (atNewline && !comment) spaceBefore = true
         atNewline = true
         hasNewline = true
         hasSpace = true
-        sep += token.source
+        commentSep += token.source
         break
       case 'anchor':
         if (anchor)
