@@ -5,9 +5,9 @@ import { addComment } from './addComment.js'
 import { stringify, StringifyContext } from './stringify.js'
 
 export function stringifyPair(
-  { comment, key, value }: Readonly<Pair>,
+  { key, value }: Readonly<Pair>,
   ctx: StringifyContext,
-  onComment?: () => void,
+  _onComment?: () => void,
   onChompKeep?: () => void
 ) {
   const {
@@ -30,7 +30,7 @@ export function stringifyPair(
   let explicitKey =
     !simpleKeys &&
     (!key ||
-      (keyComment && value == null) ||
+      (keyComment && value == null && !ctx.inFlow) ||
       isCollection(key) ||
       (isScalar(key)
         ? key.type === Scalar.BLOCK_FOLDED || key.type === Scalar.BLOCK_LITERAL
@@ -62,24 +62,13 @@ export function stringifyPair(
     (value == null && (explicitKey || ctx.inFlow))
   ) {
     str = addComment(str, ctx.indent, keyComment)
-    if (comment) {
-      if (keyComment && !comment.includes('\n'))
-        str += `\n${ctx.indent || ''}#${comment}`
-      else str = addComment(str, ctx.indent, comment)
-      if (onComment) onComment()
-    } else if (chompKeep && !keyComment && onChompKeep) onChompKeep()
+    if (chompKeep && !keyComment && onChompKeep) onChompKeep()
     return ctx.inFlow && !explicitKey ? str : `? ${str}`
   }
 
   str = explicitKey
     ? `? ${addComment(str, ctx.indent, keyComment)}\n${indent}:`
     : addComment(`${str}:`, ctx.indent, keyComment)
-  if (comment) {
-    if (keyComment && !explicitKey && !comment.includes('\n'))
-      str += `\n${ctx.indent || ''}#${comment}`
-    else str = addComment(str, ctx.indent, comment)
-    if (onComment) onComment()
-  }
 
   let vcb = ''
   let valueComment = null
@@ -94,7 +83,7 @@ export function stringifyPair(
     value = doc.createNode(value)
   }
   ctx.implicitKey = false
-  if (!explicitKey && !keyComment && !comment && isScalar(value))
+  if (!explicitKey && !keyComment && isScalar(value))
     ctx.indentAtStart = str.length + 1
   chompKeep = false
   if (
@@ -117,7 +106,7 @@ export function stringifyPair(
     () => (chompKeep = true)
   )
   let ws = ' '
-  if (vcb || keyComment || comment) {
+  if (vcb || keyComment) {
     ws = `${vcb}\n${ctx.indent}`
   } else if (!explicitKey && isCollection(value)) {
     const flow = valueStr[0] === '[' || valueStr[0] === '{'

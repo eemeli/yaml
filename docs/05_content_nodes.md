@@ -46,7 +46,7 @@ On the other hand, `!!int` and `!!float` stringifiers will take `format` into ac
 ## Collections
 
 ```js
-class Pair<K = unknown, V = unknown> extends NodeBase {
+class Pair<K = unknown, V = unknown> {
   key: K    // When parsed, key and value are always
   value: V  // Node or null, but can be set to anything
 }

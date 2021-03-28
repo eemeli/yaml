@@ -1,7 +1,7 @@
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { ErrorCode, YAMLParseError, YAMLWarning } from '../errors.js'
-import { isCollection } from '../nodes/Node.js'
+import { isCollection, isPair } from '../nodes/Node.js'
 import {
   defaultOptions,
   DocumentOptions,
@@ -99,7 +99,8 @@ export class Composer {
       } else if (afterEmptyLine || doc.directives.marker || !dc) {
         doc.commentBefore = comment
       } else if (isCollection(dc) && !dc.flow && dc.items.length > 0) {
-        const it = dc.items[0]
+        let it = dc.items[0]
+        if (isPair(it)) it = it.key
         const cb = it.commentBefore
         it.commentBefore = cb ? `${comment}\n${cb}` : comment
       } else {

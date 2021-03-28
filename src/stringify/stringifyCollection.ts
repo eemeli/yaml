@@ -28,29 +28,43 @@ export function stringifyCollection(
   const inFlow = flow || ctx.inFlow
   if (inFlow) itemIndent += indentStep
   ctx = Object.assign({}, ctx, { indent: itemIndent, inFlow, type: null })
-  let chompKeep = false
+  let chompKeep = false // flag for the preceding node's status
   let hasItemWithNewLine = false
   const nodes = items.reduce((nodes: StringifyNode[], item, i) => {
     let comment: string | null = null
-    if (isNode(item) || isPair(item)) {
-      if (!chompKeep && item.spaceBefore) nodes.push({ comment: true, str: '' })
-
+    if (isNode(item)) {
+      if (!chompKeep && item.spaceBefore) {
+        nodes.push({ comment: true, str: '' })
+        if (inFlow) hasItemWithNewLine = true
+      }
       if (item.commentBefore) {
         // This match will always succeed on a non-empty string
         for (const line of item.commentBefore.match(/^.*$/gm) as string[])
           nodes.push({ comment: true, str: `#${line}` })
+        if (inFlow) hasItemWithNewLine = true
       }
-
-      if (item.comment) comment = item.comment
-
-      const pair = item as any // Apply guards manually in the following
+      if (item.comment) {
+        comment = item.comment
+        if (inFlow) hasItemWithNewLine = true
+      }
+    } else if (isPair(item)) {
+      if (isNode(item.key)) {
+        if (!chompKeep && item.key.spaceBefore) {
+          nodes.push({ comment: true, str: '' })
+          if (inFlow) hasItemWithNewLine = true
+        }
+        if (item.key.commentBefore) {
+          // This match will always succeed on a non-empty string
+          for (const line of item.key.commentBefore.match(/^.*$/gm) as string[])
+            nodes.push({ comment: true, str: `#${line}` })
+          if (inFlow) hasItemWithNewLine = true
+        }
+        if (inFlow && item.key.comment) hasItemWithNewLine = true
+      }
       if (
         inFlow &&
-        ((!chompKeep && item.spaceBefore) ||
-          item.commentBefore ||
-          item.comment ||
-          (pair.key && (pair.key.commentBefore || pair.key.comment)) ||
-          (pair.value && (pair.value.commentBefore || pair.value.comment)))
+        isNode(item.value) &&
+        (item.value.commentBefore || item.value.comment)
       )
         hasItemWithNewLine = true
     }

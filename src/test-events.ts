@@ -93,7 +93,7 @@ function addEvents(
     }
     props = ` &${anchor}`
   }
-  if (node.tag) props += ` <${node.tag}>`
+  if (isNode(node) && node.tag) props += ` <${node.tag}>`
 
   if (isMap(node)) {
     events.push(`+MAP${props}`)

@@ -1,13 +1,16 @@
 import type { CreateNodeContext } from '../../doc/createNode.js'
-import type { Schema } from '../../schema/Schema.js'
-import { isMap, isPair, isSeq } from '../../nodes/Node.js'
+import { isMap, isPair, isSeq, ParsedNode } from '../../nodes/Node.js'
 import { createPair, Pair } from '../../nodes/Pair.js'
+import { Scalar } from '../../nodes/Scalar.js'
 import { YAMLMap } from '../../nodes/YAMLMap.js'
 import { YAMLSeq } from '../../nodes/YAMLSeq.js'
+import type { Schema } from '../../schema/Schema.js'
 import type { CollectionTag } from '../types.js'
 
 export function resolvePairs(
-  seq: YAMLSeq | YAMLMap,
+  seq:
+    | YAMLSeq.Parsed<ParsedNode | Pair<ParsedNode, ParsedNode | null>>
+    | YAMLMap.Parsed,
   onError: (message: string) => void
 ) {
   if (isSeq(seq)) {
@@ -17,21 +20,24 @@ export function resolvePairs(
       else if (isMap(item)) {
         if (item.items.length > 1)
           onError('Each pair must have its own sequence indicator')
-        const pair = item.items[0] || new Pair(null)
+        const pair =
+          item.items[0] || new Pair(new Scalar(null) as Scalar.Parsed)
         if (item.commentBefore)
-          pair.commentBefore = pair.commentBefore
-            ? `${item.commentBefore}\n${pair.commentBefore}`
+          pair.key.commentBefore = pair.key.commentBefore
+            ? `${item.commentBefore}\n${pair.key.commentBefore}`
             : item.commentBefore
-        if (item.comment)
-          pair.comment = pair.comment
-            ? `${item.comment}\n${pair.comment}`
+        if (item.comment) {
+          const cn = pair.value || pair.key
+          cn.comment = cn.comment
+            ? `${item.comment}\n${cn.comment}`
             : item.comment
+        }
         item = pair
       }
       seq.items[i] = isPair(item) ? item : new Pair(item)
     }
   } else onError('Expected a sequence for this tag')
-  return seq as YAMLSeq<Pair>
+  return seq as YAMLSeq.Parsed<Pair<ParsedNode, ParsedNode | null>>
 }
 
 export function createPairs(
