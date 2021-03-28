@@ -1,3 +1,4 @@
+import { isPair } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
@@ -16,7 +17,9 @@ export function resolveFlowCollection(
 ) {
   const isMap = fc.start.source === '{'
   const fcName = isMap ? 'flow map' : 'flow sequence'
-  const coll = isMap ? new YAMLMap(ctx.schema) : new YAMLSeq(ctx.schema)
+  const coll = isMap
+    ? (new YAMLMap(ctx.schema) as YAMLMap.Parsed)
+    : (new YAMLSeq(ctx.schema) as YAMLSeq.Parsed)
   coll.flow = true
 
   let offset = fc.offset
@@ -64,8 +67,36 @@ export function resolveFlowCollection(
           'UNEXPECTED_TOKEN',
           `Unexpected , in ${fcName}`
         )
-    } else if (!props.comma)
-      onError(props.start, 'MISSING_CHAR', `Missing , between ${fcName} items`)
+    } else {
+      if (!props.comma)
+        onError(
+          props.start,
+          'MISSING_CHAR',
+          `Missing , between ${fcName} items`
+        )
+      if (props.comment) {
+        let prevItemComment = ''
+        loop: for (const st of start) {
+          switch (st.type) {
+            case 'comma':
+            case 'space':
+              break
+            case 'comment':
+              prevItemComment = st.source.substring(1)
+              break loop
+            default:
+              break loop
+          }
+        }
+        if (prevItemComment) {
+          let prev = coll.items[coll.items.length - 1]
+          if (isPair(prev)) prev = prev.value || prev.key
+          if (prev.comment) prev.comment += '\n' + prevItemComment
+          else prev.comment = prevItemComment
+          props.comment = props.comment.substring(prevItemComment.length + 1)
+        }
+      }
+    }
 
     for (const token of [key, value])
       if (token && (token.type === 'block-map' || token.type === 'block-seq'))
@@ -144,9 +175,13 @@ export function resolveFlowCollection(
         : valueProps.found
         ? composeEmptyNode(ctx, valueProps.end, sep, null, valueProps, onError)
         : null
+      if (!valueNode && valueProps.comment) {
+        if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
+        else keyNode.comment = valueProps.comment
+      }
 
       const pair = new Pair(keyNode, valueNode)
-      if (isMap) coll.items.push(pair)
+      if (isMap) (coll as YAMLMap.Parsed).items.push(pair)
       else {
         const map = new YAMLMap(ctx.schema)
         map.flow = true

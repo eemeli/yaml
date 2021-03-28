@@ -66,7 +66,7 @@ function atFirstEmptyLineAfterComments(start: SourceToken[]) {
 }
 
 function isFlowToken(
-  token: Token | null
+  token: Token | null | undefined
 ): token is FlowScalar | FlowCollection {
   switch (token?.type) {
     case 'alias':
@@ -125,10 +125,13 @@ function fixFlowSeqItems(fc: FlowCollection) {
         !includesToken(it.start, 'explicit-key-ind') &&
         !includesToken(it.sep, 'map-value-ind')
       ) {
-        Array.prototype.push.apply(it.start, it.sep)
-        delete it.sep
         if (it.key) it.value = it.key
         delete it.key
+        if (isFlowToken(it.value)) {
+          if (it.value.end) Array.prototype.push.apply(it.value.end, it.sep)
+          else it.value.end = it.sep
+        } else Array.prototype.push.apply(it.start, it.sep)
+        delete it.sep
       }
     }
   }

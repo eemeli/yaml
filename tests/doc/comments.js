@@ -261,6 +261,30 @@ describe('parse comments', () => {
   })
 
   describe('flow collection commens', () => {
+    test('line comment after , in seq', () => {
+      const doc = YAML.parseDocument(source`
+        [ a, #c0
+          b #c1
+        ]`)
+      expect(doc.contents.items).toMatchObject([
+        { value: 'a', comment: 'c0' },
+        { value: 'b', comment: 'c1' }
+      ])
+    })
+
+    test('line comment after , in map', () => {
+      const doc = YAML.parseDocument(source`
+        { a, #c0
+          b: c, #c1
+          d #c2
+        }`)
+      expect(doc.contents.items).toMatchObject([
+        { key: { value: 'a', comment: 'c0' } },
+        { key: { value: 'b' }, value: { value: 'c', comment: 'c1' } },
+        { key: { value: 'd', comment: 'c2' } }
+      ])
+    })
+
     test('multi-line comments', () => {
       const doc = YAML.parseDocument('{ a,\n#c0\n#c1\nb }')
       expect(doc.contents.items).toMatchObject([
@@ -443,6 +467,36 @@ describe('stringify comments', () => {
           value 2
         #c7
         #c8
+      `)
+    })
+  })
+
+  describe.skip('flow collection commens', () => {
+    test('line comment after , in seq', () => {
+      const doc = YAML.parseDocument(source`
+        [ a, #c0
+          b #c1
+        ]`)
+      expect(String(doc)).toBe(source`
+        [
+          a, #c0
+          b #c1
+        ]
+      `)
+    })
+
+    test('line comment after , in map', () => {
+      const doc = YAML.parseDocument(source`
+        { a, #c0
+          b: c, #c1
+          d #c2
+        }`)
+      expect(String(doc)).toBe(source`
+        {
+          ? a, #c0
+          b: c, #c1
+          ? d #c2
+        }
       `)
     })
   })
