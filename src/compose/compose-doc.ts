@@ -28,7 +28,13 @@ export function composeDoc(
     options: doc.options,
     schema: doc.schema
   }
-  const props = resolveProps(ctx, start, true, 'doc-start', offset, onError)
+  const props = resolveProps(start, {
+    ctx,
+    indicator: 'doc-start',
+    offset,
+    onError,
+    startOnNewline: true
+  })
   if (props.found) doc.directives.marker = true
   doc.contents = value
     ? composeNode(ctx, value, props, onError)

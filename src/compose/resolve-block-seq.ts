@@ -13,14 +13,13 @@ export function resolveBlockSeq(
   const seq = new YAMLSeq(ctx.schema)
   let offset = bs.offset
   for (const { start, value } of bs.items) {
-    const props = resolveProps(
+    const props = resolveProps(start, {
       ctx,
-      start,
-      true,
-      'seq-item-ind',
+      indicator: 'seq-item-ind',
       offset,
-      onError
-    )
+      onError,
+      startOnNewline: true
+    })
     offset = props.end
     if (!props.found) {
       if (props.anchor || props.tagName || value) {

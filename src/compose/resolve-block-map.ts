@@ -19,14 +19,13 @@ export function resolveBlockMap(
   let offset = bm.offset
   for (const { start, key, sep, value } of bm.items) {
     // key properties
-    const keyProps = resolveProps(
+    const keyProps = resolveProps(start, {
       ctx,
-      start,
-      true,
-      'explicit-key-ind',
+      indicator: 'explicit-key-ind',
       offset,
-      onError
-    )
+      onError,
+      startOnNewline: true
+    })
     const implicitKey = !keyProps.found
     if (implicitKey) {
       if (key) {
@@ -63,14 +62,13 @@ export function resolveBlockMap(
       : composeEmptyNode(ctx, keyStart, start, null, keyProps, onError)
 
     // value properties
-    const valueProps = resolveProps(
+    const valueProps = resolveProps(sep || [], {
       ctx,
-      sep || [],
-      !key || key.type === 'block-scalar',
-      'map-value-ind',
-      keyNode.range[1],
-      onError
-    )
+      indicator: 'map-value-ind',
+      offset: keyNode.range[1],
+      onError,
+      startOnNewline: !key || key.type === 'block-scalar'
+    })
     offset = valueProps.end
 
     if (valueProps.found) {

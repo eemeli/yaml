@@ -2,17 +2,17 @@ import type { SourceToken } from '../parse/tokens.js'
 import type { ComposeContext } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 
-export function resolveProps(
-  ctx: ComposeContext,
-  tokens: SourceToken[],
-  startOnNewline: boolean,
-  indicator:
-    | 'doc-start'
-    | 'explicit-key-ind'
-    | 'map-value-ind'
-    | 'seq-item-ind',
-  offset: number,
+export interface ResolvePropsArg {
+  ctx: ComposeContext
+  indicator: 'doc-start' | 'explicit-key-ind' | 'map-value-ind' | 'seq-item-ind'
+  offset: number
   onError: ComposeErrorHandler
+  startOnNewline: boolean
+}
+
+export function resolveProps(
+  tokens: SourceToken[],
+  { ctx, indicator, offset, onError, startOnNewline }: ResolvePropsArg
 ) {
   let spaceBefore = false
   let atNewline = startOnNewline
