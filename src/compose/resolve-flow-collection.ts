@@ -1,11 +1,11 @@
-import { isNode, isPair, ParsedNode } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
-import type { FlowCollection, SourceToken, Token } from '../parse/tokens.js'
+import type { FlowCollection } from '../parse/tokens.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveEnd } from './resolve-end.js'
+import { resolveProps } from './resolve-props.js'
 import { containsNewline } from './util-contains-newline.js'
 
 export function resolveFlowCollection(
@@ -15,244 +15,164 @@ export function resolveFlowCollection(
   onError: ComposeErrorHandler
 ) {
   const isMap = fc.start.source === '{'
+  const fcName = isMap ? 'flow map' : 'flow sequence'
   const coll = isMap ? new YAMLMap(ctx.schema) : new YAMLSeq(ctx.schema)
   coll.flow = true
 
-  let key: ParsedNode | null = null
-  let value: ParsedNode | null = null
-
-  let spaceBefore = false
-  let comment = ''
-  let hasSpace = false
-  let newlines = ''
-  let anchor = ''
-  let tagName = ''
-
-  let offset = fc.offset + 1
-  let atLineStart = false
-  let atExplicitKey = false
-  let atValueEnd = false
-  let nlAfterValueInSeq = false
-  let seqKeyToken: Token | null = null
-
-  function getProps() {
-    const props = { spaceBefore, comment, anchor, tagName }
-
-    spaceBefore = false
-    comment = ''
-    newlines = ''
-    anchor = ''
-    tagName = ''
-
-    return props
-  }
-
-  function addItem(pos: number) {
-    if (value) {
-      if (comment) value.comment = comment
-    } else {
-      value = composeEmptyNode(ctx, offset, fc.items, pos, getProps(), onError)
-    }
-    if (isMap || atExplicitKey) {
-      coll.items.push(key ? new Pair(key, value) : new Pair(value))
-    } else {
-      const seq = coll as YAMLSeq
-      if (key) {
-        const map = new YAMLMap(ctx.schema)
-        map.flow = true
-        map.items.push(new Pair(key, value))
-        seq.items.push(map)
-      } else seq.items.push(value)
-    }
-  }
-
+  let offset = fc.offset
   for (let i = 0; i < fc.items.length; ++i) {
-    const token = fc.items[i]
-    let isSourceToken = true
-    switch (token.type) {
-      case 'space':
-        hasSpace = true
-        break
-      case 'comment': {
-        if (ctx.options.strict && !hasSpace)
+    const { start, key, sep, value } = fc.items[i]
+    const props = resolveProps(start, {
+      ctx,
+      flow: fcName,
+      indicator: 'explicit-key-ind',
+      offset,
+      onError,
+      startOnNewline: false
+    })
+    if (!props.found) {
+      if (!props.anchor && !props.tagName && !sep && !value) {
+        if (i === 0 && props.comma)
           onError(
-            offset,
-            'COMMENT_SPACE',
-            'Comments must be separated from other tokens by white space characters'
-          )
-        const cb = token.source.substring(1)
-        if (!comment) comment = cb
-        else comment += newlines + cb
-        atLineStart = false
-        newlines = ''
-        break
-      }
-      case 'newline':
-        if (atLineStart && !comment) spaceBefore = true
-        if (atValueEnd) {
-          if (comment) {
-            let node = coll.items[coll.items.length - 1]
-            if (isPair(node)) node = node.value || node.key
-            /* istanbul ignore else should not happen */
-            if (isNode(node)) node.comment = comment
-            else
-              onError(
-                offset,
-                'IMPOSSIBLE',
-                'Error adding trailing comment to node'
-              )
-            comment = ''
-          }
-          atValueEnd = false
-        } else {
-          newlines += token.source
-          if (!isMap && !key && value) nlAfterValueInSeq = true
-        }
-        atLineStart = true
-        hasSpace = true
-        break
-      case 'anchor':
-        if (anchor)
-          onError(
-            offset,
-            'MULTIPLE_ANCHORS',
-            'A node can have at most one anchor'
-          )
-        anchor = token.source.substring(1)
-        atLineStart = false
-        atValueEnd = false
-        hasSpace = false
-        break
-      case 'tag': {
-        if (tagName)
-          onError(offset, 'MULTIPLE_TAGS', 'A node can have at most one tag')
-        const tn = ctx.directives.tagName(token.source, m =>
-          onError(offset, 'TAG_RESOLVE_FAILED', m)
-        )
-        if (tn) tagName = tn
-        atLineStart = false
-        atValueEnd = false
-        hasSpace = false
-        break
-      }
-      case 'explicit-key-ind':
-        if (anchor || tagName)
-          onError(
-            offset,
-            'PROP_BEFORE_SEP',
-            'Anchors and tags must be after the ? indicator'
-          )
-        atExplicitKey = true
-        atLineStart = false
-        atValueEnd = false
-        hasSpace = false
-        break
-      case 'map-value-ind': {
-        if (key) {
-          if (value) {
-            onError(
-              offset,
-              'BLOCK_AS_IMPLICIT_KEY',
-              'Missing {} around pair used as mapping key'
-            )
-            const map = new YAMLMap(ctx.schema)
-            map.flow = true
-            map.items.push(new Pair(key, value))
-            map.range = [key.range[0], value.range[1]]
-            key = map as YAMLMap.Parsed
-            value = null
-          } // else explicit key
-        } else if (value) {
-          if (ctx.options.strict) {
-            const slMsg =
-              'Implicit keys of flow sequence pairs need to be on a single line'
-            if (nlAfterValueInSeq)
-              onError(offset, 'MULTILINE_IMPLICIT_KEY', slMsg)
-            else if (seqKeyToken) {
-              if (containsNewline(seqKeyToken))
-                onError(offset, 'MULTILINE_IMPLICIT_KEY', slMsg)
-              if (seqKeyToken.offset < offset - 1024)
-                onError(
-                  offset,
-                  'KEY_OVER_1024_CHARS',
-                  'The : indicator must be at most 1024 chars after the start of an implicit flow sequence key'
-                )
-              seqKeyToken = null
-            }
-          }
-          key = value
-          value = null
-        } else {
-          key = composeEmptyNode(ctx, offset, fc.items, i, getProps(), onError)
-        }
-        if (comment) {
-          key.comment = comment
-          comment = ''
-        }
-        atExplicitKey = false
-        atValueEnd = false
-        hasSpace = false
-        break
-      }
-      case 'comma':
-        if (key || value || anchor || tagName || atExplicitKey) addItem(i)
-        else
-          onError(
-            offset,
+            props.comma.offset,
             'UNEXPECTED_TOKEN',
-            `Unexpected , in flow ${isMap ? 'map' : 'sequence'}`
+            `Unexpected , in ${fcName}`
           )
-        key = null
-        value = null
-        atExplicitKey = false
-        atValueEnd = true
-        hasSpace = false
-        nlAfterValueInSeq = false
-        seqKeyToken = null
-        break
-      case 'block-map':
-      case 'block-seq':
+        else if (i < fc.items.length - 1)
+          onError(
+            props.start,
+            'UNEXPECTED_TOKEN',
+            `Unexpected empty item in ${fcName}`
+          )
+        if (props.comment) {
+          if (coll.comment) coll.comment += '\n' + props.comment
+          else coll.comment = props.comment
+        }
+        continue
+      }
+      if (!isMap && ctx.options.strict && containsNewline(key))
         onError(
-          offset,
+          props.start,
+          'MULTILINE_IMPLICIT_KEY',
+          'Implicit keys of flow sequence pairs need to be on a single line'
+        )
+    }
+    if (i === 0) {
+      if (props.comma)
+        onError(
+          props.comma.offset,
+          'UNEXPECTED_TOKEN',
+          `Unexpected , in ${fcName}`
+        )
+    } else if (!props.comma)
+      onError(props.start, 'MISSING_CHAR', `Missing , between ${fcName} items`)
+
+    for (const token of [key, value])
+      if (token && (token.type === 'block-map' || token.type === 'block-seq'))
+        onError(
+          token.offset,
           'BLOCK_IN_FLOW',
           'Block collections are not allowed within flow collections'
         )
-      // fallthrough
-      default: {
-        if (value)
+
+    if (!isMap && !sep && !props.found) {
+      // item is a value in a seq
+      // → key & sep are empty, start does not include ? or :
+      const valueNode = value
+        ? composeNode(ctx, value, props, onError)
+        : composeEmptyNode(ctx, props.end, sep, null, props, onError)
+      ;(coll as YAMLSeq).items.push(valueNode)
+      offset = valueNode.range[1]
+    } else {
+      // item is a key+value pair
+
+      // key value
+      const keyStart = props.end
+      const keyNode = key
+        ? composeNode(ctx, key, props, onError)
+        : composeEmptyNode(ctx, keyStart, start, null, props, onError)
+
+      // value properties
+      const valueProps = resolveProps(sep || [], {
+        ctx,
+        flow: fcName,
+        indicator: 'map-value-ind',
+        offset: keyNode.range[1],
+        onError,
+        startOnNewline: false
+      })
+
+      if (valueProps.found) {
+        if (!isMap && !props.found && ctx.options.strict) {
+          if (sep)
+            for (const st of sep) {
+              if (st === valueProps.found) break
+              if (st.type === 'newline') {
+                onError(
+                  st.offset,
+                  'MULTILINE_IMPLICIT_KEY',
+                  'Implicit keys of flow sequence pairs need to be on a single line'
+                )
+                break
+              }
+            }
+          if (props.start < valueProps.found.offset - 1024)
+            onError(
+              valueProps.found.offset,
+              'KEY_OVER_1024_CHARS',
+              'The : indicator must be at most 1024 chars after the start of an implicit flow sequence key'
+            )
+        }
+      } else if (value) {
+        if ('source' in value && value.source && value.source[0] === ':')
           onError(
-            offset,
+            value.offset,
             'MISSING_CHAR',
-            'Missing , between flow collection items'
+            `Missing space after : in ${fcName}`
           )
-        if (!isMap && !key && !atExplicitKey) seqKeyToken = token
-        value = composeNode(ctx, token, getProps(), onError)
-        offset = value.range[1]
-        atLineStart = false
-        isSourceToken = false
-        atValueEnd = false
-        hasSpace = false
+        else
+          onError(
+            valueProps.start,
+            'MISSING_CHAR',
+            `Missing , or : between ${fcName} items`
+          )
       }
+
+      // value value
+      const valueNode = value
+        ? composeNode(ctx, value, valueProps, onError)
+        : valueProps.found
+        ? composeEmptyNode(ctx, valueProps.end, sep, null, valueProps, onError)
+        : null
+
+      const pair = new Pair(keyNode, valueNode)
+      if (isMap) coll.items.push(pair)
+      else {
+        const map = new YAMLMap(ctx.schema)
+        map.flow = true
+        map.items.push(pair)
+        ;(coll as YAMLSeq).items.push(map)
+      }
+      offset = valueNode ? valueNode.range[1] : valueProps.end
     }
-    if (isSourceToken) offset += (token as SourceToken).source.length
   }
-  if (key || value || anchor || tagName || atExplicitKey)
-    addItem(fc.items.length)
 
   const expectedEnd = isMap ? '}' : ']'
   const [ce, ...ee] = fc.end
   if (!ce || ce.source !== expectedEnd) {
-    const cs = isMap ? 'map' : 'sequence'
     onError(
-      offset,
+      offset + 1,
       'MISSING_CHAR',
-      `Expected flow ${cs} to end with ${expectedEnd}`
+      `Expected ${fcName} to end with ${expectedEnd}`
     )
   }
   if (ce) offset += ce.source.length
   if (ee.length > 0) {
     const end = resolveEnd(ee, offset, ctx.options.strict, onError)
-    if (end.comment) coll.comment = comment
+    if (end.comment) {
+      if (coll.comment) coll.comment += '\n' + end.comment
+      else coll.comment = end.comment
+    }
     offset = end.offset
   }
 

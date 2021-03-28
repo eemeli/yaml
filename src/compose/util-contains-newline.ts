@@ -7,20 +7,16 @@ export function containsNewline(key: Token | null | undefined) {
     case 'scalar':
     case 'double-quoted-scalar':
     case 'single-quoted-scalar':
-      return key.source.includes('\n')
+      if (key.source.includes('\n')) return true
+      if (key.end)
+        for (const st of key.end) if (st.type === 'newline') return true
+      return false
     case 'flow-collection':
-      for (const token of key.items) {
-        switch (token.type) {
-          case 'newline':
-            return true
-          case 'alias':
-          case 'scalar':
-          case 'double-quoted-scalar':
-          case 'single-quoted-scalar':
-          case 'flow-collection':
-            if (containsNewline(token)) return true
-            break
-        }
+      for (const it of key.items) {
+        for (const st of it.start) if (st.type === 'newline') return true
+        if (it.sep)
+          for (const st of it.sep) if (st.type === 'newline') return true
+        if (containsNewline(it.key) || containsNewline(it.value)) return true
       }
       return false
     default:

@@ -116,6 +116,24 @@ function getFirstKeyStartProps(prev: SourceToken[]) {
   return prev.splice(i, prev.length)
 }
 
+function fixFlowSeqItems(fc: FlowCollection) {
+  if (fc.start.type === 'flow-seq-start') {
+    for (const it of fc.items) {
+      if (
+        it.sep &&
+        !it.value &&
+        !includesToken(it.start, 'explicit-key-ind') &&
+        !includesToken(it.sep, 'map-value-ind')
+      ) {
+        Array.prototype.push.apply(it.start, it.sep)
+        delete it.sep
+        if (it.key) it.value = it.key
+        delete it.key
+      }
+    }
+  }
+}
+
 /**
  * A YAML concrete syntax tree (CST) parser
  *
@@ -309,6 +327,7 @@ export class Parser {
       // For these, parent indent is needed instead of own
       if (token.type === 'block-scalar' || token.type === 'flow-collection')
         token.indent = 'indent' in top ? top.indent : -1
+      if (token.type === 'flow-collection') fixFlowSeqItems(token)
       switch (top.type) {
         case 'document':
           top.value = token
@@ -337,9 +356,14 @@ export class Parser {
           else it.value = token
           break
         }
-        case 'flow-collection':
-          top.items.push(token)
-          break
+        case 'flow-collection': {
+          const it = top.items[top.items.length - 1]
+          if (!it || it.value)
+            top.items.push({ start: [], key: token, sep: [] })
+          else if (it.sep) it.value = token
+          else Object.assign(it, { key: token, sep: [] })
+          return
+        }
         /* istanbul ignore next should not happen */
         default:
           this.pop()
@@ -652,31 +676,48 @@ export class Parser {
   }
 
   private flowCollection(fc: FlowCollection) {
+    const it = fc.items[fc.items.length - 1]
     if (this.type === 'flow-error-end') {
-      let top
+      let top: Token | undefined
       do {
         this.pop()
         top = this.peek(1)
       } while (top && top.type === 'flow-collection')
     } else if (fc.end.length === 0) {
       switch (this.type) {
+        case 'comma':
+        case 'explicit-key-ind':
+          if (!it || it.sep) fc.items.push({ start: [this.sourceToken] })
+          else it.start.push(this.sourceToken)
+          return
+
+        case 'map-value-ind':
+          if (!it || it.value)
+            fc.items.push({ start: [], key: null, sep: [this.sourceToken] })
+          else if (it.sep) it.sep.push(this.sourceToken)
+          else Object.assign(it, { key: null, sep: [this.sourceToken] })
+          return
+
         case 'space':
         case 'comment':
         case 'newline':
-        case 'comma':
-        case 'explicit-key-ind':
-        case 'map-value-ind':
         case 'anchor':
         case 'tag':
-          fc.items.push(this.sourceToken)
+          if (!it || it.value) fc.items.push({ start: [this.sourceToken] })
+          else if (it.sep) it.sep.push(this.sourceToken)
+          else it.start.push(this.sourceToken)
           return
 
         case 'alias':
         case 'scalar':
         case 'single-quoted-scalar':
-        case 'double-quoted-scalar':
-          fc.items.push(this.flowScalar(this.type))
+        case 'double-quoted-scalar': {
+          const fs = this.flowScalar(this.type)
+          if (!it || it.value) fc.items.push({ start: [], key: fs, sep: [] })
+          else if (it.sep) this.stack.push(fs)
+          else Object.assign(it, { key: fs, sep: [] })
           return
+        }
 
         case 'flow-map-end':
         case 'flow-seq-end':
@@ -706,6 +747,7 @@ export class Parser {
       ) {
         const prev = getPrevProps(parent)
         const start = getFirstKeyStartProps(prev)
+        fixFlowSeqItems(fc)
         const sep = fc.end.splice(1, fc.end.length)
         sep.push(this.sourceToken)
         const map: BlockMap = {

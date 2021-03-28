@@ -122,24 +122,17 @@ describe('block collections', () => {
 describe('flow collections', () => {
   test('start only of flow map (eemeli/yaml#8)', () => {
     const doc = YAML.parseDocument('{')
-    const message = expect.stringContaining('Expected flow map to end with }')
-    expect(doc.errors).toMatchObject([{ message, offset: 1 }])
+    expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR', offset: 1 }])
   })
 
   test('start only of flow sequence (eemeli/yaml#8)', () => {
     const doc = YAML.parseDocument('[')
-    const message = expect.stringContaining(
-      'Expected flow sequence to end with ]'
-    )
-    expect(doc.errors).toMatchObject([{ message, offset: 1 }])
+    expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR', offset: 1 }])
   })
 
   test('flow sequence without end', () => {
     const doc = YAML.parseDocument('[ foo, bar,')
-    const message = expect.stringContaining(
-      'Expected flow sequence to end with ]'
-    )
-    expect(doc.errors).toMatchObject([{ message, offset: 11 }])
+    expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR', offset: 11 }])
   })
 
   test('doc-end within flow sequence', () => {
@@ -147,7 +140,7 @@ describe('flow collections', () => {
       prettyErrors: false
     })
     expect(doc.errors).toMatchObject([
-      { message: 'Expected flow sequence to end with ]' },
+      { code: 'MISSING_CHAR' },
       { message: 'Unexpected flow-seq-end token in YAML document: "]"' },
       {
         message:
@@ -166,18 +159,17 @@ describe('flow collections', () => {
 
   test('block seq in flow collection', () => {
     const doc = YAML.parseDocument('{\n- foo\n}')
-    expect(doc.errors).toHaveLength(1)
-    expect(doc.errors[0].message).toMatch(
-      'Block collections are not allowed within flow collections'
-    )
+    expect(doc.errors).toMatchObject([{ code: 'BLOCK_IN_FLOW' }])
   })
 
-  test('anchor before explicit key indicator', () => {
+  test.skip('anchor before explicit key indicator in block map', () => {
+    const doc = YAML.parseDocument('&a ? A')
+    expect(doc.errors).toMatchObject([{ code: 'BAD_PROP_ORDER' }])
+  })
+
+  test('anchor before explicit key indicator in flow map', () => {
     const doc = YAML.parseDocument('{ &a ? A }')
-    expect(doc.errors).toHaveLength(1)
-    expect(doc.errors[0].message).toMatch(
-      'Anchors and tags must be after the ? indicator'
-    )
+    expect(doc.errors).toMatchObject([{ code: 'BAD_PROP_ORDER' }])
   })
 })
 
@@ -228,12 +220,14 @@ describe('pretty errors', () => {
     expect(docs[0].errors[0]).not.toHaveProperty('source')
     expect(docs[1].errors).toMatchObject([
       {
+        code: 'UNEXPECTED_TOKEN',
         message:
           'Unexpected , in flow map at line 3, column 7:\n\n{ 123,,, }\n      ^\n',
         offset: 16,
         linePos: { line: 3, col: 7 }
       },
       {
+        code: 'UNEXPECTED_TOKEN',
         message:
           'Unexpected , in flow map at line 3, column 8:\n\n{ 123,,, }\n       ^\n',
         offset: 17,
