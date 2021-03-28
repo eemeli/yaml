@@ -11,7 +11,7 @@ const startColMsg = 'All mapping items must start at the same column'
 export function resolveBlockMap(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
-  { indent, items, offset }: BlockMap,
+  bm: BlockMap,
   onError: (
     offset: number,
     code: ErrorCode,
@@ -19,10 +19,10 @@ export function resolveBlockMap(
     warning?: boolean
   ) => void
 ) {
-  const start = offset
   const map = new YAMLMap(ctx.schema)
 
-  for (const { start, key, sep, value } of items) {
+  let offset = bm.offset
+  for (const { start, key, sep, value } of bm.items) {
     // key properties
     const keyProps = resolveProps(
       ctx,
@@ -41,7 +41,7 @@ export function resolveBlockMap(
             'BLOCK_AS_IMPLICIT_KEY',
             'A block sequence may not be used as an implicit map key'
           )
-        else if ('indent' in key && key.indent !== indent)
+        else if ('indent' in key && key.indent !== bm.indent)
           onError(offset, 'BAD_INDENT', startColMsg)
       }
       if (!keyProps.anchor && !keyProps.tagName && !sep) {
@@ -52,22 +52,20 @@ export function resolveBlockMap(
         }
         continue
       }
-    } else if (keyProps.found?.indent !== indent)
+    } else if (keyProps.found?.indent !== bm.indent)
       onError(offset, 'BAD_INDENT', startColMsg)
-    offset += keyProps.length
     if (implicitKey && containsNewline(key))
       onError(
-        offset,
+        keyProps.start,
         'MULTILINE_IMPLICIT_KEY',
         'Implicit keys need to be on a single line'
       )
 
     // key value
-    const keyStart = offset
+    const keyStart = keyProps.end
     const keyNode = key
       ? composeNode(ctx, key, keyProps, onError)
-      : composeEmptyNode(ctx, offset, start, null, keyProps, onError)
-    offset = keyNode.range[1]
+      : composeEmptyNode(ctx, keyStart, start, null, keyProps, onError)
 
     // value properties
     const valueProps = resolveProps(
@@ -75,10 +73,10 @@ export function resolveBlockMap(
       sep || [],
       !key || key.type === 'block-scalar',
       'map-value-ind',
-      offset,
+      keyNode.range[1],
       onError
     )
-    offset += valueProps.length
+    offset = valueProps.end
 
     if (valueProps.found) {
       if (implicitKey) {
@@ -119,6 +117,7 @@ export function resolveBlockMap(
       map.items.push(new Pair(keyNode))
     }
   }
-  map.range = [start, offset]
+
+  map.range = [bm.offset, offset]
   return map as YAMLMap.Parsed
 }

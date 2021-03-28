@@ -37,7 +37,7 @@ export function composeDoc(
   if (props.found) doc.directives.marker = true
   doc.contents = value
     ? composeNode(ctx, value, props, onError)
-    : composeEmptyNode(ctx, offset + props.length, start, null, props, onError)
+    : composeEmptyNode(ctx, props.end, start, null, props, onError)
 
   const re = resolveEnd(end, doc.contents.range[1], false, onError)
   if (re.comment) doc.comment = re.comment

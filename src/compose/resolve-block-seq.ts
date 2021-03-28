@@ -7,7 +7,7 @@ import { resolveProps } from './resolve-props.js'
 export function resolveBlockSeq(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
-  { items, offset }: BlockSequence,
+  bs: BlockSequence,
   onError: (
     offset: number,
     code: ErrorCode,
@@ -15,9 +15,9 @@ export function resolveBlockSeq(
     warning?: boolean
   ) => void
 ) {
-  const start = offset
   const seq = new YAMLSeq(ctx.schema)
-  for (const { start, value } of items) {
+  let offset = bs.offset
+  for (const { start, value } of bs.items) {
     const props = resolveProps(
       ctx,
       start,
@@ -26,7 +26,7 @@ export function resolveBlockSeq(
       offset,
       onError
     )
-    offset += props.length
+    offset = props.end
     if (!props.found) {
       if (props.anchor || props.tagName || value) {
         if (value && value.type === 'block-seq')
@@ -49,6 +49,6 @@ export function resolveBlockSeq(
     offset = node.range[1]
     seq.items.push(node)
   }
-  seq.range = [start, offset]
+  seq.range = [bs.offset, offset]
   return seq as YAMLSeq.Parsed
 }

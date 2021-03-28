@@ -14,7 +14,6 @@ export function resolveProps(
   offset: number,
   onError: (offset: number, code: ErrorCode, message: string) => void
 ) {
-  let length = 0
   let spaceBefore = false
   let atNewline = startOnNewline
   let hasSpace = startOnNewline
@@ -24,7 +23,7 @@ export function resolveProps(
   let sep = ''
   let anchor = ''
   let tagName = ''
-  let found: { indent: number; offset: number } | null = null
+  let found: SourceToken | null = null
   let start: number | null = null
   for (const token of tokens) {
     switch (token.type) {
@@ -33,7 +32,7 @@ export function resolveProps(
         // white space rather than indentation.
         if (atNewline && indicator !== 'doc-start' && token.source[0] === '\t')
           onError(
-            offset + length,
+            token.offset,
             'TAB_AS_INDENT',
             'Tabs are not allowed as indentation'
           )
@@ -42,7 +41,7 @@ export function resolveProps(
       case 'comment': {
         if (ctx.options.strict && !hasSpace)
           onError(
-            offset + length,
+            token.offset,
             'COMMENT_SPACE',
             'Comments must be separated from other tokens by white space characters'
           )
@@ -63,49 +62,49 @@ export function resolveProps(
       case 'anchor':
         if (anchor)
           onError(
-            offset + length,
+            token.offset,
             'MULTIPLE_ANCHORS',
             'A node can have at most one anchor'
           )
         anchor = token.source.substring(1)
-        if (start === null) start = offset + length
+        if (start === null) start = token.offset
         atNewline = false
         hasSpace = false
         break
       case 'tag': {
         if (tagName)
           onError(
-            offset + length,
+            token.offset,
             'MULTIPLE_TAGS',
             'A node can have at most one tag'
           )
         const tn = ctx.directives.tagName(token.source, msg =>
-          onError(offset, 'TAG_RESOLVE_FAILED', msg)
+          onError(token.offset, 'TAG_RESOLVE_FAILED', msg)
         )
         if (tn) tagName = tn
-        if (start === null) start = offset + length
+        if (start === null) start = token.offset
         atNewline = false
         hasSpace = false
         break
       }
       case indicator:
         // Could here handle preceding comments differently
-        found = { indent: token.indent, offset: offset + length }
+        found = token
         atNewline = false
         hasSpace = false
         break
       default:
         onError(
-          offset + length,
+          token.offset,
           'UNEXPECTED_TOKEN',
           `Unexpected ${token.type} token`
         )
         atNewline = false
         hasSpace = false
     }
-    /* istanbul ignore else should not happen */
-    if (token.source) length += token.source.length
   }
+  const last = tokens[tokens.length - 1]
+  const end = last ? last.offset + last.source.length : offset
   return {
     found,
     spaceBefore,
@@ -113,7 +112,7 @@ export function resolveProps(
     hasNewline,
     anchor,
     tagName,
-    length,
-    start: start ?? offset + length
+    end,
+    start: start ?? end
   }
 }
