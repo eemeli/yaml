@@ -471,7 +471,7 @@ describe('stringify comments', () => {
     })
   })
 
-  describe('flow collection commens', () => {
+  describe('flow collection comments', () => {
     test('line comment after , in seq', () => {
       const doc = YAML.parseDocument(source`
         [ a, #c0
@@ -485,7 +485,7 @@ describe('stringify comments', () => {
       `)
     })
 
-    test.skip('line comment after , in map', () => {
+    test('line comment after , in map', () => {
       const doc = YAML.parseDocument(source`
         { a, #c0
           b: c, #c1
@@ -493,9 +493,9 @@ describe('stringify comments', () => {
         }`)
       expect(String(doc)).toBe(source`
         {
-          ? a, #c0
+          a, #c0
           b: c, #c1
-          ? d #c2
+          d #c2
         }
       `)
     })

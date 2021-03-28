@@ -7,7 +7,7 @@ import { stringify, StringifyContext } from './stringify.js'
 export function stringifyPair(
   { key, value }: Readonly<Pair>,
   ctx: StringifyContext,
-  _onComment?: () => void,
+  onComment?: () => void,
   onChompKeep?: () => void
 ) {
   const {
@@ -41,11 +41,12 @@ export function stringifyPair(
     implicitKey: !explicitKey && (simpleKeys || !allNullValues),
     indent: indent + indentStep
   })
+  let keyCommentDone = false
   let chompKeep = false
   let str = stringify(
     key,
     ctx,
-    () => (keyComment = null),
+    () => (keyCommentDone = true),
     () => (chompKeep = true)
   )
 
@@ -57,15 +58,18 @@ export function stringifyPair(
     explicitKey = true
   }
 
-  if (
-    (allNullValues && (!simpleKeys || ctx.inFlow)) ||
-    (value == null && (explicitKey || ctx.inFlow))
-  ) {
-    str = addComment(str, ctx.indent, keyComment)
+  if (ctx.inFlow) {
+    if (allNullValues || value == null) {
+      if (keyCommentDone && onComment) onComment()
+      return explicitKey ? `? ${str}` : str
+    }
+  } else if ((allNullValues && !simpleKeys) || (value == null && explicitKey)) {
+    if (keyCommentDone) keyComment = null
     if (chompKeep && !keyComment && onChompKeep) onChompKeep()
-    return ctx.inFlow && !explicitKey ? str : `? ${str}`
+    return addComment(`? ${str}`, ctx.indent, keyComment)
   }
 
+  if (keyCommentDone) keyComment = null
   str = explicitKey
     ? `? ${addComment(str, ctx.indent, keyComment)}\n${indent}:`
     : addComment(`${str}:`, ctx.indent, keyComment)
@@ -99,10 +103,12 @@ export function stringifyPair(
     // If indentSeq === false, consider '- ' as part of indentation where possible
     ctx.indent = ctx.indent.substr(2)
   }
+
+  let valueCommentDone = false
   const valueStr = stringify(
     value,
     ctx,
-    () => (valueComment = null),
+    () => (valueCommentDone = true),
     () => (chompKeep = true)
   )
   let ws = ' '
@@ -112,6 +118,13 @@ export function stringifyPair(
     const flow = valueStr[0] === '[' || valueStr[0] === '{'
     if (!flow || valueStr.includes('\n')) ws = `\n${ctx.indent}`
   } else if (valueStr[0] === '\n') ws = ''
-  if (chompKeep && !valueComment && onChompKeep) onChompKeep()
-  return addComment(str + ws + valueStr, ctx.indent, valueComment)
+
+  if (ctx.inFlow) {
+    if (valueCommentDone && onComment) onComment()
+    return str + ws + valueStr
+  } else {
+    if (valueCommentDone) valueComment = null
+    if (chompKeep && !valueComment && onChompKeep) onChompKeep()
+    return addComment(str + ws + valueStr, ctx.indent, valueComment)
+  }
 }

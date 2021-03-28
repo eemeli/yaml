@@ -1,7 +1,6 @@
 import { createNode } from '../doc/createNode.js'
 import type { Schema } from '../schema/Schema.js'
-import { isCollection, isNode, isScalar, NodeBase, NODE_TYPE } from './Node.js'
-import type { Pair } from './Pair.js'
+import { isCollection, isPair, isScalar, NodeBase, NODE_TYPE } from './Node.js'
 
 export function collectionFromPath(
   schema: Schema,
@@ -143,8 +142,8 @@ export abstract class Collection extends NodeBase {
 
   hasAllNullValues(allowScalar?: boolean) {
     return this.items.every(node => {
-      if (!node || isNode(node)) return false
-      const n = (node as Pair).value
+      if (!isPair(node)) return false
+      const n = node.value
       return (
         n == null ||
         (allowScalar &&
