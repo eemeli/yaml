@@ -489,7 +489,7 @@ describe('maps with no values', () => {
     const src = `{\na: null,\n? b\n}`
     const doc = YAML.parseDocument(src)
     expect(String(doc)).toBe(`{ a: null, b }\n`)
-    doc.contents.items[1].comment = 'c'
+    doc.contents.items[1].key.comment = 'c'
     expect(String(doc)).toBe(`{\n  a: null,\n  b #c\n}\n`)
     doc.set('b', 'x')
     expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n    x\n}\n`)

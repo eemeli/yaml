@@ -28,32 +28,45 @@ export function stringifyCollection(
   const inFlow = flow || ctx.inFlow
   if (inFlow) itemIndent += indentStep
   ctx = Object.assign({}, ctx, { indent: itemIndent, inFlow, type: null })
-  let chompKeep = false
-  let hasItemWithNewLine = false
+
+  let singleLineOutput = true
+  let chompKeep = false // flag for the preceding node's status
   const nodes = items.reduce((nodes: StringifyNode[], item, i) => {
     let comment: string | null = null
-    if (isNode(item) || isPair(item)) {
+    if (isNode(item)) {
       if (!chompKeep && item.spaceBefore) nodes.push({ comment: true, str: '' })
-
       if (item.commentBefore) {
         // This match will always succeed on a non-empty string
         for (const line of item.commentBefore.match(/^.*$/gm) as string[])
           nodes.push({ comment: true, str: `#${line}` })
       }
+      if (item.comment) {
+        comment = item.comment
+        singleLineOutput = false
+      }
+    } else if (isPair(item)) {
+      const ik = isNode(item.key) ? item.key : null
+      if (ik) {
+        if (!chompKeep && ik.spaceBefore) nodes.push({ comment: true, str: '' })
+        if (ik.commentBefore) {
+          // This match will always succeed on a non-empty string
+          for (const line of ik.commentBefore.match(/^.*$/gm) as string[])
+            nodes.push({ comment: true, str: `#${line}` })
+        }
+        if (ik.comment) singleLineOutput = false
+      }
 
-      if (item.comment) comment = item.comment
-
-      const pair = item as any // Apply guards manually in the following
-      if (
-        inFlow &&
-        ((!chompKeep && item.spaceBefore) ||
-          item.commentBefore ||
-          item.comment ||
-          (pair.key && (pair.key.commentBefore || pair.key.comment)) ||
-          (pair.value && (pair.value.commentBefore || pair.value.comment)))
-      )
-        hasItemWithNewLine = true
+      if (inFlow) {
+        const iv = isNode(item.value) ? item.value : null
+        if (iv) {
+          if (iv.comment) comment = iv.comment
+          if (iv.comment || iv.commentBefore) singleLineOutput = false
+        } else if (item.value == null && ik && ik.comment) {
+          comment = ik.comment
+        }
+      }
     }
+
     chompKeep = false
     let str = stringify(
       item,
@@ -61,24 +74,30 @@ export function stringifyCollection(
       () => (comment = null),
       () => (chompKeep = true)
     )
-    if (inFlow && !hasItemWithNewLine && str.includes('\n'))
-      hasItemWithNewLine = true
     if (inFlow && i < items.length - 1) str += ','
     str = addComment(str, itemIndent, comment)
     if (chompKeep && (comment || inFlow)) chompKeep = false
     nodes.push({ comment: false, str })
     return nodes
   }, [])
+
   let str: string
   if (nodes.length === 0) {
     str = flowChars.start + flowChars.end
   } else if (inFlow) {
     const { start, end } = flowChars
     const strings = nodes.map(n => n.str)
+    let singleLineLength = 2
+    for (const node of nodes) {
+      if (node.comment || node.str.includes('\n')) {
+        singleLineOutput = false
+        break
+      }
+      singleLineLength += node.str.length + 2
+    }
     if (
-      hasItemWithNewLine ||
-      strings.reduce((sum, str) => sum + str.length + 2, 2) >
-        Collection.maxFlowStringSingleLineLength
+      !singleLineOutput ||
+      singleLineLength > Collection.maxFlowStringSingleLineLength
     ) {
       str = start
       for (const s of strings) {

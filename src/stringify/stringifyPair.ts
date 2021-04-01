@@ -5,7 +5,7 @@ import { addComment } from './addComment.js'
 import { stringify, StringifyContext } from './stringify.js'
 
 export function stringifyPair(
-  { comment, key, value }: Readonly<Pair>,
+  { key, value }: Readonly<Pair>,
   ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
@@ -30,7 +30,7 @@ export function stringifyPair(
   let explicitKey =
     !simpleKeys &&
     (!key ||
-      (keyComment && value == null) ||
+      (keyComment && value == null && !ctx.inFlow) ||
       isCollection(key) ||
       (isScalar(key)
         ? key.type === Scalar.BLOCK_FOLDED || key.type === Scalar.BLOCK_LITERAL
@@ -41,11 +41,12 @@ export function stringifyPair(
     implicitKey: !explicitKey && (simpleKeys || !allNullValues),
     indent: indent + indentStep
   })
+  let keyCommentDone = false
   let chompKeep = false
   let str = stringify(
     key,
     ctx,
-    () => (keyComment = null),
+    () => (keyCommentDone = true),
     () => (chompKeep = true)
   )
 
@@ -57,29 +58,21 @@ export function stringifyPair(
     explicitKey = true
   }
 
-  if (
-    (allNullValues && (!simpleKeys || ctx.inFlow)) ||
-    (value == null && (explicitKey || ctx.inFlow))
-  ) {
-    str = addComment(str, ctx.indent, keyComment)
-    if (comment) {
-      if (keyComment && !comment.includes('\n'))
-        str += `\n${ctx.indent || ''}#${comment}`
-      else str = addComment(str, ctx.indent, comment)
-      if (onComment) onComment()
-    } else if (chompKeep && !keyComment && onChompKeep) onChompKeep()
-    return ctx.inFlow && !explicitKey ? str : `? ${str}`
+  if (ctx.inFlow) {
+    if (allNullValues || value == null) {
+      if (keyCommentDone && onComment) onComment()
+      return explicitKey ? `? ${str}` : str
+    }
+  } else if ((allNullValues && !simpleKeys) || (value == null && explicitKey)) {
+    if (keyCommentDone) keyComment = null
+    if (chompKeep && !keyComment && onChompKeep) onChompKeep()
+    return addComment(`? ${str}`, ctx.indent, keyComment)
   }
 
+  if (keyCommentDone) keyComment = null
   str = explicitKey
     ? `? ${addComment(str, ctx.indent, keyComment)}\n${indent}:`
     : addComment(`${str}:`, ctx.indent, keyComment)
-  if (comment) {
-    if (keyComment && !explicitKey && !comment.includes('\n'))
-      str += `\n${ctx.indent || ''}#${comment}`
-    else str = addComment(str, ctx.indent, comment)
-    if (onComment) onComment()
-  }
 
   let vcb = ''
   let valueComment = null
@@ -94,7 +87,7 @@ export function stringifyPair(
     value = doc.createNode(value)
   }
   ctx.implicitKey = false
-  if (!explicitKey && !keyComment && !comment && isScalar(value))
+  if (!explicitKey && !keyComment && isScalar(value))
     ctx.indentAtStart = str.length + 1
   chompKeep = false
   if (
@@ -110,19 +103,28 @@ export function stringifyPair(
     // If indentSeq === false, consider '- ' as part of indentation where possible
     ctx.indent = ctx.indent.substr(2)
   }
+
+  let valueCommentDone = false
   const valueStr = stringify(
     value,
     ctx,
-    () => (valueComment = null),
+    () => (valueCommentDone = true),
     () => (chompKeep = true)
   )
   let ws = ' '
-  if (vcb || keyComment || comment) {
+  if (vcb || keyComment) {
     ws = `${vcb}\n${ctx.indent}`
   } else if (!explicitKey && isCollection(value)) {
     const flow = valueStr[0] === '[' || valueStr[0] === '{'
     if (!flow || valueStr.includes('\n')) ws = `\n${ctx.indent}`
   } else if (valueStr[0] === '\n') ws = ''
-  if (chompKeep && !valueComment && onChompKeep) onChompKeep()
-  return addComment(str + ws + valueStr, ctx.indent, valueComment)
+
+  if (ctx.inFlow) {
+    if (valueCommentDone && onComment) onComment()
+    return str + ws + valueStr
+  } else {
+    if (valueCommentDone) valueComment = null
+    if (chompKeep && !valueComment && onChompKeep) onChompKeep()
+    return addComment(str + ws + valueStr, ctx.indent, valueComment)
+  }
 }

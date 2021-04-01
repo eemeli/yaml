@@ -1,5 +1,4 @@
 import { Scalar } from '../nodes/Scalar.js'
-import { addCommentBefore } from './addComment.js'
 import {
   foldFlowLines,
   FoldOptions,
@@ -227,7 +226,7 @@ function plainString(
   onComment?: () => void,
   onChompKeep?: () => void
 ) {
-  const { comment, type, value } = item
+  const { type, value } = item
   const { actualString, implicitKey, indent, inFlow } = ctx
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
@@ -290,18 +289,9 @@ function plainString(
         return doubleQuotedString(value, ctx)
     }
   }
-  const body = implicitKey
+  return implicitKey
     ? str
     : foldFlowLines(str, indent, FOLD_FLOW, getFoldOptions(ctx))
-  if (
-    comment &&
-    !inFlow &&
-    (body.indexOf('\n') !== -1 || comment.indexOf('\n') !== -1)
-  ) {
-    if (onComment) onComment()
-    return addCommentBefore(body, indent, comment)
-  }
-  return body
 }
 
 export function stringifyString(

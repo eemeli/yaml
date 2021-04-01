@@ -100,7 +100,7 @@ export interface CollectionTag extends TagBase {
    * If returning a non-`Node` value, the output will be wrapped as a `Scalar`.
    */
   resolve(
-    value: YAMLMap | YAMLSeq,
+    value: YAMLMap.Parsed | YAMLSeq.Parsed,
     onError: (message: string) => void,
     options: ParseOptions
   ): unknown

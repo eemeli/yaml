@@ -2,8 +2,7 @@ import { createNode, CreateNodeContext } from '../doc/createNode.js'
 import { StringifyContext } from '../stringify/stringify.js'
 import { stringifyPair } from '../stringify/stringifyPair.js'
 import { addPairToJSMap } from './addPairToJSMap.js'
-import { isNode, NodeBase, PAIR } from './Node.js'
-import { Scalar } from './Scalar.js'
+import { NODE_TYPE, PAIR } from './Node.js'
 import { ToJSContext } from './toJS.js'
 
 export function createPair(
@@ -16,7 +15,9 @@ export function createPair(
   return new Pair(k, v)
 }
 
-export class Pair<K = unknown, V = unknown> extends NodeBase {
+export class Pair<K = unknown, V = unknown> {
+  readonly [NODE_TYPE]: symbol
+
   /** Always Node or null when parsed, but can be set to anything. */
   key: K
 
@@ -24,38 +25,9 @@ export class Pair<K = unknown, V = unknown> extends NodeBase {
   value: V | null
 
   constructor(key: K, value: V | null = null) {
-    super(PAIR)
+    Object.defineProperty(this, NODE_TYPE, { value: PAIR })
     this.key = key
     this.value = value
-
-    // TS doesn't allow for accessors to override properties
-    // https://github.com/microsoft/TypeScript/pull/33509
-    Object.defineProperties(this, {
-      commentBefore: {
-        get: () => (isNode(this.key) ? this.key.commentBefore : undefined),
-        set: (cb: string | null) => {
-          if (this.key == null) this.key = (new Scalar(null) as unknown) as K
-          if (isNode(this.key)) this.key.commentBefore = cb
-          else {
-            const msg =
-              'Pair.commentBefore is an alias for Pair.key.commentBefore. To set it, the key must be a Node.'
-            throw new Error(msg)
-          }
-        }
-      },
-      spaceBefore: {
-        get: () => (isNode(this.key) ? this.key.spaceBefore : undefined),
-        set: (sb: boolean) => {
-          if (this.key == null) this.key = (new Scalar(null) as unknown) as K
-          if (isNode(this.key)) this.key.spaceBefore = sb
-          else {
-            const msg =
-              'Pair.spaceBefore is an alias for Pair.key.spaceBefore. To set it, the key must be a Node.'
-            throw new Error(msg)
-          }
-        }
-      }
-    })
   }
 
   toJSON(_?: unknown, ctx?: ToJSContext): ReturnType<typeof addPairToJSMap> {
