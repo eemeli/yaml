@@ -87,7 +87,12 @@ export interface BlockSequence {
   type: 'block-seq'
   offset: number
   indent: number
-  items: Array<{ start: SourceToken[]; value?: Token; sep?: never }>
+  items: Array<{
+    start: SourceToken[]
+    key?: never
+    sep?: never
+    value?: Token
+  }>
 }
 
 export interface FlowCollection {
@@ -95,7 +100,12 @@ export interface FlowCollection {
   offset: number
   indent: number
   start: SourceToken
-  items: Array<Token>
+  items: Array<{
+    start: SourceToken[]
+    key?: Token | null
+    sep?: SourceToken[]
+    value?: Token
+  }>
   end: SourceToken[]
 }
 

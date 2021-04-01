@@ -4,6 +4,7 @@ import type { ComposeErrorHandler } from './composer.js'
 
 export interface ResolvePropsArg {
   ctx: ComposeContext
+  flow?: string
   indicator: 'doc-start' | 'explicit-key-ind' | 'map-value-ind' | 'seq-item-ind'
   offset: number
   onError: ComposeErrorHandler
@@ -12,7 +13,7 @@ export interface ResolvePropsArg {
 
 export function resolveProps(
   tokens: SourceToken[],
-  { ctx, indicator, offset, onError, startOnNewline }: ResolvePropsArg
+  { ctx, flow, indicator, offset, onError, startOnNewline }: ResolvePropsArg
 ) {
   let spaceBefore = false
   let atNewline = startOnNewline
@@ -22,14 +23,21 @@ export function resolveProps(
   let hasNewline = false
   let anchor = ''
   let tagName = ''
+  let comma: SourceToken | null = null
   let found: SourceToken | null = null
   let start: number | null = null
   for (const token of tokens) {
     switch (token.type) {
       case 'space':
-        // At the doc level, tabs at line start may be parsed as leading
-        // white space rather than indentation.
-        if (atNewline && indicator !== 'doc-start' && token.source[0] === '\t')
+        // At the doc level, tabs at line start may be parsed
+        // as leading white space rather than indentation.
+        // In a flow collection, only the parser handles indent.
+        if (
+          !flow &&
+          atNewline &&
+          indicator !== 'doc-start' &&
+          token.source[0] === '\t'
+        )
           onError(
             token.offset,
             'TAB_AS_INDENT',
@@ -87,10 +95,26 @@ export function resolveProps(
       }
       case indicator:
         // Could here handle preceding comments differently
+        if (anchor || tagName)
+          onError(
+            token.offset,
+            'BAD_PROP_ORDER',
+            `Anchors and tags must be after the ${token.source} indicator`
+          )
         found = token
         atNewline = false
         hasSpace = false
         break
+      case 'comma':
+        if (flow) {
+          if (comma)
+            onError(token.offset, 'UNEXPECTED_TOKEN', `Unexpected , in ${flow}`)
+          comma = token
+          atNewline = false
+          hasSpace = false
+          break
+        }
+      // else fallthrough
       default:
         onError(
           token.offset,
@@ -104,6 +128,7 @@ export function resolveProps(
   const last = tokens[tokens.length - 1]
   const end = last ? last.offset + last.source.length : offset
   return {
+    comma,
     found,
     spaceBefore,
     comment,

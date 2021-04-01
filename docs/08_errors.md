@@ -28,6 +28,7 @@ To identify errors for special handling, you should primarily use `code` to diff
 | `BAD_DIRECTIVE`          | Only the `%YAML` and `%TAG` directives are supported, and they need to follow the specified strucutre.                                                                       |
 | `BAD_DQ_ESCAPE`          | Double-quotes strings may include `\` escaped content, but that needs to be valid.                                                                                           |
 | `BAD_INDENT`             | Indentation is important in YAML, and collection items need to all start at the same level. Block scalars are also picky about their leading content.                        |
+| `BAD_PROP_ORDER`         | Anchors and tags must be placed after the `?`, `:` and `-` indicators.                                                                                                       |
 | `BAD_SCALAR_START`       | Plain scalars cannot start with a block scalar indicator, or one of the two reserved characters: `@` and <code>`</code>. To fix, use a block or quoted scalar for the value. |
 | `BLOCK_AS_IMPLICIT_KEY`  | There's probably something wrong with the indentation, or you're trying to parse something like `a: b: c`, where it's not clear what's the key and what's the value.         |
 | `BLOCK_IN_FLOW`          | YAML scalars and collections both have block and flow styles. Flow is allowed within block, but not the other way around.                                                    |
@@ -40,7 +41,6 @@ To identify errors for special handling, you should primarily use `code` to diff
 | `MULTIPLE_ANCHORS`       | A node is only allowed to have one anchor.                                                                                                                                   |
 | `MULTIPLE_DOCS`          | A YAML stream may include multiple documents. If yours does, you'll need to use `parseAllDocuments()` to work with it.                                                       |
 | `MULTIPLE_TAGS`          | A node is only allowed to have one tag.                                                                                                                                      |
-| `PROP_BEFORE_SEP`        | For an explicit key, anchors and tags must be after the `?` indicator                                                                                                        |
 | `TAB_AS_INDENT`          | Only spaces are allowed as indentation.                                                                                                                                      |
 | `TAG_RESOLVE_FAILED`     | Something went wrong when resolving a node's tag with the current schema.                                                                                                    |
 | `UNEXPECTED_TOKEN`       | A token was encountered in a place where it wasn't expected.                                                                                                                 |

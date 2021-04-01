@@ -187,10 +187,17 @@ Some of the most common node properties include:
 | `offset`              | `number`        | The start index within the source string or character stream.                                                                                 |
 | `source`              | `string`        | A raw string representation of the node's value, including all newlines and indentation.                                                      |
 | `indent`              | `number`        | The indent level of the current line; mostly just for internal use.                                                                           |
-| `items`               | `{ ... }[]`     | The contents of a collection; shape depends on the collection type, and may include `key: Token` and `value: Token`.                          |
+| `items`               | `Item[]`        | The contents of a collection; exact shape depends on the collection type.                                                                     |
 | `start`, `sep`, `end` | `SourceToken[]` | Content before, within, and after "actual" values. Includes item and collection indicators, anchors, tags, comments, as well as other things. |
 
-As an implementation detail, block and flow collections are parsed and presented rather differently due to their structural differences.
+Collection items contain some subset of the following properties:
+
+| Item property | Type            | Description                                                                                                                |
+| ------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `start`       | `SourceToken[]` | Always defined. Content before the actual value. May include comments that are later assigned to the preceding item.       |
+| `key`         | `Token ⎮ null`  | Set for key/value pairs only, so never used in block sequences.                                                            |
+| `sep`         | `SourceToken[]` | Content between the key and the value. If defined, indicates that the `key` logically exists, even if its value is `null`. |
+| `value`       | `Token ⎮ null`  | The value. Normally set, but may be left out for e.g. explicit keys with no matching value.                                |
 
 ### Counting Lines
 
