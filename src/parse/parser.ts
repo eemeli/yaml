@@ -799,7 +799,8 @@ export class Parser {
           type: 'block-scalar',
           offset: this.offset,
           indent: this.indent,
-          props: [this.sourceToken]
+          props: [this.sourceToken],
+          source: ''
         } as BlockScalar
       case 'flow-map-start':
       case 'flow-seq-start':

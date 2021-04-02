@@ -65,7 +65,7 @@ export interface BlockScalar {
   offset: number
   indent: number
   props: Token[]
-  source?: string
+  source: string
 }
 
 export interface BlockMap {
