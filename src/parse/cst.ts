@@ -1,3 +1,6 @@
+export { stringify } from './cst-stringify.js'
+export { visit, Visitor, VisitPath } from './cst-visit.js'
+
 export interface SourceToken {
   type:
     | 'byte-order-mark'
@@ -139,6 +142,22 @@ export const FLOW_END = '\x18' // C0: Cancel
 
 /** Next token is a scalar value */
 export const SCALAR = '\x1f' // C0: Unit Separator
+
+/** @returns `true` if `token` is a flow or block collection */
+export const isCollection = (
+  token: Token | null | undefined
+): token is BlockMap | BlockSequence | FlowCollection =>
+  !!token && 'items' in token
+
+/** @returns `true` if `token` is a flow or block scalar; not an alias */
+export const isScalar = (
+  token: Token | null | undefined
+): token is FlowScalar | BlockScalar =>
+  !!token &&
+  (token.type === 'scalar' ||
+    token.type === 'single-quoted-scalar' ||
+    token.type === 'double-quoted-scalar' ||
+    token.type === 'block-scalar')
 
 /* istanbul ignore next */
 /** Get a printable representation of a lexer token */

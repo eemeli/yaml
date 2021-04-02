@@ -265,3 +265,75 @@ If `forceDoc` is true and the stream contains no document, still emit a final do
 
 Current stream status information.
 Mostly useful at the end of input for an empty stream.
+
+## Working with CST Tokens
+
+```ts
+import { CST } from 'yaml'
+```
+
+For most use cases, the Document or pure JS interfaces provided by the library are the right tool.
+Sometimes, though, it's important to keep the original YAML source in as pristine a condition as possible.
+For those cases, the concrete syntax tree (CST) representation is provided, as it retains every character of the input, including whitespace.
+
+#### `CST.isCollection(token?: Token): boolean`
+
+#### `CST.isScalar(token?: Token): boolean`
+
+Custom type guards for detecting CST collections and scalars, in both their block and flow forms.
+
+#### `CST.stringify(cst: Token | CollectionItem): string`
+
+Stringify a CST document, token, or collection item.
+Fair warning: This applies no validation whatsoever, and simply concatenates the sources in their logical order.
+
+```ts
+function findScalarAtOffset(
+  cst: CST.Document,
+  offset: number
+): CST.FlowScalar | CST.BlockScalar | undefined {
+  let res: CST.FlowScalar | CST.BlockScalar | undefined = undefined
+  CST.visit(cst, ({ key, value }) => {
+    for (const token of [key, value])
+      if (CST.isScalar(token)) {
+        if (token.offset > offset) return CST.visit.BREAK
+        if (
+          token.offset == offset ||
+          (token.offset < offset && token.offset + token.source.length > offset)
+        ) {
+          res = token
+          return CST.visit.BREAK
+        }
+      }
+  })
+  return res
+}
+```
+
+#### `CST.visit(cst: CST.Document | CST.CollectionItem, visitor: CSTVisitor)`
+
+Apply a visitor to a CST document or item.
+Effectively, the general-purpose workhorse of navigating the CST.
+
+Walks through the tree (depth-first) starting from `cst` as the root, calling a `visitor` function with two arguments when entering each item:
+
+- `item`: The current item, which includes the following members:
+  - `start: SourceToken[]` – Source tokens before the key or value, possibly including its anchor or tag.
+  - `key?: Token | null` – Set for pair values. May then be `null`, if the key before the `:` separator is empty.
+  - `sep?: SourceToken[]` – Source tokens between the key and the value, which should include the `:` map value indicator if `value` is set.
+  - `value?: Token` – The value of a sequence item, or of a map pair.
+- `path`: The steps from the root to the current node, as an array of `['key' | 'value', number]` tuples.
+
+The return value of the visitor may be used to control the traversal:
+
+- `undefined` (default): Do nothing and continue
+- `CST.visit.SKIP`: Do not visit the children of this token, continue with next sibling
+- `CST.visit.BREAK`: Terminate traversal completely
+- `CST.visit.REMOVE`: Remove the current item, then continue with the next one
+- `number`: Set the index of the next step. This is useful especially if the index of the current token has changed.
+- `function`: Define the next visitor for this item. After the original visitor is called on item entry, next visitors are called after handling a non-empty `key` and when exiting the item.
+
+A couple of utility functions are provided for working with the `path`:
+
+- `CST.visit.itemAtPath(cst, path): CST.CollectionItem | undefined` – Find the item at `path` from `cst` as the root.
+- `CST.visit.parentCollection(cst, path): CST.BlockMap | CST.BlockSequence | CST.FlowCollection` – Get the immediate parent collection of the item at `path` from `cst` as the root. Throws an error if the collection is not found, which should never happen if the item itself exists.
