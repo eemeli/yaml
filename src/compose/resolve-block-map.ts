@@ -1,6 +1,6 @@
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
-import type { BlockMap } from '../parse/tokens.js'
+import type { BlockMap } from '../parse/cst.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveProps } from './resolve-props.js'

@@ -2,11 +2,7 @@ import { isMap, isNode, ParsedNode } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
-import type {
-  BlockMap,
-  BlockSequence,
-  FlowCollection
-} from '../parse/tokens.js'
+import type { BlockMap, BlockSequence, FlowCollection } from '../parse/cst.js'
 import { CollectionTag } from '../schema/types.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'

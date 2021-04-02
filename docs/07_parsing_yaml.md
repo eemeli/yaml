@@ -3,11 +3,11 @@
 <!-- prettier-ignore -->
 ```js
 import {
-  Lexer,
-  Parser,
   Composer,
+  CST,
+  Lexer,
   LineCounter,
-  tokens
+  Parser,
 } from 'yaml'
 ```
 
@@ -171,7 +171,7 @@ For debug purposes, if the `LOG_TOKENS` env var is true-ish, all lexical tokens 
 
 ### CST Nodes
 
-For a complete description of CST node interfaces, please consult the [tokens.ts source](https://github.com/eemeli/yaml/blob/master/src/parse/tokens.ts).
+For a complete description of CST node interfaces, please consult the [cst.ts source](https://github.com/eemeli/yaml/blob/master/src/parse/cst.ts).
 
 Some of the most common node properties include:
 

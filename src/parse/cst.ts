@@ -95,17 +95,19 @@ export interface BlockSequence {
   }>
 }
 
+export type CollectionItem = {
+  start: SourceToken[]
+  key?: Token | null
+  sep?: SourceToken[]
+  value?: Token
+}
+
 export interface FlowCollection {
   type: 'flow-collection'
   offset: number
   indent: number
   start: SourceToken
-  items: Array<{
-    start: SourceToken[]
-    key?: Token | null
-    sep?: SourceToken[]
-    value?: Token
-  }>
+  items: CollectionItem[]
   end: SourceToken[]
 }
 

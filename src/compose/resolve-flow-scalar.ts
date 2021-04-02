@@ -1,5 +1,5 @@
 import { Scalar } from '../nodes/Scalar.js'
-import type { FlowScalar } from '../parse/tokens.js'
+import type { FlowScalar } from '../parse/cst.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveEnd } from './resolve-end.js'
 

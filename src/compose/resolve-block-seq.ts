@@ -1,5 +1,5 @@
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
-import type { BlockSequence } from '../parse/tokens.js'
+import type { BlockSequence } from '../parse/cst.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveProps } from './resolve-props.js'

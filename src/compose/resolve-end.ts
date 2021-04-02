@@ -1,4 +1,4 @@
-import type { SourceToken } from '../parse/tokens.js'
+import type { SourceToken } from '../parse/cst.js'
 import type { ComposeErrorHandler } from './composer.js'
 
 export function resolveEnd(
