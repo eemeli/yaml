@@ -1,3 +1,8 @@
+export {
+  createScalarToken,
+  resolveAsScalar,
+  setScalarValue
+} from './cst-scalar.js'
 export { stringify } from './cst-stringify.js'
 export { visit, Visitor, VisitPath } from './cst-visit.js'
 
