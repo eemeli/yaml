@@ -74,8 +74,8 @@ const YAML = require('yaml')
 
 ### Parsing YAML
 
-- [`new Lexer(push)`](https://eemeli.org/yaml/#lexer)
-- [`new Parser(push, onNewLine?)`](https://eemeli.org/yaml/#parser)
+- [`new Lexer().lex(src)`](https://eemeli.org/yaml/#lexer)
+- [`new Parser(onNewLine?).parse(src)`](https://eemeli.org/yaml/#parser)
 - [`new Composer(push, options?)`](https://eemeli.org/yaml/#composer)
 
 ## YAML.parse

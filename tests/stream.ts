@@ -56,12 +56,11 @@ describe('Input in parts', () => {
         const composer = new Composer(doc => res.push(doc), {
           logLevel: 'error'
         })
-        const parser = new Parser(composer.next)
-
+        const parser = new Parser()
         const start = src.substring(0, i)
         const end = src.substring(i)
-        parser.parse(start, true)
-        parser.parse(end, false)
+        for (const token of parser.parse(start, true)) composer.next(token)
+        for (const token of parser.parse(end, false)) composer.next(token)
         composer.end()
 
         try {

@@ -96,6 +96,6 @@ import {
 import { Composer, Lexer, Parser } from 'yaml'
 ```
 
-- [`new Lexer(push)`](#lexer)
-- [`new Parser(push, onNewLine?)`](#parser)
+- [`new Lexer().lex(src)`](#lexer)
+- [`new Parser(onNewLine?).parse(src)`](#parser)
 - [`new Composer(push, options?)`](#composer)

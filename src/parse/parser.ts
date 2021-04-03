@@ -140,21 +140,31 @@ function fixFlowSeqItems(fc: FlowCollection) {
 /**
  * A YAML concrete syntax tree (CST) parser
  *
- * While the `parse()` method provides an API for parsing a source string
- * directly, the parser may also be used with a user-provided lexer:
+ * ```ts
+ * const src: string = ...
+ * for (const token of new Parser().parse(src)) {
+ *   // token: Token
+ * }
+ * ```
+ *
+ * To use the parser with a user-provided lexer:
  *
  * ```ts
- * const cst: Token[] = []
- * const parser = new Parser(tok => cst.push(tok))
- * const src: string = ...
+ * function* parse(source: string, lexer: Lexer) {
+ *   const parser = new Parser()
+ *   for (const lexeme of lexer.lex(source))
+ *     yield* parser.next(lexeme)
+ *   yield* parser.end()
+ * }
  *
- * // The following would be equivalent to `parser.parse(src)`
- * for (const lexeme of new Lexer().lex(src)) parser.next(lexeme)
- * parser.end()
+ * const src: string = ...
+ * const lexer = new Lexer()
+ * for (const token of parse(src, lexer)) {
+ *   // token: Token
+ * }
  * ```
  */
 export class Parser {
-  private push: (token: Token) => void
   private onNewLine?: (offset: number) => void
 
   /** If true, space and sequence indicators count as indentation */
@@ -182,44 +192,38 @@ export class Parser {
   private type = '' as TokenType
 
   /**
-   * @param push - Called separately with each parsed token
    * @param onNewLine - If defined, called separately with the start position of
    *   each new line (in `parse()`, including the start of input).
-   * @public
    */
-  constructor(
-    push: (token: Token) => void,
-    onNewLine?: (offset: number) => void
-  ) {
-    this.push = push
+  constructor(onNewLine?: (offset: number) => void) {
     this.onNewLine = onNewLine
   }
 
   /**
-   * Parse `source` as a YAML stream, calling `push` with each directive,
-   * document and other structure as it is completely parsed. If `incomplete`,
-   * a part of the last line may be left as a buffer for the next call.
+   * Parse `source` as a YAML stream.
+   * If `incomplete`, a part of the last line may be left as a buffer for the next call.
    *
-   * Errors are not thrown, but pushed out as `{ type: 'error', message }` tokens.
-   * @public
+   * Errors are not thrown, but yielded as `{ type: 'error', message }` tokens.
+   *
+   * @returns A generator of tokens representing each directive, document, and other structure.
    */
-  parse(source: string, incomplete = false) {
+  *parse(source: string, incomplete = false) {
     if (this.onNewLine && this.offset === 0) this.onNewLine(0)
-    for (const lexeme of this.lexer.lex(source, incomplete)) this.next(lexeme)
-    if (!incomplete) this.end()
+    for (const lexeme of this.lexer.lex(source, incomplete))
+      yield* this.next(lexeme)
+    if (!incomplete) yield* this.end()
   }
 
   /**
-   * Advance the parser by the `source` of one lexical token. Bound to the
-   * Parser instance, so may be used directly as a callback function.
+   * Advance the parser by the `source` of one lexical token.
    */
-  next = (source: string) => {
+  *next(source: string) {
     this.source = source
     if (process.env.LOG_TOKENS) console.log('|', prettyToken(source))
 
     if (this.atScalar) {
       this.atScalar = false
-      this.step()
+      yield* this.step()
       this.offset += source.length
       return
     }
@@ -227,7 +231,7 @@ export class Parser {
     const type = tokenType(source)
     if (!type) {
       const message = `Not a YAML token: ${source}`
-      this.pop({ type: 'error', offset: this.offset, message, source })
+      yield* this.pop({ type: 'error', offset: this.offset, message, source })
       this.offset += source.length
     } else if (type === 'scalar') {
       this.atNewLine = false
@@ -235,7 +239,7 @@ export class Parser {
       this.type = 'scalar'
     } else {
       this.type = type
-      this.step()
+      yield* this.step()
       switch (type) {
         case 'newline':
           this.atNewLine = true
@@ -260,11 +264,11 @@ export class Parser {
   }
 
   // Must be defined after `next()`
-  private lexer = new Lexer()
+  private lexer = new Lexer();
 
   /** Call at end of input to push out any remaining constructions */
-  end() {
-    while (this.stack.length > 0) this.pop()
+  *end() {
+    while (this.stack.length > 0) yield* this.pop()
   }
 
   private get sourceToken() {
@@ -277,10 +281,10 @@ export class Parser {
     return st
   }
 
-  private step() {
+  private *step(): Generator<Token, void> {
     const top = this.peek(1)
     if (this.type === 'doc-end' && (!top || top.type !== 'doc-end')) {
-      while (this.stack.length > 0) this.pop()
+      while (this.stack.length > 0) yield* this.pop()
       this.stack.push({
         type: 'doc-end',
         offset: this.offset,
@@ -288,42 +292,42 @@ export class Parser {
       })
       return
     }
-    if (!top) return this.stream()
+    if (!top) return yield* this.stream()
     switch (top.type) {
       case 'document':
-        return this.document(top)
+        return yield* this.document(top)
       case 'alias':
       case 'scalar':
       case 'single-quoted-scalar':
       case 'double-quoted-scalar':
-        return this.scalar(top)
+        return yield* this.scalar(top)
       case 'block-scalar':
-        return this.blockScalar(top)
+        return yield* this.blockScalar(top)
       case 'block-map':
-        return this.blockMap(top)
+        return yield* this.blockMap(top)
       case 'block-seq':
-        return this.blockSequence(top)
+        return yield* this.blockSequence(top)
       case 'flow-collection':
-        return this.flowCollection(top)
+        return yield* this.flowCollection(top)
       case 'doc-end':
-        return this.documentEnd(top)
+        return yield* this.documentEnd(top)
     }
     /* istanbul ignore next should not happen */
-    this.pop()
+    yield* this.pop()
   }
 
   private peek(n: number) {
     return this.stack[this.stack.length - n]
   }
 
-  private pop(error?: Token) {
+  private *pop(error?: Token): Generator<Token, void> {
     const token = error || this.stack.pop()
     /* istanbul ignore if should not happen */
     if (!token) {
       const message = 'Tried to pop an empty stack'
-      this.push({ type: 'error', offset: this.offset, source: '', message })
+      yield { type: 'error', offset: this.offset, source: '', message }
     } else if (this.stack.length === 0) {
-      this.push(token)
+      yield token
     } else {
       const top = this.peek(1)
       // For these, parent indent is needed instead of own
@@ -368,8 +372,8 @@ export class Parser {
         }
         /* istanbul ignore next should not happen */
         default:
-          this.pop()
-          this.pop(token)
+          yield* this.pop()
+          yield* this.pop(token)
       }
 
       if (
@@ -398,20 +402,16 @@ export class Parser {
     }
   }
 
-  private stream() {
+  private *stream(): Generator<Token, void> {
     switch (this.type) {
       case 'directive-line':
-        this.push({
-          type: 'directive',
-          offset: this.offset,
-          source: this.source
-        })
+        yield { type: 'directive', offset: this.offset, source: this.source }
         return
       case 'byte-order-mark':
       case 'space':
       case 'comment':
       case 'newline':
-        this.push(this.sourceToken)
+        yield this.sourceToken
         return
       case 'doc-mode':
       case 'doc-start': {
@@ -425,21 +425,21 @@ export class Parser {
         return
       }
     }
-    this.push({
+    yield {
       type: 'error',
       offset: this.offset,
       message: `Unexpected ${this.type} token in YAML stream`,
       source: this.source
-    })
+    }
   }
 
-  private document(doc: Document) {
-    if (doc.value) return this.lineEnd(doc)
+  private *document(doc: Document): Generator<Token, void> {
+    if (doc.value) return yield* this.lineEnd(doc)
     switch (this.type) {
       case 'doc-start': {
         if (includesNonEmpty(doc.start)) {
-          this.pop()
-          this.step()
+          yield* this.pop()
+          yield* this.step()
         } else doc.start.push(this.sourceToken)
         return
       }
@@ -454,16 +454,16 @@ export class Parser {
     const bv = this.startBlockValue(doc)
     if (bv) this.stack.push(bv)
     else {
-      this.push({
+      yield {
         type: 'error',
         offset: this.offset,
         message: `Unexpected ${this.type} token in YAML document`,
         source: this.source
-      })
+      }
     }
   }
 
-  private scalar(scalar: FlowScalar) {
+  private *scalar(scalar: FlowScalar) {
     if (this.type === 'map-value-ind') {
       const prev = getPrevProps(this.peek(2))
       const start = getFirstKeyStartProps(prev)
@@ -483,10 +483,10 @@ export class Parser {
       }
       this.onKeyLine = true
       this.stack[this.stack.length - 1] = map
-    } else this.lineEnd(scalar)
+    } else yield* this.lineEnd(scalar)
   }
 
-  private blockScalar(scalar: BlockScalar) {
+  private *blockScalar(scalar: BlockScalar) {
     switch (this.type) {
       case 'space':
       case 'comment':
@@ -505,16 +505,16 @@ export class Parser {
             nl = this.source.indexOf('\n', nl) + 1
           }
         }
-        this.pop()
+        yield* this.pop()
         break
       /* istanbul ignore next should not happen */
       default:
-        this.pop()
-        this.step()
+        yield* this.pop()
+        yield* this.step()
     }
   }
 
-  private blockMap(map: BlockMap) {
+  private *blockMap(map: BlockMap) {
     const it = map.items[map.items.length - 1]
     // it.sep is true-ish if pair already has key or : separator
     switch (this.type) {
@@ -634,11 +634,11 @@ export class Parser {
         }
       }
     }
-    this.pop()
-    this.step()
+    yield* this.pop()
+    yield* this.step()
   }
 
-  private blockSequence(seq: BlockSequence) {
+  private *blockSequence(seq: BlockSequence) {
     const it = seq.items[seq.items.length - 1]
     switch (this.type) {
       case 'newline':
@@ -671,18 +671,21 @@ export class Parser {
     }
     if (this.indent > seq.indent) {
       const bv = this.startBlockValue(seq)
-      if (bv) return this.stack.push(bv)
+      if (bv) {
+        this.stack.push(bv)
+        return
+      }
     }
-    this.pop()
-    this.step()
+    yield* this.pop()
+    yield* this.step()
   }
 
-  private flowCollection(fc: FlowCollection) {
+  private *flowCollection(fc: FlowCollection) {
     const it = fc.items[fc.items.length - 1]
     if (this.type === 'flow-error-end') {
       let top: Token | undefined
       do {
-        this.pop()
+        yield* this.pop()
         top = this.peek(1)
       } while (top && top.type === 'flow-collection')
     } else if (fc.end.length === 0) {
@@ -728,10 +731,10 @@ export class Parser {
       }
       const bv = this.startBlockValue(fc)
       /* istanbul ignore else should not happen */
-      if (bv) return this.stack.push(bv)
+      if (bv) this.stack.push(bv)
       else {
-        this.pop()
-        this.step()
+        yield* this.pop()
+        yield* this.step()
       }
     } else {
       const parent = this.peek(2)
@@ -741,8 +744,8 @@ export class Parser {
           (this.type === 'newline' &&
             !parent.items[parent.items.length - 1].sep))
       ) {
-        this.pop()
-        this.step()
+        yield* this.pop()
+        yield* this.step()
       } else if (
         this.type === 'map-value-ind' &&
         parent.type !== 'flow-collection'
@@ -761,7 +764,7 @@ export class Parser {
         this.onKeyLine = true
         this.stack[this.stack.length - 1] = map
       } else {
-        this.lineEnd(fc)
+        yield* this.lineEnd(fc)
       }
     }
   }
@@ -842,15 +845,15 @@ export class Parser {
     return null
   }
 
-  private documentEnd(docEnd: DocumentEnd) {
+  private *documentEnd(docEnd: DocumentEnd) {
     if (this.type !== 'doc-mode') {
       if (docEnd.end) docEnd.end.push(this.sourceToken)
       else docEnd.end = [this.sourceToken]
-      if (this.type === 'newline') this.pop()
+      if (this.type === 'newline') yield* this.pop()
     }
   }
 
-  private lineEnd(token: Document | FlowCollection | FlowScalar) {
+  private *lineEnd(token: Document | FlowCollection | FlowScalar) {
     switch (this.type) {
       case 'comma':
       case 'doc-start':
@@ -858,8 +861,8 @@ export class Parser {
       case 'flow-seq-end':
       case 'flow-map-end':
       case 'map-value-ind':
-        this.pop()
-        this.step()
+        yield* this.pop()
+        yield* this.step()
         break
       case 'newline':
         this.onKeyLine = false
@@ -870,7 +873,7 @@ export class Parser {
         // all other values are errors
         if (token.end) token.end.push(this.sourceToken)
         else token.end = [this.sourceToken]
-        if (this.type === 'newline') this.pop()
+        if (this.type === 'newline') yield* this.pop()
     }
   }
 }

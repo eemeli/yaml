@@ -50,8 +50,8 @@ export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
     doc => docs.push(doc as Document.Parsed<T>),
     options
   )
-  const parser = new Parser(composer.next, lineCounter?.addNewLine)
-  parser.parse(source)
+  const parser = new Parser(lineCounter?.addNewLine)
+  for (const token of parser.parse(source)) composer.next(token)
   composer.end()
 
   if (prettyErrors && lineCounter)
@@ -89,8 +89,8 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
       )
     }
   }, options)
-  const parser = new Parser(composer.next, lineCounter?.addNewLine)
-  parser.parse(source)
+  const parser = new Parser(lineCounter?.addNewLine)
+  for (const token of parser.parse(source)) composer.next(token)
   composer.end(true, source.length)
 
   if (prettyErrors && lineCounter) {

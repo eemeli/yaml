@@ -53,8 +53,7 @@ function parsePrelude(prelude: string[]) {
  * const options = { ... }
  * const docs: Document.Parsed[] = []
  * const composer = new Composer(doc => docs.push(doc), options)
- * const parser = new Parser(composer.next)
- * parser.parse(source)
+ * for (const doc of new Parser().parse(source)) composer.next(doc)
  * composer.end()
  * ```
  */

@@ -94,8 +94,8 @@ All remaining tokens are identifiable by their first character:
 ```js
 import { Parser } from 'yaml'
 
-const parser = new Parser(tok => console.dir(tok, { depth: null }))
-parser.parse('foo: [24,"42"]\n', false)
+for (const token of new Parser().parse('foo: [24,"42"]\n'))
+  console.dir(token, { depth: null })
 
 > {
     type: 'document',
@@ -150,24 +150,21 @@ It should never throw errors, but may (rarely) include error tokens in its outpu
 To validate a CST, you will need to compose it into a `Document`.
 If the document contains errors, they will be included in the document's `errors` array, and each error will will contain an `offset` within the source string, which you may then use to find the corresponding node in the CST.
 
-#### `new Parser(push: (token: Token) => void, onNewLine?: (offset: number) => void)`
+#### `new Parser(onNewLine?: (offset: number) => void)`
 
 Create a new parser.
-`push` is called separately with each parsed token.
 If defined, `onNewLine` is called separately with the start position of each new line (in `parse()`, including the start of input).
 
-#### `parser.parse(source: string, incomplete = false)`
+#### `parser.parse(source: string, incomplete = false): Generator<Token, void>`
 
-Parse `source` as a YAML stream, calling `push` with each directive, document and other structure as it is completely parsed.
+Parse `source` as a YAML stream, generating tokens for each directive, document and other structure as it is completely parsed.
 If `incomplete`, a part of the last line may be left as a buffer for the next call.
 
-Errors are not thrown, but pushed out as `{ type: 'error', offset, message }` tokens.
+Errors are not thrown, but are yielded as `{ type: 'error', offset, message }` tokens.
 
-#### `parser.next(lexToken: string)`
+#### `parser.next(lexToken: string): Generator<Token, void>`
 
 Advance the parser by one lexical token.
-Bound to the Parser instance, so may be used directly as a callback function.
-
 Used internally by `parser.parse()`; exposed to allow for use with an external lexer.
 
 For debug purposes, if the `LOG_TOKENS` env var is true-ish, all lexical tokens will be pretty-printed using `console.log()` as they are being processed.
@@ -202,8 +199,9 @@ Collection items contain some subset of the following properties:
 import { LineCounter, Parser } from 'yaml'
 
 const lineCounter = new LineCounter()
-const parser = new Parser(() => {}, lineCounter.addNewLine))
-parser.parse('foo:\n- 24\n- "42"\n')
+const parser = new Parser(lineCounter.addNewLine))
+const tokens = parser.parse('foo:\n- 24\n- "42"\n')
+Array.from(tokens) // forces iteration
 
 lineCounter.lineStarts
 > [ 0, 5, 10, 17 ]
@@ -233,10 +231,11 @@ If `line === 0`, `addNewLine` has never been called or `offset` is before the fi
 <!-- prettier-ignore -->
 ```js
 import { Composer, Parser } from 'yaml'
+
+const src = 'foo: bar\nfee: [24, "42"]'
 const docs = []
 const composer = new Composer(doc => docs.push(doc))
-const parser = new Parser(composer.next)
-parser.parse('foo: bar\nfee: [24, "42"]')
+for (const token of new Parser().parse(src)) composer.next(token)
 composer.end()
 
 docs.map(doc => doc.toJS())
