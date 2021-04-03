@@ -233,27 +233,29 @@ If `line === 0`, `addNewLine` has never been called or `offset` is before the fi
 import { Composer, Parser } from 'yaml'
 
 const src = 'foo: bar\nfee: [24, "42"]'
-const docs = []
-const composer = new Composer(doc => docs.push(doc))
-for (const token of new Parser().parse(src)) composer.next(token)
-composer.end()
+const tokens = new Parser().parse(src)
+const docs = new Composer().compose(tokens)
 
-docs.map(doc => doc.toJS())
+Array.from(docs, doc => doc.toJS())
 > [{ foo: 'bar', fee: [24, '42'] }]
 ```
 
-#### `new Composer(push: (doc: Document.Parsed) => void, options?: Options)`
+#### `new Composer(options?: ParseOptions & DocumentOptions & SchemaOptions)`
 
 Create a new Document composer.
 Does not include an internal Parser instance, so an external one will be needed.
-`options` will be used during composition, and passed to the `new Document` constructor; may include any of ParseOptions, DocumentOptions, and SchemaOptions.
+`options` will be used during composition, and passed to the `new Document` constructor.
 
-#### `composer.next(token: Token)`
+#### `composer.compose(tokens: Iterable<Token>, forceDoc?: boolean, endOffset?: number): Generator<Document.Parsed>`
+
+Compose tokens into documents.
+Convenience wrapper combining calls to `composer.next()` and `composer.end()`.
+
+#### `composer.next(token: Token): Generator<Document.Parsed>`
 
 Advance the composed by one CST token.
-Bound to the Composer instance, so may be used directly as a callback function.
 
-#### `composer.end(forceDoc?: boolean, offset?: number)`
+#### `composer.end(forceDoc?: boolean, offset?: number): Generator<Document.Parsed>`
 
 Always call at end of input to push out any remaining document.
 If `forceDoc` is true and the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.

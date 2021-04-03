@@ -98,4 +98,4 @@ import { Composer, Lexer, Parser } from 'yaml'
 
 - [`new Lexer().lex(src)`](#lexer)
 - [`new Parser(onNewLine?).parse(src)`](#parser)
-- [`new Composer(push, options?)`](#composer)
+- [`new Composer(options?).compose(tokens)`](#composer)

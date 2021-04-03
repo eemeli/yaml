@@ -53,15 +53,16 @@ describe('Input in parts', () => {
 
       for (let i = 1; i < src.length - 1; ++i) {
         const res: Document.Parsed[] = []
-        const composer = new Composer(doc => res.push(doc), {
-          logLevel: 'error'
-        })
+        const composer = new Composer({ logLevel: 'error' })
         const parser = new Parser()
         const start = src.substring(0, i)
         const end = src.substring(i)
-        for (const token of parser.parse(start, true)) composer.next(token)
-        for (const token of parser.parse(end, false)) composer.next(token)
-        composer.end()
+        for (const token of [
+          ...parser.parse(start, true),
+          ...parser.parse(end, false)
+        ])
+          for (const doc of composer.next(token)) res.push(doc)
+        for (const doc of composer.end()) res.push(doc)
 
         try {
           expect(res.map(doc => doc.toJS())).toMatchObject(exp)

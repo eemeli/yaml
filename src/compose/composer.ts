@@ -50,31 +50,26 @@ function parsePrelude(prelude: string[]) {
  * Compose a stream of CST nodes into a stream of YAML Documents.
  *
  * ```ts
- * const options = { ... }
- * const docs: Document.Parsed[] = []
- * const composer = new Composer(doc => docs.push(doc), options)
- * for (const doc of new Parser().parse(source)) composer.next(doc)
- * composer.end()
+ * import { Composer, Parser } from 'yaml'
+ *
+ * const src: string = ...
+ * const tokens = new Parser().parse(src)
+ * const docs = new Composer().compose(tokens)
  * ```
  */
 export class Composer {
   private directives: Directives
   private doc: Document.Parsed | null = null
-  private onDocument: (doc: Document.Parsed) => void
   private options: ParseOptions & DocumentOptions & SchemaOptions
   private atDirectives = false
   private prelude: string[] = []
   private errors: YAMLParseError[] = []
   private warnings: YAMLWarning[] = []
 
-  constructor(
-    onDocument: Composer['onDocument'],
-    options: ParseOptions & DocumentOptions & SchemaOptions = {}
-  ) {
+  constructor(options: ParseOptions & DocumentOptions & SchemaOptions = {}) {
     this.directives = new Directives({
-      version: options?.version || defaultOptions.version
+      version: options.version || defaultOptions.version
     })
-    this.onDocument = onDocument
     this.options = options
   }
 
@@ -136,10 +131,18 @@ export class Composer {
   }
 
   /**
-   * Advance the composed by one CST token. Bound to the Composer
-   * instance, so may be used directly as a callback function.
+   * Compose tokens into documents.
+   *
+   * @param forceDoc - If the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.
+   * @param endOffset - Should be set if `forceDoc` is also set, to set the document range end and to indicate errors correctly.
    */
-  next = (token: Token) => {
+  *compose(tokens: Iterable<Token>, forceDoc = false, endOffset = -1) {
+    for (const token of tokens) yield* this.next(token)
+    yield* this.end(forceDoc, endOffset)
+  }
+
+  /** Advance the composer by one CST token. */
+  *next(token: Token) {
     if (process.env.LOG_STREAM) console.dir(token, { depth: null })
     switch (token.type) {
       case 'directive':
@@ -157,7 +160,7 @@ export class Composer {
           this.onError
         )
         this.decorate(doc, false)
-        if (this.doc) this.onDocument(this.doc)
+        if (this.doc) yield this.doc
         this.doc = doc
         this.atDirectives = false
         break
@@ -211,37 +214,29 @@ export class Composer {
     }
   }
 
-  /** Call at end of input to push out any remaining document. */
-  end(): void
-
   /**
-   * Call at end of input to push out any remaining document.
+   * Call at end of input to yield any remaining document.
    *
-   * @param forceDoc - If the stream contains no document, still emit a final
-   *   document including any comments and directives that would be applied
-   *   to a subsequent document.
-   * @param offset - Should be set if `forceDoc` is also set, to set the
-   *   document range end and to indicate errors correctly.
+   * @param forceDoc - If the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.
+   * @param endOffset - Should be set if `forceDoc` is also set, to set the document range end and to indicate errors correctly.
    */
-  end(forceDoc: true, offset: number): void
-
-  end(forceDoc = false, offset = -1) {
+  *end(forceDoc = false, endOffset = -1) {
     if (this.doc) {
       this.decorate(this.doc, true)
-      this.onDocument(this.doc)
+      yield this.doc
       this.doc = null
     } else if (forceDoc) {
       const opts = Object.assign({ directives: this.directives }, this.options)
       const doc = new Document(undefined, opts) as Document.Parsed
       if (this.atDirectives)
         this.onError(
-          offset,
+          endOffset,
           'MISSING_CHAR',
           'Missing directives-end indicator line'
         )
-      doc.range = [0, offset]
+      doc.range = [0, endOffset]
       this.decorate(doc, false)
-      this.onDocument(doc)
+      yield doc
     }
   }
 }
