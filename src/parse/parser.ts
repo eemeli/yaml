@@ -148,9 +148,8 @@ function fixFlowSeqItems(fc: FlowCollection) {
  * const parser = new Parser(tok => cst.push(tok))
  * const src: string = ...
  *
- * // The following would be equivalent to `parser.parse(src, false)`
- * const lexer = new Lexer(parser.next)
- * lexer.lex(src, false)
+ * // The following would be equivalent to `parser.parse(src)`
+ * for (const lexeme of new Lexer().lex(src)) parser.next(lexeme)
  * parser.end()
  * ```
  */
@@ -206,7 +205,7 @@ export class Parser {
    */
   parse(source: string, incomplete = false) {
     if (this.onNewLine && this.offset === 0) this.onNewLine(0)
-    this.lexer.lex(source, incomplete)
+    for (const lexeme of this.lexer.lex(source, incomplete)) this.next(lexeme)
     if (!incomplete) this.end()
   }
 
@@ -261,7 +260,7 @@ export class Parser {
   }
 
   // Must be defined after `next()`
-  private lexer = new Lexer(this.next)
+  private lexer = new Lexer()
 
   /** Call at end of input to push out any remaining constructions */
   end() {

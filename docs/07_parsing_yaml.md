@@ -28,10 +28,8 @@ Both the Lexer and Parser accept incomplete input, allowing for them and the Com
 ```js
 import { Lexer } from 'yaml'
 
-const tokens = []
-const lexer = new Lexer(tok => tokens.push(tok))
-lexer.lex('foo: bar\nfee:\n  [24,"42"]\n', false)
-console.dir(tokens)
+const tokens = new Lexer().lex('foo: bar\nfee:\n  [24,"42"]\n')
+console.dir(Array.from(tokens))
 > [
     '\x02', '\x1F', 'foo',  ':',
     ' ',    '\x1F', 'bar',  '\n',
@@ -41,12 +39,11 @@ console.dir(tokens)
   ]
 ```
 
-#### `new Lexer(push: (token: string) => void)`
+#### `new Lexer()`
 
-#### `lexer.lex(src: string, incomplete: boolean): void`
+#### `lexer.lex(src: string, incomplete?: boolean): Generator<string>`
 
 The API for the lexer is rather minimal, and offers no configuration.
-The constructor accepts a single callback as argument, defining a function that will be called once for each lexical token.
 If the input stream is chunked, the `lex()` method may be called separately for each chunk if the `incomplete` argument is `true`.
 At the end of input, `lex()` should be called a final time with `incomplete: false` to ensure that the remaining tokens are emitted.
 
