@@ -8,7 +8,7 @@ import {
   ParseOptions,
   SchemaOptions
 } from '../options.js'
-import type { Token } from '../parse/tokens.js'
+import type { Token } from '../parse/cst.js'
 import { composeDoc } from './compose-doc.js'
 import { resolveEnd } from './resolve-end.js'
 

@@ -3,11 +3,11 @@
 <!-- prettier-ignore -->
 ```js
 import {
-  Lexer,
-  Parser,
   Composer,
+  CST,
+  Lexer,
   LineCounter,
-  tokens
+  Parser,
 } from 'yaml'
 ```
 
@@ -171,7 +171,7 @@ For debug purposes, if the `LOG_TOKENS` env var is true-ish, all lexical tokens 
 
 ### CST Nodes
 
-For a complete description of CST node interfaces, please consult the [tokens.ts source](https://github.com/eemeli/yaml/blob/master/src/parse/tokens.ts).
+For a complete description of CST node interfaces, please consult the [cst.ts source](https://github.com/eemeli/yaml/blob/master/src/parse/cst.ts).
 
 Some of the most common node properties include:
 
@@ -265,3 +265,154 @@ If `forceDoc` is true and the stream contains no document, still emit a final do
 
 Current stream status information.
 Mostly useful at the end of input for an empty stream.
+
+## Working with CST Tokens
+
+```ts
+import { CST } from 'yaml'
+```
+
+For most use cases, the Document or pure JS interfaces provided by the library are the right tool.
+Sometimes, though, it's important to keep the original YAML source in as pristine a condition as possible.
+For those cases, the concrete syntax tree (CST) representation is provided, as it retains every character of the input, including whitespace.
+
+#### `CST.createScalarToken(value: string, context): BlockScalar | FlowScalar`
+
+Create a new scalar token with the value `value`.
+Values that represent an actual string but may be parsed as a different type should use a `type` other than `'PLAIN'`,
+as this function does not support any schema operations and won't check for such conflicts.
+
+| Argument            | Type            | Default | Description                                                                                                                   |
+| ------------------- | --------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| value               | `string`        |         | The string representation of the value, which will have its content properly indented. **Required.**                          |
+| context.end         | `SourceToken[]` |         | Comments and whitespace after the end of the value, or after the block scalar header. If undefined, a newline will be added.  |
+| context.implicitKey | `boolean`       | `false` | Being within an implicit key may affect the resolved type of the token's value.                                               |
+| context.indent      | `number`        |         | The indent level of the token. **Required.**                                                                                  |
+| context.inFlow      | `boolean`       | `false` | Is this scalar within a flow collection? This may affect the resolved type of the token's value.                              |
+| context.offset      | `number`        | `-1`    | The offset position of the token.                                                                                             |
+| context.type        | `Scalar.Type`   |         | The preferred type of the scalar token. If undefined, the previous type of the `token` will be used, defaulting to `'PLAIN'`. |
+
+<!-- prettier-ignore -->
+```js
+const [doc] = new Parser().parse('foo: "bar" #comment')
+const item = doc.value.items[0].value
+> {
+    type: 'double-quoted-scalar',
+    offset: 5,
+    indent: 0,
+    source: '"bar"',
+    end: [
+      { type: 'space', offset: 10, indent: 0, source: ' ' },
+      { type: 'comment', offset: 11, indent: 0, source: '#comment' }
+    ]
+  }
+
+YAML.resolveAsScalar(item)
+> { value: 'bar', type: 'QUOTE_DOUBLE', comment: 'comment', length: 14 }
+```
+
+#### `CST.isCollection(token?: Token): boolean`
+
+#### `CST.isScalar(token?: Token): boolean`
+
+Custom type guards for detecting CST collections and scalars, in both their block and flow forms.
+
+#### `CST.resolveAsScalar(token?: Token, strict = true, onError?: ComposeErrorHandler)`
+
+If `token` is a CST flow or block scalar, determine its string value and a few other attributes.
+Otherwise, return `null`.
+
+#### `CST.setScalarValue(token: Token, value: string, context?)`
+
+Set the value of `token` to the given string `value`, overwriting any previous contents and type that it may have.
+
+Best efforts are made to retain any comments previously associated with the `token`, though all contents within a collection's `items` will be overwritten.
+
+Values that represent an actual string but may be parsed as a different type should use a `type` other than `'PLAIN'`, as this function does not support any schema operations and won't check for such conflicts.
+
+| Argument            | Type          | Default | Description                                                                                                                     |
+| ------------------- | ------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| token               | `Token`       |         | Any token. If it does not include an `indent` value, the value will be stringified as if it were an implicit key. **Required.** |
+| value               | `string`      |         | The string representation of the value, which will have its content properly indented. **Required.**                            |
+| context.afterKey    | `boolean`     | `false` | In most cases, values after a key should have an additional level of indentation.                                               |
+| context.implicitKey | `boolean`     | `false` | Being within an implicit key may affect the resolved type of the token's value.                                                 |
+| context.inFlow      | `boolean`     | `false` | Being within a flow collection may affect the resolved type of the token's value.                                               |
+| context.type        | `Scalar.Type` |         | The preferred type of the scalar token. If undefined, the previous type of the `token` will be used, defaulting to `'PLAIN'`.   |
+
+```ts
+function findScalarAtOffset(
+  cst: CST.Document,
+  offset: number
+): CST.FlowScalar | CST.BlockScalar | undefined {
+  let res: CST.FlowScalar | CST.BlockScalar | undefined = undefined
+  CST.visit(cst, ({ key, value }) => {
+    for (const token of [key, value])
+      if (CST.isScalar(token)) {
+        if (token.offset > offset) return CST.visit.BREAK
+        if (
+          token.offset == offset ||
+          (token.offset < offset && token.offset + token.source.length > offset)
+        ) {
+          res = token
+          return CST.visit.BREAK
+        }
+      }
+  })
+  return res
+}
+```
+
+#### `CST.stringify(cst: Token | CollectionItem): string`
+
+Stringify a CST document, token, or collection item.
+Fair warning: This applies no validation whatsoever, and simply concatenates the sources in their logical order.
+
+#### `CST.visit(cst: CST.Document | CST.CollectionItem, visitor: CSTVisitor)`
+
+Apply a visitor to a CST document or item.
+Effectively, the general-purpose workhorse of navigating the CST.
+
+Walks through the tree (depth-first) starting from `cst` as the root, calling a `visitor` function with two arguments when entering each item:
+
+- `item`: The current item, which includes the following members:
+  - `start: SourceToken[]` – Source tokens before the key or value, possibly including its anchor or tag.
+  - `key?: Token | null` – Set for pair values. May then be `null`, if the key before the `:` separator is empty.
+  - `sep?: SourceToken[]` – Source tokens between the key and the value, which should include the `:` map value indicator if `value` is set.
+  - `value?: Token` – The value of a sequence item, or of a map pair.
+- `path`: The steps from the root to the current node, as an array of `['key' | 'value', number]` tuples.
+
+The return value of the visitor may be used to control the traversal:
+
+- `undefined` (default): Do nothing and continue
+- `CST.visit.SKIP`: Do not visit the children of this token, continue with next sibling
+- `CST.visit.BREAK`: Terminate traversal completely
+- `CST.visit.REMOVE`: Remove the current item, then continue with the next one
+- `number`: Set the index of the next step. This is useful especially if the index of the current token has changed.
+- `function`: Define the next visitor for this item. After the original visitor is called on item entry, next visitors are called after handling a non-empty `key` and when exiting the item.
+
+<!-- prettier-ignore -->
+```js
+const [doc] = new Parser().parse('[ foo, bar, baz ]')
+CST.visit(doc, (item, path) => {
+  if (!CST.isScalar(item.value)) return
+  const scalar = CST.resolveAsScalar(item.value)
+  if (scalar?.value === 'bar') {
+    const parent = CST.visit.parentCollection(doc, path)
+    const idx = path[path.length - 1][1]
+    const { indent } = item.value
+    parent.items.splice(idx, 0, {
+      start: item.start.slice(),
+      value: CST.createScalarToken('bing', { end: [], indent })
+    })
+    return idx + 2
+  }
+})
+
+CST.stringify(doc)
+> '[ foo, bing, bar, baz ]'
+```
+
+A couple of utility functions are provided for working with the `path`:
+
+- `CST.visit.itemAtPath(cst, path): CST.CollectionItem | undefined` – Find the item at `path` from `cst` as the root.
+- `CST.visit.parentCollection(cst, path): CST.BlockMap | CST.BlockSequence | CST.FlowCollection` – Get the immediate parent collection of the item at `path` from `cst` as the root. Throws an error if the collection is not found, which should never happen if the item itself exists.

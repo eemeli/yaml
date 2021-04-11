@@ -33,10 +33,10 @@ export {
   ToStringOptions
 } from './options.js'
 
+export * as CST from './parse/cst.js'
 export { Lexer } from './parse/lexer.js'
 export { LineCounter } from './parse/line-counter.js'
 export { Parser } from './parse/parser.js'
-export * as tokens from './parse/tokens.js'
 
 export {
   EmptyStream,

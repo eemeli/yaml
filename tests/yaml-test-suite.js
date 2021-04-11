@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import * as YAML from 'yaml'
+import { CST, parseAllDocuments, Parser } from 'yaml'
 import { testEvents } from 'yaml/test-events'
 
 const skip = {
@@ -65,7 +65,13 @@ testDirs.forEach(dir => {
   }
 
   describe(`${dir}: ${name}`, () => {
-    const docs = YAML.parseAllDocuments(yaml, { resolveKnownTags: false })
+    test('cst stringify', () => {
+      let res = ''
+      for (const tok of new Parser().parse(yaml)) res += CST.stringify(tok)
+      expect(res).toBe(yaml)
+    })
+
+    const docs = parseAllDocuments(yaml, { resolveKnownTags: false })
     if (events) {
       _test('test.event', () => {
         const res = testEvents(yaml)
@@ -87,15 +93,15 @@ testDirs.forEach(dir => {
     if (!error) {
       const src2 =
         docs.map(doc => String(doc).replace(/\n$/, '')).join('\n...\n') + '\n'
-      const docs2 = YAML.parseAllDocuments(src2, { resolveKnownTags: false })
+      const docs2 = parseAllDocuments(src2, { resolveKnownTags: false })
 
       if (json) _test('stringfy+re-parse', () => matchJson(docs2, json))
 
       if (outYaml) {
         _test('out.yaml', () => {
-          const resDocs = YAML.parseAllDocuments(yaml)
+          const resDocs = parseAllDocuments(yaml)
           const resJson = resDocs.map(doc => doc.toJS({ mapAsMap: true }))
-          const expDocs = YAML.parseAllDocuments(outYaml)
+          const expDocs = parseAllDocuments(outYaml)
           const expJson = expDocs.map(doc => doc.toJS({ mapAsMap: true }))
           expect(resJson).toMatchObject(expJson)
         })

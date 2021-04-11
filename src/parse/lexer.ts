@@ -66,7 +66,7 @@ plain-scalar(is-flow, min)
   [else] -> plain-scalar(min)
 */
 
-import { BOM, DOCUMENT, FLOW_END, SCALAR } from './tokens.js'
+import { BOM, DOCUMENT, FLOW_END, SCALAR } from './cst.js'
 
 type State =
   | 'stream'

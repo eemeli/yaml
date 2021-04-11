@@ -5,7 +5,7 @@ import type {
   ParseOptions,
   SchemaOptions
 } from '../options.js'
-import type * as Tokens from '../parse/tokens.js'
+import type * as CST from '../parse/cst.js'
 import {
   ComposeContext,
   composeEmptyNode,
@@ -18,7 +18,7 @@ import { resolveProps } from './resolve-props.js'
 export function composeDoc(
   options: ParseOptions & DocumentOptions & SchemaOptions,
   directives: Directives,
-  { offset, start, value, end }: Tokens.Document,
+  { offset, start, value, end }: CST.Document,
   onError: ComposeErrorHandler
 ) {
   const opts = Object.assign({ directives }, options)

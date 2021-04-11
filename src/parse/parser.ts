@@ -1,4 +1,3 @@
-import { Lexer } from './lexer.js'
 import {
   SourceToken,
   Token,
@@ -12,7 +11,8 @@ import {
   prettyToken,
   tokenType,
   TokenType
-} from './tokens.js'
+} from './cst.js'
+import { Lexer } from './lexer.js'
 
 function includesToken(list: SourceToken[], type: SourceToken['type']) {
   for (let i = 0; i < list.length; ++i) if (list[i].type === type) return true
@@ -799,7 +799,8 @@ export class Parser {
           type: 'block-scalar',
           offset: this.offset,
           indent: this.indent,
-          props: [this.sourceToken]
+          props: [this.sourceToken],
+          source: ''
         } as BlockScalar
       case 'flow-map-start':
       case 'flow-seq-start':

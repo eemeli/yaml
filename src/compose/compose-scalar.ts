@@ -1,6 +1,6 @@
 import { isScalar, SCALAR } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
-import type { BlockScalar, FlowScalar } from '../parse/tokens.js'
+import type { BlockScalar, FlowScalar } from '../parse/cst.js'
 import type { Schema } from '../schema/Schema.js'
 import type { ScalarTag } from '../schema/types.js'
 import type { ComposeContext } from './compose-node.js'

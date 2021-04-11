@@ -1,4 +1,4 @@
-import type { Token } from '../parse/tokens.js'
+import type { Token } from '../parse/cst.js'
 
 export function emptyScalarPosition(
   offset: number,

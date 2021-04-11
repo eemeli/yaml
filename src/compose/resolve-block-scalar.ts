@@ -1,5 +1,5 @@
 import { Scalar } from '../nodes/Scalar.js'
-import type { BlockScalar } from '../parse/tokens.js'
+import type { BlockScalar } from '../parse/cst.js'
 import type { ComposeErrorHandler } from './composer.js'
 
 export function resolveBlockScalar(
