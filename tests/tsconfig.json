@@ -6,8 +6,7 @@
     "paths": {
       "yaml": ["../src/index.ts"]
     },
-    "rootDir": "..",
-    "target": "ES3"
+    "rootDir": ".."
   },
   "include": ["**/*.ts"]
 }

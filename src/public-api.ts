@@ -41,18 +41,12 @@ function parseOptions(options: ParseOptions | undefined) {
  */
 export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
   source: string,
-  options?: ParseOptions & DocumentOptions & SchemaOptions
+  options: ParseOptions & DocumentOptions & SchemaOptions = {}
 ): Document.Parsed<T>[] | EmptyStream {
   const { lineCounter, prettyErrors } = parseOptions(options)
-
-  const docs: Document.Parsed<T>[] = []
-  const composer = new Composer(
-    doc => docs.push(doc as Document.Parsed<T>),
-    options
-  )
-  const parser = new Parser(composer.next, lineCounter?.addNewLine)
-  parser.parse(source)
-  composer.end()
+  const parser = new Parser(lineCounter?.addNewLine)
+  const composer = new Composer(options)
+  const docs = Array.from(composer.compose(parser.parse(source)))
 
   if (prettyErrors && lineCounter)
     for (const doc of docs) {
@@ -60,7 +54,7 @@ export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
       doc.warnings.forEach(prettifyError(source, lineCounter))
     }
 
-  if (docs.length > 0) return docs
+  if (docs.length > 0) return docs as Document.Parsed<T>[]
   return Object.assign<
     Document.Parsed<T>[],
     { empty: true },
@@ -71,13 +65,19 @@ export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
 /** Parse an input string into a single YAML.Document */
 export function parseDocument<T extends ParsedNode = ParsedNode>(
   source: string,
-  options?: ParseOptions & DocumentOptions & SchemaOptions
+  options: ParseOptions & DocumentOptions & SchemaOptions = {}
 ) {
   const { lineCounter, prettyErrors } = parseOptions(options)
+  const parser = new Parser(lineCounter?.addNewLine)
+  const composer = new Composer(options)
 
   // `doc` is always set by compose.end(true) at the very latest
   let doc: Document.Parsed<T> = null as any
-  const composer = new Composer(_doc => {
+  for (const _doc of composer.compose(
+    parser.parse(source),
+    true,
+    source.length
+  )) {
     if (!doc) doc = _doc as Document.Parsed<T>
     else if (doc.options.logLevel !== 'silent') {
       doc.errors.push(
@@ -87,11 +87,9 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
           'Source contains multiple documents; please use YAML.parseAllDocuments()'
         )
       )
+      break
     }
-  }, options)
-  const parser = new Parser(composer.next, lineCounter?.addNewLine)
-  parser.parse(source)
-  composer.end(true, source.length)
+  }
 
   if (prettyErrors && lineCounter) {
     doc.errors.forEach(prettifyError(source, lineCounter))

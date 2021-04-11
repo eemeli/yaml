@@ -112,8 +112,6 @@ const isNotIdentifierChar = (ch: string) =>
  * - `\u{FEFF}` (Byte order mark): Emitted separately outside documents
  */
 export class Lexer {
-  private push: (token: string) => void
-
   /**
    * Flag indicating whether the end of the current buffer marks the end of
    * all input
@@ -159,30 +157,20 @@ export class Lexer {
   private next: State | null = null
 
   /** A pointer to `buffer`; the current position of the lexer. */
-  private pos = 0
+  private pos = 0;
 
   /**
-   * Define/initialise a YAML lexer. `push` will be called separately with each
-   * token when `lex()` is passed an input string.
+   * Generate YAML tokens from the `source` string. If `incomplete`,
+   * a part of the last line may be left as a buffer for the next call.
    *
-   * @public
+   * @returns A generator of lexical tokens
    */
-  constructor(push: (token: string) => void) {
-    this.push = push
-  }
-
-  /**
-   * Read YAML tokens from the `source` string, calling the callback
-   * defined in the constructor for each one. If `incomplete`, a part
-   * of the last line may be left as a buffer for the next call.
-   *
-   * @public
-   */
-  lex(source: string, incomplete: boolean) {
+  *lex(source: string, incomplete = false) {
     if (source) this.buffer = this.buffer ? this.buffer + source : source
     this.atEnd = !incomplete
     let next: State | null = this.next || 'stream'
-    while (next && (incomplete || this.hasChars(1))) next = this.parseNext(next)
+    while (next && (incomplete || this.hasChars(1)))
+      next = yield* this.parseNext(next)
   }
 
   private atLineEnd() {
@@ -241,32 +229,32 @@ export class Lexer {
     return this.buffer.substr(this.pos, n)
   }
 
-  private parseNext(next: State) {
+  private *parseNext(next: State) {
     switch (next) {
       case 'stream':
-        return this.parseStream()
+        return yield* this.parseStream()
       case 'line-start':
-        return this.parseLineStart()
+        return yield* this.parseLineStart()
       case 'block-start':
-        return this.parseBlockStart()
+        return yield* this.parseBlockStart()
       case 'doc':
-        return this.parseDocument()
+        return yield* this.parseDocument()
       case 'flow':
-        return this.parseFlowCollection()
+        return yield* this.parseFlowCollection()
       case 'quoted-scalar':
-        return this.parseQuotedScalar()
+        return yield* this.parseQuotedScalar()
       case 'block-scalar':
-        return this.parseBlockScalar()
+        return yield* this.parseBlockScalar()
       case 'plain-scalar':
-        return this.parsePlainScalar()
+        return yield* this.parsePlainScalar()
     }
   }
 
-  private parseStream() {
+  private *parseStream() {
     let line = this.getLine()
     if (line === null) return this.setNext('stream')
     if (line[0] === BOM) {
-      this.pushCount(1)
+      yield* this.pushCount(1)
       line = line.substring(1)
     }
     if (line[0] === '%') {
@@ -281,102 +269,102 @@ export class Lexer {
         if (ch === ' ' || ch === '\t') dirEnd -= 1
         else break
       }
-      const n = this.pushCount(dirEnd) + this.pushSpaces(true)
-      this.pushCount(line.length - n) // possible comment
+      const n = (yield* this.pushCount(dirEnd)) + (yield* this.pushSpaces(true))
+      yield* this.pushCount(line.length - n) // possible comment
       this.pushNewline()
       return 'stream'
     }
     if (this.atLineEnd()) {
-      const sp = this.pushSpaces(true)
-      this.pushCount(line.length - sp)
-      this.pushNewline()
+      const sp = yield* this.pushSpaces(true)
+      yield* this.pushCount(line.length - sp)
+      yield* this.pushNewline()
       return 'stream'
     }
-    this.push(DOCUMENT)
-    return this.parseLineStart()
+    yield DOCUMENT
+    return yield* this.parseLineStart()
   }
 
-  private parseLineStart() {
+  private *parseLineStart() {
     const ch = this.charAt(0)
     if (!ch && !this.atEnd) return this.setNext('line-start')
     if (ch === '-' || ch === '.') {
       if (!this.atEnd && !this.hasChars(4)) return this.setNext('line-start')
       const s = this.peek(3)
       if (s === '---' && isEmpty(this.charAt(3))) {
-        this.pushCount(3)
+        yield* this.pushCount(3)
         this.indentValue = 0
         this.indentNext = 0
         return 'doc'
       } else if (s === '...' && isEmpty(this.charAt(3))) {
-        this.pushCount(3)
+        yield* this.pushCount(3)
         return 'stream'
       }
     }
-    this.indentValue = this.pushSpaces(false)
+    this.indentValue = yield* this.pushSpaces(false)
     if (this.indentNext > this.indentValue && !isEmpty(this.charAt(1)))
       this.indentNext = this.indentValue
-    return this.parseBlockStart()
+    return yield* this.parseBlockStart()
   }
 
-  private parseBlockStart(): 'doc' | null {
+  private *parseBlockStart(): Generator<string, 'doc' | null> {
     const [ch0, ch1] = this.peek(2)
     if (!ch1 && !this.atEnd) return this.setNext('block-start')
     if ((ch0 === '-' || ch0 === '?' || ch0 === ':') && isEmpty(ch1)) {
-      const n = this.pushCount(1) + this.pushSpaces(true)
+      const n = (yield* this.pushCount(1)) + (yield* this.pushSpaces(true))
       this.indentNext = this.indentValue + 1
       this.indentValue += n
-      return this.parseBlockStart()
+      return yield* this.parseBlockStart()
     }
     return 'doc'
   }
 
-  private parseDocument() {
-    this.pushSpaces(true)
+  private *parseDocument() {
+    yield* this.pushSpaces(true)
     const line = this.getLine()
     if (line === null) return this.setNext('doc')
-    let n = this.pushIndicators()
+    let n = yield* this.pushIndicators()
     switch (line[n]) {
       case '#':
-        this.pushCount(line.length - n)
+        yield* this.pushCount(line.length - n)
       // fallthrough
       case undefined:
-        this.pushNewline()
-        return this.parseLineStart()
+        yield* this.pushNewline()
+        return yield* this.parseLineStart()
       case '{':
       case '[':
-        this.pushCount(1)
+        yield* this.pushCount(1)
         this.flowKey = false
         this.flowLevel = 1
         return 'flow'
       case '}':
       case ']':
         // this is an error
-        this.pushCount(1)
+        yield* this.pushCount(1)
         return 'doc'
       case '*':
-        this.pushUntil(isNotIdentifierChar)
+        yield* this.pushUntil(isNotIdentifierChar)
         return 'doc'
       case '"':
       case "'":
-        return this.parseQuotedScalar()
+        return yield* this.parseQuotedScalar()
       case '|':
       case '>':
-        n += this.parseBlockScalarHeader()
-        n += this.pushSpaces(true)
-        this.pushCount(line.length - n)
-        this.pushNewline()
-        return this.parseBlockScalar()
+        n += yield* this.parseBlockScalarHeader()
+        n += yield* this.pushSpaces(true)
+        yield* this.pushCount(line.length - n)
+        yield* this.pushNewline()
+        return yield* this.parseBlockScalar()
       default:
-        return this.parsePlainScalar()
+        return yield* this.parsePlainScalar()
     }
   }
 
-  private parseFlowCollection() {
+  private *parseFlowCollection() {
     let nl: number, sp: number
     let indent = -1
     do {
-      nl = this.pushNewline()
-      sp = this.pushSpaces(true)
+      nl = yield* this.pushNewline()
+      sp = yield* this.pushSpaces(true)
       if (nl > 0) this.indentValue = indent = sp
     } while (nl + sp > 0)
     const line = this.getLine()
@@ -397,54 +385,55 @@ export class Lexer {
       if (!atFlowEndMarker) {
         // this is an error
         this.flowLevel = 0
-        this.push(FLOW_END)
-        return this.parseLineStart()
+        yield FLOW_END
+        return yield* this.parseLineStart()
       }
     }
     let n = 0
-    while (line[n] === ',') n += this.pushCount(1) + this.pushSpaces(true)
-    n += this.pushIndicators()
+    while (line[n] === ',')
+      n += (yield* this.pushCount(1)) + (yield* this.pushSpaces(true))
+    n += yield* this.pushIndicators()
     switch (line[n]) {
       case undefined:
         return 'flow'
       case '#':
-        this.pushCount(line.length - n)
+        yield* this.pushCount(line.length - n)
         return 'flow'
       case '{':
       case '[':
-        this.pushCount(1)
+        yield* this.pushCount(1)
         this.flowKey = false
         this.flowLevel += 1
         return 'flow'
       case '}':
       case ']':
-        this.pushCount(1)
+        yield* this.pushCount(1)
         this.flowKey = true
         this.flowLevel -= 1
         return this.flowLevel ? 'flow' : 'doc'
       case '*':
-        this.pushUntil(isNotIdentifierChar)
+        yield* this.pushUntil(isNotIdentifierChar)
         return 'flow'
       case '"':
       case "'":
         this.flowKey = true
-        return this.parseQuotedScalar()
+        return yield* this.parseQuotedScalar()
       case ':': {
         const next = this.charAt(1)
         if (this.flowKey || isEmpty(next) || next === ',') {
-          this.pushCount(1)
-          this.pushSpaces(true)
+          yield* this.pushCount(1)
+          yield* this.pushSpaces(true)
           return 'flow'
         }
       }
       // fallthrough
       default:
         this.flowKey = false
-        return this.parsePlainScalar()
+        return yield* this.parsePlainScalar()
     }
   }
 
-  private parseQuotedScalar() {
+  private *parseQuotedScalar() {
     const quote = this.charAt(0)
     let end = this.buffer.indexOf(quote, this.pos + 1)
     if (quote === "'") {
@@ -475,11 +464,11 @@ export class Lexer {
       if (!this.atEnd) return this.setNext('quoted-scalar')
       end = this.buffer.length
     }
-    this.pushToIndex(end + 1, false)
+    yield* this.pushToIndex(end + 1, false)
     return this.flowLevel ? 'flow' : 'doc'
   }
 
-  private parseBlockScalarHeader() {
+  private *parseBlockScalarHeader() {
     this.blockScalarIndent = -1
     this.blockScalarKeep = false
     let i = this.pos
@@ -489,10 +478,10 @@ export class Lexer {
       else if (ch > '0' && ch <= '9') this.blockScalarIndent = Number(ch) - 1
       else if (ch !== '-') break
     }
-    return this.pushUntil(ch => isEmpty(ch) || ch === '#')
+    return yield* this.pushUntil(ch => isEmpty(ch) || ch === '#')
   }
 
-  private parseBlockScalar() {
+  private *parseBlockScalar() {
     let nl = this.pos - 1 // may be -1 if this.pos === 0
     let indent = 0
     let ch: string
@@ -538,12 +527,12 @@ export class Lexer {
         else break
       } while (true)
     }
-    this.push(SCALAR)
-    this.pushToIndex(nl + 1, true)
-    return this.parseLineStart()
+    yield SCALAR
+    yield* this.pushToIndex(nl + 1, true)
+    return yield* this.parseLineStart()
   }
 
-  private parsePlainScalar() {
+  private *parsePlainScalar() {
     const inFlow = this.flowLevel > 0
     let end = this.pos - 1
     let i = this.pos - 1
@@ -574,45 +563,45 @@ export class Lexer {
       }
     }
     if (!ch && !this.atEnd) return this.setNext('plain-scalar')
-    this.push(SCALAR)
-    this.pushToIndex(end + 1, true)
+    yield SCALAR
+    yield* this.pushToIndex(end + 1, true)
     return inFlow ? 'flow' : 'doc'
   }
 
-  private pushCount(n: number) {
+  private *pushCount(n: number) {
     if (n > 0) {
-      this.push(this.buffer.substr(this.pos, n))
+      yield this.buffer.substr(this.pos, n)
       this.pos += n
       return n
     }
     return 0
   }
 
-  private pushToIndex(i: number, allowEmpty: boolean) {
+  private *pushToIndex(i: number, allowEmpty: boolean) {
     const s = this.buffer.slice(this.pos, i)
     if (s) {
-      this.push(s)
+      yield s
       this.pos += s.length
       return s.length
-    } else if (allowEmpty) this.push('')
+    } else if (allowEmpty) yield ''
     return 0
   }
 
-  private pushIndicators(): number {
+  private *pushIndicators(): Generator<string, number> {
     switch (this.charAt(0)) {
       case '!':
         if (this.charAt(1) === '<')
           return (
-            this.pushVerbatimTag() +
-            this.pushSpaces(true) +
-            this.pushIndicators()
+            (yield* this.pushVerbatimTag()) +
+            (yield* this.pushSpaces(true)) +
+            (yield* this.pushIndicators())
           )
       // fallthrough
       case '&':
         return (
-          this.pushUntil(isNotIdentifierChar) +
-          this.pushSpaces(true) +
-          this.pushIndicators()
+          (yield* this.pushUntil(isNotIdentifierChar)) +
+          (yield* this.pushSpaces(true)) +
+          (yield* this.pushIndicators())
         )
       case ':':
       case '?': // this is an error outside flow collections
@@ -620,28 +609,31 @@ export class Lexer {
         if (isEmpty(this.charAt(1))) {
           if (this.flowLevel === 0) this.indentNext = this.indentValue + 1
           return (
-            this.pushCount(1) + this.pushSpaces(true) + this.pushIndicators()
+            (yield* this.pushCount(1)) +
+            (yield* this.pushSpaces(true)) +
+            (yield* this.pushIndicators())
           )
         }
     }
     return 0
   }
 
-  private pushVerbatimTag() {
+  private *pushVerbatimTag() {
     let i = this.pos + 2
     let ch = this.buffer[i]
     while (!isEmpty(ch) && ch !== '>') ch = this.buffer[++i]
-    return this.pushToIndex(ch === '>' ? i + 1 : i, false)
+    return yield* this.pushToIndex(ch === '>' ? i + 1 : i, false)
   }
 
-  private pushNewline() {
+  private *pushNewline() {
     const ch = this.buffer[this.pos]
-    if (ch === '\n') return this.pushCount(1)
-    else if (ch === '\r' && this.charAt(1) === '\n') return this.pushCount(2)
+    if (ch === '\n') return yield* this.pushCount(1)
+    else if (ch === '\r' && this.charAt(1) === '\n')
+      return yield* this.pushCount(2)
     else return 0
   }
 
-  private pushSpaces(allowTabs: boolean) {
+  private *pushSpaces(allowTabs: boolean) {
     let i = this.pos - 1
     let ch: string
     do {
@@ -649,16 +641,16 @@ export class Lexer {
     } while (ch === ' ' || (allowTabs && ch === '\t'))
     const n = i - this.pos
     if (n > 0) {
-      this.push(this.buffer.substr(this.pos, n))
+      yield this.buffer.substr(this.pos, n)
       this.pos = i
     }
     return n
   }
 
-  private pushUntil(test: (ch: string) => boolean) {
+  private *pushUntil(test: (ch: string) => boolean) {
     let i = this.pos
     let ch = this.buffer[i]
     while (!test(ch)) ch = this.buffer[++i]
-    return this.pushToIndex(i, false)
+    return yield* this.pushToIndex(i, false)
   }
 }

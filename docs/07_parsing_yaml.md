@@ -28,10 +28,8 @@ Both the Lexer and Parser accept incomplete input, allowing for them and the Com
 ```js
 import { Lexer } from 'yaml'
 
-const tokens = []
-const lexer = new Lexer(tok => tokens.push(tok))
-lexer.lex('foo: bar\nfee:\n  [24,"42"]\n', false)
-console.dir(tokens)
+const tokens = new Lexer().lex('foo: bar\nfee:\n  [24,"42"]\n')
+console.dir(Array.from(tokens))
 > [
     '\x02', '\x1F', 'foo',  ':',
     ' ',    '\x1F', 'bar',  '\n',
@@ -41,12 +39,11 @@ console.dir(tokens)
   ]
 ```
 
-#### `new Lexer(push: (token: string) => void)`
+#### `new Lexer()`
 
-#### `lexer.lex(src: string, incomplete: boolean): void`
+#### `lexer.lex(src: string, incomplete?: boolean): Generator<string>`
 
 The API for the lexer is rather minimal, and offers no configuration.
-The constructor accepts a single callback as argument, defining a function that will be called once for each lexical token.
 If the input stream is chunked, the `lex()` method may be called separately for each chunk if the `incomplete` argument is `true`.
 At the end of input, `lex()` should be called a final time with `incomplete: false` to ensure that the remaining tokens are emitted.
 
@@ -97,8 +94,8 @@ All remaining tokens are identifiable by their first character:
 ```js
 import { Parser } from 'yaml'
 
-const parser = new Parser(tok => console.dir(tok, { depth: null }))
-parser.parse('foo: [24,"42"]\n', false)
+for (const token of new Parser().parse('foo: [24,"42"]\n'))
+  console.dir(token, { depth: null })
 
 > {
     type: 'document',
@@ -153,24 +150,21 @@ It should never throw errors, but may (rarely) include error tokens in its outpu
 To validate a CST, you will need to compose it into a `Document`.
 If the document contains errors, they will be included in the document's `errors` array, and each error will will contain an `offset` within the source string, which you may then use to find the corresponding node in the CST.
 
-#### `new Parser(push: (token: Token) => void, onNewLine?: (offset: number) => void)`
+#### `new Parser(onNewLine?: (offset: number) => void)`
 
 Create a new parser.
-`push` is called separately with each parsed token.
 If defined, `onNewLine` is called separately with the start position of each new line (in `parse()`, including the start of input).
 
-#### `parser.parse(source: string, incomplete = false)`
+#### `parser.parse(source: string, incomplete = false): Generator<Token, void>`
 
-Parse `source` as a YAML stream, calling `push` with each directive, document and other structure as it is completely parsed.
+Parse `source` as a YAML stream, generating tokens for each directive, document and other structure as it is completely parsed.
 If `incomplete`, a part of the last line may be left as a buffer for the next call.
 
-Errors are not thrown, but pushed out as `{ type: 'error', offset, message }` tokens.
+Errors are not thrown, but are yielded as `{ type: 'error', offset, message }` tokens.
 
-#### `parser.next(lexToken: string)`
+#### `parser.next(lexToken: string): Generator<Token, void>`
 
 Advance the parser by one lexical token.
-Bound to the Parser instance, so may be used directly as a callback function.
-
 Used internally by `parser.parse()`; exposed to allow for use with an external lexer.
 
 For debug purposes, if the `LOG_TOKENS` env var is true-ish, all lexical tokens will be pretty-printed using `console.log()` as they are being processed.
@@ -205,8 +199,9 @@ Collection items contain some subset of the following properties:
 import { LineCounter, Parser } from 'yaml'
 
 const lineCounter = new LineCounter()
-const parser = new Parser(() => {}, lineCounter.addNewLine))
-parser.parse('foo:\n- 24\n- "42"\n')
+const parser = new Parser(lineCounter.addNewLine))
+const tokens = parser.parse('foo:\n- 24\n- "42"\n')
+Array.from(tokens) // forces iteration
 
 lineCounter.lineStarts
 > [ 0, 5, 10, 17 ]
@@ -236,28 +231,31 @@ If `line === 0`, `addNewLine` has never been called or `offset` is before the fi
 <!-- prettier-ignore -->
 ```js
 import { Composer, Parser } from 'yaml'
-const docs = []
-const composer = new Composer(doc => docs.push(doc))
-const parser = new Parser(composer.next)
-parser.parse('foo: bar\nfee: [24, "42"]')
-composer.end()
 
-docs.map(doc => doc.toJS())
+const src = 'foo: bar\nfee: [24, "42"]'
+const tokens = new Parser().parse(src)
+const docs = new Composer().compose(tokens)
+
+Array.from(docs, doc => doc.toJS())
 > [{ foo: 'bar', fee: [24, '42'] }]
 ```
 
-#### `new Composer(push: (doc: Document.Parsed) => void, options?: Options)`
+#### `new Composer(options?: ParseOptions & DocumentOptions & SchemaOptions)`
 
 Create a new Document composer.
 Does not include an internal Parser instance, so an external one will be needed.
-`options` will be used during composition, and passed to the `new Document` constructor; may include any of ParseOptions, DocumentOptions, and SchemaOptions.
+`options` will be used during composition, and passed to the `new Document` constructor.
 
-#### `composer.next(token: Token)`
+#### `composer.compose(tokens: Iterable<Token>, forceDoc?: boolean, endOffset?: number): Generator<Document.Parsed>`
+
+Compose tokens into documents.
+Convenience wrapper combining calls to `composer.next()` and `composer.end()`.
+
+#### `composer.next(token: Token): Generator<Document.Parsed>`
 
 Advance the composed by one CST token.
-Bound to the Composer instance, so may be used directly as a callback function.
 
-#### `composer.end(forceDoc?: boolean, offset?: number)`
+#### `composer.end(forceDoc?: boolean, offset?: number): Generator<Document.Parsed>`
 
 Always call at end of input to push out any remaining document.
 If `forceDoc` is true and the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.
