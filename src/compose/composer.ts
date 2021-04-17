@@ -159,6 +159,12 @@ export class Composer {
           token,
           this.onError
         )
+        if (this.atDirectives && !doc.directives.marker)
+          this.onError(
+            token.offset,
+            'MISSING_CHAR',
+            'Missing directives-end indicator line'
+          )
         this.decorate(doc, false)
         if (this.doc) yield this.doc
         this.doc = doc
