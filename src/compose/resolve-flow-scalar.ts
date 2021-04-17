@@ -86,14 +86,16 @@ function singleQuotedValue(source: string, onError: ComposeErrorHandler) {
 }
 
 function foldLines(source: string) {
-  const first = /(.*?)[ \t]*\r?\n/sy
+  // The negative lookbehind here and in the `re` RegExp is to
+  // prevent causing a polynomial search time in certain cases.
+  const first = /(.*?)(?<![ \t])[ \t]*\r?\n/sy
   let match = first.exec(source)
   if (!match) return source
 
   let pos = first.lastIndex
   let res = match[1]
   let sep = ' '
-  const re = /[ \t]*(.*?)[ \t]*\r?\n/sy
+  const re = /[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?\r?\n/sy
   re.lastIndex = pos
   while ((match = re.exec(source))) {
     const line = match[1]
