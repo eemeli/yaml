@@ -161,58 +161,75 @@ function blockString(
   const indent =
     ctx.indent ||
     (ctx.forceBlockIndent || containsDocumentMarker(value) ? '  ' : '')
-  const indentSize = indent ? '2' : '1' // root is at -1
   const literal =
     type === Scalar.BLOCK_FOLDED
       ? false
       : type === Scalar.BLOCK_LITERAL
       ? true
       : !lineLengthOverLimit(value, ctx.options.lineWidth, indent.length)
-  let header = literal ? '|' : '>'
-  if (!value) return header + '\n'
-  let wsStart = ''
-  let wsEnd = ''
-  value = value
-    .replace(/[\n\t ]*$/, ws => {
-      const n = ws.indexOf('\n')
-      if (n === -1) {
-        header += '-' // strip
-      } else if (value === ws || n !== ws.length - 1) {
-        header += '+' // keep
-        if (onChompKeep) onChompKeep()
-      }
-      wsEnd = ws.replace(/\n$/, '')
-      return ''
-    })
-    .replace(/^[\n ]*/, ws => {
-      if (ws.indexOf(' ') !== -1) header += indentSize
-      const m = ws.match(/ +$/)
-      if (m) {
-        wsStart = ws.slice(0, -m[0].length)
-        return m[0]
-      } else {
-        wsStart = ws
-        return ''
-      }
-    })
-  if (wsEnd) wsEnd = wsEnd.replace(/\n+(?!\n|$)/g, `$&${indent}`)
-  if (wsStart) wsStart = wsStart.replace(/\n+/g, `$&${indent}`)
+  if (!value) return literal ? '|\n' : '>\n'
+
+  // determine chomping from whitespace at value end
+  let chomp: '' | '-' | '+'
+  let endStart: number
+  for (endStart = value.length; endStart > 0; --endStart) {
+    const ch = value[endStart - 1]
+    if (ch !== '\n' && ch !== '\t' && ch !== ' ') break
+  }
+  let end = value.substring(endStart)
+  const endNlPos = end.indexOf('\n')
+  if (endNlPos === -1) {
+    chomp = '-' // strip
+  } else if (value === end || endNlPos !== end.length - 1) {
+    chomp = '+' // keep
+    if (onChompKeep) onChompKeep()
+  } else {
+    chomp = '' // clip
+  }
+  if (end) {
+    value = value.slice(0, -end.length)
+    if (end[end.length - 1] === '\n') end = end.slice(0, -1)
+    end = end.replace(/\n+(?!\n|$)/g, `$&${indent}`)
+  }
+
+  // determine indent indicator from whitespace at value start
+  let startWithSpace = false
+  let startEnd: number
+  let startNlPos = -1
+  for (startEnd = 0; startEnd < value.length; ++startEnd) {
+    const ch = value[startEnd]
+    if (ch === ' ') startWithSpace = true
+    else if (ch === '\n') startNlPos = startEnd
+    else break
+  }
+  let start = value.substring(
+    0,
+    startNlPos < startEnd ? startNlPos + 1 : startEnd
+  )
+  if (start) {
+    value = value.substring(start.length)
+    start = start.replace(/\n+/g, `$&${indent}`)
+  }
+
+  const indentSize = indent ? '2' : '1' // root is at -1
+  let header =
+    (literal ? '|' : '>') + (startWithSpace ? indentSize : '') + chomp
   if (comment) {
     header += ' #' + comment.replace(/ ?[\r\n]+/g, ' ')
     if (onComment) onComment()
   }
-  if (!value) return `${header}${indentSize}\n${indent}${wsEnd}`
+
   if (literal) {
     value = value.replace(/\n+/g, `$&${indent}`)
-    return `${header}\n${indent}${wsStart}${value}${wsEnd}`
+    return `${header}\n${indent}${start}${value}${end}`
   }
   value = value
     .replace(/\n+/g, '\n$&')
     .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
-    //         ^ ind.line  ^ empty     ^ capture next empty lines only at end of indent
+    //                ^ more-ind. ^ empty     ^ capture next empty lines only at end of indent
     .replace(/\n+/g, `$&${indent}`)
   const body = foldFlowLines(
-    `${wsStart}${value}${wsEnd}`,
+    `${start}${value}${end}`,
     indent,
     FOLD_BLOCK,
     getFoldOptions(ctx)
