@@ -14,33 +14,30 @@ doc.contents
 // YAMLMap {
 //   items:
 //    [ Pair {
-//        key: Scalar { value: 'YAML', range: [ 0, 4 ] },
+//        key: Scalar { value: 'YAML', range: [ 0, 4, 4 ] },
 //        value:
 //         YAMLSeq {
 //           items:
 //            [ Scalar {
 //                value: 'A human-readable data serialization language',
-//                range: [ 10, 55 ] },
+//                range: [ 10, 54, 55 ] },
 //              Scalar {
 //                value: 'https://en.wikipedia.org/wiki/YAML',
-//                range: [ 59, 94 ] } ],
-//           tag: 'tag:yaml.org,2002:seq',
-//           range: [ 8, 94 ] } },
+//                range: [ 59, 93, 94 ] } ],
+//           range: [ 8, 94, 94 ] } },
 //      Pair {
-//        key: Scalar { value: 'yaml', range: [ 94, 98 ] },
+//        key: Scalar { value: 'yaml', range: [ 94, 98, 98 ] },
 //        value:
 //         YAMLSeq {
 //           items:
 //            [ Scalar {
 //                value: 'A complete JavaScript implementation',
-//                range: [ 104, 141 ] },
+//                range: [ 104, 140, 141 ] },
 //              Scalar {
 //                value: 'https://www.npmjs.com/package/yaml',
-//                range: [ 145, 180 ] } ],
-//           tag: 'tag:yaml.org,2002:seq',
-//           range: [ 102, 180 ] } } ],
-//   tag: 'tag:yaml.org,2002:map',
-//   range: [ 0, 180 ] }
+//                range: [ 145, 180, 180 ] } ],
+//           range: [ 102, 180, 180 ] } } ],
+//   range: [ 0, 180, 180 ] }
 ```
 
 #### `parseDocument(str, options = {}): Document`

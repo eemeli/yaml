@@ -2,6 +2,7 @@ import type { ComposeErrorHandler } from '../compose/composer.js'
 import { resolveBlockScalar } from '../compose/resolve-block-scalar.js'
 import { resolveFlowScalar } from '../compose/resolve-flow-scalar.js'
 import { YAMLParseError } from '../errors.js'
+import { Range } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyString } from '../stringify/stringifyString.js'
@@ -19,7 +20,7 @@ export function resolveAsScalar(
   value: string
   type: Scalar.Type | null
   comment: string
-  length: number
+  range: Range
 } | null {
   if (token) {
     if (!onError)

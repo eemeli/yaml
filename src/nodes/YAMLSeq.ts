@@ -2,7 +2,7 @@ import type { Schema } from '../schema/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyCollection } from '../stringify/stringifyCollection.js'
 import { Collection } from './Collection.js'
-import { isScalar, ParsedNode, SEQ } from './Node.js'
+import { isScalar, ParsedNode, Range, SEQ } from './Node.js'
 import type { Pair } from './Pair.js'
 import { isScalarValue } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
@@ -12,7 +12,7 @@ export declare namespace YAMLSeq {
     T extends ParsedNode | Pair<ParsedNode, ParsedNode | null> = ParsedNode
   > extends YAMLSeq<T> {
     items: T[]
-    range: [number, number]
+    range: Range
   }
 }
 

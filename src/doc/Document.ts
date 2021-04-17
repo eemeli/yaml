@@ -7,7 +7,8 @@ import {
   isScalar,
   Node,
   NODE_TYPE,
-  ParsedNode
+  ParsedNode,
+  Range
 } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import type { Scalar } from '../nodes/Scalar.js'
@@ -35,9 +36,7 @@ export type Replacer = any[] | ((key: any, value: any) => unknown)
 
 export declare namespace Document {
   interface Parsed<T extends ParsedNode = ParsedNode> extends Document<T> {
-    range: [number, number]
-    /** The schema used with the document. */
-    schema: Schema
+    range: Range
   }
 }
 
@@ -64,6 +63,12 @@ export class Document<T = unknown> {
       'lineCounter' | 'directives' | 'version'
     >
   >
+
+  /**
+   * The [start, value-end, node-end] character offsets for the part of the
+   * source parsed into this document (undefined if not parsed).
+   */
+  declare range?: Range
 
   // TS can't figure out that setSchema() will set this, or throw
   /** The schema used with the document. Use `setSchema()` to change. */

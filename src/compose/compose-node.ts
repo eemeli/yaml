@@ -102,8 +102,9 @@ function composeAlias(
   onError: ComposeErrorHandler
 ) {
   const alias = new Alias(source.substring(1))
-  const re = resolveEnd(end, offset + source.length, options.strict, onError)
-  alias.range = [offset, re.offset]
+  const valueEnd = offset + source.length
+  const re = resolveEnd(end, valueEnd, options.strict, onError)
+  alias.range = [offset, valueEnd, re.offset]
   if (re.comment) alias.comment = re.comment
   return alias as Alias.Parsed
 }

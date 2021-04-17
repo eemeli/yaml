@@ -14,8 +14,7 @@ export function composeScalar(
   tagName: string | null,
   onError: ComposeErrorHandler
 ) {
-  const { offset } = token
-  const { value, type, comment, length } =
+  const { value, type, comment, range } =
     token.type === 'block-scalar'
       ? resolveBlockScalar(token, ctx.options.strict, onError)
       : resolveFlowScalar(token, ctx.options.strict, onError)
@@ -28,15 +27,15 @@ export function composeScalar(
   try {
     const res = tag.resolve(
       value,
-      msg => onError(offset, 'TAG_RESOLVE_FAILED', msg),
+      msg => onError(token.offset, 'TAG_RESOLVE_FAILED', msg),
       ctx.options
     )
     scalar = isScalar(res) ? res : new Scalar(res)
   } catch (error) {
-    onError(offset, 'TAG_RESOLVE_FAILED', error.message)
+    onError(token.offset, 'TAG_RESOLVE_FAILED', error.message)
     scalar = new Scalar(value)
   }
-  scalar.range = [offset, offset + length]
+  scalar.range = range
   scalar.source = value
   if (type) scalar.type = type
   if (tagName) scalar.tag = tagName

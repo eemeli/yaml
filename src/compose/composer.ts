@@ -206,7 +206,7 @@ export class Composer {
           const dc = this.doc.comment
           this.doc.comment = dc ? `${dc}\n${end.comment}` : end.comment
         }
-        this.doc.range[1] = end.offset
+        this.doc.range[2] = end.offset
         break
       }
       default:
@@ -240,7 +240,7 @@ export class Composer {
           'MISSING_CHAR',
           'Missing directives-end indicator line'
         )
-      doc.range = [0, endOffset]
+      doc.range = [0, endOffset, endOffset]
       this.decorate(doc, false)
       yield doc
     }

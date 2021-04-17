@@ -14,6 +14,8 @@ export type ParsedNode =
   | YAMLMap.Parsed
   | YAMLSeq.Parsed
 
+export type Range = [number, number, number]
+
 export const ALIAS = Symbol.for('yaml.alias')
 export const DOC = Symbol.for('yaml.document')
 export const MAP = Symbol.for('yaml.map')
@@ -75,10 +77,10 @@ export abstract class NodeBase {
   declare commentBefore?: string | null
 
   /**
-   * The [start, end] range of characters of the source parsed
-   * into this node (undefined for pairs or if not parsed)
+   * The [start, value-end, node-end] character offsets for the part of the
+   * source parsed into this node (undefined if not parsed).
    */
-  declare range?: [number, number] | null
+  declare range?: Range | null
 
   /** A blank line before this node and its commentBefore */
   declare spaceBefore?: boolean
