@@ -86,27 +86,37 @@ function singleQuotedValue(source: string, onError: ComposeErrorHandler) {
 }
 
 function foldLines(source: string) {
-  // The negative lookbehind here and in the `re` RegExp is to
-  // prevent causing a polynomial search time in certain cases.
-  const first = /(.*?)(?<![ \t])[ \t]*\r?\n/sy
+  /**
+   * The negative lookbehind here and in the `re` RegExp is to
+   * prevent causing a polynomial search time in certain cases.
+   *
+   * The try-catch is for Safari, which doesn't support this yet:
+   * https://caniuse.com/js-regexp-lookbehind
+   */
+  let first: RegExp, line: RegExp
+  try {
+    first = new RegExp('(.*?)(?<![ \t])[ \t]*\r?\n', 'sy')
+    line = new RegExp('[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?\r?\n', 'sy')
+  } catch (_) {
+    first = /(.*?)[ \t]*\r?\n/sy
+    line = /[ \t]*(.*?)[ \t]*\r?\n/sy
+  }
   let match = first.exec(source)
   if (!match) return source
 
-  let pos = first.lastIndex
   let res = match[1]
   let sep = ' '
-  const re = /[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?\r?\n/sy
-  re.lastIndex = pos
-  while ((match = re.exec(source))) {
-    const line = match[1]
-    if (line === '') {
+  let pos = first.lastIndex
+  line.lastIndex = pos
+  while ((match = line.exec(source))) {
+    if (match[1] === '') {
       if (sep === '\n') res += sep
       else sep = '\n'
     } else {
-      res += sep + line
+      res += sep + match[1]
       sep = ' '
     }
-    pos = re.lastIndex
+    pos = line.lastIndex
   }
 
   const last = /[ \t]*(.*)/sy
