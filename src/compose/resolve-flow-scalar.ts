@@ -58,28 +58,24 @@ export function resolveFlowScalar(
 }
 
 function plainValue(source: string, onError: ComposeErrorHandler) {
+  let message = ''
   switch (source[0]) {
     /* istanbul ignore next should not happen */
     case '\t':
-      onError(
-        0,
-        'BAD_SCALAR_START',
-        'Plain value cannot start with a tab character'
-      )
+      message = 'Plain value cannot start with a tab character'
       break
     case '|':
     case '>': {
-      const message = `Plain value cannot start with block scalar indicator ${source[0]}`
-      onError(0, 'BAD_SCALAR_START', message)
+      message = `Plain value cannot start with block scalar indicator ${source[0]}`
       break
     }
     case '@':
     case '`': {
-      const message = `Plain value cannot start with reserved character ${source[0]}`
-      onError(0, 'BAD_SCALAR_START', message)
+      message = `Plain value cannot start with reserved character ${source[0]}`
       break
     }
   }
+  if (message) onError(0, 'BAD_SCALAR_START', message)
   return foldLines(source)
 }
 
@@ -90,11 +86,17 @@ function singleQuotedValue(source: string, onError: ComposeErrorHandler) {
 }
 
 function foldLines(source: string) {
-  const lines = source.split(/[ \t]*\r?\n[ \t]*/)
-  let res = lines[0]
+  const first = /(.*?)[ \t]*\r?\n/sy
+  let match = first.exec(source)
+  if (!match) return source
+
+  let pos = first.lastIndex
+  let res = match[1]
   let sep = ' '
-  for (let i = 1; i < lines.length - 1; ++i) {
-    const line = lines[i]
+  const re = /[ \t]*(.*?)[ \t]*\r?\n/sy
+  re.lastIndex = pos
+  while ((match = re.exec(source))) {
+    const line = match[1]
     if (line === '') {
       if (sep === '\n') res += sep
       else sep = '\n'
@@ -102,9 +104,13 @@ function foldLines(source: string) {
       res += sep + line
       sep = ' '
     }
+    pos = re.lastIndex
   }
-  if (lines.length > 1) res += sep + lines[lines.length - 1]
-  return res
+
+  const last = /[ \t]*(.*)/sy
+  last.lastIndex = pos
+  match = last.exec(source)
+  return res + sep + ((match && match[1]) || '')
 }
 
 function doubleQuotedValue(source: string, onError: ComposeErrorHandler) {
