@@ -47,6 +47,7 @@ export function testEvents(src: string) {
       const doc = docs[i]
       let root = doc.contents
       if (Array.isArray(root)) root = root[0]
+      // eslint-disable-next-line no-sparse-arrays
       const [rootStart, , rootEnd] = doc.range || [0, , 0]
       const error = doc.errors[0]
       if (error && (!error.offset || error.offset < rootStart))
