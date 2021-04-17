@@ -103,6 +103,7 @@ function getFirstKeyStartProps(prev: SourceToken[]) {
   let i = prev.length
   loop: while (--i >= 0) {
     switch (prev[i].type) {
+      case 'doc-start':
       case 'explicit-key-ind':
       case 'map-value-ind':
       case 'seq-item-ind':

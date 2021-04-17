@@ -35,7 +35,19 @@ export function composeDoc(
     onError,
     startOnNewline: true
   })
-  if (props.found) doc.directives.marker = true
+  if (props.found) {
+    doc.directives.marker = true
+    if (
+      value &&
+      (value.type === 'block-map' || value.type === 'block-seq') &&
+      !props.hasNewline
+    )
+      onError(
+        props.end,
+        'MISSING_CHAR',
+        'Block collection cannot start on same line with directives-end marker'
+      )
+  }
   doc.contents = value
     ? composeNode(ctx, value, props, onError)
     : composeEmptyNode(ctx, props.end, start, null, props, onError)
