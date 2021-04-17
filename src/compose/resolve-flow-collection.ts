@@ -113,7 +113,7 @@ export function resolveFlowCollection(
         ? composeNode(ctx, value, props, onError)
         : composeEmptyNode(ctx, props.end, sep, null, props, onError)
       ;(coll as YAMLSeq).items.push(valueNode)
-      offset = valueNode.range[1]
+      offset = valueNode.range[2]
     } else {
       // item is a key+value pair
 
@@ -128,7 +128,7 @@ export function resolveFlowCollection(
         ctx,
         flow: fcName,
         indicator: 'map-value-ind',
-        offset: keyNode.range[1],
+        offset: keyNode.range[2],
         onError,
         startOnNewline: false
       })
@@ -188,29 +188,32 @@ export function resolveFlowCollection(
         map.items.push(pair)
         ;(coll as YAMLSeq).items.push(map)
       }
-      offset = valueNode ? valueNode.range[1] : valueProps.end
+      offset = valueNode ? valueNode.range[2] : valueProps.end
     }
   }
 
   const expectedEnd = isMap ? '}' : ']'
   const [ce, ...ee] = fc.end
-  if (!ce || ce.source !== expectedEnd) {
+  let cePos = offset
+  if (ce && ce.source === expectedEnd) cePos += ce.source.length
+  else {
     onError(
       offset + 1,
       'MISSING_CHAR',
       `Expected ${fcName} to end with ${expectedEnd}`
     )
+    if (ce && ce.source.length !== 1) ee.unshift(ce)
   }
-  if (ce) offset += ce.source.length
   if (ee.length > 0) {
-    const end = resolveEnd(ee, offset, ctx.options.strict, onError)
+    const end = resolveEnd(ee, cePos, ctx.options.strict, onError)
     if (end.comment) {
       if (coll.comment) coll.comment += '\n' + end.comment
       else coll.comment = end.comment
     }
-    offset = end.offset
+    coll.range = [fc.offset, cePos, end.offset]
+  } else {
+    coll.range = [fc.offset, cePos, cePos]
   }
 
-  coll.range = [fc.offset, offset]
   return coll as YAMLMap.Parsed | YAMLSeq.Parsed
 }

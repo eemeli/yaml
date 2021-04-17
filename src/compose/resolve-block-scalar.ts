@@ -1,3 +1,4 @@
+import { Range } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar } from '../parse/cst.js'
 import type { ComposeErrorHandler } from './composer.js'
@@ -10,10 +11,12 @@ export function resolveBlockScalar(
   value: string
   type: Scalar.BLOCK_FOLDED | Scalar.BLOCK_LITERAL | null
   comment: string
-  length: number
+  range: Range
 } {
+  const start = scalar.offset
   const header = parseBlockScalarHeader(scalar, strict, onError)
-  if (!header) return { value: '', type: null, comment: '', length: 0 }
+  if (!header)
+    return { value: '', type: null, comment: '', range: [start, start, start] }
   const type = header.mode === '>' ? Scalar.BLOCK_FOLDED : Scalar.BLOCK_LITERAL
   const lines = scalar.source ? splitLines(scalar.source) : []
 
@@ -29,9 +32,9 @@ export function resolveBlockScalar(
   if (!scalar.source || chompStart === 0) {
     const value =
       header.chomp === '+' ? lines.map(line => line[0]).join('\n') : ''
-    let length = header.length
-    if (scalar.source) length += scalar.source.length
-    return { value, type, comment: header.comment, length }
+    let end = start + header.length
+    if (scalar.source) end += scalar.source.length
+    return { value, type, comment: header.comment, range: [start, end, end] }
   }
 
   // find the indentation level to trim from start
@@ -113,12 +116,8 @@ export function resolveBlockScalar(
       value += '\n'
   }
 
-  return {
-    value,
-    type,
-    comment: header.comment,
-    length: header.length + scalar.source.length
-  }
+  const end = start + header.length + scalar.source.length
+  return { value, type, comment: header.comment, range: [start, end, end] }
 }
 
 function parseBlockScalarHeader(

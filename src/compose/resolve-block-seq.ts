@@ -40,9 +40,9 @@ export function resolveBlockSeq(
     const node = value
       ? composeNode(ctx, value, props, onError)
       : composeEmptyNode(ctx, offset, start, null, props, onError)
-    offset = node.range[1]
+    offset = node.range[2]
     seq.items.push(node)
   }
-  seq.range = [bs.offset, offset]
+  seq.range = [bs.offset, offset, offset]
   return seq as YAMLSeq.Parsed
 }

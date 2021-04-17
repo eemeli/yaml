@@ -3,7 +3,7 @@ import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyCollection } from '../stringify/stringifyCollection.js'
 import { addPairToJSMap } from './addPairToJSMap.js'
 import { Collection } from './Collection.js'
-import { isPair, isScalar, MAP, ParsedNode } from './Node.js'
+import { isPair, isScalar, MAP, ParsedNode, Range } from './Node.js'
 import { Pair } from './Pair.js'
 import { isScalarValue } from './Scalar.js'
 import type { ToJSContext } from './toJS.js'
@@ -28,7 +28,7 @@ export declare namespace YAMLMap {
     V extends ParsedNode | null = ParsedNode | null
   > extends YAMLMap<K, V> {
     items: Pair<K, V>[]
-    range: [number, number]
+    range: Range
   }
 }
 

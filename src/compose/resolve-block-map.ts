@@ -65,7 +65,7 @@ export function resolveBlockMap(
     const valueProps = resolveProps(sep || [], {
       ctx,
       indicator: 'map-value-ind',
-      offset: keyNode.range[1],
+      offset: keyNode.range[2],
       onError,
       startOnNewline: !key || key.type === 'block-scalar'
     })
@@ -93,7 +93,7 @@ export function resolveBlockMap(
       const valueNode = value
         ? composeNode(ctx, value, valueProps, onError)
         : composeEmptyNode(ctx, offset, sep, null, valueProps, onError)
-      offset = valueNode.range[1]
+      offset = valueNode.range[2]
       map.items.push(new Pair(keyNode, valueNode))
     } else {
       // key with no value
@@ -111,6 +111,6 @@ export function resolveBlockMap(
     }
   }
 
-  map.range = [bm.offset, offset]
+  map.range = [bm.offset, offset, offset]
   return map as YAMLMap.Parsed
 }

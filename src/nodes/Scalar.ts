@@ -1,4 +1,4 @@
-import { NodeBase, SCALAR } from './Node.js'
+import { NodeBase, Range, SCALAR } from './Node.js'
 import { toJS, ToJSContext } from './toJS.js'
 
 export const isScalarValue = (value: unknown) =>
@@ -6,7 +6,7 @@ export const isScalarValue = (value: unknown) =>
 
 export declare namespace Scalar {
   interface Parsed extends Scalar {
-    range: [number, number]
+    range: Range
     source: string
   }
 

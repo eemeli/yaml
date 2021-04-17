@@ -21,7 +21,7 @@ export class Schema {
 
   // Used by createNode() and composeScalar()
   [MAP]: CollectionTag;
-  [SCALAR]: ScalarTag
+  [SCALAR]: ScalarTag;
   [SEQ]: CollectionTag
 
   constructor({

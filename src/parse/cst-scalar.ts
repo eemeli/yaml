@@ -2,6 +2,7 @@ import type { ComposeErrorHandler } from '../compose/composer.js'
 import { resolveBlockScalar } from '../compose/resolve-block-scalar.js'
 import { resolveFlowScalar } from '../compose/resolve-flow-scalar.js'
 import { YAMLParseError } from '../errors.js'
+import { Range } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyString } from '../stringify/stringifyString.js'
@@ -19,7 +20,7 @@ export function resolveAsScalar(
   value: string
   type: Scalar.Type | null
   comment: string
-  length: number
+  range: Range
 } | null {
   if (token) {
     if (!onError)
@@ -79,7 +80,9 @@ export function createScalarToken(
       options: { lineWidth: -1 }
     } as StringifyContext
   )
-  const end = context.end ?? [{ type: 'newline', offset: -1, indent, source: '\n' }]
+  const end = context.end ?? [
+    { type: 'newline', offset: -1, indent, source: '\n' }
+  ]
   switch (source[0]) {
     case '|':
     case '>': {
@@ -185,7 +188,7 @@ function setBlockScalarValue(token: Token, source: string) {
     header.source = head
     token.source = body
   } else {
-    let offset = token.offset
+    const { offset } = token
     const indent = 'indent' in token ? token.indent : -1
     const props: Token[] = [
       { type: 'block-scalar-header', offset, indent, source: head }

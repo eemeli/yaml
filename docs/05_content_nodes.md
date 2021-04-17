@@ -12,9 +12,9 @@ It is valid to have an anchor associated with a node even if it has no aliases.
 class NodeBase {
   comment?: string        // a comment on or immediately after this
   commentBefore?: string  // a comment before this
-  range?: [number, number]
-      // the [start, end] range of characters of the source parsed
-      // into this node (undefined for pairs or if not parsed)
+  range?: [number, number, number]
+      // The [start, value-end, node-end] character offsets for the part
+      // of the source parsed into this node (undefined if not parsed).
   spaceBefore?: boolean
       // a blank line before this node and its commentBefore
   tag?: string   // a fully qualified tag, if required

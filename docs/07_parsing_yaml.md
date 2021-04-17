@@ -308,7 +308,7 @@ const item = doc.value.items[0].value
   }
 
 YAML.resolveAsScalar(item)
-> { value: 'bar', type: 'QUOTE_DOUBLE', comment: 'comment', length: 14 }
+> { value: 'bar', type: 'QUOTE_DOUBLE', comment: 'comment', range: [5, 9, 19] }
 ```
 
 #### `CST.isCollection(token?: Token): boolean`
