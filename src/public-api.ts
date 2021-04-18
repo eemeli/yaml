@@ -82,7 +82,7 @@ export function parseDocument<T extends ParsedNode = ParsedNode>(
     else if (doc.options.logLevel !== 'silent') {
       doc.errors.push(
         new YAMLParseError(
-          _doc.range[0],
+          _doc.range.slice(0, 2) as [number, number],
           'MULTIPLE_DOCS',
           'Source contains multiple documents; please use YAML.parseAllDocuments()'
         )

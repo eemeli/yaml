@@ -22,16 +22,18 @@ export type ErrorCode =
   | 'TAG_RESOLVE_FAILED'
   | 'UNEXPECTED_TOKEN'
 
+export type LinePos = { line: number; col: number }
+
 export class YAMLError extends Error {
   name: 'YAMLParseError' | 'YAMLWarning'
   code: ErrorCode
   message: string
-  offset: number
-  linePos?: { line: number; col: number }
+  pos: [number, number]
+  linePos?: [LinePos] | [LinePos, LinePos]
 
   constructor(
     name: YAMLError['name'],
-    offset: number,
+    pos: [number, number],
     code: ErrorCode,
     message: string
   ) {
@@ -39,28 +41,30 @@ export class YAMLError extends Error {
     this.name = name
     this.code = code
     this.message = message
-    this.offset = offset
+    this.pos = pos
   }
 }
 
 export class YAMLParseError extends YAMLError {
-  constructor(offset: number, code: ErrorCode, message: string) {
-    super('YAMLParseError', offset, code, message)
+  constructor(pos: [number, number], code: ErrorCode, message: string) {
+    super('YAMLParseError', pos, code, message)
   }
 }
 
 export class YAMLWarning extends YAMLError {
-  constructor(offset: number, code: ErrorCode, message: string) {
-    super('YAMLWarning', offset, code, message)
+  constructor(pos: [number, number], code: ErrorCode, message: string) {
+    super('YAMLWarning', pos, code, message)
   }
 }
 
 export const prettifyError = (src: string, lc: LineCounter) => (
   error: YAMLError
 ) => {
-  if (error.offset === -1) return
-  error.linePos = lc.linePos(error.offset)
-  const { line, col } = error.linePos
+  if (error.pos[0] === -1) return
+  error.linePos = error.pos.map(pos => lc.linePos(pos)) as
+    | [LinePos]
+    | [LinePos, LinePos]
+  const { line, col } = error.linePos[0]
   error.message += ` at line ${line}, column ${col}`
 
   let ci = col - 1
@@ -85,7 +89,12 @@ export const prettifyError = (src: string, lc: LineCounter) => (
   }
 
   if (/[^ ]/.test(lineStr)) {
-    const pointer = ' '.repeat(ci) + '^'
+    let count = 1
+    const end = error.linePos[1]
+    if (end && end.line === line && end.col > col) {
+      count = Math.min(end.col - col, 80 - ci)
+    }
+    const pointer = ' '.repeat(ci) + '^'.repeat(count)
     error.message += `:\n\n${lineStr}\n${pointer}\n`
   }
 }

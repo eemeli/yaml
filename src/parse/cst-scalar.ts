@@ -1,7 +1,7 @@
 import type { ComposeErrorHandler } from '../compose/composer.js'
 import { resolveBlockScalar } from '../compose/resolve-block-scalar.js'
 import { resolveFlowScalar } from '../compose/resolve-flow-scalar.js'
-import { YAMLParseError } from '../errors.js'
+import { ErrorCode, YAMLParseError } from '../errors.js'
 import { Range } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { StringifyContext } from '../stringify/stringify.js'
@@ -15,7 +15,7 @@ import type { BlockScalar, FlowScalar, SourceToken, Token } from './cst.js'
 export function resolveAsScalar(
   token: Token | null | undefined,
   strict = true,
-  onError?: ComposeErrorHandler
+  onError?: (offset: number, code: ErrorCode, message: string) => void
 ): {
   value: string
   type: Scalar.Type | null
@@ -23,17 +23,19 @@ export function resolveAsScalar(
   range: Range
 } | null {
   if (token) {
-    if (!onError)
-      onError = (offset, code, message) => {
-        throw new YAMLParseError(offset, code, message)
-      }
+    const _onError: ComposeErrorHandler = (pos, code, message) => {
+      const offset =
+        typeof pos === 'number' ? pos : Array.isArray(pos) ? pos[0] : pos.offset
+      if (onError) onError(offset, code, message)
+      else throw new YAMLParseError([offset, offset + 1], code, message)
+    }
     switch (token.type) {
       case 'scalar':
       case 'single-quoted-scalar':
       case 'double-quoted-scalar':
-        return resolveFlowScalar(token, strict, onError)
+        return resolveFlowScalar(token, strict, _onError)
       case 'block-scalar':
-        return resolveBlockScalar(token, strict, onError)
+        return resolveBlockScalar(token, strict, _onError)
     }
   }
   return null

@@ -127,7 +127,7 @@ function parseBlockScalarHeader(
 ) {
   /* istanbul ignore if should not happen */
   if (props[0].type !== 'block-scalar-header') {
-    onError(offset, 'IMPOSSIBLE', 'Block scalar header not found')
+    onError(props[0], 'IMPOSSIBLE', 'Block scalar header not found')
     return null
   }
   const { source } = props[0]
@@ -166,19 +166,19 @@ function parseBlockScalarHeader(
         if (strict && !hasSpace) {
           const message =
             'Comments must be separated from other tokens by white space characters'
-          onError(offset + length, 'COMMENT_SPACE', message)
+          onError(token, 'COMMENT_SPACE', message)
         }
         length += token.source.length
         comment = token.source.substring(1)
         break
       case 'error':
-        onError(offset + length, 'UNEXPECTED_TOKEN', token.message)
+        onError(token, 'UNEXPECTED_TOKEN', token.message)
         length += token.source.length
         break
       /* istanbul ignore next should not happen */
       default: {
         const message = `Unexpected token in block scalar header: ${token.type}`
-        onError(offset + length, 'UNEXPECTED_TOKEN', message)
+        onError(token, 'UNEXPECTED_TOKEN', message)
         const ts = (token as any).source
         if (ts && typeof ts === 'string') length += ts.length
       }

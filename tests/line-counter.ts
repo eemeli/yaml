@@ -3,7 +3,7 @@ import { LineCounter, parseDocument } from 'yaml'
 test('Parse error, no newlines', () => {
   const lineCounter = new LineCounter()
   const doc = parseDocument('foo: bar: baz', { lineCounter })
-  expect(doc.errors).toMatchObject([{ offset: 5 }])
+  expect(doc.errors).toMatchObject([{ pos: [5, 6] }])
   expect(lineCounter.lineStarts).toMatchObject([0])
   expect(lineCounter.linePos(5)).toMatchObject({ line: 1, col: 6 })
 })
@@ -11,9 +11,10 @@ test('Parse error, no newlines', () => {
 test('Parse error with newlines', () => {
   const lineCounter = new LineCounter()
   const doc = parseDocument('foo:\n  bar: - baz\n', { lineCounter })
-  expect(doc.errors).toMatchObject([{ offset: 14 }])
+  expect(doc.errors).toMatchObject([{ pos: [14, 17] }])
   expect(lineCounter.lineStarts).toMatchObject([0, 5, 18])
   expect(lineCounter.linePos(14)).toMatchObject({ line: 2, col: 10 })
+  expect(lineCounter.linePos(17)).toMatchObject({ line: 2, col: 13 })
 })
 
 test('block scalar', () => {

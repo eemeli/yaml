@@ -1,7 +1,7 @@
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { ErrorCode, YAMLParseError, YAMLWarning } from '../errors.js'
-import { isCollection, isPair } from '../nodes/Node.js'
+import { isCollection, isPair, Range } from '../nodes/Node.js'
 import {
   defaultOptions,
   DocumentOptions,
@@ -12,12 +12,25 @@ import type { Token } from '../parse/cst.js'
 import { composeDoc } from './compose-doc.js'
 import { resolveEnd } from './resolve-end.js'
 
+type ErrorSource =
+  | number
+  | [number, number]
+  | Range
+  | { offset: number; source?: string }
+
 export type ComposeErrorHandler = (
-  offset: number,
+  source: ErrorSource,
   code: ErrorCode,
   message: string,
   warning?: boolean
 ) => void
+
+function getErrorPos(src: ErrorSource): [number, number] {
+  if (typeof src === 'number') return [src, src + 1]
+  if (Array.isArray(src)) return src.length === 2 ? src : [src[0], src[1]]
+  const { offset, source } = src
+  return [offset, offset + (typeof source === 'string' ? source.length : 1)]
+}
 
 function parsePrelude(prelude: string[]) {
   let comment = ''
@@ -73,14 +86,10 @@ export class Composer {
     this.options = options
   }
 
-  private onError = (
-    offset: number,
-    code: ErrorCode,
-    message: string,
-    warning?: boolean
-  ) => {
-    if (warning) this.warnings.push(new YAMLWarning(offset, code, message))
-    else this.errors.push(new YAMLParseError(offset, code, message))
+  private onError: ComposeErrorHandler = (source, code, message, warning) => {
+    const pos = getErrorPos(source)
+    if (warning) this.warnings.push(new YAMLWarning(pos, code, message))
+    else this.errors.push(new YAMLParseError(pos, code, message))
   }
 
   private decorate(doc: Document.Parsed, afterDoc: boolean) {
@@ -146,9 +155,11 @@ export class Composer {
     if (process.env.LOG_STREAM) console.dir(token, { depth: null })
     switch (token.type) {
       case 'directive':
-        this.directives.add(token.source, (offset, message, warning) =>
-          this.onError(offset, 'BAD_DIRECTIVE', message, warning)
-        )
+        this.directives.add(token.source, (offset, message, warning) => {
+          const pos = getErrorPos(token)
+          pos[0] += offset
+          this.onError(pos, 'BAD_DIRECTIVE', message, warning)
+        })
         this.prelude.push(token.source)
         this.atDirectives = true
         break
@@ -161,7 +172,7 @@ export class Composer {
         )
         if (this.atDirectives && !doc.directives.marker)
           this.onError(
-            token.offset,
+            token,
             'MISSING_CHAR',
             'Missing directives-end indicator line'
           )
@@ -182,7 +193,11 @@ export class Composer {
         const msg = token.source
           ? `${token.message}: ${JSON.stringify(token.source)}`
           : token.message
-        const error = new YAMLParseError(-1, 'UNEXPECTED_TOKEN', msg)
+        const error = new YAMLParseError(
+          getErrorPos(token),
+          'UNEXPECTED_TOKEN',
+          msg
+        )
         if (this.atDirectives || !this.doc) this.errors.push(error)
         else this.doc.errors.push(error)
         break
@@ -191,7 +206,7 @@ export class Composer {
         if (!this.doc) {
           const msg = 'Unexpected doc-end without preceding document'
           this.errors.push(
-            new YAMLParseError(token.offset, 'UNEXPECTED_TOKEN', msg)
+            new YAMLParseError(getErrorPos(token), 'UNEXPECTED_TOKEN', msg)
           )
           break
         }
@@ -212,7 +227,7 @@ export class Composer {
       default:
         this.errors.push(
           new YAMLParseError(
-            -1,
+            getErrorPos(token),
             'UNEXPECTED_TOKEN',
             `Unsupported token ${token.type}`
           )

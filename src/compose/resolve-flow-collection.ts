@@ -2,12 +2,16 @@ import { isPair } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
-import type { FlowCollection } from '../parse/cst.js'
+import type { FlowCollection, Token } from '../parse/cst.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveProps } from './resolve-props.js'
 import { containsNewline } from './util-contains-newline.js'
+
+const blockMsg = 'Block collections are not allowed within flow collections'
+const isBlock = (token: Token | null | undefined) =>
+  token && (token.type === 'block-map' || token.type === 'block-seq')
 
 export function resolveFlowCollection(
   { composeNode, composeEmptyNode }: ComposeNode,
@@ -34,13 +38,9 @@ export function resolveFlowCollection(
       startOnNewline: false
     })
     if (!props.found) {
-      if (!props.anchor && !props.tagName && !sep && !value) {
+      if (!props.anchor && !props.tag && !sep && !value) {
         if (i === 0 && props.comma)
-          onError(
-            props.comma.offset,
-            'UNEXPECTED_TOKEN',
-            `Unexpected , in ${fcName}`
-          )
+          onError(props.comma, 'UNEXPECTED_TOKEN', `Unexpected , in ${fcName}`)
         else if (i < fc.items.length - 1)
           onError(
             props.start,
@@ -55,18 +55,14 @@ export function resolveFlowCollection(
       }
       if (!isMap && ctx.options.strict && containsNewline(key))
         onError(
-          props.start,
+          key as Token, // checked by containsNewline()
           'MULTILINE_IMPLICIT_KEY',
           'Implicit keys of flow sequence pairs need to be on a single line'
         )
     }
     if (i === 0) {
       if (props.comma)
-        onError(
-          props.comma.offset,
-          'UNEXPECTED_TOKEN',
-          `Unexpected , in ${fcName}`
-        )
+        onError(props.comma, 'UNEXPECTED_TOKEN', `Unexpected , in ${fcName}`)
     } else {
       if (!props.comma)
         onError(
@@ -98,14 +94,6 @@ export function resolveFlowCollection(
       }
     }
 
-    for (const token of [key, value])
-      if (token && (token.type === 'block-map' || token.type === 'block-seq'))
-        onError(
-          token.offset,
-          'BLOCK_IN_FLOW',
-          'Block collections are not allowed within flow collections'
-        )
-
     if (!isMap && !sep && !props.found) {
       // item is a value in a seq
       // → key & sep are empty, start does not include ? or :
@@ -114,6 +102,7 @@ export function resolveFlowCollection(
         : composeEmptyNode(ctx, props.end, sep, null, props, onError)
       ;(coll as YAMLSeq).items.push(valueNode)
       offset = valueNode.range[2]
+      if (isBlock(value)) onError(valueNode.range, 'BLOCK_IN_FLOW', blockMsg)
     } else {
       // item is a key+value pair
 
@@ -122,6 +111,7 @@ export function resolveFlowCollection(
       const keyNode = key
         ? composeNode(ctx, key, props, onError)
         : composeEmptyNode(ctx, keyStart, start, null, props, onError)
+      if (isBlock(key)) onError(keyNode.range, 'BLOCK_IN_FLOW', blockMsg)
 
       // value properties
       const valueProps = resolveProps(sep || [], {
@@ -140,7 +130,7 @@ export function resolveFlowCollection(
               if (st === valueProps.found) break
               if (st.type === 'newline') {
                 onError(
-                  st.offset,
+                  st,
                   'MULTILINE_IMPLICIT_KEY',
                   'Implicit keys of flow sequence pairs need to be on a single line'
                 )
@@ -149,18 +139,14 @@ export function resolveFlowCollection(
             }
           if (props.start < valueProps.found.offset - 1024)
             onError(
-              valueProps.found.offset,
+              valueProps.found,
               'KEY_OVER_1024_CHARS',
               'The : indicator must be at most 1024 chars after the start of an implicit flow sequence key'
             )
         }
       } else if (value) {
         if ('source' in value && value.source && value.source[0] === ':')
-          onError(
-            value.offset,
-            'MISSING_CHAR',
-            `Missing space after : in ${fcName}`
-          )
+          onError(value, 'MISSING_CHAR', `Missing space after : in ${fcName}`)
         else
           onError(
             valueProps.start,
@@ -175,7 +161,9 @@ export function resolveFlowCollection(
         : valueProps.found
         ? composeEmptyNode(ctx, valueProps.end, sep, null, valueProps, onError)
         : null
-      if (!valueNode && valueProps.comment) {
+      if (valueNode) {
+        if (isBlock(value)) onError(valueNode.range, 'BLOCK_IN_FLOW', blockMsg)
+      } else if (valueProps.comment) {
         if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
         else keyNode.comment = valueProps.comment
       }
