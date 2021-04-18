@@ -11,7 +11,8 @@ export function resolveEnd(
   if (end) {
     let hasSpace = false
     let sep = ''
-    for (const { source, type } of end) {
+    for (const token of end) {
+      const { source, type } = token
       switch (type) {
         case 'space':
           hasSpace = true
@@ -19,7 +20,7 @@ export function resolveEnd(
         case 'comment': {
           if (reqSpace && !hasSpace)
             onError(
-              offset,
+              token,
               'COMMENT_SPACE',
               'Comments must be separated from other tokens by white space characters'
             )
@@ -34,7 +35,7 @@ export function resolveEnd(
           hasSpace = true
           break
         default:
-          onError(offset, 'UNEXPECTED_TOKEN', `Unexpected ${type} at node end`)
+          onError(token, 'UNEXPECTED_TOKEN', `Unexpected ${type} at node end`)
       }
       offset += source.length
     }

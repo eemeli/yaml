@@ -21,8 +21,8 @@ export function resolveProps(
   let comment = ''
   let commentSep = ''
   let hasNewline = false
-  let anchor = ''
-  let tagName = ''
+  let anchor: SourceToken | null = null
+  let tag: SourceToken | null = null
   let comma: SourceToken | null = null
   let found: SourceToken | null = null
   let start: number | null = null
@@ -38,17 +38,13 @@ export function resolveProps(
           indicator !== 'doc-start' &&
           token.source[0] === '\t'
         )
-          onError(
-            token.offset,
-            'TAB_AS_INDENT',
-            'Tabs are not allowed as indentation'
-          )
+          onError(token, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation')
         hasSpace = true
         break
       case 'comment': {
         if (ctx.options.strict && !hasSpace)
           onError(
-            token.offset,
+            token,
             'COMMENT_SPACE',
             'Comments must be separated from other tokens by white space characters'
           )
@@ -68,26 +64,19 @@ export function resolveProps(
       case 'anchor':
         if (anchor)
           onError(
-            token.offset,
+            token,
             'MULTIPLE_ANCHORS',
             'A node can have at most one anchor'
           )
-        anchor = token.source.substring(1)
+        anchor = token
         if (start === null) start = token.offset
         atNewline = false
         hasSpace = false
         break
       case 'tag': {
-        if (tagName)
-          onError(
-            token.offset,
-            'MULTIPLE_TAGS',
-            'A node can have at most one tag'
-          )
-        const tn = ctx.directives.tagName(token.source, msg =>
-          onError(token.offset, 'TAG_RESOLVE_FAILED', msg)
-        )
-        if (tn) tagName = tn
+        if (tag)
+          onError(token, 'MULTIPLE_TAGS', 'A node can have at most one tag')
+        tag = token
         if (start === null) start = token.offset
         atNewline = false
         hasSpace = false
@@ -95,9 +84,9 @@ export function resolveProps(
       }
       case indicator:
         // Could here handle preceding comments differently
-        if (anchor || tagName)
+        if (anchor || tag)
           onError(
-            token.offset,
+            token,
             'BAD_PROP_ORDER',
             `Anchors and tags must be after the ${token.source} indicator`
           )
@@ -108,7 +97,7 @@ export function resolveProps(
       case 'comma':
         if (flow) {
           if (comma)
-            onError(token.offset, 'UNEXPECTED_TOKEN', `Unexpected , in ${flow}`)
+            onError(token, 'UNEXPECTED_TOKEN', `Unexpected , in ${flow}`)
           comma = token
           atNewline = false
           hasSpace = false
@@ -116,11 +105,7 @@ export function resolveProps(
         }
       // else fallthrough
       default:
-        onError(
-          token.offset,
-          'UNEXPECTED_TOKEN',
-          `Unexpected ${token.type} token`
-        )
+        onError(token, 'UNEXPECTED_TOKEN', `Unexpected ${token.type} token`)
         atNewline = false
         hasSpace = false
     }
@@ -134,7 +119,7 @@ export function resolveProps(
     comment,
     hasNewline,
     anchor,
-    tagName,
+    tag,
     end,
     start: start ?? end
   }

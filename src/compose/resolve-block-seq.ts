@@ -22,7 +22,7 @@ export function resolveBlockSeq(
     })
     offset = props.end
     if (!props.found) {
-      if (props.anchor || props.tagName || value) {
+      if (props.anchor || props.tag || value) {
         if (value && value.type === 'block-seq')
           onError(
             offset,

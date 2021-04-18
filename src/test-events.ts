@@ -50,14 +50,13 @@ export function testEvents(src: string) {
       // eslint-disable-next-line no-sparse-arrays
       const [rootStart, , rootEnd] = doc.range || [0, , 0]
       const error = doc.errors[0]
-      if (error && (!error.offset || error.offset < rootStart))
-        throw new Error()
+      if (error && (!error.pos || error.pos[0] < rootStart)) throw new Error()
       let docStart = '+DOC'
       if (doc.directives.marker) docStart += ' ---'
       else if (doc.contents && doc.contents.range[2] === doc.contents.range[0])
         continue
       events.push(docStart)
-      addEvents(events, doc, error?.offset ?? -1, root)
+      addEvents(events, doc, error?.pos[0] ?? -1, root)
 
       let docEnd = '-DOC'
       if (rootEnd) {

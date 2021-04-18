@@ -1,6 +1,6 @@
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
-import type { BlockMap } from '../parse/cst.js'
+import type { BlockMap, Token } from '../parse/cst.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveProps } from './resolve-props.js'
@@ -38,7 +38,7 @@ export function resolveBlockMap(
         else if ('indent' in key && key.indent !== bm.indent)
           onError(offset, 'BAD_INDENT', startColMsg)
       }
-      if (!keyProps.anchor && !keyProps.tagName && !sep) {
+      if (!keyProps.anchor && !keyProps.tag && !sep) {
         // TODO: assert being at last item?
         if (keyProps.comment) {
           if (map.comment) map.comment += '\n' + keyProps.comment
@@ -50,7 +50,7 @@ export function resolveBlockMap(
       onError(offset, 'BAD_INDENT', startColMsg)
     if (implicitKey && containsNewline(key))
       onError(
-        keyProps.start,
+        key as Token, // checked by containsNewline()
         'MULTILINE_IMPLICIT_KEY',
         'Implicit keys need to be on a single line'
       )
@@ -84,7 +84,7 @@ export function resolveBlockMap(
           keyProps.start < valueProps.found.offset - 1024
         )
           onError(
-            offset,
+            keyNode.range,
             'KEY_OVER_1024_CHARS',
             'The : indicator must be at most 1024 chars after the start of an implicit block mapping key'
           )
@@ -99,7 +99,7 @@ export function resolveBlockMap(
       // key with no value
       if (implicitKey)
         onError(
-          keyStart,
+          keyNode.range,
           'MISSING_CHAR',
           'Implicit map keys need to be followed by map values'
         )

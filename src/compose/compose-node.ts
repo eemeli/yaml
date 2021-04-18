@@ -2,7 +2,7 @@ import type { Directives } from '../doc/directives.js'
 import { Alias } from '../nodes/Alias.js'
 import type { ParsedNode } from '../nodes/Node.js'
 import type { ParseOptions } from '../options.js'
-import type { FlowScalar, Token } from '../parse/cst.js'
+import type { FlowScalar, SourceToken, Token } from '../parse/cst.js'
 import type { Schema } from '../schema/Schema.js'
 import { composeCollection } from './compose-collection.js'
 import { composeScalar } from './compose-scalar.js'
@@ -16,11 +16,11 @@ export interface ComposeContext {
   schema: Readonly<Schema>
 }
 
-export interface Props {
+interface Props {
   spaceBefore: boolean
   comment: string
-  anchor: string
-  tagName: string
+  anchor: SourceToken | null
+  tag: SourceToken | null
 }
 
 const CN = { composeNode, composeEmptyNode }
@@ -32,14 +32,14 @@ export function composeNode(
   props: Props,
   onError: ComposeErrorHandler
 ) {
-  const { spaceBefore, comment, anchor, tagName } = props
+  const { spaceBefore, comment, anchor, tag } = props
   let node: ParsedNode
   switch (token.type) {
     case 'alias':
       node = composeAlias(ctx, token, onError)
-      if (anchor || tagName)
+      if (anchor || tag)
         onError(
-          token.offset,
+          token,
           'ALIAS_PROPS',
           'An alias node must not specify any properties'
         )
@@ -48,18 +48,14 @@ export function composeNode(
     case 'single-quoted-scalar':
     case 'double-quoted-scalar':
     case 'block-scalar':
-      node = composeScalar(ctx, token, tagName, onError)
-      if (anchor) {
-        node.anchor = anchor
-      }
+      node = composeScalar(ctx, token, tag, onError)
+      if (anchor) node.anchor = anchor.source.substring(1)
       break
     case 'block-map':
     case 'block-seq':
     case 'flow-collection':
-      node = composeCollection(CN, ctx, token, tagName, onError)
-      if (anchor) {
-        node.anchor = anchor
-      }
+      node = composeCollection(CN, ctx, token, tag, onError)
+      if (anchor) node.anchor = anchor.source.substring(1)
       break
     default:
       console.log(token)
@@ -78,7 +74,7 @@ export function composeEmptyNode(
   offset: number,
   before: Token[] | undefined,
   pos: number | null,
-  { spaceBefore, comment, anchor, tagName }: Props,
+  { spaceBefore, comment, anchor, tag }: Props,
   onError: ComposeErrorHandler
 ) {
   const token: FlowScalar = {
@@ -87,10 +83,8 @@ export function composeEmptyNode(
     indent: -1,
     source: ''
   }
-  const node = composeScalar(ctx, token, tagName, onError)
-  if (anchor) {
-    node.anchor = anchor
-  }
+  const node = composeScalar(ctx, token, tag, onError)
+  if (anchor) node.anchor = anchor.source.substring(1)
   if (spaceBefore) node.spaceBefore = true
   if (comment) node.comment = comment
   return node

@@ -2,7 +2,12 @@ import { isMap, isNode, ParsedNode } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
-import type { BlockMap, BlockSequence, FlowCollection } from '../parse/cst.js'
+import type {
+  BlockMap,
+  BlockSequence,
+  FlowCollection,
+  SourceToken
+} from '../parse/cst.js'
 import { CollectionTag } from '../schema/types.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
@@ -14,7 +19,7 @@ export function composeCollection(
   CN: ComposeNode,
   ctx: ComposeContext,
   token: BlockMap | BlockSequence | FlowCollection,
-  tagName: string | null,
+  tagToken: SourceToken | null,
   onError: ComposeErrorHandler
 ) {
   let coll: YAMLMap.Parsed | YAMLSeq.Parsed
@@ -33,6 +38,10 @@ export function composeCollection(
     }
   }
 
+  if (!tagToken) return coll
+  const tagName = ctx.directives.tagName(tagToken.source, msg =>
+    onError(tagToken, 'TAG_RESOLVE_FAILED', msg)
+  )
   if (!tagName) return coll
 
   // Cast needed due to: https://github.com/Microsoft/TypeScript/issues/3841
@@ -53,7 +62,7 @@ export function composeCollection(
       tag = kt
     } else {
       onError(
-        coll.range[0],
+        tagToken,
         'TAG_RESOLVE_FAILED',
         `Unresolved tag: ${tagName}`,
         true
@@ -65,7 +74,7 @@ export function composeCollection(
 
   const res = tag.resolve(
     coll,
-    msg => onError(coll.range[0], 'TAG_RESOLVE_FAILED', msg),
+    msg => onError(tagToken, 'TAG_RESOLVE_FAILED', msg),
     ctx.options
   )
   const node = isNode(res)

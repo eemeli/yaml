@@ -1,6 +1,6 @@
 import { isScalar, SCALAR } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
-import type { BlockScalar, FlowScalar } from '../parse/cst.js'
+import type { BlockScalar, FlowScalar, SourceToken } from '../parse/cst.js'
 import type { Schema } from '../schema/Schema.js'
 import type { ScalarTag } from '../schema/types.js'
 import type { ComposeContext } from './compose-node.js'
@@ -11,7 +11,7 @@ import { resolveFlowScalar } from './resolve-flow-scalar.js'
 export function composeScalar(
   ctx: ComposeContext,
   token: FlowScalar | BlockScalar,
-  tagName: string | null,
+  tagToken: SourceToken | null,
   onError: ComposeErrorHandler
 ) {
   const { value, type, comment, range } =
@@ -19,20 +19,26 @@ export function composeScalar(
       ? resolveBlockScalar(token, ctx.options.strict, onError)
       : resolveFlowScalar(token, ctx.options.strict, onError)
 
-  const tag = tagName
-    ? findScalarTagByName(ctx.schema, value, tagName, onError)
-    : findScalarTagByTest(ctx.schema, value, token.type === 'scalar')
+  const tagName = tagToken
+    ? ctx.directives.tagName(tagToken.source, msg =>
+        onError(tagToken, 'TAG_RESOLVE_FAILED', msg)
+      )
+    : null
+  const tag =
+    tagToken && tagName
+      ? findScalarTagByName(ctx.schema, value, tagName, tagToken, onError)
+      : findScalarTagByTest(ctx.schema, value, token.type === 'scalar')
 
   let scalar: Scalar
   try {
     const res = tag.resolve(
       value,
-      msg => onError(token.offset, 'TAG_RESOLVE_FAILED', msg),
+      msg => onError(tagToken || token, 'TAG_RESOLVE_FAILED', msg),
       ctx.options
     )
     scalar = isScalar(res) ? res : new Scalar(res)
   } catch (error) {
-    onError(token.offset, 'TAG_RESOLVE_FAILED', error.message)
+    onError(tagToken || token, 'TAG_RESOLVE_FAILED', error.message)
     scalar = new Scalar(value)
   }
   scalar.range = range
@@ -49,6 +55,7 @@ function findScalarTagByName(
   schema: Schema,
   value: string,
   tagName: string,
+  tagToken: SourceToken,
   onError: ComposeErrorHandler
 ) {
   if (tagName === '!') return schema[SCALAR] // non-specific tag
@@ -68,7 +75,7 @@ function findScalarTagByName(
     return kt
   }
   onError(
-    0,
+    tagToken,
     'TAG_RESOLVE_FAILED',
     `Unresolved tag: ${tagName}`,
     tagName !== 'tag:yaml.org,2002:str'

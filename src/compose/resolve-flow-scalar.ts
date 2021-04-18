@@ -1,11 +1,18 @@
+import { ErrorCode } from '../errors.js'
 import { Range } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { FlowScalar } from '../parse/cst.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveEnd } from './resolve-end.js'
 
+type FlowScalarErrorHandler = (
+  offset: number,
+  code: ErrorCode,
+  message: string
+) => void
+
 export function resolveFlowScalar(
-  { offset, type, source, end }: FlowScalar,
+  scalar: FlowScalar,
   strict: boolean,
   onError: ComposeErrorHandler
 ): {
@@ -14,9 +21,10 @@ export function resolveFlowScalar(
   comment: string
   range: Range
 } {
+  const { offset, type, source, end } = scalar
   let _type: Scalar.PLAIN | Scalar.QUOTE_DOUBLE | Scalar.QUOTE_SINGLE
   let value: string
-  const _onError: ComposeErrorHandler = (rel, code, msg) =>
+  const _onError: FlowScalarErrorHandler = (rel, code, msg) =>
     onError(offset + rel, code, msg)
   switch (type) {
     case 'scalar':
@@ -37,7 +45,7 @@ export function resolveFlowScalar(
     /* istanbul ignore next should not happen */
     default:
       onError(
-        offset,
+        scalar,
         'UNEXPECTED_TOKEN',
         `Expected a flow scalar value, but found: ${type}`
       )
@@ -49,16 +57,17 @@ export function resolveFlowScalar(
       }
   }
 
-  const re = resolveEnd(end, 0, strict, _onError)
+  const valueEnd = offset + source.length
+  const re = resolveEnd(end, valueEnd, strict, onError)
   return {
     value,
     type: _type,
     comment: re.comment,
-    range: [offset, offset + source.length, offset + source.length + re.offset]
+    range: [offset, valueEnd, re.offset]
   }
 }
 
-function plainValue(source: string, onError: ComposeErrorHandler) {
+function plainValue(source: string, onError: FlowScalarErrorHandler) {
   let message = ''
   switch (source[0]) {
     /* istanbul ignore next should not happen */
@@ -80,7 +89,7 @@ function plainValue(source: string, onError: ComposeErrorHandler) {
   return foldLines(source)
 }
 
-function singleQuotedValue(source: string, onError: ComposeErrorHandler) {
+function singleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
   if (source[source.length - 1] !== "'" || source.length === 1)
     onError(source.length, 'MISSING_CHAR', "Missing closing 'quote")
   return foldLines(source.slice(1, -1)).replace(/''/g, "'")
@@ -126,7 +135,7 @@ function foldLines(source: string) {
   return res + sep + ((match && match[1]) || '')
 }
 
-function doubleQuotedValue(source: string, onError: ComposeErrorHandler) {
+function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
   let res = ''
   for (let i = 1; i < source.length - 1; ++i) {
     const ch = source[i]
@@ -209,7 +218,7 @@ function parseCharCode(
   source: string,
   offset: number,
   length: number,
-  onError: ComposeErrorHandler
+  onError: FlowScalarErrorHandler
 ) {
   const cc = source.substr(offset, length)
   const ok = cc.length === length && /^[0-9a-fA-F]+$/.test(cc)
