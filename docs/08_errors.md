@@ -2,13 +2,13 @@
 
 Nearly all errors and warnings produced by the `yaml` parser functions contain the following fields:
 
-| Member  | Type                                          | Description                                                                                                                 |
-| ------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| code    | `string`                                      | An identifier for the error type.                                                                                           |
-| linePos | `{ line: number, col: number } ⎮` `undefined` | If `prettyErrors` is enabled and `offset` is known, the one-indexed human-friendly source location.                         |
-| name    | `'YAMLParseError' ⎮` `'YAMLWarning'`          |                                                                                                                             |
-| message | `string`                                      | A human-readable description of the error                                                                                   |
-| offset  | `number`                                      | The offset in the source at which this error or warning was encountered. May be `-1` if the offset could not be determined. |
+| Member  | Type                                 | Description                                                                                                                         |
+| ------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| code    | `string`                             | An identifier for the error type.                                                                                                   |
+| linePos | `[LinePos, LinePos] ⎮` `undefined`   | If `prettyErrors` is enabled and `offset` is known, the one-indexed human-friendly source location `{ line: number, col: number }`. |
+| name    | `'YAMLParseError' ⎮` `'YAMLWarning'` |                                                                                                                                     |
+| message | `string`                             | A human-readable description of the error                                                                                           |
+| pos     | `[number, number]`                   | The position in the source at which this error or warning was encountered.                                                          |
 
 A `YAMLParseError` is an error encountered while parsing a source as YAML.
 They are included in the `doc.errors` array.
