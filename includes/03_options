@@ -63,18 +63,6 @@ Options in various categories do not overlap, so it&#39;s fine to use a single &
 </tr>
 </thead><tbody>
 <tr>
-<td>anchorPrefix</td>
-<td><code>string</code></td>
-<td><code>&#39;a&#39;</code></td>
-<td>Default prefix for anchors, resulting in anchors <code>a1</code>, <code>a2</code>, ... by default.</td>
-</tr>
-<tr>
-<td>keepUndefined</td>
-<td><code>boolean</code></td>
-<td><code>false</code></td>
-<td>Keep <code>undefined</code> object values when creating mappings and return a Scalar node when stringifying <code>undefined</code>.</td>
-</tr>
-<tr>
 <td>logLevel</td>
 <td><code>&#39;warn&#39; ⎮ &#39;error&#39; ⎮</code> <code>&#39;silent&#39;</code></td>
 <td><code>&#39;warn&#39;</code></td>
@@ -160,6 +148,42 @@ The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
 </code></pre></div>
 <p><strong>Merge</strong> keys are a <a href="http://yaml.org/type/merge.html">YAML 1.1 feature</a> that is not a part of the 1.2 spec.
 To use a merge key, assign an alias node or an array of alias nodes as the value of a <code>&lt;&lt;</code> key in a mapping.</p>
+<h2 id='createnode-options'>CreateNode Options</h2>
+<p>Used by: <code>stringify()</code>, <code>new Document()</code>, <code>doc.createNode()</code>, and <code>doc.createPair()</code></p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>anchorPrefix</td>
+<td><code>string</code></td>
+<td><code>&#39;a&#39;</code></td>
+<td>Default prefix for anchors, resulting in anchors <code>a1</code>, <code>a2</code>, ... by default.</td>
+</tr>
+<tr>
+<td>flow</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Force the top-level collection node to use flow style.</td>
+</tr>
+<tr>
+<td>keepUndefined</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Keep <code>undefined</code> object values when creating mappings and return a Scalar node when stringifying <code>undefined</code>.</td>
+</tr>
+<tr>
+<td>tag</td>
+<td><code>string</code></td>
+<td></td>
+<td>Specify the top-level collection type, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available in this document&#39;s schema.</td>
+</tr>
+</tbody></table>
 <h2 id='tojs-options'>ToJS Options</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// { '[1,2]': 'many' }</span>
 <span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">mapAsMap</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span> <span class="c1">// Map { [ 1, 2 ] =&gt; 'many' }</span>
 </code></pre></div>

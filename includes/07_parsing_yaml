@@ -1,11 +1,11 @@
 <h1 id='parsing-yaml'>Parsing YAML</h1>
 <!-- prettier-ignore -->
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
-  <span class="nx">Lexer</span><span class="p">,</span>
-  <span class="nx">Parser</span><span class="p">,</span>
   <span class="nx">Composer</span><span class="p">,</span>
+  <span class="nx">CST</span><span class="p">,</span>
+  <span class="nx">Lexer</span><span class="p">,</span>
   <span class="nx">LineCounter</span><span class="p">,</span>
-  <span class="nx">tokens</span>
+  <span class="nx">Parser</span><span class="p">,</span>
 <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 </code></pre></div>
 <p>If you&#39;re interested only in the final output, <a href="#yaml-parse"><code>parse()</code></a> will directly produce native JavaScript
@@ -22,10 +22,8 @@ Finally, the <a href="#composer">Composer</a> builds a more user-friendly and ac
 <!-- prettier-ignore -->
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Lexer</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 
-<span class="kd">const</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="kd">const</span> <span class="nx">lexer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Lexer</span><span class="p">(</span><span class="nx">tok</span> <span class="o">=&gt;</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tok</span><span class="p">))</span>
-<span class="nx">lexer</span><span class="p">.</span><span class="nx">lex</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo: bar</span><span class="se">\n</span><span class="s1">fee:</span><span class="se">\n</span><span class="s1">  [24,"42"]</span><span class="se">\n</span><span class="dl">'</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">tokens</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Lexer</span><span class="p">().</span><span class="nx">lex</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo: bar</span><span class="se">\n</span><span class="s1">fee:</span><span class="se">\n</span><span class="s1">  [24,"42"]</span><span class="se">\n</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nx">tokens</span><span class="p">))</span>
 <span class="o">&gt;</span> <span class="p">[</span>
     <span class="dl">'</span><span class="se">\</span><span class="s1">x02</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="se">\</span><span class="s1">x1F</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">,</span>  <span class="dl">'</span><span class="s1">:</span><span class="dl">'</span><span class="p">,</span>
     <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">,</span>    <span class="dl">'</span><span class="se">\</span><span class="s1">x1F</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">,</span>  <span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">,</span>
@@ -33,9 +31,8 @@ Finally, the <a href="#composer">Composer</a> builds a more user-friendly and ac
     <span class="dl">'</span><span class="s1">  </span><span class="dl">'</span><span class="p">,</span>   <span class="dl">'</span><span class="s1">[</span><span class="dl">'</span><span class="p">,</span>    <span class="dl">'</span><span class="se">\</span><span class="s1">x1F</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">24</span><span class="dl">'</span><span class="p">,</span>
     <span class="dl">'</span><span class="s1">,</span><span class="dl">'</span><span class="p">,</span>    <span class="dl">'</span><span class="s1">"42"</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">]</span><span class="dl">'</span><span class="p">,</span>    <span class="dl">'</span><span class="se">\n</span><span class="dl">'</span>
   <span class="p">]</span>
-</code></pre></div><h4 id='new-lexer-push-token-string-gt-void'><code>new Lexer(push: (token: string) =&gt; void)</code></h4><h4 id='lexer-lex-src-string-incomplete-boolean-void'><code>lexer.lex(src: string, incomplete: boolean): void</code></h4>
+</code></pre></div><h4 id='new-lexer'><code>new Lexer()</code></h4><h4 id='lexer-lex-src-string-incomplete-boolean-generator-lt-string-gt'><code>lexer.lex(src: string, incomplete?: boolean): Generator&lt;string&gt;</code></h4>
 <p>The API for the lexer is rather minimal, and offers no configuration.
-The constructor accepts a single callback as argument, defining a function that will be called once for each lexical token.
 If the input stream is chunked, the <code>lex()</code> method may be called separately for each chunk if the <code>incomplete</code> argument is <code>true</code>.
 At the end of input, <code>lex()</code> should be called a final time with <code>incomplete: false</code> to ensure that the remaining tokens are emitted.</p>
 
@@ -191,8 +188,8 @@ In addition to slices of the input stream, a few control characters are addition
 <!-- prettier-ignore -->
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Parser</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 
-<span class="kd">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Parser</span><span class="p">(</span><span class="nx">tok</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">tok</span><span class="p">,</span> <span class="p">{</span> <span class="na">depth</span><span class="p">:</span> <span class="kc">null</span> <span class="p">}))</span>
-<span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo: [24,"42"]</span><span class="se">\n</span><span class="dl">'</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
+<span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">token</span> <span class="k">of</span> <span class="k">new</span> <span class="nx">Parser</span><span class="p">().</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo: [24,"42"]</span><span class="se">\n</span><span class="dl">'</span><span class="p">))</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="p">{</span> <span class="na">depth</span><span class="p">:</span> <span class="kc">null</span> <span class="p">})</span>
 
 <span class="o">&gt;</span> <span class="p">{</span>
     <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">document</span><span class="dl">'</span><span class="p">,</span>
@@ -207,17 +204,17 @@ In addition to slices of the input stream, a few control characters are addition
           <span class="na">start</span><span class="p">:</span> <span class="p">[],</span>
           <span class="na">key</span><span class="p">:</span> <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">scalar</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span> <span class="p">},</span>
           <span class="na">sep</span><span class="p">:</span> <span class="p">[</span>
-            <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">map-value-ind</span><span class="dl">'</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">:</span><span class="dl">'</span> <span class="p">},</span>
-            <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">space</span><span class="dl">'</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="p">}</span>
+            <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">map-value-ind</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">:</span><span class="dl">'</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">space</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="p">}</span>
           <span class="p">],</span>
           <span class="na">value</span><span class="p">:</span> <span class="p">{</span>
             <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">flow-collection</span><span class="dl">'</span><span class="p">,</span>
             <span class="na">offset</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
             <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="na">start</span><span class="p">:</span> <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">flow-seq-start</span><span class="dl">'</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">[</span><span class="dl">'</span> <span class="p">},</span>
+            <span class="na">start</span><span class="p">:</span> <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">flow-seq-start</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">[</span><span class="dl">'</span> <span class="p">},</span>
             <span class="na">items</span><span class="p">:</span> <span class="p">[</span>
               <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">scalar</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">24</span><span class="dl">'</span> <span class="p">},</span>
-              <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">comma</span><span class="dl">'</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">,</span><span class="dl">'</span> <span class="p">},</span>
+              <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">comma</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">,</span><span class="dl">'</span> <span class="p">},</span>
               <span class="p">{</span>
                 <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">double-quoted-scalar</span><span class="dl">'</span><span class="p">,</span>
                 <span class="na">offset</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
@@ -226,8 +223,8 @@ In addition to slices of the input stream, a few control characters are addition
               <span class="p">}</span>
             <span class="p">],</span>
             <span class="na">end</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">flow-seq-end</span><span class="dl">'</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">]</span><span class="dl">'</span> <span class="p">},</span>
-              <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">newline</span><span class="dl">'</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="se">\n</span><span class="dl">'</span> <span class="p">}</span>
+              <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">flow-seq-end</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">]</span><span class="dl">'</span> <span class="p">},</span>
+              <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">newline</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="se">\n</span><span class="dl">'</span> <span class="p">}</span>
             <span class="p">]</span>
           <span class="p">}</span>
         <span class="p">}</span>
@@ -245,24 +242,21 @@ It should never throw errors, but may (rarely) include error tokens in its outpu
 
 <p>To validate a CST, you will need to compose it into a <code>Document</code>.
 If the document contains errors, they will be included in the document&#39;s <code>errors</code> array, and each error will will contain an <code>offset</code> within the source string, which you may then use to find the corresponding node in the CST.</p>
-<h4 id='new-parser-push-token-token-gt-void-onnewline-offset-number-gt-void'><code>new Parser(push: (token: Token) =&gt; void, onNewLine?: (offset: number) =&gt; void)</code></h4>
+<h4 id='new-parser-onnewline-offset-number-gt-void'><code>new Parser(onNewLine?: (offset: number) =&gt; void)</code></h4>
 <p>Create a new parser.
-<code>push</code> is called separately with each parsed token.
 If defined, <code>onNewLine</code> is called separately with the start position of each new line (in <code>parse()</code>, including the start of input).</p>
-<h4 id='parser-parse-source-string-incomplete-false'><code>parser.parse(source: string, incomplete = false)</code></h4>
-<p>Parse <code>source</code> as a YAML stream, calling <code>push</code> with each directive, document and other structure as it is completely parsed.
+<h4 id='parser-parse-source-string-incomplete-false-generator-lt-token-void-gt'><code>parser.parse(source: string, incomplete = false): Generator&lt;Token, void&gt;</code></h4>
+<p>Parse <code>source</code> as a YAML stream, generating tokens for each directive, document and other structure as it is completely parsed.
 If <code>incomplete</code>, a part of the last line may be left as a buffer for the next call.</p>
 
-<p>Errors are not thrown, but pushed out as <code>{ type: &#39;error&#39;, message }</code> tokens.</p>
-<h4 id='parser-next-lextoken-string'><code>parser.next(lexToken: string)</code></h4>
+<p>Errors are not thrown, but are yielded as <code>{ type: &#39;error&#39;, offset, message }</code> tokens.</p>
+<h4 id='parser-next-lextoken-string-generator-lt-token-void-gt'><code>parser.next(lexToken: string): Generator&lt;Token, void&gt;</code></h4>
 <p>Advance the parser by one lexical token.
-Bound to the Parser instance, so may be used directly as a callback function.</p>
-
-<p>Used internally by <code>parser.parse()</code>; exposed to allow for use with an external lexer.</p>
+Used internally by <code>parser.parse()</code>; exposed to allow for use with an external lexer.</p>
 
 <p>For debug purposes, if the <code>LOG_TOKENS</code> env var is true-ish, all lexical tokens will be pretty-printed using <code>console.log()</code> as they are being processed.</p>
 <h3 id='cst-nodes'>CST Nodes</h3>
-<p>For a complete description of CST node interfaces, please consult the <a href="https://github.com/eemeli/yaml/blob/master/src/parse/tokens.ts">tokens.ts source</a>.</p>
+<p>For a complete description of CST node interfaces, please consult the <a href="https://github.com/eemeli/yaml/blob/master/src/parse/cst.ts">cst.ts source</a>.</p>
 
 <p>Some of the most common node properties include:</p>
 
@@ -295,8 +289,8 @@ Bound to the Parser instance, so may be used directly as a callback function.</p
 </tr>
 <tr>
 <td><code>items</code></td>
-<td><code>{ ... }[]</code></td>
-<td>The contents of a collection; shape depends on the collection type, and may include <code>key: Token</code> and <code>value: Token</code>.</td>
+<td><code>Item[]</code></td>
+<td>The contents of a collection; exact shape depends on the collection type.</td>
 </tr>
 <tr>
 <td><code>start</code>, <code>sep</code>, <code>end</code></td>
@@ -305,12 +299,42 @@ Bound to the Parser instance, so may be used directly as a callback function.</p
 </tr>
 </tbody></table>
 
-<p>As an implementation detail, block and flow collections are parsed and presented rather differently due to their structural differences.</p>
+<p>Collection items contain some subset of the following properties:</p>
+
+<table><thead>
+<tr>
+<th>Item property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>start</code></td>
+<td><code>SourceToken[]</code></td>
+<td>Always defined. Content before the actual value. May include comments that are later assigned to the preceding item.</td>
+</tr>
+<tr>
+<td><code>key</code></td>
+<td><code>Token ⎮ null</code></td>
+<td>Set for key/value pairs only, so never used in block sequences.</td>
+</tr>
+<tr>
+<td><code>sep</code></td>
+<td><code>SourceToken[]</code></td>
+<td>Content between the key and the value. If defined, indicates that the <code>key</code> logically exists, even if its value is <code>null</code>.</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td><code>Token ⎮ null</code></td>
+<td>The value. Normally set, but may be left out for e.g. explicit keys with no matching value.</td>
+</tr>
+</tbody></table>
 <h3 id='counting-lines'>Counting Lines</h3><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">LineCounter</span><span class="p">,</span> <span class="nx">Parser</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 
 <span class="kd">const</span> <span class="nx">lineCounter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">LineCounter</span><span class="p">()</span>
-<span class="kd">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Parser</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{},</span> <span class="nx">lineCounter</span><span class="p">.</span><span class="nx">addNewLine</span><span class="p">))</span>
-<span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo:</span><span class="se">\n</span><span class="s1">- 24</span><span class="se">\n</span><span class="s1">- "42"</span><span class="se">\n</span><span class="dl">'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Parser</span><span class="p">(</span><span class="nx">lineCounter</span><span class="p">.</span><span class="nx">addNewLine</span><span class="p">))</span>
+<span class="kd">const</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo:</span><span class="se">\n</span><span class="s1">- 24</span><span class="se">\n</span><span class="s1">- "42"</span><span class="se">\n</span><span class="dl">'</span><span class="p">)</span>
+<span class="nb">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nx">tokens</span><span class="p">)</span> <span class="c1">// forces iteration</span>
 
 <span class="nx">lineCounter</span><span class="p">.</span><span class="nx">lineStarts</span>
 <span class="o">&gt;</span> <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">17</span> <span class="p">]</span>
@@ -330,25 +354,239 @@ If <code>line === 0</code>, <code>addNewLine</code> has never been called or <co
 <h2 id='composer'>Composer</h2>
 <!-- prettier-ignore -->
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Composer</span><span class="p">,</span> <span class="nx">Parser</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
-<span class="kd">const</span> <span class="nx">docs</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="kd">const</span> <span class="nx">composer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Composer</span><span class="p">(</span><span class="nx">doc</span> <span class="o">=&gt;</span> <span class="nx">docs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">doc</span><span class="p">))</span>
-<span class="kd">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Parser</span><span class="p">(</span><span class="nx">composer</span><span class="p">.</span><span class="nx">next</span><span class="p">)</span>
-<span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo: bar</span><span class="se">\n</span><span class="s1">fee: [24, "42"]</span><span class="dl">'</span><span class="p">)</span>
-<span class="nx">composer</span><span class="p">.</span><span class="nx">end</span><span class="p">()</span>
 
-<span class="nx">docs</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">doc</span> <span class="o">=&gt;</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">())</span>
+<span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">foo: bar</span><span class="se">\n</span><span class="s1">fee: [24, "42"]</span><span class="dl">'</span>
+<span class="kd">const</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Parser</span><span class="p">().</span><span class="nx">parse</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">docs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Composer</span><span class="p">().</span><span class="nx">compose</span><span class="p">(</span><span class="nx">tokens</span><span class="p">)</span>
+
+<span class="nb">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nx">docs</span><span class="p">,</span> <span class="nx">doc</span> <span class="o">=&gt;</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">())</span>
 <span class="o">&gt;</span> <span class="p">[{</span> <span class="na">foo</span><span class="p">:</span> <span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">,</span> <span class="na">fee</span><span class="p">:</span> <span class="p">[</span><span class="mi">24</span><span class="p">,</span> <span class="dl">'</span><span class="s1">42</span><span class="dl">'</span><span class="p">]</span> <span class="p">}]</span>
-</code></pre></div><h4 id='new-composer-push-doc-document-parsed-gt-void-options-options'><code>new Composer(push: (doc: Document.Parsed) =&gt; void, options?: Options)</code></h4>
+</code></pre></div><h4 id='new-composer-options-parseoptions-amp-documentoptions-amp-schemaoptions'><code>new Composer(options?: ParseOptions &amp; DocumentOptions &amp; SchemaOptions)</code></h4>
 <p>Create a new Document composer.
 Does not include an internal Parser instance, so an external one will be needed.
-<code>options</code> will be used during composition, and passed to the <code>new Document</code> constructor; may include any of ParseOptions, DocumentOptions, and SchemaOptions.</p>
-<h4 id='composer-next-token-token'><code>composer.next(token: Token)</code></h4>
-<p>Advance the composed by one CST token.
-Bound to the Composer instance, so may be used directly as a callback function.</p>
-<h4 id='composer-end-forcedoc-boolean-offset-number'><code>composer.end(forceDoc?: boolean, offset?: number)</code></h4>
+<code>options</code> will be used during composition, and passed to the <code>new Document</code> constructor.</p>
+<h4 id='composer-compose-tokens-iterable-lt-token-gt-forcedoc-boolean-endoffset-number-generator-lt-document-parsed-gt'><code>composer.compose(tokens: Iterable&lt;Token&gt;, forceDoc?: boolean, endOffset?: number): Generator&lt;Document.Parsed&gt;</code></h4>
+<p>Compose tokens into documents.
+Convenience wrapper combining calls to <code>composer.next()</code> and <code>composer.end()</code>.</p>
+<h4 id='composer-next-token-token-generator-lt-document-parsed-gt'><code>composer.next(token: Token): Generator&lt;Document.Parsed&gt;</code></h4>
+<p>Advance the composed by one CST token.</p>
+<h4 id='composer-end-forcedoc-boolean-offset-number-generator-lt-document-parsed-gt'><code>composer.end(forceDoc?: boolean, offset?: number): Generator&lt;Document.Parsed&gt;</code></h4>
 <p>Always call at end of input to push out any remaining document.
 If <code>forceDoc</code> is true and the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.
 <code>offset</code> should be set if <code>forceDoc</code> is also set, to set the document range end and to indicate errors correctly.</p>
 <h4 id='composer-streaminfo-comment-directives-errors-warnings'><code>composer.streamInfo(): { comment, directives, errors, warnings }</code></h4>
 <p>Current stream status information.
 Mostly useful at the end of input for an empty stream.</p>
+<h2 id='working-with-cst-tokens'>Working with CST Tokens</h2><div class="highlight"><pre class="highlight typescript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">CST</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+</code></pre></div>
+<p>For most use cases, the Document or pure JS interfaces provided by the library are the right tool.
+Sometimes, though, it&#39;s important to keep the original YAML source in as pristine a condition as possible.
+For those cases, the concrete syntax tree (CST) representation is provided, as it retains every character of the input, including whitespace.</p>
+<h4 id='cst-createscalartoken-value-string-context-blockscalar-flowscalar'><code>CST.createScalarToken(value: string, context): BlockScalar | FlowScalar</code></h4>
+<p>Create a new scalar token with the value <code>value</code>.
+Values that represent an actual string but may be parsed as a different type should use a <code>type</code> other than <code>&#39;PLAIN&#39;</code>,
+as this function does not support any schema operations and won&#39;t check for such conflicts.</p>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>value</td>
+<td><code>string</code></td>
+<td></td>
+<td>The string representation of the value, which will have its content properly indented. <strong>Required.</strong></td>
+</tr>
+<tr>
+<td>context.end</td>
+<td><code>SourceToken[]</code></td>
+<td></td>
+<td>Comments and whitespace after the end of the value, or after the block scalar header. If undefined, a newline will be added.</td>
+</tr>
+<tr>
+<td>context.implicitKey</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Being within an implicit key may affect the resolved type of the token&#39;s value.</td>
+</tr>
+<tr>
+<td>context.indent</td>
+<td><code>number</code></td>
+<td></td>
+<td>The indent level of the token. <strong>Required.</strong></td>
+</tr>
+<tr>
+<td>context.inFlow</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Is this scalar within a flow collection? This may affect the resolved type of the token&#39;s value.</td>
+</tr>
+<tr>
+<td>context.offset</td>
+<td><code>number</code></td>
+<td><code>-1</code></td>
+<td>The offset position of the token.</td>
+</tr>
+<tr>
+<td>context.type</td>
+<td><code>Scalar.Type</code></td>
+<td></td>
+<td>The preferred type of the scalar token. If undefined, the previous type of the <code>token</code> will be used, defaulting to <code>&#39;PLAIN&#39;</code>.</td>
+</tr>
+</tbody></table>
+
+<!-- prettier-ignore -->
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="p">[</span><span class="nx">doc</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Parser</span><span class="p">().</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo: "bar" #comment</span><span class="dl">'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">item</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span>
+<span class="o">&gt;</span> <span class="p">{</span>
+    <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">double-quoted-scalar</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">offset</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">"bar"</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">end</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">space</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">comment</span><span class="dl">'</span><span class="p">,</span> <span class="na">offset</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="na">indent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">source</span><span class="p">:</span> <span class="dl">'</span><span class="s1">#comment</span><span class="dl">'</span> <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+
+<span class="nx">YAML</span><span class="p">.</span><span class="nx">resolveAsScalar</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="p">{</span> <span class="na">value</span><span class="p">:</span> <span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">,</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">QUOTE_DOUBLE</span><span class="dl">'</span><span class="p">,</span> <span class="na">comment</span><span class="p">:</span> <span class="dl">'</span><span class="s1">comment</span><span class="dl">'</span><span class="p">,</span> <span class="na">range</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">19</span><span class="p">]</span> <span class="p">}</span>
+</code></pre></div><h4 id='cst-iscollection-token-token-boolean'><code>CST.isCollection(token?: Token): boolean</code></h4><h4 id='cst-isscalar-token-token-boolean'><code>CST.isScalar(token?: Token): boolean</code></h4>
+<p>Custom type guards for detecting CST collections and scalars, in both their block and flow forms.</p>
+<h4 id='cst-resolveasscalar-token-token-strict-true-onerror-composeerrorhandler'><code>CST.resolveAsScalar(token?: Token, strict = true, onError?: ComposeErrorHandler)</code></h4>
+<p>If <code>token</code> is a CST flow or block scalar, determine its string value and a few other attributes.
+Otherwise, return <code>null</code>.</p>
+<h4 id='cst-setscalarvalue-token-token-value-string-context'><code>CST.setScalarValue(token: Token, value: string, context?)</code></h4>
+<p>Set the value of <code>token</code> to the given string <code>value</code>, overwriting any previous contents and type that it may have.</p>
+
+<p>Best efforts are made to retain any comments previously associated with the <code>token</code>, though all contents within a collection&#39;s <code>items</code> will be overwritten.</p>
+
+<p>Values that represent an actual string but may be parsed as a different type should use a <code>type</code> other than <code>&#39;PLAIN&#39;</code>, as this function does not support any schema operations and won&#39;t check for such conflicts.</p>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>token</td>
+<td><code>Token</code></td>
+<td></td>
+<td>Any token. If it does not include an <code>indent</code> value, the value will be stringified as if it were an implicit key. <strong>Required.</strong></td>
+</tr>
+<tr>
+<td>value</td>
+<td><code>string</code></td>
+<td></td>
+<td>The string representation of the value, which will have its content properly indented. <strong>Required.</strong></td>
+</tr>
+<tr>
+<td>context.afterKey</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>In most cases, values after a key should have an additional level of indentation.</td>
+</tr>
+<tr>
+<td>context.implicitKey</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Being within an implicit key may affect the resolved type of the token&#39;s value.</td>
+</tr>
+<tr>
+<td>context.inFlow</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Being within a flow collection may affect the resolved type of the token&#39;s value.</td>
+</tr>
+<tr>
+<td>context.type</td>
+<td><code>Scalar.Type</code></td>
+<td></td>
+<td>The preferred type of the scalar token. If undefined, the previous type of the <code>token</code> will be used, defaulting to <code>&#39;PLAIN&#39;</code>.</td>
+</tr>
+</tbody></table>
+<div class="highlight"><pre class="highlight typescript"><code><span class="kd">function</span> <span class="nx">findScalarAtOffset</span><span class="p">(</span>
+  <span class="nx">cst</span><span class="p">:</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">Document</span><span class="p">,</span>
+  <span class="nx">offset</span><span class="p">:</span> <span class="kr">number</span>
+<span class="p">):</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">FlowScalar</span> <span class="o">|</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">BlockScalar</span> <span class="o">|</span> <span class="kc">undefined</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">res</span><span class="p">:</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">FlowScalar</span> <span class="o">|</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">BlockScalar</span> <span class="o">|</span> <span class="kc">undefined</span> <span class="o">=</span> <span class="kc">undefined</span>
+  <span class="nx">CST</span><span class="p">.</span><span class="nx">visit</span><span class="p">(</span><span class="nx">cst</span><span class="p">,</span> <span class="p">({</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">value</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">token</span> <span class="k">of</span> <span class="p">[</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">])</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">CST</span><span class="p">.</span><span class="nx">isScalar</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">token</span><span class="p">.</span><span class="nx">offset</span> <span class="o">&gt;</span> <span class="nx">offset</span><span class="p">)</span> <span class="k">return</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">visit</span><span class="p">.</span><span class="nx">BREAK</span>
+        <span class="k">if</span> <span class="p">(</span>
+          <span class="nx">token</span><span class="p">.</span><span class="nx">offset</span> <span class="o">==</span> <span class="nx">offset</span> <span class="o">||</span>
+          <span class="p">(</span><span class="nx">token</span><span class="p">.</span><span class="nx">offset</span> <span class="o">&lt;</span> <span class="nx">offset</span> <span class="o">&amp;&amp;</span> <span class="nx">token</span><span class="p">.</span><span class="nx">offset</span> <span class="o">+</span> <span class="nx">token</span><span class="p">.</span><span class="nx">source</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="nx">offset</span><span class="p">)</span>
+        <span class="p">)</span> <span class="p">{</span>
+          <span class="nx">res</span> <span class="o">=</span> <span class="nx">token</span>
+          <span class="k">return</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">visit</span><span class="p">.</span><span class="nx">BREAK</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+  <span class="p">})</span>
+  <span class="k">return</span> <span class="nx">res</span>
+<span class="p">}</span>
+</code></pre></div><h4 id='cst-stringify-cst-token-collectionitem-string'><code>CST.stringify(cst: Token | CollectionItem): string</code></h4>
+<p>Stringify a CST document, token, or collection item.
+Fair warning: This applies no validation whatsoever, and simply concatenates the sources in their logical order.</p>
+<h4 id='cst-visit-cst-cst-document-cst-collectionitem-visitor-cstvisitor'><code>CST.visit(cst: CST.Document | CST.CollectionItem, visitor: CSTVisitor)</code></h4>
+<p>Apply a visitor to a CST document or item.
+Effectively, the general-purpose workhorse of navigating the CST.</p>
+
+<p>Walks through the tree (depth-first) starting from <code>cst</code> as the root, calling a <code>visitor</code> function with two arguments when entering each item:</p>
+
+<ul>
+<li><code>item</code>: The current item, which includes the following members:
+
+<ul>
+<li><code>start: SourceToken[]</code> – Source tokens before the key or value, possibly including its anchor or tag.</li>
+<li><code>key?: Token | null</code> – Set for pair values. May then be <code>null</code>, if the key before the <code>:</code> separator is empty.</li>
+<li><code>sep?: SourceToken[]</code> – Source tokens between the key and the value, which should include the <code>:</code> map value indicator if <code>value</code> is set.</li>
+<li><code>value?: Token</code> – The value of a sequence item, or of a map pair.</li>
+</ul></li>
+<li><code>path</code>: The steps from the root to the current node, as an array of <code>[&#39;key&#39; | &#39;value&#39;, number]</code> tuples.</li>
+</ul>
+
+<p>The return value of the visitor may be used to control the traversal:</p>
+
+<ul>
+<li><code>undefined</code> (default): Do nothing and continue</li>
+<li><code>CST.visit.SKIP</code>: Do not visit the children of this token, continue with next sibling</li>
+<li><code>CST.visit.BREAK</code>: Terminate traversal completely</li>
+<li><code>CST.visit.REMOVE</code>: Remove the current item, then continue with the next one</li>
+<li><code>number</code>: Set the index of the next step. This is useful especially if the index of the current token has changed.</li>
+<li><code>function</code>: Define the next visitor for this item. After the original visitor is called on item entry, next visitors are called after handling a non-empty <code>key</code> and when exiting the item.</li>
+</ul>
+
+<!-- prettier-ignore -->
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="p">[</span><span class="nx">doc</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Parser</span><span class="p">().</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">[ foo, bar, baz ]</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">CST</span><span class="p">.</span><span class="nx">visit</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="p">(</span><span class="nx">item</span><span class="p">,</span> <span class="nx">path</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">CST</span><span class="p">.</span><span class="nx">isScalar</span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">value</span><span class="p">))</span> <span class="k">return</span>
+  <span class="kd">const</span> <span class="nx">scalar</span> <span class="o">=</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">resolveAsScalar</span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">scalar</span><span class="p">?.</span><span class="nx">value</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">parent</span> <span class="o">=</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">visit</span><span class="p">.</span><span class="nx">parentCollection</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">path</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nx">path</span><span class="p">[</span><span class="nx">path</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">indent</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">item</span><span class="p">.</span><span class="nx">value</span>
+    <span class="nx">parent</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">start</span><span class="p">:</span> <span class="nx">item</span><span class="p">.</span><span class="nx">start</span><span class="p">.</span><span class="nx">slice</span><span class="p">(),</span>
+      <span class="na">value</span><span class="p">:</span> <span class="nx">CST</span><span class="p">.</span><span class="nx">createScalarToken</span><span class="p">(</span><span class="dl">'</span><span class="s1">bing</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">end</span><span class="p">:</span> <span class="p">[],</span> <span class="nx">indent</span> <span class="p">})</span>
+    <span class="p">})</span>
+    <span class="k">return</span> <span class="nx">idx</span> <span class="o">+</span> <span class="mi">2</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="nx">CST</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="dl">'</span><span class="s1">[ foo, bing, bar, baz ]</span><span class="dl">'</span>
+</code></pre></div>
+<p>A couple of utility functions are provided for working with the <code>path</code>:</p>
+
+<ul>
+<li><code>CST.visit.itemAtPath(cst, path): CST.CollectionItem | undefined</code> – Find the item at <code>path</code> from <code>cst</code> as the root.</li>
+<li><code>CST.visit.parentCollection(cst, path): CST.BlockMap | CST.BlockSequence | CST.FlowCollection</code> – Get the immediate parent collection of the item at <code>path</code> from <code>cst</code> as the root. Throws an error if the collection is not found, which should never happen if the item itself exists.</li>
+</ul>

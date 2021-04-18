@@ -1,25 +1,30 @@
 <h1 id='content-nodes'>Content Nodes</h1>
 <p>After parsing, the <code>contents</code> value of each <code>YAML.Document</code> is the root of an <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree</a> of nodes representing the document (or <code>null</code> for an empty document).</p>
+
+<p>Both scalar and collection values may have an <code>anchor</code> associated with them; this is rendered in the string representation with a <code>&amp;</code> prefix, so e.g. in <code>foo: &amp;aa bar</code>, the value <code>bar</code> has the anchor <code>aa</code>.
+Anchors are used by <a href="#alias-nodes">Alias nodes</a> to allow for the same value to be used in multiple places in the document.
+It is valid to have an anchor associated with a node even if it has no aliases.</p>
 <h2 id='scalar-values'>Scalar Values</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">class</span> <span class="nx">NodeBase</span> <span class="p">{</span>
-  <span class="nx">comment</span><span class="p">?:</span> <span class="nx">string</span><span class="p">,</span>   <span class="c1">// a comment on or immediately after this</span>
-  <span class="nx">commentBefore</span><span class="p">?:</span> <span class="nx">string</span><span class="p">,</span> <span class="c1">// a comment before this</span>
-  <span class="nx">range</span><span class="p">?:</span> <span class="p">[</span><span class="nx">number</span><span class="p">,</span> <span class="nx">number</span><span class="p">],</span>
-      <span class="c1">// the [start, end] range of characters of the source parsed</span>
-      <span class="c1">// into this node (undefined for pairs or if not parsed)</span>
-  <span class="nx">spaceBefore</span><span class="p">?:</span> <span class="nx">boolean</span><span class="p">,</span>
+  <span class="nx">comment</span><span class="p">?:</span> <span class="nx">string</span>        <span class="c1">// a comment on or immediately after this</span>
+  <span class="nx">commentBefore</span><span class="p">?:</span> <span class="nx">string</span>  <span class="c1">// a comment before this</span>
+  <span class="nx">range</span><span class="p">?:</span> <span class="p">[</span><span class="nx">number</span><span class="p">,</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">number</span><span class="p">]</span>
+      <span class="c1">// The [start, value-end, node-end] character offsets for the part</span>
+      <span class="c1">// of the source parsed into this node (undefined if not parsed).</span>
+  <span class="nx">spaceBefore</span><span class="p">?:</span> <span class="nx">boolean</span>
       <span class="c1">// a blank line before this node and its commentBefore</span>
-  <span class="nx">tag</span><span class="p">?:</span> <span class="nx">string</span><span class="p">,</span>       <span class="c1">// a fully qualified tag, if required</span>
-  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>       <span class="c1">// a plain JS or JSON representation of this node</span>
+  <span class="nx">tag</span><span class="p">?:</span> <span class="nx">string</span>   <span class="c1">// a fully qualified tag, if required</span>
+  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>  <span class="c1">// a plain JS or JSON representation of this node</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>For scalar values, the <code>tag</code> will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, <code>YAMLMap</code>, or <code>YAMLSeq</code>).</p>
 <div class="highlight"><pre class="highlight javascript"><code><span class="kd">class</span> <span class="nx">Scalar</span><span class="o">&lt;</span><span class="nx">T</span> <span class="o">=</span> <span class="nx">unknown</span><span class="o">&gt;</span> <span class="kd">extends</span> <span class="nx">NodeBase</span> <span class="p">{</span>
-  <span class="nx">format</span><span class="p">?:</span> <span class="dl">'</span><span class="s1">BIN</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">HEX</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">OCT</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">TIME</span><span class="dl">'</span> <span class="o">|</span> <span class="kc">undefined</span><span class="p">,</span>
+  <span class="nx">anchor</span><span class="p">?:</span> <span class="nx">string</span>  <span class="c1">// an anchor associated with this node</span>
+  <span class="nx">format</span><span class="p">?:</span> <span class="dl">'</span><span class="s1">BIN</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">HEX</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">OCT</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">TIME</span><span class="dl">'</span> <span class="o">|</span> <span class="kc">undefined</span>
       <span class="c1">// By default (undefined), numbers use decimal notation.</span>
       <span class="c1">// The YAML 1.2 core schema only supports 'HEX' and 'OCT'.</span>
   <span class="nx">type</span><span class="p">?:</span>
     <span class="dl">'</span><span class="s1">BLOCK_FOLDED</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">BLOCK_LITERAL</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">PLAIN</span><span class="dl">'</span> <span class="o">|</span>
-    <span class="dl">'</span><span class="s1">QUOTE_DOUBLE</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">QUOTE_SINGLE</span><span class="dl">'</span> <span class="o">|</span> <span class="kc">undefined</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">QUOTE_DOUBLE</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">QUOTE_SINGLE</span><span class="dl">'</span> <span class="o">|</span> <span class="kc">undefined</span>
   <span class="nx">value</span><span class="p">:</span> <span class="nx">T</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -28,13 +33,14 @@ However, this is not a requirement for the document&#39;s stringification, which
 
 <p>When stringifying, the node <code>type</code> will be taken into account by <code>!!str</code> and <code>!!binary</code> values, and ignored by other scalars.
 On the other hand, <code>!!int</code> and <code>!!float</code> stringifiers will take <code>format</code> into account.</p>
-<h2 id='collections'>Collections</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">class</span> <span class="nx">Pair</span><span class="o">&lt;</span><span class="nx">K</span> <span class="o">=</span> <span class="nx">unknown</span><span class="p">,</span> <span class="nx">V</span> <span class="o">=</span> <span class="nx">unknown</span><span class="o">&gt;</span> <span class="kd">extends</span> <span class="nx">NodeBase</span> <span class="p">{</span>
-  <span class="nl">key</span><span class="p">:</span> <span class="nx">K</span><span class="p">,</span>   <span class="c1">// When parsed, key and value are always</span>
-  <span class="nx">value</span><span class="p">:</span> <span class="nx">V</span>  <span class="c1">// Node or null, but can be set to anything</span>
+<h2 id='collections'>Collections</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">class</span> <span class="nx">Pair</span><span class="o">&lt;</span><span class="nx">K</span> <span class="o">=</span> <span class="nx">unknown</span><span class="p">,</span> <span class="nx">V</span> <span class="o">=</span> <span class="nx">unknown</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="na">key</span><span class="p">:</span> <span class="nx">K</span>    <span class="c1">// When parsed, key and value are always</span>
+  <span class="na">value</span><span class="p">:</span> <span class="nx">V</span>  <span class="c1">// Node or null, but can be set to anything</span>
 <span class="p">}</span>
 
 <span class="kd">class</span> <span class="nx">Collection</span> <span class="kd">extends</span> <span class="nx">NodeBase</span> <span class="p">{</span>
-  <span class="nx">flow</span><span class="p">?:</span> <span class="nx">boolean</span> <span class="c1">// use flow style when stringifying this</span>
+  <span class="nx">anchor</span><span class="p">?:</span> <span class="nx">string</span>  <span class="c1">// an anchor associated with this node</span>
+  <span class="nx">flow</span><span class="p">?:</span> <span class="nx">boolean</span>   <span class="c1">// use flow style when stringifying this</span>
   <span class="nx">schema</span><span class="p">?:</span> <span class="nx">Schema</span>
   <span class="nx">addIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">value</span><span class="p">:</span> <span class="nx">unknown</span><span class="p">):</span> <span class="k">void</span>
   <span class="nx">deleteIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">):</span> <span class="nx">boolean</span>
@@ -140,7 +146,8 @@ If any of the intermediate collections is not found:</p>
 <h2 id='alias-nodes'>Alias Nodes</h2>
 <!-- prettier-ignore -->
 <div class="highlight"><pre class="highlight javascript"><code><span class="kd">class</span> <span class="nx">Alias</span> <span class="kd">extends</span> <span class="nx">NodeBase</span> <span class="p">{</span>
-  <span class="nl">source</span><span class="p">:</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">YAMLMap</span> <span class="o">|</span> <span class="nx">YAMLSeq</span>
+  <span class="nl">source</span><span class="p">:</span> <span class="nx">string</span>
+  <span class="nx">resolve</span><span class="p">(</span><span class="nx">doc</span><span class="p">:</span> <span class="nx">Document</span><span class="p">):</span> <span class="nx">Scalar</span> <span class="o">|</span> <span class="nx">YAMLMap</span> <span class="o">|</span> <span class="nx">YAMLSeq</span> <span class="o">|</span> <span class="kc">undefined</span>
 <span class="p">}</span>
 
 <span class="kd">const</span> <span class="nx">obj</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">[ &amp;x { X: 42 }, Y, *x ]</span><span class="dl">'</span><span class="p">)</span>
@@ -154,7 +161,9 @@ If any of the intermediate collections is not found:</p>
   <span class="c1">// - Y</span>
   <span class="c1">// - *a1</span>
 </code></pre></div>
-<p><code>Alias</code> nodes provide a way to include a single node in multiple places in a document; the <code>source</code> of an alias node must be a preceding node in the document. Circular references are fully supported, and where possible the JS representation of alias nodes will be the actual source object.</p>
+<p><code>Alias</code> nodes provide a way to include a single node in multiple places in a document; the <code>source</code> of an alias node must be a preceding anchor in the document.
+Circular references are fully supported, and where possible the JS representation of alias nodes will be the actual source object.
+For ease of use, alias nodes also provide a <code>resolve(doc)</code> method to dreference its source node.</p>
 
 <p>When nodes are constructed from JS structures (e.g. during <code>YAML.stringify()</code>), multiple references to the same object will result in including an autogenerated anchor at its first instance, and alias nodes to that anchor at later references.</p>
 <h2 id='creating-nodes'>Creating Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">Document</span><span class="p">([</span><span class="dl">'</span><span class="s1">some</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">values</span><span class="dl">'</span><span class="p">])</span>
@@ -178,24 +187,37 @@ If any of the intermediate collections is not found:</p>
 <span class="c1">// - some # A commented item</span>
 <span class="c1">// - values</span>
 <span class="c1">// - balloons: 99</span>
-</code></pre></div><h4 id='yaml-document-createnode-value-options-node'><code>YAML.Document#createNode(value, options?): Node</code></h4>
+</code></pre></div><h4 id='doc-createnode-value-replacer-options-node'><code>doc.createNode(value, replacer?, options?): Node</code></h4>
 <p>To create a new node, use the <code>createNode(value, options?)</code> document method.
 This will recursively wrap any input with appropriate <code>Node</code> containers.
 Generic JS <code>Object</code> values as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences.
 With <code>Object</code>, entries that have an <code>undefined</code> value are dropped.</p>
 
-<p>To force flow styling on a collection, use <code>options.flow = true</code>
-Use <code>options.replacer</code> to apply a replacer array or function, following the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>.
-To specify the collection type, set <code>options.tag</code> to its identifying string, e.g. <code>&quot;!!omap&quot;</code>.
-Note that this requires the corresponding tag to be available in the document&#39;s schema.</p>
-
-<p>As a possible side effect, this method may add entries to the document&#39;s <a href="#working-with-anchors"><code>anchors</code></a>.</p>
+<p>Use a <code>replacer</code> to apply a replacer array or function, following the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>.
+To force flow styling on a collection, use the <code>flow: true</code> option.
+For all available options, see the <a href="#createnode-options">CreateNode Options</a> section.</p>
 
 <p>The primary purpose of this method is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output.
 To that end, you&#39;ll need to assign its return value to the <code>contents</code> of a document (or somewhere within said contents), as the document&#39;s schema is required for YAML string output.
 If you&#39;re not interested in working with such metadata, document <code>contents</code> may also include non-<code>Node</code> values at any level.</p>
 
-<h4 style="clear:both"><code>new YAMLMap(), new YAMLSeq(), doc.createPair(key, value)</code></h4>
+<h4 style="clear:both"><code>doc.createAlias(node, name?): Alias</code></h4>
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">true</span><span class="p">),</span> <span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// - some # A commented item</span>
+<span class="c1">// - &amp;foo values</span>
+<span class="c1">// - balloons: 99</span>
+<span class="c1">// - *foo</span>
+</code></pre></div>
+<p>Create a new <code>Alias</code> node, ensuring that the target <code>node</code> has the required anchor.
+If <code>node</code> already has an anchor, <code>name</code> is ignored.
+Otherwise, the <code>node.anchor</code> value will be set to <code>name</code>, or if an anchor with that name is already present in the document, <code>name</code> will be used as a prefix for a new unique anchor.
+If <code>name</code> is undefined, the generated anchor will use &#39;a&#39; as a prefix.</p>
+
+<p>You should make sure to only add alias nodes to the document after the nodes to which they refer, or the document&#39;s YAML stringification will fail.</p>
+
+<h4 style="clear:both"><code>new YAMLMap(), new YAMLSeq(), doc.createPair(key, value): Pair</code></h4>
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Document</span><span class="p">,</span> <span class="nx">YAMLSeq</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 
 <span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Document</span><span class="p">(</span><span class="k">new</span> <span class="nx">YAMLSeq</span><span class="p">())</span>

@@ -9,33 +9,30 @@
 <span class="c1">// YAMLMap {</span>
 <span class="c1">//   items:</span>
 <span class="c1">//    [ Pair {</span>
-<span class="c1">//        key: Scalar { value: 'YAML', range: [ 0, 4 ] },</span>
+<span class="c1">//        key: Scalar { value: 'YAML', range: [ 0, 4, 4 ] },</span>
 <span class="c1">//        value:</span>
 <span class="c1">//         YAMLSeq {</span>
 <span class="c1">//           items:</span>
 <span class="c1">//            [ Scalar {</span>
 <span class="c1">//                value: 'A human-readable data serialization language',</span>
-<span class="c1">//                range: [ 10, 55 ] },</span>
+<span class="c1">//                range: [ 10, 54, 55 ] },</span>
 <span class="c1">//              Scalar {</span>
 <span class="c1">//                value: 'https://en.wikipedia.org/wiki/YAML',</span>
-<span class="c1">//                range: [ 59, 94 ] } ],</span>
-<span class="c1">//           tag: 'tag:yaml.org,2002:seq',</span>
-<span class="c1">//           range: [ 8, 94 ] } },</span>
+<span class="c1">//                range: [ 59, 93, 94 ] } ],</span>
+<span class="c1">//           range: [ 8, 94, 94 ] } },</span>
 <span class="c1">//      Pair {</span>
-<span class="c1">//        key: Scalar { value: 'yaml', range: [ 94, 98 ] },</span>
+<span class="c1">//        key: Scalar { value: 'yaml', range: [ 94, 98, 98 ] },</span>
 <span class="c1">//        value:</span>
 <span class="c1">//         YAMLSeq {</span>
 <span class="c1">//           items:</span>
 <span class="c1">//            [ Scalar {</span>
 <span class="c1">//                value: 'A complete JavaScript implementation',</span>
-<span class="c1">//                range: [ 104, 141 ] },</span>
+<span class="c1">//                range: [ 104, 140, 141 ] },</span>
 <span class="c1">//              Scalar {</span>
 <span class="c1">//                value: 'https://www.npmjs.com/package/yaml',</span>
-<span class="c1">//                range: [ 145, 180 ] } ],</span>
-<span class="c1">//           tag: 'tag:yaml.org,2002:seq',</span>
-<span class="c1">//           range: [ 102, 180 ] } } ],</span>
-<span class="c1">//   tag: 'tag:yaml.org,2002:map',</span>
-<span class="c1">//   range: [ 0, 180 ] }</span>
+<span class="c1">//                range: [ 145, 180, 180 ] } ],</span>
+<span class="c1">//           range: [ 102, 180, 180 ] } } ],</span>
+<span class="c1">//   range: [ 0, 180, 180 ] }</span>
 </code></pre></div><h4 id='parsedocument-str-options-document'><code>parseDocument(str, options = {}): Document</code></h4>
 <p>Parses a single <code>Document</code> from the input <code>str</code>; used internally by <code>parse</code>.
 Will include an error if <code>str</code> contains more than one document.
@@ -66,11 +63,6 @@ See <a href="#options">Options</a> for more information on the last argument.</p
 <th>Description</th>
 </tr>
 </thead><tbody>
-<tr>
-<td>anchors</td>
-<td><a href="#anchors"><code>Anchors</code></a></td>
-<td>Anchors associated with the document&#39;s nodes; also provides alias &amp; merge node creators.</td>
-</tr>
 <tr>
 <td>commentBefore</td>
 <td><code>string?</code></td>
@@ -130,6 +122,11 @@ Although <code>parseDocument()</code> and <code>parseAllDocuments()</code> will 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>createAlias(node: Node, name?: string)</td>
+<td><code>Alias</code></td>
+<td>Create a new <code>Alias</code> node, adding the required anchor for <code>node</code>. If <code>name</code> is empty, a new anchor name will be generated.</td>
+</tr>
 <tr>
 <td>createNode(value,&nbsp;options?)</td>
 <td><code>Node</code></td>
@@ -213,100 +210,3 @@ See the section on <a href="#writing-custom-tags">custom tags</a> for more on th
 
 <p><code>doc.contents.yaml</code> determines if an explicit <code>%YAML</code> directive should be included in the output, and what version it should use.
 If changing the version after the document&#39;s creation, you&#39;ll probably want to use <code>doc.setSchema()</code> as it will also update the schema accordingly.</p>
-<h2 id='working-with-anchors'>Working with Anchors</h2>
-<p>A description of <a href="#alias-nodes">alias and merge nodes</a> is included in the next section.</p>
-
-<p><br/></p>
-<h4 id='document-anchors'><code>Document#anchors</code></h4>
-<table><thead>
-<tr>
-<th>Method</th>
-<th>Returns</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>createAlias(node: Node, name?: string)</td>
-<td><code>Alias</code></td>
-<td>Create a new <code>Alias</code> node, adding the required anchor for <code>node</code>. If <code>name</code> is empty, a new anchor name will be generated.</td>
-</tr>
-<tr>
-<td>createMergePair(...Node)</td>
-<td><code>Pair</code></td>
-<td>Create a new merge pair with the given source nodes. Non-<code>Alias</code> sources will be automatically wrapped.</td>
-</tr>
-<tr>
-<td>getName(node: Node)</td>
-<td><code>string?</code></td>
-<td>The anchor name associated with <code>node</code>, if set.</td>
-</tr>
-<tr>
-<td>getNames()</td>
-<td><code>string[]</code></td>
-<td>List of all defined anchor names.</td>
-</tr>
-<tr>
-<td>getNode(name: string)</td>
-<td><code>Node?</code></td>
-<td>The node associated with the anchor <code>name</code>, if set.</td>
-</tr>
-<tr>
-<td>newName(prefix: string)</td>
-<td><code>string</code></td>
-<td>Find an available anchor name with the given <code>prefix</code> and a numerical suffix.</td>
-</tr>
-<tr>
-<td>setAnchor(node?: Node, name?: string)</td>
-<td><code>string?</code></td>
-<td>Associate an anchor with <code>node</code>. If <code>name</code> is empty, a new name will be generated.</td>
-</tr>
-</tbody></table>
-<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">[{ a: A }, { b: B }]</span><span class="dl">'</span>
-<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">],</span> <span class="kc">true</span><span class="p">))</span> <span class="c1">// 'a1'</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">],</span> <span class="kc">true</span><span class="p">))</span> <span class="c1">// 'a2'</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">setAnchor</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a1</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 'a1'</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">getNode</span><span class="p">(</span><span class="dl">'</span><span class="s1">a2</span><span class="dl">'</span><span class="p">)</span>
-<span class="c1">// { value: 'B', range: [ 16, 18 ], type: 'PLAIN' }</span>
-<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
-<span class="c1">// [ { a: A }, { b: &amp;a2 B } ]</span>
-
-<span class="kd">const</span> <span class="nx">alias</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">true</span><span class="p">),</span> <span class="dl">'</span><span class="s1">AA</span><span class="dl">'</span><span class="p">)</span>
-<span class="c1">// Alias { source: YAMLMap { items: [ [Pair] ] } }</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
-<span class="c1">// [ { a: 'A' }, { b: 'B' }, { a: 'A' } ]</span>
-<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
-<span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B }, *AA ]</span>
-
-<span class="nx">doc</span><span class="p">.</span><span class="nx">setSchema</span><span class="p">(</span><span class="dl">'</span><span class="s1">1.2</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">merge</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
-<span class="kd">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createMergePair</span><span class="p">(</span><span class="nx">alias</span><span class="p">)</span>
-<span class="c1">// Pair {</span>
-<span class="c1">//   key: Scalar { value: '&lt;&lt;' },</span>
-<span class="c1">//   value: Alias { source: YAMLMap { ... } } }</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="nx">merge</span><span class="p">)</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
-<span class="c1">// [ { a: 'A' }, { b: 'B', a: 'A' }, { a: 'A' } ]</span>
-<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
-<span class="c1">// [ &amp;AA { a: A }, { b: &amp;a2 B, &lt;&lt;: *AA }, *AA ]</span>
-
-<span class="c1">// This creates a circular reference</span>
-<span class="nx">merge</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">anchors</span><span class="p">.</span><span class="nx">createAlias</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">true</span><span class="p">))</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span> <span class="c1">// [RangeError: Maximum call stack size exceeded]</span>
-<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
-<span class="c1">// [</span>
-<span class="c1">//   &amp;AA { a: A },</span>
-<span class="c1">//   &amp;a1 { b: &amp;a2 B, &lt;&lt;: *a1 },</span>
-<span class="c1">//   *AA</span>
-<span class="c1">// ]</span>
-</code></pre></div>
-<p>You should make sure to only add alias and merge nodes to the document after the nodes to which they refer, or the document&#39;s YAML stringification will fail.</p>
-
-<p>It is valid to have an anchor associated with a node even if it has no aliases.
-<code>yaml</code> will not allow you to associate the same name with more than one node, even though this is allowed by the YAML spec (all but the last instance will have numerical suffixes added).
-To add or reassign an anchor, use <strong><code>setAnchor(node, name)</code></strong>.
-The second parameter is optional, and if left out either the pre-existing anchor name of the node will be used, or a new one generated.
-To remove an anchor, use <code>setAnchor(null, name)</code>.
-The function will return the new anchor&#39;s name, or <code>null</code> if both of its arguments are <code>null</code>.</p>
-
-<p>While the <code>merge</code> option needs to be true to parse merge pairs as such, this is not required during stringification.</p>
