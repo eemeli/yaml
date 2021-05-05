@@ -588,6 +588,10 @@ describe('sortMapEntries', () => {
     doc.set('bb', 4)
     expect(String(doc)).toBe('a: 1\nb: 2\nbb: 4\nc: 3\n')
   })
+  test('parseDocument', () => {
+    const doc = YAML.parseDocument(YAML.stringify(obj), { sortMapEntries: true })
+    expect(String(doc)).toBe('a: 1\nb: 2\nc: 3\n')
+  })
 })
 
 describe('custom indent', () => {
