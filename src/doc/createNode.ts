@@ -39,7 +39,7 @@ export function createNode(
   if (isNode(value)) return value as Node
   if (isPair(value)) {
     const map = ctx.schema[MAP].createNode?.(ctx.schema, null, ctx) as YAMLMap
-    map.items.push(value)
+    map.add(value)
     return map
   }
   if (

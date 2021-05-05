@@ -173,7 +173,7 @@ export function resolveFlowCollection(
       else {
         const map = new YAMLMap(ctx.schema)
         map.flow = true
-        map.items.push(pair)
+        map.add(pair, ctx.schema.merge)
         ;(coll as YAMLSeq).items.push(map)
       }
       offset = valueNode ? valueNode.range[2] : valueProps.end

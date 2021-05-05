@@ -94,7 +94,7 @@ export function resolveBlockMap(
         ? composeNode(ctx, value, valueProps, onError)
         : composeEmptyNode(ctx, offset, sep, null, valueProps, onError)
       offset = valueNode.range[2]
-      map.items.push(new Pair(keyNode, valueNode))
+      map.add(new Pair(keyNode, valueNode), ctx.schema.merge)
     } else {
       // key with no value
       if (implicitKey)
@@ -107,7 +107,7 @@ export function resolveBlockMap(
         if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
         else keyNode.comment = valueProps.comment
       }
-      map.items.push(new Pair(keyNode))
+      map.add(new Pair(keyNode), ctx.schema.merge)
     }
   }
 

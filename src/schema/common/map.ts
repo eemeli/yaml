@@ -12,7 +12,7 @@ function createMap(schema: Schema, obj: unknown, ctx: CreateNodeContext) {
     if (typeof replacer === 'function') value = replacer.call(obj, key, value)
     else if (Array.isArray(replacer) && !replacer.includes(key)) return
     if (value !== undefined || keepUndefined)
-      map.items.push(createPair(key, value, ctx))
+      map.add(createPair(key, value, ctx), schema.merge)
   }
   if (obj instanceof Map) {
     for (const [key, value] of obj) add(key, value)
