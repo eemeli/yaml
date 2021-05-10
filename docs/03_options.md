@@ -85,7 +85,7 @@ const src = `
   target:
     <<: *base
     b: base`
-const mergeResult = parse(src, { marge: true })
+const mergeResult = parse(src, { merge: true })
 mergeResult.target
 // { a: 1, b: 'base' }
 ```
