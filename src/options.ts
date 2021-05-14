@@ -96,6 +96,7 @@ export type SchemaOptions = {
   /**
    * When adding to or stringifying a map, sort the entries.
    * If `true`, sort by comparing key values with `<`.
+   * Does not affect item order when parsing.
    *
    * Default: `false`
    */
