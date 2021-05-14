@@ -65,8 +65,10 @@ export class Document<T = unknown> {
   >
 
   /**
-   * The [start, value-end, node-end] character offsets for the part of the
-   * source parsed into this document (undefined if not parsed).
+   * The `[start, value-end, node-end]` character offsets for the part of the
+   * source parsed into this document (undefined if not parsed). The `value-end`
+   * and `node-end` positions are themselves not included in their respective
+   * ranges.
    */
   declare range?: Range
 

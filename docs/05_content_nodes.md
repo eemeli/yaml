@@ -13,8 +13,10 @@ class NodeBase {
   comment?: string        // a comment on or immediately after this
   commentBefore?: string  // a comment before this
   range?: [number, number, number]
-      // The [start, value-end, node-end] character offsets for the part
+      // The `[start, value-end, node-end]` character offsets for the part
       // of the source parsed into this node (undefined if not parsed).
+      // The `value-end` and `node-end` positions are themselves not
+      // included in their respective ranges.
   spaceBefore?: boolean
       // a blank line before this node and its commentBefore
   tag?: string   // a fully qualified tag, if required

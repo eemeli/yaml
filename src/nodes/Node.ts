@@ -77,8 +77,10 @@ export abstract class NodeBase {
   declare commentBefore?: string | null
 
   /**
-   * The [start, value-end, node-end] character offsets for the part of the
-   * source parsed into this node (undefined if not parsed).
+   * The `[start, value-end, node-end]` character offsets for the part of the
+   * source parsed into this node (undefined if not parsed). The `value-end`
+   * and `node-end` positions are themselves not included in their respective
+   * ranges.
    */
   declare range?: Range | null
 
