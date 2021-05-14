@@ -612,6 +612,40 @@ test('Anchor for empty node (6KGN)', () => {
   expect(YAML.parse(src)).toMatchObject({ a: null, b: null })
 })
 
+describe('duplicate keys', () => {
+  test('block collection scalars', () => {
+    const doc = YAML.parseDocument('foo: 1\nbar: 2\nfoo: 3\n')
+    expect(doc.errors).toMatchObject([{ code: 'DUPLICATE_KEY' }])
+  })
+
+  test('flow collection scalars', () => {
+    const doc = YAML.parseDocument('{ foo: 1, bar: 2, foo: 3 }\n')
+    expect(doc.errors).toMatchObject([{ code: 'DUPLICATE_KEY' }])
+  })
+
+  test('merge key (disabled)', () => {
+    const doc = YAML.parseDocument('<<: 1\nbar: 2\n<<: 3\n', { merge: false })
+    expect(doc.errors).toMatchObject([{ code: 'DUPLICATE_KEY' }])
+  })
+
+  test('disable with option', () => {
+    const doc = YAML.parseDocument('foo: 1\nbar: 2\nfoo: 3\n', {
+      uniqueKeys: false
+    })
+    expect(doc.errors).toMatchObject([])
+  })
+
+  test('customise with option', () => {
+    const doc = YAML.parseDocument('foo: 1\nbar: 2\nfoo: 3\n', {
+      uniqueKeys: () => true
+    })
+    expect(doc.errors).toMatchObject([
+      { code: 'DUPLICATE_KEY' },
+      { code: 'DUPLICATE_KEY' }
+    ])
+  })
+})
+
 describe('handling complex keys', () => {
   let origEmitWarning
   beforeAll(() => {

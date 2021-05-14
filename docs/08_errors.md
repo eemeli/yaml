@@ -33,6 +33,7 @@ To identify errors for special handling, you should primarily use `code` to diff
 | `BLOCK_AS_IMPLICIT_KEY`  | There's probably something wrong with the indentation, or you're trying to parse something like `a: b: c`, where it's not clear what's the key and what's the value.         |
 | `BLOCK_IN_FLOW`          | YAML scalars and collections both have block and flow styles. Flow is allowed within block, but not the other way around.                                                    |
 | `COMMENT_SPACE`          | Comments need to be separated from their preceding content by a space.                                                                                                       |
+| `DUPLICATE_KEY`          | Map keys must be unique. Use the `uniqueKeys` option to disable or customise this check when parsing.                                                                        |
 | `IMPOSSIBLE`             | This really should not happen. If you encounter this error code, please file a bug.                                                                                          |
 | `KEY_OVER_1024_CHARS`    | Due to legacy reasons, implicit keys must have their following `:` indicator after at most 1k characters.                                                                    |
 | `MISSING_ANCHOR`         | Aliases can only dereference anchors that are before them in the document.                                                                                                   |
