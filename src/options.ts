@@ -1,6 +1,7 @@
 import type { Reviver } from './doc/applyReviver.js'
 import type { Directives } from './doc/directives.js'
 import type { LogLevelId } from './log.js'
+import type { ParsedNode } from './nodes/Node.js'
 import type { Pair } from './nodes/Pair.js'
 import type { Scalar } from './nodes/Scalar.js'
 import type { LineCounter } from './parse/line-counter.js'
@@ -38,6 +39,20 @@ export type ParseOptions = {
    * Default: `true`
    */
   strict?: boolean
+
+  /**
+   * YAML requires map keys to be unique. By default, this is checked by
+   * comparing scalar values with `===`; deep equality is not checked for
+   * aliases or collections. If merge keys are enabled by the schema,
+   * multiple `<<` keys are allowed.
+   *
+   * Set `false` to disable, or provide your own comparator function to
+   * customise. The comparator will be passed two `ParsedNode` values, and
+   * is expected to return a `boolean` indicating their equality.
+   *
+   * Default: `true`
+   */
+  uniqueKeys?: boolean | ((a: ParsedNode, b: ParsedNode) => boolean)
 }
 
 export type DocumentOptions = {
@@ -305,5 +320,6 @@ export const defaultOptions: Required<
   logLevel: 'warn',
   prettyErrors: true,
   strict: true,
+  uniqueKeys: true,
   version: '1.2'
 }

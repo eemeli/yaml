@@ -1,3 +1,4 @@
+import type { ParsedNode } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import type { BlockMap, Token } from '../parse/cst.js'
@@ -5,6 +6,7 @@ import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveProps } from './resolve-props.js'
 import { containsNewline } from './util-contains-newline.js'
+import { mapIncludes } from './util-map-includes.js'
 
 const startColMsg = 'All mapping items must start at the same column'
 
@@ -14,7 +16,7 @@ export function resolveBlockMap(
   bm: BlockMap,
   onError: ComposeErrorHandler
 ) {
-  const map = new YAMLMap(ctx.schema)
+  const map = new YAMLMap<ParsedNode, ParsedNode>(ctx.schema)
 
   let offset = bm.offset
   for (const { start, key, sep, value } of bm.items) {
@@ -60,6 +62,9 @@ export function resolveBlockMap(
     const keyNode = key
       ? composeNode(ctx, key, keyProps, onError)
       : composeEmptyNode(ctx, keyStart, start, null, keyProps, onError)
+
+    if (mapIncludes(ctx, map.items, keyNode))
+      onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
 
     // value properties
     const valueProps = resolveProps(sep || [], {

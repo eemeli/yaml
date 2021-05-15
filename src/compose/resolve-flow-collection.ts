@@ -8,6 +8,7 @@ import type { ComposeErrorHandler } from './composer.js'
 import { resolveEnd } from './resolve-end.js'
 import { resolveProps } from './resolve-props.js'
 import { containsNewline } from './util-contains-newline.js'
+import { mapIncludes } from './util-map-includes.js'
 
 const blockMsg = 'Block collections are not allowed within flow collections'
 const isBlock = (token: Token | null | undefined) =>
@@ -169,8 +170,12 @@ export function resolveFlowCollection(
       }
 
       const pair = new Pair(keyNode, valueNode)
-      if (isMap) (coll as YAMLMap.Parsed).items.push(pair)
-      else {
+      if (isMap) {
+        const map = coll as YAMLMap.Parsed
+        if (mapIncludes(ctx, map.items, keyNode))
+          onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
+        map.items.push(pair)
+      } else {
         const map = new YAMLMap(ctx.schema)
         map.flow = true
         map.items.push(pair)
