@@ -44,14 +44,6 @@ test('flow scalar', () => {
   })
   expect(doc.toJS()).toMatchObject({ 'a b': ' c\n\nd' })
   expect(lineCounter.lineStarts).toMatchObject([
-    0,
-    2,
-    6,
-    10,
-    14,
-    17,
-    19,
-    20,
-    24
+    0, 2, 6, 10, 14, 17, 19, 20, 24
   ])
 })

@@ -7,7 +7,7 @@ function parseSexagesimal<B extends boolean>(str: string, asBigInt?: B) {
   const sign = str[0]
   const parts = sign === '-' || sign === '+' ? str.substring(1) : str
   const num = (n: unknown) =>
-    asBigInt ? ((BigInt(n) as unknown) as number) : Number(n)
+    asBigInt ? (BigInt(n) as unknown as number) : Number(n)
   const res = parts
     .replace(/_/g, '')
     .split(':')
@@ -25,7 +25,7 @@ function parseSexagesimal<B extends boolean>(str: string, asBigInt?: B) {
 function stringifySexagesimal(node: Scalar) {
   let { value } = node as Scalar<number>
   let num = (n: number) => n
-  if (typeof value === 'bigint') num = n => (BigInt(n) as unknown) as number
+  if (typeof value === 'bigint') num = n => BigInt(n) as unknown as number
   else if (isNaN(value) || !isFinite(value)) return stringifyNumber(node)
   let sign = ''
   if (value < 0) {

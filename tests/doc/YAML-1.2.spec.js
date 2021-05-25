@@ -1,7 +1,8 @@
 import * as YAML from 'yaml'
 import { YAMLError } from 'yaml'
 
-const collectionKeyWarning = /^Keys with collection values will be stringified due to JS Object restrictions/
+const collectionKeyWarning =
+  /^Keys with collection values will be stringified due to JS Object restrictions/
 
 const spec = {
   '2.1. Collections': {
@@ -242,8 +243,9 @@ rbi:
       tgt: ["Mark McGwire's year was crippled by a knee injury.\n"]
     },
 
-    'Example 2.15. Folded newlines are preserved for "more indented" and blank lines': {
-      src: `>
+    'Example 2.15. Folded newlines are preserved for "more indented" and blank lines':
+      {
+        src: `>
  Sammy Sosa completed another
  fine season with great stats.
 
@@ -251,15 +253,15 @@ rbi:
    0.288 Batting Average
 
  What a year!`,
-      tgt: [
-        `Sammy Sosa completed another fine season with great stats.
+        tgt: [
+          `Sammy Sosa completed another fine season with great stats.
 
   63 Home Runs
   0.288 Batting Average
 
 What a year!\n`
-      ]
-    },
+        ]
+      },
 
     'Example 2.16. Indentation determines scope': {
       src: `name: Mark McGwire
@@ -403,71 +405,11 @@ application specific tag: !something |
         {
           'not-date': '2002-04-28',
           picture: Buffer.from([
-            71,
-            73,
-            70,
-            56,
-            57,
-            97,
-            12,
-            0,
-            12,
-            0,
-            132,
-            0,
-            0,
-            255,
-            255,
-            247,
-            245,
-            245,
-            238,
-            233,
-            233,
-            229,
-            102,
-            102,
-            102,
-            0,
-            0,
-            0,
-            231,
-            231,
-            231,
-            94,
-            94,
-            94,
-            243,
-            243,
-            237,
-            142,
-            142,
-            142,
-            224,
-            224,
-            224,
-            159,
-            159,
-            159,
-            147,
-            147,
-            147,
-            167,
-            167,
-            167,
-            158,
-            158,
-            158,
-            105,
-            94,
-            16,
-            39,
-            32,
-            130,
-            10,
-            1,
-            0,
-            59
+            71, 73, 70, 56, 57, 97, 12, 0, 12, 0, 132, 0, 0, 255, 255, 247, 245,
+            245, 238, 233, 233, 229, 102, 102, 102, 0, 0, 0, 231, 231, 231, 94,
+            94, 94, 243, 243, 237, 142, 142, 142, 224, 224, 224, 159, 159, 159,
+            147, 147, 147, 167, 167, 167, 158, 158, 158, 105, 94, 16, 39, 32,
+            130, 10, 1, 0, 59
           ]),
           'application specific tag':
             'The semantics of the tag\nabove may be different for\ndifferent documents.\n'
@@ -1859,9 +1801,8 @@ for (const section in spec) {
   describe(section, () => {
     for (const name in spec[section]) {
       test(name, () => {
-        const { src, tgt, errors, special, jsWarnings, warnings } = spec[
-          section
-        ][name]
+        const { src, tgt, errors, special, jsWarnings, warnings } =
+          spec[section][name]
         const documents = YAML.parseAllDocuments(src, { prettyErrors: false })
         const json = documents.map(doc => doc.toJS())
         expect(json).toMatchObject(tgt)

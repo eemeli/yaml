@@ -39,7 +39,7 @@ export class YAMLOMap extends YAMLSeq {
         throw new Error('Ordered maps must not include duplicate keys')
       map.set(key, value)
     }
-    return (map as unknown) as unknown[]
+    return map as unknown as unknown[]
   }
 }
 

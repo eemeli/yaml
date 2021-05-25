@@ -120,11 +120,7 @@ export class Document<T = unknown> {
 
     if (value === undefined) this.contents = null
     else {
-      this.contents = (this.createNode(
-        value,
-        _replacer,
-        options
-      ) as unknown) as T
+      this.contents = this.createNode(value, _replacer, options) as unknown as T
     }
   }
 
@@ -289,11 +285,11 @@ export class Document<T = unknown> {
    */
   set(key: any, value: unknown) {
     if (this.contents == null) {
-      this.contents = (collectionFromPath(
+      this.contents = collectionFromPath(
         this.schema,
         [key],
         value
-      ) as unknown) as T
+      ) as unknown as T
     } else if (assertCollection(this.contents)) {
       this.contents.set(key, value)
     }
@@ -304,13 +300,13 @@ export class Document<T = unknown> {
    * boolean to add/remove the item from the set.
    */
   setIn(path: Iterable<unknown>, value: unknown) {
-    if (isEmptyPath(path)) this.contents = (value as unknown) as T
+    if (isEmptyPath(path)) this.contents = value as unknown as T
     else if (this.contents == null) {
-      this.contents = (collectionFromPath(
+      this.contents = collectionFromPath(
         this.schema,
         Array.from(path),
         value
-      ) as unknown) as T
+      ) as unknown as T
     } else if (assertCollection(this.contents)) {
       this.contents.setIn(path, value)
     }
