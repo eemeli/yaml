@@ -188,7 +188,7 @@ export function resolveFlowCollection(
   const expectedEnd = isMap ? '}' : ']'
   const [ce, ...ee] = fc.end
   let cePos = offset
-  if (ce && ce.source === expectedEnd) cePos += ce.source.length
+  if (ce && ce.source === expectedEnd) cePos = ce.offset + ce.source.length
   else {
     onError(
       offset + 1,

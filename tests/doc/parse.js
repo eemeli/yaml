@@ -495,6 +495,11 @@ describe('maps with no values', () => {
     expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n    x\n}\n`)
   })
 
+  test('flow map has correct range', () => {
+    const doc = YAML.parseDocument('{  }')
+    expect(doc.range).toEqual([0, 4, 4])
+  })
+
   test('implicit scalar key after explicit key with no value', () => {
     const doc = YAML.parseDocument('? - 1\nx:\n')
     expect(doc.contents.items).toMatchObject([
@@ -723,7 +728,7 @@ describe('__proto__ as mapping key', () => {
 
 describe('reviver', () => {
   test('MDN exemple', () => {
-    const reviver = jest.fn((key, value) => value)
+    const reviver = jest.fn((_key, value) => value)
     const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
     const obj = JSON.parse(src)
     YAML.parse(src, reviver)
@@ -748,7 +753,7 @@ describe('reviver', () => {
   })
 
   test('modify values', () => {
-    const reviver = jest.fn((key, value) =>
+    const reviver = jest.fn((_key, value) =>
       typeof value === 'number' ? 2 * value : value
     )
     const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
