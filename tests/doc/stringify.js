@@ -207,12 +207,10 @@ describe('unpaired surrogate pairs of Unicode code points', () => {
   test('\uD83D\uDE00', () => {
     expect(YAML.stringify('\uD83D\uDE00')).toBe('😀\n')
   })
-
-  const maybe = process.version < 'v12' ? test.skip : test
-  maybe('\uDF06\uD834', () => {
+  test('\uDF06\uD834', () => {
     expect(YAML.stringify('\uDF06\uD834')).toBe('"\\udf06\\ud834"\n')
   })
-  maybe('\uDEAD', () => {
+  test('\uDEAD', () => {
     expect(YAML.stringify('\uDEAD')).toBe('"\\udead"\n')
   })
 })
@@ -532,7 +530,7 @@ describe('simple keys', () => {
   })
 
   test('key value lingth > 1024', () => {
-    let str = `
+    const str = `
     ? ${new Array(1026).join('a')}
     : longkey`
     const doc = YAML.parseDocument(str)
@@ -900,7 +898,7 @@ describe('replacer', () => {
   })
 
   test('function as logger', () => {
-    const spy = jest.fn((key, value) => value)
+    const spy = jest.fn((_key, value) => value)
     const obj = { 1: 1, b: 2, c: [4] }
     YAML.stringify(obj, spy)
     expect(spy.mock.calls).toMatchObject([
@@ -921,7 +919,7 @@ describe('replacer', () => {
 
   test('function as filter of Object entries', () => {
     const obj = { 1: 1, b: 2, c: [4] }
-    const fn = (key, value) => (typeof value === 'number' ? undefined : value)
+    const fn = (_key, value) => (typeof value === 'number' ? undefined : value)
     expect(YAML.stringify(obj, fn)).toBe('c:\n  - null\n')
   })
 
@@ -931,13 +929,13 @@ describe('replacer', () => {
       ['b', 2],
       ['c', [4]]
     ])
-    const fn = (key, value) => (typeof value === 'number' ? undefined : value)
+    const fn = (_key, value) => (typeof value === 'number' ? undefined : value)
     expect(YAML.stringify(map, fn)).toBe('c:\n  - null\n')
   })
 
   test('function as transformer', () => {
     const obj = { a: 1, b: 2, c: [3, 4] }
-    const fn = (key, value) => (typeof value === 'number' ? 2 * value : value)
+    const fn = (_key, value) => (typeof value === 'number' ? 2 * value : value)
     expect(YAML.stringify(obj, fn)).toBe('a: 2\nb: 4\nc:\n  - 6\n  - 8\n')
   })
 
