@@ -1,7 +1,7 @@
 import { Collection } from '../nodes/Collection.js'
-import { addComment } from '../stringify/addComment.js'
-import { stringify, StringifyContext } from '../stringify/stringify.js'
 import { isNode, isPair } from '../nodes/Node.js'
+import { stringify, StringifyContext } from './stringify.js'
+import { addComment, stringifyComment } from './stringifyComment.js'
 
 type StringifyNode = { comment: boolean; str: string }
 
@@ -38,7 +38,7 @@ export function stringifyCollection(
       if (item.commentBefore) {
         // This match will always succeed on a non-empty string
         for (const line of item.commentBefore.match(/^.*$/gm) as string[])
-          nodes.push({ comment: true, str: `#${line}` })
+          nodes.push({ comment: true, str: line ? `#${line}` : '' })
       }
       if (item.comment) {
         comment = item.comment
@@ -51,7 +51,7 @@ export function stringifyCollection(
         if (ik.commentBefore) {
           // This match will always succeed on a non-empty string
           for (const line of ik.commentBefore.match(/^.*$/gm) as string[])
-            nodes.push({ comment: true, str: `#${line}` })
+            nodes.push({ comment: true, str: line ? `#${line}` : '' })
         }
         if (ik.comment) singleLineOutput = false
       }
@@ -113,7 +113,7 @@ export function stringifyCollection(
     for (const s of strings) str += s ? `\n${indent}${s}` : '\n'
   }
   if (comment) {
-    str += '\n' + comment.replace(/^/gm, `${indent}#`)
+    str += '\n' + stringifyComment(comment, indent)
     if (onComment) onComment()
   } else if (chompKeep && onChompKeep) onChompKeep()
   return str

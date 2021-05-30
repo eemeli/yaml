@@ -1,8 +1,8 @@
 import { isCollection, isNode, isScalar, isSeq } from '../nodes/Node.js'
 import type { Pair } from '../nodes/Pair.js'
 import { Scalar } from '../nodes/Scalar.js'
-import { addComment } from './addComment.js'
 import { stringify, StringifyContext } from './stringify.js'
+import { addComment, stringifyComment } from './stringifyComment.js'
 
 export function stringifyPair(
   { key, value }: Readonly<Pair>,
@@ -78,10 +78,8 @@ export function stringifyPair(
   let valueComment = null
   if (isNode(value)) {
     if (value.spaceBefore) vcb = '\n'
-    if (value.commentBefore) {
-      const cs = value.commentBefore.replace(/^/gm, `${ctx.indent}#`)
-      vcb += `\n${cs}`
-    }
+    if (value.commentBefore)
+      vcb += `\n${stringifyComment(value.commentBefore, ctx.indent)}`
     valueComment = value.comment
   } else if (value && typeof value === 'object') {
     value = doc.createNode(value)
