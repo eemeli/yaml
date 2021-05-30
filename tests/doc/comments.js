@@ -80,7 +80,7 @@ describe('parse comments', () => {
       const src = source`
         #c0
         - value 1
-        #c1
+          #c1
 
         - value 2
 
@@ -93,7 +93,7 @@ describe('parse comments', () => {
             { commentBefore: 'c0', value: 'value 1', comment: 'c1' },
             { value: 'value 2' }
           ],
-          range: [4, 29, 29]
+          range: [4, 31, 31]
         },
         comment: 'c2'
       })
@@ -102,7 +102,7 @@ describe('parse comments', () => {
     test('multiline', () => {
       const src = source`
         - value 1
-        #c0
+          #c0
         #c1
 
         #c2
@@ -126,7 +126,7 @@ describe('parse comments', () => {
       const src = source`
         #c0
         key1: value 1
-        #c1
+          #c1
 
         key2: value 2
 
@@ -147,7 +147,7 @@ describe('parse comments', () => {
     test('multiline', () => {
       const src = source`
         key1: value 1
-        #c0
+          #c0
         #c1
 
         #c2

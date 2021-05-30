@@ -33,13 +33,17 @@ function includesNonEmpty(list: SourceToken[]) {
   return false
 }
 
-function atFirstEmptyLineAfterComments(start: SourceToken[]) {
+function atFirstEmptyLineAfterIndentedComments(
+  start: SourceToken[],
+  indent: number
+) {
   let hasComment = false
   for (let i = 0; i < start.length; ++i) {
     switch (start[i].type) {
       case 'space':
         break
       case 'comment':
+        if (!hasComment && start[i].indent <= indent) return false
         hasComment = true
         break
       case 'newline':
@@ -521,7 +525,10 @@ export class Parser {
     switch (this.type) {
       case 'newline':
         this.onKeyLine = false
-        if (!it.sep && atFirstEmptyLineAfterComments(it.start)) {
+        if (
+          !it.sep &&
+          atFirstEmptyLineAfterIndentedComments(it.start, map.indent)
+        ) {
           const prev = map.items[map.items.length - 2]
           const end = (prev?.value as { end: SourceToken[] })?.end
           if (Array.isArray(end)) {
@@ -643,7 +650,10 @@ export class Parser {
     const it = seq.items[seq.items.length - 1]
     switch (this.type) {
       case 'newline':
-        if (!it.value && atFirstEmptyLineAfterComments(it.start)) {
+        if (
+          !it.value &&
+          atFirstEmptyLineAfterIndentedComments(it.start, seq.indent)
+        ) {
           const prev = seq.items[seq.items.length - 2]
           const end = (prev?.value as { end: SourceToken[] })?.end
           if (Array.isArray(end)) {
