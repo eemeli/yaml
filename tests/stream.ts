@@ -32,10 +32,10 @@ aa: AA
 
 describe('Input in parts', () => {
   const cases = [
-    { title: 'LF line endings', src },
-    { title: 'CRLF line endings', src: src.replace(/\n/g, '\r\n') }
+    { title: 'LF line endings', src, nl: '\n' },
+    { title: 'CRLF line endings', src: src.replace(/\n/g, '\r\n'), nl: '\r\n' }
   ]
-  for (const { title, src } of cases)
+  for (const { title, src, nl } of cases)
     test(title, () => {
       const doc = parseDocument(src, { logLevel: 'error' })
       const exp = [doc.toJS()]
@@ -49,7 +49,7 @@ describe('Input in parts', () => {
         '{ hh }': ['HH', 'II\rII II']
       })
       const cb = [doc.commentBefore, doc.contents?.commentBefore]
-      expect(cb).toMatchObject(['c0\n\nc1', 'c2'])
+      expect(cb).toMatchObject(['c0\n\nc1', `c2${nl}${nl}`])
 
       for (let i = 1; i < src.length - 1; ++i) {
         const res: Document.Parsed[] = []

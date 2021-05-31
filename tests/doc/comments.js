@@ -592,9 +592,30 @@ describe('blank lines', () => {
   })
 
   test('between seq items with leading comments', () => {
-    const src = '#A\n- a\n\n#B\n- b\n\n\n#C\n\n- c\n'
+    const src = source`
+      #A
+      - a
+
+      #B
+      - b
+
+
+      #C
+
+      - c
+    `
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('#A\n- a\n\n#B\n- b\n\n#C\n- c\n')
+    expect(String(doc)).toBe(source`
+      #A
+      - a
+
+      #B
+      - b
+
+      #C
+
+      - c
+    `)
   })
 
   describe('not after block scalar with keep chomping', () => {
@@ -793,7 +814,7 @@ map:
       const doc = YAML.parseDocument(src)
       expect(doc.contents).toMatchObject({
         items: [
-          { value: { commentBefore: ' c1\n \n c2', comment: ' c3\n \n c4' } }
+          { value: { commentBefore: ' c1\n \n c2\n', comment: ' c3\n \n c4' } }
         ]
       })
       expect(doc.toString()).toBe(
@@ -802,6 +823,7 @@ map:
             # c1
             #·
             # c2
+
             value
             # c3
             #·
@@ -826,7 +848,7 @@ map:
       const doc = YAML.parseDocument(src)
       expect(doc.contents).toMatchObject({
         items: [
-          { value: { commentBefore: ' c1\n\n c2', comment: ' c3\n\n c4' } }
+          { value: { commentBefore: ' c1\n\n c2\n', comment: ' c3\n\n c4' } }
         ]
       })
       expect(doc.toString()).toBe(source`
@@ -834,6 +856,7 @@ map:
           # c1
 
           # c2
+
           value
           # c3
 
