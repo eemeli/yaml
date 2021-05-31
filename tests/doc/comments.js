@@ -959,6 +959,24 @@ map:
       `)
     })
   })
+
+  test('eemeli/yaml#277', () => {
+    const src = source`
+      environment:
+        ### SESSION START ###
+        A: "true"
+        B: "true"
+        ### SESSION END ###
+
+        ### ANOTHER SESSION START ###
+        C: "true"
+        D: "true"
+        ### ANOTHER SESSION END ###
+
+    `
+    const doc = YAML.parseDocument(src)
+    expect(doc.toString()).toBe(src)
+  })
 })
 
 describe('eemeli/yaml#18', () => {
