@@ -37,8 +37,10 @@ export function stringifyCollection(
       if (!chompKeep && item.spaceBefore) nodes.push({ comment: true, str: '' })
       if (item.commentBefore) {
         // This match will always succeed on a non-empty string
-        for (const line of item.commentBefore.match(/^.*$/gm) as string[])
-          nodes.push({ comment: true, str: line ? `#${line}` : '' })
+        for (const line of item.commentBefore.match(/^.*$/gm) as string[]) {
+          const str = line === ' ' ? '#' : line ? `#${line}` : ''
+          nodes.push({ comment: true, str })
+        }
       }
       if (item.comment) {
         comment = item.comment
@@ -50,8 +52,10 @@ export function stringifyCollection(
         if (!chompKeep && ik.spaceBefore) nodes.push({ comment: true, str: '' })
         if (ik.commentBefore) {
           // This match will always succeed on a non-empty string
-          for (const line of ik.commentBefore.match(/^.*$/gm) as string[])
-            nodes.push({ comment: true, str: line ? `#${line}` : '' })
+          for (const line of ik.commentBefore.match(/^.*$/gm) as string[]) {
+            const str = line === ' ' ? '#' : line ? `#${line}` : ''
+            nodes.push({ comment: true, str })
+          }
         }
         if (ik.comment) singleLineOutput = false
       }

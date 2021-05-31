@@ -32,15 +32,13 @@ describe('parse comments', () => {
       `
       const doc = YAML.parseDocument(src)
       expect(doc.contents.commentBefore).toBe('comment\n \ncomment')
-      expect(String(doc)).toBe(
-        source`
-          ---
-          #comment
-          #·
-          #comment
-          string
-        `.replace(/·/g, ' ')
-      )
+      expect(String(doc)).toBe(source`
+        ---
+        #comment
+        #
+        #comment
+        string
+      `)
     })
 
     test('body end comments', () => {
@@ -393,20 +391,18 @@ describe('stringify comments', () => {
       doc.contents.items[0].commentBefore = 'c0\nc1'
       doc.contents.items[1].commentBefore = ' \nc2\n\nc3'
       doc.contents.comment = 'c4\nc5'
-      expect(String(doc)).toBe(
-        source`
+      expect(String(doc)).toBe( source`
         #c0
         #c1
         - value 1
-        #·
+        #
         #c2
 
         #c3
         - value 2
         #c4
         #c5
-      `.replace(/·/g, ' ')
-      )
+      `)
     })
 
     test('seq-in-map', () => {
@@ -461,12 +457,11 @@ describe('stringify comments', () => {
       doc.contents.items[1].value.spaceBefore = true
       doc.contents.items[1].value.commentBefore = 'c6'
       doc.contents.comment = 'c7\nc8'
-      expect(String(doc)).toBe(
-        source`
+      expect(String(doc)).toBe(source`
         #c0
         #c1
         key1: value 1
-        #·
+        #
         #c2
 
         #c3
@@ -478,8 +473,7 @@ describe('stringify comments', () => {
           value 2
         #c7
         #c8
-      `.replace(/·/g, ' ')
-      )
+      `)
     })
   })
 
@@ -763,19 +757,17 @@ map:
         commentBefore: ' c1\n \n c2',
         comment: ' c3\n \n c4'
       })
-      expect(doc.toString()).toBe(
-        source`
-          # c1
-          #·
-          # c2
+      expect(doc.toString()).toBe(source`
+        # c1
+        #
+        # c2
 
-          value
+        value
 
-          # c3
-          #·
-          # c4
-        `.replace(/·/g, ' ')
-      )
+        # c3
+        #
+        # c4
+      `)
     })
 
     test('document comments without #', () => {
@@ -817,19 +809,17 @@ map:
           { value: { commentBefore: ' c1\n \n c2\n', comment: ' c3\n \n c4' } }
         ]
       })
-      expect(doc.toString()).toBe(
-        source`
-          key:
-            # c1
-            #·
-            # c2
+      expect(doc.toString()).toBe(source`
+        key:
+          # c1
+          #
+          # c2
 
-            value
-            # c3
-            #·
-            # c4
-        `.replace(/·/g, ' ')
-      )
+          value
+          # c3
+          #
+          # c4
+      `)
     })
 
     test('map comments without #', () => {
@@ -882,18 +872,16 @@ map:
           { commentBefore: ' c4' }
         ]
       })
-      expect(doc.toString()).toBe(
-        source`
-          # c1
-          #·
-          # c2
-          - v1
-            # c3
-            #·
-          # c4
-          - v2
-        `.replace(/·/g, ' ')
-      )
+      expect(doc.toString()).toBe(source`
+        # c1
+        #
+        # c2
+        - v1
+          # c3
+          #
+        # c4
+        - v2
+      `)
     })
 
     test('seq comments without #', () => {
