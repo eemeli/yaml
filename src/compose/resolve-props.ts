@@ -48,7 +48,7 @@ export function resolveProps(
             'COMMENT_SPACE',
             'Comments must be separated from other tokens by white space characters'
           )
-        const cb = token.source.substring(1)
+        const cb = token.source.substring(1) || ' '
         if (!comment) comment = cb
         else comment += commentSep + cb
         commentSep = ''

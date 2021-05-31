@@ -42,7 +42,7 @@ function parsePrelude(prelude: string[]) {
       case '#':
         comment +=
           (comment === '' ? '' : afterEmptyLine ? '\n\n' : '\n') +
-          source.substring(1)
+          (source.substring(1) || ' ')
         atComment = true
         afterEmptyLine = false
         break

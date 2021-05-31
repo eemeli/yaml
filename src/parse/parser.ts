@@ -33,42 +33,6 @@ function includesNonEmpty(list: SourceToken[]) {
   return false
 }
 
-function atFirstEmptyLineAfterIndentedComments(
-  start: SourceToken[],
-  indent: number
-) {
-  let hasComment = false
-  for (let i = 0; i < start.length; ++i) {
-    switch (start[i].type) {
-      case 'space':
-        break
-      case 'comment':
-        if (!hasComment && start[i].indent <= indent) return false
-        hasComment = true
-        break
-      case 'newline':
-        if (!hasComment) return false
-        break
-      default:
-        return false
-    }
-  }
-  if (hasComment) {
-    for (let i = start.length - 1; i >= 0; --i) {
-      switch (start[i].type) {
-        /* istanbul ignore next */
-        case 'space':
-          break
-        case 'newline':
-          return true
-        default:
-          return false
-      }
-    }
-  }
-  return false
-}
-
 function isFlowToken(
   token: Token | null | undefined
 ): token is FlowScalar | FlowCollection {
@@ -525,24 +489,31 @@ export class Parser {
     switch (this.type) {
       case 'newline':
         this.onKeyLine = false
-        if (
-          !it.sep &&
-          atFirstEmptyLineAfterIndentedComments(it.start, map.indent)
-        ) {
-          const prev = map.items[map.items.length - 2]
-          const end = (prev?.value as { end: SourceToken[] })?.end
-          if (Array.isArray(end)) {
-            Array.prototype.push.apply(end, it.start)
-            it.start = [this.sourceToken]
-            return
-          }
-        }
-      // fallthrough
+        if (it.value) {
+          const end = 'end' in it.value ? it.value.end : undefined
+          const last = Array.isArray(end) ? end[end.length - 1] : undefined
+          if (last?.type === 'comment') end?.push(this.sourceToken)
+          else map.items.push({ start: [this.sourceToken] })
+        } else if (it.sep) it.sep.push(this.sourceToken)
+        else it.start.push(this.sourceToken)
+        return
       case 'space':
       case 'comment':
         if (it.value) map.items.push({ start: [this.sourceToken] })
         else if (it.sep) it.sep.push(this.sourceToken)
-        else it.start.push(this.sourceToken)
+        else {
+          if (this.atIndentedComment(it.start, map.indent)) {
+            const prev = map.items[map.items.length - 2]
+            const end = (prev?.value as { end: SourceToken[] })?.end
+            if (Array.isArray(end)) {
+              Array.prototype.push.apply(end, it.start)
+              end.push(this.sourceToken)
+              map.items.pop()
+              return
+            }
+          }
+          it.start.push(this.sourceToken)
+        }
         return
     }
     if (this.indent >= map.indent) {
@@ -650,23 +621,29 @@ export class Parser {
     const it = seq.items[seq.items.length - 1]
     switch (this.type) {
       case 'newline':
-        if (
-          !it.value &&
-          atFirstEmptyLineAfterIndentedComments(it.start, seq.indent)
-        ) {
-          const prev = seq.items[seq.items.length - 2]
-          const end = (prev?.value as { end: SourceToken[] })?.end
-          if (Array.isArray(end)) {
-            Array.prototype.push.apply(end, it.start)
-            it.start = [this.sourceToken]
-            return
-          }
-        }
-      // fallthrough
+        if (it.value) {
+          const end = 'end' in it.value ? it.value.end : undefined
+          const last = Array.isArray(end) ? end[end.length - 1] : undefined
+          if (last?.type === 'comment') end?.push(this.sourceToken)
+          else seq.items.push({ start: [this.sourceToken] })
+        } else it.start.push(this.sourceToken)
+        return
       case 'space':
       case 'comment':
         if (it.value) seq.items.push({ start: [this.sourceToken] })
-        else it.start.push(this.sourceToken)
+        else {
+          if (this.atIndentedComment(it.start, seq.indent)) {
+            const prev = seq.items[seq.items.length - 2]
+            const end = (prev?.value as { end: SourceToken[] })?.end
+            if (Array.isArray(end)) {
+              Array.prototype.push.apply(end, it.start)
+              end.push(this.sourceToken)
+              seq.items.pop()
+              return
+            }
+          }
+          it.start.push(this.sourceToken)
+        }
         return
       case 'anchor':
       case 'tag':
@@ -855,6 +832,12 @@ export class Parser {
       }
     }
     return null
+  }
+
+  private atIndentedComment(start: SourceToken[], indent: number) {
+    if (this.type !== 'comment') return false
+    if (this.indent <= indent) return false
+    return start.every(st => st.type === 'newline' || st.type === 'space')
   }
 
   private *documentEnd(docEnd: DocumentEnd) {

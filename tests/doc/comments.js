@@ -31,14 +31,16 @@ describe('parse comments', () => {
         string
       `
       const doc = YAML.parseDocument(src)
-      expect(doc.contents.commentBefore).toBe('comment\n\ncomment')
-      expect(String(doc)).toBe(source`
-        ---
-        #comment
-
-        #comment
-        string
-      `)
+      expect(doc.contents.commentBefore).toBe('comment\n \ncomment')
+      expect(String(doc)).toBe(
+        source`
+          ---
+          #comment
+          #·
+          #comment
+          string
+        `.replace(/·/g, ' ')
+      )
     })
 
     test('body end comments', () => {
@@ -120,7 +122,7 @@ describe('parse comments', () => {
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
         contents: {
-          items: [{ comment: 'c0\nc1' }, { commentBefore: 'c2' }]
+          items: [{ comment: 'c0' }, { commentBefore: 'c1\n\nc2' }]
         },
         comment: 'c3\nc4'
       })
@@ -166,8 +168,8 @@ describe('parse comments', () => {
       expect(doc).toMatchObject({
         contents: {
           items: [
-            { value: { comment: 'c0\nc1' } },
-            { key: { commentBefore: 'c2' } }
+            { value: { comment: 'c0' } },
+            { key: { commentBefore: 'c1\n\nc2' } }
           ]
         },
         comment: 'c3\nc4'
@@ -719,6 +721,185 @@ map:
     expect(doc.errors).toHaveLength(0)
     expect(doc.toJS()).toMatchObject({
       map: { foo0: { key2: 'value2' }, foo2: { key3: 'value3' } }
+    })
+  })
+
+  describe('commented empty lines', () => {
+    test('document comments with #', () => {
+      const src = source`
+        # c1
+        #
+        # c2
+
+        value
+
+        # c3
+        #
+        # c4
+      `
+      const doc = YAML.parseDocument(src)
+      expect(doc).toMatchObject({
+        commentBefore: ' c1\n \n c2',
+        comment: ' c3\n \n c4'
+      })
+      expect(doc.toString()).toBe(
+        source`
+          # c1
+          #·
+          # c2
+
+          value
+
+          # c3
+          #·
+          # c4
+        `.replace(/·/g, ' ')
+      )
+    })
+
+    test('document comments without #', () => {
+      const src = source`
+        # c1
+
+        # c2
+
+        value
+
+        # c3
+
+        # c4
+      `
+      const doc = YAML.parseDocument(src)
+      expect(doc).toMatchObject({
+        commentBefore: ' c1\n\n c2',
+        comment: ' c3\n\n c4'
+      })
+      expect(doc.toString()).toBe(src)
+    })
+
+    test('map comments with #', () => {
+      const src = source`
+        key:
+          # c1
+          #
+          # c2
+
+          value
+
+          # c3
+          #
+          # c4
+      `
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).toMatchObject({
+        items: [
+          { value: { commentBefore: ' c1\n \n c2', comment: ' c3\n \n c4' } }
+        ]
+      })
+      expect(doc.toString()).toBe(
+        source`
+          key:
+            # c1
+            #·
+            # c2
+            value
+            # c3
+            #·
+            # c4
+        `.replace(/·/g, ' ')
+      )
+    })
+
+    test('map comments without #', () => {
+      const src = source`
+        key:
+          # c1
+
+          # c2
+
+          value
+
+          # c3
+
+          # c4
+      `
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).toMatchObject({
+        items: [
+          { value: { commentBefore: ' c1\n\n c2', comment: ' c3\n\n c4' } }
+        ]
+      })
+      expect(doc.toString()).toBe(source`
+        key:
+          # c1
+
+          # c2
+          value
+          # c3
+
+          # c4
+      `)
+    })
+
+    test('seq comments with #', () => {
+      const src = source`
+        # c1
+        #
+        # c2
+        - v1
+          # c3
+          #
+        # c4
+        - v2
+      `
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).toMatchObject({
+        items: [
+          { commentBefore: ' c1\n \n c2', comment: ' c3\n ' },
+          { commentBefore: ' c4' }
+        ]
+      })
+      expect(doc.toString()).toBe(
+        source`
+          # c1
+          #·
+          # c2
+          - v1
+            # c3
+            #·
+          # c4
+          - v2
+        `.replace(/·/g, ' ')
+      )
+    })
+
+    test('seq comments without #', () => {
+      const src = source`
+        # c1
+
+        # c2
+        - v1
+          # c3
+
+        # c4
+        - v2
+      `
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).toMatchObject({
+        items: [
+          { commentBefore: ' c1\n\n c2', comment: ' c3' },
+          { commentBefore: ' c4', spaceBefore: true }
+        ]
+      })
+      expect(doc.toString()).toBe(source`
+        # c1
+
+        # c2
+        - v1 # c3
+
+        # c4
+        - v2
+      `)
     })
   })
 })
