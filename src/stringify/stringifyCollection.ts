@@ -35,9 +35,12 @@ export function stringifyCollection(
     let comment: string | null = null
     if (isNode(item)) {
       if (!chompKeep && item.spaceBefore) nodes.push({ comment: true, str: '' })
-      if (item.commentBefore) {
+      let cb = item.commentBefore
+      if (cb && chompKeep) cb = cb.replace(/^\n+/, '')
+      if (cb) {
+        if (/^\n+$/.test(cb)) cb = cb.substring(1)
         // This match will always succeed on a non-empty string
-        for (const line of item.commentBefore.match(/^.*$/gm) as string[]) {
+        for (const line of cb.match(/^.*$/gm) as string[]) {
           const str = line === ' ' ? '#' : line ? `#${line}` : ''
           nodes.push({ comment: true, str })
         }
@@ -50,9 +53,12 @@ export function stringifyCollection(
       const ik = isNode(item.key) ? item.key : null
       if (ik) {
         if (!chompKeep && ik.spaceBefore) nodes.push({ comment: true, str: '' })
-        if (ik.commentBefore) {
+        let cb = ik.commentBefore
+        if (cb && chompKeep) cb = cb.replace(/^\n+/, '')
+        if (cb) {
+          if (/^\n+$/.test(cb)) cb = cb.substring(1)
           // This match will always succeed on a non-empty string
-          for (const line of ik.commentBefore.match(/^.*$/gm) as string[]) {
+          for (const line of cb.match(/^.*$/gm) as string[]) {
             const str = line === ' ' ? '#' : line ? `#${line}` : ''
             nodes.push({ comment: true, str })
           }

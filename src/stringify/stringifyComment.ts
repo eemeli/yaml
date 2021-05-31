@@ -1,15 +1,7 @@
 export const stringifyComment = (comment: string, indent: string) =>
-  comment.replace(/^(?!$)(?: $)?/gm, `${indent}#`)
-
-export function addCommentBefore(
-  str: string,
-  indent: string,
-  comment?: string | null
-) {
-  if (!comment) return str
-  const cc = comment.replace(/([\s\S])^(?!$)(?: $)?/gm, `$1${indent}#`)
-  return `#${cc}\n${indent}${str}`
-}
+  /^\n+$/.test(comment)
+    ? comment.substring(1)
+    : comment.replace(/^(?!$)(?: $)?/gm, `${indent}#`)
 
 export function addComment(
   str: string,

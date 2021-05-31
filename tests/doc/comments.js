@@ -627,6 +627,8 @@ describe('blank lines', () => {
         expect(it).not.toHaveProperty('spaceBefore', true)
         it.spaceBefore = true
         expect(String(doc)).toBe(src)
+        it.commentBefore = '\n\n'
+        expect(String(doc)).toBe(src)
       })
     }
 
@@ -637,6 +639,8 @@ describe('blank lines', () => {
         comment: 'c',
         contents: { value: 'a\n\n' }
       })
+      expect(String(doc)).toBe(src)
+      doc.comment = '\n\nc'
       expect(String(doc)).toBe(src)
     })
   })
@@ -910,6 +914,48 @@ map:
 
         # c4
         - v2
+      `)
+    })
+  })
+
+  describe('newlines as comments', () => {
+    test('seq', () => {
+      const doc = YAML.parseDocument('- v1\n- v2\n')
+      const [v1, v2] = doc.contents.items
+      v1.commentBefore = '\n'
+      v1.comment = '\n'
+      v2.commentBefore = '\n'
+      v2.comment = '\n'
+      expect(doc.toString()).toBe(source`
+
+        - v1
+
+
+        - v2
+
+      `)
+    })
+
+    test('map', () => {
+      const doc = YAML.parseDocument('k1: v1\nk2: v2')
+      const [p1, p2] = doc.contents.items
+      p1.key.commentBefore = '\n'
+      p1.value.commentBefore = '\n'
+      p1.value.comment = '\n'
+      p2.key.commentBefore = '\n'
+      p2.value.commentBefore = '\n'
+      p2.value.comment = '\n'
+      expect(doc.toString()).toBe(source`
+
+        k1:
+
+          v1
+
+
+        k2:
+
+          v2
+
       `)
     })
   })

@@ -58,10 +58,12 @@ export function stringifyDocument(
   } else {
     lines.push(stringify(doc.contents, ctx))
   }
-  if (doc.comment) {
+  let dc = doc.comment
+  if (dc && chompKeep) dc = dc.replace(/^\n+/, '')
+  if (dc) {
     if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')
       lines.push('')
-    lines.push(stringifyComment(doc.comment, ''))
+    lines.push(stringifyComment(dc, ''))
   }
   return lines.join('\n') + '\n'
 }
