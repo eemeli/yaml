@@ -360,24 +360,25 @@ The return value of the visitor may be used to control the traversal:
 If `visitor` is a single function, it will be called with all values encountered in the tree, including e.g. `null` values.
 Alternatively, separate visitor functions may be defined for each `Map`, `Pair`, `Seq`, `Alias` and `Scalar` node.
 
-## Comments
+## Comments and Blank Lines
 
 ```js
 const doc = YAML.parseDocument(`
 # This is YAML.
 ---
 it has:
+
   - an array
+
   - of values
 `)
 
-doc.toJS()
-// { 'it has': [ 'an array', 'of values' ] }
+doc.toJS() // { 'it has': [ 'an array', 'of values' ] }
+doc.commentBefore // ' This is YAML.'
 
-doc.commentBefore
-// ' This is YAML.'
+const seq = doc.get('it has')
+seq.spaceBefore // true
 
-const seq = doc.contents.items[0].value
 seq.items[0].comment = ' item comment'
 seq.comment = ' collection end comment'
 
@@ -385,39 +386,25 @@ doc.toString()
 // # This is YAML.
 //
 // it has:
+//
 //   - an array # item comment
+//
 //   - of values
 //   # collection end comment
 ```
 
-A primary differentiator between this and other YAML libraries is the ability to programmatically handle comments, which according to [the spec](http://yaml.org/spec/1.2/spec.html#id2767100) "must not have any effect on the serialization tree or representation graph. In particular, comments are not associated with a particular node."
+A primary differentiator between this and other YAML libraries is the ability to programmatically handle comments, which according to [the spec](http://yaml.org/spec/1.2/spec.html#id2767100)
+"must not have any effect on the serialization tree or representation graph. In particular, comments are not associated with a particular node."
+Similarly to comments, the YAML spec instructs non-content blank lines to be discarded.
 
-This library does allow comments to be handled programmatically, and does attach them to particular nodes (most often, the following node). Each `Scalar`, `Map`, `Seq` and the `Document` itself has `comment` and `commentBefore` members that may be set to a stringifiable value.
+This library _does_ allow comments and blank lines to be handled programmatically, and does attach them to particular nodes (most often, the following node).
+Each `Scalar`, `Map`, `Seq` and the `Document` itself has `comment`, `commentBefore` members that may be set to a stringifiable value, and a `spaceBefore` boolean to add an empty line before the comment.
 
-The string contents of comments are not processed by the library, except for merging adjacent comment lines together and prefixing each line with the `#` comment indicator. Document comments will be separated from the rest of the document by a blank line.
+The string contents of comments are not processed by the library, except for merging adjacent comment and blank lines together.
+Document comments will be separated from the rest of the document by a blank line.
+In the node member values, comment lines terminating with the `#` indicator are represented by a single space, while completely empty lines are represented as empty strings.
 
-**Note**: Due to implementation details, the library's comment handling is not completely stable. In particular, when creating, writing, and then reading a YAML file, comments may sometimes be associated with a different node.
+Scalar block values with "keep" chomping (i.e. with `+` in their header) consider any trailing empty lines to be a part of their content, so the following node's `spaceBefore` or `commentBefore` with leading whitespace is ignored.
 
-## Blank Lines
-
-```js
-const doc = YAML.parseDocument('[ one, two, three ]')
-
-doc.contents.items[0].comment = ' item comment'
-doc.contents.items[1].spaceBefore = true
-doc.comment = ' document end comment'
-
-doc.toString()
-// [
-//   one, # item comment
-//
-//   two,
-//   three
-// ]
-//
-// # document end comment
-```
-
-Similarly to comments, the YAML spec instructs non-content blank lines to be discarded. Instead of doing that, `yaml` provides a `spaceBefore` boolean property for each node. If true, the node (and its `commentBefore`, if any) will be separated from the preceding node by a blank line.
-
-Note that scalar block values with "keep" chomping (i.e. with `+` in their header) consider any trailing empty lines to be a part of their content, so the `spaceBefore` setting of a node following such a value is ignored.
+**Note**: Due to implementation details, the library's comment handling is not completely stable, in particular for trailing comments.
+When creating, writing, and then reading a YAML file, comments may sometimes be associated with a different node.
