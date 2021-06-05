@@ -24,7 +24,7 @@ export function resolveEnd(
               'COMMENT_SPACE',
               'Comments must be separated from other tokens by white space characters'
             )
-          const cb = source.substring(1)
+          const cb = source.substring(1) || ' '
           if (!comment) comment = cb
           else comment += sep + cb
           sep = ''

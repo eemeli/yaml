@@ -1,7 +1,7 @@
 import { Collection } from '../nodes/Collection.js'
-import { addComment } from '../stringify/addComment.js'
-import { stringify, StringifyContext } from '../stringify/stringify.js'
 import { isNode, isPair } from '../nodes/Node.js'
+import { stringify, StringifyContext } from './stringify.js'
+import { addComment, stringifyComment } from './stringifyComment.js'
 
 type StringifyNode = { comment: boolean; str: string }
 
@@ -35,10 +35,15 @@ export function stringifyCollection(
     let comment: string | null = null
     if (isNode(item)) {
       if (!chompKeep && item.spaceBefore) nodes.push({ comment: true, str: '' })
-      if (item.commentBefore) {
+      let cb = item.commentBefore
+      if (cb && chompKeep) cb = cb.replace(/^\n+/, '')
+      if (cb) {
+        if (/^\n+$/.test(cb)) cb = cb.substring(1)
         // This match will always succeed on a non-empty string
-        for (const line of item.commentBefore.match(/^.*$/gm) as string[])
-          nodes.push({ comment: true, str: `#${line}` })
+        for (const line of cb.match(/^.*$/gm) as string[]) {
+          const str = line === ' ' ? '#' : line ? `#${line}` : ''
+          nodes.push({ comment: true, str })
+        }
       }
       if (item.comment) {
         comment = item.comment
@@ -48,10 +53,15 @@ export function stringifyCollection(
       const ik = isNode(item.key) ? item.key : null
       if (ik) {
         if (!chompKeep && ik.spaceBefore) nodes.push({ comment: true, str: '' })
-        if (ik.commentBefore) {
+        let cb = ik.commentBefore
+        if (cb && chompKeep) cb = cb.replace(/^\n+/, '')
+        if (cb) {
+          if (/^\n+$/.test(cb)) cb = cb.substring(1)
           // This match will always succeed on a non-empty string
-          for (const line of ik.commentBefore.match(/^.*$/gm) as string[])
-            nodes.push({ comment: true, str: `#${line}` })
+          for (const line of cb.match(/^.*$/gm) as string[]) {
+            const str = line === ' ' ? '#' : line ? `#${line}` : ''
+            nodes.push({ comment: true, str })
+          }
         }
         if (ik.comment) singleLineOutput = false
       }
@@ -113,7 +123,7 @@ export function stringifyCollection(
     for (const s of strings) str += s ? `\n${indent}${s}` : '\n'
   }
   if (comment) {
-    str += '\n' + comment.replace(/^/gm, `${indent}#`)
+    str += '\n' + stringifyComment(comment, indent)
     if (onComment) onComment()
   } else if (chompKeep && onChompKeep) onChompKeep()
   return str

@@ -48,18 +48,21 @@ export function resolveProps(
             'COMMENT_SPACE',
             'Comments must be separated from other tokens by white space characters'
           )
-        const cb = token.source.substring(1)
+        const cb = token.source.substring(1) || ' '
         if (!comment) comment = cb
         else comment += commentSep + cb
         commentSep = ''
+        atNewline = false
         break
       }
       case 'newline':
-        if (atNewline && !comment) spaceBefore = true
+        if (atNewline) {
+          if (comment) comment += token.source
+          else spaceBefore = true
+        } else commentSep += token.source
         atNewline = true
         hasNewline = true
         hasSpace = true
-        commentSep += token.source
         break
       case 'anchor':
         if (anchor)

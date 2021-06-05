@@ -1,12 +1,12 @@
 import { Document } from '../doc/Document.js'
 import { isNode } from '../nodes/Node.js'
 import { ToStringOptions } from '../options.js'
-import { addComment } from './addComment.js'
 import {
   createStringifyContext,
   stringify,
   StringifyContext
 } from './stringify.js'
+import { addComment, stringifyComment } from './stringifyComment.js'
 
 export function stringifyDocument(
   doc: Readonly<Document>,
@@ -24,7 +24,7 @@ export function stringifyDocument(
   if (hasDirectives) lines.push('---')
   if (doc.commentBefore) {
     if (lines.length !== 1) lines.unshift('')
-    lines.unshift(doc.commentBefore.replace(/^/gm, '#'))
+    lines.unshift(stringifyComment(doc.commentBefore, ''))
   }
 
   const ctx: StringifyContext = createStringifyContext(doc, options)
@@ -34,7 +34,7 @@ export function stringifyDocument(
     if (isNode(doc.contents)) {
       if (doc.contents.spaceBefore && hasDirectives) lines.push('')
       if (doc.contents.commentBefore)
-        lines.push(doc.contents.commentBefore.replace(/^/gm, '#'))
+        lines.push(stringifyComment(doc.contents.commentBefore, ''))
       // top-level block scalars need to be indented if followed by a comment
       ctx.forceBlockIndent = !!doc.comment
       contentComment = doc.contents.comment
@@ -58,10 +58,12 @@ export function stringifyDocument(
   } else {
     lines.push(stringify(doc.contents, ctx))
   }
-  if (doc.comment) {
+  let dc = doc.comment
+  if (dc && chompKeep) dc = dc.replace(/^\n+/, '')
+  if (dc) {
     if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')
       lines.push('')
-    lines.push(doc.comment.replace(/^/gm, '#'))
+    lines.push(stringifyComment(dc, ''))
   }
   return lines.join('\n') + '\n'
 }
