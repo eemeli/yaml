@@ -1,9 +1,10 @@
-import type { SourceToken } from '../parse/cst.js'
+import type { SourceToken, Token } from '../parse/cst.js'
 import type { ComposeErrorHandler } from './composer.js'
 
 export interface ResolvePropsArg {
   flow?: string
   indicator: 'doc-start' | 'explicit-key-ind' | 'map-value-ind' | 'seq-item-ind'
+  next: Token | null | undefined
   offset: number
   onError: ComposeErrorHandler
   startOnNewline: boolean
@@ -11,7 +12,7 @@ export interface ResolvePropsArg {
 
 export function resolveProps(
   tokens: SourceToken[],
-  { flow, indicator, offset, onError, startOnNewline }: ResolvePropsArg
+  { flow, indicator, next, offset, onError, startOnNewline }: ResolvePropsArg
 ) {
   let spaceBefore = false
   let atNewline = startOnNewline
@@ -19,12 +20,26 @@ export function resolveProps(
   let comment = ''
   let commentSep = ''
   let hasNewline = false
+  let reqSpace = false
   let anchor: SourceToken | null = null
   let tag: SourceToken | null = null
   let comma: SourceToken | null = null
   let found: SourceToken | null = null
   let start: number | null = null
   for (const token of tokens) {
+    if (reqSpace) {
+      if (
+        token.type !== 'space' &&
+        token.type !== 'newline' &&
+        token.type !== 'comma'
+      )
+        onError(
+          token.offset,
+          'MISSING_CHAR',
+          'Tags and anchors must be separated from the next token by white space'
+        )
+      reqSpace = false
+    }
     switch (token.type) {
       case 'space':
         // At the doc level, tabs at line start may be parsed
@@ -73,6 +88,7 @@ export function resolveProps(
         if (start === null) start = token.offset
         atNewline = false
         hasSpace = false
+        reqSpace = true
         break
       case 'tag': {
         if (tag)
@@ -81,6 +97,7 @@ export function resolveProps(
         if (start === null) start = token.offset
         atNewline = false
         hasSpace = false
+        reqSpace = true
         break
       }
       case indicator:
@@ -113,6 +130,19 @@ export function resolveProps(
   }
   const last = tokens[tokens.length - 1]
   const end = last ? last.offset + last.source.length : offset
+  if (
+    reqSpace &&
+    next &&
+    next.type !== 'space' &&
+    next.type !== 'newline' &&
+    next.type !== 'comma' &&
+    (next.type !== 'scalar' || next.source !== '')
+  )
+    onError(
+      next.offset,
+      'MISSING_CHAR',
+      'Tags and anchors must be separated from the next token by white space'
+    )
   return {
     comma,
     found,

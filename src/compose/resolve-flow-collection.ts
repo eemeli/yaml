@@ -33,6 +33,7 @@ export function resolveFlowCollection(
     const props = resolveProps(start, {
       flow: fcName,
       indicator: 'explicit-key-ind',
+      next: key || sep?.[0],
       offset,
       onError,
       startOnNewline: false
@@ -117,6 +118,7 @@ export function resolveFlowCollection(
       const valueProps = resolveProps(sep || [], {
         flow: fcName,
         indicator: 'map-value-ind',
+        next: value,
         offset: keyNode.range[2],
         onError,
         startOnNewline: false

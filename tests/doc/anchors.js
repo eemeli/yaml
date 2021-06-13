@@ -321,6 +321,12 @@ y:
       expect(() => doc.toJS()).toThrow('Maximum call stack size exceeded')
       expect(String(doc)).toBe(src)
     })
+
+    test('missing whitespace', () => {
+      expect(() => YAML.parse('&a{}')).toThrow(
+        'Tags and anchors must be separated from the next token by white space'
+      )
+    })
   })
 
   describe('stringify', () => {

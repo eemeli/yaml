@@ -181,8 +181,11 @@ describe('flow collections', () => {
 describe('comments', () => {
   test('comment without whitespace after tag', () => {
     const doc = YAML.parseDocument('!<a>#cc\nA')
-    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors).toHaveLength(2)
     expect(doc.errors[0].message).toMatch(
+      'Tags and anchors must be separated from the next token by white space'
+    )
+    expect(doc.errors[1].message).toMatch(
       'Comments must be separated from other tokens by white space characters'
     )
   })

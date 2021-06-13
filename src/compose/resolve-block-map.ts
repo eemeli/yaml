@@ -23,6 +23,7 @@ export function resolveBlockMap(
     // key properties
     const keyProps = resolveProps(start, {
       indicator: 'explicit-key-ind',
+      next: key || sep?.[0],
       offset,
       onError,
       startOnNewline: true
@@ -68,6 +69,7 @@ export function resolveBlockMap(
     // value properties
     const valueProps = resolveProps(sep || [], {
       indicator: 'map-value-ind',
+      next: value,
       offset: keyNode.range[2],
       onError,
       startOnNewline: !key || key.type === 'block-scalar'

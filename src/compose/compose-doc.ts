@@ -30,6 +30,7 @@ export function composeDoc(
   }
   const props = resolveProps(start, {
     indicator: 'doc-start',
+    next: value || end?.[0],
     offset,
     onError,
     startOnNewline: true
