@@ -22,7 +22,6 @@ export function resolveBlockMap(
   for (const { start, key, sep, value } of bm.items) {
     // key properties
     const keyProps = resolveProps(start, {
-      ctx,
       indicator: 'explicit-key-ind',
       offset,
       onError,
@@ -68,7 +67,6 @@ export function resolveBlockMap(
 
     // value properties
     const valueProps = resolveProps(sep || [], {
-      ctx,
       indicator: 'map-value-ind',
       offset: keyNode.range[2],
       onError,

@@ -29,7 +29,6 @@ export function composeDoc(
     schema: doc.schema
   }
   const props = resolveProps(start, {
-    ctx,
     indicator: 'doc-start',
     offset,
     onError,

@@ -21,7 +21,7 @@ export function resolveEnd(
           if (reqSpace && !hasSpace)
             onError(
               token,
-              'COMMENT_SPACE',
+              'MISSING_CHAR',
               'Comments must be separated from other tokens by white space characters'
             )
           const cb = source.substring(1) || ' '

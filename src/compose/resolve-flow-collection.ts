@@ -31,7 +31,6 @@ export function resolveFlowCollection(
   for (let i = 0; i < fc.items.length; ++i) {
     const { start, key, sep, value } = fc.items[i]
     const props = resolveProps(start, {
-      ctx,
       flow: fcName,
       indicator: 'explicit-key-ind',
       offset,
@@ -116,7 +115,6 @@ export function resolveFlowCollection(
 
       // value properties
       const valueProps = resolveProps(sep || [], {
-        ctx,
         flow: fcName,
         indicator: 'map-value-ind',
         offset: keyNode.range[2],

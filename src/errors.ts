@@ -9,7 +9,6 @@ export type ErrorCode =
   | 'BAD_SCALAR_START'
   | 'BLOCK_AS_IMPLICIT_KEY'
   | 'BLOCK_IN_FLOW'
-  | 'COMMENT_SPACE'
   | 'DUPLICATE_KEY'
   | 'IMPOSSIBLE'
   | 'KEY_OVER_1024_CHARS'

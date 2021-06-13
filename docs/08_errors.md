@@ -32,7 +32,6 @@ To identify errors for special handling, you should primarily use `code` to diff
 | `BAD_SCALAR_START`       | Plain scalars cannot start with a block scalar indicator, or one of the two reserved characters: `@` and <code>`</code>. To fix, use a block or quoted scalar for the value. |
 | `BLOCK_AS_IMPLICIT_KEY`  | There's probably something wrong with the indentation, or you're trying to parse something like `a: b: c`, where it's not clear what's the key and what's the value.         |
 | `BLOCK_IN_FLOW`          | YAML scalars and collections both have block and flow styles. Flow is allowed within block, but not the other way around.                                                    |
-| `COMMENT_SPACE`          | Comments need to be separated from their preceding content by a space.                                                                                                       |
 | `DUPLICATE_KEY`          | Map keys must be unique. Use the `uniqueKeys` option to disable or customise this check when parsing.                                                                        |
 | `IMPOSSIBLE`             | This really should not happen. If you encounter this error code, please file a bug.                                                                                          |
 | `KEY_OVER_1024_CHARS`    | Due to legacy reasons, implicit keys must have their following `:` indicator after at most 1k characters.                                                                    |
@@ -51,7 +50,6 @@ To identify errors for special handling, you should primarily use `code` to diff
 Some of the errors encountered during parsing are required by the spec, but are caused by content that may be parsed unambiguously.
 To ignore these errors, use the `strict: false` option:
 
-- `COMMENT_SPACE`: Comments must be separated from other tokens by white space characters (only when preceding node is known to have ended)
 - `MULTILINE_IMPLICIT_KEY`: Implicit keys of flow sequence pairs need to be on a single line
 - `KEY_OVER_1024_CHARS`: The : indicator must be at most 1024 chars after the start of an implicit block mapping key
 

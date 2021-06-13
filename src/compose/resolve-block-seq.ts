@@ -14,7 +14,6 @@ export function resolveBlockSeq(
   let offset = bs.offset
   for (const { start, value } of bs.items) {
     const props = resolveProps(start, {
-      ctx,
       indicator: 'seq-item-ind',
       offset,
       onError,

@@ -166,7 +166,7 @@ function parseBlockScalarHeader(
         if (strict && !hasSpace) {
           const message =
             'Comments must be separated from other tokens by white space characters'
-          onError(token, 'COMMENT_SPACE', message)
+          onError(token, 'MISSING_CHAR', message)
         }
         length += token.source.length
         comment = token.source.substring(1)

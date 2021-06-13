@@ -1,9 +1,7 @@
 import type { SourceToken } from '../parse/cst.js'
-import type { ComposeContext } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 
 export interface ResolvePropsArg {
-  ctx: ComposeContext
   flow?: string
   indicator: 'doc-start' | 'explicit-key-ind' | 'map-value-ind' | 'seq-item-ind'
   offset: number
@@ -13,7 +11,7 @@ export interface ResolvePropsArg {
 
 export function resolveProps(
   tokens: SourceToken[],
-  { ctx, flow, indicator, offset, onError, startOnNewline }: ResolvePropsArg
+  { flow, indicator, offset, onError, startOnNewline }: ResolvePropsArg
 ) {
   let spaceBefore = false
   let atNewline = startOnNewline
@@ -42,10 +40,10 @@ export function resolveProps(
         hasSpace = true
         break
       case 'comment': {
-        if (ctx.options.strict && !hasSpace)
+        if (!hasSpace)
           onError(
             token,
-            'COMMENT_SPACE',
+            'MISSING_CHAR',
             'Comments must be separated from other tokens by white space characters'
           )
         const cb = token.source.substring(1) || ' '
