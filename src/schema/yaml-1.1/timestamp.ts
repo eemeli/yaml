@@ -6,7 +6,7 @@ import type { ScalarTag } from '../types.js'
 function parseSexagesimal<B extends boolean>(str: string, asBigInt?: B) {
   const sign = str[0]
   const parts = sign === '-' || sign === '+' ? str.substring(1) : str
-  const num = (n: unknown) =>
+  const num = (n: number | string) =>
     asBigInt ? (BigInt(n) as unknown as number) : Number(n)
   const res = parts
     .replace(/_/g, '')

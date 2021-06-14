@@ -391,7 +391,7 @@ describe('stringify comments', () => {
       doc.contents.items[0].commentBefore = 'c0\nc1'
       doc.contents.items[1].commentBefore = ' \nc2\n\nc3'
       doc.contents.comment = 'c4\nc5'
-      expect(String(doc)).toBe( source`
+      expect(String(doc)).toBe(source`
         #c0
         #c1
         - value 1
