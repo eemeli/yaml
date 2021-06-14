@@ -8,8 +8,10 @@ It is valid to have an anchor associated with a node even if it has no aliases.<
   <span class="nx">comment</span><span class="p">?:</span> <span class="nx">string</span>        <span class="c1">// a comment on or immediately after this</span>
   <span class="nx">commentBefore</span><span class="p">?:</span> <span class="nx">string</span>  <span class="c1">// a comment before this</span>
   <span class="nx">range</span><span class="p">?:</span> <span class="p">[</span><span class="nx">number</span><span class="p">,</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">number</span><span class="p">]</span>
-      <span class="c1">// The [start, value-end, node-end] character offsets for the part</span>
+      <span class="c1">// The `[start, value-end, node-end]` character offsets for the part</span>
       <span class="c1">// of the source parsed into this node (undefined if not parsed).</span>
+      <span class="c1">// The `value-end` and `node-end` positions are themselves not</span>
+      <span class="c1">// included in their respective ranges.</span>
   <span class="nx">spaceBefore</span><span class="p">?:</span> <span class="nx">boolean</span>
       <span class="c1">// a blank line before this node and its commentBefore</span>
   <span class="nx">tag</span><span class="p">?:</span> <span class="nx">string</span>   <span class="c1">// a fully qualified tag, if required</span>
@@ -326,21 +328,22 @@ This is useful especially if the index of the current node has changed.</li>
 
 <p>If <code>visitor</code> is a single function, it will be called with all values encountered in the tree, including e.g. <code>null</code> values.
 Alternatively, separate visitor functions may be defined for each <code>Map</code>, <code>Pair</code>, <code>Seq</code>, <code>Alias</code> and <code>Scalar</code> node.</p>
-<h2 id='comments'>Comments</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
+<h2 id='comments-and-blank-lines'>Comments and Blank Lines</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---
 it has:
+
   - an array
+
   - of values
 `</span><span class="p">)</span>
 
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
-<span class="c1">// { 'it has': [ 'an array', 'of values' ] }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span> <span class="c1">// { 'it has': [ 'an array', 'of values' ] }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span> <span class="c1">// ' This is YAML.'</span>
 
-<span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span>
-<span class="c1">// ' This is YAML.'</span>
+<span class="kd">const</span> <span class="nx">seq</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">it has</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">seq</span><span class="p">.</span><span class="nx">spaceBefore</span> <span class="c1">// true</span>
 
-<span class="kd">const</span> <span class="nx">seq</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span>
 <span class="nx">seq</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">comment</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> item comment</span><span class="dl">'</span>
 <span class="nx">seq</span><span class="p">.</span><span class="nx">comment</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> collection end comment</span><span class="dl">'</span>
 
@@ -348,33 +351,24 @@ it has:
 <span class="c1">// # This is YAML.</span>
 <span class="c1">//</span>
 <span class="c1">// it has:</span>
+<span class="c1">//</span>
 <span class="c1">//   - an array # item comment</span>
+<span class="c1">//</span>
 <span class="c1">//   - of values</span>
 <span class="c1">//   # collection end comment</span>
 </code></pre></div>
-<p>A primary differentiator between this and other YAML libraries is the ability to programmatically handle comments, which according to <a href="http://yaml.org/spec/1.2/spec.html#id2767100">the spec</a> &quot;must not have any effect on the serialization tree or representation graph. In particular, comments are not associated with a particular node.&quot;</p>
+<p>A primary differentiator between this and other YAML libraries is the ability to programmatically handle comments, which according to <a href="http://yaml.org/spec/1.2/spec.html#id2767100">the spec</a>
+&quot;must not have any effect on the serialization tree or representation graph. In particular, comments are not associated with a particular node.&quot;
+Similarly to comments, the YAML spec instructs non-content blank lines to be discarded.</p>
 
-<p>This library does allow comments to be handled programmatically, and does attach them to particular nodes (most often, the following node). Each <code>Scalar</code>, <code>Map</code>, <code>Seq</code> and the <code>Document</code> itself has <code>comment</code> and <code>commentBefore</code> members that may be set to a stringifiable value.</p>
+<p>This library <em>does</em> allow comments and blank lines to be handled programmatically, and does attach them to particular nodes (most often, the following node).
+Each <code>Scalar</code>, <code>Map</code>, <code>Seq</code> and the <code>Document</code> itself has <code>comment</code>, <code>commentBefore</code> members that may be set to a stringifiable value, and a <code>spaceBefore</code> boolean to add an empty line before the comment.</p>
 
-<p>The string contents of comments are not processed by the library, except for merging adjacent comment lines together and prefixing each line with the <code>#</code> comment indicator. Document comments will be separated from the rest of the document by a blank line.</p>
+<p>The string contents of comments are not processed by the library, except for merging adjacent comment and blank lines together.
+Document comments will be separated from the rest of the document by a blank line.
+In the node member values, comment lines terminating with the <code>#</code> indicator are represented by a single space, while completely empty lines are represented as empty strings.</p>
 
-<p><strong>Note</strong>: Due to implementation details, the library&#39;s comment handling is not completely stable. In particular, when creating, writing, and then reading a YAML file, comments may sometimes be associated with a different node.</p>
-<h2 id='blank-lines'>Blank Lines</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="dl">'</span><span class="s1">[ one, two, three ]</span><span class="dl">'</span><span class="p">)</span>
+<p>Scalar block values with &quot;keep&quot; chomping (i.e. with <code>+</code> in their header) consider any trailing empty lines to be a part of their content, so the following node&#39;s <code>spaceBefore</code> or <code>commentBefore</code> with leading whitespace is ignored.</p>
 
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">comment</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> item comment</span><span class="dl">'</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">spaceBefore</span> <span class="o">=</span> <span class="kc">true</span>
-<span class="nx">doc</span><span class="p">.</span><span class="nx">comment</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> document end comment</span><span class="dl">'</span>
-
-<span class="nx">doc</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
-<span class="c1">// [</span>
-<span class="c1">//   one, # item comment</span>
-<span class="c1">//</span>
-<span class="c1">//   two,</span>
-<span class="c1">//   three</span>
-<span class="c1">// ]</span>
-<span class="c1">//</span>
-<span class="c1">// # document end comment</span>
-</code></pre></div>
-<p>Similarly to comments, the YAML spec instructs non-content blank lines to be discarded. Instead of doing that, <code>yaml</code> provides a <code>spaceBefore</code> boolean property for each node. If true, the node (and its <code>commentBefore</code>, if any) will be separated from the preceding node by a blank line.</p>
-
-<p>Note that scalar block values with &quot;keep&quot; chomping (i.e. with <code>+</code> in their header) consider any trailing empty lines to be a part of their content, so the <code>spaceBefore</code> setting of a node following such a value is ignored.</p>
+<p><strong>Note</strong>: Due to implementation details, the library&#39;s comment handling is not completely stable, in particular for trailing comments.
+When creating, writing, and then reading a YAML file, comments may sometimes be associated with a different node.</p>

@@ -48,6 +48,12 @@ Options in various categories do not overlap, so it&#39;s fine to use a single &
 <td><code>true</code></td>
 <td>When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.</td>
 </tr>
+<tr>
+<td>uniqueKeys</td>
+<td><code>boolean ⎮ (a, b) =&gt; boolean</code></td>
+<td><code>true</code></td>
+<td>Whether key uniqueness is checked, or customised. If set to be a function, it will be passed two parsed nodes and should return a boolean value indicating their equality.</td>
+</tr>
 </tbody></table>
 <h2 id='document-options'>Document Options</h2>
 <p>Document options are relevant for operations on the <code>Document</code> object, which makes them relevant for both conversion directions.</p>
@@ -142,7 +148,7 @@ The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
   target:
     &lt;&lt;: *base
     b: base`</span>
-<span class="kd">const</span> <span class="nx">mergeResult</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">marge</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
+<span class="kd">const</span> <span class="nx">mergeResult</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">merge</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
 <span class="nx">mergeResult</span><span class="p">.</span><span class="nx">target</span>
 <span class="c1">// { a: 1, b: 'base' }</span>
 </code></pre></div>

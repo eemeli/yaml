@@ -86,8 +86,8 @@ In particular, <code>TypeError</code> may occur when parsing invalid input using
 <td>YAML scalars and collections both have block and flow styles. Flow is allowed within block, but not the other way around.</td>
 </tr>
 <tr>
-<td><code>COMMENT_SPACE</code></td>
-<td>Comments need to be separated from their preceding content by a space.</td>
+<td><code>DUPLICATE_KEY</code></td>
+<td>Map keys must be unique. Use the <code>uniqueKeys</code> option to disable or customise this check when parsing.</td>
 </tr>
 <tr>
 <td><code>IMPOSSIBLE</code></td>
@@ -139,7 +139,6 @@ In particular, <code>TypeError</code> may occur when parsing invalid input using
 To ignore these errors, use the <code>strict: false</code> option:</p>
 
 <ul>
-<li><code>COMMENT_SPACE</code>: Comments must be separated from other tokens by white space characters (only when preceding node is known to have ended)</li>
 <li><code>MULTILINE_IMPLICIT_KEY</code>: Implicit keys of flow sequence pairs need to be on a single line</li>
 <li><code>KEY_OVER_1024_CHARS</code>: The : indicator must be at most 1024 chars after the start of an implicit block mapping key</li>
 </ul>
