@@ -75,6 +75,31 @@ describe('create', () => {
     expect(alias2.source).toBe('AA1')
     expect(String(doc)).toMatch('[ &AA { a: A }, &AA1 { b: B }, *AA ]\n')
   })
+
+  test('repeated Array in createNode', () => {
+    const doc = new YAML.Document()
+    const ref = []
+    const node = doc.createNode({ src: ref, ref })
+    expect(node).toMatchObject({
+      items: [
+        { key: { value: 'src' }, value: { items: [], anchor: 'a1' } },
+        { key: { value: 'ref' }, value: { source: 'a1' } }
+      ]
+    })
+  })
+
+  test('repeated Date in createNode', () => {
+    const doc = new YAML.Document()
+    const date = new Date()
+    const value = date.toJSON()
+    const node = doc.createNode({ src: date, ref: date })
+    expect(node).toMatchObject({
+      items: [
+        { key: { value: 'src' }, value: { value, anchor: 'a1' } },
+        { key: { value: 'ref' }, value: { source: 'a1' } }
+      ]
+    })
+  })
 })
 
 describe('errors', () => {

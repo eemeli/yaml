@@ -36,7 +36,7 @@ export function createNode(
   tagName: string | undefined,
   ctx: CreateNodeContext
 ): Node {
-  if (isNode(value)) return value as Node
+  if (isNode(value)) return value
   if (isPair(value)) {
     const map = ctx.schema[MAP].createNode?.(ctx.schema, null, ctx) as YAMLMap
     map.items.push(value)
@@ -75,7 +75,11 @@ export function createNode(
   if (!tagObj) {
     if (value && typeof (value as any).toJSON === 'function')
       value = (value as any).toJSON()
-    if (!value || typeof value !== 'object') return new Scalar(value)
+    if (!value || typeof value !== 'object') {
+      const node = new Scalar(value)
+      if (ref) ref.node = node
+      return node
+    }
     tagObj =
       value instanceof Map
         ? schema[MAP]
