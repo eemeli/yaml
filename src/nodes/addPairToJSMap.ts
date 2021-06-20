@@ -63,8 +63,9 @@ function mergeToJSMap(
     | Record<string | number | symbol, unknown>,
   value: unknown
 ) {
-  const source = ctx && isAlias(value) ? value.resolve(ctx.doc) : null
-  if (!isMap(source)) throw new Error('Merge sources must be map aliases')
+  const source = ctx && isAlias(value) ? value.resolve(ctx.doc) : value
+  if (!isMap(source))
+    throw new Error('Merge sources must be maps or map aliases')
   const srcMap = source.toJSON(null, ctx, Map)
   for (const [key, value] of srcMap) {
     if (map instanceof Map) {

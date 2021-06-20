@@ -92,7 +92,8 @@ mergeResult.target
 ```
 
 **Merge** keys are a [YAML 1.1 feature](http://yaml.org/type/merge.html) that is not a part of the 1.2 spec.
-To use a merge key, assign an alias node or an array of alias nodes as the value of a `<<` key in a mapping.
+To use a merge key, assign a map or its alias or an array of such as the value of a `<<` key in a mapping.
+Multiple merge keys may be used on the same map, with earlier values taking precedence over latter ones, in case both define a value for the same key.
 
 ## CreateNode Options
 
