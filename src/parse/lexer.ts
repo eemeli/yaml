@@ -91,10 +91,14 @@ function isEmpty(ch: string) {
   }
 }
 
-const invalidFlowScalarChars = [',', '[', ']', '{', '}']
-const invalidIdentifierChars = [' ', ',', '[', ']', '{', '}', '\n', '\r', '\t']
-const isNotIdentifierChar = (ch: string) =>
-  !ch || invalidIdentifierChars.includes(ch)
+const hexDigits = '0123456789ABCDEFabcdef'.split('')
+const tagChars =
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-#;/?:@&=+$_.!~*'()".split(
+    ''
+  )
+const invalidFlowScalarChars = ',[]{}'.split('')
+const invalidAnchorChars = ' ,[]{}\n\r\t'.split('')
+const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.includes(ch)
 
 /**
  * Splits an input string into lexical tokens, i.e. smaller strings that are
@@ -342,7 +346,7 @@ export class Lexer {
         yield* this.pushCount(1)
         return 'doc'
       case '*':
-        yield* this.pushUntil(isNotIdentifierChar)
+        yield* this.pushUntil(isNotAnchorChar)
         return 'doc'
       case '"':
       case "'":
@@ -412,7 +416,7 @@ export class Lexer {
         this.flowLevel -= 1
         return this.flowLevel ? 'flow' : 'doc'
       case '*':
-        yield* this.pushUntil(isNotIdentifierChar)
+        yield* this.pushUntil(isNotAnchorChar)
         return 'flow'
       case '"':
       case "'":
@@ -590,16 +594,14 @@ export class Lexer {
   private *pushIndicators(): Generator<string, number> {
     switch (this.charAt(0)) {
       case '!':
-        if (this.charAt(1) === '<')
-          return (
-            (yield* this.pushVerbatimTag()) +
-            (yield* this.pushSpaces(true)) +
-            (yield* this.pushIndicators())
-          )
-      // fallthrough
+        return (
+          (yield* this.pushTag()) +
+          (yield* this.pushSpaces(true)) +
+          (yield* this.pushIndicators())
+        )
       case '&':
         return (
-          (yield* this.pushUntil(isNotIdentifierChar)) +
+          (yield* this.pushUntil(isNotAnchorChar)) +
           (yield* this.pushSpaces(true)) +
           (yield* this.pushIndicators())
         )
@@ -618,11 +620,27 @@ export class Lexer {
     return 0
   }
 
-  private *pushVerbatimTag() {
-    let i = this.pos + 2
-    let ch = this.buffer[i]
-    while (!isEmpty(ch) && ch !== '>') ch = this.buffer[++i]
-    return yield* this.pushToIndex(ch === '>' ? i + 1 : i, false)
+  private *pushTag() {
+    if (this.charAt(1) === '<') {
+      let i = this.pos + 2
+      let ch = this.buffer[i]
+      while (!isEmpty(ch) && ch !== '>') ch = this.buffer[++i]
+      return yield* this.pushToIndex(ch === '>' ? i + 1 : i, false)
+    } else {
+      let i = this.pos + 1
+      let ch = this.buffer[i]
+      while (ch) {
+        if (tagChars.includes(ch)) ch = this.buffer[++i]
+        else if (
+          ch === '%' &&
+          hexDigits.includes(this.buffer[i + 1]) &&
+          hexDigits.includes(this.buffer[i + 2])
+        ) {
+          ch = this.buffer[(i += 3)]
+        } else break
+      }
+      return yield* this.pushToIndex(i, false)
+    }
   }
 
   private *pushNewline() {

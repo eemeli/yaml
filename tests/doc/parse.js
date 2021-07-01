@@ -81,6 +81,24 @@ describe('tags', () => {
     })
   })
 
+  describe('invalid tags', () => {
+    for (const tag of [
+      '!t`ag x',
+      '!t^ag x',
+      '!t\\ag x',
+      '!t<ag x',
+      '!t>ag x',
+      '!t,ag x',
+      '!t"ag x'
+    ]) {
+      test(`invalid tag: ${tag}`, () => {
+        const doc = YAML.parseDocument(tag)
+        expect(doc.errors).not.toHaveLength(0)
+        expect(doc.errors[0].code).toBe('MISSING_CHAR')
+      })
+    }
+  })
+
   test('eemeli/yaml#97', () => {
     const doc = YAML.parseDocument('foo: !!float 3.0')
     expect(String(doc)).toBe('foo: !!float 3.0\n')
