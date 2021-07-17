@@ -61,6 +61,8 @@ export function composeNode(
       console.log(token)
       throw new Error(`Unsupporten token type: ${(token as any).type}`)
   }
+  if (anchor && node.anchor === '')
+    onError(anchor, 'BAD_ALIAS', 'Anchor cannot be an empty string')
   if (spaceBefore) node.spaceBefore = true
   if (comment) {
     if (token.type === 'scalar' && token.source === '') node.comment = comment
@@ -84,7 +86,11 @@ export function composeEmptyNode(
     source: ''
   }
   const node = composeScalar(ctx, token, tag, onError)
-  if (anchor) node.anchor = anchor.source.substring(1)
+  if (anchor) {
+    node.anchor = anchor.source.substring(1)
+    if (node.anchor === '')
+      onError(anchor, 'BAD_ALIAS', 'Anchor cannot be an empty string')
+  }
   if (spaceBefore) node.spaceBefore = true
   if (comment) node.comment = comment
   return node
@@ -96,6 +102,8 @@ function composeAlias(
   onError: ComposeErrorHandler
 ) {
   const alias = new Alias(source.substring(1))
+  if (alias.source === '')
+    onError(offset, 'BAD_ALIAS', 'Alias cannot be an empty string')
   const valueEnd = offset + source.length
   const re = resolveEnd(end, valueEnd, options.strict, onError)
   alias.range = [offset, valueEnd, re.offset]

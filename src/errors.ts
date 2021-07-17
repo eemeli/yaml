@@ -2,6 +2,7 @@ import type { LineCounter } from './parse/line-counter'
 
 export type ErrorCode =
   | 'ALIAS_PROPS'
+  | 'BAD_ALIAS'
   | 'BAD_DIRECTIVE'
   | 'BAD_DQ_ESCAPE'
   | 'BAD_INDENT'
@@ -12,7 +13,6 @@ export type ErrorCode =
   | 'DUPLICATE_KEY'
   | 'IMPOSSIBLE'
   | 'KEY_OVER_1024_CHARS'
-  | 'MISSING_ANCHOR'
   | 'MISSING_CHAR'
   | 'MULTILINE_IMPLICIT_KEY'
   | 'MULTIPLE_ANCHORS'

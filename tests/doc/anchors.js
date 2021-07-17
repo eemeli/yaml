@@ -128,6 +128,21 @@ describe('errors', () => {
       'Unresolved alias (the anchor must be set before the alias): AA'
     )
   })
+
+  test('empty alias', () => {
+    const doc = YAML.parseDocument('- *\n')
+    expect(doc.errors).toMatchObject([{ code: 'BAD_ALIAS' }])
+  })
+
+  test('empty anchor on value', () => {
+    const doc = YAML.parseDocument('- & foo\n')
+    expect(doc.errors).toMatchObject([{ code: 'BAD_ALIAS' }])
+  })
+
+  test('empty anchor at end', () => {
+    const doc = YAML.parseDocument('- &\n')
+    expect(doc.errors).toMatchObject([{ code: 'BAD_ALIAS' }])
+  })
 })
 
 describe('__proto__ as anchor name', () => {
@@ -217,12 +232,16 @@ describe('merge <<', () => {
     })
 
     test('multiple maps', () => {
-      const res = YAML.parse('{ <<: [{ a: A }, { b: B }], c: C }', { merge: true })
+      const res = YAML.parse('{ <<: [{ a: A }, { b: B }], c: C }', {
+        merge: true
+      })
       expect(res).toEqual({ a: 'A', b: 'B', c: 'C' })
     })
 
     test('mixed refs & maps', () => {
-      const res = YAML.parse('{ <<: [{ a: &a { A: 1 } }, *a], b: B }', { merge: true })
+      const res = YAML.parse('{ <<: [{ a: &a { A: 1 } }, *a], b: B }', {
+        merge: true
+      })
       expect(res).toEqual({ a: { A: 1 }, A: 1, b: 'B' })
     })
   })

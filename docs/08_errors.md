@@ -25,7 +25,8 @@ To identify errors for special handling, you should primarily use `code` to diff
 | Code                     | Description                                                                                                                                                                  |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ALIAS_PROPS`            | Unlike scalars and collections, alias nodes cannot have an anchor or tag associated with it.                                                                                 |
-| `BAD_DIRECTIVE`          | Only the `%YAML` and `%TAG` directives are supported, and they need to follow the specified strucutre.                                                                       |
+| `BAD_ALIAS`              | An alias identifier must be a non-empty sequence of valid characters.                                                                                                        |
+| `BAD_DIRECTIVE`          | Only the `%YAML` and `%TAG` directives are supported, and they need to follow the specified structure.                                                                       |
 | `BAD_DQ_ESCAPE`          | Double-quotes strings may include `\` escaped content, but that needs to be valid.                                                                                           |
 | `BAD_INDENT`             | Indentation is important in YAML, and collection items need to all start at the same level. Block scalars are also picky about their leading content.                        |
 | `BAD_PROP_ORDER`         | Anchors and tags must be placed after the `?`, `:` and `-` indicators.                                                                                                       |
