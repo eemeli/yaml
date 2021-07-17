@@ -323,24 +323,6 @@ test('broken document with comment before first node', () => {
   ])
 })
 
-describe('broken directives', () => {
-  for (const tag of ['%TAG', '%YAML'])
-    test(`incomplete ${tag} directive`, () => {
-      const doc = YAML.parseDocument(`${tag}\n---\n`)
-      expect(doc.errors).toMatchObject([{ pos: [0, tag.length] }])
-    })
-
-  test('missing separator at end of stream', () => {
-    const doc = YAML.parseDocument(`%YAML 1.2\n`)
-    expect(doc.errors).toMatchObject([{ pos: [10, 11] }])
-  })
-
-  test('missing separator before doc contents', () => {
-    const doc = YAML.parseDocument(`%YAML 1.2\nfoo\n`)
-    expect(doc.errors).toMatchObject([{ pos: [10, 11] }])
-  })
-})
-
 test('multiple tags on one node', () => {
   const doc = YAML.parseDocument('!foo !bar baz\n')
   expect(doc.contents).toMatchObject({ value: 'baz', type: 'PLAIN' })

@@ -47,7 +47,7 @@ function parsePrelude(prelude: string[]) {
         afterEmptyLine = false
         break
       case '%':
-        if (prelude[i + 1][0] !== '#') i += 1
+        if (prelude[i + 1]?.[0] !== '#') i += 1
         atComment = false
         break
       default:

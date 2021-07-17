@@ -38,3 +38,29 @@ describe('%TAG', () => {
     `)
   })
 })
+
+describe('broken directives', () => {
+  for (const tag of ['%TAG', '%YAML'])
+    test(`incomplete ${tag} directive`, () => {
+      const doc = parseDocument(`${tag}\n---\n`)
+      expect(doc.errors).toMatchObject([{ pos: [0, tag.length] }])
+    })
+
+  test('missing separator at end of stream', () => {
+    const doc = parseDocument(`%YAML 1.2\n`)
+    expect(doc.errors).toMatchObject([{ pos: [10, 11] }])
+  })
+
+  test('missing separator before doc contents', () => {
+    const doc = parseDocument(`%YAML 1.2\nfoo\n`)
+    expect(doc.errors).toMatchObject([{ pos: [10, 11] }])
+  })
+
+  test('lone %', () => {
+    const doc = parseDocument(`%`)
+    expect(doc).toMatchObject({
+      errors: [{ code: 'MISSING_CHAR', pos: [1, 2] }],
+      warnings: [{ code: 'BAD_DIRECTIVE', pos: [0, 1] }]
+    })
+  })
+})
