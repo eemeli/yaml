@@ -382,3 +382,11 @@ describe('logLevel', () => {
     expect(res).toMatchObject({ foo: { bar: 'baz' } })
   })
 })
+
+describe('Invalid plain first characters', () => {
+  for (const ch of [',', '%', '@', '`'])
+    test(ch, () => {
+      const doc = YAML.parseDocument(`- ${ch}foo`)
+      expect(doc.errors).toMatchObject([{ code: 'BAD_SCALAR_START' }])
+    })
+})

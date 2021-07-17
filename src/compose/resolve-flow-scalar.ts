@@ -68,24 +68,30 @@ export function resolveFlowScalar(
 }
 
 function plainValue(source: string, onError: FlowScalarErrorHandler) {
-  let message = ''
+  let badChar = ''
   switch (source[0]) {
     /* istanbul ignore next should not happen */
     case '\t':
-      message = 'Plain value cannot start with a tab character'
+      badChar = 'a tab character'
+      break
+    case ',':
+      badChar = 'flow indicator character ,'
+      break
+    case '%':
+      badChar = 'directive indicator character %'
       break
     case '|':
     case '>': {
-      message = `Plain value cannot start with block scalar indicator ${source[0]}`
+      badChar = `block scalar indicator ${source[0]}`
       break
     }
     case '@':
     case '`': {
-      message = `Plain value cannot start with reserved character ${source[0]}`
+      badChar = `reserved character ${source[0]}`
       break
     }
   }
-  if (message) onError(0, 'BAD_SCALAR_START', message)
+  if (badChar) onError(0, 'BAD_SCALAR_START',  `Plain value cannot start with ${badChar}`)
   return foldLines(source)
 }
 
