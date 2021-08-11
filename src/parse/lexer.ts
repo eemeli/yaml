@@ -157,6 +157,9 @@ export class Lexer {
   /** Indentation level of the current line. */
   private indentValue = 0
 
+  /** Position of the next \n character. */
+  private lineEndPos: number | null = null
+
   /** Stores the state of the lexer if reaching the end of incpomplete input */
   private next: State | null = null
 
@@ -170,7 +173,10 @@ export class Lexer {
    * @returns A generator of lexical tokens
    */
   *lex(source: string, incomplete = false) {
-    if (source) this.buffer = this.buffer ? this.buffer + source : source
+    if (source) {
+      this.buffer = this.buffer ? this.buffer + source : source
+      this.lineEndPos = null
+    }
     this.atEnd = !incomplete
     let next: State | null = this.next || 'stream'
     while (next && (incomplete || this.hasChars(1)))
@@ -212,7 +218,11 @@ export class Lexer {
   }
 
   private getLine(): string | null {
-    let end = this.buffer.indexOf('\n', this.pos)
+    let end = this.lineEndPos
+    if (typeof end !== 'number' || (end !== -1 && end < this.pos)) {
+      end = this.buffer.indexOf('\n', this.pos)
+      this.lineEndPos = end
+    }
     if (end === -1) return this.atEnd ? this.buffer.substring(this.pos) : null
     if (this.buffer[end - 1] === '\r') end -= 1
     return this.buffer.substring(this.pos, end)
@@ -452,14 +462,16 @@ export class Lexer {
         end = this.buffer.indexOf('"', end + 1)
       }
     }
-    let nl = this.buffer.indexOf('\n', this.pos)
-    if (nl !== -1 && nl < end) {
-      while (nl !== -1 && nl < end) {
+    // Only looking for newlines within the quotes
+    const qb = this.buffer.substring(0, end)
+    let nl = qb.indexOf('\n', this.pos)
+    if (nl !== -1) {
+      while (nl !== -1) {
         const cs = this.continueScalar(nl + 1)
         if (cs === -1) break
-        nl = this.buffer.indexOf('\n', cs)
+        nl = qb.indexOf('\n', cs)
       }
-      if (nl !== -1 && nl < end) {
+      if (nl !== -1) {
         // this is an error caused by an unexpected unindent
         end = nl - 1
       }
