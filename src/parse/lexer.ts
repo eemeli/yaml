@@ -235,6 +235,7 @@ export class Lexer {
   private setNext(state: State) {
     this.buffer = this.buffer.substring(this.pos)
     this.pos = 0
+    this.lineEndPos = null
     this.next = state
     return null
   }

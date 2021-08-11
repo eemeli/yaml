@@ -10,7 +10,7 @@ aa: AA
  AA
 'bb': 'BB
   BB'
-"cc": "CC"
+"cc": "CC\n\n \\ "
 ? |
  dd
 : >
@@ -42,7 +42,7 @@ describe('Input in parts', () => {
       expect(exp[0]).toMatchObject({
         aa: 'AA AA',
         bb: 'BB BB',
-        cc: 'CC',
+        cc: 'CC\n ',
         'dd\n': '\nDD\n DD\n\nDD\n',
         EE: null,
         '[ ee, ff ]': { 'gg gg': ['GG'] },
