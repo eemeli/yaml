@@ -182,12 +182,20 @@ export class Document<T = unknown> {
       replacer = undefined
     }
 
-    const { anchorPrefix, flow, keepUndefined, onTagObj, tag } = options || {}
+    const {
+      aliasDuplicateObjects,
+      anchorPrefix,
+      flow,
+      keepUndefined,
+      onTagObj,
+      tag
+    } = options || {}
     const { onAnchor, setAnchors, sourceObjects } = createNodeAnchors(
       this,
       anchorPrefix || 'a'
     )
     const ctx: CreateNodeContext = {
+      aliasDuplicateObjects: aliasDuplicateObjects ?? true,
       keepUndefined: keepUndefined ?? false,
       onAnchor,
       onTagObj,

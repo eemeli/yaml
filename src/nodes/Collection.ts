@@ -26,6 +26,8 @@ export function collectionFromPath(
     }
   }
   return createNode(v, undefined, {
+    aliasDuplicateObjects: true,
+    keepUndefined: false,
     onAnchor() {
       throw new Error('Repeated objects are not supported here')
     },
