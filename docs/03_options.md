@@ -99,12 +99,13 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 
 Used by: `stringify()`, `new Document()`, `doc.createNode()`, and `doc.createPair()`
 
-| Name          | Type      | Default | Description                                                                                                                                      |
-| ------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| anchorPrefix  | `string`  | `'a'`   | Default prefix for anchors, resulting in anchors `a1`, `a2`, ... by default.                                                                     |
-| flow          | `boolean` | `false` | Force the top-level collection node to use flow style.                                                                                           |
-| keepUndefined | `boolean` | `false` | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`.                                    |
-| tag           | `string`  |         | Specify the top-level collection type, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available in this document's schema. |
+| Name                  | Type      | Default | Description                                                                                                                                      |
+| --------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| aliasDuplicateObjects | `boolean` | `true`  | During node construction, use anchors and aliases to keep strictly equal non-null objects as equivalent in YAML.                                 |
+| anchorPrefix          | `string`  | `'a'`   | Default prefix for anchors, resulting in anchors `a1`, `a2`, ... by default.                                                                     |
+| flow                  | `boolean` | `false` | Force the top-level collection node to use flow style.                                                                                           |
+| keepUndefined         | `boolean` | `false` | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`.                                    |
+| tag                   | `string`  |         | Specify the top-level collection type, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available in this document's schema. |
 
 ## ToJS Options
 

@@ -15,19 +15,14 @@ export function collectionFromPath(
       a[k] = v
       v = a
     } else {
-      const o = {}
-      Object.defineProperty(o, typeof k === 'symbol' ? k : String(k), {
-        value: v,
-        writable: true,
-        enumerable: true,
-        configurable: true
-      })
-      v = o
+      v = new Map<unknown, unknown>([[k, v]])
     }
   }
   return createNode(v, undefined, {
-    onAnchor() {
-      throw new Error('Repeated objects are not supported here')
+    aliasDuplicateObjects: false,
+    keepUndefined: false,
+    onAnchor: () => {
+      throw new Error('This should not happen, please report a bug.')
     },
     schema,
     sourceObjects: new Map()

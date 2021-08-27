@@ -120,6 +120,14 @@ export type SchemaOptions = {
 
 export type CreateNodeOptions = {
   /**
+   * During node construction, use anchors and aliases to keep strictly equal
+   * non-null objects as equivalent in YAML.
+   *
+   * Default: `true`
+   */
+  aliasDuplicateObjects?: boolean
+
+  /**
    * Default prefix for anchors.
    *
    * Default: `'a'`, resulting in anchors `a1`, `a2`, etc.

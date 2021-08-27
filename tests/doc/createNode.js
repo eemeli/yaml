@@ -297,6 +297,31 @@ describe('toJSON()', () => {
   })
 })
 
+describe('strictly equal objects', () => {
+  test('createNode([foo, foo])', () => {
+    const foo = { foo: 'FOO' }
+    const s = doc.createNode([foo, foo])
+    expect(s).toBeInstanceOf(YAMLSeq)
+    expect(s.items).toMatchObject([
+      {
+        anchor: 'a1',
+        items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }]
+      },
+      { source: 'a1' }
+    ])
+  })
+
+  test('createNode([foo, foo], { aliasDuplicateObjects: false })', () => {
+    const foo = { foo: 'FOO' }
+    const s = doc.createNode([foo, foo], { aliasDuplicateObjects: false })
+    expect(s).toBeInstanceOf(YAMLSeq)
+    expect(s.items).toMatchObject([
+      { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] },
+      { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] }
+    ])
+  })
+})
+
 describe('circular references', () => {
   test('parent at root', () => {
     const map = { foo: 'bar' }

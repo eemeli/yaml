@@ -9,7 +9,8 @@ import type { Replacer } from './Document.js'
 const defaultTagPrefix = 'tag:yaml.org,2002:'
 
 export interface CreateNodeContext {
-  keepUndefined?: boolean
+  aliasDuplicateObjects: boolean
+  keepUndefined: boolean
   onAnchor(source: unknown): string
   onTagObj?: (tagObj: ScalarTag | CollectionTag) => void
   sourceObjects: Map<unknown, { anchor: string | null; node: Node | null }>
@@ -52,12 +53,13 @@ export function createNode(
     value = value.valueOf()
   }
 
-  const { onAnchor, onTagObj, schema, sourceObjects } = ctx
+  const { aliasDuplicateObjects, onAnchor, onTagObj, schema, sourceObjects } =
+    ctx
 
   // Detect duplicate references to the same object & use Alias nodes for all
   // after first. The `ref` wrapper allows for circular references to resolve.
   let ref: { anchor: string | null; node: Node | null } | undefined = undefined
-  if (value && typeof value === 'object') {
+  if (aliasDuplicateObjects && value && typeof value === 'object') {
     ref = sourceObjects.get(value)
     if (ref) {
       if (!ref.anchor) ref.anchor = onAnchor(value)

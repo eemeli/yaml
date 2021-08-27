@@ -520,4 +520,37 @@ describe('Document', () => {
     doc.setIn(['c', '__proto__'], 9)
     expect(String(doc)).toBe('a: 1\nb:\n  - 2\n  - 3\nc:\n  __proto__: 9\n')
   })
+
+  test('setIn with object key', () => {
+    doc.contents = null
+    const foo = { foo: 'FOO' }
+    doc.setIn([foo], 'BAR')
+    expect(doc.contents.items).toMatchObject([
+      {
+        key: { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] },
+        value: { value: 'BAR' }
+      }
+    ])
+  })
+
+  test('setIn with repeated object key', () => {
+    doc.contents = null
+    const foo = { foo: 'FOO' }
+    doc.setIn([foo, foo], 'BAR')
+    expect(doc.contents.items).toMatchObject([
+      {
+        key: { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] },
+        value: {
+          items: [
+            {
+              key: {
+                items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }]
+              },
+              value: { value: 'BAR' }
+            }
+          ]
+        }
+      }
+    ])
+  })
 })
