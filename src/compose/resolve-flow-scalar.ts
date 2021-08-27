@@ -91,7 +91,8 @@ function plainValue(source: string, onError: FlowScalarErrorHandler) {
       break
     }
   }
-  if (badChar) onError(0, 'BAD_SCALAR_START',  `Plain value cannot start with ${badChar}`)
+  if (badChar)
+    onError(0, 'BAD_SCALAR_START', `Plain value cannot start with ${badChar}`)
   return foldLines(source)
 }
 
