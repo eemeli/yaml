@@ -40,6 +40,12 @@ export class Directives {
     this.tags = Object.assign({}, Directives.defaultTags, tags)
   }
 
+  clone(): Directives {
+    const copy = new Directives(this.yaml, this.tags)
+    copy.marker = this.marker
+    return copy
+  }
+
   /**
    * During parsing, get a Directives instance for the current document and
    * update the stream state according to the current version's spec.

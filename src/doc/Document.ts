@@ -4,6 +4,7 @@ import { collectionFromPath, isEmptyPath } from '../nodes/Collection.js'
 import {
   DOC,
   isCollection,
+  isNode,
   isScalar,
   Node,
   NODE_TYPE,
@@ -122,6 +123,29 @@ export class Document<T = unknown> {
     else {
       this.contents = this.createNode(value, _replacer, options) as unknown as T
     }
+  }
+
+  /**
+   * Create a deep copy of this Document and its contents.
+   *
+   * Custom Node values that inherit from `Object` still refer to their original instances.
+   */
+  clone(): Document<T> {
+    const copy: Document<T> = Object.create(Document.prototype, {
+      [NODE_TYPE]: { value: DOC }
+    })
+    copy.commentBefore = this.commentBefore
+    copy.comment = this.comment
+    copy.errors = this.errors.slice()
+    copy.warnings = this.warnings.slice()
+    copy.options = Object.assign({}, this.options)
+    copy.directives = this.directives.clone()
+    copy.schema = this.schema.clone()
+    copy.contents = isNode(this.contents)
+      ? (this.contents.clone(copy.schema) as unknown as T)
+      : this.contents
+    if (this.range) copy.range = this.range.slice() as Document['range']
+    return copy
   }
 
   /** Adds a value to the document. */

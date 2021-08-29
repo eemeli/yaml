@@ -1,9 +1,10 @@
 import { createNode, CreateNodeContext } from '../doc/createNode.js'
-import { StringifyContext } from '../stringify/stringify.js'
+import type { Schema } from '../schema/Schema.js'
+import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyPair } from '../stringify/stringifyPair.js'
 import { addPairToJSMap } from './addPairToJSMap.js'
-import { NODE_TYPE, PAIR } from './Node.js'
-import { ToJSContext } from './toJS.js'
+import { isNode, NODE_TYPE, PAIR } from './Node.js'
+import type { ToJSContext } from './toJS.js'
 
 export function createPair(
   key: unknown,
@@ -28,6 +29,13 @@ export class Pair<K = unknown, V = unknown> {
     Object.defineProperty(this, NODE_TYPE, { value: PAIR })
     this.key = key
     this.value = value
+  }
+
+  clone(schema?: Schema): Pair<K, V> {
+    let { key, value } = this
+    if (isNode(key)) key = key.clone(schema) as unknown as K
+    if (isNode(value)) value = value.clone(schema) as unknown as V
+    return new Pair(key, value)
   }
 
   toJSON(_?: unknown, ctx?: ToJSContext): ReturnType<typeof addPairToJSMap> {

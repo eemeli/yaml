@@ -19,8 +19,9 @@ class NodeBase {
       // included in their respective ranges.
   spaceBefore?: boolean
       // a blank line before this node and its commentBefore
-  tag?: string   // a fully qualified tag, if required
-  toJSON(): any  // a plain JS or JSON representation of this node
+  tag?: string       // a fully qualified tag, if required
+  clone(): NodeBase  // a copy of this node
+  toJSON(): any      // a plain JS or JSON representation of this node
 }
 ```
 
@@ -58,6 +59,7 @@ class Collection extends NodeBase {
   flow?: boolean   // use flow style when stringifying this
   schema?: Schema
   addIn(path: Iterable<unknown>, value: unknown): void
+  clone(schema?: Schema): NodeBase  // a deep copy of this collection
   deleteIn(path: Iterable<unknown>): boolean
   getIn(path: Iterable<unknown>, keepScalar?: boolean): unknown
   hasIn(path: Iterable<unknown>): boolean
@@ -193,6 +195,11 @@ To create a new node, use the `createNode(value, options?)` document method.
 This will recursively wrap any input with appropriate `Node` containers.
 Generic JS `Object` values as well as `Map` and its descendants become mappings, while arrays and other iterable objects result in sequences.
 With `Object`, entries that have an `undefined` value are dropped.
+
+If `value` is already a `Node` instance, it will be directly returned.
+To create a copy of a node, use instead the `node.clone()` method.
+For collections, the method accepts a single `Schema` argument,
+which allows overwriting the original's `schema` value.
 
 Use a `replacer` to apply a replacer array or function, following the [JSON implementation][replacer].
 To force flow styling on a collection, use the `flow: true` option.
