@@ -1,5 +1,5 @@
 import { Alias } from '../nodes/Alias.js'
-import { isNode, isPair, MAP, Node, SEQ } from '../nodes/Node.js'
+import { isDocument, isNode, isPair, MAP, Node, SEQ } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { Schema } from '../schema/Schema.js'
@@ -37,6 +37,7 @@ export function createNode(
   tagName: string | undefined,
   ctx: CreateNodeContext
 ): Node {
+  if (isDocument(value)) value = value.contents
   if (isNode(value)) return value
   if (isPair(value)) {
     const map = ctx.schema[MAP].createNode?.(ctx.schema, null, ctx) as YAMLMap
