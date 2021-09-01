@@ -8,8 +8,10 @@ import {
 } from './foldFlowLines.js'
 import type { StringifyContext } from './stringify.js'
 
-interface StringifyScalar extends Scalar {
+interface StringifyScalar {
   value: string
+  comment?: string | null
+  type?: string
 }
 
 const getFoldOptions = (ctx: StringifyContext): FoldOptions => ({
@@ -318,9 +320,9 @@ export function stringifyString(
   onChompKeep?: () => void
 ) {
   const { implicitKey, inFlow } = ctx
-  const ss: Scalar<string> =
+  const ss: StringifyScalar =
     typeof item.value === 'string'
-      ? (item as Scalar<string>)
+      ? (item as StringifyScalar)
       : Object.assign({}, item, { value: String(item.value) })
 
   let { type } = item

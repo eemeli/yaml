@@ -102,4 +102,14 @@ export abstract class NodeBase {
   constructor(type: symbol) {
     Object.defineProperty(this, NODE_TYPE, { value: type })
   }
+
+  /** Create a copy of this node.  */
+  clone(): NodeBase {
+    const copy: NodeBase = Object.create(
+      Object.getPrototypeOf(this),
+      Object.getOwnPropertyDescriptors(this)
+    )
+    if (this.range) copy.range = this.range.slice() as NodeBase['range']
+    return copy
+  }
 }

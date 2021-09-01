@@ -1,6 +1,13 @@
 import { createNode } from '../doc/createNode.js'
 import type { Schema } from '../schema/Schema.js'
-import { isCollection, isPair, isScalar, NodeBase, NODE_TYPE } from './Node.js'
+import {
+  isCollection,
+  isNode,
+  isPair,
+  isScalar,
+  NodeBase,
+  NODE_TYPE
+} from './Node.js'
 
 export function collectionFromPath(
   schema: Schema,
@@ -60,6 +67,24 @@ export abstract class Collection extends NodeBase {
       enumerable: false,
       writable: true
     })
+  }
+
+  /**
+   * Create a copy of this collection.
+   *
+   * @param schema - If defined, overwrites the original's schema
+   */
+  clone(schema?: Schema): Collection {
+    const copy: Collection = Object.create(
+      Object.getPrototypeOf(this),
+      Object.getOwnPropertyDescriptors(this)
+    )
+    if (schema) copy.schema = schema
+    copy.items = copy.items.map(it =>
+      isNode(it) || isPair(it) ? it.clone(schema) : it
+    )
+    if (this.range) copy.range = this.range.slice() as NodeBase['range']
+    return copy
   }
 
   /** Adds a value to the collection. */
