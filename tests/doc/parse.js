@@ -376,7 +376,8 @@ aliases:
         version: 2
       }
     })
-    expect(String(doc)).toBe(src)
+    const exp = src.replace(/\r\n/g, '\n') // To account for git core.autocrlf true on Windows
+    expect(String(doc)).toBe(exp)
   })
 
   test('minimal', () => {

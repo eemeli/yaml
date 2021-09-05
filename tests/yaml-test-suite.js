@@ -91,11 +91,15 @@ testDirs.forEach(dir => {
       }
     })
     if (!error) {
-      const src2 =
-        docs.map(doc => String(doc).replace(/\n$/, '')).join('\n...\n') + '\n'
-      const docs2 = parseAllDocuments(src2, { resolveKnownTags: false })
-
-      if (json) _test('stringfy+re-parse', () => matchJson(docs2, json))
+      if (json) {
+        _test('stringfy+re-parse', () => {
+          const src2 =
+            docs.map(doc => String(doc).replace(/\n$/, '')).join('\n...\n') +
+            '\n'
+          const docs2 = parseAllDocuments(src2, { resolveKnownTags: false })
+          matchJson(docs2, json)
+        })
+      }
 
       if (outYaml) {
         _test('out.yaml', () => {
