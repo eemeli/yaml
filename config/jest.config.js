@@ -1,6 +1,6 @@
 let moduleNameMapper
 const transform = {
-  '/tests/.*\\.(js|ts)$': [
+  '[/\\\\]tests[/\\\\].*\\.(js|ts)$': [
     'babel-jest',
     { configFile: './config/babel.config.js' }
   ]
@@ -25,7 +25,7 @@ switch (process.env.npm_lifecycle_event) {
       '^yaml/util$': '<rootDir>/src/util.ts',
       '^yaml/test-events$': '<rootDir>/src/test-events.ts'
     }
-    transform['/src/.*\\.ts$'] = [
+    transform['[/\\\\]src[/\\\\].*\\.ts$'] = [
       'babel-jest',
       { configFile: './config/babel.config.js' }
     ]
