@@ -18,8 +18,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
+        with: { submodules: true }
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
