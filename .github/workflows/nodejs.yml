@@ -17,7 +17,6 @@ jobs:
         node-version: [12.x, 14.x, 16.x]
 
     steps:
-      - run: git config --global core.autocrlf false
       - uses: actions/checkout@v2
         with: { submodules: true }
       - name: Use Node.js ${{ matrix.node-version }}
