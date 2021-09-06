@@ -159,6 +159,10 @@ function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
         // skip escaped newlines, but still trim the following line
         next = source[i + 1]
         while (next === ' ' || next === '\t') next = source[++i + 1]
+      } else if (next === '\r' && source[i + 1] === '\n') {
+        // skip escaped CRLF newlines, but still trim the following line
+        next = source[++i + 1]
+        while (next === ' ' || next === '\t') next = source[++i + 1]
       } else if (next === 'x' || next === 'u' || next === 'U') {
         const length = { x: 2, u: 4, U: 8 }[next]
         res += parseCharCode(source, i + 1, length, onError)
@@ -173,7 +177,8 @@ function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
       const wsStart = i
       let next = source[i + 1]
       while (next === ' ' || next === '\t') next = source[++i + 1]
-      if (next !== '\n') res += i > wsStart ? source.slice(wsStart, i + 1) : ch
+      if (next !== '\n' && !(next === '\r' && source[i + 2] === '\n'))
+        res += i > wsStart ? source.slice(wsStart, i + 1) : ch
     } else {
       res += ch
     }

@@ -918,3 +918,15 @@ describe('reviver', () => {
     ])
   })
 })
+
+describe('CRLF line endings', () => {
+  test('trailing space in double-quoted scalar', () => {
+    const res = YAML.parse('"foo \r\nbar"')
+    expect(res).toBe('foo bar')
+  })
+
+  test('escaped newline in double-quoted scalar', () => {
+    const res = YAML.parse('"foo \\\r\nbar"')
+    expect(res).toBe('foo bar')
+  })
+})
