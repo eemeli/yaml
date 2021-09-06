@@ -560,15 +560,16 @@ export class Lexer {
         if (isEmpty(next) || (inFlow && next === ',')) break
         end = i
       } else if (isEmpty(ch)) {
-        const next = this.buffer[i + 1]
-        if (next === '#' || (inFlow && invalidFlowScalarChars.includes(next)))
-          break
+        let next = this.buffer[i + 1]
         if (ch === '\r') {
           if (next === '\n') {
             i += 1
             ch = '\n'
+            next = this.buffer[i + 1]
           } else end = i
         }
+        if (next === '#' || (inFlow && invalidFlowScalarChars.includes(next)))
+          break
         if (ch === '\n') {
           const cs = this.continueScalar(i + 1)
           if (cs === -1) break
