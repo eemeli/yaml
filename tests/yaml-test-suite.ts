@@ -21,11 +21,7 @@ function testJsonMatch(docs: Document[], json: string) {
           .split('\n')
           .map(line => JSON.parse(line))
       : [JSON.parse(json)]
-  if (!received || typeof received !== 'object') {
-    expect(received).toBe(expected)
-  } else {
-    expect(received).toMatchObject(expected)
-  }
+  expect(received).toEqual(expected)
 }
 
 const testRoot = resolve(__dirname, 'yaml-test-suite')
@@ -68,7 +64,8 @@ for (const dir of testDirs) {
     if (events) {
       test_('test.event', () => {
         const res = testEvents(yaml)
-        expect(res.events.join('\n') + '\n').toBe(events)
+        const exp = events.replace(/\r\n/g, '\n')
+        expect(res.events.join('\n') + '\n').toBe(exp)
         expect(res.error).toBeNull()
       })
     }
@@ -110,7 +107,7 @@ for (const dir of testDirs) {
             const resJson = resDocs.map(doc => doc.toJS({ mapAsMap: true }))
             const expDocs = parseAllDocuments(outYaml)
             const expJson = expDocs.map(doc => doc.toJS({ mapAsMap: true }))
-            expect(resJson).toMatchObject(expJson)
+            expect(resJson).toEqual(expJson)
           })
         }
       }
