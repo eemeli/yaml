@@ -474,7 +474,7 @@ export class Lexer {
       }
       if (nl !== -1) {
         // this is an error caused by an unexpected unindent
-        end = nl - 1
+        end = nl - (qb[nl - 1] === '\r' ? 2 : 1)
       }
     }
     if (end === -1) {
