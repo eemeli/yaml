@@ -1,3 +1,4 @@
+import type { BlockScalar, FlowScalar } from '../parse/cst.js'
 import { NodeBase, Range, SCALAR } from './Node.js'
 import { toJS, ToJSContext } from './toJS.js'
 
@@ -8,6 +9,7 @@ export declare namespace Scalar {
   interface Parsed extends Scalar {
     range: Range
     source: string
+    srcToken?: FlowScalar | BlockScalar
   }
 
   type BLOCK_FOLDED = 'BLOCK_FOLDED'

@@ -20,6 +20,14 @@ export type ParseOptions = {
   intAsBigInt?: boolean
 
   /**
+   * Include a `srcToken` value on each parsed `Node`, containing the CST token
+   * that was composed into this node.
+   *
+   * Default: `false`
+   */
+  keepSourceTokens?: boolean
+
+  /**
    * If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)`
    * to provide the `{ line, col }` positions within the input.
    */
@@ -325,6 +333,7 @@ export const defaultOptions: Required<
   Omit<ParseOptions, 'lineCounter'> & Omit<DocumentOptions, 'directives'>
 > = {
   intAsBigInt: false,
+  keepSourceTokens: false,
   logLevel: 'warn',
   prettyErrors: true,
   strict: true,

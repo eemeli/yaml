@@ -1,3 +1,4 @@
+import type { BlockMap, FlowCollection } from '../parse/cst.js'
 import type { Schema } from '../schema/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyCollection } from '../stringify/stringifyCollection.js'
@@ -29,6 +30,7 @@ export declare namespace YAMLMap {
   > extends YAMLMap<K, V> {
     items: Pair<K, V>[]
     range: Range
+    srcToken?: BlockMap | FlowCollection
   }
 }
 

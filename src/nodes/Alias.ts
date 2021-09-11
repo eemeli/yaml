@@ -1,7 +1,8 @@
-import { anchorIsValid } from '../doc/anchors'
-import type { Document } from '../doc/Document'
+import { anchorIsValid } from '../doc/anchors.js'
+import type { Document } from '../doc/Document.js'
+import type { FlowScalar } from '../parse/cst.js'
 import type { StringifyContext } from '../stringify/stringify.js'
-import { visit } from '../visit'
+import { visit } from '../visit.js'
 import {
   ALIAS,
   isAlias,
@@ -13,12 +14,13 @@ import {
 } from './Node.js'
 import type { Scalar } from './Scalar'
 import type { ToJSContext } from './toJS.js'
-import type { YAMLMap } from './YAMLMap'
-import type { YAMLSeq } from './YAMLSeq'
+import type { YAMLMap } from './YAMLMap.js'
+import type { YAMLSeq } from './YAMLSeq.js'
 
 export declare namespace Alias {
   interface Parsed extends Alias {
     range: Range
+    srcToken?: FlowScalar & { type: 'alias' }
   }
 }
 

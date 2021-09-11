@@ -68,6 +68,7 @@ export function composeNode(
     if (token.type === 'scalar' && token.source === '') node.comment = comment
     else node.commentBefore = comment
   }
+  if (ctx.options.keepSourceTokens) node.srcToken = token
   return node
 }
 
