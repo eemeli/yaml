@@ -13,6 +13,26 @@ import type { BlockScalar, FlowScalar, SourceToken, Token } from './cst.js'
  * Otherwise, return `null`.
  */
 export function resolveAsScalar(
+  token: FlowScalar | BlockScalar,
+  strict?: boolean,
+  onError?: (offset: number, code: ErrorCode, message: string) => void
+): {
+  value: string
+  type: Scalar.Type | null
+  comment: string
+  range: Range
+}
+export function resolveAsScalar(
+  token: Token | null | undefined,
+  strict?: boolean,
+  onError?: (offset: number, code: ErrorCode, message: string) => void
+): {
+  value: string
+  type: Scalar.Type | null
+  comment: string
+  range: Range
+} | null
+export function resolveAsScalar(
   token: Token | null | undefined,
   strict = true,
   onError?: (offset: number, code: ErrorCode, message: string) => void
