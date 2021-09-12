@@ -1,4 +1,5 @@
 import { createNode, CreateNodeContext } from '../doc/createNode.js'
+import type { CollectionItem } from '../parse/cst.js'
 import type { Schema } from '../schema/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyPair } from '../stringify/stringifyPair.js'
@@ -24,6 +25,9 @@ export class Pair<K = unknown, V = unknown> {
 
   /** Always Node or null when parsed, but can be set to anything. */
   value: V | null
+
+  /** The CST token that was composed into this pair.  */
+  declare srcToken?: CollectionItem
 
   constructor(key: K, value: V | null = null) {
     Object.defineProperty(this, NODE_TYPE, { value: PAIR })

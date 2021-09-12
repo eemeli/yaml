@@ -746,17 +746,27 @@ describe('__proto__ as mapping key', () => {
 })
 
 describe('keepSourceTokens', () => {
-  test('default false', () => {
-    const doc = YAML.parseDocument('foo: bar')
-    expect(doc.contents).not.toHaveProperty('srcToken')
-    expect(doc.get('foo', true)).not.toHaveProperty('srcToken')
-  })
+  for (const [src, type] of [
+    ['foo: bar', 'block-map'],
+    ['{ foo: bar }', 'flow-collection']
+  ]) {
+    test(`${type}: default false`, () => {
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).not.toHaveProperty('srcToken')
+      expect(doc.contents.items[0]).not.toHaveProperty('srcToken')
+      expect(doc.get('foo', true)).not.toHaveProperty('srcToken')
+    })
 
-  test('included when set', () => {
-    const doc = YAML.parseDocument('foo: bar', { keepSourceTokens: true })
-    expect(doc.contents.srcToken).toMatchObject({ type: 'block-map' })
-    expect(doc.get('foo', true).srcToken).toMatchObject({ type: 'scalar' })
-  })
+    test(`${type}: included when set`, () => {
+      const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+      expect(doc.contents.srcToken).toMatchObject({ type })
+      expect(doc.contents.items[0].srcToken).toMatchObject({
+        key: { type: 'scalar' },
+        value: { type: 'scalar' }
+      })
+      expect(doc.get('foo', true).srcToken).toMatchObject({ type: 'scalar' })
+    })
+  }
 
   test('allow for CST modifications (eemeli/yaml#903)', () => {
     const src = 'foo:\n  [ 42 ]'

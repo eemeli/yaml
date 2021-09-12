@@ -19,7 +19,9 @@ export function resolveBlockMap(
   const map = new YAMLMap<ParsedNode, ParsedNode>(ctx.schema)
 
   let offset = bm.offset
-  for (const { start, key, sep, value } of bm.items) {
+  for (const collItem of bm.items) {
+    const { start, key, sep, value } = collItem
+
     // key properties
     const keyProps = resolveProps(start, {
       indicator: 'explicit-key-ind',
@@ -99,7 +101,9 @@ export function resolveBlockMap(
         ? composeNode(ctx, value, valueProps, onError)
         : composeEmptyNode(ctx, offset, sep, null, valueProps, onError)
       offset = valueNode.range[2]
-      map.items.push(new Pair(keyNode, valueNode))
+      const pair = new Pair(keyNode, valueNode)
+      if (ctx.options.keepSourceTokens) pair.srcToken = collItem
+      map.items.push(pair)
     } else {
       // key with no value
       if (implicitKey)
@@ -112,7 +116,9 @@ export function resolveBlockMap(
         if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
         else keyNode.comment = valueProps.comment
       }
-      map.items.push(new Pair(keyNode))
+      const pair: Pair<ParsedNode, ParsedNode> = new Pair(keyNode)
+      if (ctx.options.keepSourceTokens) pair.srcToken = collItem
+      map.items.push(pair)
     }
   }
 

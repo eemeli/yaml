@@ -29,7 +29,9 @@ export function resolveFlowCollection(
 
   let offset = fc.offset
   for (let i = 0; i < fc.items.length; ++i) {
-    const { start, key, sep, value } = fc.items[i]
+    const collItem = fc.items[i]
+    const { start, key, sep, value } = collItem
+
     const props = resolveProps(start, {
       flow: fcName,
       indicator: 'explicit-key-ind',
@@ -170,6 +172,7 @@ export function resolveFlowCollection(
       }
 
       const pair = new Pair(keyNode, valueNode)
+      if (ctx.options.keepSourceTokens) pair.srcToken = collItem
       if (isMap) {
         const map = coll as YAMLMap.Parsed
         if (mapIncludes(ctx, map.items, keyNode))
