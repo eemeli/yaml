@@ -22,13 +22,14 @@ Parse options affect the parsing and composition of a YAML Document from it sour
 
 Used by: `parse()`, `parseDocument()`, `parseAllDocuments()`, `new Composer()`, and `new Document()`
 
-| Name         | Type                          | Default | Description                                                                                                                                                                |
-| ------------ | ----------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| intAsBigInt  | `boolean`                     | `false` | Whether integers should be parsed into [BigInt] rather than `number` values.                                                                                               |
-| lineCounter  | `LineCounter`                 |         | If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)` to provide the `{ line, col }` positions within the input.                                    |
-| prettyErrors | `boolean`                     | `true`  | Include line/col position in errors, along with an extract of the source string.                                                                                           |
-| strict       | `boolean`                     | `true`  | When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.                                                                       |
-| uniqueKeys   | `boolean ⎮ (a, b) => boolean` | `true`  | Whether key uniqueness is checked, or customised. If set to be a function, it will be passed two parsed nodes and should return a boolean value indicating their equality. |
+| Name             | Type                          | Default | Description                                                                                                                                                                |
+| ---------------- | ----------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| intAsBigInt      | `boolean`                     | `false` | Whether integers should be parsed into [BigInt] rather than `number` values.                                                                                               |
+| keepSourceTokens | `boolean`                     | `false` | Include a `srcToken` value on each parsed `Node`, containing the CST token that was composed into this node.                                                               |
+| lineCounter      | `LineCounter`                 |         | If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)` to provide the `{ line, col }` positions within the input.                                    |
+| prettyErrors     | `boolean`                     | `true`  | Include line/col position in errors, along with an extract of the source string.                                                                                           |
+| strict           | `boolean`                     | `true`  | When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.                                                                       |
+| uniqueKeys       | `boolean ⎮ (a, b) => boolean` | `true`  | Whether key uniqueness is checked, or customised. If set to be a function, it will be passed two parsed nodes and should return a boolean value indicating their equality. |
 
 [bigint]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt
 

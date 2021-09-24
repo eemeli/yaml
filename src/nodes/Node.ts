@@ -1,4 +1,5 @@
 import type { Document } from '../doc/Document.js'
+import { Token } from '../parse/cst.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import type { Alias } from './Alias.js'
 import type { Pair } from './Pair.js'
@@ -86,6 +87,9 @@ export abstract class NodeBase {
 
   /** A blank line before this node and its commentBefore */
   declare spaceBefore?: boolean
+
+  /** The CST token that was composed into this node.  */
+  declare srcToken?: Token
 
   /** A fully qualified tag, if required */
   declare tag?: string

@@ -745,6 +745,41 @@ describe('__proto__ as mapping key', () => {
   })
 })
 
+describe('keepSourceTokens', () => {
+  for (const [src, type] of [
+    ['foo: bar', 'block-map'],
+    ['{ foo: bar }', 'flow-collection']
+  ]) {
+    test(`${type}: default false`, () => {
+      const doc = YAML.parseDocument(src)
+      expect(doc.contents).not.toHaveProperty('srcToken')
+      expect(doc.contents.items[0]).not.toHaveProperty('srcToken')
+      expect(doc.get('foo', true)).not.toHaveProperty('srcToken')
+    })
+
+    test(`${type}: included when set`, () => {
+      const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+      expect(doc.contents.srcToken).toMatchObject({ type })
+      expect(doc.contents.items[0].srcToken).toMatchObject({
+        key: { type: 'scalar' },
+        value: { type: 'scalar' }
+      })
+      expect(doc.get('foo', true).srcToken).toMatchObject({ type: 'scalar' })
+    })
+  }
+
+  test('allow for CST modifications (eemeli/yaml#903)', () => {
+    const src = 'foo:\n  [ 42 ]'
+    const tokens = Array.from(new YAML.Parser().parse(src))
+    const docs = new YAML.Composer({ keepSourceTokens: true }).compose(tokens)
+    const doc = Array.from(docs)[0]
+    const node = doc.get('foo', true)
+    YAML.CST.setScalarValue(node.srcToken, 'eek')
+    const res = tokens.map(YAML.CST.stringify).join('')
+    expect(res).toBe('foo:\n  eek')
+  })
+})
+
 describe('reviver', () => {
   test('MDN exemple', () => {
     const reviver = jest.fn((_key, value) => value)
