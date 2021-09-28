@@ -405,8 +405,11 @@ export class Lexer {
       }
     }
     let n = 0
-    while (line[n] === ',')
-      n += (yield* this.pushCount(1)) + (yield* this.pushSpaces(true))
+    while (line[n] === ',') {
+      n += yield* this.pushCount(1)
+      n += yield* this.pushSpaces(true)
+      this.flowKey = false
+    }
     n += yield* this.pushIndicators()
     switch (line[n]) {
       case undefined:

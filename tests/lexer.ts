@@ -16,3 +16,9 @@ test('plain scalar + CRLF + comment', () => {
   const res = Array.from(new Lexer().lex(src))
   expect(res).toEqual(['\u0002', '\u001f', 'foo', '\r\n', '# bar'])
 })
+
+test('Scalar starting with : after flow-ish key in preceding node in flow collection', () => {
+  const src = '[[], :@]'
+  const res = Array.from(new Lexer().lex(src))
+  expect(res).toEqual(['\u0002', '[', '[', ']', ',', ' ', '\u001f', ':@', ']'])
+})
