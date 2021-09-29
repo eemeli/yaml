@@ -40,6 +40,7 @@
     "build:node": "rollup -c config/rollup.node-config.js",
     "clean": "git clean -fdxe node_modules",
     "lint": "eslint src/",
+    "prepare": "npm run build",
     "prettier": "prettier --write .",
     "prestart": "npm run build:node",
     "start": "node -i -e 'YAML=require(\"./dist/index.js\")'",
