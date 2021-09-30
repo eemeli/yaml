@@ -22,3 +22,9 @@ test('Scalar starting with : after flow-ish key in preceding node in flow collec
   const res = Array.from(new Lexer().lex(src))
   expect(res).toEqual(['\u0002', '[', '[', ']', ',', ' ', '\u001f', ':@', ']'])
 })
+
+test('unindented comment in flow collection', () => {
+  const src = '- {\n#c\n  }'
+  const res = Array.from(new Lexer().lex(src))
+  expect(res).toEqual(['\u0002', '-', ' ', '{', '\n', '#c', '\n', '  ', '}'])
+})

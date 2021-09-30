@@ -385,7 +385,7 @@ export class Lexer {
     const line = this.getLine()
     if (line === null) return this.setNext('flow')
     if (
-      (indent !== -1 && indent < this.indentNext) ||
+      (indent !== -1 && indent < this.indentNext && line[0] !== '#') ||
       (indent === 0 &&
         (line.startsWith('---') || line.startsWith('...')) &&
         isEmpty(line[3]))
