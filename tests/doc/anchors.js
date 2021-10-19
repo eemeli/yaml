@@ -225,6 +225,16 @@ describe('merge <<', () => {
     ])
   })
 
+  test('alias is associated with a sequence', () => {
+    const res = YAML.parse(
+      '- &items [{ a: A }, { b: B }]\n- { <<: *items, c: C }',
+      {
+        merge: true
+      }
+    )
+    expect(res[1]).toEqual({ a: 'A', b: 'B', c: 'C' })
+  })
+
   describe('non-alias merges', () => {
     test('single map', () => {
       const res = YAML.parse('{ <<: { a: A }, b: B }', { merge: true })

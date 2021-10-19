@@ -16,6 +16,7 @@ export function addPairToJSMap(
   { key, value }: Pair
 ) {
   if (ctx && ctx.doc.schema.merge && isMergeKey(key)) {
+    value = isAlias(value) ? value.resolve(ctx.doc) : value
     if (isSeq(value)) for (const it of value.items) mergeToJSMap(ctx, map, it)
     else if (Array.isArray(value))
       for (const it of value) mergeToJSMap(ctx, map, it)
