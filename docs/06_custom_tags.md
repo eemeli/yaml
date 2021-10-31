@@ -137,6 +137,9 @@ import {
   debug, // (logLevel, ...messages) => void -- Log debug messages to console
   findPair, // (items, key) => Pair? -- Given a key, find a matching Pair
   foldFlowLines, // (text, indent, mode, options) => string -- Fold long lines
+  mapTag, // CollectionTag
+  seqTag, // CollectionTag
+  stringTag, // ScalarTag
   stringifyNumber, // (node) => string
   stringifyString, // (node, ctx, ...) => string
   toJS, // (value, arg, ctx) => any -- Recursively convert to plain JS
