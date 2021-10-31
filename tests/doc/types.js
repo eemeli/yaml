@@ -1,6 +1,6 @@
 import * as YAML from 'yaml'
 import { Scalar, YAMLSeq } from 'yaml'
-import { stringifyString } from 'yaml/util'
+import { seqTag, stringTag, stringifyString } from 'yaml/util'
 import { source } from '../_utils'
 
 describe('json schema', () => {
@@ -773,6 +773,69 @@ describe('custom tags', () => {
     const obj = { re: /re/g, symbol: Symbol.for('foo') }
     const str = YAML.stringify(obj, { customTags: [[regexp, sharedSymbol]] })
     expect(str).toBe('re: !re /re/g\nsymbol: !symbol/shared foo\n')
+  })
+
+  describe('completely custom schema', () => {
+    test('customTags is required', () => {
+      expect(() =>
+        YAML.parseDocument('foo', { schema: 'custom-test' })
+      ).toThrow(/Unknown schema "custom-test"/)
+    })
+
+    test('parse success', () => {
+      const src = '- foo\n- !re /bar/\n'
+      const doc = YAML.parseDocument(src, {
+        customTags: [seqTag, stringTag, regexp],
+        schema: 'custom-test'
+      })
+      expect(doc.errors).toEqual([])
+      expect(doc.warnings).toEqual([])
+      expect(doc.schema.name).toBe('custom-test')
+      expect(doc.toJS()).toEqual(['foo', /bar/])
+    })
+
+    test('parse fail', () => {
+      // map, seq & string are always parsed, even if not included
+      const src = '- foo\n- !re /bar/\n'
+      const doc = YAML.parseDocument(src, {
+        customTags: [],
+        schema: 'custom-test'
+      })
+      expect(doc.errors).toEqual([])
+      expect(doc.warnings).toHaveLength(1)
+      expect(doc.warnings[0].message).toMatch(/Unresolved tag: !re/)
+    })
+
+    test('stringify success', () => {
+      let src = '- foo\n'
+      let doc = YAML.parseDocument(src, {
+        customTags: [seqTag, stringTag],
+        schema: 'custom-test'
+      })
+      expect(doc.toString()).toBe(src)
+
+      src = '- foo\n- !re /bar/\n'
+      doc = YAML.parseDocument(src, {
+        customTags: [seqTag, stringTag, regexp],
+        schema: 'custom-test'
+      })
+      expect(doc.toString()).toBe(src)
+    })
+
+    test('stringify fail', () => {
+      const src = '- foo\n'
+      let doc = YAML.parseDocument(src, {
+        customTags: [],
+        schema: 'custom-test'
+      })
+      expect(() => String(doc)).toThrow(/Tag not resolved for YAMLSeq value/)
+
+      doc = YAML.parseDocument(src, {
+        customTags: [seqTag],
+        schema: 'custom-test'
+      })
+      expect(() => String(doc)).toThrow(/Tag not resolved for String value/)
+    })
   })
 })
 
