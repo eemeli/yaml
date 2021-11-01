@@ -135,12 +135,13 @@ function doubleQuotedString(value: string, ctx: StringifyContext) {
 }
 
 function singleQuotedString(value: string, ctx: StringifyContext) {
-  if (ctx.implicitKey) {
-    if (/\n/.test(value)) return doubleQuotedString(value, ctx)
-  } else {
-    // single quoted string can't have leading or trailing whitespace around newline
-    if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, ctx)
-  }
+  if (
+    ctx.options.singleQuote === false ||
+    (ctx.implicitKey && value.includes('\n')) ||
+    /[ \t]\n|\n[ \t]/.test(value) // single quoted string can't have leading or trailing whitespace around newline
+  )
+    return doubleQuotedString(value, ctx)
+
   const indent = ctx.indent || (containsDocumentMarker(value) ? '  ' : '')
   const res =
     "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'"
@@ -150,12 +151,16 @@ function singleQuotedString(value: string, ctx: StringifyContext) {
 }
 
 function quotedString(value: string, ctx: StringifyContext) {
-  const hasDouble = value.indexOf('"') !== -1
-  const hasSingle = value.indexOf("'") !== -1
+  const { singleQuote } = ctx.options
   let qs
-  if (hasDouble && !hasSingle) qs = singleQuotedString
-  else if (hasSingle && !hasDouble) qs = doubleQuotedString
-  else qs = ctx.options.singleQuote ? singleQuotedString : doubleQuotedString
+  if (singleQuote === false) qs = doubleQuotedString
+  else {
+    const hasDouble = value.includes('"')
+    const hasSingle = value.includes("'")
+    if (hasDouble && !hasSingle) qs = singleQuotedString
+    else if (hasSingle && !hasDouble) qs = doubleQuotedString
+    else qs = singleQuote ? singleQuotedString : doubleQuotedString
+  }
   return qs(value, ctx)
 }
 

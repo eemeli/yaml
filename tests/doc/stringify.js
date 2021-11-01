@@ -732,19 +732,40 @@ describe('Scalar options', () => {
     })
   })
 
-  for (const { bool, numeric, upgrade } of [
-    { bool: false, numeric: '"123"\n', upgrade: '"foo #bar"\n' },
-    { bool: true, numeric: "'123'\n", upgrade: "'foo #bar'\n" }
+  for (const { singleQuote, numeric, upgrade, parsed } of [
+    {
+      singleQuote: null,
+      numeric: '"123"\n',
+      upgrade: '"foo #bar"\n',
+      parsed: "'foo'\n"
+    },
+    {
+      singleQuote: false,
+      numeric: '"123"\n',
+      upgrade: '"foo #bar"\n',
+      parsed: '"foo"\n'
+    },
+    {
+      singleQuote: true,
+      numeric: "'123'\n",
+      upgrade: "'foo #bar'\n",
+      parsed: "'foo'\n"
+    }
   ]) {
-    describe(`singleQuote: ${bool}`, () => {
-      const opt = { singleQuote: bool }
+    describe(`singleQuote: ${singleQuote}`, () => {
+      const opt = { singleQuote }
 
       test('plain', () => {
         expect(YAML.stringify('foo bar', opt)).toBe('foo bar\n')
       })
 
-      test('forced', () => {
-        expect(YAML.stringify('foo: "bar"', opt)).toBe(`'foo: "bar"'\n`)
+      test('contains double-quote', () => {
+        expect(YAML.stringify('foo: "bar"', opt)).toBe(
+          singleQuote === false ? `"foo: \\"bar\\""\n` : `'foo: "bar"'\n`
+        )
+      })
+
+      test('contains single-quote', () => {
         expect(YAML.stringify("foo: 'bar'", opt)).toBe(`"foo: 'bar'"\n`)
       })
 
@@ -754,6 +775,11 @@ describe('Scalar options', () => {
 
       test('upgrade from plain', () => {
         expect(YAML.stringify('foo #bar', opt)).toBe(upgrade)
+      })
+
+      test('parsed node', () => {
+        const doc = YAML.parseDocument("'foo'")
+        expect(doc.toString(opt)).toBe(parsed)
       })
     })
   }

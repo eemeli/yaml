@@ -306,11 +306,12 @@ export type ToStringOptions = {
   simpleKeys?: boolean
 
   /**
-   * Prefer 'single quote' rather than "double quote" where applicable.
+   * Use 'single quote' rather than "double quote" where applicable.
+   * Set to `false` to disable single quotes completely.
    *
-   * Default: `false`
+   * Default: `null`
    */
-  singleQuote?: boolean
+  singleQuote?: boolean | null
 
   /**
    * String representation for `true`.

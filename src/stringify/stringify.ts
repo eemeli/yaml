@@ -51,7 +51,7 @@ export const createStringifyContext = (
       minContentWidth: 20,
       nullStr: 'null',
       simpleKeys: false,
-      singleQuote: false,
+      singleQuote: null,
       trueStr: 'true',
       verifyAliasOrder: true
     },
