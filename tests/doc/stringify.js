@@ -757,6 +757,50 @@ describe('Scalar options', () => {
       })
     })
   }
+
+  for (const { blockQuote, marker, value, parsed } of [
+    {
+      blockQuote: false,
+      marker: '"---"\n',
+      value: 'foo: "bar\\nfuzz\\n"\n',
+      parsed: '"foo\\n"\n'
+    },
+    {
+      blockQuote: true,
+      marker: '|-\n  ---\n',
+      value: 'foo: |\n  bar\n  fuzz\n',
+      parsed: '>\nfoo\n'
+    },
+    {
+      blockQuote: 'literal',
+      marker: '|-\n  ---\n',
+      value: 'foo: |\n  bar\n  fuzz\n',
+      parsed: '|\nfoo\n'
+    },
+    {
+      blockQuote: 'folded',
+      marker: '>-\n  ---\n',
+      value: 'foo: >\n  bar\n\n  fuzz\n',
+      parsed: '>\nfoo\n'
+    }
+  ]) {
+    describe(`blockQuote: ${blockQuote}`, () => {
+      test('doc-marker', () => {
+        expect(YAML.stringify('---', { blockQuote })).toBe(marker)
+      })
+
+      test('map with value', () => {
+        expect(YAML.stringify({ foo: 'bar\nfuzz\n' }, { blockQuote })).toBe(
+          value
+        )
+      })
+
+      test('override parsed type', () => {
+        const doc = YAML.parseDocument('>\n  foo\n')
+        expect(doc.toString({ blockQuote })).toBe(parsed)
+      })
+    })
+  }
 })
 
 describe('Document markers in top-level scalars', () => {

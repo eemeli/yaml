@@ -155,8 +155,7 @@ function quotedString(value: string, ctx: StringifyContext) {
   let qs
   if (hasDouble && !hasSingle) qs = singleQuotedString
   else if (hasSingle && !hasDouble) qs = doubleQuotedString
-  else if (ctx.options.singleQuote) qs = singleQuotedString
-  else qs = doubleQuotedString
+  else qs = ctx.options.singleQuote ? singleQuotedString : doubleQuotedString
   return qs(value, ctx)
 }
 
@@ -166,20 +165,24 @@ function blockString(
   onComment?: () => void,
   onChompKeep?: () => void
 ) {
+  const { lineWidth, blockQuote } = ctx.options
   // 1. Block can't end in whitespace unless the last line is non-empty.
   // 2. Strings consisting of only whitespace are best rendered explicitly.
-  if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
+  if (!blockQuote || /\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
     return quotedString(value, ctx)
   }
+
   const indent =
     ctx.indent ||
     (ctx.forceBlockIndent || containsDocumentMarker(value) ? '  ' : '')
   const literal =
-    type === Scalar.BLOCK_FOLDED
+    blockQuote === 'literal'
+      ? true
+      : blockQuote === 'folded' || type === Scalar.BLOCK_FOLDED
       ? false
       : type === Scalar.BLOCK_LITERAL
       ? true
-      : !lineLengthOverLimit(value, ctx.options.lineWidth, indent.length)
+      : !lineLengthOverLimit(value, lineWidth, indent.length)
   if (!value) return literal ? '|\n' : '>\n'
 
   // determine chomping from whitespace at value end

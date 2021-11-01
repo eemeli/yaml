@@ -194,6 +194,14 @@ export type ToJSOptions = {
 
 export type ToStringOptions = {
   /**
+   * Use block quote styles for scalar values where applicable.
+   * Set to `false` to disable block quotes completely.
+   *
+   * Default: `true`
+   */
+  blockQuote?: boolean | 'folded' | 'literal'
+
+  /**
    * The default type of string literal used to stringify implicit key values.
    * Output may use other types if required to fully represent the value.
    *

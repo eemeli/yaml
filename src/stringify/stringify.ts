@@ -39,6 +39,7 @@ export const createStringifyContext = (
     typeof options.indent === 'number' ? ' '.repeat(options.indent) : '  ',
   options: Object.assign(
     {
+      blockQuote: true,
       defaultKeyType: null,
       defaultStringType: 'PLAIN',
       directives: null,
