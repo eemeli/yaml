@@ -149,6 +149,17 @@ function singleQuotedString(value: string, ctx: StringifyContext) {
     : foldFlowLines(res, indent, FOLD_FLOW, getFoldOptions(ctx))
 }
 
+function quotedString(value: string, ctx: StringifyContext) {
+  const hasDouble = value.indexOf('"') !== -1
+  const hasSingle = value.indexOf("'") !== -1
+  let qs
+  if (hasDouble && !hasSingle) qs = singleQuotedString
+  else if (hasSingle && !hasDouble) qs = doubleQuotedString
+  else if (ctx.options.singleQuote) qs = singleQuotedString
+  else qs = doubleQuotedString
+  return qs(value, ctx)
+}
+
 function blockString(
   { comment, type, value }: StringifyScalar,
   ctx: StringifyContext,
@@ -158,7 +169,7 @@ function blockString(
   // 1. Block can't end in whitespace unless the last line is non-empty.
   // 2. Strings consisting of only whitespace are best rendered explicitly.
   if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
-    return doubleQuotedString(value, ctx)
+    return quotedString(value, ctx)
   }
   const indent =
     ctx.indent ||
@@ -251,7 +262,7 @@ function plainString(
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
   ) {
-    return doubleQuotedString(value, ctx)
+    return quotedString(value, ctx)
   }
   if (
     !value ||
@@ -259,18 +270,6 @@ function plainString(
       value
     )
   ) {
-    const hasDouble = value.indexOf('"') !== -1
-    const hasSingle = value.indexOf("'") !== -1
-    let quotedString
-    if (hasDouble && !hasSingle) {
-      quotedString = singleQuotedString
-    } else if (hasSingle && !hasDouble) {
-      quotedString = doubleQuotedString
-    } else if (ctx.options.singleQuote) {
-      quotedString = singleQuotedString
-    } else {
-      quotedString = doubleQuotedString
-    }
     // not allowed:
     // - empty string, '-' or '?'
     // - start with an indicator character (except [?:-]) or /[?-] /
@@ -305,7 +304,7 @@ function plainString(
         tag.tag !== 'tag:yaml.org,2002:str' &&
         tag.test?.test(str)
       )
-        return doubleQuotedString(value, ctx)
+        return quotedString(value, ctx)
     }
   }
   return implicitKey
@@ -337,7 +336,7 @@ export function stringifyString(
       case Scalar.BLOCK_FOLDED:
       case Scalar.BLOCK_LITERAL:
         return implicitKey || inFlow
-          ? doubleQuotedString(ss.value, ctx) // blocks are not valid inside flow containers
+          ? quotedString(ss.value, ctx) // blocks are not valid inside flow containers
           : blockString(ss, ctx, onComment, onChompKeep)
       case Scalar.QUOTE_DOUBLE:
         return doubleQuotedString(ss.value, ctx)

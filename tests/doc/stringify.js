@@ -732,9 +732,9 @@ describe('Scalar options', () => {
     })
   })
 
-  for (const { bool, exp } of [
-    { bool: false, exp: '"foo #bar"\n' },
-    { bool: true, exp: "'foo #bar'\n" }
+  for (const { bool, numeric, upgrade } of [
+    { bool: false, numeric: '"123"\n', upgrade: '"foo #bar"\n' },
+    { bool: true, numeric: "'123'\n", upgrade: "'foo #bar'\n" }
   ]) {
     describe(`singleQuote: ${bool}`, () => {
       const opt = { singleQuote: bool }
@@ -749,11 +749,11 @@ describe('Scalar options', () => {
       })
 
       test('numerical string', () => {
-        expect(YAML.stringify('123', opt)).toBe('"123"\n')
+        expect(YAML.stringify('123', opt)).toBe(numeric)
       })
 
       test('upgrade from plain', () => {
-        expect(YAML.stringify('foo #bar', opt)).toBe(exp)
+        expect(YAML.stringify('foo #bar', opt)).toBe(upgrade)
       })
     })
   }
