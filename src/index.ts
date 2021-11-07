@@ -3,7 +3,7 @@ export { Composer } from './compose/composer.js'
 export { Document } from './doc/Document.js'
 export { Schema } from './schema/Schema.js'
 
-export { YAMLError, YAMLParseError, YAMLWarning } from './errors.js'
+export { ErrorCode, YAMLError, YAMLParseError, YAMLWarning } from './errors.js'
 
 export { Alias } from './nodes/Alias.js'
 export {
@@ -16,7 +16,8 @@ export {
   isScalar,
   isSeq,
   Node,
-  ParsedNode
+  ParsedNode,
+  Range
 } from './nodes/Node.js'
 export { Pair } from './nodes/Pair.js'
 export { Scalar } from './nodes/Scalar.js'
