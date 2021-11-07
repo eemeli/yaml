@@ -99,7 +99,7 @@ export function createScalarToken(
       implicitKey,
       indent: indent > 0 ? ' '.repeat(indent) : '',
       inFlow,
-      options: { lineWidth: -1 }
+      options: { blockQuote: true, lineWidth: -1 }
     } as StringifyContext
   )
   const end = context.end ?? [
@@ -180,7 +180,7 @@ export function setScalarValue(
       implicitKey: implicitKey || indent === null,
       indent: indent !== null && indent > 0 ? ' '.repeat(indent) : '',
       inFlow,
-      options: { lineWidth: -1 }
+      options: { blockQuote: true, lineWidth: -1 }
     } as StringifyContext
   )
   switch (source[0]) {

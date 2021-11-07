@@ -135,12 +135,13 @@ function doubleQuotedString(value: string, ctx: StringifyContext) {
 }
 
 function singleQuotedString(value: string, ctx: StringifyContext) {
-  if (ctx.implicitKey) {
-    if (/\n/.test(value)) return doubleQuotedString(value, ctx)
-  } else {
-    // single quoted string can't have leading or trailing whitespace around newline
-    if (/[ \t]\n|\n[ \t]/.test(value)) return doubleQuotedString(value, ctx)
-  }
+  if (
+    ctx.options.singleQuote === false ||
+    (ctx.implicitKey && value.includes('\n')) ||
+    /[ \t]\n|\n[ \t]/.test(value) // single quoted string can't have leading or trailing whitespace around newline
+  )
+    return doubleQuotedString(value, ctx)
+
   const indent = ctx.indent || (containsDocumentMarker(value) ? '  ' : '')
   const res =
     "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'"
@@ -149,26 +150,44 @@ function singleQuotedString(value: string, ctx: StringifyContext) {
     : foldFlowLines(res, indent, FOLD_FLOW, getFoldOptions(ctx))
 }
 
+function quotedString(value: string, ctx: StringifyContext) {
+  const { singleQuote } = ctx.options
+  let qs
+  if (singleQuote === false) qs = doubleQuotedString
+  else {
+    const hasDouble = value.includes('"')
+    const hasSingle = value.includes("'")
+    if (hasDouble && !hasSingle) qs = singleQuotedString
+    else if (hasSingle && !hasDouble) qs = doubleQuotedString
+    else qs = singleQuote ? singleQuotedString : doubleQuotedString
+  }
+  return qs(value, ctx)
+}
+
 function blockString(
   { comment, type, value }: StringifyScalar,
   ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
 ) {
+  const { lineWidth, blockQuote } = ctx.options
   // 1. Block can't end in whitespace unless the last line is non-empty.
   // 2. Strings consisting of only whitespace are best rendered explicitly.
-  if (/\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
-    return doubleQuotedString(value, ctx)
+  if (!blockQuote || /\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
+    return quotedString(value, ctx)
   }
+
   const indent =
     ctx.indent ||
     (ctx.forceBlockIndent || containsDocumentMarker(value) ? '  ' : '')
   const literal =
-    type === Scalar.BLOCK_FOLDED
+    blockQuote === 'literal'
+      ? true
+      : blockQuote === 'folded' || type === Scalar.BLOCK_FOLDED
       ? false
       : type === Scalar.BLOCK_LITERAL
       ? true
-      : !lineLengthOverLimit(value, ctx.options.lineWidth, indent.length)
+      : !lineLengthOverLimit(value, lineWidth, indent.length)
   if (!value) return literal ? '|\n' : '>\n'
 
   // determine chomping from whitespace at value end
@@ -251,7 +270,7 @@ function plainString(
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
   ) {
-    return doubleQuotedString(value, ctx)
+    return quotedString(value, ctx)
   }
   if (
     !value ||
@@ -259,18 +278,6 @@ function plainString(
       value
     )
   ) {
-    const hasDouble = value.indexOf('"') !== -1
-    const hasSingle = value.indexOf("'") !== -1
-    let quotedString
-    if (hasDouble && !hasSingle) {
-      quotedString = singleQuotedString
-    } else if (hasSingle && !hasDouble) {
-      quotedString = doubleQuotedString
-    } else if (ctx.options.singleQuote) {
-      quotedString = singleQuotedString
-    } else {
-      quotedString = doubleQuotedString
-    }
     // not allowed:
     // - empty string, '-' or '?'
     // - start with an indicator character (except [?:-]) or /[?-] /
@@ -305,7 +312,7 @@ function plainString(
         tag.tag !== 'tag:yaml.org,2002:str' &&
         tag.test?.test(str)
       )
-        return doubleQuotedString(value, ctx)
+        return quotedString(value, ctx)
     }
   }
   return implicitKey
@@ -337,7 +344,7 @@ export function stringifyString(
       case Scalar.BLOCK_FOLDED:
       case Scalar.BLOCK_LITERAL:
         return implicitKey || inFlow
-          ? doubleQuotedString(ss.value, ctx) // blocks are not valid inside flow containers
+          ? quotedString(ss.value, ctx) // blocks are not valid inside flow containers
           : blockString(ss, ctx, onComment, onChompKeep)
       case Scalar.QUOTE_DOUBLE:
         return doubleQuotedString(ss.value, ctx)

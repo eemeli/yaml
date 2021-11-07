@@ -732,28 +732,98 @@ describe('Scalar options', () => {
     })
   })
 
-  for (const { bool, exp } of [
-    { bool: false, exp: '"foo #bar"\n' },
-    { bool: true, exp: "'foo #bar'\n" }
+  for (const { singleQuote, numeric, upgrade, parsed } of [
+    {
+      singleQuote: null,
+      numeric: '"123"\n',
+      upgrade: '"foo #bar"\n',
+      parsed: "'foo'\n"
+    },
+    {
+      singleQuote: false,
+      numeric: '"123"\n',
+      upgrade: '"foo #bar"\n',
+      parsed: '"foo"\n'
+    },
+    {
+      singleQuote: true,
+      numeric: "'123'\n",
+      upgrade: "'foo #bar'\n",
+      parsed: "'foo'\n"
+    }
   ]) {
-    describe(`singleQuote: ${bool}`, () => {
-      const opt = { singleQuote: bool }
+    describe(`singleQuote: ${singleQuote}`, () => {
+      const opt = { singleQuote }
 
       test('plain', () => {
         expect(YAML.stringify('foo bar', opt)).toBe('foo bar\n')
       })
 
-      test('forced', () => {
-        expect(YAML.stringify('foo: "bar"', opt)).toBe(`'foo: "bar"'\n`)
+      test('contains double-quote', () => {
+        expect(YAML.stringify('foo: "bar"', opt)).toBe(
+          singleQuote === false ? `"foo: \\"bar\\""\n` : `'foo: "bar"'\n`
+        )
+      })
+
+      test('contains single-quote', () => {
         expect(YAML.stringify("foo: 'bar'", opt)).toBe(`"foo: 'bar'"\n`)
       })
 
       test('numerical string', () => {
-        expect(YAML.stringify('123', opt)).toBe('"123"\n')
+        expect(YAML.stringify('123', opt)).toBe(numeric)
       })
 
       test('upgrade from plain', () => {
-        expect(YAML.stringify('foo #bar', opt)).toBe(exp)
+        expect(YAML.stringify('foo #bar', opt)).toBe(upgrade)
+      })
+
+      test('parsed node', () => {
+        const doc = YAML.parseDocument("'foo'")
+        expect(doc.toString(opt)).toBe(parsed)
+      })
+    })
+  }
+
+  for (const { blockQuote, marker, value, parsed } of [
+    {
+      blockQuote: false,
+      marker: '"---"\n',
+      value: 'foo: "bar\\nfuzz\\n"\n',
+      parsed: '"foo\\n"\n'
+    },
+    {
+      blockQuote: true,
+      marker: '|-\n  ---\n',
+      value: 'foo: |\n  bar\n  fuzz\n',
+      parsed: '>\nfoo\n'
+    },
+    {
+      blockQuote: 'literal',
+      marker: '|-\n  ---\n',
+      value: 'foo: |\n  bar\n  fuzz\n',
+      parsed: '|\nfoo\n'
+    },
+    {
+      blockQuote: 'folded',
+      marker: '>-\n  ---\n',
+      value: 'foo: >\n  bar\n\n  fuzz\n',
+      parsed: '>\nfoo\n'
+    }
+  ]) {
+    describe(`blockQuote: ${blockQuote}`, () => {
+      test('doc-marker', () => {
+        expect(YAML.stringify('---', { blockQuote })).toBe(marker)
+      })
+
+      test('map with value', () => {
+        expect(YAML.stringify({ foo: 'bar\nfuzz\n' }, { blockQuote })).toBe(
+          value
+        )
+      })
+
+      test('override parsed type', () => {
+        const doc = YAML.parseDocument('>\n  foo\n')
+        expect(doc.toString({ blockQuote })).toBe(parsed)
       })
     })
   }
