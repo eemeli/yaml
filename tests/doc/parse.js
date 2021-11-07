@@ -413,8 +413,14 @@ test('eemeli/yaml#32', () => {
   expect(YAML.parse('[ 123, ? 456 ]')).toEqual([123, { 456: null }])
 })
 
-test('eemeli/yaml#34', () => {
-  expect(YAML.parse('|')).toEqual('')
+describe('block scalars', () => {
+  test('eemeli/yaml#34', () => {
+    expect(YAML.parse('|')).toEqual('')
+  })
+
+  test('eemeli/yaml#313', () => {
+    expect(YAML.parse('|+\n   \n\n     \n')).toEqual('\n\n\n')
+  })
 })
 
 test('eemeli/yaml#36', () => {
