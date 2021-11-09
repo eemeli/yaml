@@ -109,6 +109,7 @@ export function resolveBlockMap(
         const valueIndent: number | undefined = (collItem?.value as any)?.indent
 
         if (
+          ctx.options.preserveCollectionIndentation &&
           keyIndent !== undefined &&
           valueIndent !== undefined &&
           valueIndent >= keyIndent

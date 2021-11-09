@@ -28,6 +28,17 @@ export type ParseOptions = {
   keepSourceTokens?: boolean
 
   /**
+   * When parsing a document, stores indentation levels on each collection node,
+   * allowing them to be preserved when latery stringified.
+   *
+   * If 'keepSourceTokens' is not `true`, this has no affect, since source tokens
+   * must be provided in order to determine indentation.
+   *
+   * Default: `false`
+   */
+  preserveCollectionIndentation?: boolean
+
+  /**
    * If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)`
    * to provide the `{ line, col }` positions within the input.
    */
