@@ -98,6 +98,21 @@ for (const dir of testDirs) {
             const docs2 = parseAllDocuments(src2, { resolveKnownTags: false })
             testJsonMatch(docs2, json)
           })
+
+          test('stringify+re-parse when preserving indentation', () => {
+            const roundTripDocuments = parseAllDocuments(yaml, {
+              resolveKnownTags: false,
+              keepSourceTokens: true,
+              preserveCollectionIndentation: true
+            })
+            testJsonMatch(roundTripDocuments, json)
+
+            const src2 =
+              docs.map(doc => String(doc).replace(/\n$/, '')).join('\n...\n') +
+              '\n'
+            const docs2 = parseAllDocuments(src2, { resolveKnownTags: false })
+            testJsonMatch(docs2, json)
+          })
         }
 
         const outYaml = load('out.yaml')

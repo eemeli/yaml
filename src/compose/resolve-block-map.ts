@@ -105,6 +105,9 @@ export function resolveBlockMap(
       if (ctx.options.keepSourceTokens) {
         pair.srcToken = collItem
 
+        // Check to see if the key tokens exist and have an indentation set.
+        // If so, we can compute the difference between them and preserve it
+        // if the preserveCollectionIndentation option is set.
         const keyIndent: number | undefined = (collItem?.key as any)?.indent
         const valueIndent: number | undefined = (collItem?.value as any)?.indent
 

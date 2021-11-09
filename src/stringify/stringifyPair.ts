@@ -18,7 +18,24 @@ export function stringifyPair(
     options: { indentSeq, simpleKeys }
   } = ctx
   if (srcIndentStep !== undefined) {
-    indentStep = ' '.repeat(srcIndentStep)
+    // If the pair originally had some indentation step, preserve that
+    // value.
+    if (srcIndentStep > 0 || (srcIndentStep === 0 && isSeq(value))) {
+      // Indentation can only be preserved if it's positive, or if it's 0
+      // and the item to render is a seq, since:
+
+      // foo:
+      // - a
+      // - b
+      // - c
+
+      // is a valid seq with 0 indentStep.
+
+      // Note that ctx.indentStep is *not* modified, so later indentations
+      // will still use the original indentStep if not being preserved from
+      // input.
+      indentStep = ' '.repeat(srcIndentStep)
+    }
   }
 
   let keyComment = (isNode(key) && key.comment) || null
