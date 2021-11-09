@@ -5,18 +5,22 @@ import { stringify, StringifyContext } from './stringify.js'
 import { addComment, stringifyComment } from './stringifyComment.js'
 
 export function stringifyPair(
-  { key, value }: Readonly<Pair>,
+  { key, value, srcIndentStep }: Readonly<Pair>,
   ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
 ) {
-  const {
+  let {
     allNullValues,
     doc,
     indent,
     indentStep,
     options: { indentSeq, simpleKeys }
   } = ctx
+  if (srcIndentStep !== undefined) {
+    indentStep = ' '.repeat(srcIndentStep)
+  }
+
   let keyComment = (isNode(key) && key.comment) || null
   if (simpleKeys) {
     if (keyComment) {

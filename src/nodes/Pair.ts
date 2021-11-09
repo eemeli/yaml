@@ -29,6 +29,9 @@ export class Pair<K = unknown, V = unknown> {
   /** The CST token that was composed into this pair.  */
   declare srcToken?: CollectionItem
 
+  /** The indentation between key and value in the source. */
+  declare srcIndentStep?: number
+
   constructor(key: K, value: V | null = null) {
     Object.defineProperty(this, NODE_TYPE, { value: PAIR })
     this.key = key

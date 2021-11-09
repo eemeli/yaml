@@ -102,7 +102,20 @@ export function resolveBlockMap(
         : composeEmptyNode(ctx, offset, sep, null, valueProps, onError)
       offset = valueNode.range[2]
       const pair = new Pair(keyNode, valueNode)
-      if (ctx.options.keepSourceTokens) pair.srcToken = collItem
+      if (ctx.options.keepSourceTokens) {
+        pair.srcToken = collItem
+
+        const keyIndent: number | undefined = (collItem?.key as any)?.indent
+        const valueIndent: number | undefined = (collItem?.value as any)?.indent
+
+        if (
+          keyIndent !== undefined &&
+          valueIndent !== undefined &&
+          valueIndent >= keyIndent
+        ) {
+          pair.srcIndentStep = valueIndent - keyIndent
+        }
+      }
       map.items.push(pair)
     } else {
       // key with no value
