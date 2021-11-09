@@ -111,11 +111,11 @@ export function stringifyPair(
   )
   let ws = ' '
   if (vcb || keyComment) {
-    ws = `${vcb}\n${ctx.indent}`
+    ws = valueStr === '' && !ctx.inFlow ? vcb : `${vcb}\n${ctx.indent}`
   } else if (!explicitKey && isCollection(value)) {
     const flow = valueStr[0] === '[' || valueStr[0] === '{'
     if (!flow || valueStr.includes('\n')) ws = `\n${ctx.indent}`
-  } else if (valueStr[0] === '\n') ws = ''
+  } else if (valueStr === '' || valueStr[0] === '\n') ws = ''
 
   if (ctx.inFlow) {
     if (valueCommentDone && onComment) onComment()

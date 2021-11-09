@@ -105,22 +105,6 @@ describe('tags', () => {
   })
 })
 
-describe('custom string on node', () => {
-  test('tiled null', () => {
-    const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { nullStr: '~', simpleKeys: true })
-    expect(str).toBe('a: ~\n')
-    expect(YAML.parse(str)).toEqual({ a: null })
-  })
-
-  test('empty string null', () => {
-    const doc = YAML.parse('a: null')
-    const str = YAML.stringify(doc, { nullStr: '', simpleKeys: true })
-    expect(str).toBe('a: \n')
-    expect(YAML.parse(str)).toEqual({ a: null })
-  })
-})
-
 describe('number types', () => {
   describe('intAsBigInt: false', () => {
     test('Version 1.1', () => {

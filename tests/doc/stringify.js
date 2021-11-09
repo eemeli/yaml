@@ -323,6 +323,47 @@ z:
     doc.add(new YAML.Document({ b: 2, c: 3 }))
     expect(String(doc)).toBe('a: 1\n? b: 2\n  c: 3\n')
   })
+
+  describe('No extra whitespace for empty values', () => {
+    test('Block map, no comments', () => {
+      const doc = new YAML.Document({ a: null, b: null })
+      expect(doc.toString({ nullStr: '' })).toBe('a:\nb:\n')
+    })
+
+    test('Block map, with key.comment', () => {
+      const doc = new YAML.Document({ a: null, b: null })
+      doc.contents.items[0].key.comment = 'c'
+      expect(doc.toString({ nullStr: '' })).toBe('a: #c\nb:\n')
+    })
+
+    test('Block map, with value.commentBefore', () => {
+      const doc = new YAML.Document({ a: null, b: null })
+      doc.get('a', true).commentBefore = 'c'
+      expect(doc.toString({ nullStr: '' })).toBe('a:\n  #c\nb:\n')
+    })
+
+    test('Flow map, no comments', () => {
+      const doc = new YAML.Document({ a: null, b: null })
+      doc.contents.flow = true
+      expect(doc.toString({ nullStr: '' })).toBe('{ a:, b: }\n')
+    })
+
+    test('Flow map, with key.comment', () => {
+      const doc = new YAML.Document({ a: null, b: null })
+      doc.contents.flow = true
+      doc.contents.items[0].key.comment = 'c'
+      expect(doc.toString({ nullStr: '' })).toBe('{\n  a: #c\n    ,\n  b:\n}\n')
+    })
+
+    test('Flow map, with value.commentBefore', () => {
+      const doc = new YAML.Document({ a: null, b: null })
+      doc.contents.flow = true
+      doc.get('a', true).commentBefore = 'c'
+      expect(doc.toString({ nullStr: '' })).toBe(
+        '{\n  a:\n    #c\n    ,\n  b:\n}\n'
+      )
+    })
+  })
 })
 
 test('eemeli/yaml#43: Quoting colons', () => {
@@ -370,8 +411,8 @@ test('eemeli/yaml#87', () => {
   expect(String(doc)).toBe('test:\n  a: test\n')
 })
 
-describe('emitter custom null/bool string', () => {
-  test('tiled null', () => {
+describe('Custom null/bool string representations', () => {
+  test('tilde null', () => {
     const doc = YAML.parse('a: null')
     const str = YAML.stringify(doc, { nullStr: '~', simpleKeys: true })
     expect(str).toBe('a: ~\n')
@@ -381,7 +422,7 @@ describe('emitter custom null/bool string', () => {
   test('empty string null', () => {
     const doc = YAML.parse('a: null')
     const str = YAML.stringify(doc, { nullStr: '', simpleKeys: true })
-    expect(str).toBe('a: \n')
+    expect(str).toBe('a:\n')
     expect(YAML.parse(str)).toEqual({ a: null })
   })
 
