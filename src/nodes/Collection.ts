@@ -138,7 +138,8 @@ export abstract class Collection extends NodeBase {
    * Removes a value from the collection.
    * @returns `true` if the item was found and removed.
    */
-  deleteIn([key, ...rest]: Iterable<unknown>): boolean {
+  deleteIn(path: Iterable<unknown>): boolean {
+    const [key, ...rest] = path
     if (rest.length === 0) return this.delete(key)
     const node = this.get(key, true)
     if (isCollection(node)) return node.deleteIn(rest)
@@ -153,7 +154,8 @@ export abstract class Collection extends NodeBase {
    * scalar values from their surrounding node; to disable set `keepScalar` to
    * `true` (collections are always returned intact).
    */
-  getIn([key, ...rest]: Iterable<unknown>, keepScalar?: boolean): unknown {
+  getIn(path: Iterable<unknown>, keepScalar?: boolean): unknown {
+    const [key, ...rest] = path
     const node = this.get(key, true)
     if (rest.length === 0)
       return !keepScalar && isScalar(node) ? node.value : node
@@ -179,7 +181,8 @@ export abstract class Collection extends NodeBase {
   /**
    * Checks if the collection includes a value with the key `key`.
    */
-  hasIn([key, ...rest]: Iterable<unknown>): boolean {
+  hasIn(path: Iterable<unknown>): boolean {
+    const [key, ...rest] = path
     if (rest.length === 0) return this.has(key)
     const node = this.get(key, true)
     return isCollection(node) ? node.hasIn(rest) : false
@@ -189,7 +192,8 @@ export abstract class Collection extends NodeBase {
    * Sets a value in this collection. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    */
-  setIn([key, ...rest]: Iterable<unknown>, value: unknown) {
+  setIn(path: Iterable<unknown>, value: unknown) {
+    const [key, ...rest] = path
     if (rest.length === 0) {
       this.set(key, value)
     } else {
