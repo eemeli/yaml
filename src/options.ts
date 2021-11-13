@@ -5,7 +5,6 @@ import type { ParsedNode } from './nodes/Node.js'
 import type { Pair } from './nodes/Pair.js'
 import type { Scalar } from './nodes/Scalar.js'
 import type { LineCounter } from './parse/line-counter.js'
-import type { SchemaName } from './schema/Schema.js'
 import type { Tags } from './schema/tags.js'
 import type { CollectionTag, ScalarTag } from './schema/types.js'
 
@@ -112,9 +111,18 @@ export type SchemaOptions = {
   /**
    * The base schema to use.
    *
-   * Default: `"core"` for YAML 1.2, `"yaml-1.1"` for earlier versions
+   * The core library has built-in support for the following:
+   * - `'failsafe'`: A minimal schema that parses all scalars as strings
+   * - `'core'`: The YAML 1.2 core schema
+   * - `'json'`: The YAML 1.2 JSON schema, with minimal rules for JSON compatibility
+   * - `'yaml-1.1'`: The YAML 1.1 schema
+   *
+   * If using another (custom) schema, the `customTags` array needs to
+   * fully define the schema's tags.
+   *
+   * Default: `'core'` for YAML 1.2, `'yaml-1.1'` for earlier versions
    */
-  schema?: SchemaName
+  schema?: string
 
   /**
    * When adding to or stringifying a map, sort the entries.

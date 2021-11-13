@@ -14,16 +14,15 @@ import { pairs } from './yaml-1.1/pairs.js'
 import { schema as yaml11 } from './yaml-1.1/schema.js'
 import { set } from './yaml-1.1/set.js'
 import { floatTime, intTime, timestamp } from './yaml-1.1/timestamp.js'
-import type { SchemaName } from './Schema.js'
 import type { CollectionTag, ScalarTag } from './types.js'
 
-const schemas = {
-  core,
-  failsafe: [map, seq, string],
-  json,
-  yaml11,
-  'yaml-1.1': yaml11
-}
+const schemas = new Map<string, Array<CollectionTag | ScalarTag>>([
+  ['core', core],
+  ['failsafe', [map, seq, string]],
+  ['json', json],
+  ['yaml11', yaml11],
+  ['yaml-1.1', yaml11]
+])
 
 const tagsByName = {
   binary,
@@ -59,13 +58,13 @@ export const coreKnownTags = {
 
 export function getTags(
   customTags: SchemaOptions['customTags'] | undefined,
-  schemaName: SchemaName
+  schemaName: string
 ) {
-  let tags: Tags = schemas[schemaName]
+  let tags: Tags | undefined = schemas.get(schemaName)
   if (!tags) {
     if (Array.isArray(customTags)) tags = []
     else {
-      const keys = Object.keys(schemas)
+      const keys = Array.from(schemas.keys())
         .filter(key => key !== 'yaml11')
         .map(key => JSON.stringify(key))
         .join(', ')

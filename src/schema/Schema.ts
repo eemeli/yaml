@@ -7,15 +7,13 @@ import { string } from './common/string.js'
 import { coreKnownTags, getTags } from './tags.js'
 import type { CollectionTag, ScalarTag } from './types.js'
 
-export type SchemaName = 'core' | 'failsafe' | 'json' | 'yaml-1.1'
-
 const sortMapEntriesByKey = (a: Pair<any>, b: Pair<any>) =>
   a.key < b.key ? -1 : a.key > b.key ? 1 : 0
 
 export class Schema {
   knownTags: Record<string, CollectionTag | ScalarTag>
   merge: boolean
-  name: SchemaName
+  name: string
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
   tags: Array<CollectionTag | ScalarTag>;
 
