@@ -47,7 +47,7 @@
     "test": "jest --config config/jest.config.js",
     "test:browsers": "cd playground && npm test",
     "test:dist": "npm run build:node && jest --config config/jest.config.js",
-    "test:dist:types": "tsc --allowJs --moduleResolution node --noEmit --target es2017 dist/index.js",
+    "test:dist:types": "tsc --allowJs --moduleResolution node --noEmit --target es5 dist/index.js",
     "test:types": "tsc --noEmit",
     "docs:install": "cd docs-slate && bundle install",
     "docs:deploy": "cd docs-slate && ./deploy.sh",
