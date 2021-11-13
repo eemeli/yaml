@@ -11,6 +11,7 @@ const sortMapEntriesByKey = (a: Pair<any>, b: Pair<any>) =>
   a.key < b.key ? -1 : a.key > b.key ? 1 : 0
 
 export class Schema {
+  compat: Array<CollectionTag | ScalarTag> | null
   knownTags: Record<string, CollectionTag | ScalarTag>
   merge: boolean
   name: string
@@ -23,12 +24,18 @@ export class Schema {
   [SEQ]: CollectionTag
 
   constructor({
+    compat,
     customTags,
     merge,
     resolveKnownTags,
     schema,
     sortMapEntries
   }: SchemaOptions) {
+    this.compat = Array.isArray(compat)
+      ? getTags(compat, 'compat')
+      : compat
+      ? getTags(null, compat)
+      : null
     this.merge = !!merge
     this.name = schema || 'core'
     this.knownTags = resolveKnownTags ? coreKnownTags : {}
