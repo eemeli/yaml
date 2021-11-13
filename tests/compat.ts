@@ -35,6 +35,26 @@ describe('composer compatibility warnings', () => {
     ])
     expect(doc.toJS()).toEqual({ x: true, true: false })
   })
+
+  test('flow collection with end at parent map indent', () => {
+    let doc = parseDocument('x: {\n  y: 42\n}', { compat: 'core' })
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.warnings).toMatchObject([{ code: 'BAD_INDENT', pos: [13, 14] }])
+
+    doc = parseDocument('x:\n {\n  y: 42\n }', { compat: 'core' })
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.warnings).toHaveLength(0)
+  })
+
+  test('flow collection with end at parent seq indent', () => {
+    let doc = parseDocument('- {\n  y: 42\n}', { compat: 'core' })
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.warnings).toMatchObject([{ code: 'BAD_INDENT', pos: [12, 13] }])
+
+    doc = parseDocument('- {\n  y: 42\n }', { compat: 'core' })
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.warnings).toHaveLength(0)
+  })
 })
 
 describe('stringify compatible values', () => {
