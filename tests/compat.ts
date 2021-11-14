@@ -36,6 +36,12 @@ describe('composer compatibility warnings', () => {
     expect(doc.toJS()).toEqual({ x: true, true: false })
   })
 
+  test('single-line flow collection', () => {
+    const doc = parseDocument('foo: { x: 42 }\n', { compat: 'core' })
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.warnings).toHaveLength(0)
+  })
+
   test('flow collection with end at parent map indent', () => {
     let doc = parseDocument('x: {\n  y: 42\n}', { compat: 'core' })
     expect(doc.errors).toHaveLength(0)
