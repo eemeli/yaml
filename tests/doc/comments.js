@@ -426,6 +426,22 @@ describe('stringify comments', () => {
           #c5
         `)
     })
+
+    test('custom stringifier', () => {
+      const doc = YAML.parseDocument('- a\n- b\n')
+      doc.contents.commentBefore = 'c0'
+      doc.contents.items[0].commentBefore = 'c1'
+      doc.contents.items[1].commentBefore = 'c2\nc3'
+      const commentString = str => str.replace(/^/gm, '// ')
+      expect(doc.toString({ commentString })).toBe(source`
+        // c0
+        // c1
+        - a
+        // c2
+        // c3
+        - b
+      `)
+    })
   })
 
   describe('map entry comments', () => {

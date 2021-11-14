@@ -210,6 +210,16 @@ export type ToStringOptions = {
   blockQuote?: boolean | 'folded' | 'literal'
 
   /**
+   * Comment stringifier.
+   * Output should be valid for the current schema.
+   *
+   * By default, empty comment lines are left empty,
+   * lines consisting of a single space are replaced by `#`,
+   * and all other lines are prefixed with a `#`.
+   */
+  commentString?: (comment: string) => string
+
+  /**
    * The default type of string literal used to stringify implicit key values.
    * Output may use other types if required to fully represent the value.
    *
