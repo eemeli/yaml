@@ -105,7 +105,7 @@ export class YAMLSeq<T = unknown> extends Collection {
   ): string {
     if (!ctx) return JSON.stringify(this)
     return stringifyCollection(this, ctx, {
-      blockItem: n => (n.comment ? n.str : `- ${n.str}`),
+      blockItemPrefix: '- ',
       flowChars: { start: '[', end: ']' },
       itemIndent: (ctx.indent || '') + '  ',
       onChompKeep,

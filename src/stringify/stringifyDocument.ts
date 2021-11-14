@@ -12,7 +12,7 @@ export function stringifyDocument(
   doc: Readonly<Document>,
   options: ToStringOptions
 ) {
-  const lines = []
+  const lines: string[] = []
   let hasDirectives = options.directives === true
   if (options.directives !== false) {
     const dir = doc.directives.toString(doc)
