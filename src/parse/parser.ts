@@ -224,6 +224,7 @@ export class Parser {
           if (this.atNewLine) this.indent += source.length
           break
         case 'doc-mode':
+        case 'flow-error-end':
           return
         default:
           this.atNewLine = false
