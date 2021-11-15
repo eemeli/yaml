@@ -78,6 +78,7 @@ Used by: `parse()`, `parseDocument()`, `parseAllDocuments()`, `stringify()`, `ne
 | resolveKnownTags | `boolean`                                              | `true`                                   | When using the `'core'` schema, support parsing values with these explicit [YAML 1.1 tags]: `!!binary`, `!!omap`, `!!pairs`, `!!set`, `!!timestamp`. By default `true`. |
 | schema           | `'core' ⎮ 'failsafe' ⎮` `'json' ⎮ 'yaml-1.1' ⎮ string` | 1.1:&nbsp;`'yaml-1.1` 1.2:&nbsp;`'core'` | The base schema to use. Default value depends on YAML version. If using a custom value, `customTags` must be an array of tags.                                          |
 | sortMapEntries   | `boolean ⎮` `(a, b: Pair) => number`                   | `false`                                  | When stringifying, sort map entries. If `true`, sort by comparing key values using the native less-than `<` operator.                                                   |
+| toStringDefaults | `ToStringOptions`                                      |                                          | Override default values for `toString()` options.                                                                                                                       |
 
 [yaml 1.1 tags]: https://yaml.org/type/
 

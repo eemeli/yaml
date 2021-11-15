@@ -870,6 +870,24 @@ describe('Scalar options', () => {
   }
 })
 
+describe('toStringDefaults', () => {
+  test('Set on Document creation', () => {
+    const doc = new YAML.Document(
+      { foo: null },
+      { toStringDefaults: { nullStr: '~' } }
+    )
+    expect(doc.toString()).toBe('foo: ~\n')
+  })
+
+  test('Override in toString()', () => {
+    const doc = new YAML.Document(
+      { foo: null },
+      { toStringDefaults: { nullStr: '~' } }
+    )
+    expect(doc.toString({ nullStr: '' })).toBe('foo:\n')
+  })
+})
+
 describe('Document markers in top-level scalars', () => {
   test('---', () => {
     const str = YAML.stringify('---')

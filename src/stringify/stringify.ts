@@ -28,16 +28,11 @@ export type StringifyContext = {
   options: Readonly<Required<Omit<ToStringOptions, 'indent'>>>
 }
 
-export const createStringifyContext = (
+export function createStringifyContext(
   doc: Document,
   options: ToStringOptions
-): StringifyContext => ({
-  anchors: new Set(),
-  doc,
-  indent: '',
-  indentStep:
-    typeof options.indent === 'number' ? ' '.repeat(options.indent) : '  ',
-  options: Object.assign(
+): StringifyContext {
+  const opt = Object.assign(
     {
       blockQuote: true,
       defaultKeyType: null,
@@ -55,9 +50,18 @@ export const createStringifyContext = (
       trueStr: 'true',
       verifyAliasOrder: true
     },
+    doc.schema.toStringOptions,
     options
   )
-})
+
+  return {
+    anchors: new Set(),
+    doc,
+    indent: '',
+    indentStep: typeof opt.indent === 'number' ? ' '.repeat(opt.indent) : '  ',
+    options: opt
+  }
+}
 
 function getTagObject(tags: Array<ScalarTag | CollectionTag>, item: Node) {
   if (item.tag) {
