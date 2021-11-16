@@ -349,29 +349,34 @@ export class Document<T = unknown> {
    *
    * Overrides all previously set schema options
    */
-  setSchema(version: '1.1' | '1.2', options?: SchemaOptions) {
-    let _options: SchemaOptions
-    switch (String(version)) {
-      case '1.1':
-        this.directives.yaml.version = '1.1'
-        _options = Object.assign(
-          { merge: true, resolveKnownTags: false, schema: 'yaml-1.1' },
-          options
-        )
-        break
-      case '1.2':
-        this.directives.yaml.version = '1.2'
-        _options = Object.assign(
-          { merge: false, resolveKnownTags: true, schema: 'core' },
-          options
-        )
-        break
-      default: {
-        const sv = JSON.stringify(version)
-        throw new Error(`Expected '1.1' or '1.2' as version, but found: ${sv}`)
+  setSchema(version: '1.1' | '1.2', options?: SchemaOptions): void
+  setSchema(schema: Schema): void
+  setSchema(version: '1.1' | '1.2' | Schema, options: SchemaOptions = {}) {
+    // Not using `instanceof Schema` to allow for duck typing
+    if (version instanceof Object) {
+      this.schema = version
+    } else if (options.schema instanceof Object) {
+      this.schema = options.schema
+    } else {
+      let opt: SchemaOptions & { schema: string }
+      switch (String(version)) {
+        case '1.1':
+          this.directives.yaml.version = '1.1'
+          opt = { merge: true, resolveKnownTags: false, schema: 'yaml-1.1' }
+          break
+        case '1.2':
+          this.directives.yaml.version = '1.2'
+          opt = { merge: false, resolveKnownTags: true, schema: 'core' }
+          break
+        default: {
+          const sv = JSON.stringify(version)
+          throw new Error(
+            `Expected '1.1', '1.2' or Schema instance as first argument, but found: ${sv}`
+          )
+        }
       }
+      this.schema = new Schema(Object.assign(opt, options))
     }
-    this.schema = new Schema(_options)
   }
 
   /** A plain JavaScript representation of the document `contents`. */

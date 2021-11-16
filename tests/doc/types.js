@@ -775,7 +775,7 @@ describe('custom tags', () => {
     expect(str).toBe('re: !re /re/g\nsymbol: !symbol/shared foo\n')
   })
 
-  describe('completely custom schema', () => {
+  describe('schema from custom tags', () => {
     test('customTags is required', () => {
       expect(() =>
         YAML.parseDocument('foo', { schema: 'custom-test' })
@@ -835,6 +835,23 @@ describe('custom tags', () => {
         schema: 'custom-test'
       })
       expect(() => String(doc)).toThrow(/Tag not resolved for String value/)
+    })
+
+    test('setSchema', () => {
+      const src = '- foo\n'
+      const doc = YAML.parseDocument(src)
+
+      doc.setSchema('1.2', {
+        customTags: [seqTag, stringTag],
+        schema: 'custom-test-1'
+      })
+      expect(doc.toString()).toBe(src)
+
+      doc.setSchema('1.2', {
+        customTags: [stringTag],
+        schema: 'custom-test-2'
+      })
+      expect(() => String(doc)).toThrow(/Tag not resolved for YAMLSeq value/)
     })
   })
 })
@@ -903,5 +920,20 @@ describe('schema changes', () => {
     })
     doc.set('a', false)
     expect(String(doc)).toBe('a: false\n')
+  })
+
+  test('custom schema instance', () => {
+    const src = '[y, yes, on, n, no, off]'
+    const doc = YAML.parseDocument(src, { version: '1.1' })
+
+    const schema = new YAML.Schema({ schema: 'core' })
+    doc.setSchema(schema)
+    expect(String(doc)).toBe('[ true, true, true, false, false, false ]\n')
+
+    doc.setSchema(Object.assign({}, new YAML.Schema({ schema: 'yaml-1.1' })))
+    expect(String(doc)).toBe('[ y, yes, on, n, no, off ]\n')
+
+    doc.setSchema('1.1', { schema })
+    expect(String(doc)).toBe('[ true, true, true, false, false, false ]\n')
   })
 })

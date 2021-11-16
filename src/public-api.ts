@@ -21,12 +21,10 @@ export interface EmptyStream
   empty: true
 }
 
-function parseOptions(options: ParseOptions | undefined) {
-  const prettyErrors = !options || options.prettyErrors !== false
+function parseOptions(options: ParseOptions) {
+  const prettyErrors = options.prettyErrors !== false
   const lineCounter =
-    (options && options.lineCounter) ||
-    (prettyErrors && new LineCounter()) ||
-    null
+    options.lineCounter || (prettyErrors && new LineCounter()) || null
   return { lineCounter, prettyErrors }
 }
 
