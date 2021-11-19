@@ -13,6 +13,13 @@ big_indent:
          - a
          - b
          - c
+list_map1:
+  - foo: 1
+    bar: 2
+    qux: 3
+  - foo: 4
+    bar: 5
+    qux: 6
 more:
    # A comment goes here,
    # which spans multiple lines.
@@ -86,6 +93,13 @@ big_indent:
   - a
   - b
   - c
+list_map1:
+  - foo: 1
+    bar: 2
+    qux: 3
+  - foo: 4
+    bar: 5
+    qux: 6
 more:
   # A comment goes here,
   # which spans multiple lines.
@@ -116,6 +130,13 @@ preservedDocument:
            - a
            - b
            - c
+  list_map1:
+    - foo: 1
+      bar: 2
+      qux: 3
+    - foo: 4
+      bar: 5
+      qux: 6
   more:
      # A comment goes here,
      # which spans multiple lines.
@@ -153,5 +174,30 @@ preservedDocument:
     newDocument.set('preservedDocument', document)
 
     expect(newDocument.toString().trim()).toEqual(combined.trim())
+  })
+
+  const editingSample = `
+foo:
+            big_indent: 1
+            again: 2
+            more: 3
+  `.trim()
+
+  const editingSampleAfter = `
+foo:
+            big_indent: 1
+            again: 2
+            more: 3
+            new: 4
+`.trim()
+
+  test('preserveCollectionIndentation: adds new item preserving indentation', () => {
+    const document = parseDocument(editingSample, {
+      preserveCollectionIndentation: true
+    })
+
+    document.setIn(['foo', 'new'], 4)
+
+    expect(document.toString().trim()).toEqual(editingSampleAfter)
   })
 })
