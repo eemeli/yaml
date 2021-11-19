@@ -102,7 +102,6 @@ for (const dir of testDirs) {
           test('stringify+re-parse when preserving indentation', () => {
             const roundTripDocuments = parseAllDocuments(yaml, {
               resolveKnownTags: false,
-              keepSourceTokens: true,
               preserveCollectionIndentation: true
             })
             testJsonMatch(roundTripDocuments, json)

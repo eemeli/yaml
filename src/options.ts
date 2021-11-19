@@ -29,10 +29,7 @@ export type ParseOptions = {
 
   /**
    * When parsing a document, stores indentation levels on each collection node,
-   * allowing them to be preserved when latery stringified.
-   *
-   * If 'keepSourceTokens' is not `true`, this has no affect, since source tokens
-   * must be provided in order to determine indentation.
+   * allowing them to be preserved when later stringified.
    *
    * Default: `false`
    */

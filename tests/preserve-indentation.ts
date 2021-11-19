@@ -37,7 +37,6 @@ more:
 
   test('preserveCollectionIndentation: toString() preserve document indentation', () => {
     const document = parseDocument(sample, {
-      keepSourceTokens: true,
       preserveCollectionIndentation: true
     })
     const roundtrippedSource = document.toString()
@@ -67,7 +66,6 @@ foo:
 
   test('preserveCollectionIndentation: produces correct yaml when preserving indentation with edits', () => {
     const document = parseDocument(sample2, {
-      keepSourceTokens: true,
       preserveCollectionIndentation: true
     })
     expect(document.toString().trim()).toEqual(sample2.trim())
@@ -142,7 +140,6 @@ preservedDocument:
 
   test('preserveCollectionIndentation: documents with preserved indentation can be inserted into other documents', () => {
     const document = parseDocument(sample, {
-      keepSourceTokens: true,
       preserveCollectionIndentation: true
     })
 
