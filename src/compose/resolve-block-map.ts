@@ -109,8 +109,10 @@ export function resolveBlockMap(
       // Check to see if the key tokens exist and have an indentation set.
       // If so, we can compute the difference between them and preserve it
       // if the preserveCollectionIndentation option is set.
-      const keyIndent: number | undefined = (collItem?.key as any)?.indent
-      const valueIndent: number | undefined = (collItem?.value as any)?.indent
+      const keyIndent: number | undefined =
+        key && 'indent' in key ? key.indent : undefined
+      const valueIndent: number | undefined =
+        value && 'indent' in value ? value.indent : undefined
 
       if (
         ctx.options.preserveCollectionIndentation &&
