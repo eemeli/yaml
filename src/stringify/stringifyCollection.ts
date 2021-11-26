@@ -1,7 +1,7 @@
 import { Collection } from '../nodes/Collection.js'
 import { isNode, isPair } from '../nodes/Node.js'
 import { stringify, StringifyContext } from './stringify.js'
-import { addComment, stringifyComment } from './stringifyComment.js'
+import { indentComment, lineComment } from './stringifyComment.js'
 
 interface StringifyCollectionOptions {
   blockItemPrefix: string
@@ -34,8 +34,11 @@ function stringifyBlockCollection(
     onComment
   }: StringifyCollectionOptions
 ) {
-  const { indent } = ctx
-  ctx = Object.assign({}, ctx, { indent: itemIndent, type: null })
+  const {
+    indent,
+    options: { commentString }
+  } = ctx
+  const itemCtx = Object.assign({}, ctx, { indent: itemIndent, type: null })
 
   let chompKeep = false // flag for the preceding node's status
   const lines: string[] = []
@@ -44,24 +47,24 @@ function stringifyBlockCollection(
     let comment: string | null = null
     if (isNode(item)) {
       if (!chompKeep && item.spaceBefore) lines.push('')
-      addCommentBefore(lines, item.commentBefore, chompKeep)
+      addCommentBefore(ctx, lines, item.commentBefore, chompKeep)
       if (item.comment) comment = item.comment
     } else if (isPair(item)) {
       const ik = isNode(item.key) ? item.key : null
       if (ik) {
         if (!chompKeep && ik.spaceBefore) lines.push('')
-        addCommentBefore(lines, ik.commentBefore, chompKeep)
+        addCommentBefore(ctx, lines, ik.commentBefore, chompKeep)
       }
     }
 
     chompKeep = false
     let str = stringify(
       item,
-      ctx,
+      itemCtx,
       () => (comment = null),
       () => (chompKeep = true)
     )
-    str = addComment(str, itemIndent, comment)
+    if (comment) str += lineComment(str, itemIndent, commentString(comment))
     if (chompKeep && comment) chompKeep = false
     lines.push(blockItemPrefix + str)
   }
@@ -78,7 +81,7 @@ function stringifyBlockCollection(
   }
 
   if (comment) {
-    str += '\n' + stringifyComment(comment, indent)
+    str += '\n' + indentComment(commentString(comment), indent)
     if (onComment) onComment()
   } else if (chompKeep && onChompKeep) onChompKeep()
 
@@ -90,9 +93,17 @@ function stringifyFlowCollection(
   ctx: StringifyContext,
   { flowChars, itemIndent, onComment }: StringifyCollectionOptions
 ) {
-  const { indent, indentStep } = ctx
+  const {
+    indent,
+    indentStep,
+    options: { commentString }
+  } = ctx
   itemIndent += indentStep
-  ctx = Object.assign({}, ctx, { indent: itemIndent, inFlow: true, type: null })
+  const itemCtx = Object.assign({}, ctx, {
+    indent: itemIndent,
+    inFlow: true,
+    type: null
+  })
 
   let reqNewline = false
   let linesAtValue = 0
@@ -102,13 +113,13 @@ function stringifyFlowCollection(
     let comment: string | null = null
     if (isNode(item)) {
       if (item.spaceBefore) lines.push('')
-      addCommentBefore(lines, item.commentBefore, false)
+      addCommentBefore(ctx, lines, item.commentBefore, false)
       if (item.comment) comment = item.comment
     } else if (isPair(item)) {
       const ik = isNode(item.key) ? item.key : null
       if (ik) {
         if (ik.spaceBefore) lines.push('')
-        addCommentBefore(lines, ik.commentBefore, false)
+        addCommentBefore(ctx, lines, ik.commentBefore, false)
         if (ik.comment) reqNewline = true
       }
 
@@ -122,9 +133,9 @@ function stringifyFlowCollection(
     }
 
     if (comment) reqNewline = true
-    let str = stringify(item, ctx, () => (comment = null))
+    let str = stringify(item, itemCtx, () => (comment = null))
     if (i < items.length - 1) str += ','
-    str = addComment(str, itemIndent, comment)
+    if (comment) str += lineComment(str, itemIndent, commentString(comment))
     if (!reqNewline && (lines.length > linesAtValue || str.includes('\n')))
       reqNewline = true
     lines.push(str)
@@ -151,23 +162,21 @@ function stringifyFlowCollection(
   }
 
   if (comment) {
-    str += comment.includes('\n')
-      ? '\n' + stringifyComment(comment, indent)
-      : ` #${comment}`
+    str += lineComment(str, commentString(comment), indent)
     if (onComment) onComment()
   }
   return str
 }
 
 function addCommentBefore(
+  { indent, options: { commentString } }: StringifyContext,
   lines: string[],
   comment: string | null | undefined,
   chompKeep: boolean
 ) {
   if (comment && chompKeep) comment = comment.replace(/^\n+/, '')
   if (comment) {
-    if (/^\n+$/.test(comment)) comment = comment.substring(1)
-    for (const line of comment.match(/^.*$/gm) as string[])
-      lines.push(line === ' ' ? '#' : line ? `#${line}` : '')
+    const ic = indentComment(commentString(comment), indent)
+    lines.push(ic.trimStart()) // Avoid double indent on first line
   }
 }

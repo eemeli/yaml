@@ -171,7 +171,7 @@ function blockString(
   onComment?: () => void,
   onChompKeep?: () => void
 ) {
-  const { lineWidth, blockQuote } = ctx.options
+  const { blockQuote, commentString, lineWidth } = ctx.options
   // 1. Block can't end in whitespace unless the last line is non-empty.
   // 2. Strings consisting of only whitespace are best rendered explicitly.
   if (!blockQuote || /\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
@@ -237,7 +237,7 @@ function blockString(
   let header =
     (literal ? '|' : '>') + (startWithSpace ? indentSize : '') + chomp
   if (comment) {
-    header += ' #' + comment.replace(/ ?[\r\n]+/g, ' ')
+    header += ' ' + commentString(comment.replace(/ ?[\r\n]+/g, ' '))
     if (onComment) onComment()
   }
 
