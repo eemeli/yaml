@@ -86,6 +86,15 @@ export type DocumentOptions = {
 
 export type SchemaOptions = {
   /**
+   * When parsing, warn about compatibility issues with the given schema.
+   * When stringifying, use scalar styles that are parsed correctly
+   * by the `compat` schema as well as the actual schema.
+   *
+   * Default: `null`
+   */
+  compat?: string | Tags | null
+
+  /**
    * Array of additional tags to include in the schema, or a function that may
    * modify the schema's base tag array.
    */
@@ -213,6 +222,16 @@ export type ToStringOptions = {
    * Default: `true`
    */
   blockQuote?: boolean | 'folded' | 'literal'
+
+  /**
+   * Comment stringifier.
+   * Output should be valid for the current schema.
+   *
+   * By default, empty comment lines are left empty,
+   * lines consisting of a single space are replaced by `#`,
+   * and all other lines are prefixed with a `#`.
+   */
+  commentString?: (comment: string) => string
 
   /**
    * The default type of string literal used to stringify implicit key values.

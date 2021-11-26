@@ -27,7 +27,9 @@ export function composeScalar(
   const tag =
     tagToken && tagName
       ? findScalarTagByName(ctx.schema, value, tagName, tagToken, onError)
-      : findScalarTagByTest(ctx.schema, value, token.type === 'scalar')
+      : token.type === 'scalar'
+      ? findScalarTagByTest(ctx, value, token, onError)
+      : ctx.schema[SCALAR]
 
   let scalar: Scalar
   try {
@@ -84,11 +86,28 @@ function findScalarTagByName(
   return schema[SCALAR]
 }
 
-function findScalarTagByTest(schema: Schema, value: string, apply: boolean) {
-  if (apply) {
-    for (const tag of schema.tags) {
-      if (tag.default && tag.test?.test(value)) return tag
+function findScalarTagByTest(
+  { directives, schema }: ComposeContext,
+  value: string,
+  token: FlowScalar,
+  onError: ComposeErrorHandler
+) {
+  const tag =
+    (schema.tags.find(
+      tag => tag.default && tag.test?.test(value)
+    ) as ScalarTag) || schema[SCALAR]
+
+  if (schema.compat) {
+    const compat =
+      schema.compat.find(tag => tag.default && tag.test?.test(value)) ||
+      schema[SCALAR]
+    if (tag.tag !== compat.tag) {
+      const ts = directives.tagString(tag.tag)
+      const cs = directives.tagString(compat.tag)
+      const msg = `Value may be parsed as either ${ts} or ${cs}`
+      onError(token, 'TAG_RESOLVE_FAILED', msg, true)
     }
   }
-  return schema[SCALAR]
+
+  return tag
 }

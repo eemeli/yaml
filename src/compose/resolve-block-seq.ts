@@ -3,6 +3,7 @@ import type { BlockSequence } from '../parse/cst.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveProps } from './resolve-props.js'
+import { flowIndentCheck } from './util-flow-indent-check.js'
 
 export function resolveBlockSeq(
   { composeNode, composeEmptyNode }: ComposeNode,
@@ -40,6 +41,7 @@ export function resolveBlockSeq(
     const node = value
       ? composeNode(ctx, value, props, onError)
       : composeEmptyNode(ctx, offset, start, null, props, onError)
+    if (ctx.schema.compat) flowIndentCheck(bs.indent, value, onError)
     offset = node.range[2]
     seq.items.push(node)
   }

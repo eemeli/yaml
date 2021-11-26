@@ -11,6 +11,7 @@ import {
 import type { Scalar } from '../nodes/Scalar.js'
 import type { ToStringOptions } from '../options.js'
 import type { CollectionTag, ScalarTag } from '../schema/types.js'
+import { stringifyComment } from './stringifyComment.js'
 import { stringifyString } from './stringifyString.js'
 
 export type StringifyContext = {
@@ -35,6 +36,7 @@ export function createStringifyContext(
   const opt = Object.assign(
     {
       blockQuote: true,
+      commentString: stringifyComment,
       defaultKeyType: null,
       defaultStringType: 'PLAIN',
       directives: null,

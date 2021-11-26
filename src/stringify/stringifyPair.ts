@@ -2,7 +2,7 @@ import { isCollection, isNode, isScalar, isSeq } from '../nodes/Node.js'
 import type { Pair } from '../nodes/Pair.js'
 import { Scalar } from '../nodes/Scalar.js'
 import { stringify, StringifyContext } from './stringify.js'
-import { addComment, stringifyComment } from './stringifyComment.js'
+import { indentComment, lineComment } from './stringifyComment.js'
 
 export function stringifyPair(
   { key, value }: Readonly<Pair>,
@@ -15,7 +15,7 @@ export function stringifyPair(
     doc,
     indent,
     indentStep,
-    options: { indentSeq, simpleKeys }
+    options: { commentString, indentSeq, simpleKeys }
   } = ctx
   let keyComment = (isNode(key) && key.comment) || null
   if (simpleKeys) {
@@ -64,22 +64,32 @@ export function stringifyPair(
       return explicitKey ? `? ${str}` : str
     }
   } else if ((allNullValues && !simpleKeys) || (value == null && explicitKey)) {
-    if (keyCommentDone) keyComment = null
-    if (chompKeep && !keyComment && onChompKeep) onChompKeep()
-    return addComment(`? ${str}`, ctx.indent, keyComment)
+    str = `? ${str}`
+    if (keyComment && !keyCommentDone) {
+      str += lineComment(str, ctx.indent, commentString(keyComment))
+    } else if (chompKeep && onChompKeep) onChompKeep()
+    return str
   }
 
   if (keyCommentDone) keyComment = null
-  str = explicitKey
-    ? `? ${addComment(str, ctx.indent, keyComment)}\n${indent}:`
-    : addComment(`${str}:`, ctx.indent, keyComment)
+  if (explicitKey) {
+    if (keyComment)
+      str += lineComment(str, ctx.indent, commentString(keyComment))
+    str = `? ${str}\n${indent}:`
+  } else {
+    str = `${str}:`
+    if (keyComment)
+      str += lineComment(str, ctx.indent, commentString(keyComment))
+  }
 
   let vcb = ''
   let valueComment = null
   if (isNode(value)) {
     if (value.spaceBefore) vcb = '\n'
-    if (value.commentBefore)
-      vcb += `\n${stringifyComment(value.commentBefore, ctx.indent)}`
+    if (value.commentBefore) {
+      const cs = commentString(value.commentBefore)
+      vcb += `\n${indentComment(cs, ctx.indent)}`
+    }
     valueComment = value.comment
   } else if (value && typeof value === 'object') {
     value = doc.createNode(value)
@@ -116,13 +126,15 @@ export function stringifyPair(
     const flow = valueStr[0] === '[' || valueStr[0] === '{'
     if (!flow || valueStr.includes('\n')) ws = `\n${ctx.indent}`
   } else if (valueStr === '' || valueStr[0] === '\n') ws = ''
+  str += ws + valueStr
 
   if (ctx.inFlow) {
     if (valueCommentDone && onComment) onComment()
-    return str + ws + valueStr
-  } else {
-    if (valueCommentDone) valueComment = null
-    if (chompKeep && !valueComment && onChompKeep) onChompKeep()
-    return addComment(str + ws + valueStr, ctx.indent, valueComment)
+  } else if (valueComment && !valueCommentDone) {
+    str += lineComment(str, ctx.indent, commentString(valueComment))
+  } else if (chompKeep && onChompKeep) {
+    onChompKeep()
   }
+
+  return str
 }
