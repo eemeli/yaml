@@ -141,6 +141,11 @@ export type SchemaOptions = {
    * Default: `false`
    */
   sortMapEntries?: boolean | ((a: Pair, b: Pair) => number)
+
+  /**
+   * Override default values for `toString()` options.
+   */
+  toStringDefaults?: ToStringOptions
 }
 
 export type CreateNodeOptions = {

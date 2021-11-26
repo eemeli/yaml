@@ -1,6 +1,6 @@
 import { MAP, SCALAR, SEQ } from '../nodes/Node.js'
 import type { Pair } from '../nodes/Pair.js'
-import type { SchemaOptions } from '../options.js'
+import type { SchemaOptions, ToStringOptions } from '../options.js'
 import { map } from './common/map.js'
 import { seq } from './common/seq.js'
 import { string } from './common/string.js'
@@ -16,7 +16,8 @@ export class Schema {
   merge: boolean
   name: string
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
-  tags: Array<CollectionTag | ScalarTag>;
+  tags: Array<CollectionTag | ScalarTag>
+  toStringOptions: Readonly<ToStringOptions> | null;
 
   // Used by createNode() and composeScalar()
   [MAP]: CollectionTag;
@@ -29,7 +30,8 @@ export class Schema {
     merge,
     resolveKnownTags,
     schema,
-    sortMapEntries
+    sortMapEntries,
+    toStringDefaults
   }: SchemaOptions) {
     this.compat = Array.isArray(compat)
       ? getTags(compat, 'compat')
@@ -40,6 +42,7 @@ export class Schema {
     this.name = schema || 'core'
     this.knownTags = resolveKnownTags ? coreKnownTags : {}
     this.tags = getTags(customTags, this.name)
+    this.toStringOptions = toStringDefaults || null
 
     Object.defineProperty(this, MAP, { value: map })
     Object.defineProperty(this, SCALAR, { value: string })
