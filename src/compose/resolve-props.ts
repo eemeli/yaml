@@ -108,6 +108,12 @@ export function resolveProps(
             'BAD_PROP_ORDER',
             `Anchors and tags must be after the ${token.source} indicator`
           )
+        if (found)
+          onError(
+            token,
+            'UNEXPECTED_TOKEN',
+            `Unexpected ${token.source} in ${flow || 'collection'}`
+          )
         found = token
         atNewline = false
         hasSpace = false

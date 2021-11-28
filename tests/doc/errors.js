@@ -176,6 +176,11 @@ describe('flow collections', () => {
     const doc = YAML.parseDocument('{ &a ? A }')
     expect(doc.errors).toMatchObject([{ code: 'BAD_PROP_ORDER' }])
   })
+
+  test('flow map with doubled indicator', () => {
+    const doc = YAML.parseDocument('{ foo: : bar }')
+    expect(doc.errors).toMatchObject([{ code: 'UNEXPECTED_TOKEN' }])
+  })
 })
 
 describe('comments', () => {
