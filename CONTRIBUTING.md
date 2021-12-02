@@ -56,6 +56,7 @@ npm test # just to be sure
 - **`tests/`** - Tests for the library:
   - **`tests/artifacts/`** - YAML files used by some of the tests
   - **`tests/doc/`** - Tests for the AST level of the library
+  - **`tests/json-test-suite/`** - Git submodule of the [JSON Test Suite](https://github.com/nst/JSONTestSuite)
   - **`tests/yaml-test-suite/`** - Git submodule of a custom fork of the [YAML Test Suite](https://github.com/yaml/yaml-test-suite)
 
 ## Contributing Code

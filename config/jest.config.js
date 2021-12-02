@@ -38,6 +38,6 @@ module.exports = {
   rootDir: '..',
   testEnvironment: 'node',
   testMatch: ['**/tests/**/*.{js,ts}'],
-  testPathIgnorePatterns: ['tests/_utils'],
+  testPathIgnorePatterns: ['tests/_utils', 'tests/json-test-suite/'],
   transform
 }
