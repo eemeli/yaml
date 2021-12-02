@@ -224,6 +224,15 @@ export type ToStringOptions = {
   blockQuote?: boolean | 'folded' | 'literal'
 
   /**
+   * Enforce `'block'` or `'flow'` style on maps and sequences.
+   * Empty collections will always be stringified as `{}` or `[]`.
+   *
+   * Default: `'any'`, allowing each node to set its style separately
+   * with its `flow: boolean` (default `false`) property.
+   */
+  collectionStyle?: 'any' | 'block' | 'flow'
+
+  /**
    * Comment stringifier.
    * Output should be valid for the current schema.
    *

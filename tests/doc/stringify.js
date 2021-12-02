@@ -720,6 +720,59 @@ describe('indentSeq: false', () => {
   })
 })
 
+describe('collectionStyle', () => {
+  test('collectionStyle: undefined', () => {
+    const doc = new YAML.Document({ foo: ['bar'] })
+    expect(doc.toString()).toBe('foo:\n  - bar\n')
+
+    doc.contents.flow = false
+    doc.get('foo').flow = true
+    expect(doc.toString()).toBe('foo: [ bar ]\n')
+
+    doc.contents.flow = true
+    doc.get('foo').flow = false
+    expect(doc.toString()).toBe('{ foo: [ bar ] }\n')
+  })
+
+  test("collectionStyle: 'any'", () => {
+    const doc = new YAML.Document({ foo: ['bar'] })
+    expect(doc.toString({ collectionStyle: 'any' })).toBe('foo:\n  - bar\n')
+
+    doc.contents.flow = false
+    doc.get('foo').flow = true
+    expect(doc.toString({ collectionStyle: 'any' })).toBe('foo: [ bar ]\n')
+
+    doc.contents.flow = true
+    doc.get('foo').flow = false
+    expect(doc.toString({ collectionStyle: 'any' })).toBe('{ foo: [ bar ] }\n')
+  })
+
+  test("collectionStyle: 'block'", () => {
+    const doc = new YAML.Document({ foo: ['bar'] })
+    expect(doc.toString({ collectionStyle: 'block' })).toBe('foo:\n  - bar\n')
+
+    doc.contents.flow = false
+    doc.get('foo').flow = true
+    expect(doc.toString({ collectionStyle: 'block' })).toBe('foo:\n  - bar\n')
+
+    doc.contents.flow = true
+    doc.get('foo').flow = false
+    expect(doc.toString({ collectionStyle: 'block' })).toBe('foo:\n  - bar\n')
+  })
+
+  test("collectionStyle: 'flow'", () => {
+    const doc = new YAML.Document({ foo: ['bar'] })
+    expect(doc.toString({ collectionStyle: 'flow' })).toBe('{ foo: [ bar ] }\n')
+
+    doc.get('foo').flow = true
+    expect(doc.toString({ collectionStyle: 'flow' })).toBe('{ foo: [ bar ] }\n')
+
+    doc.contents.flow = true
+    doc.get('foo').flow = false
+    expect(doc.toString({ collectionStyle: 'flow' })).toBe('{ foo: [ bar ] }\n')
+  })
+})
+
 describe('Scalar options', () => {
   describe('defaultStringType & defaultKeyType', () => {
     test('PLAIN, PLAIN', () => {
