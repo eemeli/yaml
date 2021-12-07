@@ -8,3 +8,7 @@
 [submodule "playground"]
 	path = playground
 	url = https://github.com/eemeli/yaml-playground.git
+[submodule "tests/json-test-suite"]
+	path = tests/json-test-suite
+	url = https://github.com/nst/JSONTestSuite.git
+	branch = master
