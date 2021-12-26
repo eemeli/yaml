@@ -411,6 +411,21 @@ test('eemeli/yaml#36', () => {
   expect(() => YAML.parse(`{ x: ${'x'.repeat(1024)} }`)).not.toThrowError()
 })
 
+test('block map with flow collection key as explicit key', () => {
+  const doc = YAML.parseDocument(`? []: x`)
+  expect(doc.errors).toHaveLength(0)
+  expect(doc.contents).toMatchObject({
+    items: [
+      {
+        key: {
+          items: [{ key: { items: [], flow: true }, value: { value: 'x' } }]
+        },
+        value: null
+      }
+    ]
+  })
+})
+
 test('eemeli/yaml#38', () => {
   const src = `
   content:

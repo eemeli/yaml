@@ -300,9 +300,13 @@ export class Parser {
       yield token
     } else {
       const top = this.peek(1)
-      // For these, parent indent is needed instead of own
-      if (token.type === 'block-scalar' || token.type === 'flow-collection')
+      if (token.type === 'block-scalar') {
+        // Block scalars use their parent rather than header indent
         token.indent = 'indent' in top ? top.indent : -1
+      } else if (token.type === 'flow-collection' && top.type === 'document') {
+        // Ignore all indent for top-level flow collections
+        token.indent = -1
+      }
       if (token.type === 'flow-collection') fixFlowSeqItems(token)
       switch (top.type) {
         case 'document':
