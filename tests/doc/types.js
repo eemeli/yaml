@@ -923,17 +923,28 @@ describe('schema changes', () => {
   })
 
   test('custom schema instance', () => {
-    const src = '[y, yes, on, n, no, off]'
+    const src = '[ !!bool yes, no ]'
     const doc = YAML.parseDocument(src, { version: '1.1' })
 
+    doc.setSchema('1.2', new YAML.Schema({ schema: 'core' }))
+    expect(String(doc)).toBe('[ !!bool true, false ]\n')
+
+    const yaml11 = new YAML.Schema({ schema: 'yaml-1.1' })
+    doc.setSchema('1.1', Object.assign({}, yaml11))
+    expect(String(doc)).toBe('[ !!bool yes, no ]\n')
+
     const schema = new YAML.Schema({ schema: 'core' })
-    doc.setSchema(schema)
-    expect(String(doc)).toBe('[ true, true, true, false, false, false ]\n')
+    doc.setSchema(null, { schema })
+    expect(String(doc)).toBe('[ true, false ]\n')
+  })
 
-    doc.setSchema(Object.assign({}, new YAML.Schema({ schema: 'yaml-1.1' })))
-    expect(String(doc)).toBe('[ y, yes, on, n, no, off ]\n')
-
-    doc.setSchema('1.1', { schema })
-    expect(String(doc)).toBe('[ true, true, true, false, false, false ]\n')
+  test('null version requires Schema instance', () => {
+    const doc = YAML.parseDocument('foo: bar')
+    const msg =
+      'With a null YAML version, the { schema: Schema } option is required'
+    expect(() => doc.setSchema(null)).toThrow(msg)
+    expect(() => doc.setSchema(null, { schema: 'core' })).toThrow(msg)
+    doc.setSchema(null, { schema: doc.schema })
+    expect(doc.toString()).toBe('foo: bar\n')
   })
 })

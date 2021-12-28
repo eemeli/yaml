@@ -119,10 +119,9 @@ function stringifyProps(
     anchors.add(anchor)
     props.push(`&${anchor}`)
   }
-  if (node.tag) {
-    props.push(doc.directives.tagString(node.tag))
-  } else if (!tagObj.default) {
-    props.push(doc.directives.tagString(tagObj.tag))
+  if (doc.directives) {
+    const tag = node.tag || (tagObj.default ? null : tagObj.tag)
+    if (tag) props.push(doc.directives.tagString(tag))
   }
   return props.join(' ')
 }
