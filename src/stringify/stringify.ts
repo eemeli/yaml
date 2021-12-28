@@ -24,9 +24,11 @@ export type StringifyContext = {
   indent: string
   indentStep: string
   indentAtStart?: number
-  inFlow?: boolean
+  inFlow: boolean | null
   inStringifyKey?: boolean
-  options: Readonly<Required<Omit<ToStringOptions, 'indent'>>>
+  options: Readonly<
+    Required<Omit<ToStringOptions, 'collectionStyle' | 'indent'>>
+  >
 }
 
 export function createStringifyContext(
@@ -56,11 +58,24 @@ export function createStringifyContext(
     options
   )
 
+  let inFlow: boolean | null
+  switch (opt.collectionStyle) {
+    case 'block':
+      inFlow = false
+      break
+    case 'flow':
+      inFlow = true
+      break
+    default:
+      inFlow = null
+  }
+
   return {
     anchors: new Set(),
     doc,
     indent: '',
     indentStep: typeof opt.indent === 'number' ? ' '.repeat(opt.indent) : '  ',
+    inFlow,
     options: opt
   }
 }
