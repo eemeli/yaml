@@ -923,19 +923,19 @@ describe('schema changes', () => {
   })
 
   test('custom schema instance', () => {
-    const src = '[ !!bool yes, no ]'
+    const src = '[ !!bool yes, &foo no, *foo ]'
     const doc = YAML.parseDocument(src, { version: '1.1' })
 
     doc.setSchema('1.2', new YAML.Schema({ schema: 'core' }))
-    expect(String(doc)).toBe('[ !!bool true, false ]\n')
+    expect(String(doc)).toBe('[ !!bool true, &foo false, *foo ]\n')
 
     const yaml11 = new YAML.Schema({ schema: 'yaml-1.1' })
     doc.setSchema('1.1', Object.assign({}, yaml11))
-    expect(String(doc)).toBe('[ !!bool yes, no ]\n')
+    expect(String(doc)).toBe('[ !!bool yes, &foo no, *foo ]\n')
 
     const schema = new YAML.Schema({ schema: 'core' })
     doc.setSchema(null, { schema })
-    expect(String(doc)).toBe('[ true, false ]\n')
+    expect(String(doc)).toBe('[ true, false, false ]\n')
   })
 
   test('null version requires Schema instance', () => {

@@ -347,7 +347,7 @@ export class Document<T = unknown> {
 
   /**
    * Change the YAML version and schema used by the document.
-   * A `null` version disables support for directives and explicit tags.
+   * A `null` version disables support for directives, explicit tags, anchors, and aliases.
    * It also requires the `schema` option to be given as a `Schema` instance value.
    *
    * Overrides all previously set schema options.
