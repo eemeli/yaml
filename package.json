@@ -45,6 +45,7 @@
     "prestart": "npm run build:node",
     "start": "node -i -e 'YAML=require(\"./dist/index.js\")'",
     "test": "jest --config config/jest.config.js",
+    "test:all": "npm test && npm run test:types && npm run test:dist && npm run test:dist:types",
     "test:browsers": "cd playground && npm test",
     "test:dist": "npm run build:node && jest --config config/jest.config.js",
     "test:dist:types": "tsc --allowJs --moduleResolution node --noEmit --target es5 dist/index.js",
