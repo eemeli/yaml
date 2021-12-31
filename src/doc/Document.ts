@@ -37,6 +37,7 @@ export type Replacer = any[] | ((key: any, value: any) => unknown)
 
 export declare namespace Document {
   interface Parsed<T extends ParsedNode = ParsedNode> extends Document<T> {
+    directives: Directives
     range: Range
   }
 }
@@ -53,7 +54,7 @@ export class Document<T = unknown> {
   /** The document contents. */
   contents: T | null
 
-  directives: Directives
+  directives?: Directives
 
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []
@@ -139,7 +140,7 @@ export class Document<T = unknown> {
     copy.errors = this.errors.slice()
     copy.warnings = this.warnings.slice()
     copy.options = Object.assign({}, this.options)
-    copy.directives = this.directives.clone()
+    if (this.directives) copy.directives = this.directives.clone()
     copy.schema = this.schema.clone()
     copy.contents = isNode(this.contents)
       ? (this.contents.clone(copy.schema) as unknown as T)
@@ -346,32 +347,45 @@ export class Document<T = unknown> {
 
   /**
    * Change the YAML version and schema used by the document.
+   * A `null` version disables support for directives, explicit tags, anchors, and aliases.
+   * It also requires the `schema` option to be given as a `Schema` instance value.
    *
-   * Overrides all previously set schema options
+   * Overrides all previously set schema options.
    */
-  setSchema(version: '1.1' | '1.2', options?: SchemaOptions) {
-    let _options: SchemaOptions
-    switch (String(version)) {
+  setSchema(version: '1.1' | '1.2' | null, options: SchemaOptions = {}) {
+    if (typeof version === 'number') version = String(version) as '1.1' | '1.2'
+
+    let opt: (SchemaOptions & { schema: string }) | null
+    switch (version) {
       case '1.1':
-        this.directives.yaml.version = '1.1'
-        _options = Object.assign(
-          { merge: true, resolveKnownTags: false, schema: 'yaml-1.1' },
-          options
-        )
+        if (this.directives) this.directives.yaml.version = '1.1'
+        else this.directives = new Directives({ version: '1.1' })
+        opt = { merge: true, resolveKnownTags: false, schema: 'yaml-1.1' }
         break
       case '1.2':
-        this.directives.yaml.version = '1.2'
-        _options = Object.assign(
-          { merge: false, resolveKnownTags: true, schema: 'core' },
-          options
-        )
+        if (this.directives) this.directives.yaml.version = '1.2'
+        else this.directives = new Directives({ version: '1.2' })
+        opt = { merge: false, resolveKnownTags: true, schema: 'core' }
+        break
+      case null:
+        if (this.directives) delete this.directives
+        opt = null
         break
       default: {
         const sv = JSON.stringify(version)
-        throw new Error(`Expected '1.1' or '1.2' as version, but found: ${sv}`)
+        throw new Error(
+          `Expected '1.1', '1.2' or null as first argument, but found: ${sv}`
+        )
       }
     }
-    this.schema = new Schema(_options)
+
+    // Not using `instanceof Schema` to allow for duck typing
+    if (options.schema instanceof Object) this.schema = options.schema
+    else if (opt) this.schema = new Schema(Object.assign(opt, options))
+    else
+      throw new Error(
+        `With a null YAML version, the { schema: Schema } option is required`
+      )
   }
 
   /** A plain JavaScript representation of the document `contents`. */

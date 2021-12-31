@@ -775,7 +775,7 @@ describe('custom tags', () => {
     expect(str).toBe('re: !re /re/g\nsymbol: !symbol/shared foo\n')
   })
 
-  describe('completely custom schema', () => {
+  describe('schema from custom tags', () => {
     test('customTags is required', () => {
       expect(() =>
         YAML.parseDocument('foo', { schema: 'custom-test' })
@@ -835,6 +835,23 @@ describe('custom tags', () => {
         schema: 'custom-test'
       })
       expect(() => String(doc)).toThrow(/Tag not resolved for String value/)
+    })
+
+    test('setSchema', () => {
+      const src = '- foo\n'
+      const doc = YAML.parseDocument(src)
+
+      doc.setSchema('1.2', {
+        customTags: [seqTag, stringTag],
+        schema: 'custom-test-1'
+      })
+      expect(doc.toString()).toBe(src)
+
+      doc.setSchema('1.2', {
+        customTags: [stringTag],
+        schema: 'custom-test-2'
+      })
+      expect(() => String(doc)).toThrow(/Tag not resolved for YAMLSeq value/)
     })
   })
 })
@@ -903,5 +920,31 @@ describe('schema changes', () => {
     })
     doc.set('a', false)
     expect(String(doc)).toBe('a: false\n')
+  })
+
+  test('custom schema instance', () => {
+    const src = '[ !!bool yes, &foo no, *foo ]'
+    const doc = YAML.parseDocument(src, { version: '1.1' })
+
+    doc.setSchema('1.2', new YAML.Schema({ schema: 'core' }))
+    expect(String(doc)).toBe('[ !!bool true, &foo false, *foo ]\n')
+
+    const yaml11 = new YAML.Schema({ schema: 'yaml-1.1' })
+    doc.setSchema('1.1', Object.assign({}, yaml11))
+    expect(String(doc)).toBe('[ !!bool yes, &foo no, *foo ]\n')
+
+    const schema = new YAML.Schema({ schema: 'core' })
+    doc.setSchema(null, { schema })
+    expect(String(doc)).toBe('[ true, false, false ]\n')
+  })
+
+  test('null version requires Schema instance', () => {
+    const doc = YAML.parseDocument('foo: bar')
+    const msg =
+      'With a null YAML version, the { schema: Schema } option is required'
+    expect(() => doc.setSchema(null)).toThrow(msg)
+    expect(() => doc.setSchema(null, { schema: 'core' })).toThrow(msg)
+    doc.setSchema(null, { schema: doc.schema })
+    expect(doc.toString()).toBe('foo: bar\n')
   })
 })

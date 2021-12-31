@@ -14,7 +14,7 @@ export function stringifyDocument(
 ) {
   const lines: string[] = []
   let hasDirectives = options.directives === true
-  if (options.directives !== false) {
+  if (options.directives !== false && doc.directives) {
     const dir = doc.directives.toString(doc)
     if (dir) {
       lines.push(dir)

@@ -5,6 +5,7 @@ import type { ParsedNode } from './nodes/Node.js'
 import type { Pair } from './nodes/Pair.js'
 import type { Scalar } from './nodes/Scalar.js'
 import type { LineCounter } from './parse/line-counter.js'
+import type { Schema } from './schema/Schema.js'
 import type { Tags } from './schema/tags.js'
 import type { CollectionTag, ScalarTag } from './schema/types.js'
 
@@ -131,7 +132,7 @@ export type SchemaOptions = {
    *
    * Default: `'core'` for YAML 1.2, `'yaml-1.1'` for earlier versions
    */
-  schema?: string
+  schema?: string | Schema
 
   /**
    * When adding to or stringifying a map, sort the entries.

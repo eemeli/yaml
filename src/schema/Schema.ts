@@ -39,7 +39,7 @@ export class Schema {
       ? getTags(null, compat)
       : null
     this.merge = !!merge
-    this.name = schema || 'core'
+    this.name = (typeof schema === 'string' && schema) || 'core'
     this.knownTags = resolveKnownTags ? coreKnownTags : {}
     this.tags = getTags(customTags, this.name)
     this.toStringOptions = toStringDefaults || null

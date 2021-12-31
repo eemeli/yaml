@@ -1,5 +1,6 @@
 import { anchorIsValid } from '../doc/anchors.js'
 import type { Document } from '../doc/Document.js'
+import type { Alias } from '../nodes/Alias.js'
 import {
   isAlias,
   isCollection,
@@ -29,6 +30,7 @@ export type StringifyContext = {
   options: Readonly<
     Required<Omit<ToStringOptions, 'collectionStyle' | 'indent'>>
   >
+  resolvedAliases?: Set<Alias>
 }
 
 export function createStringifyContext(
@@ -113,17 +115,15 @@ function stringifyProps(
   tagObj: ScalarTag | CollectionTag,
   { anchors, doc }: StringifyContext
 ) {
+  if (!doc.directives) return ''
   const props = []
   const anchor = (isScalar(node) || isCollection(node)) && node.anchor
   if (anchor && anchorIsValid(anchor)) {
     anchors.add(anchor)
     props.push(`&${anchor}`)
   }
-  if (node.tag) {
-    props.push(doc.directives.tagString(node.tag))
-  } else if (!tagObj.default) {
-    props.push(doc.directives.tagString(tagObj.tag))
-  }
+  const tag = node.tag || (tagObj.default ? null : tagObj.tag)
+  if (tag) props.push(doc.directives.tagString(tag))
   return props.join(' ')
 }
 
@@ -134,7 +134,19 @@ export function stringify(
   onChompKeep?: () => void
 ): string {
   if (isPair(item)) return item.toString(ctx, onComment, onChompKeep)
-  if (isAlias(item)) return item.toString(ctx)
+  if (isAlias(item)) {
+    if (ctx.doc.directives) return item.toString(ctx)
+
+    if (ctx.resolvedAliases?.has(item)) {
+      throw new TypeError(
+        `Cannot stringify circular structure without alias nodes`
+      )
+    } else {
+      if (ctx.resolvedAliases) ctx.resolvedAliases.add(item)
+      else ctx.resolvedAliases = new Set([item])
+      item = item.resolve(ctx.doc)
+    }
+  }
 
   let tagObj: ScalarTag | CollectionTag | undefined = undefined
   const node = isNode(item)
