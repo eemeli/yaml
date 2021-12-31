@@ -14,8 +14,9 @@ It is valid to have an anchor associated with a node even if it has no aliases.<
       <span class="c1">// included in their respective ranges.</span>
   <span class="nx">spaceBefore</span><span class="p">?:</span> <span class="nx">boolean</span>
       <span class="c1">// a blank line before this node and its commentBefore</span>
-  <span class="nx">tag</span><span class="p">?:</span> <span class="nx">string</span>   <span class="c1">// a fully qualified tag, if required</span>
-  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>  <span class="c1">// a plain JS or JSON representation of this node</span>
+  <span class="nx">tag</span><span class="p">?:</span> <span class="nx">string</span>       <span class="c1">// a fully qualified tag, if required</span>
+  <span class="nx">clone</span><span class="p">():</span> <span class="nx">NodeBase</span>  <span class="c1">// a copy of this node</span>
+  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>      <span class="c1">// a plain JS or JSON representation of this node</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>For scalar values, the <code>tag</code> will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, <code>YAMLMap</code>, or <code>YAMLSeq</code>).</p>
@@ -45,6 +46,7 @@ On the other hand, <code>!!int</code> and <code>!!float</code> stringifiers will
   <span class="nx">flow</span><span class="p">?:</span> <span class="nx">boolean</span>   <span class="c1">// use flow style when stringifying this</span>
   <span class="nx">schema</span><span class="p">?:</span> <span class="nx">Schema</span>
   <span class="nx">addIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">value</span><span class="p">:</span> <span class="nx">unknown</span><span class="p">):</span> <span class="k">void</span>
+  <span class="nx">clone</span><span class="p">(</span><span class="nx">schema</span><span class="p">?:</span> <span class="nx">Schema</span><span class="p">):</span> <span class="nx">NodeBase</span>  <span class="c1">// a deep copy of this collection</span>
   <span class="nx">deleteIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">):</span> <span class="nx">boolean</span>
   <span class="nx">getIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">keepScalar</span><span class="p">?:</span> <span class="nx">boolean</span><span class="p">):</span> <span class="nx">unknown</span>
   <span class="nx">hasIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">):</span> <span class="nx">boolean</span>
@@ -194,6 +196,11 @@ For ease of use, alias nodes also provide a <code>resolve(doc)</code> method to 
 This will recursively wrap any input with appropriate <code>Node</code> containers.
 Generic JS <code>Object</code> values as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences.
 With <code>Object</code>, entries that have an <code>undefined</code> value are dropped.</p>
+
+<p>If <code>value</code> is already a <code>Node</code> instance, it will be directly returned.
+To create a copy of a node, use instead the <code>node.clone()</code> method.
+For collections, the method accepts a single <code>Schema</code> argument,
+which allows overwriting the original&#39;s <code>schema</code> value.</p>
 
 <p>Use a <code>replacer</code> to apply a replacer array or function, following the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>.
 To force flow styling on a collection, use the <code>flow: true</code> option.

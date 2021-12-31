@@ -209,6 +209,9 @@ For collections in particular, the default stringifier should be perfectly suffi
   <span class="nx">debug</span><span class="p">,</span> <span class="c1">// (logLevel, ...messages) =&gt; void -- Log debug messages to console</span>
   <span class="nx">findPair</span><span class="p">,</span> <span class="c1">// (items, key) =&gt; Pair? -- Given a key, find a matching Pair</span>
   <span class="nx">foldFlowLines</span><span class="p">,</span> <span class="c1">// (text, indent, mode, options) =&gt; string -- Fold long lines</span>
+  <span class="nx">mapTag</span><span class="p">,</span> <span class="c1">// CollectionTag</span>
+  <span class="nx">seqTag</span><span class="p">,</span> <span class="c1">// CollectionTag</span>
+  <span class="nx">stringTag</span><span class="p">,</span> <span class="c1">// ScalarTag</span>
   <span class="nx">stringifyNumber</span><span class="p">,</span> <span class="c1">// (node) =&gt; string</span>
   <span class="nx">stringifyString</span><span class="p">,</span> <span class="c1">// (node, ctx, ...) =&gt; string</span>
   <span class="nx">toJS</span><span class="p">,</span> <span class="c1">// (value, arg, ctx) =&gt; any -- Recursively convert to plain JS</span>

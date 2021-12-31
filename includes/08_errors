@@ -58,8 +58,12 @@ In particular, <code>TypeError</code> may occur when parsing invalid input using
 <td>Unlike scalars and collections, alias nodes cannot have an anchor or tag associated with it.</td>
 </tr>
 <tr>
+<td><code>BAD_ALIAS</code></td>
+<td>An alias identifier must be a non-empty sequence of valid characters.</td>
+</tr>
+<tr>
 <td><code>BAD_DIRECTIVE</code></td>
-<td>Only the <code>%YAML</code> and <code>%TAG</code> directives are supported, and they need to follow the specified strucutre.</td>
+<td>Only the <code>%YAML</code> and <code>%TAG</code> directives are supported, and they need to follow the specified structure.</td>
 </tr>
 <tr>
 <td><code>BAD_DQ_ESCAPE</code></td>

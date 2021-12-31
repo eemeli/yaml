@@ -123,6 +123,11 @@ Although <code>parseDocument()</code> and <code>parseAllDocuments()</code> will 
 </tr>
 </thead><tbody>
 <tr>
+<td>clone()</td>
+<td><code>Document</code></td>
+<td>Create a deep copy of this Document and its contents. Custom Node values that inherit from <code>Object</code> still refer to their original instances.</td>
+</tr>
+<tr>
 <td>createAlias(node: Node, name?: string)</td>
 <td><code>Alias</code></td>
 <td>Create a new <code>Alias</code> node, adding the required anchor for <code>node</code>. If <code>name</code> is empty, a new anchor name will be generated.</td>

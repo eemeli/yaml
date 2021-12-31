@@ -292,7 +292,7 @@
       gtag('js', new Date());
       gtag('config', 'UA-126084011-1');
     </script>
-      <script src="javascripts/all-2711f997.js"></script>
+      <script src="javascripts/all-8481f148.js"></script>
 
   </head>
 
@@ -640,6 +640,12 @@ Options in various categories do not overlap, so it&#39;s fine to use a single &
 <td>Whether integers should be parsed into <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a> rather than <code>number</code> values.</td>
 </tr>
 <tr>
+<td>keepSourceTokens</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Include a <code>srcToken</code> value on each parsed <code>Node</code>, containing the CST token that was composed into this node.</td>
+</tr>
+<tr>
 <td>lineCounter</td>
 <td><code>LineCounter</code></td>
 <td></td>
@@ -722,6 +728,12 @@ The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
 </tr>
 </thead><tbody>
 <tr>
+<td>compat</td>
+<td><code>string ⎮ Tag[] ⎮ null</code></td>
+<td><code>null</code></td>
+<td>When parsing, warn about compatibility issues with the given schema. When stringifying, use scalar styles that are parsed correctly by the <code>compat</code> schema as well as the actual schema.</td>
+</tr>
+<tr>
 <td>customTags</td>
 <td><code>Tag[] ⎮ function</code></td>
 <td></td>
@@ -741,15 +753,21 @@ The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
 </tr>
 <tr>
 <td>schema</td>
-<td><code>&#39;core&#39; ⎮ &#39;failsafe&#39; ⎮</code> <code>&#39;json&#39; ⎮ &#39;yaml-1.1&#39;</code></td>
+<td><code>string</code></td>
 <td>1.1:&nbsp;<code>&#39;yaml-1.1</code> 1.2:&nbsp;<code>&#39;core&#39;</code></td>
-<td>The base schema to use. Default value depends on YAML version.</td>
+<td>The base schema to use. Default value depends on YAML version. Built-in support is provided for <code>&#39;core&#39;</code>, <code>&#39;failsafe&#39;</code>, <code>&#39;json&#39;</code>, and <code>&#39;yaml-1.1&#39;</code>. If using another value, <code>customTags</code> must be an array of tags.</td>
 </tr>
 <tr>
 <td>sortMapEntries</td>
 <td><code>boolean ⎮</code> <code>(a, b: Pair) =&gt; number</code></td>
 <td><code>false</code></td>
 <td>When stringifying, sort map entries. If <code>true</code>, sort by comparing key values using the native less-than <code>&lt;</code> operator.</td>
+</tr>
+<tr>
+<td>toStringDefaults</td>
+<td><code>ToStringOptions</code></td>
+<td></td>
+<td>Override default values for <code>toString()</code> options.</td>
 </tr>
 </tbody></table>
 <div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="s2">`
@@ -762,7 +780,8 @@ The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
 <span class="c1">// { a: 1, b: 'base' }</span>
 </code></pre></div>
 <p><strong>Merge</strong> keys are a <a href="http://yaml.org/type/merge.html">YAML 1.1 feature</a> that is not a part of the 1.2 spec.
-To use a merge key, assign an alias node or an array of alias nodes as the value of a <code>&lt;&lt;</code> key in a mapping.</p>
+To use a merge key, assign a map or its alias or an array of such as the value of a <code>&lt;&lt;</code> key in a mapping.
+Multiple merge keys may be used on the same map, with earlier values taking precedence over latter ones, in case both define a value for the same key.</p>
 <h2 id='createnode-options'>CreateNode Options</h2>
 <p>Used by: <code>stringify()</code>, <code>new Document()</code>, <code>doc.createNode()</code>, and <code>doc.createPair()</code></p>
 
@@ -774,6 +793,12 @@ To use a merge key, assign an alias node or an array of alias nodes as the value
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>aliasDuplicateObjects</td>
+<td><code>boolean</code></td>
+<td><code>true</code></td>
+<td>During node construction, use anchors and aliases to keep strictly equal non-null objects as equivalent in YAML.</td>
+</tr>
 <tr>
 <td>anchorPrefix</td>
 <td><code>string</code></td>
@@ -859,6 +884,24 @@ To use a merge key, assign an alias node or an array of alias nodes as the value
 </tr>
 </thead><tbody>
 <tr>
+<td>blockQuote</td>
+<td><code>boolean ⎮ &#39;folded&#39; ⎮ &#39;literal&#39;</code></td>
+<td><code>true</code></td>
+<td>Use block quote styles for scalar values where applicable. Set to <code>false</code> to disable block quotes completely.</td>
+</tr>
+<tr>
+<td>collectionStyle</td>
+<td><code>&#39;any&#39; ⎮ &#39;block&#39; ⎮ &#39;flow&#39;</code></td>
+<td><code>&#39;any&#39;</code></td>
+<td>Enforce <code>&#39;block&#39;</code> or <code>&#39;flow&#39;</code> style on maps and sequences. By default, allows each collection to set its own <code>flow: boolean</code> property.</td>
+</tr>
+<tr>
+<td>commentString</td>
+<td><code>(comment: string) =&gt; string</code></td>
+<td></td>
+<td>Output should be valid for the current schema. By default, empty comment lines are left empty, lines consisting of a single space are replaced by <code>#</code>, and all other lines are prefixed with a <code>#</code>.</td>
+</tr>
+<tr>
 <td>defaultKeyType</td>
 <td><code>Type ⎮ null</code></td>
 <td><code>null</code></td>
@@ -932,9 +975,9 @@ To use a merge key, assign an alias node or an array of alias nodes as the value
 </tr>
 <tr>
 <td>singleQuote</td>
-<td><code>boolean</code></td>
-<td><code>false</code></td>
-<td>Prefer &#39;single quote&#39; rather than &quot;double quote&quot; where applicable.</td>
+<td><code>boolean ⎮ null</code></td>
+<td><code>null</code></td>
+<td>Use &#39;single quote&#39; rather than &quot;double quote&quot; where applicable. Set to <code>false</code> to disable single quotes completely.</td>
 </tr>
 <tr>
 <td>trueStr</td>
@@ -1068,6 +1111,11 @@ Although <code>parseDocument()</code> and <code>parseAllDocuments()</code> will 
 </tr>
 </thead><tbody>
 <tr>
+<td>clone()</td>
+<td><code>Document</code></td>
+<td>Create a deep copy of this Document and its contents. Custom Node values that inherit from <code>Object</code> still refer to their original instances.</td>
+</tr>
+<tr>
 <td>createAlias(node: Node, name?: string)</td>
 <td><code>Alias</code></td>
 <td>Create a new <code>Alias</code> node, adding the required anchor for <code>node</code>. If <code>name</code> is empty, a new anchor name will be generated.</td>
@@ -1171,8 +1219,9 @@ It is valid to have an anchor associated with a node even if it has no aliases.<
       <span class="c1">// included in their respective ranges.</span>
   <span class="nx">spaceBefore</span><span class="p">?:</span> <span class="nx">boolean</span>
       <span class="c1">// a blank line before this node and its commentBefore</span>
-  <span class="nx">tag</span><span class="p">?:</span> <span class="nx">string</span>   <span class="c1">// a fully qualified tag, if required</span>
-  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>  <span class="c1">// a plain JS or JSON representation of this node</span>
+  <span class="nx">tag</span><span class="p">?:</span> <span class="nx">string</span>       <span class="c1">// a fully qualified tag, if required</span>
+  <span class="nx">clone</span><span class="p">():</span> <span class="nx">NodeBase</span>  <span class="c1">// a copy of this node</span>
+  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>      <span class="c1">// a plain JS or JSON representation of this node</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>For scalar values, the <code>tag</code> will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, <code>YAMLMap</code>, or <code>YAMLSeq</code>).</p>
@@ -1202,6 +1251,7 @@ On the other hand, <code>!!int</code> and <code>!!float</code> stringifiers will
   <span class="nx">flow</span><span class="p">?:</span> <span class="nx">boolean</span>   <span class="c1">// use flow style when stringifying this</span>
   <span class="nx">schema</span><span class="p">?:</span> <span class="nx">Schema</span>
   <span class="nx">addIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">value</span><span class="p">:</span> <span class="nx">unknown</span><span class="p">):</span> <span class="k">void</span>
+  <span class="nx">clone</span><span class="p">(</span><span class="nx">schema</span><span class="p">?:</span> <span class="nx">Schema</span><span class="p">):</span> <span class="nx">NodeBase</span>  <span class="c1">// a deep copy of this collection</span>
   <span class="nx">deleteIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">):</span> <span class="nx">boolean</span>
   <span class="nx">getIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">keepScalar</span><span class="p">?:</span> <span class="nx">boolean</span><span class="p">):</span> <span class="nx">unknown</span>
   <span class="nx">hasIn</span><span class="p">(</span><span class="nx">path</span><span class="p">:</span> <span class="nx">Iterable</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">):</span> <span class="nx">boolean</span>
@@ -1351,6 +1401,11 @@ For ease of use, alias nodes also provide a <code>resolve(doc)</code> method to 
 This will recursively wrap any input with appropriate <code>Node</code> containers.
 Generic JS <code>Object</code> values as well as <code>Map</code> and its descendants become mappings, while arrays and other iterable objects result in sequences.
 With <code>Object</code>, entries that have an <code>undefined</code> value are dropped.</p>
+
+<p>If <code>value</code> is already a <code>Node</code> instance, it will be directly returned.
+To create a copy of a node, use instead the <code>node.clone()</code> method.
+For collections, the method accepts a single <code>Schema</code> argument,
+which allows overwriting the original&#39;s <code>schema</code> value.</p>
 
 <p>Use a <code>replacer</code> to apply a replacer array or function, following the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>.
 To force flow styling on a collection, use the <code>flow: true</code> option.
@@ -1740,6 +1795,9 @@ For collections in particular, the default stringifier should be perfectly suffi
   <span class="nx">debug</span><span class="p">,</span> <span class="c1">// (logLevel, ...messages) =&gt; void -- Log debug messages to console</span>
   <span class="nx">findPair</span><span class="p">,</span> <span class="c1">// (items, key) =&gt; Pair? -- Given a key, find a matching Pair</span>
   <span class="nx">foldFlowLines</span><span class="p">,</span> <span class="c1">// (text, indent, mode, options) =&gt; string -- Fold long lines</span>
+  <span class="nx">mapTag</span><span class="p">,</span> <span class="c1">// CollectionTag</span>
+  <span class="nx">seqTag</span><span class="p">,</span> <span class="c1">// CollectionTag</span>
+  <span class="nx">stringTag</span><span class="p">,</span> <span class="c1">// ScalarTag</span>
   <span class="nx">stringifyNumber</span><span class="p">,</span> <span class="c1">// (node) =&gt; string</span>
   <span class="nx">stringifyString</span><span class="p">,</span> <span class="c1">// (node, ctx, ...) =&gt; string</span>
   <span class="nx">toJS</span><span class="p">,</span> <span class="c1">// (value, arg, ctx) =&gt; any -- Recursively convert to plain JS</span>
@@ -2410,8 +2468,12 @@ In particular, <code>TypeError</code> may occur when parsing invalid input using
 <td>Unlike scalars and collections, alias nodes cannot have an anchor or tag associated with it.</td>
 </tr>
 <tr>
+<td><code>BAD_ALIAS</code></td>
+<td>An alias identifier must be a non-empty sequence of valid characters.</td>
+</tr>
+<tr>
 <td><code>BAD_DIRECTIVE</code></td>
-<td>Only the <code>%YAML</code> and <code>%TAG</code> directives are supported, and they need to follow the specified strucutre.</td>
+<td>Only the <code>%YAML</code> and <code>%TAG</code> directives are supported, and they need to follow the specified structure.</td>
 </tr>
 <tr>
 <td><code>BAD_DQ_ESCAPE</code></td>
