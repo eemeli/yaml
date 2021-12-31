@@ -12,6 +12,8 @@ export function resolveBlockSeq(
   onError: ComposeErrorHandler
 ) {
   const seq = new YAMLSeq(ctx.schema)
+
+  if (ctx.atRoot) ctx.atRoot = false
   let offset = bs.offset
   for (const { start, value } of bs.items) {
     const props = resolveProps(start, {

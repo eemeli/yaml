@@ -302,10 +302,10 @@ export class Parser {
       const top = this.peek(1)
       if (token.type === 'block-scalar') {
         // Block scalars use their parent rather than header indent
-        token.indent = 'indent' in top ? top.indent : -1
+        token.indent = 'indent' in top ? top.indent : 0
       } else if (token.type === 'flow-collection' && top.type === 'document') {
         // Ignore all indent for top-level flow collections
-        token.indent = -1
+        token.indent = 0
       }
       if (token.type === 'flow-collection') fixFlowSeqItems(token)
       switch (top.type) {

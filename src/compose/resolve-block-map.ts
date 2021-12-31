@@ -19,6 +19,7 @@ export function resolveBlockMap(
 ) {
   const map = new YAMLMap<ParsedNode, ParsedNode>(ctx.schema)
 
+  if (ctx.atRoot) ctx.atRoot = false
   let offset = bm.offset
   for (const collItem of bm.items) {
     const { start, key, sep, value } = collItem
