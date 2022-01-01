@@ -2,8 +2,7 @@ import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { ErrorCode, YAMLParseError, YAMLWarning } from '../errors.js'
 import { isCollection, isPair, Range } from '../nodes/Node.js'
-import {
-  defaultOptions,
+import type {
   DocumentOptions,
   ParseOptions,
   SchemaOptions
@@ -80,9 +79,7 @@ export class Composer {
   private warnings: YAMLWarning[] = []
 
   constructor(options: ParseOptions & DocumentOptions & SchemaOptions = {}) {
-    this.directives = new Directives({
-      version: options.version || defaultOptions.version
-    })
+    this.directives = new Directives({ version: options.version || '1.2' })
     this.options = options
   }
 

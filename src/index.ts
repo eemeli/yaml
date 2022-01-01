@@ -24,9 +24,8 @@ export { Scalar } from './nodes/Scalar.js'
 export { YAMLMap } from './nodes/YAMLMap.js'
 export { YAMLSeq } from './nodes/YAMLSeq.js'
 
-export {
+export type {
   CreateNodeOptions,
-  defaultOptions,
   DocumentOptions,
   ParseOptions,
   SchemaOptions,

@@ -16,9 +16,8 @@ import type { Scalar } from '../nodes/Scalar.js'
 import { toJS, ToJSContext } from '../nodes/toJS.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
-import {
+import type {
   CreateNodeOptions,
-  defaultOptions,
   DocumentOptions,
   ParseOptions,
   SchemaOptions,
@@ -111,7 +110,18 @@ export class Document<T = unknown> {
       replacer = undefined
     }
 
-    const opt = Object.assign({}, defaultOptions, options)
+    const opt = Object.assign(
+      {
+        intAsBigInt: false,
+        keepSourceTokens: false,
+        logLevel: 'warn',
+        prettyErrors: true,
+        strict: true,
+        uniqueKeys: true,
+        version: '1.2'
+      },
+      options
+    )
     this.options = opt
     let { version } = opt
     if (options?.directives) {
