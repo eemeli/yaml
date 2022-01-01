@@ -362,7 +362,10 @@ export class Document<T = unknown> {
    *
    * Overrides all previously set schema options.
    */
-  setSchema(version: '1.1' | '1.2' | null, options: SchemaOptions = {}) {
+  setSchema(
+    version: '1.1' | '1.2' | 'next' | null,
+    options: SchemaOptions = {}
+  ) {
     if (typeof version === 'number') version = String(version) as '1.1' | '1.2'
 
     let opt: (SchemaOptions & { schema: string }) | null
@@ -373,8 +376,9 @@ export class Document<T = unknown> {
         opt = { merge: true, resolveKnownTags: false, schema: 'yaml-1.1' }
         break
       case '1.2':
-        if (this.directives) this.directives.yaml.version = '1.2'
-        else this.directives = new Directives({ version: '1.2' })
+      case 'next':
+        if (this.directives) this.directives.yaml.version = version
+        else this.directives = new Directives({ version })
         opt = { merge: false, resolveKnownTags: true, schema: 'core' }
         break
       case null:

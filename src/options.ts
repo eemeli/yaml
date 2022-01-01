@@ -82,7 +82,7 @@ export type DocumentOptions = {
    *
    * Default: `"1.2"`
    */
-  version?: '1.1' | '1.2'
+  version?: '1.1' | '1.2' | 'next'
 }
 
 export type SchemaOptions = {

@@ -18,7 +18,7 @@ export class Directives {
   static defaultYaml: Directives['yaml'] = { explicit: false, version: '1.2' }
   static defaultTags: Directives['tags'] = { '!!': 'tag:yaml.org,2002:' }
 
-  yaml: { version: '1.1' | '1.2'; explicit?: boolean }
+  yaml: { version: '1.1' | '1.2' | 'next'; explicit?: boolean }
   tags: Record<string, string>
 
   /**
