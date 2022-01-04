@@ -8,7 +8,6 @@ import { testEvents } from 'yaml/test-events'
 
 const skip: Record<string, boolean | string[]> = {
   '9MMA': ['errors'], // allow stream with directive & no docs
-  B63P: ['errors'], // allow ... after directives
   SF5V: ['errors'] // allow duplicate %YAML directives
 }
 
