@@ -95,7 +95,7 @@ export class Directives {
       }
       case '%YAML': {
         this.yaml.explicit = true
-        if (parts.length < 1) {
+        if (parts.length !== 1) {
           onError(0, '%YAML directive should contain exactly one part')
           return false
         }
