@@ -372,3 +372,13 @@ export type ToStringOptions = {
    */
   verifyAliasOrder?: boolean
 }
+
+export type MergeOptions = {
+  /**
+   *  Behavior when the merge function encounters two sequences at the same
+   *  path.
+   *
+   *  Default: `'replace'`
+   * */
+  onSequence?: 'append' | 'replace'
+}

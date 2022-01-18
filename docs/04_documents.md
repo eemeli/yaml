@@ -174,3 +174,53 @@ See the section on [custom tags](#writing-custom-tags) for more on this topic.
 
 `doc.contents.yaml` determines if an explicit `%YAML` directive should be included in the output, and what version it should use.
 If changing the version after the document's creation, you'll probably want to use `doc.setSchema()` as it will also update the schema accordingly.
+
+## Deep Merging
+
+To deep merge a Collection into an existing document, use `merge(doc, value)`.
+
+As the value argument you may pass any `Document`, `Collection` or plain JS 
+Object.
+```ts
+import { Document, merge } from 'yaml'
+
+const doc = new Document({ a: 1, b: { c: 3 } })
+merge(doc, { b: { d: 4 }, e: 5 }) // { a: 1, b: { c: 3, d: 4 }, e: 5 }
+```
+```ts
+// Merge any Map or Seq
+const doc = new Document({ a: 1, b: { c: 3 } })
+const map = doc.createNode({ b: { d: 4 }, e: 5 }) // YAMLMap { b: { d: 4 }, e: 5 }
+merge(doc, map) // { a: 1, b: { c: 3, d: 4 }, e: 5 }
+```
+```ts
+// Merge two documents
+const doc1 = new Document({ a: 1, b: { c: 3 } })
+const doc2 = new Document({ b: { d: 4 }, e: 5 })
+merge(doc1, doc2) // { a: 1, b: { c: 3, d: 4 }, e: 5 }
+```
+
+
+**Note**: If the type on a path from the source conflicts with the type of
+that particular node being merged into, the merge function will throw an Error.
+
+```ts
+// Note: The collection to be merged must have a compatible structure
+const doc = new Document({ a: { b: 1 } })
+const incompatibleMap = { a: [2, 3] }
+merge(doc, incompatibleMap) // Error: Expected YAML collection at a.
+```
+
+### Merging sequences
+
+By default, the merge function will replace the values of an existing Sequence
+with the values from the Collection being merged into it. You can change this
+behavior by passing a `mergeOptions` object with `{ onSequence: 'append' }` 
+to the `merge` function.
+
+```ts
+import { Document, merge } from 'yaml'
+
+const doc = new Document({ foo: [1, 2] })
+merge(doc, { foo: [3, 4] }, { onSequence: 'append' }) // { foo: [1, 2, 3, 4] }
+```
