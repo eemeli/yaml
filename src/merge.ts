@@ -78,7 +78,7 @@ export function merge(target: Document, source: unknown, options: MergeOptions =
 
   if (!isCollection(target.contents)) {
     // If the target doc is empty add the source to it directly
-    target.add(source)
+    Object.assign(target, { contents: sourceNode })
     return target
   }
 

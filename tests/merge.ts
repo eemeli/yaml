@@ -147,7 +147,7 @@ describe('Merge two Nodes', () => {
   })
 
   test('merging a collection into an empty doc', () => {
-    const targetDoc = new Document({})
+    const targetDoc = new Document()
     merge(targetDoc, { foo: { bar: 'baz' } })
     const expected = parseDocument('foo:\n  bar: baz\n')
     expect(targetDoc.toString()).toEqual(expected.toString())
