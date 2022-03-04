@@ -24,9 +24,8 @@ function getPath(ancestry: readonly (Document | Node | Pair)[]): (string|number)
 
 function getFirstChildNode(collection: Collection): Node | undefined {
   if (isSeq(collection)) {
-    return <Node | undefined>(<YAMLSeq> collection).items.find(
-      (i) => isNode(i)
-    );
+    for (const item of collection.items) if (isNode(item)) return item;
+    return undefined;
   }
   if (collection.constructor.name === 'YAMLMap') {
     const firstChildKey = (<YAMLMap> collection).items[0]?.key;
