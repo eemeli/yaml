@@ -23,7 +23,7 @@ function getPath(ancestry: readonly (Document | Node | Pair)[]): (string|number)
 }
 
 function getFirstChildNode(collection: Collection): Node | undefined {
-  if (collection.constructor.name === 'YAMLSeq') {
+  if (isSeq(collection)) {
     return <Node | undefined>(<YAMLSeq> collection).items.find(
       (i) => isNode(i)
     );
