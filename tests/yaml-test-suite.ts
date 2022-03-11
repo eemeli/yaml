@@ -1,6 +1,6 @@
 /* eslint-disable no-empty */
 import { existsSync, readdirSync, readFileSync } from 'fs'
-import { resolve } from 'path'
+import { join, resolve } from 'path'
 
 import { CST, Document, Lexer, parseAllDocuments, Parser } from 'yaml'
 // @ts-ignore
@@ -8,7 +8,30 @@ import { testEvents } from 'yaml/test-events'
 
 const skip: Record<string, boolean | string[]> = {
   '9MMA': ['errors'], // allow stream with directive & no docs
-  SF5V: ['errors'] // allow duplicate %YAML directives
+  SF5V: ['errors'], // allow duplicate %YAML directives
+
+  // FIXME recent upstream additions
+  '9MQT/01': ['in.json'],
+  'DK95/00': true,
+  'DK95/01': ['in.json'],
+  'DK95/04': true,
+  'DK95/05': true,
+  'DK95/06': ['in.json'],
+  G5U8: ['errors'],
+  'JEF9/02': true,
+  'L24T/00': true,
+  'L24T/01': true,
+  'M2N8/00': true,
+  'MUS6/00': ['errors'],
+  'UKK6/02': ['test.event'],
+  'Y79Y/003': ['errors'],
+  'Y79Y/004': ['errors'],
+  'Y79Y/005': ['errors'],
+  'Y79Y/006': ['errors'],
+  'Y79Y/007': ['errors'],
+  'Y79Y/008': ['errors'],
+  'Y79Y/009': ['errors'],
+  YJV2: ['errors']
 }
 
 function testJsonMatch(docs: Document[], json: string) {
@@ -26,6 +49,14 @@ function testJsonMatch(docs: Document[], json: string) {
 
 const testRoot = resolve(__dirname, 'yaml-test-suite')
 const testDirs = readdirSync(testRoot).filter(dir => /^[A-Z0-9]{4}$/.test(dir))
+for (let i = testDirs.length - 1; i >= 0; --i) {
+  const dir = testDirs[i]
+  const contents = readdirSync(resolve(testRoot, dir))
+  if (contents.every(cd => /^[0-9]+$/.test(cd))) {
+    const subs = contents.map(cd => join(dir, cd))
+    testDirs.splice(i, 1, ...subs)
+  }
+}
 
 for (const dir of testDirs) {
   const load = (filename: string) => {
