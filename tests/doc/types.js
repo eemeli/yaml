@@ -159,7 +159,7 @@ english: null
       english: null,
       '': 'null key'
     })
-    expect(String(doc)).toBe(`empty: null
+    expect(String(doc)).toBe(`empty:
 canonical: ~
 english: null
 ~: null key\n`)
@@ -379,7 +379,7 @@ english: null
     })
     expect(String(doc)).toBe(`%YAML 1.1
 ---
-empty: null
+empty:
 canonical: ~
 english: null
 ~: null key\n`)

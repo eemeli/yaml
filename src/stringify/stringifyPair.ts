@@ -61,7 +61,7 @@ export function stringifyPair(
   if (ctx.inFlow) {
     if (allNullValues || value == null) {
       if (keyCommentDone && onComment) onComment()
-      return explicitKey ? `? ${str}` : str
+      return str === '' ? '?' : explicitKey ? `? ${str}` : str
     }
   } else if ((allNullValues && !simpleKeys) || (value == null && explicitKey)) {
     str = `? ${str}`

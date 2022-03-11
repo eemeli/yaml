@@ -9,5 +9,7 @@ export const nullTag: ScalarTag & { test: RegExp } = {
   test: /^(?:~|[Nn]ull|NULL)?$/,
   resolve: () => new Scalar(null),
   stringify: ({ source }, ctx) =>
-    source && nullTag.test.test(source) ? source : ctx.options.nullStr
+    typeof source === 'string' && nullTag.test.test(source)
+      ? source
+      : ctx.options.nullStr
 }

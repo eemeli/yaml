@@ -380,13 +380,13 @@ describe('eemeli/yaml#19', () => {
   test('map', () => {
     const src = 'a:\n  # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('a: null # 123\n')
+    expect(String(doc)).toBe('a: # 123\n')
   })
 
   test('seq', () => {
     const src = '- a: # 123'
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('- a: null # 123\n')
+    expect(String(doc)).toBe('- a: # 123\n')
   })
 })
 
