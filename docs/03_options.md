@@ -13,7 +13,7 @@ parse('number: 999', { schema: 'failsafe' })
 // { number: '999' }
 ```
 
-The options supported by various `yaml` are split into various categories, depending on how and where they are used.
+The options supported by various `yaml` features are split into various categories, depending on how and where they are used.
 Options in various categories do not overlap, so it's fine to use a single "bag" of options and pass it to each function or method.
 
 ## Parse Options
@@ -25,10 +25,10 @@ Used by: `parse()`, `parseDocument()`, `parseAllDocuments()`, `new Composer()`, 
 | Name             | Type                          | Default | Description                                                                                                                                                                |
 | ---------------- | ----------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | intAsBigInt      | `boolean`                     | `false` | Whether integers should be parsed into [BigInt] rather than `number` values.                                                                                               |
-| keepSourceTokens | `boolean`                     | `false` | Include a `srcToken` value on each parsed `Node`, containing the CST token that was composed into this node.                                                               |
+| keepSourceTokens | `boolean`                     | `false` | Include a `srcToken` value on each parsed `Node`, containing the [CST token](#working-with-cst-tokens) that was composed into this node.                                   |
 | lineCounter      | `LineCounter`                 |         | If set, newlines will be tracked, to allow for `lineCounter.linePos(offset)` to provide the `{ line, col }` positions within the input.                                    |
 | prettyErrors     | `boolean`                     | `true`  | Include line/col position in errors, along with an extract of the source string.                                                                                           |
-| strict           | `boolean`                     | `true`  | When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.                                                                       |
+| strict           | `boolean`                     | `true`  | When parsing, do not ignore errors [required](#silencing-errors-and-warnings) by the YAML 1.2 spec, but caused by unambiguous content.                                     |
 | uniqueKeys       | `boolean ⎮ (a, b) => boolean` | `true`  | Whether key uniqueness is checked, or customised. If set to be a function, it will be passed two parsed nodes and should return a boolean value indicating their equality. |
 
 [bigint]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt
@@ -59,7 +59,7 @@ parse('No', { schema: 'yaml-1.1' }) // false
 parse('No', { version: '1.1' }) // false
 ```
 
-Schema options determine the types of values that the document is expected and able to support.
+Schema options determine the types of values that the document supports.
 
 Aside from defining the language structure, the YAML 1.2 spec defines a number of different _schemas_ that may be used.
 The default is the [`core`](http://yaml.org/spec/1.2/spec.html#id2804923) schema, which is the most common one.
@@ -71,15 +71,15 @@ The `!!value` and `!!yaml` types are not supported.
 
 Used by: `parse()`, `parseDocument()`, `parseAllDocuments()`, `stringify()`, `new Composer()`, `new Document()`, and `doc.setSchema()`
 
-| Name             | Type                                 | Default                                  | Description                                                                                                                                                                                                        |
-| ---------------- | ------------------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| compat           | `string ⎮ Tag[] ⎮ null`              | `null`                                   | When parsing, warn about compatibility issues with the given schema. When stringifying, use scalar styles that are parsed correctly by the `compat` schema as well as the actual schema.                           |
-| customTags       | `Tag[] ⎮ function`                   |                                          | Array of [additional tags](#custom-data-types) to include in the schema                                                                                                                                            |
-| merge            | `boolean`                            | 1.1:&nbsp;`true` 1.2:&nbsp;`false`       | Enable support for `<<` merge keys. Default value depends on YAML version.                                                                                                                                         |
-| resolveKnownTags | `boolean`                            | `true`                                   | When using the `'core'` schema, support parsing values with these explicit [YAML 1.1 tags]: `!!binary`, `!!omap`, `!!pairs`, `!!set`, `!!timestamp`. By default `true`.                                            |
-| schema           | `string`                             | 1.1:&nbsp;`'yaml-1.1` 1.2:&nbsp;`'core'` | The base schema to use. Default value depends on YAML version. Built-in support is provided for `'core'`, `'failsafe'`, `'json'`, and `'yaml-1.1'`. If using another value, `customTags` must be an array of tags. |
-| sortMapEntries   | `boolean ⎮` `(a, b: Pair) => number` | `false`                                  | When stringifying, sort map entries. If `true`, sort by comparing key values using the native less-than `<` operator.                                                                                              |
-| toStringDefaults | `ToStringOptions`                    |                                          | Override default values for `toString()` options.                                                                                                                                                                  |
+| Name             | Type                                 | Default                                   | Description                                                                                                                                                                                                        |
+| ---------------- | ------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| compat           | `string ⎮ Tag[] ⎮ null`              | `null`                                    | When parsing, warn about compatibility issues with the given schema. When stringifying, use scalar styles that are parsed correctly by the `compat` schema as well as the actual schema.                           |
+| customTags       | `Tag[] ⎮ function`                   |                                           | Array of [additional tags](#custom-data-types) to include in the schema                                                                                                                                            |
+| merge            | `boolean`                            | 1.1:&nbsp;`true` 1.2:&nbsp;`false`        | Enable support for `<<` merge keys. Default value depends on YAML version.                                                                                                                                         |
+| resolveKnownTags | `boolean`                            | `true`                                    | When using the `'core'` schema, support parsing values with these explicit [YAML 1.1 tags]: `!!binary`, `!!omap`, `!!pairs`, `!!set`, `!!timestamp`. By default `true`.                                            |
+| schema           | `string`                             | 1.1:&nbsp;`'yaml-1.1'` 1.2:&nbsp;`'core'` | The base schema to use. Default value depends on YAML version. Built-in support is provided for `'core'`, `'failsafe'`, `'json'`, and `'yaml-1.1'`. If using another value, `customTags` must be an array of tags. |
+| sortMapEntries   | `boolean ⎮` `(a, b: Pair) => number` | `false`                                   | When stringifying, sort map entries. If `true`, sort by comparing key values using the native less-than `<` operator.                                                                                              |
+| toStringDefaults | `ToStringOptions`                    |                                           | Override default values for `toString()` options.                                                                                                                                                                  |
 
 [yaml 1.1 tags]: https://yaml.org/type/
 
@@ -108,12 +108,12 @@ Used by: `stringify()`, `new Document()`, `doc.createNode()`, and `doc.createPai
 | anchorPrefix          | `string`  | `'a'`   | Default prefix for anchors, resulting in anchors `a1`, `a2`, ... by default.                                                                     |
 | flow                  | `boolean` | `false` | Force the top-level collection node to use flow style.                                                                                           |
 | keepUndefined         | `boolean` | `false` | Keep `undefined` object values when creating mappings and return a Scalar node when stringifying `undefined`.                                    |
-| tag                   | `string`  |         | Specify the top-level collection type, e.g. `"!!omap"`. Note that this requires the corresponding tag to be available in this document's schema. |
+| tag                   | `string`  |         | Specify the top-level collection type, e.g. `'!!omap'`. Note that this requires the corresponding tag to be available in this document's schema. |
 
 ## ToJS Options
 
 ```js
-parse('{[1, 2]: many}') // { '[1,2]': 'many' }
+parse('{[1, 2]: many}') // { '[ 1, 2 ]': 'many' }
 parse('{[1, 2]: many}', { mapAsMap: true }) // Map { [ 1, 2 ] => 'many' }
 ```
 

@@ -62,7 +62,6 @@ import {
 
 - [`Document`](#documents)
   - [`constructor(value, replacer?, options?)`](#creating-documents)
-  - [`#anchors`](#working-with-anchors)
   - [`#contents`](#content-nodes)
   - [`#directives`](#stream-directives)
   - [`#errors`](#errors)
@@ -85,7 +84,7 @@ import {
 - [`new Scalar(value)`](#scalar-values)
 - [`new YAMLMap()`](#collections)
 - [`new YAMLSeq()`](#collections)
-- [`doc.createAlias(node, name?): Alias`](#working-with-anchors)
+- [`doc.createAlias(node, name?): Alias`](#creating-nodes)
 - [`doc.createNode(value, options?): Node`](#creating-nodes)
 - [`doc.createPair(key, value): Pair`](#creating-nodes)
 - [`visit(node, visitor)`](#modifying-nodes)
