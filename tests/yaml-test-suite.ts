@@ -68,7 +68,7 @@ for (const dir of testDirs) {
     }
   }
   const test_ = (name: string, cb: () => void) => {
-    const sd = skip[dir]
+    const sd = skip[dir.replace('\\', '/')]
     if (sd === true || (sd && sd.includes(name))) test.skip(name, cb)
     else test(name, cb)
   }
