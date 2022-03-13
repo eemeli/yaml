@@ -733,7 +733,7 @@ export class Parser {
       const parent = this.peek(2)
       if (
         parent.type === 'block-map' &&
-        (this.type === 'map-value-ind' ||
+        ((this.type === 'map-value-ind' && parent.indent === fc.indent) ||
           (this.type === 'newline' &&
             !parent.items[parent.items.length - 1].sep))
       ) {

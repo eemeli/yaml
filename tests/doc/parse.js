@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import * as YAML from 'yaml'
+import { source } from '../_utils'
 
 describe('scalars', () => {
   test('empty block scalar at end of document', () => {
@@ -411,18 +412,66 @@ test('eemeli/yaml#36', () => {
   expect(() => YAML.parse(`{ x: ${'x'.repeat(1024)} }`)).not.toThrowError()
 })
 
-test('block map with flow collection key as explicit key', () => {
-  const doc = YAML.parseDocument(`? []: x`)
-  expect(doc.errors).toHaveLength(0)
-  expect(doc.contents).toMatchObject({
-    items: [
-      {
-        key: {
-          items: [{ key: { items: [], flow: true }, value: { value: 'x' } }]
-        },
-        value: null
-      }
-    ]
+describe('flow collection keys', () => {
+  test('block map with flow collection key as explicit key', () => {
+    const doc = YAML.parseDocument(`? []: x`)
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.contents).toMatchObject({
+      items: [
+        {
+          key: {
+            items: [{ key: { items: [], flow: true }, value: { value: 'x' } }]
+          },
+          value: null
+        }
+      ]
+    })
+  })
+
+  test('flow collection as first block map key (redhat-developer/vscode-yaml#712)', () => {
+    const doc = YAML.parseDocument(source`
+      a:
+        []: b
+        c: d
+    `)
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.contents).toMatchObject({
+      items: [
+        {
+          key: { value: 'a' },
+          value: {
+            items: [
+              { key: { items: [] }, value: { value: 'b' } },
+              { key: { value: 'c' }, value: { value: 'd' } }
+            ]
+          }
+        }
+      ]
+    })
+  })
+
+  test('flow collection as second block map key (redhat-developer/vscode-yaml#712)', () => {
+    const doc = YAML.parseDocument(source`
+      x: y
+      a:
+        []: b
+        c: d
+    `)
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.contents).toMatchObject({
+      items: [
+        { key: { value: 'x' }, value: { value: 'y' } },
+        {
+          key: { value: 'a' },
+          value: {
+            items: [
+              { key: { items: [] }, value: { value: 'b' } },
+              { key: { value: 'c' }, value: { value: 'd' } }
+            ]
+          }
+        }
+      ]
+    })
   })
 })
 
