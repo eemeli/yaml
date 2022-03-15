@@ -84,6 +84,13 @@ export function resolveProps(
             'MULTIPLE_ANCHORS',
             'A node can have at most one anchor'
           )
+        if (token.source.endsWith(':'))
+          onError(
+            token.offset + token.source.length - 1,
+            'BAD_ALIAS',
+            'Anchor ending in : is ambiguous',
+            true
+          )
         anchor = token
         if (start === null) start = token.offset
         atNewline = false

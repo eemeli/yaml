@@ -145,6 +145,20 @@ describe('errors', () => {
   })
 })
 
+describe('warnings', () => {
+  test('anchor ending in colon', () => {
+    const doc = YAML.parseDocument('- &x:\n')
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.warnings).toMatchObject([{ code: 'BAD_ALIAS' }])
+  })
+
+  test('alias ending in colon', () => {
+    const doc = YAML.parseDocument('- *x:\n')
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.warnings).toMatchObject([{ code: 'BAD_ALIAS' }])
+  })
+})
+
 describe('__proto__ as anchor name', () => {
   test('parse', () => {
     const src = `- &__proto__ 1\n- *__proto__\n`

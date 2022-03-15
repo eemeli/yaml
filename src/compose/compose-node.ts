@@ -106,6 +106,13 @@ function composeAlias(
   const alias = new Alias(source.substring(1))
   if (alias.source === '')
     onError(offset, 'BAD_ALIAS', 'Alias cannot be an empty string')
+  if (alias.source.endsWith(':'))
+    onError(
+      offset + source.length - 1,
+      'BAD_ALIAS',
+      'Alias ending in : is ambiguous',
+      true
+    )
   const valueEnd = offset + source.length
   const re = resolveEnd(end, valueEnd, options.strict, onError)
   alias.range = [offset, valueEnd, re.offset]
