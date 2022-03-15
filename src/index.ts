@@ -49,4 +49,11 @@ export {
 export type { TagId, Tags } from './schema/tags'
 export type { CollectionTag, ScalarTag } from './schema/types'
 
-export { visit, visitor, visitorFn } from './visit.js'
+export {
+  asyncVisitor,
+  asyncVisitorFn,
+  visit,
+  visitAsync,
+  visitor,
+  visitorFn
+} from './visit.js'

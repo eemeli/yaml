@@ -74,9 +74,9 @@ import {
 <!-- prettier-ignore -->
 ```js
 import {
-  isAlias, isCollection, isMap,
-  isNode, isPair, isScalar, isSeq,
-  Scalar, visit, YAMLMap, YAMLSeq
+  isAlias, isCollection, isMap, isNode,
+  isPair, isScalar, isSeq, Scalar,
+  visit, visitAsync, YAMLMap, YAMLSeq
 } from 'yaml'
 ```
 
@@ -88,6 +88,7 @@ import {
 - [`doc.createNode(value, options?): Node`](#creating-nodes)
 - [`doc.createPair(key, value): Pair`](#creating-nodes)
 - [`visit(node, visitor)`](#modifying-nodes)
+- [`visitAsync(node, visitor)`](#modifying-nodes)
 
 <h3>Parsing YAML</h3>
 
