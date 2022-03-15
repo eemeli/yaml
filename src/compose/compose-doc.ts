@@ -37,7 +37,7 @@ export function composeDoc(
     startOnNewline: true
   })
   if (props.found) {
-    doc.directives.marker = true
+    doc.directives.docStart = true
     if (
       value &&
       (value.type === 'block-map' || value.type === 'block-seq') &&

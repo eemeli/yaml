@@ -159,7 +159,7 @@ See [Options](#options) for more information on the optional parameter.
 const doc = new Document()
 doc.directives
 > {
-    marker: null, // set true to force the doc-start marker
+    docStart: null, // set true to force the doc-start marker
     tags: { '!!': 'tag:yaml.org,2002:' }, // Record<handle, prefix>
     yaml: { explicit: false, version: '1.2' }
   }

@@ -52,7 +52,7 @@ export function testEvents(src: string) {
       const error = doc.errors[0]
       if (error && (!error.pos || error.pos[0] < rootStart)) throw new Error()
       let docStart = '+DOC'
-      if (doc.directives.marker) docStart += ' ---'
+      if (doc.directives.docStart) docStart += ' ---'
       else if (doc.contents && doc.contents.range[2] === doc.contents.range[0])
         continue
       events.push(docStart)

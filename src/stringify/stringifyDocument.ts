@@ -19,7 +19,7 @@ export function stringifyDocument(
     if (dir) {
       lines.push(dir)
       hasDirectives = true
-    } else if (doc.directives.marker) hasDirectives = true
+    } else if (doc.directives.docStart) hasDirectives = true
   }
   if (hasDirectives) lines.push('---')
 
