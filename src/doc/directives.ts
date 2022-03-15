@@ -27,6 +27,9 @@ export class Directives {
    */
   docStart: true | null = null
 
+  /** The doc-end marker `...`.  */
+  docEnd = false
+
   /**
    * Used when parsing YAML 1.1, where:
    * > If the document specifies no directives, it is parsed using the same

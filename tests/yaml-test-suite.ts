@@ -123,9 +123,7 @@ for (const dir of testDirs) {
       if (!error) {
         if (json) {
           test_('stringfy+re-parse', () => {
-            const src2 =
-              docs.map(doc => String(doc).replace(/\n$/, '')).join('\n...\n') +
-              '\n'
+            const src2 = docs.map(String).join('')
             const docs2 = parseAllDocuments(src2, { resolveKnownTags: false })
             testJsonMatch(docs2, json)
           })

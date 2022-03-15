@@ -47,8 +47,7 @@ export function testEvents(src: string) {
       const doc = docs[i]
       let root = doc.contents
       if (Array.isArray(root)) root = root[0]
-      // eslint-disable-next-line no-sparse-arrays
-      const [rootStart, , rootEnd] = doc.range || [0, , 0]
+      const [rootStart] = doc.range || [0]
       const error = doc.errors[0]
       if (error && (!error.pos || error.pos[0] < rootStart)) throw new Error()
       let docStart = '+DOC'
@@ -59,10 +58,7 @@ export function testEvents(src: string) {
       addEvents(events, doc, error?.pos[0] ?? -1, root)
 
       let docEnd = '-DOC'
-      if (rootEnd) {
-        const post = src.slice(rootStart, rootEnd)
-        if (/^\.\.\.($|\s)/m.test(post)) docEnd += ' ...'
-      }
+      if (doc.directives.docEnd) docEnd += ' ...'
       events.push(docEnd)
     }
   } catch (e) {

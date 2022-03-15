@@ -171,7 +171,7 @@ export class Composer {
           this.onError(
             token,
             'MISSING_CHAR',
-            'Missing directives-end indicator line'
+            'Missing directives-end/doc-start indicator line'
           )
         this.decorate(doc, false)
         if (this.doc) yield this.doc
@@ -207,6 +207,7 @@ export class Composer {
           )
           break
         }
+        this.doc.directives.docEnd = true
         const end = resolveEnd(
           token.end,
           token.offset + token.source.length,
