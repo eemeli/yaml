@@ -18,8 +18,6 @@ const skip: Record<string, boolean | string[]> = {
   'DK95/05': true,
   'DK95/06': ['in.json'],
   'JEF9/02': true,
-  'L24T/00': true,
-  'L24T/01': true,
   'M2N8/00': true,
   'MUS6/00': ['errors'],
   'UKK6/02': ['test.event'],

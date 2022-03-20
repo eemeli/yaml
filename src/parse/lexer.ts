@@ -543,8 +543,9 @@ export class Lexer {
         let i = nl - 1
         let ch = this.buffer[i]
         if (ch === '\r') ch = this.buffer[--i]
+        const lastChar = i // Drop the line if last char not more indented
         while (ch === ' ' || ch === '\t') ch = this.buffer[--i]
-        if (ch === '\n' && i >= this.pos) nl = i
+        if (ch === '\n' && i >= this.pos && i + 1 + indent > lastChar) nl = i
         else break
       } while (true)
     }

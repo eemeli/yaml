@@ -59,6 +59,11 @@ export function resolveBlockScalar(
     offset += indent.length + content.length + 1
   }
 
+  // include trailing more-indented empty lines in content
+  for (let i = lines.length - 1; i >= chompStart; --i) {
+    if (lines[i][0].length > trimIndent) chompStart = i + 1
+  }
+
   let value = ''
   let sep = ''
   let prevMoreIndented = false
