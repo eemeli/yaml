@@ -342,7 +342,7 @@ In general, it's safe to modify nodes manually, e.g. splicing the `items` array 
 For operations on nodes at a known location in the tree, it's probably easiest to use `doc.getIn(path, true)` to access them.
 For more complex or general operations, a visitor API is provided:
 
-#### `YAML.visit(node, visitor)`
+#### `YAML.visit(node, visitor): void`
 
 Apply a visitor to an AST node or document.
 
@@ -366,6 +366,12 @@ The return value of the visitor may be used to control the traversal:
 
 If `visitor` is a single function, it will be called with all values encountered in the tree, including e.g. `null` values.
 Alternatively, separate visitor functions may be defined for each `Map`, `Pair`, `Seq`, `Alias` and `Scalar` node.
+
+#### `YAML.visitAsync(node, visitor): Promise<void>`
+
+The same as `visit()`,
+but allows for visitor functions that return a promise
+which resolves to one of the above-defined control values.
 
 ## Comments and Blank Lines
 
