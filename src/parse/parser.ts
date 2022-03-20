@@ -552,37 +552,63 @@ export class Parser {
           return
 
         case 'map-value-ind':
-          if (!it.sep) Object.assign(it, { key: null, sep: [this.sourceToken] })
-          else if (
-            it.value ||
-            (atNextItem && !includesToken(it.start, 'explicit-key-ind'))
-          )
-            map.items.push({ start: [], key: null, sep: [this.sourceToken] })
-          else if (includesToken(it.sep, 'map-value-ind'))
-            this.stack.push({
-              type: 'block-map',
-              offset: this.offset,
-              indent: this.indent,
-              items: [{ start: [], key: null, sep: [this.sourceToken] }]
-            })
-          else if (
-            includesToken(it.start, 'explicit-key-ind') &&
-            isFlowToken(it.key) &&
-            !includesToken(it.sep, 'newline')
-          ) {
-            const start = getFirstKeyStartProps(it.start)
-            const key = it.key
-            const sep = it.sep
-            sep.push(this.sourceToken)
-            // @ts-ignore type guard is wrong here
-            delete it.key, delete it.sep
-            this.stack.push({
-              type: 'block-map',
-              offset: this.offset,
-              indent: this.indent,
-              items: [{ start, key, sep }]
-            })
-          } else it.sep.push(this.sourceToken)
+          if (includesToken(it.start, 'explicit-key-ind')) {
+            if (!it.sep) {
+              if (includesToken(it.start, 'newline')) {
+                Object.assign(it, { key: null, sep: [this.sourceToken] })
+              } else {
+                const start = getFirstKeyStartProps(it.start)
+                this.stack.push({
+                  type: 'block-map',
+                  offset: this.offset,
+                  indent: this.indent,
+                  items: [{ start, key: null, sep: [this.sourceToken] }]
+                })
+              }
+            } else if (it.value) {
+              map.items.push({ start: [], key: null, sep: [this.sourceToken] })
+            } else if (includesToken(it.sep, 'map-value-ind')) {
+              this.stack.push({
+                type: 'block-map',
+                offset: this.offset,
+                indent: this.indent,
+                items: [{ start: [], key: null, sep: [this.sourceToken] }]
+              })
+            } else if (
+              isFlowToken(it.key) &&
+              !includesToken(it.sep, 'newline')
+            ) {
+              const start = getFirstKeyStartProps(it.start)
+              const key = it.key
+              const sep = it.sep
+              sep.push(this.sourceToken)
+              // @ts-expect-error type guard is wrong here
+              delete it.key, delete it.sep
+              this.stack.push({
+                type: 'block-map',
+                offset: this.offset,
+                indent: this.indent,
+                items: [{ start, key, sep }]
+              })
+            } else {
+              it.sep.push(this.sourceToken)
+            }
+          } else {
+            if (!it.sep) {
+              Object.assign(it, { key: null, sep: [this.sourceToken] })
+            } else if (it.value || atNextItem) {
+              map.items.push({ start: [], key: null, sep: [this.sourceToken] })
+            } else if (includesToken(it.sep, 'map-value-ind')) {
+              this.stack.push({
+                type: 'block-map',
+                offset: this.offset,
+                indent: this.indent,
+                items: [{ start: [], key: null, sep: [this.sourceToken] }]
+              })
+            } else {
+              it.sep.push(this.sourceToken)
+            }
+          }
           this.onKeyLine = true
           return
 
