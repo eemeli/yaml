@@ -623,11 +623,13 @@ export class Lexer {
           (yield* this.pushSpaces(true)) +
           (yield* this.pushIndicators())
         )
-      case ':':
-      case '?': // this is an error outside flow collections
       case '-': // this is an error
-        if (isEmpty(this.charAt(1))) {
-          if (this.flowLevel === 0) this.indentNext = this.indentValue + 1
+      case '?': // this is an error outside flow collections
+      case ':': {
+        const inFlow = this.flowLevel > 0
+        const ch1 = this.charAt(1)
+        if (isEmpty(ch1) || (inFlow && invalidFlowScalarChars.includes(ch1))) {
+          if (!inFlow) this.indentNext = this.indentValue + 1
           else if (this.flowKey) this.flowKey = false
           return (
             (yield* this.pushCount(1)) +
@@ -635,6 +637,7 @@ export class Lexer {
             (yield* this.pushIndicators())
           )
         }
+      }
     }
     return 0
   }

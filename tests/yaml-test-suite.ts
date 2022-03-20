@@ -17,7 +17,6 @@ const skip: Record<string, boolean | string[]> = {
   'DK95/04': true,
   'DK95/05': true,
   'DK95/06': ['in.json'],
-  G5U8: ['errors'],
   'JEF9/02': true,
   'L24T/00': true,
   'L24T/01': true,
@@ -31,7 +30,6 @@ const skip: Record<string, boolean | string[]> = {
   'Y79Y/007': ['errors'],
   'Y79Y/008': ['errors'],
   'Y79Y/009': ['errors'],
-  YJV2: ['errors']
 }
 
 function testJsonMatch(docs: Document[], json: string) {
