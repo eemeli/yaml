@@ -107,7 +107,8 @@ export class Directives {
           this.yaml.version = version
           return true
         } else {
-          onError(6, `Unsupported YAML version ${version}`, true)
+          const isValid = /^\d+\.\d+$/.test(version)
+          onError(6, `Unsupported YAML version ${version}`, isValid)
           return false
         }
       }
