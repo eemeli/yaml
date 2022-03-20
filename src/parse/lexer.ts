@@ -379,8 +379,13 @@ export class Lexer {
     let indent = -1
     do {
       nl = yield* this.pushNewline()
-      sp = yield* this.pushSpaces(true)
-      if (nl > 0) this.indentValue = indent = sp
+      if (nl > 0) {
+        sp = yield* this.pushSpaces(false)
+        this.indentValue = indent = sp
+      } else {
+        sp = 0
+      }
+      sp += yield* this.pushSpaces(true)
     } while (nl + sp > 0)
     const line = this.getLine()
     if (line === null) return this.setNext('flow')
