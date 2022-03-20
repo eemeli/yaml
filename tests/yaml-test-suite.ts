@@ -11,12 +11,9 @@ const skip: Record<string, boolean | string[]> = {
   SF5V: ['errors'], // allow duplicate %YAML directives
 
   // FIXME recent upstream additions
-  '9MQT/01': ['in.json'],
   'DK95/00': true,
-  'DK95/01': ['in.json'],
   'DK95/04': true,
   'DK95/05': true,
-  'DK95/06': ['in.json'],
   'JEF9/02': true,
   'M2N8/00': true,
   'MUS6/00': ['errors'],
@@ -27,7 +24,7 @@ const skip: Record<string, boolean | string[]> = {
   'Y79Y/006': ['errors'],
   'Y79Y/007': ['errors'],
   'Y79Y/008': ['errors'],
-  'Y79Y/009': ['errors'],
+  'Y79Y/009': ['errors']
 }
 
 function testJsonMatch(docs: Document[], json: string) {
@@ -103,9 +100,6 @@ for (const dir of testDirs) {
         docs = parseAllDocuments(yaml, { resolveKnownTags: false })
       })
 
-      const json = load('in.json')
-      if (json) test_('in.json', () => testJsonMatch(docs, json))
-
       test_('errors', () => {
         let errors: Error[] = []
         for (const doc of docs) errors = errors.concat(doc.errors)
@@ -117,7 +111,10 @@ for (const dir of testDirs) {
       })
 
       if (!error) {
+        const json = load('in.json')
         if (json) {
+          test_('in.json', () => testJsonMatch(docs, json))
+
           test_('stringfy+re-parse', () => {
             const src2 = docs.map(String).join('')
             const docs2 = parseAllDocuments(src2, { resolveKnownTags: false })
