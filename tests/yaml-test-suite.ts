@@ -17,7 +17,6 @@ const skip: Record<string, boolean | string[]> = {
   'JEF9/02': true,
   'M2N8/00': true,
   'MUS6/00': ['errors'],
-  'UKK6/02': ['test.event'],
   'Y79Y/003': ['errors'],
   'Y79Y/004': ['errors'],
   'Y79Y/005': ['errors'],
