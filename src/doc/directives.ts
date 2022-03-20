@@ -25,7 +25,10 @@ export class Directives {
    * The directives-end/doc-start marker `---`. If `null`, a marker may still be
    * included in the document's stringified representation.
    */
-  marker: true | null = null
+  docStart: true | null = null
+
+  /** The doc-end marker `...`.  */
+  docEnd = false
 
   /**
    * Used when parsing YAML 1.1, where:
@@ -42,7 +45,7 @@ export class Directives {
 
   clone(): Directives {
     const copy = new Directives(this.yaml, this.tags)
-    copy.marker = this.marker
+    copy.docStart = this.docStart
     return copy
   }
 

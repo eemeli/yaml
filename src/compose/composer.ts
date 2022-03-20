@@ -96,7 +96,7 @@ export class Composer {
       const dc = doc.contents
       if (afterDoc) {
         doc.comment = doc.comment ? `${doc.comment}\n${comment}` : comment
-      } else if (afterEmptyLine || doc.directives.marker || !dc) {
+      } else if (afterEmptyLine || doc.directives.docStart || !dc) {
         doc.commentBefore = comment
       } else if (isCollection(dc) && !dc.flow && dc.items.length > 0) {
         let it = dc.items[0]
@@ -167,11 +167,11 @@ export class Composer {
           token,
           this.onError
         )
-        if (this.atDirectives && !doc.directives.marker)
+        if (this.atDirectives && !doc.directives.docStart)
           this.onError(
             token,
             'MISSING_CHAR',
-            'Missing directives-end indicator line'
+            'Missing directives-end/doc-start indicator line'
           )
         this.decorate(doc, false)
         if (this.doc) yield this.doc
@@ -207,6 +207,7 @@ export class Composer {
           )
           break
         }
+        this.doc.directives.docEnd = true
         const end = resolveEnd(
           token.end,
           token.offset + token.source.length,

@@ -47,9 +47,9 @@ test('Use preceding directives if none defined', () => {
     }
   ])
   expect(docs.map(String)).toMatchObject([
-    '!bar "First document"\n',
+    '!bar "First document"\n...\n',
     '%TAG ! !foo\n---\n!bar "With directives"\n',
-    '%TAG ! !foo\n---\n!bar "Using previous TAG directive"\n',
+    '%TAG ! !foo\n---\n!bar "Using previous TAG directive"\n...\n',
     '%YAML 1.1\n---\n!bar "Reset settings"\n',
     '%YAML 1.1\n---\n!bar "Using previous YAML directive"\n'
   ])

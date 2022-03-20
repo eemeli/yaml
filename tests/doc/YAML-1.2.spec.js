@@ -1823,7 +1823,7 @@ for (const section in spec) {
         })
         if (special) special(src)
         if (!errors) {
-          const src2 = documents.map(doc => String(doc)).join('\n...\n')
+          const src2 = documents.map(String).join('')
           const documents2 = YAML.parseAllDocuments(src2, {
             prettyErrors: false
           })

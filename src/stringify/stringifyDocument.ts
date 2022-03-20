@@ -19,7 +19,7 @@ export function stringifyDocument(
     if (dir) {
       lines.push(dir)
       hasDirectives = true
-    } else if (doc.directives.marker) hasDirectives = true
+    } else if (doc.directives.docStart) hasDirectives = true
   }
   if (hasDirectives) lines.push('---')
 
@@ -65,12 +65,26 @@ export function stringifyDocument(
   } else {
     lines.push(stringify(doc.contents, ctx))
   }
-  let dc = doc.comment
-  if (dc && chompKeep) dc = dc.replace(/^\n+/, '')
-  if (dc) {
-    if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')
-      lines.push('')
-    lines.push(indentComment(commentString(dc), ''))
+  if (doc.directives?.docEnd) {
+    if (doc.comment) {
+      const cs = commentString(doc.comment)
+      if (cs.includes('\n')) {
+        lines.push('...')
+        lines.push(indentComment(cs, ''))
+      } else {
+        lines.push(`... ${cs}`)
+      }
+    } else {
+      lines.push('...')
+    }
+  } else {
+    let dc = doc.comment
+    if (dc && chompKeep) dc = dc.replace(/^\n+/, '')
+    if (dc) {
+      if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')
+        lines.push('')
+      lines.push(indentComment(commentString(dc), ''))
+    }
   }
   return lines.join('\n') + '\n'
 }
