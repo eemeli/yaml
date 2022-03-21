@@ -35,6 +35,7 @@ export function composeNode(
 ) {
   const { spaceBefore, comment, anchor, tag } = props
   let node: ParsedNode
+  let isSrcToken = true
   switch (token.type) {
     case 'alias':
       node = composeAlias(ctx, token, onError)
@@ -58,9 +59,22 @@ export function composeNode(
       node = composeCollection(CN, ctx, token, tag, onError)
       if (anchor) node.anchor = anchor.source.substring(1)
       break
-    default:
-      console.log(token)
-      throw new Error(`Unsupporten token type: ${(token as any).type}`)
+    default: {
+      const message =
+        token.type === 'error'
+          ? token.message
+          : `Unsupported token (type: ${token.type})`
+      onError(token, 'UNEXPECTED_TOKEN', message)
+      node = composeEmptyNode(
+        ctx,
+        token.offset,
+        undefined,
+        null,
+        props,
+        onError
+      )
+      isSrcToken = false
+    }
   }
   if (anchor && node.anchor === '')
     onError(anchor, 'BAD_ALIAS', 'Anchor cannot be an empty string')
@@ -69,7 +83,8 @@ export function composeNode(
     if (token.type === 'scalar' && token.source === '') node.comment = comment
     else node.commentBefore = comment
   }
-  if (ctx.options.keepSourceTokens) node.srcToken = token
+  // @ts-expect-error Type checking misses meaning of isSrcToken
+  if (ctx.options.keepSourceTokens && isSrcToken) node.srcToken = token
   return node
 }
 
