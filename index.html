@@ -513,7 +513,6 @@ The first has the simplest API and &quot;just works&quot;, the second gets you a
 
 <ul>
 <li><a href="#creating-documents"><code>constructor(value, replacer?, options?)</code></a></li>
-<li><a href="#working-with-anchors"><code>#anchors</code></a></li>
 <li><a href="#content-nodes"><code>#contents</code></a></li>
 <li><a href="#stream-directives"><code>#directives</code></a></li>
 <li><a href="#errors"><code>#errors</code></a></li>
@@ -527,9 +526,9 @@ The first has the simplest API and &quot;just works&quot;, the second gets you a
 
 <!-- prettier-ignore -->
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
-  <span class="nx">isAlias</span><span class="p">,</span> <span class="nx">isCollection</span><span class="p">,</span> <span class="nx">isMap</span><span class="p">,</span>
-  <span class="nx">isNode</span><span class="p">,</span> <span class="nx">isPair</span><span class="p">,</span> <span class="nx">isScalar</span><span class="p">,</span> <span class="nx">isSeq</span><span class="p">,</span>
-  <span class="nx">Scalar</span><span class="p">,</span> <span class="nx">visit</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span>
+  <span class="nx">isAlias</span><span class="p">,</span> <span class="nx">isCollection</span><span class="p">,</span> <span class="nx">isMap</span><span class="p">,</span> <span class="nx">isNode</span><span class="p">,</span>
+  <span class="nx">isPair</span><span class="p">,</span> <span class="nx">isScalar</span><span class="p">,</span> <span class="nx">isSeq</span><span class="p">,</span> <span class="nx">Scalar</span><span class="p">,</span>
+  <span class="nx">visit</span><span class="p">,</span> <span class="nx">visitAsync</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span>
 <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 </code></pre></div>
 <ul>
@@ -537,10 +536,11 @@ The first has the simplest API and &quot;just works&quot;, the second gets you a
 <li><a href="#scalar-values"><code>new Scalar(value)</code></a></li>
 <li><a href="#collections"><code>new YAMLMap()</code></a></li>
 <li><a href="#collections"><code>new YAMLSeq()</code></a></li>
-<li><a href="#working-with-anchors"><code>doc.createAlias(node, name?): Alias</code></a></li>
+<li><a href="#creating-nodes"><code>doc.createAlias(node, name?): Alias</code></a></li>
 <li><a href="#creating-nodes"><code>doc.createNode(value, options?): Node</code></a></li>
 <li><a href="#creating-nodes"><code>doc.createPair(key, value): Pair</code></a></li>
 <li><a href="#modifying-nodes"><code>visit(node, visitor)</code></a></li>
+<li><a href="#modifying-nodes"><code>visitAsync(node, visitor)</code></a></li>
 </ul>
 
 <h3>Parsing YAML</h3>
@@ -618,7 +618,7 @@ The first has the simplest API and &quot;just works&quot;, the second gets you a
 <span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">number: 999</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="dl">'</span><span class="s1">failsafe</span><span class="dl">'</span> <span class="p">})</span>
 <span class="c1">// { number: '999' }</span>
 </code></pre></div>
-<p>The options supported by various <code>yaml</code> are split into various categories, depending on how and where they are used.
+<p>The options supported by various <code>yaml</code> features are split into various categories, depending on how and where they are used.
 Options in various categories do not overlap, so it&#39;s fine to use a single &quot;bag&quot; of options and pass it to each function or method.</p>
 <h2 id='parse-options'>Parse Options</h2>
 <p>Parse options affect the parsing and composition of a YAML Document from it source.</p>
@@ -643,7 +643,7 @@ Options in various categories do not overlap, so it&#39;s fine to use a single &
 <td>keepSourceTokens</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td>Include a <code>srcToken</code> value on each parsed <code>Node</code>, containing the CST token that was composed into this node.</td>
+<td>Include a <code>srcToken</code> value on each parsed <code>Node</code>, containing the <a href="#working-with-cst-tokens">CST token</a> that was composed into this node.</td>
 </tr>
 <tr>
 <td>lineCounter</td>
@@ -661,7 +661,7 @@ Options in various categories do not overlap, so it&#39;s fine to use a single &
 <td>strict</td>
 <td><code>boolean</code></td>
 <td><code>true</code></td>
-<td>When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.</td>
+<td>When parsing, do not ignore errors <a href="#silencing-errors-and-warnings">required</a> by the YAML 1.2 spec, but caused by unambiguous content.</td>
 </tr>
 <tr>
 <td>uniqueKeys</td>
@@ -707,7 +707,7 @@ If you&#39;d like to silence these, set the <code>logLevel</code> option to <cod
 <span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">No</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="dl">'</span><span class="s1">yaml-1.1</span><span class="dl">'</span> <span class="p">})</span> <span class="c1">// false</span>
 <span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">No</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">version</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1.1</span><span class="dl">'</span> <span class="p">})</span> <span class="c1">// false</span>
 </code></pre></div>
-<p>Schema options determine the types of values that the document is expected and able to support.</p>
+<p>Schema options determine the types of values that the document supports.</p>
 
 <p>Aside from defining the language structure, the YAML 1.2 spec defines a number of different <em>schemas</em> that may be used.
 The default is the <a href="http://yaml.org/spec/1.2/spec.html#id2804923"><code>core</code></a> schema, which is the most common one.
@@ -754,7 +754,7 @@ The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
 <tr>
 <td>schema</td>
 <td><code>string</code></td>
-<td>1.1:&nbsp;<code>&#39;yaml-1.1</code> 1.2:&nbsp;<code>&#39;core&#39;</code></td>
+<td>1.1:&nbsp;<code>&#39;yaml-1.1&#39;</code> 1.2:&nbsp;<code>&#39;core&#39;</code></td>
 <td>The base schema to use. Default value depends on YAML version. Built-in support is provided for <code>&#39;core&#39;</code>, <code>&#39;failsafe&#39;</code>, <code>&#39;json&#39;</code>, and <code>&#39;yaml-1.1&#39;</code>. If using another value, <code>customTags</code> must be an array of tags.</td>
 </tr>
 <tr>
@@ -821,10 +821,10 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <td>tag</td>
 <td><code>string</code></td>
 <td></td>
-<td>Specify the top-level collection type, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available in this document&#39;s schema.</td>
+<td>Specify the top-level collection type, e.g. <code>&#39;!!omap&#39;</code>. Note that this requires the corresponding tag to be available in this document&#39;s schema.</td>
 </tr>
 </tbody></table>
-<h2 id='tojs-options'>ToJS Options</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// { '[1,2]': 'many' }</span>
+<h2 id='tojs-options'>ToJS Options</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// { '[ 1, 2 ]': 'many' }</span>
 <span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">mapAsMap</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span> <span class="c1">// Map { [ 1, 2 ] =&gt; 'many' }</span>
 </code></pre></div>
 <p>These options influence how the document is transformed into &quot;native&quot; JavaScript representation.</p>
@@ -1189,7 +1189,8 @@ See <a href="#options">Options</a> for more information on the optional paramete
 <div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Document</span><span class="p">()</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">directives</span>
 <span class="o">&gt;</span> <span class="p">{</span>
-    <span class="na">marker</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> <span class="c1">// set true to force the doc-start marker</span>
+    <span class="na">docStart</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> <span class="c1">// set true to force the doc-start marker</span>
+    <span class="na">docEnd</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// set true to force the doc-end marker</span>
     <span class="na">tags</span><span class="p">:</span> <span class="p">{</span> <span class="dl">'</span><span class="s1">!!</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">tag:yaml.org,2002:</span><span class="dl">'</span> <span class="p">},</span> <span class="c1">// Record&lt;handle, prefix&gt;</span>
     <span class="na">yaml</span><span class="p">:</span> <span class="p">{</span> <span class="na">explicit</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="na">version</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1.2</span><span class="dl">'</span> <span class="p">}</span>
   <span class="p">}</span>
@@ -1513,7 +1514,7 @@ These should be preferred over other methods such as <code>instanceof</code> che
 <p>In general, it&#39;s safe to modify nodes manually, e.g. splicing the <code>items</code> array of a <code>YAMLMap</code> or setting its <code>flow</code> value to <code>true</code>.
 For operations on nodes at a known location in the tree, it&#39;s probably easiest to use <code>doc.getIn(path, true)</code> to access them.
 For more complex or general operations, a visitor API is provided:</p>
-<h4 id='yaml-visit-node-visitor'><code>YAML.visit(node, visitor)</code></h4>
+<h4 id='yaml-visit-node-visitor-void'><code>YAML.visit(node, visitor): void</code></h4>
 <p>Apply a visitor to an AST node or document.</p>
 
 <p>Walks through the tree (depth-first) starting from <code>node</code>, calling a <code>visitor</code> function with three arguments:</p>
@@ -1540,6 +1541,10 @@ This is useful especially if the index of the current node has changed.</li>
 
 <p>If <code>visitor</code> is a single function, it will be called with all values encountered in the tree, including e.g. <code>null</code> values.
 Alternatively, separate visitor functions may be defined for each <code>Map</code>, <code>Pair</code>, <code>Seq</code>, <code>Alias</code> and <code>Scalar</code> node.</p>
+<h4 id='yaml-visitasync-node-visitor-promise-lt-void-gt'><code>YAML.visitAsync(node, visitor): Promise&lt;void&gt;</code></h4>
+<p>The same as <code>visit()</code>,
+but allows for visitor functions that return a promise
+which resolves to one of the above-defined control values.</p>
 <h2 id='comments-and-blank-lines'>Comments and Blank Lines</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---

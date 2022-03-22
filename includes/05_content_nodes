@@ -308,7 +308,7 @@ These should be preferred over other methods such as <code>instanceof</code> che
 <p>In general, it&#39;s safe to modify nodes manually, e.g. splicing the <code>items</code> array of a <code>YAMLMap</code> or setting its <code>flow</code> value to <code>true</code>.
 For operations on nodes at a known location in the tree, it&#39;s probably easiest to use <code>doc.getIn(path, true)</code> to access them.
 For more complex or general operations, a visitor API is provided:</p>
-<h4 id='yaml-visit-node-visitor'><code>YAML.visit(node, visitor)</code></h4>
+<h4 id='yaml-visit-node-visitor-void'><code>YAML.visit(node, visitor): void</code></h4>
 <p>Apply a visitor to an AST node or document.</p>
 
 <p>Walks through the tree (depth-first) starting from <code>node</code>, calling a <code>visitor</code> function with three arguments:</p>
@@ -335,6 +335,10 @@ This is useful especially if the index of the current node has changed.</li>
 
 <p>If <code>visitor</code> is a single function, it will be called with all values encountered in the tree, including e.g. <code>null</code> values.
 Alternatively, separate visitor functions may be defined for each <code>Map</code>, <code>Pair</code>, <code>Seq</code>, <code>Alias</code> and <code>Scalar</code> node.</p>
+<h4 id='yaml-visitasync-node-visitor-promise-lt-void-gt'><code>YAML.visitAsync(node, visitor): Promise&lt;void&gt;</code></h4>
+<p>The same as <code>visit()</code>,
+but allows for visitor functions that return a promise
+which resolves to one of the above-defined control values.</p>
 <h2 id='comments-and-blank-lines'>Comments and Blank Lines</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---

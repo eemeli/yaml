@@ -59,7 +59,6 @@ The first has the simplest API and &quot;just works&quot;, the second gets you a
 
 <ul>
 <li><a href="#creating-documents"><code>constructor(value, replacer?, options?)</code></a></li>
-<li><a href="#working-with-anchors"><code>#anchors</code></a></li>
 <li><a href="#content-nodes"><code>#contents</code></a></li>
 <li><a href="#stream-directives"><code>#directives</code></a></li>
 <li><a href="#errors"><code>#errors</code></a></li>
@@ -73,9 +72,9 @@ The first has the simplest API and &quot;just works&quot;, the second gets you a
 
 <!-- prettier-ignore -->
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
-  <span class="nx">isAlias</span><span class="p">,</span> <span class="nx">isCollection</span><span class="p">,</span> <span class="nx">isMap</span><span class="p">,</span>
-  <span class="nx">isNode</span><span class="p">,</span> <span class="nx">isPair</span><span class="p">,</span> <span class="nx">isScalar</span><span class="p">,</span> <span class="nx">isSeq</span><span class="p">,</span>
-  <span class="nx">Scalar</span><span class="p">,</span> <span class="nx">visit</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span>
+  <span class="nx">isAlias</span><span class="p">,</span> <span class="nx">isCollection</span><span class="p">,</span> <span class="nx">isMap</span><span class="p">,</span> <span class="nx">isNode</span><span class="p">,</span>
+  <span class="nx">isPair</span><span class="p">,</span> <span class="nx">isScalar</span><span class="p">,</span> <span class="nx">isSeq</span><span class="p">,</span> <span class="nx">Scalar</span><span class="p">,</span>
+  <span class="nx">visit</span><span class="p">,</span> <span class="nx">visitAsync</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span>
 <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 </code></pre></div>
 <ul>
@@ -83,10 +82,11 @@ The first has the simplest API and &quot;just works&quot;, the second gets you a
 <li><a href="#scalar-values"><code>new Scalar(value)</code></a></li>
 <li><a href="#collections"><code>new YAMLMap()</code></a></li>
 <li><a href="#collections"><code>new YAMLSeq()</code></a></li>
-<li><a href="#working-with-anchors"><code>doc.createAlias(node, name?): Alias</code></a></li>
+<li><a href="#creating-nodes"><code>doc.createAlias(node, name?): Alias</code></a></li>
 <li><a href="#creating-nodes"><code>doc.createNode(value, options?): Node</code></a></li>
 <li><a href="#creating-nodes"><code>doc.createPair(key, value): Pair</code></a></li>
 <li><a href="#modifying-nodes"><code>visit(node, visitor)</code></a></li>
+<li><a href="#modifying-nodes"><code>visitAsync(node, visitor)</code></a></li>
 </ul>
 
 <h3>Parsing YAML</h3>

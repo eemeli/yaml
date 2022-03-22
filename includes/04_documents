@@ -201,7 +201,8 @@ See <a href="#options">Options</a> for more information on the optional paramete
 <div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Document</span><span class="p">()</span>
 <span class="nx">doc</span><span class="p">.</span><span class="nx">directives</span>
 <span class="o">&gt;</span> <span class="p">{</span>
-    <span class="na">marker</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> <span class="c1">// set true to force the doc-start marker</span>
+    <span class="na">docStart</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> <span class="c1">// set true to force the doc-start marker</span>
+    <span class="na">docEnd</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// set true to force the doc-end marker</span>
     <span class="na">tags</span><span class="p">:</span> <span class="p">{</span> <span class="dl">'</span><span class="s1">!!</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">tag:yaml.org,2002:</span><span class="dl">'</span> <span class="p">},</span> <span class="c1">// Record&lt;handle, prefix&gt;</span>
     <span class="na">yaml</span><span class="p">:</span> <span class="p">{</span> <span class="na">explicit</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="na">version</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1.2</span><span class="dl">'</span> <span class="p">}</span>
   <span class="p">}</span>

@@ -9,7 +9,7 @@
 <span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">number: 999</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="dl">'</span><span class="s1">failsafe</span><span class="dl">'</span> <span class="p">})</span>
 <span class="c1">// { number: '999' }</span>
 </code></pre></div>
-<p>The options supported by various <code>yaml</code> are split into various categories, depending on how and where they are used.
+<p>The options supported by various <code>yaml</code> features are split into various categories, depending on how and where they are used.
 Options in various categories do not overlap, so it&#39;s fine to use a single &quot;bag&quot; of options and pass it to each function or method.</p>
 <h2 id='parse-options'>Parse Options</h2>
 <p>Parse options affect the parsing and composition of a YAML Document from it source.</p>
@@ -34,7 +34,7 @@ Options in various categories do not overlap, so it&#39;s fine to use a single &
 <td>keepSourceTokens</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td>Include a <code>srcToken</code> value on each parsed <code>Node</code>, containing the CST token that was composed into this node.</td>
+<td>Include a <code>srcToken</code> value on each parsed <code>Node</code>, containing the <a href="#working-with-cst-tokens">CST token</a> that was composed into this node.</td>
 </tr>
 <tr>
 <td>lineCounter</td>
@@ -52,7 +52,7 @@ Options in various categories do not overlap, so it&#39;s fine to use a single &
 <td>strict</td>
 <td><code>boolean</code></td>
 <td><code>true</code></td>
-<td>When parsing, do not ignore errors required by the YAML 1.2 spec, but caused by unambiguous content.</td>
+<td>When parsing, do not ignore errors <a href="#silencing-errors-and-warnings">required</a> by the YAML 1.2 spec, but caused by unambiguous content.</td>
 </tr>
 <tr>
 <td>uniqueKeys</td>
@@ -98,7 +98,7 @@ If you&#39;d like to silence these, set the <code>logLevel</code> option to <cod
 <span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">No</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">schema</span><span class="p">:</span> <span class="dl">'</span><span class="s1">yaml-1.1</span><span class="dl">'</span> <span class="p">})</span> <span class="c1">// false</span>
 <span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">No</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">version</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1.1</span><span class="dl">'</span> <span class="p">})</span> <span class="c1">// false</span>
 </code></pre></div>
-<p>Schema options determine the types of values that the document is expected and able to support.</p>
+<p>Schema options determine the types of values that the document supports.</p>
 
 <p>Aside from defining the language structure, the YAML 1.2 spec defines a number of different <em>schemas</em> that may be used.
 The default is the <a href="http://yaml.org/spec/1.2/spec.html#id2804923"><code>core</code></a> schema, which is the most common one.
@@ -145,7 +145,7 @@ The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
 <tr>
 <td>schema</td>
 <td><code>string</code></td>
-<td>1.1:&nbsp;<code>&#39;yaml-1.1</code> 1.2:&nbsp;<code>&#39;core&#39;</code></td>
+<td>1.1:&nbsp;<code>&#39;yaml-1.1&#39;</code> 1.2:&nbsp;<code>&#39;core&#39;</code></td>
 <td>The base schema to use. Default value depends on YAML version. Built-in support is provided for <code>&#39;core&#39;</code>, <code>&#39;failsafe&#39;</code>, <code>&#39;json&#39;</code>, and <code>&#39;yaml-1.1&#39;</code>. If using another value, <code>customTags</code> must be an array of tags.</td>
 </tr>
 <tr>
@@ -212,10 +212,10 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <td>tag</td>
 <td><code>string</code></td>
 <td></td>
-<td>Specify the top-level collection type, e.g. <code>&quot;!!omap&quot;</code>. Note that this requires the corresponding tag to be available in this document&#39;s schema.</td>
+<td>Specify the top-level collection type, e.g. <code>&#39;!!omap&#39;</code>. Note that this requires the corresponding tag to be available in this document&#39;s schema.</td>
 </tr>
 </tbody></table>
-<h2 id='tojs-options'>ToJS Options</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// { '[1,2]': 'many' }</span>
+<h2 id='tojs-options'>ToJS Options</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// { '[ 1, 2 ]': 'many' }</span>
 <span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">{[1, 2]: many}</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">mapAsMap</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span> <span class="c1">// Map { [ 1, 2 ] =&gt; 'many' }</span>
 </code></pre></div>
 <p>These options influence how the document is transformed into &quot;native&quot; JavaScript representation.</p>
