@@ -491,6 +491,17 @@ describe('stringify comments', () => {
         #c8
       `)
     })
+
+    test('indented comment on empty value with spaceBefore', () => {
+      const src = source`
+        key1:
+
+          # comment
+        key2: x
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(src)
+    })
   })
 
   describe('flow collection comments', () => {

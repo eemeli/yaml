@@ -121,7 +121,8 @@ export function stringifyPair(
   )
   let ws = ' '
   if (vcb || keyComment) {
-    ws = valueStr === '' && !ctx.inFlow ? vcb : `${vcb}\n${ctx.indent}`
+    if (valueStr === '' && !ctx.inFlow) ws = vcb === '\n' ? '\n\n' : vcb
+    else ws = `${vcb}\n${ctx.indent}`
   } else if (!explicitKey && isCollection(value)) {
     const flow = valueStr[0] === '[' || valueStr[0] === '{'
     if (!flow || valueStr.includes('\n')) ws = `\n${ctx.indent}`

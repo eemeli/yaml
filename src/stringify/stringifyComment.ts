@@ -14,6 +14,8 @@ export function indentComment(comment: string, indent: string) {
 }
 
 export const lineComment = (str: string, indent: string, comment: string) =>
-  comment.includes('\n')
+  str.endsWith('\n')
+    ? indentComment(comment, indent)
+    : comment.includes('\n')
     ? '\n' + indentComment(comment, indent)
     : (str.endsWith(' ') ? '' : ' ') + comment
