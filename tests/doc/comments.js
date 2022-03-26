@@ -502,6 +502,17 @@ describe('stringify comments', () => {
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe(src)
     })
+
+    test('comment after empty value with spaceBefore', () => {
+      const src = source`
+        key1:
+
+        # comment
+        key2: x
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(src)
+    })
   })
 
   describe('flow collection comments', () => {

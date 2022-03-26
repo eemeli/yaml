@@ -526,28 +526,57 @@ export class Parser {
         !this.onKeyLine &&
         this.indent === map.indent &&
         (it.sep || includesNonEmpty(it.start))
+
+      // For empty nodes, assign newline-separated not indented empty tokens to following node
+      let start: SourceToken[] = []
+      if (atNextItem && it.sep && !it.value) {
+        const nl: number[] = []
+        for (let i = 0; i < it.sep.length; ++i) {
+          const st = it.sep[i]
+          switch (st.type) {
+            case 'newline':
+              nl.push(i)
+              break
+            case 'space':
+              break
+            case 'comment':
+              if (st.indent > map.indent) nl.length = 0
+              break
+            default:
+              nl.length = 0
+          }
+        }
+        if (nl.length >= 2) start = it.sep.splice(nl[1])
+      }
+
       switch (this.type) {
         case 'anchor':
         case 'tag':
           if (atNextItem || it.value) {
-            map.items.push({ start: [this.sourceToken] })
+            start.push(this.sourceToken)
+            map.items.push({ start })
             this.onKeyLine = true
-          } else if (it.sep) it.sep.push(this.sourceToken)
-          else it.start.push(this.sourceToken)
+          } else if (it.sep) {
+            it.sep.push(this.sourceToken)
+          } else {
+            it.start.push(this.sourceToken)
+          }
           return
 
         case 'explicit-key-ind':
-          if (!it.sep && !includesToken(it.start, 'explicit-key-ind'))
+          if (!it.sep && !includesToken(it.start, 'explicit-key-ind')) {
             it.start.push(this.sourceToken)
-          else if (atNextItem || it.value)
-            map.items.push({ start: [this.sourceToken] })
-          else
+          } else if (atNextItem || it.value) {
+            start.push(this.sourceToken)
+            map.items.push({ start })
+          } else {
             this.stack.push({
               type: 'block-map',
               offset: this.offset,
               indent: this.indent,
               items: [{ start: [this.sourceToken] }]
             })
+          }
           this.onKeyLine = true
           return
 
@@ -572,7 +601,7 @@ export class Parser {
                 type: 'block-map',
                 offset: this.offset,
                 indent: this.indent,
-                items: [{ start: [], key: null, sep: [this.sourceToken] }]
+                items: [{ start, key: null, sep: [this.sourceToken] }]
               })
             } else if (
               isFlowToken(it.key) &&
@@ -590,6 +619,9 @@ export class Parser {
                 indent: this.indent,
                 items: [{ start, key, sep }]
               })
+            } else if (start.length > 0) {
+              // Not actually at next item
+              it.sep = it.sep.concat(start, this.sourceToken)
             } else {
               it.sep.push(this.sourceToken)
             }
@@ -597,7 +629,7 @@ export class Parser {
             if (!it.sep) {
               Object.assign(it, { key: null, sep: [this.sourceToken] })
             } else if (it.value || atNextItem) {
-              map.items.push({ start: [], key: null, sep: [this.sourceToken] })
+              map.items.push({ start, key: null, sep: [this.sourceToken] })
             } else if (includesToken(it.sep, 'map-value-ind')) {
               this.stack.push({
                 type: 'block-map',
@@ -618,7 +650,7 @@ export class Parser {
         case 'double-quoted-scalar': {
           const fs = this.flowScalar(this.type)
           if (atNextItem || it.value) {
-            map.items.push({ start: [], key: fs, sep: [] })
+            map.items.push({ start, key: fs, sep: [] })
             this.onKeyLine = true
           } else if (it.sep) {
             this.stack.push(fs)
@@ -636,8 +668,9 @@ export class Parser {
               atNextItem &&
               bv.type !== 'block-seq' &&
               includesToken(it.start, 'explicit-key-ind')
-            )
-              map.items.push({ start: [] })
+            ) {
+              map.items.push({ start })
+            }
             this.stack.push(bv)
             return
           }
