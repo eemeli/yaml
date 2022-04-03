@@ -66,7 +66,7 @@ export function testEvents(src: string) {
       events.push(docEnd)
     }
   } catch (e) {
-    return { events, error: error || e }
+    return { events, error: error ?? e }
   }
   events.push('-STR')
   return { events, error }

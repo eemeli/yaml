@@ -35,13 +35,13 @@ export function composeScalar(
   try {
     const res = tag.resolve(
       value,
-      msg => onError(tagToken || token, 'TAG_RESOLVE_FAILED', msg),
+      msg => onError(tagToken ?? token, 'TAG_RESOLVE_FAILED', msg),
       ctx.options
     )
     scalar = isScalar(res) ? res : new Scalar(res)
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
-    onError(tagToken || token, 'TAG_RESOLVE_FAILED', msg)
+    onError(tagToken ?? token, 'TAG_RESOLVE_FAILED', msg)
     scalar = new Scalar(value)
   }
   scalar.range = range
@@ -99,7 +99,7 @@ function findScalarTagByTest(
 
   if (schema.compat) {
     const compat =
-      schema.compat.find(tag => tag.default && tag.test?.test(value)) ||
+      schema.compat.find(tag => tag.default && tag.test?.test(value)) ??
       schema[SCALAR]
     if (tag.tag !== compat.tag) {
       const ts = directives.tagString(tag.tag)

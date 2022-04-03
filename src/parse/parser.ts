@@ -54,7 +54,7 @@ function getPrevProps(parent: Token) {
       return parent.start
     case 'block-map': {
       const it = parent.items[parent.items.length - 1]
-      return it.sep || it.start
+      return it.sep ?? it.start
     }
     case 'block-seq':
       return parent.items[parent.items.length - 1].start
@@ -291,7 +291,7 @@ export class Parser {
   }
 
   private *pop(error?: Token): Generator<Token, void> {
-    const token = error || this.stack.pop()
+    const token = error ?? this.stack.pop()
     /* istanbul ignore if should not happen */
     if (!token) {
       const message = 'Tried to pop an empty stack'

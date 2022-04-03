@@ -42,7 +42,7 @@ export class Schema {
     this.name = (typeof schema === 'string' && schema) || 'core'
     this.knownTags = resolveKnownTags ? coreKnownTags : {}
     this.tags = getTags(customTags, this.name)
-    this.toStringOptions = toStringDefaults || null
+    this.toStringOptions = toStringDefaults ?? null
 
     Object.defineProperty(this, MAP, { value: map })
     Object.defineProperty(this, SCALAR, { value: string })
@@ -50,7 +50,11 @@ export class Schema {
 
     // Used by createMap()
     this.sortMapEntries =
-      sortMapEntries === true ? sortMapEntriesByKey : sortMapEntries || null
+      typeof sortMapEntries === 'function'
+        ? sortMapEntries
+        : sortMapEntries === true
+        ? sortMapEntriesByKey
+        : null
   }
 
   clone(): Schema {

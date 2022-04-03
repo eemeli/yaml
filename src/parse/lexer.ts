@@ -178,7 +178,7 @@ export class Lexer {
       this.lineEndPos = null
     }
     this.atEnd = !incomplete
-    let next: State | null = this.next || 'stream'
+    let next: State | null = this.next ?? 'stream'
     while (next && (incomplete || this.hasChars(1)))
       next = yield* this.parseNext(next)
   }

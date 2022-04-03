@@ -182,6 +182,7 @@ export class Document<T = unknown> {
     if (!node.anchor) {
       const prev = anchorNames(this)
       node.anchor =
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         !name || prev.has(name) ? findNewAnchor(name || 'a', prev) : name
     }
     return new Alias(node.anchor)
@@ -224,9 +225,10 @@ export class Document<T = unknown> {
       keepUndefined,
       onTagObj,
       tag
-    } = options || {}
+    } = options ?? {}
     const { onAnchor, setAnchors, sourceObjects } = createNodeAnchors(
       this,
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       anchorPrefix || 'a'
     )
     const ctx: CreateNodeContext = {
@@ -423,7 +425,7 @@ export class Document<T = unknown> {
       maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100,
       stringify
     }
-    const res = toJS(this.contents, jsonArg || '', ctx)
+    const res = toJS(this.contents, jsonArg ?? '', ctx)
     if (typeof onAnchor === 'function')
       for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
     return typeof reviver === 'function'

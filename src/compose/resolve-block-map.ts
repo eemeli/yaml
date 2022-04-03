@@ -27,7 +27,7 @@ export function resolveBlockMap(
     // key properties
     const keyProps = resolveProps(start, {
       indicator: 'explicit-key-ind',
-      next: key || sep?.[0],
+      next: key ?? sep?.[0],
       offset,
       onError,
       startOnNewline: true
@@ -72,7 +72,7 @@ export function resolveBlockMap(
       onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
 
     // value properties
-    const valueProps = resolveProps(sep || [], {
+    const valueProps = resolveProps(sep ?? [], {
       indicator: 'map-value-ind',
       next: value,
       offset: keyNode.range[2],

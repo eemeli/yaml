@@ -202,7 +202,7 @@ export function stringify(
     options = indent < 1 ? undefined : indent > 8 ? { indent: 8 } : { indent }
   }
   if (value === undefined) {
-    const { keepUndefined } = options || (replacer as CreateNodeOptions) || {}
+    const { keepUndefined } = options ?? (replacer as CreateNodeOptions) ?? {}
     if (!keepUndefined) return undefined
   }
   return new Document(value, _replacer, options).toString(options)

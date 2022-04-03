@@ -25,7 +25,7 @@ function findTagObject(
 ) {
   if (tagName) {
     const match = tags.filter(t => t.tag === tagName)
-    const tagObj = match.find(t => !t.format) || match[0]
+    const tagObj = match.find(t => !t.format) ?? match[0]
     if (!tagObj) throw new Error(`Tag ${tagName} not found`)
     return tagObj
   }

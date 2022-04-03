@@ -2,7 +2,7 @@ import type { SourceToken, Token } from '../parse/cst.js'
 import type { ComposeErrorHandler } from './composer.js'
 
 export interface ResolvePropsArg {
-  flow?: string
+  flow?: 'flow map' | 'flow sequence'
   indicator: 'doc-start' | 'explicit-key-ind' | 'map-value-ind' | 'seq-item-ind'
   next: Token | null | undefined
   offset: number
@@ -119,7 +119,7 @@ export function resolveProps(
           onError(
             token,
             'UNEXPECTED_TOKEN',
-            `Unexpected ${token.source} in ${flow || 'collection'}`
+            `Unexpected ${token.source} in ${flow ?? 'collection'}`
           )
         found = token
         atNewline = false

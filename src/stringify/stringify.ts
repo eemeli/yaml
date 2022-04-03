@@ -86,7 +86,7 @@ function getTagObject(tags: Array<ScalarTag | CollectionTag>, item: Node) {
   if (item.tag) {
     const match = tags.filter(t => t.tag === item.tag)
     if (match.length > 0)
-      return match.find(t => t.format === (item as Scalar).format) || match[0]
+      return match.find(t => t.format === (item as Scalar).format) ?? match[0]
   }
 
   let tagObj: ScalarTag | CollectionTag | undefined = undefined
@@ -95,7 +95,7 @@ function getTagObject(tags: Array<ScalarTag | CollectionTag>, item: Node) {
     obj = item.value
     const match = tags.filter(t => t.identify?.(obj))
     tagObj =
-      match.find(t => t.format === item.format) || match.find(t => !t.format)
+      match.find(t => t.format === item.format) ?? match.find(t => !t.format)
   } else {
     obj = item
     tagObj = tags.find(t => t.nodeClass && obj instanceof t.nodeClass)
@@ -121,7 +121,7 @@ function stringifyProps(
     anchors.add(anchor)
     props.push(`&${anchor}`)
   }
-  const tag = node.tag || (tagObj.default ? null : tagObj.tag)
+  const tag = node.tag ? node.tag : tagObj.default ? null : tagObj.tag
   if (tag) props.push(doc.directives.tagString(tag))
   return props.join(' ')
 }
@@ -156,7 +156,7 @@ export function stringify(
 
   const props = stringifyProps(node, tagObj, ctx)
   if (props.length > 0)
-    ctx.indentAtStart = (ctx.indentAtStart || 0) + props.length + 1
+    ctx.indentAtStart = (ctx.indentAtStart ?? 0) + props.length + 1
 
   const str =
     typeof tagObj.stringify === 'function'

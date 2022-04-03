@@ -79,6 +79,7 @@ export class Composer {
   private warnings: YAMLWarning[] = []
 
   constructor(options: ParseOptions & DocumentOptions & SchemaOptions = {}) {
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     this.directives = new Directives({ version: options.version || '1.2' })
     this.options = options
   }

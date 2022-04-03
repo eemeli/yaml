@@ -37,7 +37,7 @@ export function resolveFlowCollection(
     const props = resolveProps(start, {
       flow: fcName,
       indicator: 'explicit-key-ind',
-      next: key || sep?.[0],
+      next: key ?? sep?.[0],
       offset,
       onError,
       startOnNewline: false
@@ -92,7 +92,7 @@ export function resolveFlowCollection(
         }
         if (prevItemComment) {
           let prev = coll.items[coll.items.length - 1]
-          if (isPair(prev)) prev = prev.value || prev.key
+          if (isPair(prev)) prev = prev.value ?? prev.key
           if (prev.comment) prev.comment += '\n' + prevItemComment
           else prev.comment = prevItemComment
           props.comment = props.comment.substring(prevItemComment.length + 1)
@@ -120,7 +120,7 @@ export function resolveFlowCollection(
       if (isBlock(key)) onError(keyNode.range, 'BLOCK_IN_FLOW', blockMsg)
 
       // value properties
-      const valueProps = resolveProps(sep || [], {
+      const valueProps = resolveProps(sep ?? [], {
         flow: fcName,
         indicator: 'map-value-ind',
         next: value,
