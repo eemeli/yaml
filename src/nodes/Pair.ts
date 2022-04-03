@@ -43,7 +43,7 @@ export class Pair<K = unknown, V = unknown> {
   }
 
   toJSON(_?: unknown, ctx?: ToJSContext): ReturnType<typeof addPairToJSMap> {
-    const pair = ctx && ctx.mapAsMap ? new Map() : {}
+    const pair = ctx?.mapAsMap ? new Map() : {}
     return addPairToJSMap(ctx, pair, this)
   }
 
@@ -52,7 +52,7 @@ export class Pair<K = unknown, V = unknown> {
     onComment?: () => void,
     onChompKeep?: () => void
   ): string {
-    return ctx && ctx.doc
+    return ctx?.doc
       ? stringifyPair(this, ctx, onComment, onChompKeep)
       : JSON.stringify(this)
   }

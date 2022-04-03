@@ -199,8 +199,9 @@ function splitLines(source: string) {
   const split = source.split(/\n( *)/)
   const first = split[0]
   const m = first.match(/^( *)/)
-  const line0: [string, string] =
-    m && m[1] ? [m[1], first.slice(m[1].length)] : ['', first]
+  const line0: [string, string] = m?.[1]
+    ? [m[1], first.slice(m[1].length)]
+    : ['', first]
   const lines = [line0]
   for (let i = 1; i < split.length; i += 2) lines.push([split[i], split[i + 1]])
   return lines

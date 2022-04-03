@@ -26,7 +26,7 @@ export class YAMLOMap extends YAMLSeq {
   toJSON(_?: unknown, ctx?: ToJSContext) {
     if (!ctx) return super.toJSON(_)
     const map = new Map()
-    if (ctx && ctx.onCreate) ctx.onCreate(map)
+    if (ctx?.onCreate) ctx.onCreate(map)
     for (const pair of this.items) {
       let key, value
       if (isPair(pair)) {

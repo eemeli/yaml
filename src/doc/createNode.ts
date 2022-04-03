@@ -29,7 +29,7 @@ function findTagObject(
     if (!tagObj) throw new Error(`Tag ${tagName} not found`)
     return tagObj
   }
-  return tags.find(t => t.identify && t.identify(value) && !t.format)
+  return tags.find(t => t.identify?.(value) && !t.format)
 }
 
 export function createNode(
@@ -71,8 +71,7 @@ export function createNode(
     }
   }
 
-  if (tagName && tagName.startsWith('!!'))
-    tagName = defaultTagPrefix + tagName.slice(2)
+  if (tagName?.startsWith('!!')) tagName = defaultTagPrefix + tagName.slice(2)
 
   let tagObj = findTagObject(value, tagName, schema.tags)
   if (!tagObj) {

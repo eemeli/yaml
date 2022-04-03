@@ -62,7 +62,7 @@ visit.REMOVE = REMOVE as symbol
 visit.itemAtPath = (cst: Document | CollectionItem, path: VisitPath) => {
   let item: CollectionItem = cst
   for (const [field, index] of path) {
-    const tok = item && item[field]
+    const tok = item?.[field]
     if (tok && 'items' in tok) {
       item = tok.items[index]
     } else return undefined
@@ -78,7 +78,7 @@ visit.itemAtPath = (cst: Document | CollectionItem, path: VisitPath) => {
 visit.parentCollection = (cst: Document | CollectionItem, path: VisitPath) => {
   const parent = visit.itemAtPath(cst, path.slice(0, -1))
   const field = path[path.length - 1][0]
-  const coll = parent && parent[field]
+  const coll = parent?.[field]
   if (coll && 'items' in coll) return coll
   throw new Error('Parent collection not found')
 }

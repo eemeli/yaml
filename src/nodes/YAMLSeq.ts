@@ -92,7 +92,7 @@ export class YAMLSeq<T = unknown> extends Collection {
 
   toJSON(_?: unknown, ctx?: ToJSContext) {
     const seq: unknown[] = []
-    if (ctx && ctx.onCreate) ctx.onCreate(seq)
+    if (ctx?.onCreate) ctx.onCreate(seq)
     let i = 0
     for (const item of this.items) seq.push(toJS(item, String(i++), ctx))
     return seq

@@ -60,7 +60,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     } else _pair = new Pair(pair.key, pair.value)
 
     const prev = findPair(this.items, _pair.key)
-    const sortEntries = this.schema && this.schema.sortMapEntries
+    const sortEntries = this.schema?.sortMapEntries
     if (prev) {
       if (!overwrite) throw new Error(`Key ${_pair.key} already set`)
       // For scalars, keep the old node & its comments and anchors
@@ -85,7 +85,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
 
   get(key: K, keepScalar?: boolean) {
     const it = findPair(this.items, key)
-    const node = it && it.value
+    const node = it?.value
     return !keepScalar && isScalar(node) ? node.value : node
   }
 
@@ -107,8 +107,8 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     ctx?: ToJSContext,
     Type?: { new (): T }
   ): any {
-    const map = Type ? new Type() : ctx && ctx.mapAsMap ? new Map() : {}
-    if (ctx && ctx.onCreate) ctx.onCreate(map)
+    const map = Type ? new Type() : ctx?.mapAsMap ? new Map() : {}
+    if (ctx?.onCreate) ctx.onCreate(map)
     for (const item of this.items) addPairToJSMap(ctx, map, item)
     return map
   }

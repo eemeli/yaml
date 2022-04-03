@@ -47,6 +47,6 @@ export function toJS(value: any, arg: string | null, ctx?: ToJSContext): any {
     if (ctx.onCreate) ctx.onCreate(res)
     return res
   }
-  if (typeof value === 'bigint' && !(ctx && ctx.keep)) return Number(value)
+  if (typeof value === 'bigint' && !ctx?.keep) return Number(value)
   return value
 }
