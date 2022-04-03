@@ -54,7 +54,7 @@ export class Schema {
   }
 
   clone(): Schema {
-    const copy = Object.create(
+    const copy: Schema = Object.create(
       Schema.prototype,
       Object.getOwnPropertyDescriptors(this)
     )

@@ -54,7 +54,7 @@ export class Scalar<T = unknown> extends NodeBase {
     this.value = value
   }
 
-  toJSON(arg?: any, ctx?: ToJSContext) {
+  toJSON(arg?: any, ctx?: ToJSContext): any {
     return ctx && ctx.keep ? this.value : toJS(this.value, arg, ctx)
   }
 

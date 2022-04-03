@@ -11,7 +11,6 @@ import {
   ParsedNode
 } from './nodes/Node.js'
 import type { Pair } from './nodes/Pair.js'
-import type { Scalar } from './nodes/Scalar.js'
 import { parseAllDocuments } from './public-api.js'
 import { visit } from './visit.js'
 
@@ -126,7 +125,7 @@ function addEvents(
   } else {
     const scalar = scalarChar[String(node.type)]
     if (!scalar) throw new Error(`Unexpected node type ${node.type}`)
-    const value = (node as Scalar.Parsed).source
+    const value = node.source
       .replace(/\\/g, '\\\\')
       .replace(/\0/g, '\\0')
       .replace(/\x07/g, '\\a')

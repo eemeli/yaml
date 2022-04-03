@@ -214,5 +214,5 @@ export function resolveFlowCollection(
     coll.range = [fc.offset, cePos, cePos]
   }
 
-  return coll as YAMLMap.Parsed | YAMLSeq.Parsed
+  return coll
 }

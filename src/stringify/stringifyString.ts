@@ -285,7 +285,7 @@ function plainString(
     // - '\n ', ': ' or ' \n' anywhere
     // - '#' not preceded by a non-space char
     // - end with ' ' or ':'
-    return implicitKey || inFlow || value.indexOf('\n') === -1
+    return implicitKey || inFlow || !value.includes('\n')
       ? quotedString(value, ctx)
       : blockString(item, ctx, onComment, onChompKeep)
   }
@@ -293,7 +293,7 @@ function plainString(
     !implicitKey &&
     !inFlow &&
     type !== Scalar.PLAIN &&
-    value.indexOf('\n') !== -1
+    value.includes('\n')
   ) {
     // Where allowed & type not set explicitly, prefer block style for multiline strings
     return blockString(item, ctx, onComment, onChompKeep)

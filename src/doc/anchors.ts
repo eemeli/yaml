@@ -44,7 +44,7 @@ export function createNodeAnchors(doc: Document, prefix: string) {
   let prevAnchors: Set<string> | null = null
 
   return {
-    onAnchor(source: unknown) {
+    onAnchor: (source: unknown) => {
       aliasObjects.push(source)
       if (!prevAnchors) prevAnchors = anchorNames(doc)
       const anchor = findNewAnchor(prefix, prevAnchors)
@@ -57,7 +57,7 @@ export function createNodeAnchors(doc: Document, prefix: string) {
      * of its child nodes are. This is why anchors are set only after all of
      * the nodes have been created.
      */
-    setAnchors() {
+    setAnchors: () => {
       for (const source of aliasObjects) {
         const ref = sourceObjects.get(source)
         if (

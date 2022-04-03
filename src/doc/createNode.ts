@@ -11,7 +11,7 @@ const defaultTagPrefix = 'tag:yaml.org,2002:'
 export interface CreateNodeContext {
   aliasDuplicateObjects: boolean
   keepUndefined: boolean
-  onAnchor(source: unknown): string
+  onAnchor: (source: unknown) => string
   onTagObj?: (tagObj: ScalarTag | CollectionTag) => void
   sourceObjects: Map<unknown, { anchor: string | null; node: Node | null }>
   replacer?: Replacer
@@ -76,8 +76,10 @@ export function createNode(
 
   let tagObj = findTagObject(value, tagName, schema.tags)
   if (!tagObj) {
-    if (value && typeof (value as any).toJSON === 'function')
+    if (value && typeof (value as any).toJSON === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       value = (value as any).toJSON()
+    }
     if (!value || typeof value !== 'object') {
       const node = new Scalar(value)
       if (ref) ref.node = node
@@ -91,7 +93,7 @@ export function createNode(
         : schema[MAP]
   }
   if (onTagObj) {
-    onTagObj(tagObj as ScalarTag | CollectionTag)
+    onTagObj(tagObj)
     delete ctx.onTagObj
   }
 

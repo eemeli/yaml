@@ -102,7 +102,11 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
    * @param {Class} Type - If set, forces the returned collection type
    * @returns Instance of Type, Map, or Object
    */
-  toJSON(_?: unknown, ctx?: ToJSContext, Type?: any) {
+  toJSON<T = unknown>(
+    _?: unknown,
+    ctx?: ToJSContext,
+    Type?: { new (): T }
+  ): any {
     const map = Type ? new Type() : ctx && ctx.mapAsMap ? new Map() : {}
     if (ctx && ctx.onCreate) ctx.onCreate(map)
     for (const item of this.items) addPairToJSMap(ctx, map, item)

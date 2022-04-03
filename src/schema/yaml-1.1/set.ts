@@ -61,7 +61,7 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
     }
   }
 
-  toJSON(_?: unknown, ctx?: ToJSContext) {
+  toJSON(_?: unknown, ctx?: ToJSContext): any {
     return super.toJSON(_, ctx, Set)
   }
 

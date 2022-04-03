@@ -102,8 +102,7 @@ function getTagObject(tags: Array<ScalarTag | CollectionTag>, item: Node) {
   }
 
   if (!tagObj) {
-    // @ts-ignore
-    const name = obj && obj.constructor ? obj.constructor.name : typeof obj
+    const name = (obj as any)?.constructor?.name ?? typeof obj
     throw new Error(`Tag not resolved for ${name} value`)
   }
   return tagObj

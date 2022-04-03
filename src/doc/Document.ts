@@ -343,7 +343,7 @@ export class Document<T = unknown> {
    * boolean to add/remove the item from the set.
    */
   setIn(path: Iterable<unknown>, value: unknown) {
-    if (isEmptyPath(path)) this.contents = value as unknown as T
+    if (isEmptyPath(path)) this.contents = value as T
     else if (this.contents == null) {
       this.contents = collectionFromPath(
         this.schema,
@@ -413,7 +413,7 @@ export class Document<T = unknown> {
     maxAliasCount,
     onAnchor,
     reviver
-  }: ToJSOptions & { json?: boolean; jsonArg?: string | null } = {}) {
+  }: ToJSOptions & { json?: boolean; jsonArg?: string | null } = {}): any {
     const ctx: ToJSContext = {
       anchors: new Map(),
       doc: this,
@@ -437,7 +437,7 @@ export class Document<T = unknown> {
    * @param jsonArg Used by `JSON.stringify` to indicate the array index or
    *   property name.
    */
-  toJSON(jsonArg?: string | null, onAnchor?: ToJSOptions['onAnchor']) {
+  toJSON(jsonArg?: string | null, onAnchor?: ToJSOptions['onAnchor']): any {
     return this.toJS({ json: true, jsonArg, mapAsMap: false, onAnchor })
   }
 
