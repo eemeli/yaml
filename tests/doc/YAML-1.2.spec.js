@@ -1808,10 +1808,10 @@ for (const section in spec) {
         expect(json).toMatchObject(tgt)
         documents.forEach((doc, i) => {
           expect(doc.errors.map(err => err.message)).toMatchObject(
-            (errors && errors[i]) || []
+            errors?.[i] || []
           )
           expect(doc.warnings.map(err => err.message)).toMatchObject(
-            (warnings && warnings[i]) || []
+            warnings?.[i] || []
           )
           for (const err of doc.errors.concat(doc.warnings))
             expect(err).toBeInstanceOf(YAMLError)

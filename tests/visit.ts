@@ -233,7 +233,7 @@ for (const [visit_, title] of [
           'Cannot replace node with scalar parent'
         )
       } else {
-        expect(visit_(doc.contents, { Seq })).rejects.toMatchObject({
+        await expect(visit_(doc.contents, { Seq })).rejects.toMatchObject({
           message: 'Cannot replace node with scalar parent'
         })
       }

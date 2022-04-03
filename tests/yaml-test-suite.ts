@@ -1,10 +1,8 @@
-/* eslint-disable no-empty */
 import { existsSync, readdirSync, readFileSync } from 'fs'
 import { join, resolve } from 'path'
 
 import { CST, Document, Lexer, parseAllDocuments, Parser } from 'yaml'
-// @ts-ignore
-import { testEvents } from 'yaml/test-events'
+import { testEvents } from '../src/test-events' // no public export
 
 const skip: Record<string, boolean | string[]> = {
   '9MMA': ['errors'], // allow stream with directive & no docs
@@ -56,8 +54,8 @@ for (const dir of testDirs) {
     }
   }
   const test_ = (name: string, cb: () => void) => {
-    const sd = skip[dir.replace('\\', '/')]
-    if (sd === true || (sd && sd.includes(name))) test.skip(name, cb)
+    const sd = skip[dir.replace('\\', '/')] || null
+    if (sd === true || sd?.includes(name)) test.skip(name, cb)
     else test(name, cb)
   }
 

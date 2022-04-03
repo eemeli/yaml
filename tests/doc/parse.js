@@ -519,9 +519,8 @@ test('comment between key & : in flow collection (eemeli/yaml#149)', () => {
   expect(YAML.parse(src1)).toEqual({ a: 1 })
 
   const src2 = '{a\n#c\n:1}'
-  expect(async () => YAML.parse(src2)).rejects.toMatchObject({
-    code: 'MISSING_CHAR'
-  })
+  const doc = YAML.parseDocument(src2)
+  expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR' }])
 })
 
 describe('empty(ish) nodes', () => {

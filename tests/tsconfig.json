@@ -8,5 +8,5 @@
     },
     "rootDir": ".."
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "**/doc/*.js"]
 }

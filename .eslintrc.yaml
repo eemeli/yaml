@@ -1,7 +1,9 @@
 root: true
 parser: '@typescript-eslint/parser'
 parserOptions:
-  project: ./tsconfig.json
+  project:
+    - ./tsconfig.json
+    - ./tests/tsconfig.json
 env:
   node: true
 
@@ -47,3 +49,9 @@ overrides:
       jest: true
     rules:
       camelcase: 0
+      '@typescript-eslint/no-unsafe-return': off
+
+  - files: [tests/doc/**]
+    rules:
+      '@typescript-eslint/no-unsafe-call': off
+      '@typescript-eslint/unbound-method': off
