@@ -19,7 +19,7 @@ For more information, see the project's documentation site: [**eemeli.org/yaml**
 To install:
 
 ```sh
-npm install --save-exact yaml@next
+npm install yaml
 ```
 
 **Note:** These docs are for `yaml@2`. For v1, see the [v1.10.0 tag](https://github.com/eemeli/yaml/tree/v1.10.0) for the source and [eemeli.org/yaml/v1](https://eemeli.org/yaml/v1/) for the documentation.

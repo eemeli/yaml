@@ -3,9 +3,9 @@
 > To install:
 
 ```sh
-npm install --save-exact yaml@next
+npm install yaml
 # or
-yarn add --exact yaml@next
+yarn add yaml
 ```
 
 > To use:
