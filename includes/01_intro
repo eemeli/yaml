@@ -2,9 +2,9 @@
 <blockquote>
 <p>To install:</p>
 </blockquote>
-<div class="highlight"><pre class="highlight sh tab-shell"><code>npm <span class="nb">install</span> <span class="nt">--save-exact</span> yaml@next
+<div class="highlight"><pre class="highlight sh tab-shell"><code>npm <span class="nb">install </span>yaml
 <span class="c"># or</span>
-yarn add <span class="nt">--exact</span> yaml@next
+yarn add yaml
 </code></pre></div>
 <blockquote>
 <p>To use:</p>
