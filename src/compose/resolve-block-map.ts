@@ -52,14 +52,16 @@ export function resolveBlockMap(
         }
         continue
       }
-    } else if (keyProps.found?.indent !== bm.indent)
+      if (keyProps.hasNewlineAfterProp || containsNewline(key)) {
+        onError(
+          key ?? start[start.length - 1],
+          'MULTILINE_IMPLICIT_KEY',
+          'Implicit keys need to be on a single line'
+        )
+      }
+    } else if (keyProps.found?.indent !== bm.indent) {
       onError(offset, 'BAD_INDENT', startColMsg)
-    if (implicitKey && containsNewline(key))
-      onError(
-        key as Token, // checked by containsNewline()
-        'MULTILINE_IMPLICIT_KEY',
-        'Implicit keys need to be on a single line'
-      )
+    }
 
     // key value
     const keyStart = keyProps.end

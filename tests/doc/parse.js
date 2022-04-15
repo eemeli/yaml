@@ -300,6 +300,26 @@ test('comment between key & : in flow collection (eemeli/yaml#149)', () => {
   expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR' }])
 })
 
+describe('indented key with anchor (eemeli/yaml#378)', () => {
+  test('followed by value', () => {
+    const src1 = '&a foo: 1\n&b bar: 2'
+    expect(YAML.parse(src1)).toEqual({ foo: 1, bar: 2 })
+
+    const src2 = ' &a foo: 3\n &b bar: 4'
+    expect(YAML.parse(src2)).toEqual({ foo: 3, bar: 4 })
+  })
+
+  test('with : on separate line', () => {
+    const src1 = 'a: 1\n&b\nc: 2'
+    const doc1 = YAML.parseDocument(src1)
+    expect(doc1.errors).toMatchObject([{ code: 'MULTILINE_IMPLICIT_KEY' }])
+
+    const src2 = ' a: 1\n &b\n : 2'
+    const doc2 = YAML.parseDocument(src2)
+    expect(doc2.errors).toMatchObject([{ code: 'MULTILINE_IMPLICIT_KEY' }])
+  })
+})
+
 describe('empty(ish) nodes', () => {
   test('empty node position', () => {
     const doc = YAML.parseDocument('\r\na: # 123\r\n')

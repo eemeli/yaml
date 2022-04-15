@@ -20,6 +20,7 @@ export function resolveProps(
   let comment = ''
   let commentSep = ''
   let hasNewline = false
+  let hasNewlineAfterProp = false
   let reqSpace = false
   let anchor: SourceToken | null = null
   let tag: SourceToken | null = null
@@ -75,6 +76,7 @@ export function resolveProps(
         } else commentSep += token.source
         atNewline = true
         hasNewline = true
+        if (anchor || tag) hasNewlineAfterProp = true
         hasSpace = true
         break
       case 'anchor':
@@ -162,6 +164,7 @@ export function resolveProps(
     spaceBefore,
     comment,
     hasNewline,
+    hasNewlineAfterProp,
     anchor,
     tag,
     end,

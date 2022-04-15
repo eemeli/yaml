@@ -19,7 +19,7 @@ function includesToken(list: SourceToken[], type: SourceToken['type']) {
   return false
 }
 
-function includesNonEmpty(list: SourceToken[]) {
+function findNonEmptyIndex(list: SourceToken[]) {
   for (let i = 0; i < list.length; ++i) {
     switch (list[i].type) {
       case 'space':
@@ -27,10 +27,10 @@ function includesNonEmpty(list: SourceToken[]) {
       case 'newline':
         break
       default:
-        return true
+        return i
     }
   }
-  return false
+  return -1
 }
 
 function isFlowToken(
@@ -362,7 +362,7 @@ export class Parser {
           !last.sep &&
           !last.value &&
           last.start.length > 0 &&
-          !includesNonEmpty(last.start) &&
+          findNonEmptyIndex(last.start) === -1 &&
           (token.indent === 0 ||
             last.start.every(
               st => st.type !== 'comment' || st.indent < token.indent
@@ -411,7 +411,7 @@ export class Parser {
     if (doc.value) return yield* this.lineEnd(doc)
     switch (this.type) {
       case 'doc-start': {
-        if (includesNonEmpty(doc.start)) {
+        if (findNonEmptyIndex(doc.start) !== -1) {
           yield* this.pop()
           yield* this.step()
         } else doc.start.push(this.sourceToken)
@@ -490,6 +490,7 @@ export class Parser {
 
   private *blockMap(map: BlockMap) {
     const it = map.items[map.items.length - 1]
+
     // it.sep is true-ish if pair already has key or : separator
     switch (this.type) {
       case 'newline':
@@ -499,14 +500,19 @@ export class Parser {
           const last = Array.isArray(end) ? end[end.length - 1] : undefined
           if (last?.type === 'comment') end?.push(this.sourceToken)
           else map.items.push({ start: [this.sourceToken] })
-        } else if (it.sep) it.sep.push(this.sourceToken)
-        else it.start.push(this.sourceToken)
+        } else if (it.sep) {
+          it.sep.push(this.sourceToken)
+        } else {
+          it.start.push(this.sourceToken)
+        }
         return
       case 'space':
       case 'comment':
-        if (it.value) map.items.push({ start: [this.sourceToken] })
-        else if (it.sep) it.sep.push(this.sourceToken)
-        else {
+        if (it.value) {
+          map.items.push({ start: [this.sourceToken] })
+        } else if (it.sep) {
+          it.sep.push(this.sourceToken)
+        } else {
           if (this.atIndentedComment(it.start, map.indent)) {
             const prev = map.items[map.items.length - 2]
             const end = (prev?.value as { end: SourceToken[] })?.end
@@ -521,11 +527,9 @@ export class Parser {
         }
         return
     }
+
     if (this.indent >= map.indent) {
-      const atNextItem =
-        !this.onKeyLine &&
-        this.indent === map.indent &&
-        (it.sep || includesNonEmpty(it.start))
+      const atNextItem = !this.onKeyLine && this.indent === map.indent && it.sep
 
       // For empty nodes, assign newline-separated not indented empty tokens to following node
       let start: SourceToken[] = []
