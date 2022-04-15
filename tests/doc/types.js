@@ -3,6 +3,229 @@ import { Scalar, YAMLSeq } from 'yaml'
 import { seqTag, stringTag, stringifyString } from 'yaml/util'
 import { source } from '../_utils'
 
+describe('tags', () => {
+  describe('implicit tags', () => {
+    test('plain string', () => {
+      const doc = YAML.parseDocument('foo')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.value).toBe('foo')
+    })
+    test('quoted string', () => {
+      const doc = YAML.parseDocument('"foo"')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.value).toBe('foo')
+    })
+    test('flow map', () => {
+      const doc = YAML.parseDocument('{ foo }')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+    })
+    test('flow seq', () => {
+      const doc = YAML.parseDocument('[ foo ]')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+    })
+    test('block map', () => {
+      const doc = YAML.parseDocument('foo:\n')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+    })
+    test('block seq', () => {
+      const doc = YAML.parseDocument('- foo')
+      expect(doc.contents.tag).toBeUndefined()
+      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+    })
+  })
+
+  describe('explicit tags', () => {
+    test('plain string', () => {
+      const doc = YAML.parseDocument('!!str foo')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:str')
+      expect(doc.contents.value).toBe('foo')
+    })
+    test('quoted string', () => {
+      const doc = YAML.parseDocument('!!str "foo"')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:str')
+      expect(doc.contents.value).toBe('foo')
+    })
+    test('flow map', () => {
+      const doc = YAML.parseDocument('!!map { foo }')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:map')
+      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+    })
+    test('flow seq', () => {
+      const doc = YAML.parseDocument('!!seq [ foo ]')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
+      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+    })
+    test('block map', () => {
+      const doc = YAML.parseDocument('!!map\nfoo:\n')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:map')
+      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+    })
+    test('block seq', () => {
+      const doc = YAML.parseDocument('!!seq\n- foo')
+      expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
+      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+    })
+  })
+
+  describe('invalid tags', () => {
+    for (const tag of [
+      '!t`ag x',
+      '!t^ag x',
+      '!t\\ag x',
+      '!t<ag x',
+      '!t>ag x',
+      '!t,ag x',
+      '!t"ag x'
+    ]) {
+      test(`invalid tag: ${tag}`, () => {
+        const doc = YAML.parseDocument(tag)
+        expect(doc.errors).not.toHaveLength(0)
+        expect(doc.errors[0].code).toBe('MISSING_CHAR')
+      })
+    }
+  })
+
+  test('eemeli/yaml#97', () => {
+    const doc = YAML.parseDocument('foo: !!float 3.0')
+    expect(String(doc)).toBe('foo: !!float 3.0\n')
+  })
+})
+
+describe('number types', () => {
+  describe('intAsBigInt: false', () => {
+    test('Version 1.1', () => {
+      const src = `
+- 0b10_10
+- 0123
+- -00
+- 123_456
+- 3.1e+2
+- 5.1_2_3E-1
+- 4.02
+- 4.20
+- .42
+- 00.4`
+      const doc = YAML.parseDocument(src, {
+        intAsBigInt: false,
+        version: '1.1'
+      })
+      expect(doc.contents.items).toMatchObject([
+        { value: 10, format: 'BIN' },
+        { value: 83, format: 'OCT' },
+        { value: -0, format: 'OCT' },
+        { value: 123456 },
+        { value: 310, format: 'EXP' },
+        { value: 0.5123, format: 'EXP' },
+        { value: 4.02 },
+        { value: 4.2, minFractionDigits: 2 },
+        { value: 0.42 },
+        { value: 0.4 }
+      ])
+      expect(doc.contents.items[3]).not.toHaveProperty('format')
+      expect(doc.contents.items[6]).not.toHaveProperty('format')
+      expect(doc.contents.items[6]).not.toHaveProperty('minFractionDigits')
+      expect(doc.contents.items[7]).not.toHaveProperty('format')
+    })
+
+    test('Version 1.2', () => {
+      const src = `
+- 0o123
+- 0o0
+- 123456
+- 3.1e+2
+- 5.123E-1
+- 4.02
+- 4.20
+- .42
+- 00.4`
+      const doc = YAML.parseDocument(src, {
+        intAsBigInt: false,
+        version: '1.2'
+      })
+      expect(doc.contents.items).toMatchObject([
+        { value: 83, format: 'OCT' },
+        { value: 0, format: 'OCT' },
+        { value: 123456 },
+        { value: 310, format: 'EXP' },
+        { value: 0.5123, format: 'EXP' },
+        { value: 4.02 },
+        { value: 4.2, minFractionDigits: 2 },
+        { value: 0.42 },
+        { value: 0.4 }
+      ])
+      expect(doc.contents.items[2]).not.toHaveProperty('format')
+      expect(doc.contents.items[5]).not.toHaveProperty('format')
+      expect(doc.contents.items[5]).not.toHaveProperty('minFractionDigits')
+      expect(doc.contents.items[6]).not.toHaveProperty('format')
+    })
+  })
+
+  describe('intAsBigInt: true', () => {
+    test('Version 1.1', () => {
+      const src = `
+- 0b10_10
+- 0123
+- -00
+- 123_456
+- 3.1e+2
+- 5.1_2_3E-1
+- 4.02`
+      const doc = YAML.parseDocument(src, { intAsBigInt: true, version: '1.1' })
+      expect(doc.contents.items).toMatchObject([
+        { value: 10n, format: 'BIN' },
+        { value: 83n, format: 'OCT' },
+        { value: 0n, format: 'OCT' },
+        { value: 123456n },
+        { value: 310, format: 'EXP' },
+        { value: 0.5123, format: 'EXP' },
+        { value: 4.02 }
+      ])
+      expect(doc.contents.items[3]).not.toHaveProperty('format')
+      expect(doc.contents.items[6]).not.toHaveProperty('format')
+      expect(doc.contents.items[6]).not.toHaveProperty('minFractionDigits')
+    })
+
+    test('Version 1.2', () => {
+      const src = `
+- 0o123
+- 0o0
+- 123456
+- 3.1e+2
+- 5.123E-1
+- 4.02`
+      const doc = YAML.parseDocument(src, { intAsBigInt: true, version: '1.2' })
+      expect(doc.contents.items).toMatchObject([
+        { value: 83n, format: 'OCT' },
+        { value: 0n, format: 'OCT' },
+        { value: 123456n },
+        { value: 310, format: 'EXP' },
+        { value: 0.5123, format: 'EXP' },
+        { value: 4.02 }
+      ])
+      expect(doc.contents.items[2]).not.toHaveProperty('format')
+      expect(doc.contents.items[5]).not.toHaveProperty('format')
+      expect(doc.contents.items[5]).not.toHaveProperty('minFractionDigits')
+    })
+  })
+})
+
+test('eemeli/yaml#2', () => {
+  const src = `
+aliases:
+  - docker:
+      - image: circleci/node:8.11.2
+  - key: repository-{{ .Revision }}\n`
+  expect(YAML.parse(src)).toMatchObject({
+    aliases: [
+      { docker: [{ image: 'circleci/node:8.11.2' }] },
+      { key: 'repository-{{ .Revision }}' }
+    ]
+  })
+})
+
 describe('json schema', () => {
   test('!!bool', () => {
     const src = `"canonical": true
