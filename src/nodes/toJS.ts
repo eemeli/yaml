@@ -5,7 +5,6 @@ import { hasAnchor, Node } from './Node.js'
 export interface AnchorData {
   aliasCount: number
   count: number
-  res: unknown
 }
 
 export interface ToJSContext {
@@ -16,6 +15,7 @@ export interface ToJSContext {
   mapKeyWarned: boolean
   maxAliasCount: number
   onCreate?: (res: unknown) => void
+  resolved: WeakMap<Node, unknown>
 
   /** Requiring this directly in Pair would create circular dependencies */
   stringify: typeof stringify
@@ -35,16 +35,17 @@ export function toJS(value: any, arg: string | null, ctx?: ToJSContext): any {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   if (Array.isArray(value)) return value.map((v, i) => toJS(v, String(i), ctx))
   if (value && typeof value.toJSON === 'function') {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    if (!ctx || !hasAnchor(value)) return value.toJSON(arg, ctx)
-    const data: AnchorData = { aliasCount: 0, count: 1, res: undefined }
-    ctx.anchors.set(value, data)
-    ctx.onCreate = res => {
-      data.res = res
-      delete ctx.onCreate
+    if (ctx) {
+      if (hasAnchor(value)) ctx.anchors.set(value, { aliasCount: 0, count: 1 })
+      ctx.onCreate = res => {
+        ctx.onCreate = undefined
+        ctx.resolved.set(value, res)
+      }
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const res = value.toJSON(arg, ctx)
-    if (ctx.onCreate) ctx.onCreate(res)
+    if (ctx?.onCreate) ctx.onCreate(res)
     return res
   }
   if (typeof value === 'bigint' && !ctx?.keep) return Number(value)
