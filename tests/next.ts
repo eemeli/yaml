@@ -53,3 +53,24 @@ describe('relative-path alias', () => {
     expect(() => doc.toJS()).toThrow(ReferenceError)
   })
 })
+
+describe('unique anchors', () => {
+  test('repeats are fine without flag', () => {
+    const src = source`
+      - &a 1
+      - &a 2
+      - *a
+    `
+    expect(parse(src)).toEqual([1, 2, 2])
+  })
+
+  test("repeats are an error with 'next'", () => {
+    const src = source`
+      - &a 1
+      - &a 2
+      - *a
+    `
+    const doc = parseDocument(src, { version: 'next' })
+    expect(doc.errors).toMatchObject([{ code: 'DUPLICATE_ANCHOR' }])
+  })
+})

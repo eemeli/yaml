@@ -24,6 +24,7 @@ export function composeDoc(
   const opts = Object.assign({ _directives: directives }, options)
   const doc = new Document(undefined, opts) as Document.Parsed
   const ctx: ComposeContext = {
+    anchors: options.version === 'next' ? new Map() : null,
     atRoot: true,
     directives: doc.directives,
     options: doc.options,
