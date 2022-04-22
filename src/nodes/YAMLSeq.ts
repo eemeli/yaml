@@ -56,17 +56,16 @@ export class YAMLSeq<T = unknown> extends Collection {
    * `key` must contain a representation of an integer for this to succeed.
    * It may be wrapped in a `Scalar`.
    */
-  get<S extends T = T>(key: unknown, keepScalar: true): Scalar<S> | undefined
-  get<S extends T = T>(key: unknown, keepScalar?: false): S | undefined
-  get<S extends T = T>(
+  get(key: unknown, keepScalar: true): Scalar<T> | undefined
+  get(key: unknown, keepScalar?: boolean): T | undefined
+  get(
     key: unknown,
     keepScalar?: boolean
-  ): S | Scalar<S> | undefined
-  get(key: unknown, keepScalar?: boolean) {
+  ): T | Scalar<T> | undefined {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number') return undefined
     const it = this.items[idx]
-    return !keepScalar && isScalar(it) ? it.value : it
+    return !keepScalar && isScalar<T>(it) ? it.value : it
   }
 
   /**

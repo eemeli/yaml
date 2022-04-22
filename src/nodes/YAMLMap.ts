@@ -83,12 +83,12 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     return del.length > 0
   }
 
-  get<T extends V = V>(key: unknown, keepScalar: true): Scalar<T> | undefined
-  get<T extends V = V>(key: unknown, keepScalar?: false): T | undefined
-  get<T extends V = V>(
+  get(key: unknown, keepScalar: true): Scalar<V> | undefined
+  get(key: unknown, keepScalar?: boolean): V | undefined
+  get(
     key: unknown,
     keepScalar?: boolean
-  ): T | Scalar<T> | undefined
+  ): V | Scalar<V> | undefined
   get(key: unknown, keepScalar?: boolean) {
     const it = findPair(this.items, key)
     const node = it?.value

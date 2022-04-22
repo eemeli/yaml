@@ -8,7 +8,9 @@ import {
   YAMLMap,
   YAMLOMap,
   YAMLSeq,
-  YAMLSet
+  YAMLSet,
+  isSeq,
+  isMap
 } from 'yaml'
 
 describe('Map', () => {
@@ -57,7 +59,11 @@ describe('Map', () => {
   test('get with value', () => {
     expect(map.get('a')).toBe(1)
     expect(map.get('a', true)).toMatchObject({ value: 1 })
-    expect(map.get<YAMLMap<string, number>>('b')?.toJSON()).toMatchObject({
+    const subMap = map.get('b')
+    if (!isMap<string, number>(subMap)) {
+      throw new Error('Expected subMap to be a Map')
+    }
+    expect(subMap.toJSON()).toMatchObject({
       c: 3,
       d: 4
     })
@@ -67,9 +73,11 @@ describe('Map', () => {
   test('get with node', () => {
     expect(map.get(doc.createNode('a'))).toBe(1)
     expect(map.get(doc.createNode('a'), true)).toMatchObject({ value: 1 })
-    expect(
-      map.get<YAMLMap<string, number>>(doc.createNode('b'))?.toJSON()
-    ).toMatchObject({ c: 3, d: 4 })
+    const subMap = map.get(doc.createNode('b'))
+    if (!isMap<string, number>(subMap)) {
+      throw new Error('Expected subMap to be a Map')
+    }
+    expect(subMap.toJSON()).toMatchObject({ c: 3, d: 4 })
     expect(map.get(doc.createNode('c'))).toBeUndefined()
   })
 
@@ -151,9 +159,11 @@ describe('Seq', () => {
     expect(seq.get(0)).toBe(1)
     expect(seq.get('0')).toBe(1)
     expect(seq.get(0, true)).toMatchObject({ value: 1 })
-    expect(
-      seq.get<YAMLSeq<number | Scalar<number>>>(1)?.toJSON()
-    ).toMatchObject([2, 3])
+    const subSeq = seq.get(1)
+    if (!isSeq<number>(subSeq)) {
+      throw new Error('not a seq')
+    }
+    expect(subSeq.toJSON()).toMatchObject([2, 3])
     expect(seq.get(2)).toBeUndefined()
   })
 
@@ -161,9 +171,11 @@ describe('Seq', () => {
     expect(seq.get(doc.createNode(0))).toBe(1)
     expect(seq.get(doc.createNode('0'))).toBe(1)
     expect(seq.get(doc.createNode(0), true)).toMatchObject({ value: 1 })
-    expect(
-      seq.get<YAMLSeq<number | Scalar<number>>>(doc.createNode(1))?.toJSON()
-    ).toMatchObject([2, 3])
+    const subSeq = seq.get(doc.createNode(1))
+    if (!isSeq<number>(subSeq)) {
+      throw new Error('not a seq')
+    }
+    expect(subSeq.toJSON()).toMatchObject([2, 3])
     expect(seq.get(doc.createNode(2))).toBeUndefined()
   })
 
@@ -301,7 +313,11 @@ describe('OMap', () => {
   test('get', () => {
     expect(omap.get('a')).toBe(1)
     expect(omap.get('a', true)).toMatchObject({ value: 1 })
-    expect(omap.get('b').toJSON()).toMatchObject({ c: 3, d: 4 })
+    const subMap = omap.get('b')
+    if (!isMap(subMap)) {
+      throw new Error('Expected subMap to be a map')
+    }
+    expect(subMap.toJSON()).toMatchObject({ c: 3, d: 4 })
     expect(omap.get('c')).toBeUndefined()
   })
 
@@ -342,7 +358,11 @@ describe('Collection', () => {
     expect(() => map.addIn(['a'], -1)).toThrow(/Expected YAML collection/)
     map.addIn(['b', 3], 6)
     expect(map.items).toHaveLength(3)
-    expect(map.get<YAMLSeq<Scalar<number>>>('b')?.items).toHaveLength(4)
+    const seq = map.getIn(['b'])
+    if (!isSeq(seq)) {
+      throw new Error('Expected seq to be a seq')
+    }
+    expect(seq.items).toHaveLength(4)
   })
 
   test('deleteIn', () => {
@@ -354,7 +374,11 @@ describe('Collection', () => {
     expect(map.deleteIn(['b', 2])).toBe(false)
     expect(() => map.deleteIn(['a', 'e'])).toThrow(/Expected YAML collection/)
     expect(map.items).toHaveLength(1)
-    expect(map.get<YAMLSeq<Scalar<number>>>('b')?.items).toHaveLength(1)
+    const subSeq = map.getIn(['b'])
+    if (!isSeq(subSeq)) {
+      throw new Error('Expected subSeq to be a seq')
+    }
+    expect(subSeq.items).toHaveLength(1)
   })
 
   test('getIn', () => {
@@ -391,7 +415,11 @@ describe('Collection', () => {
     expect(map.getIn(['e', 'e'])).toBe(7)
     expect(() => map.setIn(['a', 'e'], 8)).toThrow(/Expected YAML collection/)
     expect(map.items).toHaveLength(4)
-    expect(map.get<YAMLSeq<Scalar<number>>>('b')?.items).toHaveLength(3)
+    const subSeq = map.getIn(['b'])
+    if (!isSeq(subSeq)) {
+      throw new Error('Expected subSeq to be a seq')
+    }
+    expect(subSeq.items).toHaveLength(3)
   })
 })
 

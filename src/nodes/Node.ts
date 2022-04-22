@@ -14,12 +14,12 @@ export type Node<T = unknown> =
   | YAMLSeq<T>
 
 /** Utility type mapper */
-export type NodeType<T> = T extends string | number | bigint | boolean | null
-  ? Scalar<T>
-  : T extends Array<any>
-  ? YAMLSeq<NodeType<T[number]>>
-  : T extends { [key: string | number]: any }
-  ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
+export type NodeType<TValue> = TValue extends string | number | bigint | boolean | null
+  ? Scalar<TValue>
+  : TValue extends Array<any>
+  ? YAMLSeq<NodeType<TValue[number]>>
+  : TValue extends { [key: string | number]: any }
+  ? YAMLMap<NodeType<keyof TValue>, NodeType<TValue[keyof TValue]>>
   : Node
 
 export type ParsedNode =

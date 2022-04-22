@@ -193,7 +193,7 @@ export class Document<T extends Node = Node> {
    * Convert any value into a `Node` using the current schema, recursively
    * turning objects into collections.
    */
-  createNode<T = unknown>(value: T, options?: CreateNodeOptions): NodeType<T>
+  createNode<TValue = unknown>(value: TValue, options?: CreateNodeOptions): NodeType<TValue>
   createNode<T = unknown>(
     value: T,
     replacer: Replacer | CreateNodeOptions | null,
