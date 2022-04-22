@@ -5,7 +5,7 @@ import { stringifyCollection } from '../stringify/stringifyCollection.js'
 import { Collection } from './Collection.js'
 import { isScalar, ParsedNode, Range, SEQ } from './Node.js'
 import type { Pair } from './Pair.js'
-import { isScalarValue } from './Scalar.js'
+import { isScalarValue, Scalar } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
 
 export declare namespace YAMLSeq {
@@ -29,7 +29,7 @@ export class YAMLSeq<T = unknown> extends Collection {
     super(SEQ, schema)
   }
 
-  add(value: T) {
+  add(value: T): void {
     this.items.push(value)
   }
 
@@ -41,7 +41,7 @@ export class YAMLSeq<T = unknown> extends Collection {
    *
    * @returns `true` if the item was found and removed.
    */
-  delete(key: unknown) {
+  delete(key: unknown): boolean {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number') return false
     const del = this.items.splice(idx, 1)
@@ -56,6 +56,12 @@ export class YAMLSeq<T = unknown> extends Collection {
    * `key` must contain a representation of an integer for this to succeed.
    * It may be wrapped in a `Scalar`.
    */
+  get<S extends T = T>(key: unknown, keepScalar: true): Scalar<S> | undefined
+  get<S extends T = T>(key: unknown, keepScalar?: false): S | undefined
+  get<S extends T = T>(
+    key: unknown,
+    keepScalar?: boolean
+  ): S | Scalar<S> | undefined
   get(key: unknown, keepScalar?: boolean) {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number') return undefined
@@ -69,7 +75,7 @@ export class YAMLSeq<T = unknown> extends Collection {
    * `key` must contain a representation of an integer for this to succeed.
    * It may be wrapped in a `Scalar`.
    */
-  has(key: unknown) {
+  has(key: unknown): boolean {
     const idx = asItemIndex(key)
     return typeof idx === 'number' && idx < this.items.length
   }
@@ -81,7 +87,7 @@ export class YAMLSeq<T = unknown> extends Collection {
    * If `key` does not contain a representation of an integer, this will throw.
    * It may be wrapped in a `Scalar`.
    */
-  set(key: unknown, value: T) {
+  set(key: unknown, value: T): void {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number')
       throw new Error(`Expected a valid index, not ${key}.`)
