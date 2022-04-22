@@ -7,6 +7,7 @@ import {
   isNode,
   isScalar,
   Node,
+  NodeType,
   NODE_TYPE,
   ParsedNode,
   Range
@@ -41,7 +42,7 @@ export declare namespace Document {
   }
 }
 
-export class Document<T = unknown> {
+export class Document<T extends Node = Node> {
   readonly [NODE_TYPE]: symbol
 
   /** A comment before this Document */
@@ -192,12 +193,12 @@ export class Document<T = unknown> {
    * Convert any value into a `Node` using the current schema, recursively
    * turning objects into collections.
    */
-  createNode(value: unknown, options?: CreateNodeOptions): Node
-  createNode(
-    value: unknown,
+  createNode<T = unknown>(value: T, options?: CreateNodeOptions): NodeType<T>
+  createNode<T = unknown>(
+    value: T,
     replacer: Replacer | CreateNodeOptions | null,
     options?: CreateNodeOptions
-  ): Node
+  ): NodeType<T>
   createNode(
     value: unknown,
     replacer?: Replacer | CreateNodeOptions | null,

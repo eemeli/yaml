@@ -320,7 +320,7 @@ function replaceNode(
     if (key === 'key') parent.key = node
     else parent.value = node
   } else if (isDocument(parent)) {
-    parent.contents = node
+    parent.contents = node as Node
   } else {
     const pt = isAlias(parent) ? 'alias' : 'scalar'
     throw new Error(`Cannot replace node with ${pt} parent`)

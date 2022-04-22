@@ -13,6 +13,15 @@ export type Node<T = unknown> =
   | YAMLMap<unknown, T>
   | YAMLSeq<T>
 
+/** Utility type mapper */
+export type NodeType<T> = T extends string | number | bigint | boolean | null
+  ? Scalar<T>
+  : T extends Array<any>
+  ? YAMLSeq<NodeType<T[number]>>
+  : T extends { [key: string | number]: any }
+  ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
+  : Node
+
 export type ParsedNode =
   | Alias.Parsed
   | Scalar.Parsed
@@ -32,7 +41,9 @@ export const NODE_TYPE = Symbol.for('yaml.node.type')
 export const isAlias = (node: any): node is Alias =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === ALIAS
 
-export const isDocument = <T = unknown>(node: any): node is Document<T> =>
+export const isDocument = <T extends Node = Node>(
+  node: any
+): node is Document<T> =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === DOC
 
 export const isMap = <K = unknown, V = unknown>(
