@@ -48,6 +48,8 @@ export {
 
 export type { TagId, Tags } from './schema/tags'
 export type { CollectionTag, ScalarTag } from './schema/types'
+export type { YAMLOMap } from './schema/yaml-1.1/omap'
+export type { YAMLSet } from './schema/yaml-1.1/set'
 
 export {
   asyncVisitor,
