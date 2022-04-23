@@ -36,8 +36,11 @@ export function collectionFromPath(
   })
 }
 
-// null, undefined, or an empty non-string iterable (e.g. [])
-export const isEmptyPath = (path: Iterable<unknown> | null | undefined) =>
+// Type guard is intentionally a little wrong so as to be more useful,
+// as it does not cover untypable empty non-string iterables (e.g. []).
+export const isEmptyPath = (
+  path: Iterable<unknown> | null | undefined
+): path is null | undefined =>
   path == null ||
   (typeof path === 'object' && !!path[Symbol.iterator]().next().done)
 

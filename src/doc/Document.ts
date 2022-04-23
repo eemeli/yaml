@@ -7,6 +7,7 @@ import {
   isNode,
   isScalar,
   Node,
+  NodeType,
   NODE_TYPE,
   ParsedNode,
   Range
@@ -41,7 +42,7 @@ export declare namespace Document {
   }
 }
 
-export class Document<T = unknown> {
+export class Document<T extends Node = Node> {
   readonly [NODE_TYPE]: symbol
 
   /** A comment before this Document */
@@ -192,12 +193,12 @@ export class Document<T = unknown> {
    * Convert any value into a `Node` using the current schema, recursively
    * turning objects into collections.
    */
-  createNode(value: unknown, options?: CreateNodeOptions): Node
-  createNode(
-    value: unknown,
+  createNode<T = unknown>(value: T, options?: CreateNodeOptions): NodeType<T>
+  createNode<T = unknown>(
+    value: T,
     replacer: Replacer | CreateNodeOptions | null,
     options?: CreateNodeOptions
-  ): Node
+  ): NodeType<T>
   createNode(
     value: unknown,
     replacer?: Replacer | CreateNodeOptions | null,
@@ -264,7 +265,7 @@ export class Document<T = unknown> {
    * Removes a value from the document.
    * @returns `true` if the item was found and removed.
    */
-  delete(key: any) {
+  delete(key: unknown): boolean {
     return assertCollection(this.contents) ? this.contents.delete(key) : false
   }
 
@@ -272,7 +273,7 @@ export class Document<T = unknown> {
    * Removes a value from the document.
    * @returns `true` if the item was found and removed.
    */
-  deleteIn(path: Iterable<unknown>) {
+  deleteIn(path: Iterable<unknown> | null): boolean {
     if (isEmptyPath(path)) {
       if (this.contents == null) return false
       this.contents = null
@@ -288,7 +289,7 @@ export class Document<T = unknown> {
    * scalar values from their surrounding node; to disable set `keepScalar` to
    * `true` (collections are always returned intact).
    */
-  get(key: unknown, keepScalar?: boolean) {
+  get(key: unknown, keepScalar?: boolean): unknown {
     return isCollection(this.contents)
       ? this.contents.get(key, keepScalar)
       : undefined
@@ -299,7 +300,7 @@ export class Document<T = unknown> {
    * scalar values from their surrounding node; to disable set `keepScalar` to
    * `true` (collections are always returned intact).
    */
-  getIn(path: Iterable<unknown>, keepScalar?: boolean) {
+  getIn(path: Iterable<unknown> | null, keepScalar?: boolean): unknown {
     if (isEmptyPath(path))
       return !keepScalar && isScalar(this.contents)
         ? this.contents.value
@@ -312,14 +313,14 @@ export class Document<T = unknown> {
   /**
    * Checks if the document includes a value with the key `key`.
    */
-  has(key: unknown) {
+  has(key: unknown): boolean {
     return isCollection(this.contents) ? this.contents.has(key) : false
   }
 
   /**
    * Checks if the document includes a value at `path`.
    */
-  hasIn(path: Iterable<unknown>) {
+  hasIn(path: Iterable<unknown> | null): boolean {
     if (isEmptyPath(path)) return this.contents !== undefined
     return isCollection(this.contents) ? this.contents.hasIn(path) : false
   }
@@ -328,7 +329,7 @@ export class Document<T = unknown> {
    * Sets a value in this document. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    */
-  set(key: any, value: unknown) {
+  set(key: any, value: unknown): void {
     if (this.contents == null) {
       this.contents = collectionFromPath(
         this.schema,
@@ -344,7 +345,7 @@ export class Document<T = unknown> {
    * Sets a value in this document. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    */
-  setIn(path: Iterable<unknown>, value: unknown) {
+  setIn(path: Iterable<unknown> | null, value: unknown): void {
     if (isEmptyPath(path)) this.contents = value as T
     else if (this.contents == null) {
       this.contents = collectionFromPath(

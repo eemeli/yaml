@@ -6,7 +6,7 @@ import { addPairToJSMap } from './addPairToJSMap.js'
 import { Collection } from './Collection.js'
 import { isPair, isScalar, MAP, ParsedNode, Range } from './Node.js'
 import { Pair } from './Pair.js'
-import { isScalarValue } from './Scalar.js'
+import { isScalarValue, Scalar } from './Scalar.js'
 import type { ToJSContext } from './toJS.js'
 
 export function findPair<K = unknown, V = unknown>(
@@ -51,12 +51,12 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
    * @param overwrite - If not set `true`, using a key that is already in the
    *   collection will throw. Otherwise, overwrites the previous value.
    */
-  add(pair: Pair<K, V> | { key: K; value: V }, overwrite?: boolean) {
+  add(pair: Pair<K, V> | { key: K; value: V }, overwrite?: boolean): void {
     let _pair: Pair<K, V>
     if (isPair(pair)) _pair = pair
     else if (!pair || typeof pair !== 'object' || !('key' in pair)) {
       // In TypeScript, this never happens.
-      _pair = new Pair<K, V>(pair as any, (pair as any).value)
+      _pair = new Pair<K, V>(pair as any, (pair as any)?.value)
     } else _pair = new Pair(pair.key, pair.value)
 
     const prev = findPair(this.items, _pair.key)
@@ -76,24 +76,27 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
     }
   }
 
-  delete(key: K) {
+  delete(key: unknown): boolean {
     const it = findPair(this.items, key)
     if (!it) return false
     const del = this.items.splice(this.items.indexOf(it), 1)
     return del.length > 0
   }
 
-  get(key: K, keepScalar?: boolean) {
+  get(key: unknown, keepScalar: true): Scalar<V> | undefined
+  get(key: unknown, keepScalar?: false): V | undefined
+  get(key: unknown, keepScalar?: boolean): V | Scalar<V> | undefined
+  get(key: unknown, keepScalar?: boolean): V | Scalar<V> | undefined {
     const it = findPair(this.items, key)
     const node = it?.value
-    return !keepScalar && isScalar(node) ? node.value : node
+    return (!keepScalar && isScalar<V>(node) ? node.value : node) ?? undefined
   }
 
-  has(key: K) {
+  has(key: unknown): boolean {
     return !!findPair(this.items, key)
   }
 
-  set(key: K, value: V) {
+  set(key: K, value: V): void {
     this.add(new Pair(key, value), true)
   }
 

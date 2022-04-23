@@ -7,7 +7,20 @@ import type { Scalar } from './Scalar.js'
 import type { YAMLMap } from './YAMLMap.js'
 import type { YAMLSeq } from './YAMLSeq.js'
 
-export type Node = Alias | Scalar | YAMLMap | YAMLSeq
+export type Node<T = unknown> =
+  | Alias
+  | Scalar<T>
+  | YAMLMap<unknown, T>
+  | YAMLSeq<T>
+
+/** Utility type mapper */
+export type NodeType<T> = T extends string | number | bigint | boolean | null
+  ? Scalar<T>
+  : T extends Array<any>
+  ? YAMLSeq<NodeType<T[number]>>
+  : T extends { [key: string | number]: any }
+  ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
+  : Node
 
 export type ParsedNode =
   | Alias.Parsed
@@ -28,22 +41,30 @@ export const NODE_TYPE = Symbol.for('yaml.node.type')
 export const isAlias = (node: any): node is Alias =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === ALIAS
 
-export const isDocument = (node: any): node is Document =>
+export const isDocument = <T extends Node = Node>(
+  node: any
+): node is Document<T> =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === DOC
 
-export const isMap = (node: any): node is YAMLMap =>
+export const isMap = <K = unknown, V = unknown>(
+  node: any
+): node is YAMLMap<K, V> =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === MAP
 
-export const isPair = (node: any): node is Pair =>
+export const isPair = <K = unknown, V = unknown>(
+  node: any
+): node is Pair<K, V> =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === PAIR
 
-export const isScalar = (node: any): node is Scalar =>
+export const isScalar = <T = unknown>(node: any): node is Scalar<T> =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === SCALAR
 
-export const isSeq = (node: any): node is YAMLSeq =>
+export const isSeq = <T = unknown>(node: any): node is YAMLSeq<T> =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === SEQ
 
-export function isCollection(node: any): node is YAMLMap | YAMLSeq {
+export function isCollection<K = unknown, V = unknown>(
+  node: any
+): node is YAMLMap<K, V> | YAMLSeq<V> {
   if (node && typeof node === 'object')
     switch (node[NODE_TYPE]) {
       case MAP:
@@ -53,7 +74,7 @@ export function isCollection(node: any): node is YAMLMap | YAMLSeq {
   return false
 }
 
-export function isNode(node: any): node is Node {
+export function isNode<T = unknown>(node: any): node is Node<T> {
   if (node && typeof node === 'object')
     switch (node[NODE_TYPE]) {
       case ALIAS:
@@ -65,7 +86,9 @@ export function isNode(node: any): node is Node {
   return false
 }
 
-export const hasAnchor = (node: unknown): node is Scalar | YAMLMap | YAMLSeq =>
+export const hasAnchor = <K = unknown, V = unknown>(
+  node: unknown
+): node is Scalar<V> | YAMLMap<K, V> | YAMLSeq<V> =>
   (isScalar(node) || isCollection(node)) && !!node.anchor
 
 export abstract class NodeBase {

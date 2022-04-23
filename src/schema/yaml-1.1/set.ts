@@ -35,7 +35,11 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
     if (!prev) this.items.push(pair)
   }
 
-  get(key?: T, keepPair?: boolean) {
+  /**
+   * If `keepPair` is `true`, returns the Pair matching `key`.
+   * Otherwise, returns the value of that Pair's key.
+   */
+  get(key: unknown, keepPair?: boolean): any {
     const pair = findPair(this.items, key)
     return !keepPair && isPair(pair)
       ? isScalar(pair.key)
@@ -46,7 +50,7 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
 
   set(key: T, value: boolean): void
 
-  /** Will throw; `value` must be boolean */
+  /** @deprecated Will throw; `value` must be boolean */
   set(key: T, value: null): void
   set(key: T, value: boolean | null) {
     if (typeof value !== 'boolean')
