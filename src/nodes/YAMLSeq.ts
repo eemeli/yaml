@@ -57,7 +57,11 @@ export class YAMLSeq<T = unknown> extends Collection {
    * It may be wrapped in a `Scalar`.
    */
   get(key: unknown, keepScalar: true): Scalar<T> | undefined
-  get(key: unknown, keepScalar?: boolean): T | undefined
+  get(key: unknown, keepScalar?: false): T | undefined
+  get(
+    key: unknown,
+    keepScalar?: boolean
+  ): T | Scalar<T> | undefined
   get(
     key: unknown,
     keepScalar?: boolean
