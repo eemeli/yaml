@@ -28,7 +28,7 @@ export type ParsedNode =
   | YAMLMap.Parsed
   | YAMLSeq.Parsed
 
-export type Range = [number, number, number]
+export type Range = [start: number, valueEnd: number, nodeEnd: number]
 
 export const ALIAS = Symbol.for('yaml.alias')
 export const DOC = Symbol.for('yaml.document')
