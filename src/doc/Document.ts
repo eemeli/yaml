@@ -62,7 +62,7 @@ export class Document<T extends Node = Node> {
   options: Required<
     Omit<
       ParseOptions & DocumentOptions,
-      'lineCounter' | 'directives' | 'version'
+      '_directives' | 'lineCounter' | 'version'
     >
   >
 
@@ -125,8 +125,8 @@ export class Document<T extends Node = Node> {
     )
     this.options = opt
     let { version } = opt
-    if (options?.directives) {
-      this.directives = options.directives.atDocument()
+    if (options?._directives) {
+      this.directives = options._directives.atDocument()
       if (this.directives.yaml.explicit) version = this.directives.yaml.version
     } else this.directives = new Directives({ version })
     this.setSchema(version, options)

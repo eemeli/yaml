@@ -246,7 +246,7 @@ export class Composer {
       yield this.doc
       this.doc = null
     } else if (forceDoc) {
-      const opts = Object.assign({ directives: this.directives }, this.options)
+      const opts = Object.assign({ _directives: this.directives }, this.options)
       const doc = new Document(undefined, opts) as Document.Parsed
       if (this.atDirectives)
         this.onError(

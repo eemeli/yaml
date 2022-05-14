@@ -65,10 +65,11 @@ export type ParseOptions = {
 
 export type DocumentOptions = {
   /**
+   * @internal
    * Used internally by Composer. If set and includes an explicit version,
    * that overrides the `version` option.
    */
-  directives?: Directives
+  _directives?: Directives
 
   /**
    * Control the logging level during parsing

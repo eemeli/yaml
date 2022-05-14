@@ -21,7 +21,7 @@ export function composeDoc(
   { offset, start, value, end }: CST.Document,
   onError: ComposeErrorHandler
 ) {
-  const opts = Object.assign({ directives }, options)
+  const opts = Object.assign({ _directives: directives }, options)
   const doc = new Document(undefined, opts) as Document.Parsed
   const ctx: ComposeContext = {
     atRoot: true,
