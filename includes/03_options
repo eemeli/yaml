@@ -294,13 +294,13 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 </tr>
 <tr>
 <td>defaultKeyType</td>
-<td><code>Type ⎮ null</code></td>
+<td><code>&#39;BLOCK_FOLDED&#39; ⎮ &#39;BLOCK_LITERAL&#39; ⎮</code> <code>&#39;QUOTE_DOUBLE&#39; ⎮ &#39;QUOTE_SINGLE&#39; ⎮</code> <code>&#39;PLAIN&#39; ⎮ null</code></td>
 <td><code>null</code></td>
 <td>If not <code>null</code>, overrides <code>defaultStringType</code> for implicit key values.</td>
 </tr>
 <tr>
 <td>defaultStringType</td>
-<td><code>Type</code></td>
+<td><code>&#39;BLOCK_FOLDED&#39; ⎮ &#39;BLOCK_LITERAL&#39; ⎮</code> <code>&#39;QUOTE_DOUBLE&#39; ⎮ &#39;QUOTE_SINGLE&#39; ⎮</code> <code>&#39;PLAIN&#39;</code></td>
 <td><code>&#39;PLAIN&#39;</code></td>
 <td>The default type of string literal used to stringify values.</td>
 </tr>
