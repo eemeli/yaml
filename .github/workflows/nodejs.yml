@@ -39,3 +39,22 @@ jobs:
         with: { node-version: 16.x }
       - run: npm ci
       - run: npm run lint
+
+  typescript:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ts-version: ['4.0', '4.2', '4.4', '4.6']
+
+    steps:
+      - uses: actions/checkout@v2
+        with: { submodules: true }
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with: { node-version: 16.x }
+      - run: npm ci
+      - run: npm install --no-save typescript@${{ matrix.ts-version }}
+      - run: npm run test:types
+      - run: npm run build:node
+      - run: npm run test:dist:types
