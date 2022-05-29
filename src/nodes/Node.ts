@@ -18,7 +18,9 @@ export type NodeType<T> = T extends string | number | bigint | boolean | null
   ? Scalar<T>
   : T extends Array<any>
   ? YAMLSeq<NodeType<T[number]>>
-  : T extends { [key: string | number]: any }
+  : T extends { [key: string]: any }
+  ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
+  : T extends { [key: number]: any } // Merge with previous once supported in all TS versions
   ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
   : Node
 
