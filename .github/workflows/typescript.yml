@@ -1,0 +1,31 @@
+name: TypeScript
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  typescript:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with: { node-version: 16.x }
+      - run: npm ci
+      - run: npm run build:node
+      - run: npm run test:dist:types
+
+      - run: npm install --no-save typescript@4.2
+      - run: npm run test:dist:types
+
+      - run: npm uninstall jest
+      - run: npm install --no-save typescript@4.0
+      - run: npm run test:dist:types
+
+      - run: npm install --no-save typescript@3.8
+      - run: npm run test:dist:types
