@@ -43,7 +43,7 @@ export declare namespace Document {
 }
 
 export class Document<T extends Node = Node> {
-  readonly [NODE_TYPE]: symbol
+  declare readonly [NODE_TYPE]: symbol
 
   /** A comment before this Document */
   commentBefore: string | null = null

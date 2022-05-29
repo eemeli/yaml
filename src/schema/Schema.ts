@@ -20,9 +20,9 @@ export class Schema {
   toStringOptions: Readonly<ToStringOptions> | null;
 
   // Used by createNode() and composeScalar()
-  [MAP]: CollectionTag;
-  [SCALAR]: ScalarTag;
-  [SEQ]: CollectionTag
+  declare readonly [MAP]: CollectionTag;
+  declare readonly [SCALAR]: ScalarTag;
+  declare readonly [SEQ]: CollectionTag
 
   constructor({
     compat,

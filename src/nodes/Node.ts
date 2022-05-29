@@ -92,7 +92,7 @@ export const hasAnchor = <K = unknown, V = unknown>(
   (isScalar(node) || isCollection(node)) && !!node.anchor
 
 export abstract class NodeBase {
-  readonly [NODE_TYPE]: symbol
+  declare readonly [NODE_TYPE]: symbol
 
   /** A comment on or immediately after this */
   declare comment?: string | null
