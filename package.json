@@ -37,8 +37,9 @@
   },
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
-    "build:browser": "rollup -c config/rollup.browser-config.js",
+    "build:browser": "rollup -c config/rollup.browser-config.js && npm run create:browser:package",
     "build:node": "rollup -c config/rollup.node-config.js",
+    "create:browser:package": "node -e require(`fs`).writeFileSync(`browser/dist/package.json`,`{\\\"type\\\":\\\"module\\\",\\\"version\\\":\\\"${process.env.npm_package_version}\\\"}`)",
     "clean": "git clean -fdxe node_modules",
     "lint": "eslint src/",
     "prettier": "prettier --write .",
