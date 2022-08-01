@@ -1,6 +1,6 @@
 # YAML <a href="https://www.npmjs.com/package/yaml"><img align="right" src="https://badge.fury.io/js/yaml.svg" title="npm package" /></a>
 
-`yaml` is a definitive library for [YAML](http://yaml.org/), the human friendly data serialization standard.
+`yaml` is a definitive library for [YAML](https://yaml.org/), the human friendly data serialization standard.
 This library:
 
 - Supports both YAML 1.1 and YAML 1.2 and all common data schemas,
