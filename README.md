@@ -139,5 +139,5 @@ YAML.stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
 Browser testing provided by:
 
 <a href="https://www.browserstack.com/open-source">
-<img width=200 src="https://eemeli.org/yaml/images/browserstack.svg" />
+<img width=200 src="https://eemeli.org/yaml/images/browserstack-ce562660.svg" />
 </a>
