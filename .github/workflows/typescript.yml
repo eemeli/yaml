@@ -23,7 +23,7 @@ jobs:
       - run: npm install --no-save typescript@4.2
       - run: npm run test:dist:types
 
-      - run: npm uninstall jest
+      - run: npm uninstall jest @types/jest
       - run: npm install --no-save typescript@4.0
       - run: npm run test:dist:types
 
