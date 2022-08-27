@@ -24,6 +24,7 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
     let pair: Pair<T, Scalar<null> | null>
     if (isPair(key)) pair = key
     else if (
+      key &&
       typeof key === 'object' &&
       'key' in key &&
       'value' in key &&

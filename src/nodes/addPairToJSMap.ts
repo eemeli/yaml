@@ -4,15 +4,13 @@ import { isAlias, isMap, isNode, isScalar, isSeq } from './Node.js'
 import type { Pair } from './Pair.js'
 import { Scalar } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
+import type { MapLike } from './YAMLMap.js'
 
 const MERGE_KEY = '<<'
 
 export function addPairToJSMap(
   ctx: ToJSContext | undefined,
-  map:
-    | Map<unknown, unknown>
-    | Set<unknown>
-    | Record<string | number | symbol, unknown>,
+  map: MapLike,
   { key, value }: Pair
 ) {
   if (ctx?.doc.schema.merge && isMergeKey(key)) {
@@ -58,10 +56,7 @@ const isMergeKey = (key: unknown) =>
 // later mapping nodes. -- http://yaml.org/type/merge.html
 function mergeToJSMap(
   ctx: ToJSContext | undefined,
-  map:
-    | Map<unknown, unknown>
-    | Set<unknown>
-    | Record<string | number | symbol, unknown>,
+  map: MapLike,
   value: unknown
 ) {
   const source = ctx && isAlias(value) ? value.resolve(ctx.doc) : value

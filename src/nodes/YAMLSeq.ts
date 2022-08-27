@@ -58,14 +58,8 @@ export class YAMLSeq<T = unknown> extends Collection {
    */
   get(key: unknown, keepScalar: true): Scalar<T> | undefined
   get(key: unknown, keepScalar?: false): T | undefined
-  get(
-    key: unknown,
-    keepScalar?: boolean
-  ): T | Scalar<T> | undefined
-  get(
-    key: unknown,
-    keepScalar?: boolean
-  ): T | Scalar<T> | undefined {
+  get(key: unknown, keepScalar?: boolean): T | Scalar<T> | undefined
+  get(key: unknown, keepScalar?: boolean): T | Scalar<T> | undefined {
     const idx = asItemIndex(key)
     if (typeof idx !== 'number') return undefined
     const it = this.items[idx]

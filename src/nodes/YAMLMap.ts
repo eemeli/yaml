@@ -9,6 +9,11 @@ import { Pair } from './Pair.js'
 import { isScalarValue, Scalar } from './Scalar.js'
 import type { ToJSContext } from './toJS.js'
 
+export type MapLike =
+  | Map<unknown, unknown>
+  | Set<unknown>
+  | Record<string | number | symbol, unknown>
+
 export function findPair<K = unknown, V = unknown>(
   items: Iterable<Pair<K, V>>,
   key: unknown
@@ -105,7 +110,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
    * @param {Class} Type - If set, forces the returned collection type
    * @returns Instance of Type, Map, or Object
    */
-  toJSON<T = unknown>(
+  toJSON<T extends MapLike = Map<unknown, unknown>>(
     _?: unknown,
     ctx?: ToJSContext,
     Type?: { new (): T }
