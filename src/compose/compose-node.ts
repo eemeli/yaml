@@ -22,6 +22,7 @@ interface Props {
   comment: string
   anchor: SourceToken | null
   tag: SourceToken | null
+  end: number
 }
 
 const CN = { composeNode, composeEmptyNode }
@@ -93,7 +94,7 @@ export function composeEmptyNode(
   offset: number,
   before: Token[] | undefined,
   pos: number | null,
-  { spaceBefore, comment, anchor, tag }: Props,
+  { spaceBefore, comment, anchor, tag, end }: Props,
   onError: ComposeErrorHandler
 ) {
   const token: FlowScalar = {
@@ -109,7 +110,10 @@ export function composeEmptyNode(
       onError(anchor, 'BAD_ALIAS', 'Anchor cannot be an empty string')
   }
   if (spaceBefore) node.spaceBefore = true
-  if (comment) node.comment = comment
+  if (comment) {
+    node.comment = comment
+    node.range[2] = end
+  }
   return node
 }
 

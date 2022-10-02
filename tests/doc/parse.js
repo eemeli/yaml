@@ -324,7 +324,7 @@ describe('empty(ish) nodes', () => {
   test('empty node position', () => {
     const doc = YAML.parseDocument('\r\na: # 123\r\n')
     const empty = doc.contents.items[0].value
-    expect(empty.range).toEqual([5, 5, 5])
+    expect(empty.range).toEqual([5, 5, 12])
   })
 
   test('parse an empty string as null', () => {

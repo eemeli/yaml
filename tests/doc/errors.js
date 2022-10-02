@@ -122,6 +122,24 @@ describe('block collections', () => {
       }
     ])
   })
+
+  test('key after long comment on empty value (eemeli/yaml#413)', () => {
+    const doc = YAML.parseDocument(source`
+      one:
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+      two: b
+    `)
+    expect(doc.errors).toMatchObject([])
+  })
 })
 
 describe('flow collections', () => {
