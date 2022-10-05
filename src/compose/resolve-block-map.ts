@@ -21,6 +21,7 @@ export function resolveBlockMap(
 
   if (ctx.atRoot) ctx.atRoot = false
   let offset = bm.offset
+  let commentEnd: number | null = null
   for (const collItem of bm.items) {
     const { start, key, sep, value } = collItem
 
@@ -45,7 +46,7 @@ export function resolveBlockMap(
           onError(offset, 'BAD_INDENT', startColMsg)
       }
       if (!keyProps.anchor && !keyProps.tag && !sep) {
-        // TODO: assert being at last item?
+        commentEnd = keyProps.end
         if (keyProps.comment) {
           if (map.comment) map.comment += '\n' + keyProps.comment
           else map.comment = keyProps.comment
@@ -128,6 +129,8 @@ export function resolveBlockMap(
     }
   }
 
-  map.range = [bm.offset, offset, offset]
+  if (commentEnd && commentEnd < offset)
+    onError(commentEnd, 'IMPOSSIBLE', 'Map comment with trailing content')
+  map.range = [bm.offset, offset, commentEnd ?? offset]
   return map as YAMLMap.Parsed
 }

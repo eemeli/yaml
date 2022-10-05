@@ -15,6 +15,7 @@ export function resolveBlockSeq(
 
   if (ctx.atRoot) ctx.atRoot = false
   let offset = bs.offset
+  let commentEnd: number | null = null
   for (const { start, value } of bs.items) {
     const props = resolveProps(start, {
       indicator: 'seq-item-ind',
@@ -23,30 +24,29 @@ export function resolveBlockSeq(
       onError,
       startOnNewline: true
     })
-    offset = props.end
     if (!props.found) {
       if (props.anchor || props.tag || value) {
         if (value && value.type === 'block-seq')
           onError(
-            offset,
+            props.end,
             'BAD_INDENT',
             'All sequence items must start at the same column'
           )
         else
           onError(offset, 'MISSING_CHAR', 'Sequence item without - indicator')
       } else {
-        // TODO: assert being at last item?
+        commentEnd = props.end
         if (props.comment) seq.comment = props.comment
         continue
       }
     }
     const node = value
       ? composeNode(ctx, value, props, onError)
-      : composeEmptyNode(ctx, offset, start, null, props, onError)
+      : composeEmptyNode(ctx, props.end, start, null, props, onError)
     if (ctx.schema.compat) flowIndentCheck(bs.indent, value, onError)
     offset = node.range[2]
     seq.items.push(node)
   }
-  seq.range = [bs.offset, offset, offset]
+  seq.range = [bs.offset, offset, commentEnd ?? offset]
   return seq as YAMLSeq.Parsed
 }

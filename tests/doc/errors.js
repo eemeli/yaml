@@ -140,6 +140,44 @@ describe('block collections', () => {
     `)
     expect(doc.errors).toMatchObject([])
   })
+
+  test('key after long comment on block map (eemeli/yaml#413)', () => {
+    const doc = YAML.parseDocument(source`
+      one:
+        sub: a
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+      two: b
+    `)
+    expect(doc.errors).toMatchObject([])
+  })
+
+  test('key after long comment on block seq (eemeli/yaml#413)', () => {
+    const doc = YAML.parseDocument(source`
+      one:
+        - a
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+        # large block of text, large block of text, large block of text, large block of text, large block of text,
+      two: b
+    `)
+    expect(doc.errors).toMatchObject([])
+  })
 })
 
 describe('flow collections', () => {
