@@ -414,6 +414,7 @@ export class Document<T extends Node = Node> {
     jsonArg,
     mapAsMap,
     maxAliasCount,
+    emptySourceAsObject,
     onAnchor,
     reviver
   }: ToJSOptions & { json?: boolean; jsonArg?: string | null } = {}): any {
@@ -423,6 +424,7 @@ export class Document<T extends Node = Node> {
       keep: !json,
       mapAsMap: mapAsMap === true,
       mapKeyWarned: false,
+      emptySourceAsObject: emptySourceAsObject === true,
       maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100,
       stringify
     }

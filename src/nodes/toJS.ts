@@ -15,6 +15,7 @@ export interface ToJSContext {
   mapAsMap: boolean
   mapKeyWarned: boolean
   maxAliasCount: number
+  emptySourceAsObject: boolean
   onCreate?: (res: unknown) => void
 
   /** Requiring this directly in Pair would create circular dependencies */

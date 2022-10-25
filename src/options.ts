@@ -195,6 +195,13 @@ export type ToJSOptions = {
   mapAsMap?: boolean
 
   /**
+   * Convert empty source as empty Object
+   *
+   * Default: `false`
+   */
+  emptySourceAsObject?: boolean
+
+  /**
    * Prevent exponential entity expansion attacks by limiting data aliasing count;
    * set to `-1` to disable checks; `0` disallows all alias nodes.
    *
