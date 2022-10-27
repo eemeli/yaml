@@ -301,6 +301,14 @@ export type ToStringOptions = {
   falseStr?: string
 
   /**
+   * When true, a single space of padding will be added inside the delimiters
+   * of non-empty single-line flow collections.
+   * 
+   * Default: `true`
+   */
+  flowCollectionPadding?: boolean
+
+  /**
    * The number of spaces to use when indenting code.
    *
    * Default: `2`

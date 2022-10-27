@@ -27,6 +27,7 @@ export type StringifyContext = {
   indentAtStart?: number
   inFlow: boolean | null
   inStringifyKey?: boolean
+  flowCollectionPadding: string
   options: Readonly<
     Required<Omit<ToStringOptions, 'collectionStyle' | 'indent'>>
   >
@@ -47,6 +48,7 @@ export function createStringifyContext(
       doubleQuotedAsJSON: false,
       doubleQuotedMinMultiLineLength: 40,
       falseStr: 'false',
+      flowCollectionPadding: true,
       indentSeq: true,
       lineWidth: 80,
       minContentWidth: 20,
@@ -75,6 +77,7 @@ export function createStringifyContext(
   return {
     anchors: new Set(),
     doc,
+    flowCollectionPadding: opt.flowCollectionPadding ? ' ' : '',
     indent: '',
     indentStep: typeof opt.indent === 'number' ? ' '.repeat(opt.indent) : '  ',
     inFlow,
