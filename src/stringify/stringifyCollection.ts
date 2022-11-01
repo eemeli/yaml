@@ -94,6 +94,7 @@ function stringifyFlowCollection(
   const {
     indent,
     indentStep,
+    flowCollectionPadding,
     options: { commentString }
   } = ctx
   itemIndent += indentStep
@@ -155,7 +156,7 @@ function stringifyFlowCollection(
         str += line ? `\n${indentStep}${indent}${line}` : '\n'
       str += `\n${indent}${end}`
     } else {
-      str = `${start} ${lines.join(' ')} ${end}`
+      str = `${start}${flowCollectionPadding}${lines.join(' ')}${flowCollectionPadding}${end}`
     }
   }
 

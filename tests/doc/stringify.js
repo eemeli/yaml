@@ -1180,3 +1180,17 @@ describe('YAML.stringify on ast Document', () => {
     expect(YAML.stringify(doc)).toBe('null\n')
   })
 })
+
+describe('flow collection padding', () => {
+  const doc = new YAML.Document();
+  doc.contents = new YAML.YAMLSeq();
+  doc.contents.items = [1, 2];
+  doc.contents.flow = true;
+
+  test('default', () => {
+    expect(doc.toString()).toBe('[ 1, 2 ]\n')
+  });
+  test('default', () => {
+    expect(doc.toString({flowCollectionPadding: false})).toBe('[1, 2]\n')
+  });
+})
