@@ -82,17 +82,16 @@ export function stringifyPair(
       str += lineComment(str, ctx.indent, commentString(keyComment))
   }
 
-  let vcb = ''
-  let valueComment = null
+  let vsb, vcb, valueComment
   if (isNode(value)) {
-    if (value.spaceBefore) vcb = '\n'
-    if (value.commentBefore) {
-      const cs = commentString(value.commentBefore)
-      vcb += `\n${indentComment(cs, ctx.indent)}`
-    }
+    vsb = !!value.spaceBefore
+    vcb = value.commentBefore
     valueComment = value.comment
-  } else if (value && typeof value === 'object') {
-    value = doc.createNode(value)
+  } else {
+    vsb = false
+    vcb = null
+    valueComment = null
+    if (value && typeof value === 'object') value = doc.createNode(value)
   }
   ctx.implicitKey = false
   if (!explicitKey && !keyComment && isScalar(value))
@@ -109,7 +108,7 @@ export function stringifyPair(
     !value.anchor
   ) {
     // If indentSeq === false, consider '- ' as part of indentation where possible
-    ctx.indent = ctx.indent.substr(2)
+    ctx.indent = ctx.indent.substring(2)
   }
 
   let valueCommentDone = false
@@ -120,13 +119,41 @@ export function stringifyPair(
     () => (chompKeep = true)
   )
   let ws = ' '
-  if (vcb || keyComment) {
-    if (valueStr === '' && !ctx.inFlow) ws = vcb === '\n' ? '\n\n' : vcb
-    else ws = `${vcb}\n${ctx.indent}`
+  if (keyComment || vsb || vcb) {
+    ws = vsb ? '\n' : ''
+    if (vcb) {
+      const cs = commentString(vcb)
+      ws += `\n${indentComment(cs, ctx.indent)}`
+    }
+    if (valueStr === '' && !ctx.inFlow) {
+      if (ws === '\n') ws = '\n\n'
+    } else {
+      ws += `\n${ctx.indent}`
+    }
   } else if (!explicitKey && isCollection(value)) {
-    const flow = valueStr[0] === '[' || valueStr[0] === '{'
-    if (!flow || valueStr.includes('\n')) ws = `\n${ctx.indent}`
-  } else if (valueStr === '' || valueStr[0] === '\n') ws = ''
+    const vs0 = valueStr[0]
+    const nl0 = valueStr.indexOf('\n')
+    const hasNewline = nl0 !== -1
+    const flow = ctx.inFlow ?? value.flow ?? value.items.length === 0
+    if (hasNewline || !flow) {
+      let hasPropsLine = false
+      if (hasNewline && (vs0 === '&' || vs0 === '!')) {
+        let sp0 = valueStr.indexOf(' ')
+        if (
+          vs0 === '&' &&
+          sp0 !== -1 &&
+          sp0 < nl0 &&
+          valueStr[sp0 + 1] === '!'
+        ) {
+          sp0 = valueStr.indexOf(' ', sp0 + 1)
+        }
+        if (sp0 === -1 || nl0 < sp0) hasPropsLine = true
+      }
+      if (!hasPropsLine) ws = `\n${ctx.indent}`
+    }
+  } else if (valueStr === '' || valueStr[0] === '\n') {
+    ws = ''
+  }
   str += ws + valueStr
 
   if (ctx.inFlow) {

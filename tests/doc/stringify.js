@@ -253,8 +253,7 @@ foo:
     const seq = [{ foo: { bar: { baz } } }, { fe: { fi: { fo: { baz } } } }]
     expect(YAML.stringify(seq)).toBe(`- foo:
     bar:
-      baz:
-        &a1
+      baz: &a1
         a: 1
 - fe:
     fi:
@@ -362,6 +361,137 @@ z:
       expect(doc.toString({ nullStr: '' })).toBe(
         '{\n  a:\n    #c\n    ,\n  b:\n}\n'
       )
+    })
+  })
+
+  describe('properties on collections in block mapping', () => {
+    test('explicit tag on block sequence', () => {
+      const src = source`
+        key: !tag
+          - one
+          - two
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(src)
+    })
+    test('explicit tag on block mapping', () => {
+      const src = source`
+        key: !tag
+          one: 1
+          two: 2
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(src)
+    })
+    test('single-line comment on block sequence', () => {
+      const src = source`
+        key: #comment
+          - one
+          - two
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(source`
+        key:
+          #comment
+          - one
+          - two
+      `)
+    })
+    test('single-line comment and explicit tag on block sequence', () => {
+      const src = source`
+        key: #comment
+          !tag
+          - one
+          - two
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(source`
+        key:
+          #comment
+          !tag
+          - one
+          - two
+      `)
+    })
+    test('explicit tag and comment on block sequence', () => {
+      const src = source`
+        key: !tag
+          #comment
+          - one
+          - two
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(source`
+        key:
+          #comment
+          !tag
+          - one
+          - two
+      `)
+    })
+    test('anchor on block sequence', () => {
+      const src = source`
+        key: &anchor
+          - one
+          - two
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(src)
+    })
+    test('anchor and explicit tag on block sequence', () => {
+      const src = source`
+        key: &anchor !tag
+          - one
+          - two
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(src)
+    })
+    test('explicit tag on empty mapping', () => {
+      const doc = new YAML.Document({ key: {} })
+      doc.get('key').tag = '!tag'
+      expect(String(doc)).toBe(source`
+        key: !tag {}
+      `)
+    })
+    test('explicit tag on single-line flow mapping', () => {
+      const src = source`
+        key: !tag { one: 1, two: 2 }
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(src)
+    })
+    test('explicit tag on multi-line flow mapping', () => {
+      const src = source`
+        key: !tag {
+          one: aaaaaaaaaa,
+          two: bbbbbbbbbb,
+          three: cccccccccc,
+          four: dddddddddd,
+          five: eeeeeeeeee
+        }
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(source`
+        key:
+          !tag {
+            one: aaaaaaaaaa,
+            two: bbbbbbbbbb,
+            three: cccccccccc,
+            four: dddddddddd,
+            five: eeeeeeeeee
+          }
+      `)
+    })
+    test('explicit tag on explicit-value block sequence', () => {
+      const src = source`
+        ? [ key ]
+        : !tag
+          - one
+          - two
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(src)
     })
   })
 })
@@ -702,7 +832,7 @@ describe('indentSeq: false', () => {
         b: 2
       map:
         seq:
-          #sc
+        #sc
         - a
     `)
   })
@@ -714,7 +844,7 @@ describe('indentSeq: false', () => {
           b: 2
       map:
           seq:
-              #sc
+            #sc
             - a
     `)
   })
@@ -1182,15 +1312,15 @@ describe('YAML.stringify on ast Document', () => {
 })
 
 describe('flow collection padding', () => {
-  const doc = new YAML.Document();
-  doc.contents = new YAML.YAMLSeq();
-  doc.contents.items = [1, 2];
-  doc.contents.flow = true;
+  const doc = new YAML.Document()
+  doc.contents = new YAML.YAMLSeq()
+  doc.contents.items = [1, 2]
+  doc.contents.flow = true
 
   test('default', () => {
     expect(doc.toString()).toBe('[ 1, 2 ]\n')
-  });
+  })
   test('default', () => {
-    expect(doc.toString({flowCollectionPadding: false})).toBe('[1, 2]\n')
-  });
+    expect(doc.toString({ flowCollectionPadding: false })).toBe('[1, 2]\n')
+  })
 })
