@@ -938,6 +938,12 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <td>String representation for <code>false</code> values.</td>
 </tr>
 <tr>
+<td>flowCollectionPadding</td>
+<td><code>boolean</code></td>
+<td><code>true</code></td>
+<td>When true, a single space of padding will be added inside the delimiters of non-empty single-line flow collections.</td>
+</tr>
+<tr>
 <td>indent</td>
 <td><code>number</code></td>
 <td><code>2</code></td>
@@ -1745,12 +1751,13 @@ When creating, writing, and then reading a YAML file, comments may sometimes be 
   <span class="na">tag</span><span class="p">:</span> <span class="dl">'</span><span class="s1">!re</span><span class="dl">'</span><span class="p">,</span>
   <span class="nx">resolve</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">const</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">str</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^</span><span class="se">\/([\s\S]</span><span class="sr">+</span><span class="se">)\/([</span><span class="sr">gimuy</span><span class="se">]</span><span class="sr">*</span><span class="se">)</span><span class="sr">$/</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">match</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Invalid !re value</span><span class="dl">'</span><span class="p">)</span>
     <span class="k">return</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">match</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
   <span class="p">}</span>
 <span class="p">}</span>
 
 <span class="kd">const</span> <span class="nx">sharedSymbol</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">identify</span><span class="p">:</span> <span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">value</span><span class="p">.</span><span class="kd">constructor</span> <span class="o">===</span> <span class="nb">Symbol</span><span class="p">,</span>
+  <span class="na">identify</span><span class="p">:</span> <span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">value</span><span class="p">?.</span><span class="kd">constructor</span> <span class="o">===</span> <span class="nb">Symbol</span><span class="p">,</span>
   <span class="na">tag</span><span class="p">:</span> <span class="dl">'</span><span class="s1">!symbol/shared</span><span class="dl">'</span><span class="p">,</span>
   <span class="na">resolve</span><span class="p">:</span> <span class="nx">str</span> <span class="o">=&gt;</span> <span class="nb">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="nx">str</span><span class="p">),</span>
   <span class="nx">stringify</span><span class="p">(</span><span class="nx">item</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">onComment</span><span class="p">,</span> <span class="nx">onChompKeep</span><span class="p">)</span> <span class="p">{</span>

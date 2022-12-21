@@ -329,6 +329,12 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <td>String representation for <code>false</code> values.</td>
 </tr>
 <tr>
+<td>flowCollectionPadding</td>
+<td><code>boolean</code></td>
+<td><code>true</code></td>
+<td>When true, a single space of padding will be added inside the delimiters of non-empty single-line flow collections.</td>
+</tr>
+<tr>
 <td>indent</td>
 <td><code>number</code></td>
 <td><code>2</code></td>
