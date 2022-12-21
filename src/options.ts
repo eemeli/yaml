@@ -303,7 +303,7 @@ export type ToStringOptions = {
   /**
    * When true, a single space of padding will be added inside the delimiters
    * of non-empty single-line flow collections.
-   * 
+   *
    * Default: `true`
    */
   flowCollectionPadding?: boolean
