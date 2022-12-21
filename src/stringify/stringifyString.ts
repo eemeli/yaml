@@ -318,7 +318,7 @@ function plainString(
 }
 
 export function stringifyString(
-  item: Scalar,
+  item: Scalar | StringifyScalar,
   ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
@@ -336,7 +336,7 @@ export function stringifyString(
       type = Scalar.QUOTE_DOUBLE
   }
 
-  const _stringify = (_type: Scalar.Type | undefined) => {
+  const _stringify = (_type: string | undefined) => {
     switch (_type) {
       case Scalar.BLOCK_FOLDED:
       case Scalar.BLOCK_LITERAL:

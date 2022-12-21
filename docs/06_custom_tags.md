@@ -73,12 +73,13 @@ const regexp = {
   tag: '!re',
   resolve(str) {
     const match = str.match(/^\/([\s\S]+)\/([gimuy]*)$/)
+    if (!match) throw new Error('Invalid !re value')
     return new RegExp(match[1], match[2])
   }
 }
 
 const sharedSymbol = {
-  identify: value => value.constructor === Symbol,
+  identify: value => value?.constructor === Symbol,
   tag: '!symbol/shared',
   resolve: str => Symbol.for(str),
   stringify(item, ctx, onComment, onChompKeep) {

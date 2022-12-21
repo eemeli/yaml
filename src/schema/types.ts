@@ -18,7 +18,7 @@ interface TagBase {
    * an explicit tag. For most cases, it's unlikely that you'll actually want to
    * use this, even if you first think you do.
    */
-  default: boolean
+  default?: boolean
 
   /**
    * If a tag has multiple forms that should be parsed and/or stringified
