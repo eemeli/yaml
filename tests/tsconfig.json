@@ -6,7 +6,8 @@
     "paths": {
       "yaml": ["../src/index.ts"]
     },
-    "rootDir": ".."
+    "rootDir": "..",
+    "types": ["jest", "node"]
   },
   "include": ["**/*.ts", "**/doc/*.js"]
 }
