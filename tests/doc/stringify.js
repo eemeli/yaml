@@ -1118,6 +1118,20 @@ describe('Document markers in top-level scalars', () => {
   })
 })
 
+describe('Document markers in top-level map keys (eemeli/yaml#431)', () => {
+  test('---', () => {
+    const str = YAML.stringify({ '--- x': 42 })
+    expect(str).toBe('"--- x": 42\n')
+    expect(YAML.parse(str)).toEqual({ '--- x': 42 })
+  })
+
+  test('...', () => {
+    const str = YAML.stringify({ '... x': 42 })
+    expect(str).toBe('"... x": 42\n')
+    expect(YAML.parse(str)).toEqual({ '... x': 42 })
+  })
+})
+
 describe('undefined values', () => {
   test('undefined', () => {
     expect(YAML.stringify(undefined)).toBeUndefined()

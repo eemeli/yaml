@@ -266,7 +266,7 @@ function plainString(
   onChompKeep?: () => void
 ) {
   const { type, value } = item
-  const { actualString, implicitKey, indent, inFlow } = ctx
+  const { actualString, implicitKey, indent, indentStep, inFlow } = ctx
   if (
     (implicitKey && /[\n[\]{},]/.test(value)) ||
     (inFlow && /[[\]{},]/.test(value))
@@ -298,9 +298,13 @@ function plainString(
     // Where allowed & type not set explicitly, prefer block style for multiline strings
     return blockString(item, ctx, onComment, onChompKeep)
   }
-  if (indent === '' && containsDocumentMarker(value)) {
-    ctx.forceBlockIndent = true
-    return blockString(item, ctx, onComment, onChompKeep)
+  if (containsDocumentMarker(value)) {
+    if (indent === '') {
+      ctx.forceBlockIndent = true
+      return blockString(item, ctx, onComment, onChompKeep)
+    } else if (implicitKey && indent === indentStep) {
+      return quotedString(value, ctx)
+    }
   }
   const str = value.replace(/\n+/g, `$&\n${indent}`)
   // Verify that output will be parsed as a string, as e.g. plain numbers and
