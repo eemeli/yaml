@@ -36,13 +36,19 @@ import { Directives } from './directives.js'
 export type Replacer = any[] | ((key: any, value: any) => unknown)
 
 export declare namespace Document {
-  interface Parsed<T extends ParsedNode = ParsedNode> extends Document<T> {
+  interface Parsed<
+    Contents extends ParsedNode = ParsedNode,
+    Strict extends boolean = true
+  > extends Document<Contents, Strict> {
     directives: Directives
     range: Range
   }
 }
 
-export class Document<T extends Node = Node> {
+export class Document<
+  Contents extends Node = Node,
+  Strict extends boolean = true
+> {
   declare readonly [NODE_TYPE]: symbol
 
   /** A comment before this Document */
@@ -52,9 +58,9 @@ export class Document<T extends Node = Node> {
   comment: string | null = null
 
   /** The document contents. */
-  contents: T | null
+  contents: Strict extends true ? Contents | null : Contents
 
-  directives?: Directives
+  directives: Strict extends true ? Directives | undefined : Directives
 
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []
@@ -131,10 +137,9 @@ export class Document<T extends Node = Node> {
     } else this.directives = new Directives({ version })
     this.setSchema(version, options)
 
-    if (value === undefined) this.contents = null
-    else {
-      this.contents = this.createNode(value, _replacer, options) as unknown as T
-    }
+    // @ts-expect-error We can't really know that this matches Contents.
+    this.contents =
+      value === undefined ? null : this.createNode(value, _replacer, options)
   }
 
   /**
@@ -142,8 +147,8 @@ export class Document<T extends Node = Node> {
    *
    * Custom Node values that inherit from `Object` still refer to their original instances.
    */
-  clone(): Document<T> {
-    const copy: Document<T> = Object.create(Document.prototype, {
+  clone(): Document<Contents, Strict> {
+    const copy: Document<Contents, Strict> = Object.create(Document.prototype, {
       [NODE_TYPE]: { value: DOC }
     })
     copy.commentBefore = this.commentBefore
@@ -153,8 +158,9 @@ export class Document<T extends Node = Node> {
     copy.options = Object.assign({}, this.options)
     if (this.directives) copy.directives = this.directives.clone()
     copy.schema = this.schema.clone()
+    // @ts-expect-error We can't really know that this matches Contents.
     copy.contents = isNode(this.contents)
-      ? (this.contents.clone(copy.schema) as unknown as T)
+      ? this.contents.clone(copy.schema)
       : this.contents
     if (this.range) copy.range = this.range.slice() as Document['range']
     return copy
@@ -179,7 +185,10 @@ export class Document<T extends Node = Node> {
    * `name` will be used as a prefix for a new unique anchor.
    * If `name` is undefined, the generated anchor will use 'a' as a prefix.
    */
-  createAlias(node: Scalar | YAMLMap | YAMLSeq, name?: string): Alias {
+  createAlias(
+    node: Strict extends true ? Scalar | YAMLMap | YAMLSeq : Node,
+    name?: string
+  ): Alias {
     if (!node.anchor) {
       const prev = anchorNames(this)
       node.anchor =
@@ -276,6 +285,7 @@ export class Document<T extends Node = Node> {
   deleteIn(path: Iterable<unknown> | null): boolean {
     if (isEmptyPath(path)) {
       if (this.contents == null) return false
+      // @ts-expect-error Presumed impossible if Strict extends false
       this.contents = null
       return true
     }
@@ -289,7 +299,7 @@ export class Document<T extends Node = Node> {
    * scalar values from their surrounding node; to disable set `keepScalar` to
    * `true` (collections are always returned intact).
    */
-  get(key: unknown, keepScalar?: boolean): unknown {
+  get(key: unknown, keepScalar?: boolean): Strict extends true ? unknown : any {
     return isCollection(this.contents)
       ? this.contents.get(key, keepScalar)
       : undefined
@@ -300,7 +310,10 @@ export class Document<T extends Node = Node> {
    * scalar values from their surrounding node; to disable set `keepScalar` to
    * `true` (collections are always returned intact).
    */
-  getIn(path: Iterable<unknown> | null, keepScalar?: boolean): unknown {
+  getIn(
+    path: Iterable<unknown> | null,
+    keepScalar?: boolean
+  ): Strict extends true ? unknown : any {
     if (isEmptyPath(path))
       return !keepScalar && isScalar(this.contents)
         ? this.contents.value
@@ -331,11 +344,8 @@ export class Document<T extends Node = Node> {
    */
   set(key: any, value: unknown): void {
     if (this.contents == null) {
-      this.contents = collectionFromPath(
-        this.schema,
-        [key],
-        value
-      ) as unknown as T
+      // @ts-expect-error We can't really know that this matches Contents.
+      this.contents = collectionFromPath(this.schema, [key], value)
     } else if (assertCollection(this.contents)) {
       this.contents.set(key, value)
     }
@@ -346,13 +356,12 @@ export class Document<T extends Node = Node> {
    * boolean to add/remove the item from the set.
    */
   setIn(path: Iterable<unknown> | null, value: unknown): void {
-    if (isEmptyPath(path)) this.contents = value as T
-    else if (this.contents == null) {
-      this.contents = collectionFromPath(
-        this.schema,
-        Array.from(path),
-        value
-      ) as unknown as T
+    if (isEmptyPath(path)) {
+      // @ts-expect-error We can't really know that this matches Contents.
+      this.contents = value
+    } else if (this.contents == null) {
+      // @ts-expect-error We can't really know that this matches Contents.
+      this.contents = collectionFromPath(this.schema, Array.from(path), value)
     } else if (assertCollection(this.contents)) {
       this.contents.setIn(path, value)
     }

@@ -1,5 +1,5 @@
 import { Document } from '../doc/Document.js'
-import { isNode } from '../nodes/Node.js'
+import { isNode, Node } from '../nodes/Node.js'
 import { ToStringOptions } from '../options.js'
 import {
   createStringifyContext,
@@ -9,7 +9,7 @@ import {
 import { indentComment, lineComment } from './stringifyComment.js'
 
 export function stringifyDocument(
-  doc: Readonly<Document>,
+  doc: Readonly<Document<Node, boolean>>,
   options: ToStringOptions
 ) {
   const lines: string[] = []
