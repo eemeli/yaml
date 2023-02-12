@@ -1,4 +1,4 @@
-import { isAlias, isScalar, parseDocument, Scalar, visit } from 'yaml'
+import { isAlias, isScalar, parseDocument, Scalar, visit, YAMLMap } from 'yaml'
 import { source } from './_utils'
 
 describe('doc.clone()', () => {
@@ -37,7 +37,7 @@ describe('doc.clone()', () => {
   })
 
   test('has separate directives from original', () => {
-    const doc = parseDocument('foo: bar')
+    const doc = parseDocument<YAMLMap, false>('foo: bar')
     const copy = doc.clone()
     copy.directives.yaml.explicit = true
     expect(copy.toString()).toBe(source`
