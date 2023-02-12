@@ -371,6 +371,7 @@ describe('invalid options', () => {
   })
 
   test('unknown custom tag', () => {
+    // @ts-expect-error Deprecated option
     expect(() => new YAML.Document(undefined, { customTags: ['foo'] })).toThrow(
       /Unknown custom tag/
     )
