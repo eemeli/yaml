@@ -1,10 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "..",
     "declaration": false,
     "paths": {
-      "yaml": ["../src/index.ts"]
+      "yaml": ["src/index.ts"]
     },
     "rootDir": "..",
     "types": ["jest", "node"]
