@@ -49,6 +49,7 @@ overrides:
       jest: true
     rules:
       camelcase: 0
+      '@typescript-eslint/no-non-null-assertion': off
       '@typescript-eslint/no-unsafe-return': off
 
   - files: [tests/doc/**]

@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* global BigInt */
-
 import { source } from '../_utils'
 import * as YAML from 'yaml'
 import { Pair, Scalar } from 'yaml'

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { source } from '../_utils'
 import * as YAML from 'yaml'
 
