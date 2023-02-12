@@ -18,7 +18,7 @@ test('Use preceding directives if none defined', () => {
     !bar "Using previous YAML directive"
   `
   const docs = parseAllDocuments(src, { prettyErrors: false, version: '1.1' })
-  const warn = tag => ({ message: `Unresolved tag: ${tag}` })
+  const warn = (tag: string) => ({ message: `Unresolved tag: ${tag}` })
   expect(docs).toMatchObject([
     {
       directives: { yaml: { version: '1.1', explicit: false } },
