@@ -4,7 +4,8 @@
     "baseUrl": "..",
     "declaration": false,
     "paths": {
-      "yaml": ["src/index.ts"]
+      "yaml": ["src/index.ts"],
+      "yaml/util": ["src/util.ts"]
     },
     "rootDir": "..",
     "types": ["jest", "node"]

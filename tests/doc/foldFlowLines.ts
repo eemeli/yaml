@@ -1,13 +1,13 @@
 import * as YAML from 'yaml'
-import { foldFlowLines as fold } from 'yaml/util'
+import { foldFlowLines as fold, FoldOptions } from 'yaml/util'
 
 const FOLD_FLOW = 'flow'
 const FOLD_QUOTED = 'quoted'
 
 describe('plain', () => {
   const src = 'abc def ghi jkl mno pqr stu vwx yz\n'
-  let onFold
-  let options
+  let onFold: jest.Mock
+  let options: FoldOptions
   beforeEach(() => {
     onFold = jest.fn()
     options = { indentAtStart: 0, lineWidth: 10, minContentWidth: 0, onFold }
@@ -82,16 +82,14 @@ describe('plain', () => {
 
 describe('double-quoted', () => {
   const src = '"abc def ghi jkl mnopqrstuvwxyz\n"'
-  let onFold
-  let options
+  let onFold: jest.Mock
+  let options: FoldOptions
   beforeEach(() => {
     onFold = jest.fn()
     options = {
-      indent: '',
       indentAtStart: 0,
       lineWidth: 10,
       minContentWidth: 0,
-      mode: FOLD_QUOTED,
       onFold
     }
   })
@@ -157,7 +155,7 @@ describe('double-quoted', () => {
         const x =
           '{"module":"database","props":{"databaseType":"postgresql"},"extra":{},"foo":"bar\'"}'
         const str = YAML.stringify({ x })
-        const doc = YAML.parseDocument(str)
+        const doc = YAML.parseDocument<any>(str)
         expect(doc.errors).toHaveLength(0)
         expect(doc.contents.items[0].value.value).toBe(x)
       })
@@ -187,7 +185,7 @@ describe('double-quoted', () => {
         const value =
           '>####################################"##########################\'####\\P#'
         const str = YAML.stringify({ key: [[value]] })
-        const doc = YAML.parseDocument(str)
+        const doc = YAML.parseDocument<any>(str)
         expect(doc.errors).toHaveLength(0)
         expect(doc.contents.items[0].value.items[0].items[0].value).toBe(value)
       })
@@ -267,7 +265,7 @@ folded but is not.
   Text that is prevented from folding due to being more-indented.
 
 Unfolded paragraph.\n`
-    const doc = YAML.parseDocument(src)
+    const doc = YAML.parseDocument<YAML.Scalar, false>(src)
     expect(doc.contents.value).toBe(
       `Text on a line that should get folded with a line width of 20 characters.
 
@@ -293,7 +291,7 @@ Unfolded paragraph.\n`
   enough length to
   fold twice
 - plain with comment # that won't get folded\n`
-    const doc = YAML.parseDocument(src)
+    const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(src)
     expect(doc.contents.items[0].value).toBe(
       'plain value with enough length to fold twice'
     )
