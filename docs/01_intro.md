@@ -32,6 +32,10 @@ It has no external dependencies and runs on Node.js as well as modern browsers.
 For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes.
 Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).
 
+The minimum supported TypeScript version of the included typings is 3.9;
+for use in earlier versions you may need to set `skipLibCheck: true` in your config.
+This requirement may be updated between minor versions of the library.
+
 **Note:** These docs are for `yaml@2`. For v1, see the [v1.10.0 tag](https://github.com/eemeli/yaml/tree/v1.10.0) for the source and [eemeli.org/yaml/v1](https://eemeli.org/yaml/v1/) for the documentation.
 
 ## API Overview

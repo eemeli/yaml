@@ -27,6 +27,6 @@ jobs:
       - run: for d in node_modules/@types/*; do [[ $d == *node ]] || rm -r $d; done
       - run: npm run test:dist:types
 
-      - run: npm install --no-save typescript@3.8
+      - run: npm install --no-save typescript@3.9
       - run: for d in node_modules/@types/*; do [[ $d == *node ]] || rm -r $d; done
       - run: npm run test:dist:types
