@@ -36,6 +36,8 @@ import { Directives } from './directives.js'
 export type Replacer = any[] | ((key: any, value: any) => unknown)
 
 export declare namespace Document {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  /** @ts-ignore The typing of directives fails in TS <= 4.2 */
   interface Parsed<
     Contents extends ParsedNode = ParsedNode,
     Strict extends boolean = true
