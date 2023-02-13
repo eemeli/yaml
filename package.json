@@ -14,7 +14,6 @@
   "files": [
     "browser/",
     "dist/",
-    "util.d.ts",
     "util.js"
   ],
   "type": "commonjs",
@@ -33,6 +32,13 @@
     "./util": {
       "node": "./dist/util.js",
       "default": "./browser/dist/util.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
     }
   },
   "scripts": {
