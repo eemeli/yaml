@@ -165,6 +165,15 @@ function quotedString(value: string, ctx: StringifyContext) {
   return qs(value, ctx)
 }
 
+// The negative lookbehind avoids a polynomial search,
+// but isn't supported yet on Safari: https://caniuse.com/js-regexp-lookbehind
+let blockEndNewlines: RegExp
+try {
+  blockEndNewlines = new RegExp('(^|(?<!\n))\n+(?!\n|$)', 'g')
+} catch {
+  blockEndNewlines = /\n+(?!\n|$)/g
+}
+
 function blockString(
   { comment, type, value }: StringifyScalar,
   ctx: StringifyContext,
@@ -211,7 +220,7 @@ function blockString(
   if (end) {
     value = value.slice(0, -end.length)
     if (end[end.length - 1] === '\n') end = end.slice(0, -1)
-    end = end.replace(/\n+(?!\n|$)/g, `$&${indent}`)
+    end = end.replace(blockEndNewlines, `$&${indent}`)
   }
 
   // determine indent indicator from whitespace at value start
