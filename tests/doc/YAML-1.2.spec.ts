@@ -4,7 +4,20 @@ import { YAMLError } from 'yaml'
 const collectionKeyWarning =
   /^Keys with collection values will be stringified due to JS Object restrictions/
 
-const spec = {
+const spec: Record<
+  string,
+  Record<
+    string,
+    {
+      src: string
+      tgt: unknown[]
+      errors?: string[][]
+      warnings?: string[][]
+      jsWarnings?: RegExp[]
+      special?: (src: string) => void
+    }
+  >
+> = {
   '2.1. Collections': {
     'Example 2.1. Sequence of Scalars': {
       src: `- Mark McGwire\r
@@ -375,15 +388,15 @@ date: 2001-12-14`,
           date: '2001-12-14'
         }
       ],
-      special: src => {
+      special(src) {
         const obj = YAML.parse(src, { schema: 'yaml-1.1' })
         expect(Object.keys(obj)).toHaveLength(4)
-        ;[('canonical', 'iso8601', 'spaced', 'date')].forEach(key => {
+        for (const key of ['canonical', 'iso8601', 'spaced', 'date']) {
           const date = obj[key]
           expect(date).toBeInstanceOf(Date)
           expect(date.getFullYear()).toBe(2001)
           expect(date.getMonth()).toBe(11)
-        })
+        }
       }
     },
 
@@ -416,8 +429,8 @@ application specific tag: !something |
         }
       ],
       warnings: [['Unresolved tag: !something']],
-      special: src => {
-        const doc = YAML.parseDocument(src, { schema: 'yaml-1.1' })
+      special(src) {
+        const doc = YAML.parseDocument<any>(src, { schema: 'yaml-1.1' })
         const data = doc.contents.items[1].value.value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)
@@ -664,8 +677,8 @@ mapping: { sky: blue, sea: green }`,
 alias: *anchor`,
       tgt: [{ anchored: 'value', alias: 'value' }],
       warnings: [['Unresolved tag: !local']],
-      special: src => {
-        const tag = { tag: '!local', resolve: str => `local:${str}` }
+      special(src) {
+        const tag = { tag: '!local', resolve: (str: string) => `local:${str}` }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject({
           anchored: 'local:value',
@@ -700,7 +713,7 @@ double: "text"`,
       src: `%YAML 1.2
 --- text`,
       tgt: ['text'],
-      special: src => {
+      special(src) {
         const doc = YAML.parseDocument(src)
         expect(doc.directives.yaml).toMatchObject({
           version: '1.2',
@@ -925,7 +938,7 @@ Chomping: |
 "foo"`,
       tgt: ['foo'],
       warnings: [['Unsupported YAML version 1.3']],
-      special: src => {
+      special(src) {
         const doc = YAML.parseDocument(src)
         expect(doc.directives.yaml).toMatchObject({
           version: '1.2',
@@ -940,7 +953,7 @@ Chomping: |
 ---
 foo`,
       tgt: ['foo'],
-      special: src => {
+      special(src) {
         const doc = YAML.parseDocument(src)
         expect(doc.directives.yaml).toMatchObject({
           version: '1.1',
@@ -963,7 +976,7 @@ foo`,
 ---
 bar`,
       tgt: ['bar'],
-      special: src => {
+      special(src) {
         const doc = YAML.parseDocument(src)
         expect(doc.directives.tags).toMatchObject({
           '!!': 'tag:yaml.org,2002:',
@@ -985,7 +998,7 @@ bar`,
         ['Unresolved tag: !foo'],
         ['Unresolved tag: tag:example.com,2000:app/foo']
       ],
-      special: src => {
+      special(src) {
         const customTags = [
           {
             tag: '!foo',
@@ -1007,7 +1020,7 @@ bar`,
 !!int 1 - 3 # Interval, not integer`,
       tgt: ['1 - 3'],
       warnings: [['Unresolved tag: tag:example.com,2000:app/int']],
-      special: src => {
+      special(src) {
         const tag = {
           tag: 'tag:example.com,2000:app/int',
           resolve: () => 'interval'
@@ -1023,10 +1036,10 @@ bar`,
 !e!foo "bar"`,
       tgt: ['bar'],
       warnings: [['Unresolved tag: tag:example.com,2000:app/foo']],
-      special: src => {
+      special(src) {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
-          resolve: str => `foo${str}`
+          resolve: (str: string) => `foo${str}`
         }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toBe('foobar')
@@ -1043,8 +1056,11 @@ bar`,
 !m!light green`,
       tgt: ['fluorescent', 'green'],
       warnings: [['Unresolved tag: !my-light'], ['Unresolved tag: !my-light']],
-      special: src => {
-        const tag = { tag: '!my-light', resolve: str => `light:${str}` }
+      special(src) {
+        const tag = {
+          tag: '!my-light',
+          resolve: (str: string) => `light:${str}`
+        }
         const docs = YAML.parseAllDocuments(src, { customTags: [tag] })
         expect(docs.map(d => d.toJS())).toMatchObject([
           'light:fluorescent',
@@ -1059,10 +1075,10 @@ bar`,
 - !e!foo "bar"`,
       tgt: [['bar']],
       warnings: [['Unresolved tag: tag:example.com,2000:app/foo']],
-      special: src => {
+      special(src) {
         const tag = {
           tag: 'tag:example.com,2000:app/foo',
-          resolve: str => `foo${str}`
+          resolve: (str: string) => `foo${str}`
         }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject(['foobar'])
@@ -1082,8 +1098,8 @@ bar`,
   !<!bar> baz`,
       tgt: [{ foo: 'baz' }],
       warnings: [['Unresolved tag: !bar']],
-      special: src => {
-        const tag = { tag: '!bar', resolve: str => `bar${str}` }
+      special(src) {
+        const tag = { tag: '!bar', resolve: (str: string) => `bar${str}` }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject({ foo: 'barbaz' })
       }
@@ -1110,12 +1126,12 @@ bar`,
           'Unresolved tag: tag:example.com,2000:app/tag!'
         ]
       ],
-      special: src => {
+      special(src) {
         const customTags = [
-          { tag: '!local', resolve: str => `local:${str}` },
+          { tag: '!local', resolve: (str: string) => `local:${str}` },
           {
             tag: 'tag:example.com,2000:app/tag!',
-            resolve: str => `tag!${str}`
+            resolve: (str: string) => `tag!${str}`
           }
         ]
         const res = YAML.parse(src, { customTags })
@@ -1674,8 +1690,8 @@ folded:
  value`,
       tgt: [{ literal: 'value\n', folded: 'value\n' }],
       warnings: [['Unresolved tag: !foo']],
-      special: src => {
-        const tag = { tag: '!foo', resolve: str => `foo${str}` }
+      special(src) {
+        const tag = { tag: '!foo', resolve: (str: string) => `foo${str}` }
         const res = YAML.parse(src, { customTags: [tag] })
         expect(res).toMatchObject({ literal: 'value\n', folded: 'foovalue\n' })
       }
@@ -1694,8 +1710,8 @@ mapping: !!map
           mapping: { foo: 'bar' }
         }
       ],
-      special: src => {
-        const doc = YAML.parseDocument(src)
+      special(src) {
+        const doc = YAML.parseDocument<YAML.YAMLSeq<any>, false>(src)
         expect(doc.contents.tag).toBeUndefined()
         expect(doc.contents.items[0].value.tag).toBe('tag:yaml.org,2002:seq')
         expect(doc.contents.items[0].value.items[1].tag).toBe(
@@ -1720,11 +1736,12 @@ Document`,
 Document
 ... # Suffix`,
       tgt: ['Document'],
-      special: src =>
+      special(src) {
         expect(YAML.parseDocument(src).directives.yaml).toMatchObject({
           version: '1.2',
           explicit: true
         })
+      }
     },
 
     'Example 9.3. Bare Documents': {
@@ -1808,17 +1825,19 @@ for (const section in spec) {
         expect(json).toMatchObject(tgt)
         documents.forEach((doc, i) => {
           expect(doc.errors.map(err => err.message)).toMatchObject(
-            errors?.[i] || []
+            errors?.[i] ?? []
           )
           expect(doc.warnings.map(err => err.message)).toMatchObject(
-            warnings?.[i] || []
+            warnings?.[i] ?? []
           )
           for (const err of doc.errors.concat(doc.warnings))
             expect(err).toBeInstanceOf(YAMLError)
           if (!jsWarnings) expect(mockWarn).not.toHaveBeenCalled()
           else {
             for (const warning of jsWarnings)
-              expect(mockWarn.mock.calls.some(call => warning.test(call[0])))
+              expect(
+                mockWarn.mock.calls.some(call => warning.test(String(call[0])))
+              )
           }
         })
         if (special) special(src)

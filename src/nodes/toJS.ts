@@ -10,7 +10,7 @@ export interface AnchorData {
 
 export interface ToJSContext {
   anchors: Map<Node, AnchorData>
-  doc: Document
+  doc: Document<Node, boolean>
   keep: boolean
   mapAsMap: boolean
   mapKeyWarned: boolean

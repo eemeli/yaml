@@ -3,7 +3,7 @@ import type { Reviver } from './doc/applyReviver.js'
 import { Document, Replacer } from './doc/Document.js'
 import { prettifyError, YAMLParseError } from './errors.js'
 import { warn } from './log.js'
-import type { ParsedNode } from './nodes/Node.js'
+import type { Node, ParsedNode } from './nodes/Node.js'
 import type {
   CreateNodeOptions,
   DocumentOptions,
@@ -37,10 +37,19 @@ function parseOptions(options: ParseOptions) {
  *   EmptyStream and contain additional stream information. In
  *   TypeScript, you should use `'empty' in docs` as a type guard for it.
  */
-export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
+export function parseAllDocuments<
+  Contents extends Node = ParsedNode,
+  Strict extends boolean = true
+>(
   source: string,
   options: ParseOptions & DocumentOptions & SchemaOptions = {}
-): Document.Parsed<T>[] | EmptyStream {
+):
+  | Array<
+      Contents extends ParsedNode
+        ? Document.Parsed<Contents, Strict>
+        : Document<Contents, Strict>
+    >
+  | EmptyStream {
   const { lineCounter, prettyErrors } = parseOptions(options)
   const parser = new Parser(lineCounter?.addNewLine)
   const composer = new Composer(options)
@@ -52,31 +61,42 @@ export function parseAllDocuments<T extends ParsedNode = ParsedNode>(
       doc.warnings.forEach(prettifyError(source, lineCounter))
     }
 
-  if (docs.length > 0) return docs as Document.Parsed<T>[]
+  type DocType = Contents extends ParsedNode
+    ? Document.Parsed<Contents, Strict>
+    : Document<Contents, Strict>
+  if (docs.length > 0) return docs as DocType[]
   return Object.assign<
-    Document.Parsed<T>[],
+    DocType[],
     { empty: true },
     ReturnType<Composer['streamInfo']>
   >([], { empty: true }, composer.streamInfo())
 }
 
 /** Parse an input string into a single YAML.Document */
-export function parseDocument<T extends ParsedNode = ParsedNode>(
+export function parseDocument<
+  Contents extends Node = ParsedNode,
+  Strict extends boolean = true
+>(
   source: string,
   options: ParseOptions & DocumentOptions & SchemaOptions = {}
-) {
+): Contents extends ParsedNode
+  ? Document.Parsed<Contents, Strict>
+  : Document<Contents, Strict> {
   const { lineCounter, prettyErrors } = parseOptions(options)
   const parser = new Parser(lineCounter?.addNewLine)
   const composer = new Composer(options)
 
+  type DocType = Contents extends ParsedNode
+    ? Document.Parsed<Contents, Strict>
+    : Document<Contents, Strict>
   // `doc` is always set by compose.end(true) at the very latest
-  let doc: Document.Parsed<T> = null as any
+  let doc: DocType = null as any
   for (const _doc of composer.compose(
     parser.parse(source),
     true,
     source.length
   )) {
-    if (!doc) doc = _doc as Document.Parsed<T>
+    if (!doc) doc = _doc as DocType
     else if (doc.options.logLevel !== 'silent') {
       doc.errors.push(
         new YAMLParseError(

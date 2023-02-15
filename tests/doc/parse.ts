@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import { readFileSync } from 'fs'
+import { resolve } from 'path'
 import * as YAML from 'yaml'
 import { source } from '../_utils'
 
@@ -17,7 +17,7 @@ describe('scalars', () => {
 
 test('eemeli/yaml#3', () => {
   const src = '{ ? : 123 }'
-  const doc = YAML.parseDocument(src)
+  const doc = YAML.parseDocument<any>(src)
   expect(doc.errors).toHaveLength(0)
   expect(doc.contents.items[0].key.value).toBeNull()
   expect(doc.contents.items[0].value.value).toBe(123)
@@ -41,8 +41,8 @@ aliases:
   })
 
   test('complete file', () => {
-    const src = fs.readFileSync(
-      path.resolve(__dirname, '../artifacts/prettier-circleci-config.yml'),
+    const src = readFileSync(
+      resolve(__dirname, '../artifacts/prettier-circleci-config.yml'),
       'utf8'
     )
     const doc = YAML.parseDocument(src)
@@ -322,7 +322,7 @@ describe('indented key with anchor (eemeli/yaml#378)', () => {
 
 describe('empty(ish) nodes', () => {
   test('empty node position', () => {
-    const doc = YAML.parseDocument('\r\na: # 123\r\n')
+    const doc = YAML.parseDocument<any>('\r\na: # 123\r\n')
     const empty = doc.contents.items[0].value
     expect(empty.range).toEqual([5, 5, 12])
   })
@@ -356,7 +356,7 @@ describe('maps with no values', () => {
 
   test('flow map', () => {
     const src = `{\na: null,\n? b\n}`
-    const doc = YAML.parseDocument(src)
+    const doc = YAML.parseDocument<any>(src)
     expect(String(doc)).toBe(`{ a: null, b }\n`)
     doc.contents.items[1].key.comment = 'c'
     expect(String(doc)).toBe(`{\n  a: null,\n  b #c\n}\n`)
@@ -370,7 +370,7 @@ describe('maps with no values', () => {
   })
 
   test('implicit scalar key after explicit key with no value', () => {
-    const doc = YAML.parseDocument('? - 1\nx:\n')
+    const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\nx:\n')
     expect(doc.contents.items).toMatchObject([
       { key: { items: [{ value: 1 }] }, value: null },
       { key: { value: 'x' }, value: { value: null } }
@@ -378,7 +378,7 @@ describe('maps with no values', () => {
   })
 
   test('implicit flow collection key after explicit key with no value', () => {
-    const doc = YAML.parseDocument('? - 1\n[x]: y\n')
+    const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\n[x]: y\n')
     expect(doc.contents.items).toMatchObject([
       { key: { items: [{ value: 1 }] }, value: null },
       { key: { items: [{ value: 'x' }] }, value: { value: 'y' } }
@@ -387,13 +387,13 @@ describe('maps with no values', () => {
 })
 
 describe('Excessive entity expansion attacks', () => {
-  const root = path.resolve(__dirname, '../artifacts/pr104')
-  const src1 = fs.readFileSync(path.resolve(root, 'case1.yml'), 'utf8')
-  const src2 = fs.readFileSync(path.resolve(root, 'case2.yml'), 'utf8')
-  const srcB = fs.readFileSync(path.resolve(root, 'billion-laughs.yml'), 'utf8')
-  const srcQ = fs.readFileSync(path.resolve(root, 'quadratic.yml'), 'utf8')
+  const root = resolve(__dirname, '../artifacts/pr104')
+  const src1 = readFileSync(resolve(root, 'case1.yml'), 'utf8')
+  const src2 = readFileSync(resolve(root, 'case2.yml'), 'utf8')
+  const srcB = readFileSync(resolve(root, 'billion-laughs.yml'), 'utf8')
+  const srcQ = readFileSync(resolve(root, 'quadratic.yml'), 'utf8')
 
-  let origEmitWarning
+  let origEmitWarning: typeof process.emitWarning
   beforeAll(() => {
     origEmitWarning = process.emitWarning
   })
@@ -521,7 +521,7 @@ describe('duplicate keys', () => {
 })
 
 describe('handling complex keys', () => {
-  let origEmitWarning
+  let origEmitWarning: typeof process.emitWarning
   beforeAll(() => {
     origEmitWarning = process.emitWarning
   })
@@ -530,14 +530,14 @@ describe('handling complex keys', () => {
   })
 
   test('emit warning when casting key in collection to string as JS Object key', () => {
-    process.emitWarning = jest.fn()
+    const spy = (process.emitWarning = jest.fn())
     const doc = YAML.parseDocument('[foo]: bar', { prettyErrors: false })
     expect(doc.warnings).toHaveLength(0)
-    expect(process.emitWarning).not.toHaveBeenCalled()
+    expect(spy).not.toHaveBeenCalled()
 
     doc.toJS()
-    expect(process.emitWarning).toHaveBeenCalledTimes(1)
-    expect(process.emitWarning.mock.calls[0][0]).toMatch(
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy.mock.calls[0][0]).toMatch(
       /^Keys with collection values will be stringified due to JS Object restrictions/
     )
   })
@@ -601,14 +601,16 @@ describe('keepSourceTokens', () => {
     ['{ foo: bar }', 'flow-collection']
   ]) {
     test(`${type}: default false`, () => {
-      const doc = YAML.parseDocument(src)
+      const doc = YAML.parseDocument<any>(src)
       expect(doc.contents).not.toHaveProperty('srcToken')
       expect(doc.contents.items[0]).not.toHaveProperty('srcToken')
       expect(doc.get('foo', true)).not.toHaveProperty('srcToken')
     })
 
     test(`${type}: included when set`, () => {
-      const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+      const doc = YAML.parseDocument<any, false>(src, {
+        keepSourceTokens: true
+      })
       expect(doc.contents.srcToken).toMatchObject({ type })
       expect(doc.contents.items[0].srcToken).toMatchObject({
         key: { type: 'scalar' },
@@ -621,7 +623,9 @@ describe('keepSourceTokens', () => {
   test('allow for CST modifications (eemeli/yaml#903)', () => {
     const src = 'foo:\n  [ 42 ]'
     const tokens = Array.from(new YAML.Parser().parse(src))
-    const docs = new YAML.Composer({ keepSourceTokens: true }).compose(tokens)
+    const docs = new YAML.Composer<YAML.ParsedNode, false>({
+      keepSourceTokens: true
+    }).compose(tokens)
     const doc = Array.from(docs)[0]
     const node = doc.get('foo', true)
     YAML.CST.setScalarValue(node.srcToken, 'eek')
@@ -682,6 +686,7 @@ describe('reviver', () => {
   test('add values to this', () => {
     const reviver = jest.fn(function (key, value) {
       expect(key).not.toBe('9')
+      // @ts-expect-error Let's not try to type this
       this[9] = 9
       return value
     })
@@ -695,8 +700,9 @@ describe('reviver', () => {
   })
 
   test('sequence', () => {
-    const these = []
+    const these: unknown[][] = []
     const reviver = jest.fn(function (key, value) {
+      // @ts-expect-error Let's not try to type this
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === '0') return undefined
       if (key === '3') return 10
@@ -723,8 +729,9 @@ describe('reviver', () => {
   })
 
   test('!!set', () => {
-    const these = []
+    const these: unknown[][] = []
     const reviver = jest.fn(function (key, value) {
+      // @ts-expect-error Let's not try to type this
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === 2) return undefined
       if (key === 8) return 10
@@ -751,8 +758,9 @@ describe('reviver', () => {
   })
 
   test('!!omap', () => {
-    const these = []
+    const these: unknown[][] = []
     const reviver = jest.fn(function (key, value) {
+      // @ts-expect-error Let's not try to type this
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === 2) return undefined
       if (key === 8) return 10

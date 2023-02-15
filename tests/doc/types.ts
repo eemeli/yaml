@@ -1,37 +1,56 @@
-import * as YAML from 'yaml'
-import { Scalar, YAMLSeq } from 'yaml'
+import {
+  Document,
+  DocumentOptions,
+  Node,
+  parse,
+  ParsedNode,
+  parseDocument as origParseDocument,
+  ParseOptions,
+  Scalar,
+  ScalarTag,
+  Schema,
+  SchemaOptions,
+  stringify,
+  YAMLMap,
+  YAMLSeq
+} from 'yaml'
 import { seqTag, stringTag, stringifyString } from 'yaml/util'
 import { source } from '../_utils'
+
+const parseDocument = <T extends Node = ParsedNode>(
+  source: string,
+  options?: ParseOptions & DocumentOptions & SchemaOptions
+) => origParseDocument<T, false>(source, options)
 
 describe('tags', () => {
   describe('implicit tags', () => {
     test('plain string', () => {
-      const doc = YAML.parseDocument('foo')
+      const doc = parseDocument<Scalar>('foo')
       expect(doc.contents.tag).toBeUndefined()
       expect(doc.contents.value).toBe('foo')
     })
     test('quoted string', () => {
-      const doc = YAML.parseDocument('"foo"')
+      const doc = parseDocument<Scalar>('"foo"')
       expect(doc.contents.tag).toBeUndefined()
       expect(doc.contents.value).toBe('foo')
     })
     test('flow map', () => {
-      const doc = YAML.parseDocument('{ foo }')
+      const doc = parseDocument('{ foo }')
       expect(doc.contents.tag).toBeUndefined()
       expect(doc.contents.toJSON()).toMatchObject({ foo: null })
     })
     test('flow seq', () => {
-      const doc = YAML.parseDocument('[ foo ]')
+      const doc = parseDocument('[ foo ]')
       expect(doc.contents.tag).toBeUndefined()
       expect(doc.contents.toJSON()).toMatchObject(['foo'])
     })
     test('block map', () => {
-      const doc = YAML.parseDocument('foo:\n')
+      const doc = parseDocument('foo:\n')
       expect(doc.contents.tag).toBeUndefined()
       expect(doc.contents.toJSON()).toMatchObject({ foo: null })
     })
     test('block seq', () => {
-      const doc = YAML.parseDocument('- foo')
+      const doc = parseDocument('- foo')
       expect(doc.contents.tag).toBeUndefined()
       expect(doc.contents.toJSON()).toMatchObject(['foo'])
     })
@@ -39,32 +58,32 @@ describe('tags', () => {
 
   describe('explicit tags', () => {
     test('plain string', () => {
-      const doc = YAML.parseDocument('!!str foo')
+      const doc = parseDocument<Scalar>('!!str foo')
       expect(doc.contents.tag).toBe('tag:yaml.org,2002:str')
       expect(doc.contents.value).toBe('foo')
     })
     test('quoted string', () => {
-      const doc = YAML.parseDocument('!!str "foo"')
+      const doc = parseDocument<Scalar>('!!str "foo"')
       expect(doc.contents.tag).toBe('tag:yaml.org,2002:str')
       expect(doc.contents.value).toBe('foo')
     })
     test('flow map', () => {
-      const doc = YAML.parseDocument('!!map { foo }')
+      const doc = parseDocument('!!map { foo }')
       expect(doc.contents.tag).toBe('tag:yaml.org,2002:map')
       expect(doc.contents.toJSON()).toMatchObject({ foo: null })
     })
     test('flow seq', () => {
-      const doc = YAML.parseDocument('!!seq [ foo ]')
+      const doc = parseDocument('!!seq [ foo ]')
       expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
       expect(doc.contents.toJSON()).toMatchObject(['foo'])
     })
     test('block map', () => {
-      const doc = YAML.parseDocument('!!map\nfoo:\n')
+      const doc = parseDocument('!!map\nfoo:\n')
       expect(doc.contents.tag).toBe('tag:yaml.org,2002:map')
       expect(doc.contents.toJSON()).toMatchObject({ foo: null })
     })
     test('block seq', () => {
-      const doc = YAML.parseDocument('!!seq\n- foo')
+      const doc = parseDocument('!!seq\n- foo')
       expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
       expect(doc.contents.toJSON()).toMatchObject(['foo'])
     })
@@ -81,7 +100,7 @@ describe('tags', () => {
       '!t"ag x'
     ]) {
       test(`invalid tag: ${tag}`, () => {
-        const doc = YAML.parseDocument(tag)
+        const doc = parseDocument(tag)
         expect(doc.errors).not.toHaveLength(0)
         expect(doc.errors[0].code).toBe('MISSING_CHAR')
       })
@@ -89,7 +108,7 @@ describe('tags', () => {
   })
 
   test('eemeli/yaml#97', () => {
-    const doc = YAML.parseDocument('foo: !!float 3.0')
+    const doc = parseDocument('foo: !!float 3.0')
     expect(String(doc)).toBe('foo: !!float 3.0\n')
   })
 })
@@ -108,7 +127,7 @@ describe('number types', () => {
 - 4.20
 - .42
 - 00.4`
-      const doc = YAML.parseDocument(src, {
+      const doc = parseDocument<YAMLSeq>(src, {
         intAsBigInt: false,
         version: '1.1'
       })
@@ -141,7 +160,7 @@ describe('number types', () => {
 - 4.20
 - .42
 - 00.4`
-      const doc = YAML.parseDocument(src, {
+      const doc = parseDocument<YAMLSeq>(src, {
         intAsBigInt: false,
         version: '1.2'
       })
@@ -173,7 +192,10 @@ describe('number types', () => {
 - 3.1e+2
 - 5.1_2_3E-1
 - 4.02`
-      const doc = YAML.parseDocument(src, { intAsBigInt: true, version: '1.1' })
+      const doc = parseDocument<YAMLSeq>(src, {
+        intAsBigInt: true,
+        version: '1.1'
+      })
       expect(doc.contents.items).toMatchObject([
         { value: 10n, format: 'BIN' },
         { value: 83n, format: 'OCT' },
@@ -196,7 +218,10 @@ describe('number types', () => {
 - 3.1e+2
 - 5.123E-1
 - 4.02`
-      const doc = YAML.parseDocument(src, { intAsBigInt: true, version: '1.2' })
+      const doc = parseDocument<YAMLSeq>(src, {
+        intAsBigInt: true,
+        version: '1.2'
+      })
       expect(doc.contents.items).toMatchObject([
         { value: 83n, format: 'OCT' },
         { value: 0n, format: 'OCT' },
@@ -218,7 +243,7 @@ aliases:
   - docker:
       - image: circleci/node:8.11.2
   - key: repository-{{ .Revision }}\n`
-  expect(YAML.parse(src)).toMatchObject({
+  expect(parse(src)).toMatchObject({
     aliases: [
       { docker: [{ image: 'circleci/node:8.11.2' }] },
       { key: 'repository-{{ .Revision }}' }
@@ -233,7 +258,7 @@ describe('json schema', () => {
 "logical": True
 "option": TruE`
 
-    const doc = YAML.parseDocument(src, { schema: 'json' })
+    const doc = parseDocument(src, { schema: 'json' })
     expect(doc.toJS()).toMatchObject({
       canonical: true,
       answer: false,
@@ -253,7 +278,7 @@ describe('json schema', () => {
 "negative infinity": -.inf
 "not a number": .NaN`
 
-    const doc = YAML.parseDocument(src, { schema: 'json' })
+    const doc = parseDocument<YAMLMap<Scalar, Scalar>>(src, { schema: 'json' })
     expect(doc.toJS()).toMatchObject({
       canonical: 685230.15,
       fixed: 685230.15,
@@ -262,7 +287,7 @@ describe('json schema', () => {
     })
     expect(doc.errors).toHaveLength(2)
     doc.errors = []
-    doc.contents.items[1].value.tag = 'tag:yaml.org,2002:float'
+    doc.contents.items[1].value!.tag = 'tag:yaml.org,2002:float'
     expect(String(doc)).toBe(
       '"canonical": 685230.15\n"fixed": !!float 685230.15\n"negative infinity": "-.inf"\n"not a number": ".NaN"\n'
     )
@@ -274,7 +299,7 @@ describe('json schema', () => {
 "octal": 0o2472256
 "hexadecimal": 0x0A74AE`
 
-    const doc = YAML.parseDocument(src, { schema: 'json' })
+    const doc = parseDocument(src, { schema: 'json' })
     expect(doc.toJS()).toMatchObject({
       canonical: 685230,
       decimal: -685230,
@@ -295,7 +320,7 @@ describe('json schema', () => {
 "english": null
 ~: 'null key'`
 
-    const doc = YAML.parseDocument(src, { schema: 'json' })
+    const doc = parseDocument(src, { schema: 'json' })
     expect(doc.toJS()).toMatchObject({
       empty: '',
       canonical: '~',
@@ -318,7 +343,7 @@ answer: FALSE
 logical: True
 option: TruE\n`
 
-    const doc = YAML.parseDocument(src)
+    const doc = parseDocument(src)
     expect(doc.toJS()).toMatchObject({
       canonical: true,
       answer: false,
@@ -337,7 +362,7 @@ fixed: 685230.15
 negative infinity: -.inf
 not a number: .NaN`
 
-    const doc = YAML.parseDocument(src)
+    const doc = parseDocument(src)
     expect(doc.toJS()).toMatchObject({
       canonical: 685230.15,
       fixed: 685230.15,
@@ -356,7 +381,7 @@ decimal: +685230
 octal: 0o2472256
 hexadecimal: 0x0A74AE`
 
-    const doc = YAML.parseDocument(src)
+    const doc = parseDocument(src)
     expect(doc.toJS()).toMatchObject({
       canonical: 685230,
       decimal: 685230,
@@ -375,7 +400,7 @@ canonical: ~
 english: null
 ~: null key`
 
-    const doc = YAML.parseDocument(src)
+    const doc = parseDocument(src)
     expect(doc.toJS()).toMatchObject({
       empty: null,
       canonical: null,
@@ -394,7 +419,7 @@ english: null
 one: 1
 2: two
 { 3: 4 }: many\n`
-      const doc = YAML.parseDocument(src, { logLevel: 'error' })
+      const doc = parseDocument<YAMLMap>(src, { logLevel: 'error' })
       expect(doc.toJS()).toMatchObject({
         one: 1,
         2: 'two',
@@ -414,9 +439,9 @@ one: 1
 one: 1
 2: two
 { 3: 4 }: many\n`
-      const doc = YAML.parseDocument(src)
+      const doc = parseDocument<YAMLMap>(src)
       expect(doc.toJS({ mapAsMap: true })).toMatchObject(
-        new Map([
+        new Map<unknown, unknown>([
           ['one', 1],
           [2, 'two'],
           [new Map([[3, 4]]), 'many']
@@ -425,7 +450,7 @@ one: 1
       expect(doc.errors).toHaveLength(0)
       doc.contents.items[2].key = { 3: 4 }
       expect(doc.toJS({ mapAsMap: true })).toMatchObject(
-        new Map([
+        new Map<unknown, unknown>([
           ['one', 1],
           [2, 'two'],
           [{ 3: 4 }, 'many']
@@ -450,9 +475,11 @@ generic: !!binary |
 description:
  The binary value above is a tiny arrow encoded as a gif image.`
 
-    const doc = YAML.parseDocument(src, { schema: 'yaml-1.1' })
-    const canonical = doc.contents.items[0].value.value
-    const generic = doc.contents.items[1].value.value
+    const doc = parseDocument<YAMLMap<Scalar, Scalar<Uint8Array>>>(src, {
+      schema: 'yaml-1.1'
+    })
+    const canonical = doc.contents.items[0].value!.value
+    const generic = doc.contents.items[1].value!.value
     expect(canonical).toBeInstanceOf(Uint8Array)
     expect(generic).toBeInstanceOf(Uint8Array)
     expect(canonical).toHaveLength(185)
@@ -485,7 +512,7 @@ answer: NO
 logical: True
 option: on`
 
-    const doc = YAML.parseDocument(src, { version: '1.1' })
+    const doc = parseDocument(src, { version: '1.1' })
     expect(doc.toJS()).toMatchObject({
       canonical: true,
       answer: false,
@@ -508,7 +535,7 @@ sexagesimal: 190:20:30.15
 negative infinity: -.inf
 not a number: .NaN`
 
-    const doc = YAML.parseDocument(src)
+    const doc = parseDocument(src)
     expect(doc.toJS()).toMatchObject({
       canonical: 685230.15,
       exponential: 685230.15,
@@ -537,7 +564,7 @@ hexadecimal: 0x_0A_74_AE
 binary: 0b1010_0111_0100_1010_1110
 sexagesimal: 190:20:30`
 
-    const doc = YAML.parseDocument(src)
+    const doc = parseDocument(src)
     expect(doc.toJS()).toMatchObject({
       canonical: 685230,
       decimal: 685230,
@@ -566,7 +593,7 @@ hexadecimal: 0x_0A_74_AE
 binary: 0b1010_0111_0100_1010_1110
 sexagesimal: 190:20:30`
 
-    const doc = YAML.parseDocument(src, { intAsBigInt: true })
+    const doc = parseDocument(src, { intAsBigInt: true })
     expect(doc.toJS()).toMatchObject({
       canonical: 685230n,
       decimal: 685230n,
@@ -593,7 +620,7 @@ canonical: ~
 english: null
 ~: null key`
 
-    const doc = YAML.parseDocument(src)
+    const doc = parseDocument(src)
     expect(doc.toJS()).toMatchObject({
       empty: null,
       canonical: null,
@@ -618,9 +645,9 @@ space separated:  2001-12-14 21:59:43.10 -5
 no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
-      const doc = YAML.parseDocument(src)
+      const doc = parseDocument<YAMLMap<Scalar, Scalar>>(src)
       doc.contents.items.forEach(item => {
-        expect(item.value.value).toBeInstanceOf(Date)
+        expect(item.value!.value).toBeInstanceOf(Date)
       })
       expect(doc.toJSON()).toMatchObject({
         canonical: '2001-12-15T02:59:43.100Z',
@@ -640,9 +667,9 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('stringify', () => {
       const date = new Date('2018-12-22T08:02:52Z')
-      const str = YAML.stringify(date) // stringified as !!str
+      const str = stringify(date) // stringified as !!str
       expect(str).toBe('2018-12-22T08:02:52.000Z\n')
-      const str2 = YAML.stringify(date, { version: '1.1' })
+      const str2 = stringify(date, { version: '1.1' })
       expect(str2).toBe('2018-12-22T08:02:52\n')
     })
   })
@@ -653,7 +680,7 @@ date (00:00:00Z): 2002-12-14\n`)
       { name: 'parse flow seq', src: `!!pairs [ a: 1, b: 2, a: 3 ]\n` }
     ])
       test(name, () => {
-        const doc = YAML.parseDocument(src, { version: '1.1' })
+        const doc = parseDocument<YAMLSeq>(src, { version: '1.1' })
         expect(doc.contents).toBeInstanceOf(YAMLSeq)
         expect(doc.contents.items).toMatchObject([
           { key: { value: 'a' }, value: { value: 1 } },
@@ -666,7 +693,7 @@ date (00:00:00Z): 2002-12-14\n`)
       })
 
     test('stringify', () => {
-      const doc = new YAML.Document(null, { version: '1.1' })
+      const doc = new Document(null, { version: '1.1' })
       doc.contents = doc.createNode(
         [
           ['a', 1],
@@ -686,7 +713,7 @@ date (00:00:00Z): 2002-12-14\n`)
       { name: 'parse flow seq', src: `!!omap [ a: 1, b: 2, c: 3 ]\n` }
     ])
       test(name, () => {
-        const doc = YAML.parseDocument(src, { version: '1.1' })
+        const doc = parseDocument<any>(src, { version: '1.1' })
         expect(doc.contents.constructor.tag).toBe('tag:yaml.org,2002:omap')
         expect(doc.toJS()).toBeInstanceOf(Map)
         expect(doc.toJS()).toMatchObject(
@@ -701,7 +728,7 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('require unique keys', () => {
       const src = `!!omap\n- a: 1\n- b: 2\n- b: 9\n`
-      const doc = YAML.parseDocument(src, {
+      const doc = parseDocument(src, {
         prettyErrors: false,
         version: '1.1'
       })
@@ -719,14 +746,14 @@ date (00:00:00Z): 2002-12-14\n`)
         ['b', 2],
         ['c', 3]
       ])
-      const str = YAML.stringify(map, { version: '1.1' })
+      const str = stringify(map, { version: '1.1' })
       expect(str).toBe(`!!omap\n- a: 1\n- b: 2\n- c: 3\n`)
-      const str2 = YAML.stringify(map)
+      const str2 = stringify(map)
       expect(str2).toBe(`a: 1\nb: 2\nc: 3\n`)
     })
 
     test('stringify Array', () => {
-      const doc = new YAML.Document(null, { version: '1.1' })
+      const doc = new Document<any>(null, { version: '1.1' })
       doc.contents = doc.createNode(
         [
           ['a', 1],
@@ -746,7 +773,7 @@ date (00:00:00Z): 2002-12-14\n`)
       { name: 'parse flow map', src: `!!set { a, b, c }\n` }
     ])
       test(name, () => {
-        const doc = YAML.parseDocument(src, { version: '1.1' })
+        const doc = parseDocument<any>(src, { version: '1.1' })
         expect(doc.contents.constructor.tag).toBe('tag:yaml.org,2002:set')
         expect(doc.toJS()).toBeInstanceOf(Set)
         expect(doc.toJS()).toMatchObject(new Set(['a', 'b', 'c']))
@@ -755,7 +782,7 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('require null values', () => {
       const src = `!!set\n? a\n? b\nc: d\n`
-      const doc = YAML.parseDocument(src, {
+      const doc = parseDocument(src, {
         prettyErrors: false,
         version: '1.1'
       })
@@ -769,15 +796,15 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('stringify', () => {
       const set = new Set(['a', 'b', 'c'])
-      const str = YAML.stringify(set, { version: '1.1' })
+      const str = stringify(set, { version: '1.1' })
       expect(str).toBe(`!!set\n? a\n? b\n? c\n`)
-      const str2 = YAML.stringify(set)
+      const str2 = stringify(set)
       expect(str2).toBe(`- a\n- b\n- c\n`)
     })
 
     test('eemeli/yaml#78', () => {
       const set = new Set(['a', 'b', 'c'])
-      const str = YAML.stringify({ set }, { version: '1.1' })
+      const str = stringify({ set }, { version: '1.1' })
       expect(str).toBe(source`
         set: !!set
           ? a
@@ -790,7 +817,7 @@ date (00:00:00Z): 2002-12-14\n`)
   describe('!!merge', () => {
     test('alias', () => {
       const src = '- &a { a: A, b: B }\n- { <<: *a, b: X }\n'
-      const doc = YAML.parseDocument(src, { version: '1.1' })
+      const doc = parseDocument(src, { version: '1.1' })
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
         { a: 'A', b: 'X' }
@@ -801,7 +828,7 @@ date (00:00:00Z): 2002-12-14\n`)
     test('alias sequence', () => {
       const src =
         '- &a { a: A, b: B, c: C }\n- &b { a: X }\n- { <<: [ *b, *a ], b: X }\n'
-      const doc = YAML.parseDocument(src, { version: '1.1' })
+      const doc = parseDocument(src, { version: '1.1' })
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
         { a: 'X' },
@@ -812,7 +839,7 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('explicit creation', () => {
       const src = '- { a: A, b: B }\n- { b: X }\n'
-      const doc = YAML.parseDocument(src, { version: '1.1' })
+      const doc = parseDocument(src, { version: '1.1' })
       const alias = doc.createAlias(doc.get(0), 'a')
       doc.addIn([1], doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
@@ -824,7 +851,7 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('creation by duck typing', () => {
       const src = '- { a: A, b: B }\n- { b: X }\n'
-      const doc = YAML.parseDocument(src, { version: '1.1' })
+      const doc = parseDocument(src, { version: '1.1' })
       const alias = doc.createAlias(doc.get(0), 'a')
       doc.addIn([1], doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
@@ -849,7 +876,7 @@ describe('custom tags', () => {
     `
 
     test('parse', () => {
-      const doc = YAML.parseDocument(src)
+      const doc = parseDocument<YAMLSeq<Scalar>>(src)
       expect(doc.contents).toBeInstanceOf(YAMLSeq)
       expect(doc.contents.tag).toBe('tag:example.com,2000:test/x')
       const { items } = doc.contents
@@ -861,7 +888,7 @@ describe('custom tags', () => {
     })
 
     test('stringify', () => {
-      const doc = YAML.parseDocument(src)
+      const doc = parseDocument(src)
       expect(String(doc)).toBe(source`
         %TAG !e! tag:example.com,2000:test/
         ---
@@ -874,7 +901,7 @@ describe('custom tags', () => {
     })
 
     test('modify', () => {
-      const doc = YAML.parseDocument(src)
+      const doc = parseDocument<YAMLSeq<Scalar>>(src)
       const prefix = 'tag:example.com,2000:other/'
       doc.directives.tags['!f!'] = prefix
       expect(doc.directives.tags).toMatchObject({
@@ -887,6 +914,7 @@ describe('custom tags', () => {
       doc.contents.items[3].comment = 'cc'
       const s = new Scalar(6)
       s.tag = '!g'
+      // @ts-expect-error TS should complain here
       doc.contents.items.splice(1, 1, s, '7')
       expect(String(doc)).toBe(source`
         %TAG !e! tag:example.com,2000:test/
@@ -911,42 +939,42 @@ describe('custom tags', () => {
       AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=`
 
     test('tag string in tags', () => {
-      const bin = YAML.parse(src, { customTags: ['binary'] })
+      const bin = parse(src, { customTags: ['binary'] })
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 
     test('tag string in tag array', () => {
-      const bin = YAML.parse(src, { customTags: [['binary']] })
+      // @ts-expect-error TS should complain here
+      const bin = parse(src, { customTags: [['binary']] })
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 
     test('custom tags from function', () => {
-      const customTags = tags => tags.concat('binary')
-      const bin = YAML.parse(src, { customTags })
+      const bin = parse(src, { customTags: tags => tags.concat('binary') })
       expect(bin).toBeInstanceOf(Uint8Array)
     })
 
     test('no custom tag object', () => {
-      const bin = YAML.parse(src)
+      const bin = parse(src)
       expect(bin).toBeInstanceOf(Uint8Array)
     })
   })
 
-  const regexp = {
+  const regexp: ScalarTag = {
     identify: value => value instanceof RegExp,
     tag: '!re',
     resolve(str) {
-      const match = str.match(/^\/([\s\S]+)\/([gimuy]*)$/)
+      const match = str.match(/^\/([\s\S]+)\/([gimuy]*)$/)!
       return new RegExp(match[1], match[2])
     }
   }
 
-  const sharedSymbol = {
-    identify: value => value.constructor === Symbol,
+  const sharedSymbol: ScalarTag = {
+    identify: (value: any) => value.constructor === Symbol,
     tag: '!symbol/shared',
     resolve: str => Symbol.for(str),
     stringify(item, ctx, onComment, onChompKeep) {
-      const key = Symbol.keyFor(item.value)
+      const key = Symbol.keyFor(item.value as symbol)
       if (key === undefined)
         throw new Error('Only shared symbols are supported')
       return stringifyString({ value: key }, ctx, onComment, onChompKeep)
@@ -955,26 +983,26 @@ describe('custom tags', () => {
 
   describe('RegExp', () => {
     test('stringify as plain scalar', () => {
-      const str = YAML.stringify(/re/g, { customTags: [regexp] })
+      const str = stringify(/re/g, { customTags: [regexp] })
       expect(str).toBe('!re /re/g\n')
-      const res = YAML.parse(str, { customTags: [regexp] })
+      const res = parse(str, { customTags: [regexp] })
       expect(res).toBeInstanceOf(RegExp)
     })
 
     test('stringify as quoted scalar', () => {
-      const str = YAML.stringify(/re: /g, { customTags: [regexp] })
+      const str = stringify(/re: /g, { customTags: [regexp] })
       expect(str).toBe('!re "/re: /g"\n')
-      const res = YAML.parse(str, { customTags: [regexp] })
+      const res = parse(str, { customTags: [regexp] })
       expect(res).toBeInstanceOf(RegExp)
     })
 
     test('parse plain string as string', () => {
-      const res = YAML.parse('/re/g', { customTags: [regexp] })
+      const res = parse('/re/g', { customTags: [regexp] })
       expect(res).toBe('/re/g')
     })
 
     test('parse quoted string as string', () => {
-      const res = YAML.parse('"/re/g"', { customTags: [regexp] })
+      const res = parse('"/re/g"', { customTags: [regexp] })
       expect(res).toBe('/re/g')
     })
   })
@@ -982,37 +1010,38 @@ describe('custom tags', () => {
   describe('Symbol', () => {
     test('stringify as plain scalar', () => {
       const symbol = Symbol.for('foo')
-      const str = YAML.stringify(symbol, { customTags: [sharedSymbol] })
+      const str = stringify(symbol, { customTags: [sharedSymbol] })
       expect(str).toBe('!symbol/shared foo\n')
-      const res = YAML.parse(str, { customTags: [sharedSymbol] })
+      const res = parse(str, { customTags: [sharedSymbol] })
       expect(res).toBe(symbol)
     })
 
     test('stringify as block scalar', () => {
       const symbol = Symbol.for('foo\nbar')
-      const str = YAML.stringify(symbol, { customTags: [sharedSymbol] })
+      const str = stringify(symbol, { customTags: [sharedSymbol] })
       expect(str).toBe('!symbol/shared |-\nfoo\nbar\n')
-      const res = YAML.parse(str, { customTags: [sharedSymbol] })
+      const res = parse(str, { customTags: [sharedSymbol] })
       expect(res).toBe(symbol)
     })
   })
 
   test('array within customTags', () => {
     const obj = { re: /re/g, symbol: Symbol.for('foo') }
-    const str = YAML.stringify(obj, { customTags: [[regexp, sharedSymbol]] })
+    // @ts-expect-error TS should complain here
+    const str = stringify(obj, { customTags: [[regexp, sharedSymbol]] })
     expect(str).toBe('re: !re /re/g\nsymbol: !symbol/shared foo\n')
   })
 
   describe('schema from custom tags', () => {
     test('customTags is required', () => {
-      expect(() =>
-        YAML.parseDocument('foo', { schema: 'custom-test' })
-      ).toThrow(/Unknown schema "custom-test"/)
+      expect(() => parseDocument('foo', { schema: 'custom-test' })).toThrow(
+        /Unknown schema "custom-test"/
+      )
     })
 
     test('parse success', () => {
       const src = '- foo\n- !re /bar/\n'
-      const doc = YAML.parseDocument(src, {
+      const doc = parseDocument(src, {
         customTags: [seqTag, stringTag, regexp],
         schema: 'custom-test'
       })
@@ -1025,7 +1054,7 @@ describe('custom tags', () => {
     test('parse fail', () => {
       // map, seq & string are always parsed, even if not included
       const src = '- foo\n- !re /bar/\n'
-      const doc = YAML.parseDocument(src, {
+      const doc = parseDocument(src, {
         customTags: [],
         schema: 'custom-test'
       })
@@ -1036,14 +1065,14 @@ describe('custom tags', () => {
 
     test('stringify success', () => {
       let src = '- foo\n'
-      let doc = YAML.parseDocument(src, {
+      let doc = parseDocument(src, {
         customTags: [seqTag, stringTag],
         schema: 'custom-test'
       })
       expect(doc.toString()).toBe(src)
 
       src = '- foo\n- !re /bar/\n'
-      doc = YAML.parseDocument(src, {
+      doc = parseDocument(src, {
         customTags: [seqTag, stringTag, regexp],
         schema: 'custom-test'
       })
@@ -1052,13 +1081,13 @@ describe('custom tags', () => {
 
     test('stringify fail', () => {
       const src = '- foo\n'
-      let doc = YAML.parseDocument(src, {
+      let doc = parseDocument(src, {
         customTags: [],
         schema: 'custom-test'
       })
       expect(() => String(doc)).toThrow(/Tag not resolved for YAMLSeq value/)
 
-      doc = YAML.parseDocument(src, {
+      doc = parseDocument(src, {
         customTags: [seqTag],
         schema: 'custom-test'
       })
@@ -1067,7 +1096,7 @@ describe('custom tags', () => {
 
     test('setSchema', () => {
       const src = '- foo\n'
-      const doc = YAML.parseDocument(src)
+      const doc = parseDocument(src)
 
       doc.setSchema('1.2', {
         customTags: [seqTag, stringTag],
@@ -1086,7 +1115,7 @@ describe('custom tags', () => {
 
 describe('schema changes', () => {
   test('write as json', () => {
-    const doc = YAML.parseDocument('foo: bar', { schema: 'core' })
+    const doc = parseDocument('foo: bar', { schema: 'core' })
     expect(doc.schema.name).toBe('core')
     doc.setSchema('1.2', { schema: 'json' })
     expect(doc.schema.name).toBe('json')
@@ -1094,7 +1123,7 @@ describe('schema changes', () => {
   })
 
   test('fail for missing type', () => {
-    const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
+    const doc = parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
     })
     expect(doc.directives.yaml).toMatchObject({
@@ -1111,7 +1140,7 @@ describe('schema changes', () => {
   })
 
   test('set schema + custom tags', () => {
-    const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
+    const doc = parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
     })
     doc.setSchema('1.1', { customTags: ['timestamp'], schema: 'json' })
@@ -1119,15 +1148,16 @@ describe('schema changes', () => {
   })
 
   test('set version + custom tags', () => {
-    const doc = YAML.parseDocument('foo: 1971-02-03T12:13:14', {
+    const doc = parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
     })
+    // @ts-expect-error TS should complain here
     doc.setSchema(1.2, { customTags: ['timestamp'] })
     expect(String(doc)).toBe('foo: 1971-02-03T12:13:14\n')
   })
 
   test('schema changes on bool', () => {
-    const doc = YAML.parseDocument('[y, yes, on, n, no, off]', {
+    const doc = parseDocument('[y, yes, on, n, no, off]', {
       version: '1.1'
     })
     doc.setSchema('1.1', { schema: 'core' })
@@ -1137,13 +1167,13 @@ describe('schema changes', () => {
   })
 
   test('set bool + re-stringified', () => {
-    let doc = YAML.parseDocument('a: True', {
+    let doc = parseDocument('a: True', {
       version: '1.2'
     })
     doc.set('a', false)
     expect(String(doc)).toBe('a: false\n')
 
-    doc = YAML.parseDocument('a: on', {
+    doc = parseDocument('a: on', {
       version: '1.1'
     })
     doc.set('a', false)
@@ -1152,22 +1182,22 @@ describe('schema changes', () => {
 
   test('custom schema instance', () => {
     const src = '[ !!bool yes, &foo no, *foo ]'
-    const doc = YAML.parseDocument(src, { version: '1.1' })
+    const doc = parseDocument(src, { version: '1.1' })
 
-    doc.setSchema('1.2', new YAML.Schema({ schema: 'core' }))
+    const core = new Schema({ schema: 'core' })
+    doc.setSchema('1.2', { schema: core })
     expect(String(doc)).toBe('[ !!bool true, &foo false, *foo ]\n')
 
-    const yaml11 = new YAML.Schema({ schema: 'yaml-1.1' })
-    doc.setSchema('1.1', Object.assign({}, yaml11))
+    const yaml11 = new Schema({ schema: 'yaml-1.1' })
+    doc.setSchema('1.1', { schema: Object.assign({}, yaml11) })
     expect(String(doc)).toBe('[ !!bool yes, &foo no, *foo ]\n')
 
-    const schema = new YAML.Schema({ schema: 'core' })
-    doc.setSchema(null, { schema })
+    doc.setSchema(null, { schema: core })
     expect(String(doc)).toBe('[ true, false, false ]\n')
   })
 
   test('null version requires Schema instance', () => {
-    const doc = YAML.parseDocument('foo: bar')
+    const doc = parseDocument('foo: bar')
     const msg =
       'With a null YAML version, the { schema: Schema } option is required'
     expect(() => doc.setSchema(null)).toThrow(msg)

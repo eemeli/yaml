@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
 import {
   Document,
   parseDocument,
@@ -42,7 +40,7 @@ describe('Map', () => {
   test('add', () => {
     map.add({ key: 'c', value: 'x' })
     expect(map.get('c')).toBe('x')
-    // @ts-expect-error
+    // @ts-expect-error TS should complain here
     expect(() => map.add('a')).toThrow(/already set/)
     expect(() => map.add(new Pair('c', 'y'))).toThrow(/already set/)
     expect(map.items).toHaveLength(3)
@@ -88,7 +86,7 @@ describe('Map', () => {
     expect(map.has('b')).toBe(true)
     expect(map.has('c')).toBe(false)
     expect(map.has('')).toBe(false)
-    // @ts-expect-error
+    // @ts-expect-error TS should complain here
     expect(map.has()).toBe(false)
   })
 
@@ -96,7 +94,7 @@ describe('Map', () => {
     expect(map.has(doc.createNode('a'))).toBe(true)
     expect(map.has(doc.createNode('b'))).toBe(true)
     expect(map.has(doc.createNode('c'))).toBe(false)
-    // @ts-expect-error
+    // @ts-expect-error TS should complain here
     expect(map.has(doc.createNode())).toBe(false)
   })
 
@@ -189,7 +187,7 @@ describe('Seq', () => {
     expect(seq.has(2)).toBe(false)
     expect(seq.has('0')).toBe(true)
     expect(seq.has('')).toBe(false)
-    // @ts-expect-error
+    // @ts-expect-error TS should complain here
     expect(seq.has()).toBe(false)
   })
 
@@ -198,7 +196,7 @@ describe('Seq', () => {
     expect(seq.has(doc.createNode('0'))).toBe(true)
     expect(seq.has(doc.createNode(2))).toBe(false)
     expect(seq.has(doc.createNode(''))).toBe(false)
-    // @ts-expect-error
+    // @ts-expect-error TS should complain here
     expect(seq.has(doc.createNode())).toBe(false)
   })
 
@@ -300,7 +298,7 @@ describe('OMap', () => {
   test('add', () => {
     omap.add({ key: 'c', value: 'x' })
     expect(omap.get('c')).toBe('x')
-    // @ts-expect-error
+    // @ts-expect-error TS should complain here
     expect(() => omap.add('a')).toThrow(/already set/)
     expect(() => omap.add(new Pair('c', 'y'))).toThrow(/already set/)
     expect(omap.items).toHaveLength(3)
@@ -331,7 +329,7 @@ describe('OMap', () => {
     expect(omap.has('b')).toBe(true)
     expect(omap.has('c')).toBe(false)
     expect(omap.has('')).toBe(false)
-    // @ts-expect-error
+    // @ts-expect-error TS should complain here
     expect(omap.has()).toBe(false)
   })
 

@@ -14,8 +14,16 @@ export type Node<T = unknown> =
   | YAMLSeq<T>
 
 /** Utility type mapper */
-export type NodeType<T> = T extends string | number | bigint | boolean | null
+export type NodeType<T> = T extends
+  | string
+  | number
+  | bigint
+  | boolean
+  | null
+  | undefined
   ? Scalar<T>
+  : T extends Date
+  ? Scalar<string | Date>
   : T extends Array<any>
   ? YAMLSeq<NodeType<T[number]>>
   : T extends { [key: string]: any }

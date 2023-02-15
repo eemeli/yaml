@@ -105,7 +105,7 @@ for (const { fn, exp } of [
       pair: false
     }
   }
-]) {
+] as { fn: (x: unknown) => boolean; exp: Record<string, boolean> }[]) {
   describe(fn.name, () => {
     test('parsed doc', () => {
       const doc = parseDocument('foo')
@@ -154,7 +154,7 @@ for (const { fn, exp } of [
     })
 
     test('created alias', () => {
-      expect(fn(new Alias(new Scalar(42)))).toBe(exp.alias)
+      expect(fn(new Alias('42'))).toBe(exp.alias)
     })
 
     test('created pair', () => {

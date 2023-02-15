@@ -1,7 +1,7 @@
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { ErrorCode, YAMLParseError, YAMLWarning } from '../errors.js'
-import { isCollection, isPair, Range } from '../nodes/Node.js'
+import { isCollection, isPair, ParsedNode, Range } from '../nodes/Node.js'
 import type {
   DocumentOptions,
   ParseOptions,
@@ -69,9 +69,12 @@ function parsePrelude(prelude: string[]) {
  * const docs = new Composer().compose(tokens)
  * ```
  */
-export class Composer {
+export class Composer<
+  Contents extends ParsedNode = ParsedNode,
+  Strict extends boolean = true
+> {
   private directives: Directives
-  private doc: Document.Parsed | null = null
+  private doc: Document.Parsed<Contents, Strict> | null = null
   private options: ParseOptions & DocumentOptions & SchemaOptions
   private atDirectives = false
   private prelude: string[] = []
@@ -90,7 +93,7 @@ export class Composer {
     else this.errors.push(new YAMLParseError(pos, code, message))
   }
 
-  private decorate(doc: Document.Parsed, afterDoc: boolean) {
+  private decorate(doc: Document.Parsed<Contents, Strict>, afterDoc: boolean) {
     const { comment, afterEmptyLine } = parsePrelude(this.prelude)
     //console.log({ dc: doc.comment, prelude, comment })
     if (comment) {
@@ -162,7 +165,7 @@ export class Composer {
         this.atDirectives = true
         break
       case 'document': {
-        const doc = composeDoc(
+        const doc = composeDoc<Contents, Strict>(
           this.options,
           this.directives,
           token,
@@ -247,7 +250,10 @@ export class Composer {
       this.doc = null
     } else if (forceDoc) {
       const opts = Object.assign({ _directives: this.directives }, this.options)
-      const doc = new Document(undefined, opts) as Document.Parsed
+      const doc = new Document(undefined, opts) as Document.Parsed<
+        Contents,
+        Strict
+      >
       if (this.atDirectives)
         this.onError(
           endOffset,

@@ -20,7 +20,7 @@ export function anchorIsValid(anchor: string): true {
   return true
 }
 
-export function anchorNames(root: Document | Node) {
+export function anchorNames(root: Document<Node, boolean> | Node) {
   const anchors = new Set<string>()
   visit(root, {
     Value(_key: unknown, node: Scalar | YAMLMap | YAMLSeq) {
@@ -38,7 +38,10 @@ export function findNewAnchor(prefix: string, exclude: Set<string>) {
   }
 }
 
-export function createNodeAnchors(doc: Document, prefix: string) {
+export function createNodeAnchors(
+  doc: Document<Node, boolean>,
+  prefix: string
+) {
   const aliasObjects: unknown[] = []
   const sourceObjects: CreateNodeContext['sourceObjects'] = new Map()
   let prevAnchors: Set<string> | null = null

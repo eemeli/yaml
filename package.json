@@ -14,7 +14,6 @@
   "files": [
     "browser/",
     "dist/",
-    "util.d.ts",
     "util.js"
   ],
   "type": "commonjs",
@@ -35,6 +34,13 @@
       "default": "./browser/dist/util.js"
     }
   },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
     "build:browser": "rollup -c config/rollup.browser-config.mjs",
@@ -49,7 +55,7 @@
     "test:browsers": "cd playground && npm test",
     "test:dist": "npm run build:node && jest --config config/jest.config.js",
     "test:dist:types": "tsc --allowJs --moduleResolution node --noEmit --target es5 dist/index.js",
-    "test:types": "tsc --noEmit",
+    "test:types": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
     "docs:install": "cd docs-slate && bundle install",
     "docs:deploy": "cd docs-slate && ./deploy.sh",
     "docs": "cd docs-slate && bundle exec middleman server",
