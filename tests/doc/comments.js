@@ -543,6 +543,15 @@ describe('stringify comments', () => {
         }
       `)
     })
+
+    test('line comment after flow collection (eemeli/yaml#443)', () => {
+      const doc = YAML.parseDocument(source`
+        [ value1, value2 ] # comment
+      `)
+      expect(String(doc)).toBe(source`
+        [ value1, value2 ] # comment
+      `)
+    })
   })
 })
 

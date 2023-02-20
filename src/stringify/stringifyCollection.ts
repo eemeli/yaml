@@ -161,7 +161,7 @@ function stringifyFlowCollection(
   }
 
   if (comment) {
-    str += lineComment(str, commentString(comment), indent)
+    str += lineComment(str, indent, commentString(comment))
     if (onComment) onComment()
   }
   return str
