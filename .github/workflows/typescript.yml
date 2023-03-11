@@ -18,6 +18,8 @@ jobs:
         with: { node-version: 16.x }
       - run: npm ci
       - run: npm run build:node
+      - run: npm run test:types
+      - run: npm run test:dist:types
 
       - run: npm install --no-save typescript@4.2
       - run: for d in node_modules/@types/*; do [[ $d == *node ]] || rm -r $d; done
