@@ -686,7 +686,6 @@ describe('reviver', () => {
   test('add values to this', () => {
     const reviver = jest.fn(function (key, value) {
       expect(key).not.toBe('9')
-      // @ts-expect-error Let's not try to type this
       this[9] = 9
       return value
     })
@@ -702,7 +701,6 @@ describe('reviver', () => {
   test('sequence', () => {
     const these: unknown[][] = []
     const reviver = jest.fn(function (key, value) {
-      // @ts-expect-error Let's not try to type this
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === '0') return undefined
       if (key === '3') return 10
@@ -731,7 +729,6 @@ describe('reviver', () => {
   test('!!set', () => {
     const these: unknown[][] = []
     const reviver = jest.fn(function (key, value) {
-      // @ts-expect-error Let's not try to type this
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === 2) return undefined
       if (key === 8) return 10
@@ -760,7 +757,6 @@ describe('reviver', () => {
   test('!!omap', () => {
     const these: unknown[][] = []
     const reviver = jest.fn(function (key, value) {
-      // @ts-expect-error Let's not try to type this
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === 2) return undefined
       if (key === 8) return 10
