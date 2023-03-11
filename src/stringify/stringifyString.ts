@@ -15,8 +15,11 @@ interface StringifyScalar {
   type?: string
 }
 
-const getFoldOptions = (ctx: StringifyContext): FoldOptions => ({
-  indentAtStart: ctx.indentAtStart,
+const getFoldOptions = (
+  ctx: StringifyContext,
+  isBlock: boolean
+): FoldOptions => ({
+  indentAtStart: isBlock ? ctx.indent.length : ctx.indentAtStart,
   lineWidth: ctx.options.lineWidth,
   minContentWidth: ctx.options.minContentWidth
 })
@@ -132,7 +135,7 @@ function doubleQuotedString(value: string, ctx: StringifyContext) {
   str = start ? str + json.slice(start) : json
   return implicitKey
     ? str
-    : foldFlowLines(str, indent, FOLD_QUOTED, getFoldOptions(ctx))
+    : foldFlowLines(str, indent, FOLD_QUOTED, getFoldOptions(ctx, false))
 }
 
 function singleQuotedString(value: string, ctx: StringifyContext) {
@@ -148,7 +151,7 @@ function singleQuotedString(value: string, ctx: StringifyContext) {
     "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'"
   return ctx.implicitKey
     ? res
-    : foldFlowLines(res, indent, FOLD_FLOW, getFoldOptions(ctx))
+    : foldFlowLines(res, indent, FOLD_FLOW, getFoldOptions(ctx, false))
 }
 
 function quotedString(value: string, ctx: StringifyContext) {
@@ -263,7 +266,7 @@ function blockString(
     `${start}${value}${end}`,
     indent,
     FOLD_BLOCK,
-    getFoldOptions(ctx)
+    getFoldOptions(ctx, true)
   )
   return `${header}\n${indent}${body}`
 }
@@ -327,7 +330,7 @@ function plainString(
   }
   return implicitKey
     ? str
-    : foldFlowLines(str, indent, FOLD_FLOW, getFoldOptions(ctx))
+    : foldFlowLines(str, indent, FOLD_FLOW, getFoldOptions(ctx, false))
 }
 
 export function stringifyString(

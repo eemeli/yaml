@@ -1,5 +1,6 @@
 import * as YAML from 'yaml'
 import { foldFlowLines as fold, FoldOptions } from 'yaml/util'
+import { source } from '../_utils'
 
 const FOLD_FLOW = 'flow'
 const FOLD_QUOTED = 'quoted'
@@ -245,6 +246,31 @@ describe('double-quoted', () => {
   orci."\n`
       )
     })
+  })
+})
+
+describe('block scalar', () => {
+  test('eemeli/yaml#422', () => {
+    const obj = {
+      'nginx.ingress.kubernetes.io/configuration-snippet': source`
+          location ~* ^/sites/aaaaaaa.aa/files/(.+) {
+            return 302 https://process.aaaaaaa.aa/sites/aaaaaaa.aa/files/$1;
+          }
+          location ~* ^/partner-application/cls/(.+) {
+            return 301 https://process.aaaaaaa.aa/partner-application/cls/$1$is_args$args;
+          }
+          `
+    }
+    expect(YAML.stringify(obj)).toBe(source`
+        nginx.ingress.kubernetes.io/configuration-snippet: >
+          location ~* ^/sites/aaaaaaa.aa/files/(.+) {
+            return 302 https://process.aaaaaaa.aa/sites/aaaaaaa.aa/files/$1;
+          }
+
+          location ~* ^/partner-application/cls/(.+) {
+            return 301 https://process.aaaaaaa.aa/partner-application/cls/$1$is_args$args;
+          }
+      `)
   })
 })
 
