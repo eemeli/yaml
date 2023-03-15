@@ -6,7 +6,7 @@ import { visit } from '../visit.js'
 import { ALIAS, isAlias, isCollection, isPair } from './identity.js'
 import { Node, NodeBase, Range } from './Node.js'
 import type { Scalar } from './Scalar'
-import type { ToJSContext } from './toJS.js'
+import { toJS, ToJSContext } from './toJS.js'
 import type { YAMLMap } from './YAMLMap.js'
 import type { YAMLSeq } from './YAMLSeq.js'
 
@@ -55,7 +55,12 @@ export class Alias extends NodeBase {
       const msg = `Unresolved alias (the anchor must be set before the alias): ${this.source}`
       throw new ReferenceError(msg)
     }
-    const data = anchors.get(source)
+    let data = anchors.get(source)
+    if (!data) {
+      // Resolve anchors for Node.prototype.toJS()
+      toJS(source, null, ctx)
+      data = anchors.get(source)
+    }
     /* istanbul ignore if */
     if (!data || data.res === undefined) {
       const msg = 'This should not happen: Alias anchor was not resolved?'

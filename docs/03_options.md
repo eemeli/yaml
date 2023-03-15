@@ -119,7 +119,7 @@ parse('{[1, 2]: many}', { mapAsMap: true }) // Map { [ 1, 2 ] => 'many' }
 
 These options influence how the document is transformed into "native" JavaScript representation.
 
-Used by: `parse()` and `doc.toJS()`
+Used by: `parse()`, `doc.toJS()` and `node.toJS()`
 
 | Name          | Type                                  | Default | Description                                                                                                                                         |
 | ------------- | ------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |

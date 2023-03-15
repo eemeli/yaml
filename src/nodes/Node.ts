@@ -1,8 +1,12 @@
+import { applyReviver } from '../doc/applyReviver.js'
+import type { Document } from '../doc/Document.js'
+import type { ToJSOptions } from '../options.js'
 import { Token } from '../parse/cst.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import type { Alias } from './Alias.js'
 import { NODE_TYPE } from './identity.js'
 import type { Scalar } from './Scalar.js'
+import { toJS, ToJSContext } from './toJS.js'
 import type { YAMLMap } from './YAMLMap.js'
 import type { YAMLSeq } from './YAMLSeq.js'
 
@@ -86,5 +90,26 @@ export abstract class NodeBase {
     )
     if (this.range) copy.range = this.range.slice() as NodeBase['range']
     return copy
+  }
+
+  /** A plain JavaScript representation of this node. */
+  toJS(
+    doc: Document<Node, boolean>,
+    { mapAsMap, maxAliasCount, onAnchor, reviver }: ToJSOptions = {}
+  ): any {
+    const ctx: ToJSContext = {
+      anchors: new Map(),
+      doc,
+      keep: true,
+      mapAsMap: mapAsMap === true,
+      mapKeyWarned: false,
+      maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100
+    }
+    const res = toJS(this, '', ctx)
+    if (typeof onAnchor === 'function')
+      for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
+    return typeof reviver === 'function'
+      ? applyReviver(reviver, { '': res }, '', res)
+      : res
   }
 }
