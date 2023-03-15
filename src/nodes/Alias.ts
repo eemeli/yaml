@@ -3,15 +3,8 @@ import type { Document } from '../doc/Document.js'
 import type { FlowScalar } from '../parse/cst.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { visit } from '../visit.js'
-import {
-  ALIAS,
-  isAlias,
-  isCollection,
-  isPair,
-  Node,
-  NodeBase,
-  Range
-} from './Node.js'
+import { ALIAS, isAlias, isCollection, isPair } from './identity.js'
+import { Node, NodeBase, Range } from './Node.js'
 import type { Scalar } from './Scalar'
 import type { ToJSContext } from './toJS.js'
 import type { YAMLMap } from './YAMLMap.js'

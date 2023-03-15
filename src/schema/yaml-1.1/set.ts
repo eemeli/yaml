@@ -1,5 +1,5 @@
 import type { Schema } from '../../schema/Schema.js'
-import { isMap, isPair, isScalar } from '../../nodes/Node.js'
+import { isMap, isPair, isScalar } from '../../nodes/identity.js'
 import { createPair, Pair } from '../../nodes/Pair.js'
 import { Scalar } from '../../nodes/Scalar.js'
 import { ToJSContext } from '../../nodes/toJS.js'

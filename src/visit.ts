@@ -8,9 +8,9 @@ import {
   isNode,
   isPair,
   isScalar,
-  isSeq,
-  Node
-} from './nodes/Node.js'
+  isSeq
+} from './nodes/identity.js'
+import { Node } from './nodes/Node.js'
 import type { Pair } from './nodes/Pair.js'
 import type { Scalar } from './nodes/Scalar.js'
 import type { YAMLMap } from './nodes/YAMLMap.js'

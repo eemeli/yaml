@@ -4,7 +4,7 @@ import type { Schema } from '../schema/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyPair } from '../stringify/stringifyPair.js'
 import { addPairToJSMap } from './addPairToJSMap.js'
-import { isNode, NODE_TYPE, PAIR } from './Node.js'
+import { isNode, NODE_TYPE, PAIR } from './identity.js'
 import type { ToJSContext } from './toJS.js'
 
 export function createPair(

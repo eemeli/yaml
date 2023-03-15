@@ -6,9 +6,9 @@ import {
   isCollection,
   isNode,
   isPair,
-  isScalar,
-  Node
-} from '../nodes/Node.js'
+  isScalar
+} from '../nodes/identity.js'
+import type { Node } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { ToStringOptions } from '../options.js'
 import type { CollectionTag, ScalarTag } from '../schema/types.js'

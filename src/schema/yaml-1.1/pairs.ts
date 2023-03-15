@@ -1,5 +1,6 @@
 import type { CreateNodeContext } from '../../doc/createNode.js'
-import { isMap, isPair, isSeq, ParsedNode } from '../../nodes/Node.js'
+import { isMap, isPair, isSeq } from '../../nodes/identity.js'
+import type { ParsedNode } from '../../nodes/Node.js'
 import { createPair, Pair } from '../../nodes/Pair.js'
 import { Scalar } from '../../nodes/Scalar.js'
 import { YAMLMap } from '../../nodes/YAMLMap.js'

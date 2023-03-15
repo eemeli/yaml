@@ -1,5 +1,6 @@
 import { Alias } from '../nodes/Alias.js'
-import { isDocument, isNode, isPair, MAP, Node, SEQ } from '../nodes/Node.js'
+import { isDocument, isNode, isPair, MAP, SEQ } from '../nodes/identity.js'
+import type { Node } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { Schema } from '../schema/Schema.js'

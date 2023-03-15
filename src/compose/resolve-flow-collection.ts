@@ -1,4 +1,4 @@
-import { isPair } from '../nodes/Node.js'
+import { isPair } from '../nodes/identity.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'

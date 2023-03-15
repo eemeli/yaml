@@ -6,10 +6,9 @@ import {
   isNode,
   isPair,
   isScalar,
-  isSeq,
-  Node,
-  ParsedNode
-} from './nodes/Node.js'
+  isSeq
+} from './nodes/identity.js'
+import type { Node, ParsedNode } from './nodes/Node.js'
 import type { Pair } from './nodes/Pair.js'
 import { parseAllDocuments } from './public-api.js'
 import { visit } from './visit.js'

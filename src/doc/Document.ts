@@ -6,12 +6,9 @@ import {
   isCollection,
   isNode,
   isScalar,
-  Node,
-  NodeType,
-  NODE_TYPE,
-  ParsedNode,
-  Range
-} from '../nodes/Node.js'
+  NODE_TYPE
+} from '../nodes/identity.js'
+import type { Node, NodeType, ParsedNode, Range } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import { toJS, ToJSContext } from '../nodes/toJS.js'
@@ -26,7 +23,6 @@ import type {
   ToStringOptions
 } from '../options.js'
 import { Schema } from '../schema/Schema.js'
-import { stringify } from '../stringify/stringify.js'
 import { stringifyDocument } from '../stringify/stringifyDocument.js'
 import { anchorNames, createNodeAnchors, findNewAnchor } from './anchors.js'
 import { applyReviver } from './applyReviver.js'
@@ -434,8 +430,7 @@ export class Document<
       keep: !json,
       mapAsMap: mapAsMap === true,
       mapKeyWarned: false,
-      maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100,
-      stringify
+      maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100
     }
     const res = toJS(this.contents, jsonArg ?? '', ctx)
     if (typeof onAnchor === 'function')

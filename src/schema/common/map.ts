@@ -1,5 +1,5 @@
 import type { CreateNodeContext } from '../../doc/createNode.js'
-import { isMap } from '../../nodes/Node.js'
+import { isMap } from '../../nodes/identity.js'
 import { createPair } from '../../nodes/Pair.js'
 import { YAMLMap } from '../../nodes/YAMLMap.js'
 import type { CollectionTag } from '../types.js'

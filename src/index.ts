@@ -14,11 +14,9 @@ export {
   isNode,
   isPair,
   isScalar,
-  isSeq,
-  Node,
-  ParsedNode,
-  Range
-} from './nodes/Node.js'
+  isSeq
+} from './nodes/identity.js'
+export { Node, ParsedNode, Range } from './nodes/Node.js'
 export { Pair } from './nodes/Pair.js'
 export { Scalar } from './nodes/Scalar.js'
 export { YAMLMap } from './nodes/YAMLMap.js'

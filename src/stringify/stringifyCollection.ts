@@ -1,5 +1,5 @@
 import { Collection } from '../nodes/Collection.js'
-import { isNode, isPair } from '../nodes/Node.js'
+import { isNode, isPair } from '../nodes/identity.js'
 import { stringify, StringifyContext } from './stringify.js'
 import { indentComment, lineComment } from './stringifyComment.js'
 

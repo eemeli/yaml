@@ -1,6 +1,7 @@
-import { isScalar, ParsedNode } from '../nodes/Node'
-import { Pair } from '../nodes/Pair'
-import { ComposeContext } from './compose-node'
+import { isScalar } from '../nodes/identity.js'
+import type { ParsedNode } from '../nodes/Node.js'
+import type { Pair } from '../nodes/Pair.js'
+import type { ComposeContext } from './compose-node.js'
 
 export function mapIncludes(
   ctx: ComposeContext,

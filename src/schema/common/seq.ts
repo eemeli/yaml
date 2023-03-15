@@ -1,5 +1,5 @@
 import { CreateNodeContext, createNode } from '../../doc/createNode.js'
-import { isSeq } from '../../nodes/Node.js'
+import { isSeq } from '../../nodes/identity.js'
 import { YAMLSeq } from '../../nodes/YAMLSeq.js'
 import type { Schema } from '../Schema.js'
 import type { CollectionTag } from '../types.js'

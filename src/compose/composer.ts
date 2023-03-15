@@ -1,7 +1,8 @@
 import { Directives } from '../doc/directives.js'
 import { Document } from '../doc/Document.js'
 import { ErrorCode, YAMLParseError, YAMLWarning } from '../errors.js'
-import { isCollection, isPair, ParsedNode, Range } from '../nodes/Node.js'
+import { isCollection, isPair } from '../nodes/identity.js'
+import type { ParsedNode, Range } from '../nodes/Node.js'
 import type {
   DocumentOptions,
   ParseOptions,
