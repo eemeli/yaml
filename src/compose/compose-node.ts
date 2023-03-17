@@ -11,6 +11,7 @@ import { resolveEnd } from './resolve-end.js'
 import { emptyScalarPosition } from './util-empty-scalar-position.js'
 
 export interface ComposeContext {
+  anchors: Map<string, ParsedNode> | null
   atRoot: boolean
   directives: Directives
   options: Readonly<Required<Omit<ParseOptions, 'lineCounter'>>>
@@ -52,13 +53,13 @@ export function composeNode(
     case 'double-quoted-scalar':
     case 'block-scalar':
       node = composeScalar(ctx, token, tag, onError)
-      if (anchor) node.anchor = anchor.source.substring(1)
+      if (anchor) setAnchor(ctx, node, anchor, onError)
       break
     case 'block-map':
     case 'block-seq':
     case 'flow-collection':
       node = composeCollection(CN, ctx, token, tag, onError)
-      if (anchor) node.anchor = anchor.source.substring(1)
+      if (anchor) setAnchor(ctx, node, anchor, onError)
       break
     default: {
       const message =
@@ -137,4 +138,22 @@ function composeAlias(
   alias.range = [offset, valueEnd, re.offset]
   if (re.comment) alias.comment = re.comment
   return alias as Alias.Parsed
+}
+
+function setAnchor(
+  { anchors }: ComposeContext,
+  node: ParsedNode,
+  anchor: SourceToken,
+  onError: ComposeErrorHandler
+) {
+  const name = anchor.source.substring(1)
+  if (anchors) {
+    if (anchors.has(name)) {
+      const msg = `Anchors must be unique, ${name} is repeated`
+      onError(node.range, 'DUPLICATE_ANCHOR', msg)
+    } else {
+      anchors.set(name, node)
+    }
+  }
+  node.anchor = name
 }

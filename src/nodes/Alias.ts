@@ -8,6 +8,7 @@ import {
   isAlias,
   isCollection,
   isPair,
+  isScalar,
   Node,
   NodeBase,
   Range
@@ -24,6 +25,8 @@ export declare namespace Alias {
   }
 }
 
+const RESOLVE = Symbol('_resolve')
+
 export class Alias extends NodeBase {
   source: string
 
@@ -39,46 +42,72 @@ export class Alias extends NodeBase {
     })
   }
 
+  [RESOLVE](doc: Document) {
+    let found: Scalar | YAMLMap | YAMLSeq | undefined = undefined
+    // @ts-expect-error - TS doesn't notice the assignment in the visitor
+    let root: Node & { anchor: string } = undefined
+    const pathLike = this.source.includes('/')
+    visit(doc, {
+      Node: (_key: unknown, node: Node) => {
+        if (node === this) return visit.BREAK
+        const { anchor } = node
+        if (anchor === this.source) {
+          found = node
+        } else if (
+          doc.directives?.yaml.version === 'next' &&
+          anchor &&
+          pathLike &&
+          this.source.startsWith(anchor + '/') &&
+          (!root || root.anchor.length <= anchor.length)
+        ) {
+          root = node as Node & { anchor: string }
+        }
+      }
+    })
+    if (found) return { node: found, root: found }
+
+    if (isCollection(root)) {
+      const parts = this.source.substring(root.anchor.length + 1).split('/')
+      const node = root.getIn(parts, true)
+      if (isCollection(node) || isScalar(node)) return { node, root }
+    }
+
+    return { node: undefined, root }
+  }
+
   /**
    * Resolve the value of this alias within `doc`, finding the last
    * instance of the `source` anchor before this node.
    */
   resolve(doc: Document): Scalar | YAMLMap | YAMLSeq | undefined {
-    let found: Scalar | YAMLMap | YAMLSeq | undefined = undefined
-    visit(doc, {
-      Node: (_key: unknown, node: Node) => {
-        if (node === this) return visit.BREAK
-        if (node.anchor === this.source) found = node
-      }
-    })
-    return found
+    return this[RESOLVE](doc).node
   }
 
   toJSON(_arg?: unknown, ctx?: ToJSContext) {
     if (!ctx) return { source: this.source }
-    const { anchors, doc, maxAliasCount } = ctx
-    const source = this.resolve(doc)
-    if (!source) {
+    const { anchors, doc, maxAliasCount, resolved } = ctx
+    const { node, root } = this[RESOLVE](doc)
+    if (!node) {
       const msg = `Unresolved alias (the anchor must be set before the alias): ${this.source}`
       throw new ReferenceError(msg)
     }
-    const data = anchors.get(source)
-    /* istanbul ignore if */
-    if (!data || data.res === undefined) {
-      const msg = 'This should not happen: Alias anchor was not resolved?'
-      throw new ReferenceError(msg)
-    }
+
     if (maxAliasCount >= 0) {
+      const data = anchors.get(root)
+      if (!data) {
+        const msg = 'This should not happen: Alias anchor was not resolved?'
+        throw new ReferenceError(msg)
+      }
       data.count += 1
-      if (data.aliasCount === 0)
-        data.aliasCount = getAliasCount(doc, source, anchors)
+      data.aliasCount ||= getAliasCount(doc, root, anchors)
       if (data.count * data.aliasCount > maxAliasCount) {
         const msg =
           'Excessive alias count indicates a resource exhaustion attack'
         throw new ReferenceError(msg)
       }
     }
-    return data.res
+
+    return resolved.get(node)
   }
 
   toString(
@@ -105,8 +134,8 @@ function getAliasCount(
   anchors: ToJSContext['anchors']
 ): number {
   if (isAlias(node)) {
-    const source = node.resolve(doc)
-    const anchor = anchors && source && anchors.get(source)
+    const { root } = node[RESOLVE](doc)
+    const anchor = root && anchors?.get(root)
     return anchor ? anchor.count * anchor.aliasCount : 0
   } else if (isCollection(node)) {
     let count = 0

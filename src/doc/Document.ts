@@ -435,11 +435,14 @@ export class Document<
       mapAsMap: mapAsMap === true,
       mapKeyWarned: false,
       maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100,
+      resolved: new WeakMap(),
       stringify
     }
     const res = toJS(this.contents, jsonArg ?? '', ctx)
-    if (typeof onAnchor === 'function')
-      for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
+    if (typeof onAnchor === 'function') {
+      for (const [node, { count }] of ctx.anchors)
+        onAnchor(ctx.resolved.get(node), count)
+    }
     return typeof reviver === 'function'
       ? applyReviver(reviver, { '': res }, '', res)
       : res
