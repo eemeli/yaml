@@ -99,7 +99,7 @@ stringify(
 
 In YAML-speak, a custom data type is represented by a _tag_. To define your own tag, you need to account for the ways that your data is both parsed and stringified. Furthermore, both of those processes are split into two stages by the intermediate AST node structure.
 
-If you wish to implement your own custom tags, the [`!!binary`](https://github.com/eemeli/yaml/blob/master/src/tags/yaml-1.1/binary.js) and [`!!set`](https://github.com/eemeli/yaml/blob/master/src/tags/yaml-1.1/set.js) tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.
+If you wish to implement your own custom tags, the [`!!binary`](https://github.com/eemeli/yaml/blob/main/src/tags/yaml-1.1/binary.js) and [`!!set`](https://github.com/eemeli/yaml/blob/main/src/tags/yaml-1.1/set.js) tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.
 
 ### Parsing Custom Data
 
