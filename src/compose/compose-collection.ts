@@ -1,4 +1,5 @@
-import { isMap, isNode, ParsedNode } from '../nodes/Node.js'
+import { isMap, isNode } from '../nodes/identity.js'
+import type { ParsedNode } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'

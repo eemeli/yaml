@@ -1,6 +1,6 @@
 import { warn } from '../log.js'
 import { createStringifyContext } from '../stringify/stringify.js'
-import { isAlias, isMap, isNode, isScalar, isSeq } from './Node.js'
+import { isAlias, isMap, isNode, isScalar, isSeq } from './identity.js'
 import type { Pair } from './Pair.js'
 import { Scalar } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'

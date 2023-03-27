@@ -1,4 +1,4 @@
-import { isScalar, SCALAR } from '../nodes/Node.js'
+import { isScalar, SCALAR } from '../nodes/identity.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar, FlowScalar, SourceToken } from '../parse/cst.js'
 import type { Schema } from '../schema/Schema.js'

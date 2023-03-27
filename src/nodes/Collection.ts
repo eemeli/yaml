@@ -5,9 +5,9 @@ import {
   isNode,
   isPair,
   isScalar,
-  NodeBase,
   NODE_TYPE
-} from './Node.js'
+} from './identity.js'
+import { NodeBase } from './Node.js'
 
 export function collectionFromPath(
   schema: Schema,

@@ -50,9 +50,6 @@ overrides:
     rules:
       camelcase: 0
       '@typescript-eslint/no-non-null-assertion': off
-      '@typescript-eslint/no-unsafe-return': off
-
-  - files: [tests/doc/**]
-    rules:
       '@typescript-eslint/no-unsafe-call': off
+      '@typescript-eslint/no-unsafe-return': off
       '@typescript-eslint/unbound-method': off

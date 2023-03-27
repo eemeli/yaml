@@ -1,6 +1,7 @@
-import { Document } from '../doc/Document.js'
-import { isNode, Node } from '../nodes/Node.js'
-import { ToStringOptions } from '../options.js'
+import type { Document } from '../doc/Document.js'
+import { isNode } from '../nodes/identity.js'
+import type { Node } from '../nodes/Node.js'
+import type { ToStringOptions } from '../options.js'
 import {
   createStringifyContext,
   stringify,

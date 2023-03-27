@@ -1,6 +1,6 @@
 import type { Document } from '../doc/Document.js'
-import type { stringify } from '../stringify/stringify.js'
-import { hasAnchor, Node } from './Node.js'
+import { hasAnchor } from './identity.js'
+import type { Node } from './Node.js'
 
 export interface AnchorData {
   aliasCount: number
@@ -16,9 +16,6 @@ export interface ToJSContext {
   mapKeyWarned: boolean
   maxAliasCount: number
   onCreate?: (res: unknown) => void
-
-  /** Requiring this directly in Pair would create circular dependencies */
-  stringify: typeof stringify
 }
 
 /**

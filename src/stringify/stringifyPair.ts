@@ -1,4 +1,4 @@
-import { isCollection, isNode, isScalar, isSeq } from '../nodes/Node.js'
+import { isCollection, isNode, isScalar, isSeq } from '../nodes/identity.js'
 import type { Pair } from '../nodes/Pair.js'
 import { Scalar } from '../nodes/Scalar.js'
 import { stringify, StringifyContext } from './stringify.js'

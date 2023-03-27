@@ -1,7 +1,7 @@
-import { YAMLSeq } from '../../nodes/YAMLSeq.js'
+import { isPair, isScalar } from '../../nodes/identity.js'
 import { toJS, ToJSContext } from '../../nodes/toJS.js'
-import { isPair, isScalar } from '../../nodes/Node.js'
 import { YAMLMap } from '../../nodes/YAMLMap.js'
+import { YAMLSeq } from '../../nodes/YAMLSeq.js'
 import { CollectionTag } from '../types.js'
 import { createPairs, resolvePairs } from './pairs.js'
 

@@ -1,4 +1,4 @@
-import { MAP, SCALAR, SEQ } from '../nodes/Node.js'
+import { MAP, SCALAR, SEQ } from '../nodes/identity.js'
 import type { Pair } from '../nodes/Pair.js'
 import type { SchemaOptions, ToStringOptions } from '../options.js'
 import { map } from './common/map.js'
