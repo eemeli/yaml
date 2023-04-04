@@ -99,7 +99,7 @@ stringify(
 
 In YAML-speak, a custom data type is represented by a _tag_. To define your own tag, you need to account for the ways that your data is both parsed and stringified. Furthermore, both of those processes are split into two stages by the intermediate AST node structure.
 
-If you wish to implement your own custom tags, the [`!!binary`](https://github.com/eemeli/yaml/blob/main/src/tags/yaml-1.1/binary.js) and [`!!set`](https://github.com/eemeli/yaml/blob/main/src/tags/yaml-1.1/set.js) tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.
+If you wish to implement your own custom tags, the [`!!binary`](https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/binary.ts) and [`!!set`](https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/set.ts) tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.
 
 ### Parsing Custom Data
 
@@ -135,6 +135,8 @@ For collections in particular, the default stringifier should be perfectly suffi
 
 ```js
 import {
+  createNode, // (value, tagName, ctx) => Node -- Create a new node
+  createPair, // (key, value, ctx) => Pair -- Create a new pair
   debug, // (logLevel, ...messages) => void -- Log debug messages to console
   findPair, // (items, key) => Pair? -- Given a key, find a matching Pair
   foldFlowLines, // (text, indent, mode, options) => string -- Fold long lines

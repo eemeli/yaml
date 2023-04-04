@@ -1,4 +1,6 @@
+export { createNode, CreateNodeContext } from './doc/createNode.js'
 export { debug, LogLevelId, warn } from './log.js'
+export { createPair } from './nodes/Pair.js'
 export { findPair } from './nodes/YAMLMap.js'
 export { toJS, ToJSContext } from './nodes/toJS.js'
 export { map as mapTag } from './schema/common/map.js'
