@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [14.x, 16.x]
+        node-version: [14, 16, latest]
 
     steps:
       - uses: actions/checkout@v3
@@ -23,6 +23,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      - if: matrix.node-version == 14
+        run: npm install --global npm@7
       - run: npm ci
       - run: npm test
       - run: npm run test:dist
