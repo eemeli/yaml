@@ -4,7 +4,7 @@ import type { ToJSOptions } from '../options.js'
 import { Token } from '../parse/cst.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import type { Alias } from './Alias.js'
-import { NODE_TYPE } from './identity.js'
+import { isDocument, NODE_TYPE } from './identity.js'
 import type { Scalar } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
 import type { YAMLMap } from './YAMLMap.js'
@@ -97,6 +97,7 @@ export abstract class NodeBase {
     doc: Document<Node, boolean>,
     { mapAsMap, maxAliasCount, onAnchor, reviver }: ToJSOptions = {}
   ): any {
+    if (!isDocument(doc)) throw new TypeError('A document argument is required')
     const ctx: ToJSContext = {
       anchors: new Map(),
       doc,

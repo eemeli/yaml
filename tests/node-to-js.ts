@@ -63,6 +63,11 @@ describe('alias', () => {
 })
 
 describe('options', () => {
+  test('doc is required', () => {
+    const doc = parseDocument('key: 42')
+    expect(() => doc.contents?.toJS({} as any)).toThrow(TypeError)
+  })
+
   test('mapAsMap', () => {
     const doc = parseDocument('key: 42')
     expect(doc.contents?.toJS(doc, { mapAsMap: true })).toMatchObject(
