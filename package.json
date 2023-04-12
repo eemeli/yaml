@@ -25,11 +25,13 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "node": "./dist/index.js",
       "default": "./browser/index.js"
     },
     "./package.json": "./package.json",
     "./util": {
+      "types": "./dist/util.d.ts",
       "node": "./dist/util.js",
       "default": "./browser/dist/util.js"
     }
