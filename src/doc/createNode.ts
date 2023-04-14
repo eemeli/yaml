@@ -101,6 +101,7 @@ export function createNode(
     ? tagObj.createNode(ctx.schema, value, ctx)
     : new Scalar(value)
   if (tagName) node.tag = tagName
+  else if (!tagObj.default) node.tag = tagObj.tag
 
   if (ref) ref.node = node
   return node
