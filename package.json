@@ -36,13 +36,6 @@
       "default": "./browser/dist/util.js"
     }
   },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "dist/*"
-      ]
-    }
-  },
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
     "build:browser": "rollup -c config/rollup.browser-config.mjs",
