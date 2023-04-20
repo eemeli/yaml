@@ -1,10 +1,11 @@
-import type { Schema } from '../../schema/Schema.js'
 import { isMap, isPair, isScalar } from '../../nodes/identity.js'
-import { createPair, Pair } from '../../nodes/Pair.js'
+import { Pair } from '../../nodes/Pair.js'
 import { Scalar } from '../../nodes/Scalar.js'
 import { ToJSContext } from '../../nodes/toJS.js'
-import { YAMLMap, findPair } from '../../nodes/YAMLMap.js'
+import { findPair, YAMLMap } from '../../nodes/YAMLMap.js'
+import type { Schema } from '../../schema/Schema.js'
 import type { StringifyContext } from '../../stringify/stringify.js'
+import { CreateNodeContext, createPair } from '../../util.js'
 import type { CollectionTag } from '../types.js'
 
 export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
@@ -84,26 +85,10 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
       )
     else throw new Error('Set items must all have null values')
   }
-}
 
-export const set: CollectionTag = {
-  collection: 'map',
-  identify: value => value instanceof Set,
-  nodeClass: YAMLSet,
-  default: false,
-  tag: 'tag:yaml.org,2002:set',
-
-  resolve(map, onError) {
-    if (isMap(map)) {
-      if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map)
-      else onError('Set items must all have null values')
-    } else onError('Expected a mapping for this tag')
-    return map
-  },
-
-  createNode(schema, iterable, ctx) {
+  static from(schema: Schema, iterable: unknown, ctx: CreateNodeContext) {
     const { replacer } = ctx
-    const set = new YAMLSet(schema)
+    const set = new this(schema)
     if (iterable && Symbol.iterator in Object(iterable))
       for (let value of iterable as Iterable<unknown>) {
         if (typeof replacer === 'function')
@@ -113,5 +98,21 @@ export const set: CollectionTag = {
         )
       }
     return set
+  }
+}
+
+export const set: CollectionTag = {
+  collection: 'map',
+  identify: value => value instanceof Set,
+  nodeClass: YAMLSet,
+  default: false,
+  tag: 'tag:yaml.org,2002:set',
+  createNode: (schema, iterable, ctx) => YAMLSet.from(schema, iterable, ctx),
+  resolve(map, onError) {
+    if (isMap(map)) {
+      if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map)
+      else onError('Set items must all have null values')
+    } else onError('Expected a mapping for this tag')
+    return map
   }
 }

@@ -2,6 +2,7 @@ import type { BlockSequence, FlowCollection } from '../parse/cst.js'
 import type { Schema } from '../schema/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyCollection } from '../stringify/stringifyCollection.js'
+import { createNode, CreateNodeContext } from '../util.js'
 import { Collection } from './Collection.js'
 import { isScalar, SEQ } from './identity.js'
 import type { ParsedNode, Range } from './Node.js'
@@ -115,6 +116,22 @@ export class YAMLSeq<T = unknown> extends Collection {
       onChompKeep,
       onComment
     })
+  }
+
+  static from(schema: Schema, obj: unknown, ctx: CreateNodeContext) {
+    const { replacer } = ctx
+    const seq = new YAMLSeq(schema)
+    if (obj && Symbol.iterator in Object(obj)) {
+      let i = 0
+      for (let it of obj as Iterable<unknown>) {
+        if (typeof replacer === 'function') {
+          const key = obj instanceof Set ? it : String(i++)
+          it = replacer.call(obj, key, it)
+        }
+        seq.items.push(createNode(it, undefined, ctx))
+      }
+    }
+    return seq
   }
 }
 

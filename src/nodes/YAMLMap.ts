@@ -2,11 +2,12 @@ import type { BlockMap, FlowCollection } from '../parse/cst.js'
 import type { Schema } from '../schema/Schema.js'
 import type { StringifyContext } from '../stringify/stringify.js'
 import { stringifyCollection } from '../stringify/stringifyCollection.js'
+import { CreateNodeContext } from '../util.js'
 import { addPairToJSMap } from './addPairToJSMap.js'
 import { Collection } from './Collection.js'
 import { isPair, isScalar, MAP } from './identity.js'
 import type { ParsedNode, Range } from './Node.js'
-import { Pair } from './Pair.js'
+import { createPair, Pair } from './Pair.js'
 import { isScalarValue, Scalar } from './Scalar.js'
 import type { ToJSContext } from './toJS.js'
 
@@ -49,6 +50,30 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
 
   constructor(schema?: Schema) {
     super(MAP, schema)
+  }
+
+  /**
+   * A generic collection parsing method that can be extended
+   * to other node classes that inherit from YAMLMap
+   */
+  static from(schema: Schema, obj: unknown, ctx: CreateNodeContext) {
+    const { keepUndefined, replacer } = ctx
+    const map = new this(schema)
+    const add = (key: unknown, value: unknown) => {
+      if (typeof replacer === 'function') value = replacer.call(obj, key, value)
+      else if (Array.isArray(replacer) && !replacer.includes(key)) return
+      if (value !== undefined || keepUndefined)
+        map.items.push(createPair(key, value, ctx))
+    }
+    if (obj instanceof Map) {
+      for (const [key, value] of obj) add(key, value)
+    } else if (obj && typeof obj === 'object') {
+      for (const key of Object.keys(obj)) add(key, (obj as any)[key])
+    }
+    if (typeof schema.sortMapEntries === 'function') {
+      map.items.sort(schema.sortMapEntries)
+    }
+    return map
   }
 
   /**

@@ -92,8 +92,14 @@ export interface CollectionTag extends TagBase {
   /**
    * The `Node` child class that implements this tag.
    * If set, used to select this tag when stringifying.
+   *
+   * If the class provides a static `from` method, then that
+   * will be used if the tag object doesn't have a `createNode` method.
    */
-  nodeClass?: new () => Node
+  nodeClass?: {
+    new (): Node
+    from?: (schema: Schema, obj: unknown, ctx: CreateNodeContext) => Node
+  }
 
   /**
    * Turns a value into an AST node.
