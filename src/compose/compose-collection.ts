@@ -92,9 +92,21 @@ export function composeCollection(
     return resolveCollection(CN, ctx, token, onError, tagName)
   }
 
-  let tag = ctx.schema.tags.find(
-    t => t.collection === expType && t.tag === tagName
-  ) as CollectionTag | undefined
+  let tag = ctx.schema.tags.find(t => t.tag === tagName) as
+    | CollectionTag
+    | undefined
+  if (tag && tag.collection !== expType) {
+    if (tag.collection) {
+      onError(
+        tagToken,
+        'BAD_COLLECTION_TYPE',
+        `${tag.tag} used for ${expType} collection, but expects ${tag.collection}`,
+        true
+      )
+      return resolveCollection(CN, ctx, token, onError, tagName)
+    }
+    tag = undefined
+  }
 
   if (!tag) {
     const kt = ctx.schema.knownTags[tagName]
@@ -102,12 +114,21 @@ export function composeCollection(
       ctx.schema.tags.push(Object.assign({}, kt, { default: false }))
       tag = kt
     } else {
-      onError(
-        tagToken,
-        'TAG_RESOLVE_FAILED',
-        `Unresolved tag: ${tagName}`,
-        true
-      )
+      if (kt?.collection) {
+        onError(
+          tagToken,
+          'BAD_COLLECTION_TYPE',
+          `${kt.tag} used for ${expType} collection, but expects ${kt.collection}`,
+          true
+        )
+      } else {
+        onError(
+          tagToken,
+          'TAG_RESOLVE_FAILED',
+          `Unresolved tag: ${tagName}`,
+          true
+        )
+      }
       return resolveCollection(CN, ctx, token, onError, tagName)
     }
   }

@@ -1,11 +1,11 @@
 import type { CreateNodeContext } from '../doc/createNode.js'
-import type { Schema } from './Schema.js'
 import type { Node } from '../nodes/Node.js'
 import type { Scalar } from '../nodes/Scalar.js'
 import type { YAMLMap } from '../nodes/YAMLMap.js'
 import type { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { ParseOptions } from '../options.js'
 import type { StringifyContext } from '../stringify/stringify.js'
+import type { Schema } from './Schema.js'
 
 interface TagBase {
   /**
@@ -104,10 +104,12 @@ export interface CollectionTag extends TagBase {
   /**
    * Turns a value into an AST node.
    * If returning a non-`Node` value, the output will be wrapped as a `Scalar`.
+   *
+   * Note: this is required if nodeClass is not provided.
    */
-  resolve(
+  resolve?: (
     value: YAMLMap.Parsed | YAMLSeq.Parsed,
     onError: (message: string) => void,
     options: ParseOptions
-  ): unknown
+  ) => unknown
 }
