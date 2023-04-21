@@ -65,7 +65,7 @@ These tags are a part of the YAML 1.1 [language-independent types](https://yaml.
 ## Writing Custom Tags
 
 ```js
-import { stringify } from 'yaml'
+import { YAMLMap, stringify } from 'yaml'
 import { stringifyString } from 'yaml/util'
 
 const regexp = {
@@ -89,17 +89,101 @@ const sharedSymbol = {
   }
 }
 
+class YAMLNullObject extends YAMLMap {
+  tag = '!nullobject'
+  toJSON(_, ctx) {
+    const obj = super.toJSON(_, { ...ctx, mapAsMap: false }, Object)
+    return Object.assign(Object.create(null), obj)
+  }
+}
+
+const nullObject = {
+  tag: '!nullobject',
+  collection: 'map',
+  nodeClass: YAMLNullObject,
+  identify: v => !!(
+    typeof v === 'object' &&
+    v &&
+    !Object.getPrototypeOf(v)
+  )
+}
+
+// slightly more complicated object type
+class YAMLError extends YAMLMap {
+  tag = '!error'
+  toJSON(_, ctx) {
+    const { name, message, stack, ...rest } = super.toJSON(_, {
+      ...ctx,
+      mapAsMap: false,
+    }, Object)
+    // craft the appropriate error type
+    const Cls =
+      name === 'EvalError' ? EvalError
+        : name === 'RangeError' ? RangeError
+        : name === 'ReferenceError' ? ReferenceError
+        : name === 'SyntaxError' ? SyntaxError
+        : name === 'TypeError' ? TypeError
+        : name === 'URIError' ? URIError
+        : Error
+    if (Cls.name !== name) {
+      Object.defineProperty(er, 'name', {
+        value: name,
+        enumerable: false,
+        configurable: true,
+      })
+    }
+    Object.defineProperty(er, 'stack', {
+      value: stack,
+      enumerable: false,
+      configurable: true,
+    })
+    return Object.assign(er, rest)
+  }
+
+  static from (schema, obj, ctx) {
+    const { name, message, stack } = obj
+    // ensure these props remain, even if not enumerable
+    return super.from(schema, { ...obj, name, message, stack }, ctx)
+  }
+}
+
+const error = {
+  tag: '!error',
+  collection: 'map',
+  nodeClass: YAMLError,
+  identify: v => !!(
+    typeof v === 'object' &&
+    v &&
+    v instanceof Error
+  )
+}
+
 stringify(
-  { regexp: /foo/gi, symbol: Symbol.for('bar') },
-  { customTags: [regexp, sharedSymbol] }
+  {
+    regexp: /foo/gi,
+    symbol: Symbol.for('bar'),
+    nullobj: Object.assign(Object.create(null), { a: 1, b: 2 }),
+    error: new Error('This was an error'),
+  },
+  { customTags: [regexp, sharedSymbol, nullObject, error] }
 )
 // regexp: !re /foo/gi
 // symbol: !symbol/shared bar
+// nullobj: !nullobject
+//   a: 1
+//   b: 2
+// error: !error
+//   name: Error
+//   message: 'This was an error'
+//   stack: |
+//     at some-file.js:1:3
 ```
 
 In YAML-speak, a custom data type is represented by a _tag_. To define your own tag, you need to account for the ways that your data is both parsed and stringified. Furthermore, both of those processes are split into two stages by the intermediate AST node structure.
 
 If you wish to implement your own custom tags, the [`!!binary`](https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/binary.ts) and [`!!set`](https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/set.ts) tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.
+
+Custom collection types (ie, Maps, Sets, objects, and arrays; anything with child properties that may not be propertly serialized to a scalar value) may provide a `nodeClass` property that extends the [`YAMLMap`](https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLMap.ts) and [`YAMLSeq`](https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLSeq.ts) classes, which will be used for parsing and stringifying objects with the specified tag.
 
 ### Parsing Custom Data
 
