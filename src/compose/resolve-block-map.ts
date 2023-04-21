@@ -2,6 +2,7 @@ import type { ParsedNode } from '../nodes/Node.js'
 import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import type { BlockMap } from '../parse/cst.js'
+import { CollectionTag } from '../schema/types.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveProps } from './resolve-props.js'
@@ -15,9 +16,11 @@ export function resolveBlockMap(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   bm: BlockMap,
-  onError: ComposeErrorHandler
+  onError: ComposeErrorHandler,
+  tag?: CollectionTag
 ) {
-  const map = new YAMLMap<ParsedNode, ParsedNode>(ctx.schema)
+  const NodeClass = tag?.nodeClass || YAMLMap
+  const map = new NodeClass(ctx.schema) as YAMLMap<ParsedNode, ParsedNode>
 
   if (ctx.atRoot) ctx.atRoot = false
   let offset = bm.offset
