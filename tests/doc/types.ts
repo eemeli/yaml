@@ -13,7 +13,6 @@ import {
   SchemaOptions,
   stringify,
   YAMLMap,
-  YAMLParseError,
   YAMLSeq
 } from 'yaml'
 import { seqTag, stringifyString, stringTag } from 'yaml/util'
