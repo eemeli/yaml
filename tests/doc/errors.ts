@@ -341,6 +341,12 @@ describe('pretty errors', () => {
     const doc = YAML.parseDocument(src, { prettyErrors: true })
     expect(doc.warnings).toMatchObject([{ name: 'YAMLWarning' }])
   })
+
+  test('repeated CR', () => {
+    const src = '[' + '\r'.repeat(80)
+    const doc = YAML.parseDocument(src, { prettyErrors: true })
+    expect(doc.errors[0]).not.toHaveProperty('source')
+  })
 })
 
 describe('tags on invalid nodes', () => {
