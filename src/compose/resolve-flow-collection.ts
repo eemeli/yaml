@@ -24,12 +24,10 @@ export function resolveFlowCollection(
 ) {
   const isMap = fc.start.source === '{'
   const fcName = isMap ? 'flow map' : 'flow sequence'
-  let NodeClass = tag?.nodeClass
-  const MapClass = NodeClass || YAMLMap
-  const SeqClass = NodeClass || YAMLSeq
-  const coll = isMap
-    ? (new MapClass(ctx.schema) as YAMLMap.Parsed)
-    : (new SeqClass(ctx.schema) as YAMLSeq.Parsed)
+  let NodeClass = (tag?.nodeClass ?? (isMap ? YAMLMap : YAMLSeq)) as {
+    new (ctx: ComposeContext['schema']): YAMLMap.Parsed | YAMLSeq.Parsed
+  }
+  const coll = new NodeClass(ctx.schema)
   coll.flow = true
   const atRoot = ctx.atRoot
   if (atRoot) ctx.atRoot = false

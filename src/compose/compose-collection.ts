@@ -38,10 +38,8 @@ function resolveCollection(
   if (tagName === '!' || tagName === Coll.tagName) {
     coll.tag = Coll.tagName
     return coll
-  } else if (tagName) {
-    coll.tag = tagName
   }
-
+  if (tagName) coll.tag = tagName
   return coll
 }
 
@@ -58,7 +56,6 @@ export function composeCollection(
         onError(tagToken, 'TAG_RESOLVE_FAILED', msg)
       )
 
-  let coll: YAMLMap.Parsed | YAMLSeq.Parsed
   let expType: 'map' | 'seq' | undefined =
     token.type === 'block-map'
       ? 'map'
@@ -133,7 +130,7 @@ export function composeCollection(
     }
   }
 
-  coll = resolveCollection(CN, ctx, token, onError, tagName, tag)
+  const coll = resolveCollection(CN, ctx, token, onError, tagName, tag)
 
   const res =
     tag.resolve?.(
