@@ -367,6 +367,9 @@ The return value of the visitor may be used to control the traversal:
 
 If `visitor` is a single function, it will be called with all values encountered in the tree, including e.g. `null` values.
 Alternatively, separate visitor functions may be defined for each `Map`, `Pair`, `Seq`, `Alias` and `Scalar` node.
+To define the same visitor function for more than one node type,
+use the `Collection` (map and seq), `Value` (map, seq & scalar) and `Node` (alias, map, seq & scalar) targets.
+Of all these, only the most specific defined one will be used for each node.
 
 #### `YAML.visitAsync(node, visitor): Promise<void>`
 
