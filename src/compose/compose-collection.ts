@@ -61,20 +61,9 @@ export function composeCollection(
       ? 'map'
       : token.type === 'block-seq'
       ? 'seq'
-      : token.type === 'flow-collection'
-      ? token.start.source === '{'
-        ? 'map'
-        : 'seq'
-      : undefined
-
-  if (!expType) {
-    onError(
-      token,
-      'IMPOSSIBLE',
-      'could not determine collection expression type',
-      true
-    )
-  }
+      : token.start.source === '{'
+      ? 'map'
+      : 'seq'
 
   // shortcut: check if it's a generic YAMLMap or YAMLSeq
   // before jumping into the custom tag logic.
@@ -89,21 +78,9 @@ export function composeCollection(
     return resolveCollection(CN, ctx, token, onError, tagName)
   }
 
-  let tag = ctx.schema.tags.find(t => t.tag === tagName) as
-    | CollectionTag
-    | undefined
-  if (tag && tag.collection !== expType) {
-    if (tag.collection) {
-      onError(
-        tagToken,
-        'BAD_COLLECTION_TYPE',
-        `${tag.tag} used for ${expType} collection, but expects ${tag.collection}`,
-        true
-      )
-      return resolveCollection(CN, ctx, token, onError, tagName)
-    }
-    tag = undefined
-  }
+  let tag = ctx.schema.tags.find(
+    t => t.tag === tagName && t.collection === expType
+  ) as CollectionTag | undefined
 
   if (!tag) {
     const kt = ctx.schema.knownTags[tagName]

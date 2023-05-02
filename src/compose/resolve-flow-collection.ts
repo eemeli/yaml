@@ -3,6 +3,7 @@ import { Pair } from '../nodes/Pair.js'
 import { YAMLMap } from '../nodes/YAMLMap.js'
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { FlowCollection, Token } from '../parse/cst.js'
+import { Schema } from '../schema/Schema.js'
 import { CollectionTag } from '../schema/types.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
@@ -25,7 +26,7 @@ export function resolveFlowCollection(
   const isMap = fc.start.source === '{'
   const fcName = isMap ? 'flow map' : 'flow sequence'
   let NodeClass = (tag?.nodeClass ?? (isMap ? YAMLMap : YAMLSeq)) as {
-    new (ctx: ComposeContext['schema']): YAMLMap.Parsed | YAMLSeq.Parsed
+    new (schema: Schema): YAMLMap.Parsed | YAMLSeq.Parsed
   }
   const coll = new NodeClass(ctx.schema)
   coll.flow = true

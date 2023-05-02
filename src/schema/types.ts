@@ -97,7 +97,7 @@ export interface CollectionTag extends TagBase {
    * will be used if the tag object doesn't have a `createNode` method.
    */
   nodeClass?: {
-    new (): Node
+    new (schema?: Schema): Node
     from?: (schema: Schema, obj: unknown, ctx: CreateNodeContext) => Node
   }
 
