@@ -19,7 +19,7 @@ export function resolveBlockMap(
   onError: ComposeErrorHandler,
   tag?: CollectionTag
 ) {
-  const NodeClass = tag?.nodeClass || YAMLMap
+  const NodeClass = tag?.nodeClass ?? YAMLMap
   const map = new NodeClass(ctx.schema) as YAMLMap<ParsedNode, ParsedNode>
 
   if (ctx.atRoot) ctx.atRoot = false

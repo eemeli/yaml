@@ -56,7 +56,7 @@ export function composeCollection(
         onError(tagToken, 'TAG_RESOLVE_FAILED', msg)
       )
 
-  let expType: 'map' | 'seq' | undefined =
+  const expType: 'map' | 'seq' =
     token.type === 'block-map'
       ? 'map'
       : token.type === 'block-seq'

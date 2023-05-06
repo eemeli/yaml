@@ -13,7 +13,7 @@ export function resolveBlockSeq(
   onError: ComposeErrorHandler,
   tag?: CollectionTag
 ) {
-  const NodeClass = tag?.nodeClass || YAMLSeq
+  const NodeClass = tag?.nodeClass ?? YAMLSeq
   const seq = new NodeClass(ctx.schema) as YAMLSeq
 
   if (ctx.atRoot) ctx.atRoot = false

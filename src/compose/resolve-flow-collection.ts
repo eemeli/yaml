@@ -25,7 +25,7 @@ export function resolveFlowCollection(
 ) {
   const isMap = fc.start.source === '{'
   const fcName = isMap ? 'flow map' : 'flow sequence'
-  let NodeClass = (tag?.nodeClass ?? (isMap ? YAMLMap : YAMLSeq)) as {
+  const NodeClass = (tag?.nodeClass ?? (isMap ? YAMLMap : YAMLSeq)) as {
     new (schema: Schema): YAMLMap.Parsed | YAMLSeq.Parsed
   }
   const coll = new NodeClass(ctx.schema)

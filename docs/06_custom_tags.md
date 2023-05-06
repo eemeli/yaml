@@ -101,46 +101,49 @@ const nullObject = {
   tag: '!nullobject',
   collection: 'map',
   nodeClass: YAMLNullObject,
-  identify: v => !!(
-    typeof v === 'object' &&
-    v &&
-    !Object.getPrototypeOf(v)
-  )
+  identify: v => !!(typeof v === 'object' && v && !Object.getPrototypeOf(v))
 }
 
 // slightly more complicated object type
 class YAMLError extends YAMLMap {
   tag = '!error'
   toJSON(_, ctx) {
-    const { name, message, stack, ...rest } = super.toJSON(_, {
-      ...ctx,
-      mapAsMap: false,
-    }, Object)
+    const { name, message, stack, ...rest } = super.toJSON(
+      _,
+      { ...ctx, mapAsMap: false },
+      Object
+    )
     // craft the appropriate error type
     const Cls =
-      name === 'EvalError' ? EvalError
-        : name === 'RangeError' ? RangeError
-        : name === 'ReferenceError' ? ReferenceError
-        : name === 'SyntaxError' ? SyntaxError
-        : name === 'TypeError' ? TypeError
-        : name === 'URIError' ? URIError
+      name === 'EvalError'
+        ? EvalError
+        : name === 'RangeError'
+        ? RangeError
+        : name === 'ReferenceError'
+        ? ReferenceError
+        : name === 'SyntaxError'
+        ? SyntaxError
+        : name === 'TypeError'
+        ? TypeError
+        : name === 'URIError'
+        ? URIError
         : Error
     if (Cls.name !== name) {
       Object.defineProperty(er, 'name', {
         value: name,
         enumerable: false,
-        configurable: true,
+        configurable: true
       })
     }
     Object.defineProperty(er, 'stack', {
       value: stack,
       enumerable: false,
-      configurable: true,
+      configurable: true
     })
     return Object.assign(er, rest)
   }
 
-  static from (schema, obj, ctx) {
+  static from(schema, obj, ctx) {
     const { name, message, stack } = obj
     // ensure these props remain, even if not enumerable
     return super.from(schema, { ...obj, name, message, stack }, ctx)
@@ -151,11 +154,7 @@ const error = {
   tag: '!error',
   collection: 'map',
   nodeClass: YAMLError,
-  identify: v => !!(
-    typeof v === 'object' &&
-    v &&
-    v instanceof Error
-  )
+  identify: v => !!(typeof v === 'object' && v && v instanceof Error)
 }
 
 stringify(
@@ -163,7 +162,7 @@ stringify(
     regexp: /foo/gi,
     symbol: Symbol.for('bar'),
     nullobj: Object.assign(Object.create(null), { a: 1, b: 2 }),
-    error: new Error('This was an error'),
+    error: new Error('This was an error')
   },
   { customTags: [regexp, sharedSymbol, nullObject, error] }
 )
