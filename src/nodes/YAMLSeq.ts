@@ -120,7 +120,7 @@ export class YAMLSeq<T = unknown> extends Collection {
 
   static from(schema: Schema, obj: unknown, ctx: CreateNodeContext) {
     const { replacer } = ctx
-    const seq = new YAMLSeq(schema)
+    const seq = new this(schema)
     if (obj && Symbol.iterator in Object(obj)) {
       let i = 0
       for (let it of obj as Iterable<unknown>) {
