@@ -21,6 +21,7 @@ export type ErrorCode =
   | 'TAB_AS_INDENT'
   | 'TAG_RESOLVE_FAILED'
   | 'UNEXPECTED_TOKEN'
+  | 'BAD_COLLECTION_TYPE'
 
 export type LinePos = { line: number; col: number }
 

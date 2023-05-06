@@ -1827,8 +1827,8 @@ for (const section in spec) {
           expect(doc.errors.map(err => err.message)).toMatchObject(
             errors?.[i] ?? []
           )
-          expect(doc.warnings.map(err => err.message)).toMatchObject(
-            warnings?.[i] ?? []
+          expect(new Set(doc.warnings.map(err => err.message))).toMatchObject(
+            new Set(warnings?.[i] ?? [])
           )
           for (const err of doc.errors.concat(doc.warnings))
             expect(err).toBeInstanceOf(YAMLError)

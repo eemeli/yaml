@@ -1,4 +1,5 @@
 import {
+  CollectionTag,
   Document,
   DocumentOptions,
   Node,
@@ -14,7 +15,7 @@ import {
   YAMLMap,
   YAMLSeq
 } from 'yaml'
-import { seqTag, stringTag, stringifyString } from 'yaml/util'
+import { seqTag, stringifyString, stringTag } from 'yaml/util'
 import { source } from '../_utils'
 
 const parseDocument = <T extends Node = ParsedNode>(
@@ -491,7 +492,7 @@ description:
     for (let i = 0; i < generic.length; ++i)
       genericStr += String.fromCharCode(generic[i])
     expect(canonicalStr).toBe(genericStr)
-    expect(canonicalStr.substr(0, 5)).toBe('GIF89')
+    expect(canonicalStr.substring(0, 5)).toBe('GIF89')
     expect(String(doc))
       .toBe(`canonical: !!binary "R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J\\
   +fn5OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/\\
@@ -981,6 +982,25 @@ describe('custom tags', () => {
     }
   }
 
+  class YAMLNullObject<S, T> extends YAMLMap<S, T> {
+    tag: string = '!nullobject'
+    toJSON(_?: unknown, ctx?: any): any {
+      const obj = super.toJSON<Record<any, any>>(
+        _,
+        { ...(ctx || {}), mapAsMap: false },
+        Object
+      )
+      return Object.assign(Object.create(null), obj)
+    }
+  }
+  const nullObject: CollectionTag = {
+    tag: '!nullobject',
+    collection: 'map',
+    identify: (value: any) =>
+      !!value && typeof value === 'object' && !Object.getPrototypeOf(value),
+    nodeClass: YAMLNullObject
+  }
+
   describe('RegExp', () => {
     test('stringify as plain scalar', () => {
       const str = stringify(/re/g, { customTags: [regexp] })
@@ -1023,6 +1043,21 @@ describe('custom tags', () => {
       const res = parse(str, { customTags: [sharedSymbol] })
       expect(res).toBe(symbol)
     })
+  })
+
+  test('null prototyped object', () => {
+    const obj = Object.assign(Object.create(null), { x: 'y', z: 1 })
+    const str = stringify(obj, { customTags: [nullObject] })
+    expect(str).toBe('!nullobject\nx: y\nz: 1\n')
+    const res = parse(str, { customTags: [nullObject] })
+    expect(Object.getPrototypeOf(res)).toBe(null)
+    expect(res).toMatchObject(obj)
+  })
+
+  test('cannot parse sequence as nullobject', () => {
+    const str = '!nullobject\n- y\n- 1\n'
+    const doc = origParseDocument(str)
+    expect(doc.warnings).toMatchObject([{ code: 'TAG_RESOLVE_FAILED' }])
   })
 
   test('array within customTags', () => {

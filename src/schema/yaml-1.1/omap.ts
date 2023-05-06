@@ -2,6 +2,8 @@ import { isPair, isScalar } from '../../nodes/identity.js'
 import { toJS, ToJSContext } from '../../nodes/toJS.js'
 import { YAMLMap } from '../../nodes/YAMLMap.js'
 import { YAMLSeq } from '../../nodes/YAMLSeq.js'
+import { CreateNodeContext } from '../../util.js'
+import type { Schema } from '../Schema.js'
 import { CollectionTag } from '../types.js'
 import { createPairs, resolvePairs } from './pairs.js'
 
@@ -41,6 +43,13 @@ export class YAMLOMap extends YAMLSeq {
     }
     return map as unknown as unknown[]
   }
+
+  static from(schema: Schema, iterable: unknown, ctx: CreateNodeContext) {
+    const pairs = createPairs(schema, iterable, ctx)
+    const omap = new this()
+    omap.items = pairs.items
+    return omap
+  }
 }
 
 export const omap: CollectionTag = {
@@ -64,11 +73,5 @@ export const omap: CollectionTag = {
     }
     return Object.assign(new YAMLOMap(), pairs)
   },
-
-  createNode(schema, iterable, ctx) {
-    const pairs = createPairs(schema, iterable, ctx)
-    const omap = new YAMLOMap()
-    omap.items = pairs.items
-    return omap
-  }
+  createNode: (schema, iterable, ctx) => YAMLOMap.from(schema, iterable, ctx)
 }

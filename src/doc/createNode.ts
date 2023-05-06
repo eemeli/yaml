@@ -99,6 +99,8 @@ export function createNode(
 
   const node = tagObj?.createNode
     ? tagObj.createNode(ctx.schema, value, ctx)
+    : typeof tagObj?.nodeClass?.from === 'function'
+    ? tagObj.nodeClass.from(ctx.schema, value, ctx)
     : new Scalar(value)
   if (tagName) node.tag = tagName
   else if (!tagObj.default) node.tag = tagObj.tag

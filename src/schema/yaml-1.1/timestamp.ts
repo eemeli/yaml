@@ -47,7 +47,7 @@ function stringifySexagesimal(node: Scalar) {
   return (
     sign +
     parts
-      .map(n => (n < 10 ? '0' + String(n) : String(n)))
+      .map(n => String(n).padStart(2, '0'))
       .join(':')
       .replace(/000000\d*$/, '') // % 60 may introduce error
   )

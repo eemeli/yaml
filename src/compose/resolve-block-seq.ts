@@ -1,5 +1,6 @@
 import { YAMLSeq } from '../nodes/YAMLSeq.js'
 import type { BlockSequence } from '../parse/cst.js'
+import { CollectionTag } from '../schema/types.js'
 import type { ComposeContext, ComposeNode } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 import { resolveProps } from './resolve-props.js'
@@ -9,9 +10,11 @@ export function resolveBlockSeq(
   { composeNode, composeEmptyNode }: ComposeNode,
   ctx: ComposeContext,
   bs: BlockSequence,
-  onError: ComposeErrorHandler
+  onError: ComposeErrorHandler,
+  tag?: CollectionTag
 ) {
-  const seq = new YAMLSeq(ctx.schema)
+  const NodeClass = tag?.nodeClass ?? YAMLSeq
+  const seq = new NodeClass(ctx.schema) as YAMLSeq
 
   if (ctx.atRoot) ctx.atRoot = false
   let offset = bs.offset
