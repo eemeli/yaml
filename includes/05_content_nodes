@@ -16,7 +16,8 @@ It is valid to have an anchor associated with a node even if it has no aliases.<
       <span class="c1">// a blank line before this node and its commentBefore</span>
   <span class="nx">tag</span><span class="p">?:</span> <span class="nx">string</span>       <span class="c1">// a fully qualified tag, if required</span>
   <span class="nx">clone</span><span class="p">():</span> <span class="nx">NodeBase</span>  <span class="c1">// a copy of this node</span>
-  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>      <span class="c1">// a plain JS or JSON representation of this node</span>
+  <span class="nx">toJS</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">options</span><span class="p">?):</span> <span class="nx">any</span> <span class="c1">// a plain JS representation of this node</span>
+  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>      <span class="c1">// a plain JSON representation of this node</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>For scalar values, the <code>tag</code> will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, <code>YAMLMap</code>, or <code>YAMLSeq</code>).</p>

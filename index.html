@@ -485,6 +485,10 @@ It has no external dependencies and runs on Node.js as well as modern browsers.<
 <p>For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes.
 Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).</p>
 
+<p>The minimum supported TypeScript version of the included typings is 3.9;
+for use in earlier versions you may need to set <code>skipLibCheck: true</code> in your config.
+This requirement may be updated between minor versions of the library.</p>
+
 <p><strong>Note:</strong> These docs are for <code>yaml@2</code>. For v1, see the <a href="https://github.com/eemeli/yaml/tree/v1.10.0">v1.10.0 tag</a> for the source and <a href="https://eemeli.org/yaml/v1/">eemeli.org/yaml/v1</a> for the documentation.</p>
 <h2 id='api-overview'>API Overview</h2>
 <p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the underlying <a href="#parsing-yaml">Lexer/Parser/Composer</a>.
@@ -829,7 +833,7 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 </code></pre></div>
 <p>These options influence how the document is transformed into &quot;native&quot; JavaScript representation.</p>
 
-<p>Used by: <code>parse()</code> and <code>doc.toJS()</code></p>
+<p>Used by: <code>parse()</code>, <code>doc.toJS()</code> and <code>node.toJS()</code></p>
 
 <table><thead>
 <tr>
@@ -1228,7 +1232,8 @@ It is valid to have an anchor associated with a node even if it has no aliases.<
       <span class="c1">// a blank line before this node and its commentBefore</span>
   <span class="nx">tag</span><span class="p">?:</span> <span class="nx">string</span>       <span class="c1">// a fully qualified tag, if required</span>
   <span class="nx">clone</span><span class="p">():</span> <span class="nx">NodeBase</span>  <span class="c1">// a copy of this node</span>
-  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>      <span class="c1">// a plain JS or JSON representation of this node</span>
+  <span class="nx">toJS</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">options</span><span class="p">?):</span> <span class="nx">any</span> <span class="c1">// a plain JS representation of this node</span>
+  <span class="nx">toJSON</span><span class="p">():</span> <span class="nx">any</span>      <span class="c1">// a plain JSON representation of this node</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>For scalar values, the <code>tag</code> will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, <code>YAMLMap</code>, or <code>YAMLSeq</code>).</p>
@@ -1746,7 +1751,7 @@ When creating, writing, and then reading a YAML file, comments may sometimes be 
 <td>A point in time, e.g. <code>2001-12-15T02:59:43</code>.</td>
 </tr>
 </tbody></table>
-<h2 id='writing-custom-tags'>Writing Custom Tags</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">stringify</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+<h2 id='writing-custom-tags'>Writing Custom Tags</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">stringify</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 <span class="k">import</span> <span class="p">{</span> <span class="nx">stringifyString</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml/util</span><span class="dl">'</span>
 
 <span class="kd">const</span> <span class="nx">regexp</span> <span class="o">=</span> <span class="p">{</span>
@@ -1770,16 +1775,99 @@ When creating, writing, and then reading a YAML file, comments may sometimes be 
   <span class="p">}</span>
 <span class="p">}</span>
 
+<span class="kd">class</span> <span class="nx">YAMLNullObject</span> <span class="kd">extends</span> <span class="nx">YAMLMap</span> <span class="p">{</span>
+  <span class="nx">tag</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">!nullobject</span><span class="dl">'</span>
+  <span class="nx">toJSON</span><span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">obj</span> <span class="o">=</span> <span class="k">super</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="p">{</span> <span class="p">...</span><span class="nx">ctx</span><span class="p">,</span> <span class="na">mapAsMap</span><span class="p">:</span> <span class="kc">false</span> <span class="p">},</span> <span class="nb">Object</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="kc">null</span><span class="p">),</span> <span class="nx">obj</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">nullObject</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">tag</span><span class="p">:</span> <span class="dl">'</span><span class="s1">!nullobject</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">collection</span><span class="p">:</span> <span class="dl">'</span><span class="s1">map</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">nodeClass</span><span class="p">:</span> <span class="nx">YAMLNullObject</span><span class="p">,</span>
+  <span class="na">identify</span><span class="p">:</span> <span class="nx">v</span> <span class="o">=&gt;</span> <span class="o">!!</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">v</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span> <span class="o">&amp;&amp;</span> <span class="nx">v</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">v</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="c1">// slightly more complicated object type</span>
+<span class="kd">class</span> <span class="nx">YAMLError</span> <span class="kd">extends</span> <span class="nx">YAMLMap</span> <span class="p">{</span>
+  <span class="nx">tag</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">!error</span><span class="dl">'</span>
+  <span class="nx">toJSON</span><span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">stack</span><span class="p">,</span> <span class="p">...</span><span class="nx">rest</span> <span class="p">}</span> <span class="o">=</span> <span class="k">super</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">(</span>
+      <span class="nx">_</span><span class="p">,</span>
+      <span class="p">{</span> <span class="p">...</span><span class="nx">ctx</span><span class="p">,</span> <span class="na">mapAsMap</span><span class="p">:</span> <span class="kc">false</span> <span class="p">},</span>
+      <span class="nb">Object</span>
+    <span class="p">)</span>
+    <span class="c1">// craft the appropriate error type</span>
+    <span class="kd">const</span> <span class="nx">Cls</span> <span class="o">=</span>
+      <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">EvalError</span><span class="dl">'</span>
+        <span class="p">?</span> <span class="nx">EvalError</span>
+        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">RangeError</span><span class="dl">'</span>
+        <span class="p">?</span> <span class="nx">RangeError</span>
+        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">ReferenceError</span><span class="dl">'</span>
+        <span class="p">?</span> <span class="nx">ReferenceError</span>
+        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">SyntaxError</span><span class="dl">'</span>
+        <span class="p">?</span> <span class="nx">SyntaxError</span>
+        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">TypeError</span><span class="dl">'</span>
+        <span class="p">?</span> <span class="nx">TypeError</span>
+        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">URIError</span><span class="dl">'</span>
+        <span class="p">?</span> <span class="nx">URIError</span>
+        <span class="p">:</span> <span class="nb">Error</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">Cls</span><span class="p">.</span><span class="nx">name</span> <span class="o">!==</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">er</span><span class="p">,</span> <span class="dl">'</span><span class="s1">name</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">value</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span>
+        <span class="na">enumerable</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="na">configurable</span><span class="p">:</span> <span class="kc">true</span>
+      <span class="p">})</span>
+    <span class="p">}</span>
+    <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">er</span><span class="p">,</span> <span class="dl">'</span><span class="s1">stack</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">value</span><span class="p">:</span> <span class="nx">stack</span><span class="p">,</span>
+      <span class="na">enumerable</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+      <span class="na">configurable</span><span class="p">:</span> <span class="kc">true</span>
+    <span class="p">})</span>
+    <span class="k">return</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">(</span><span class="nx">er</span><span class="p">,</span> <span class="nx">rest</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">static</span> <span class="k">from</span><span class="p">(</span><span class="nx">schema</span><span class="p">,</span> <span class="nx">obj</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">stack</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">obj</span>
+    <span class="c1">// ensure these props remain, even if not enumerable</span>
+    <span class="k">return</span> <span class="k">super</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nx">schema</span><span class="p">,</span> <span class="p">{</span> <span class="p">...</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">stack</span> <span class="p">},</span> <span class="nx">ctx</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">error</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">tag</span><span class="p">:</span> <span class="dl">'</span><span class="s1">!error</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">collection</span><span class="p">:</span> <span class="dl">'</span><span class="s1">map</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">nodeClass</span><span class="p">:</span> <span class="nx">YAMLError</span><span class="p">,</span>
+  <span class="na">identify</span><span class="p">:</span> <span class="nx">v</span> <span class="o">=&gt;</span> <span class="o">!!</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">v</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span> <span class="o">&amp;&amp;</span> <span class="nx">v</span> <span class="o">&amp;&amp;</span> <span class="nx">v</span> <span class="k">instanceof</span> <span class="nb">Error</span><span class="p">)</span>
+<span class="p">}</span>
+
 <span class="nx">stringify</span><span class="p">(</span>
-  <span class="p">{</span> <span class="na">regexp</span><span class="p">:</span> <span class="sr">/foo/gi</span><span class="p">,</span> <span class="na">symbol</span><span class="p">:</span> <span class="nb">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">)</span> <span class="p">},</span>
-  <span class="p">{</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="nx">regexp</span><span class="p">,</span> <span class="nx">sharedSymbol</span><span class="p">]</span> <span class="p">}</span>
+  <span class="p">{</span>
+    <span class="na">regexp</span><span class="p">:</span> <span class="sr">/foo/gi</span><span class="p">,</span>
+    <span class="na">symbol</span><span class="p">:</span> <span class="nb">Symbol</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">),</span>
+    <span class="na">nullobj</span><span class="p">:</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="kc">null</span><span class="p">),</span> <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}),</span>
+    <span class="na">error</span><span class="p">:</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">This was an error</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">},</span>
+  <span class="p">{</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="nx">regexp</span><span class="p">,</span> <span class="nx">sharedSymbol</span><span class="p">,</span> <span class="nx">nullObject</span><span class="p">,</span> <span class="nx">error</span><span class="p">]</span> <span class="p">}</span>
 <span class="p">)</span>
 <span class="c1">// regexp: !re /foo/gi</span>
 <span class="c1">// symbol: !symbol/shared bar</span>
+<span class="c1">// nullobj: !nullobject</span>
+<span class="c1">//   a: 1</span>
+<span class="c1">//   b: 2</span>
+<span class="c1">// error: !error</span>
+<span class="c1">//   name: Error</span>
+<span class="c1">//   message: 'This was an error'</span>
+<span class="c1">//   stack: |</span>
+<span class="c1">//     at some-file.js:1:3</span>
 </code></pre></div>
 <p>In YAML-speak, a custom data type is represented by a <em>tag</em>. To define your own tag, you need to account for the ways that your data is both parsed and stringified. Furthermore, both of those processes are split into two stages by the intermediate AST node structure.</p>
 
-<p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/master/src/tags/yaml-1.1/binary.js"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/master/src/tags/yaml-1.1/set.js"><code>!!set</code></a> tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.</p>
+<p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/binary.ts"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/set.ts"><code>!!set</code></a> tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.</p>
+
+<p>Custom collection types (ie, Maps, Sets, objects, and arrays; anything with child properties that may not be propertly serialized to a scalar value) may provide a <code>nodeClass</code> property that extends the <a href="https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLMap.ts"><code>YAMLMap</code></a> and <a href="https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLSeq.ts"><code>YAMLSeq</code></a> classes, which will be used for parsing and stringifying objects with the specified tag.</p>
 <h3 id='parsing-custom-data'>Parsing Custom Data</h3>
 <p>At the lowest level, the <a href="#lexer"><code>Lexer</code></a> and <a href="#parser"><code>Parser</code></a> will take care of turning string input into a concrete syntax tree (CST).
 In the CST all scalar values are available as strings, and maps &amp; sequences as collections of nodes.
@@ -1807,6 +1895,8 @@ For the same reason, collections need to define their own <code>createNode(schem
 For collections in particular, the default stringifier should be perfectly sufficient.
 <code>&#39;yaml/util&#39;</code> exports <code>stringifyNumber(item)</code> and <code>stringifyString(item, ctx, ...)</code>, which may be of use for custom scalar data.</p>
 <h3 id='custom-tag-api'>Custom Tag API</h3><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">createNode</span><span class="p">,</span> <span class="c1">// (value, tagName, ctx) =&gt; Node -- Create a new node</span>
+  <span class="nx">createPair</span><span class="p">,</span> <span class="c1">// (key, value, ctx) =&gt; Pair -- Create a new pair</span>
   <span class="nx">debug</span><span class="p">,</span> <span class="c1">// (logLevel, ...messages) =&gt; void -- Log debug messages to console</span>
   <span class="nx">findPair</span><span class="p">,</span> <span class="c1">// (items, key) =&gt; Pair? -- Given a key, find a matching Pair</span>
   <span class="nx">foldFlowLines</span><span class="p">,</span> <span class="c1">// (text, indent, mode, options) =&gt; string -- Fold long lines</span>
@@ -2089,7 +2179,7 @@ Used internally by <code>parser.parse()</code>; exposed to allow for use with an
 
 <p>For debug purposes, if the <code>LOG_TOKENS</code> env var is true-ish, all lexical tokens will be pretty-printed using <code>console.log()</code> as they are being processed.</p>
 <h3 id='cst-nodes'>CST Nodes</h3>
-<p>For a complete description of CST node interfaces, please consult the <a href="https://github.com/eemeli/yaml/blob/master/src/parse/cst.ts">cst.ts source</a>.</p>
+<p>For a complete description of CST node interfaces, please consult the <a href="https://github.com/eemeli/yaml/blob/main/src/parse/cst.ts">cst.ts source</a>.</p>
 
 <p>Some of the most common node properties include:</p>
 

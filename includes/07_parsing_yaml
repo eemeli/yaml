@@ -256,7 +256,7 @@ Used internally by <code>parser.parse()</code>; exposed to allow for use with an
 
 <p>For debug purposes, if the <code>LOG_TOKENS</code> env var is true-ish, all lexical tokens will be pretty-printed using <code>console.log()</code> as they are being processed.</p>
 <h3 id='cst-nodes'>CST Nodes</h3>
-<p>For a complete description of CST node interfaces, please consult the <a href="https://github.com/eemeli/yaml/blob/master/src/parse/cst.ts">cst.ts source</a>.</p>
+<p>For a complete description of CST node interfaces, please consult the <a href="https://github.com/eemeli/yaml/blob/main/src/parse/cst.ts">cst.ts source</a>.</p>
 
 <p>Some of the most common node properties include:</p>
 

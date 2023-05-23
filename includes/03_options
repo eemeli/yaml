@@ -220,7 +220,7 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 </code></pre></div>
 <p>These options influence how the document is transformed into &quot;native&quot; JavaScript representation.</p>
 
-<p>Used by: <code>parse()</code> and <code>doc.toJS()</code></p>
+<p>Used by: <code>parse()</code>, <code>doc.toJS()</code> and <code>node.toJS()</code></p>
 
 <table><thead>
 <tr>
