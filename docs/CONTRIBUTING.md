@@ -31,7 +31,7 @@ To start hacking `yaml`, this should get you set up:
 git clone https://github.com/eemeli/yaml.git # or your own fork
 cd yaml
 git submodule update --init # required by tests; also fetches the docs & playground
-npm install
+npm install # npm v7 or later is required
 npm test # just to be sure
 ```
 
