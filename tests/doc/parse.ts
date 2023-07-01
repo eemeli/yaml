@@ -2,6 +2,7 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import * as YAML from 'yaml'
 import { source } from '../_utils'
+import {YAMLInputError} from "../../src/errors";
 
 describe('scalars', () => {
   test('empty block scalar at end of document', () => {
@@ -817,5 +818,22 @@ describe('CRLF line endings', () => {
   test('escaped newline in double-quoted scalar', () => {
     const res = YAML.parse('"foo \\\r\nbar"')
     expect(res).toBe('foo bar')
+  })
+})
+
+describe('Errors on non string inputs', () => {
+  test('rise in parseDocument', () => {
+    const scenario = () => {
+      const input = Buffer.alloc(8)
+      YAML.parseDocument(input)
+    }
+    expect(scenario).toThrow(YAMLInputError)
+  })
+  test('rise in parseAllDocuments', () => {
+    const scenario = () => {
+      const input = Buffer.alloc(8)
+      YAML.parseAllDocuments(input)
+    }
+    expect(scenario).toThrow(YAMLInputError)
   })
 })

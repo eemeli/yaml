@@ -25,6 +25,15 @@ export type ErrorCode =
 
 export type LinePos = { line: number; col: number }
 
+export class YAMLInputError extends Error {
+  constructor(message: string) {
+    super();
+    this.name = 'YAMLInputError'
+    this.message = message
+  }
+}
+
+
 export class YAMLError extends Error {
   name: 'YAMLParseError' | 'YAMLWarning'
   code: ErrorCode

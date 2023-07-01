@@ -1,7 +1,7 @@
 import { Composer } from './compose/composer.js'
 import type { Reviver } from './doc/applyReviver.js'
 import { Document, Replacer } from './doc/Document.js'
-import { prettifyError, YAMLParseError } from './errors.js'
+import { prettifyError, YAMLParseError, YAMLInputError } from './errors.js'
 import { warn } from './log.js'
 import type { Node, ParsedNode } from './nodes/Node.js'
 import type {
@@ -50,6 +50,10 @@ export function parseAllDocuments<
         : Document<Contents, Strict>
     >
   | EmptyStream {
+  const inputType = typeof source;
+  if(inputType !== "string"){
+    throw new YAMLInputError(`Expected string, got ${inputType}`)
+  }
   const { lineCounter, prettyErrors } = parseOptions(options)
   const parser = new Parser(lineCounter?.addNewLine)
   const composer = new Composer(options)
@@ -82,6 +86,10 @@ export function parseDocument<
 ): Contents extends ParsedNode
   ? Document.Parsed<Contents, Strict>
   : Document<Contents, Strict> {
+  const inputType = typeof source;
+  if(inputType !== "string"){
+    throw new YAMLInputError(`Expected string, got ${inputType}`)
+  }
   const { lineCounter, prettyErrors } = parseOptions(options)
   const parser = new Parser(lineCounter?.addNewLine)
   const composer = new Composer(options)
