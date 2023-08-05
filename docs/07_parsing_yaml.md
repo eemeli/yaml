@@ -307,7 +307,7 @@ const item = doc.value.items[0].value
     ]
   }
 
-YAML.resolveAsScalar(item)
+CST.resolveAsScalar(item)
 > { value: 'bar', type: 'QUOTE_DOUBLE', comment: 'comment', range: [5, 9, 19] }
 ```
 
