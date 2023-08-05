@@ -453,7 +453,7 @@ as this function does not support any schema operations and won&#39;t check for 
     <span class="p">]</span>
   <span class="p">}</span>
 
-<span class="nx">YAML</span><span class="p">.</span><span class="nx">resolveAsScalar</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
+<span class="nx">CST</span><span class="p">.</span><span class="nx">resolveAsScalar</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="p">{</span> <span class="na">value</span><span class="p">:</span> <span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">,</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">QUOTE_DOUBLE</span><span class="dl">'</span><span class="p">,</span> <span class="na">comment</span><span class="p">:</span> <span class="dl">'</span><span class="s1">comment</span><span class="dl">'</span><span class="p">,</span> <span class="na">range</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">19</span><span class="p">]</span> <span class="p">}</span>
 </code></pre></div><h4 id='cst-iscollection-token-token-boolean'><code>CST.isCollection(token?: Token): boolean</code></h4><h4 id='cst-isscalar-token-token-boolean'><code>CST.isScalar(token?: Token): boolean</code></h4>
 <p>Custom type guards for detecting CST collections and scalars, in both their block and flow forms.</p>
