@@ -336,6 +336,11 @@ z:
     expect(String(doc)).toBe('a: 1\n? b: 2\n  c: 3\n')
   })
 
+  test('plain key containing flow indicators', () => {
+    const doc = YAML.parseDocument('foo[{}]: bar')
+    expect(doc.toString()).toBe('foo[{}]: bar\n')
+  })
+
   describe('No extra whitespace for empty values', () => {
     const getDoc = () =>
       new YAML.Document<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>, false>({
