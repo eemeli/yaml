@@ -280,7 +280,7 @@ function plainString(
   const { type, value } = item
   const { actualString, implicitKey, indent, indentStep, inFlow } = ctx
   if (
-    (implicitKey && /[\n[\]{},]/.test(value)) ||
+    (implicitKey && value.includes('\n')) ||
     (inFlow && /[[\]{},]/.test(value))
   ) {
     return quotedString(value, ctx)
