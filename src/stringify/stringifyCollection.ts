@@ -126,7 +126,7 @@ function stringifyFlowCollection(
       if (iv) {
         if (iv.comment) comment = iv.comment
         if (iv.commentBefore) reqNewline = true
-      } else if (item.value == null && ik && ik.comment) {
+      } else if (item.value == null && ik?.comment) {
         comment = ik.comment
       }
     }

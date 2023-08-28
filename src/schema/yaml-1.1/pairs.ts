@@ -65,7 +65,11 @@ export function createPairs(
         if (keys.length === 1) {
           key = keys[0]
           value = (it as any)[key as string]
-        } else throw new TypeError(`Expected { key: value } tuple: ${it}`)
+        } else {
+          throw new TypeError(
+            `Expected tuple with one key, not ${keys.length} keys`
+          )
+        }
       } else {
         key = it
       }

@@ -87,7 +87,7 @@ function stringifyKey(
 ) {
   if (jsKey === null) return ''
   if (typeof jsKey !== 'object') return String(jsKey)
-  if (isNode(key) && ctx && ctx.doc) {
+  if (isNode(key) && ctx?.doc) {
     const strCtx = createStringifyContext(ctx.doc, {})
     strCtx.anchors = new Set()
     for (const node of ctx.anchors.keys())

@@ -6,6 +6,8 @@ export function debug(logLevel: LogLevelId, ...messages: any[]) {
 
 export function warn(logLevel: LogLevelId, warning: string | Error) {
   if (logLevel === 'debug' || logLevel === 'warn') {
+    // https://github.com/typescript-eslint/typescript-eslint/issues/7478
+    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
     if (typeof process !== 'undefined' && process.emitWarning)
       process.emitWarning(warning)
     else console.warn(warning)

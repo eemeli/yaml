@@ -34,7 +34,9 @@ rules:
   '@typescript-eslint/no-unsafe-member-access': off
   '@typescript-eslint/no-unused-vars': [warn, argsIgnorePattern: '^_']
   '@typescript-eslint/prefer-includes': warn
-  '@typescript-eslint/prefer-nullish-coalescing': warn
+  '@typescript-eslint/prefer-nullish-coalescing':
+    - warn
+    - { ignoreConditionalTests: true, ignoreMixedLogicalExpressions: true }
   '@typescript-eslint/prefer-optional-chain': warn
   '@typescript-eslint/restrict-template-expressions': off
 
