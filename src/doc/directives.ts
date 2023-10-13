@@ -149,7 +149,7 @@ export class Directives {
     if (prefix) {
       try {
         return prefix + decodeURIComponent(suffix)
-      } catch (error) {
+      } catch (_) {
         onError('Failed to decode suffix')
       }
     }
