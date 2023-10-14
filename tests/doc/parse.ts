@@ -820,9 +820,10 @@ describe('CRLF line endings', () => {
   })
 })
 
-describe('Failed to decode suffix', () => {
-  test('rise in parse for malformed uri', () => {
-    const data = `[!!eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeJJJJJJJeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeebooleaeeeeeeeeeee-eeeeeeeee%eeeeeeeeeeeee[`
-    expect(() => YAML.parse(data)).toThrow(/Failed to decode suffix/)
+describe('URI malformed', () => {
+  test('for parseDocument', () => {
+    const doc = YAML.parseDocument('!!%ee 0')
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0].message).toMatch(/URI malformed/)
   })
 })

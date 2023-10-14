@@ -149,8 +149,9 @@ export class Directives {
     if (prefix) {
       try {
         return prefix + decodeURIComponent(suffix)
-      } catch (_) {
-        onError('Failed to decode suffix')
+      } catch (error) {
+        onError(String(error))
+        return null
       }
     }
     if (handle === '!') return source // local tag
