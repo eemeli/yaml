@@ -106,6 +106,12 @@ describe('tags', () => {
         expect(doc.errors[0].code).toBe('MISSING_CHAR')
       })
     }
+
+    test('malformed URI (eemeli/yaml#498)', () => {
+      const doc = parseDocument('!!%ee 0')
+      expect(doc.errors).toHaveLength(1)
+      expect(doc.errors[0].message).toMatch('URIError')
+    })
   })
 
   test('eemeli/yaml#97', () => {

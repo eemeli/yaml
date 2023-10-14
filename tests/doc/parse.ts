@@ -819,11 +819,3 @@ describe('CRLF line endings', () => {
     expect(res).toBe('foo bar')
   })
 })
-
-describe('URI malformed', () => {
-  test('for parseDocument', () => {
-    const doc = YAML.parseDocument('!!%ee 0')
-    expect(doc.errors).toHaveLength(1)
-    expect(doc.errors[0].message).toMatch(/URI malformed/)
-  })
-})
