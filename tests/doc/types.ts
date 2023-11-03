@@ -112,6 +112,12 @@ describe('tags', () => {
       expect(doc.errors).toHaveLength(1)
       expect(doc.errors[0].message).toMatch('URIError')
     })
+
+    test('CR in tag shorthand (eemeli/yaml#501', () => {
+      const doc = parseDocument(': | !\r!')
+      const err = doc.errors.find(err => err.code === 'TAG_RESOLVE_FAILED')
+      expect(err).not.toBeFalsy()
+    })
   })
 
   test('eemeli/yaml#97', () => {
