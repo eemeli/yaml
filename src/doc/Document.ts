@@ -55,7 +55,7 @@ export class Document<
   /** A comment immediately after this Document */
   comment: string | null = null
 
-  /** The document contents. */
+  /** The document contents. At runtime, the document node type will be of type YAMLMap, YAMLSeq, Scalar or null. */
   contents: Strict extends true ? Contents | null : Contents
 
   directives: Strict extends true ? Directives | undefined : Directives
