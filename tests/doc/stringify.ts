@@ -616,7 +616,7 @@ describe('scalar styles', () => {
   y,
   n
 ]\n`
-    expect(String(doc)).toBe(str)
+    expect(doc.toString({ lineWidth: 1 })).toBe(str)
     expect(YAML.parse(str)).toEqual([
       true,
       false,
@@ -865,6 +865,36 @@ describe('indentSeq: false', () => {
             #sc
             - a
     `)
+  })
+})
+
+describe('lineWidth', () => {
+  const doc = YAML.parseDocument(
+    "[ 'Sed', 'ut', 'perspiciatis', 'unde', 'omnis', 'iste', 'natus', 'error', 'sit', 'voluptatem', 'accusantium', 'doloremque', 'laudantium,', 'totam' ]"
+  )
+
+  test('limit to 80 with overlong flow collection', () => {
+    expect(doc.toString({lineWidth: 80})).toBe(`[
+  'Sed',
+  'ut',
+  'perspiciatis',
+  'unde',
+  'omnis',
+  'iste',
+  'natus',
+  'error',
+  'sit',
+  'voluptatem',
+  'accusantium',
+  'doloremque',
+  'laudantium,',
+  'totam'
+]
+`)
+  })
+
+  test('limit > flow collection length', () => {
+    expect(doc.toString({lineWidth: 162})).toBe("[ 'Sed', 'ut', 'perspiciatis', 'unde', 'omnis', 'iste', 'natus', 'error', 'sit', 'voluptatem', 'accusantium', 'doloremque', 'laudantium,', 'totam' ]\n")
   })
 })
 
