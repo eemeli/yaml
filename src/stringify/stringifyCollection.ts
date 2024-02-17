@@ -148,7 +148,7 @@ function stringifyFlowCollection(
   } else {
     if (!reqNewline) {
       const len = lines.reduce((sum, line) => sum + line.length + 2, 2)
-      reqNewline = len > Collection.maxFlowStringSingleLineLength
+      reqNewline = ctx.options.lineWidth > 0 && len > ctx.options.lineWidth
     }
     if (reqNewline) {
       str = start
