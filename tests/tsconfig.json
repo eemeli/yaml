@@ -5,6 +5,7 @@
     "declaration": false,
     "paths": {
       "yaml": ["src/index.ts"],
+      "yaml/cli": ["src/cli.ts"],
       "yaml/util": ["src/util.ts"]
     },
     "rootDir": "..",

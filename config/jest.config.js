@@ -22,6 +22,7 @@ switch (process.env.npm_lifecycle_event) {
     process.env.TRACE_LEVEL = 'log'
     moduleNameMapper = {
       '^yaml$': '<rootDir>/src/index.ts',
+      '^yaml/cli$': '<rootDir>/src/cli.ts',
       '^yaml/util$': '<rootDir>/src/util.ts'
     }
     transform['[/\\\\]src[/\\\\].*\\.ts$'] = [
