@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
+    "module": "ESNext",
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,

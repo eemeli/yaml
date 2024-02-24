@@ -1,6 +1,6 @@
 let moduleNameMapper
 const transform = {
-  '[/\\\\]tests[/\\\\].*\\.(js|ts)$': [
+  '[/\\\\]tests[/\\\\].*\\.(m?js|ts)$': [
     'babel-jest',
     { configFile: './config/babel.config.js' }
   ]

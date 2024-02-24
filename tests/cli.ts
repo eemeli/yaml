@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+
 import { Readable } from 'node:stream'
 import { main } from 'yaml/cli'
 
@@ -126,6 +128,20 @@ const skip = Number(major) < 20
         ['--doc'],
         [{ contents: { items: [{}] } }],
         [{ name: 'YAMLParseError' }]
+      )
+    })
+    describe('--visit', () => {
+      ok(
+        'unstyle',
+        '{"hello":"world"}',
+        ['--visit', './tests/artifacts/cli-unstyle.cjs'],
+        ['hello: world']
+      )
+      ok(
+        'singlequote',
+        '{"hello":"world"}',
+        ['--visit', './tests/artifacts/cli-singlequote.mjs'],
+        ["{ 'hello': 'world' }"]
       )
     })
   })

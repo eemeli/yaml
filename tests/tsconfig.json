@@ -11,5 +11,5 @@
     "rootDir": "..",
     "types": ["jest", "node"]
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "artifacts/cli-*"]
 }

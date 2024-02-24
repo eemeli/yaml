@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 
 import { type Token, prettyToken } from './parse/cst.js'
@@ -9,6 +10,7 @@ import { Composer } from './compose/composer.js'
 import { LineCounter } from './parse/line-counter.js'
 import { type Document } from './doc/Document.js'
 import { prettifyError } from './errors.js'
+import { visit, type visitor } from './visit.js'
 
 const help = `\
 yaml: A command-line YAML processor and inspector
@@ -29,6 +31,7 @@ Additional options for bare "yaml" command:
   --doc, -d     Output pretty-printed JS Document objects.
   --single, -1  Require the input to consist of a single YAML document.
   --strict, -s  Stop on errors.
+  --visit, -v   Apply a visitor to each document (requires a path to import)
   --yaml 1.1    Set the YAML version. (default: 1.2)`
 
 class UserError extends Error {
@@ -43,6 +46,7 @@ class UserError extends Error {
 
 /* istanbul ignore if */
 if (require.main === module)
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   main(process.stdin, error => {
     if (error instanceof UserError) {
       console.error(`${help}\n\n${error.message}`)
@@ -50,7 +54,7 @@ if (require.main === module)
     } else if (error) throw error
   })
 
-export function main(
+export async function main(
   stdin: NodeJS.ReadableStream,
   done: (error?: Error) => void,
   argv?: string[]
@@ -66,6 +70,7 @@ export function main(
         json: { type: 'boolean', short: 'j' },
         single: { type: 'boolean', short: '1' },
         strict: { type: 'boolean', short: 's' },
+        visit: { type: 'string', short: 'v' },
         yaml: { type: 'string', default: '1.2' }
       }
     })
@@ -129,6 +134,9 @@ export function main(
       const parser = new Parser(lineCounter.addNewLine)
       // @ts-expect-error Version is validated at runtime
       const composer = new Composer({ version: opt.yaml })
+      const visitor: visitor | null = opt.visit
+        ? (await import(resolve(opt.visit))).default
+        : null
       let source = ''
       let hasDoc = false
       let reqDocEnd = false
@@ -151,6 +159,7 @@ export function main(
           prettifyError(source, lineCounter)(warning)
           console.error(warning)
         }
+        if (visitor) visit(doc, visitor)
         if (mode === 'valid') doc.toJS()
         else if (opt.json) data.push(doc)
         else if (opt.doc) {

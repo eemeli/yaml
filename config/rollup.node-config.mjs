@@ -14,7 +14,7 @@ export default {
     esModule: false,
     preserveModules: true
   },
-  external: ['node:util'],
+  external: ['node:path', 'node:util'],
   plugins: [
     typescript(),
     {
