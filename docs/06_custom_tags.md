@@ -118,16 +118,16 @@ class YAMLError extends YAMLMap {
       name === 'EvalError'
         ? EvalError
         : name === 'RangeError'
-        ? RangeError
-        : name === 'ReferenceError'
-        ? ReferenceError
-        : name === 'SyntaxError'
-        ? SyntaxError
-        : name === 'TypeError'
-        ? TypeError
-        : name === 'URIError'
-        ? URIError
-        : Error
+          ? RangeError
+          : name === 'ReferenceError'
+            ? ReferenceError
+            : name === 'SyntaxError'
+              ? SyntaxError
+              : name === 'TypeError'
+                ? TypeError
+                : name === 'URIError'
+                  ? URIError
+                  : Error
     if (Cls.name !== name) {
       Object.defineProperty(er, 'name', {
         value: name,

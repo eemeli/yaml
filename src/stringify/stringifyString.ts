@@ -197,10 +197,10 @@ function blockString(
     blockQuote === 'literal'
       ? true
       : blockQuote === 'folded' || type === Scalar.BLOCK_FOLDED
-      ? false
-      : type === Scalar.BLOCK_LITERAL
-      ? true
-      : !lineLengthOverLimit(value, lineWidth, indent.length)
+        ? false
+        : type === Scalar.BLOCK_LITERAL
+          ? true
+          : !lineLengthOverLimit(value, lineWidth, indent.length)
   if (!value) return literal ? '|\n' : '>\n'
 
   // determine chomping from whitespace at value end

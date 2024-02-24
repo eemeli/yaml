@@ -11,8 +11,8 @@ export const floatNaN: ScalarTag = {
     str.slice(-3).toLowerCase() === 'nan'
       ? NaN
       : str[0] === '-'
-      ? Number.NEGATIVE_INFINITY
-      : Number.POSITIVE_INFINITY,
+        ? Number.NEGATIVE_INFINITY
+        : Number.POSITIVE_INFINITY,
   stringify: stringifyNumber
 }
 
