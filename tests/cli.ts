@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
 import { Readable } from 'node:stream'
-import { main } from 'yaml/cli'
+import { cli } from 'yaml/cli'
 
 const [major] = process.versions.node.split('.')
 const skip = Number(major) < 20
@@ -31,7 +31,7 @@ const skip = Number(major) < 20
     test(name, done => {
       stdout.length = 0
       stderr.length = 0
-      main(
+      cli(
         Readable.from([input]),
         error => {
           try {
@@ -56,7 +56,7 @@ const skip = Number(major) < 20
     test(name, done => {
       stderr.length = 0
       let doned = false
-      main(
+      cli(
         Readable.from([input]),
         error => {
           if (doned) return

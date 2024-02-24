@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 
@@ -12,7 +10,7 @@ import { type Document } from './doc/Document.js'
 import { prettifyError } from './errors.js'
 import { visit, type visitor } from './visit.js'
 
-const help = `\
+export const help = `\
 yaml: A command-line YAML processor and inspector
 
 Reads stdin and writes output to stdout and errors & warnings to stderr.
@@ -34,7 +32,7 @@ Additional options for bare "yaml" command:
   --visit, -v   Apply a visitor to each document (requires a path to import)
   --yaml 1.1    Set the YAML version. (default: 1.2)`
 
-class UserError extends Error {
+export class UserError extends Error {
   static ARGS = 2
   static SINGLE = 3
   code: number
@@ -44,17 +42,7 @@ class UserError extends Error {
   }
 }
 
-/* istanbul ignore if */
-if (require.main === module)
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  main(process.stdin, error => {
-    if (error instanceof UserError) {
-      console.error(`${help}\n\n${error.message}`)
-      process.exitCode = error.code
-    } else if (error) throw error
-  })
-
-export async function main(
+export async function cli(
   stdin: NodeJS.ReadableStream,
   done: (error?: Error) => void,
   argv?: string[]

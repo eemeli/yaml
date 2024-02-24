@@ -18,7 +18,7 @@
   ],
   "type": "commonjs",
   "main": "./dist/index.js",
-  "bin": "./dist/cli.js",
+  "bin": "./bin.mjs",
   "browser": {
     "./dist/index.js": "./browser/index.js",
     "./dist/util.js": "./browser/dist/util.js",

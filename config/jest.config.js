@@ -12,10 +12,14 @@ switch (process.env.npm_lifecycle_event) {
     console.log('Testing build output from dist/')
     moduleNameMapper = {
       '^yaml$': '<rootDir>/dist/index.js',
-      '^yaml/cli$': '<rootDir>/dist/cli.js',
+      '^yaml/cli$': '<rootDir>/dist/cli.mjs',
       '^yaml/util$': '<rootDir>/dist/util.js',
       '^../src/test-events$': '<rootDir>/dist/test-events.js'
     }
+    transform['[/\\\\]dist[/\\\\].*\\.mjs$'] = [
+      'babel-jest',
+      { configFile: './config/babel.config.js' }
+    ]
     break
 
   case 'test':
