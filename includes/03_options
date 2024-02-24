@@ -320,7 +320,7 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <td>doubleQuotedMinMultiLineLength</td>
 <td><code>number</code></td>
 <td><code>40</code></td>
-<td>Minimum length for double-quoted strings to use multiple lines to represent the value.</td>
+<td>Minimum length for double-quoted strings to use multiple lines to represent the value instead of escaping newlines.</td>
 </tr>
 <tr>
 <td>falseStr</td>
