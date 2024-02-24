@@ -41,6 +41,7 @@ class UserError extends Error {
   }
 }
 
+/* istanbul ignore if */
 if (require.main === module)
   main(process.stdin, error => {
     if (error instanceof UserError) {
@@ -81,6 +82,7 @@ export function main(
 
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   switch (opt.help || mode) {
+    /* istanbul ignore next */
     case true: // --help
       console.log(help)
       break
@@ -142,7 +144,7 @@ export function main(
         }
         for (const error of doc.errors) {
           prettifyError(source, lineCounter)(error)
-          if (opt.strict || mode === 'valid') throw error
+          if (opt.strict || mode === 'valid') return done(error)
           console.error(error)
         }
         for (const warning of doc.warnings) {

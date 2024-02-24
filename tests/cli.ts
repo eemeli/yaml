@@ -71,15 +71,32 @@ const skip = Number(major) < 20
     })
   }
 
+  describe('Bad arguments', () => {
+    fail('command', '42', ['nonesuch'], [])
+    fail('option', '42', ['--nonesuch'], [])
+  })
+
   describe('Stream processing', () => {
+    ok('empty', '', [], [])
     ok('basic', 'hello: world', [], ['hello: world'])
-    fail('error', 'hello: world: 2', [], [{ name: 'YAMLParseError' }])
+    ok('valid ok', 'hello: world', ['valid'], [])
+    fail('valid fail', 'hello: world: 2', ['valid'], [])
     ok(
       'multiple',
       'hello: world\n---\n42',
       [],
       ['hello: world', '...', '---\n42']
     )
+    ok(
+      'warn',
+      'hello: !foo world',
+      [],
+      ['hello: !foo world'],
+      [{ name: 'YAMLWarning' }]
+    )
+    fail('error', 'hello: world: 2', [], [{ name: 'YAMLParseError' }])
+    fail('--single + empty', '', ['--single'], [])
+    fail('--single + multiple', 'hello: world\n---\n42', ['--single'], [])
     describe('--json', () => {
       ok('basic', 'hello: world', ['--json'], ['[{"hello":"world"}]'])
       ok(
