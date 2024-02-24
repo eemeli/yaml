@@ -12,6 +12,7 @@ switch (process.env.npm_lifecycle_event) {
     console.log('Testing build output from dist/')
     moduleNameMapper = {
       '^yaml$': '<rootDir>/dist/index.js',
+      '^yaml/cli$': '<rootDir>/dist/cli.js',
       '^yaml/util$': '<rootDir>/dist/util.js',
       '^../src/test-events$': '<rootDir>/dist/test-events.js'
     }

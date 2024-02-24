@@ -1,7 +1,10 @@
 import { Readable } from 'node:stream'
 import { main } from 'yaml/cli'
 
-describe('CLI', () => {
+const [major] = process.versions.node.split('.')
+const skip = Number(major) < 20
+
+;(skip ? describe.skip : describe)('CLI', () => {
   const stdout: unknown[] = []
   const stderr: unknown[] = []
   beforeAll(() => {
