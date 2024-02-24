@@ -26,6 +26,8 @@ jobs:
       - if: matrix.node-version == 14
         run: npm install --global npm@7
       - run: npm ci
+      - if: matrix.node-version < 18
+        run: npm install --no-save rollup@3
       - run: npm test
       - run: npm run test:dist
 
