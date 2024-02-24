@@ -3,16 +3,16 @@ module.exports = {
     {
       test: /\.js$/,
       plugins: [
-        '@babel/plugin-proposal-class-properties',
-        '@babel/plugin-proposal-nullish-coalescing-operator'
+        '@babel/plugin-transform-class-properties',
+        '@babel/plugin-transform-nullish-coalescing-operator'
       ]
     },
     {
       test: /\.ts$/,
       plugins: [
         ['@babel/plugin-transform-typescript', { allowDeclareFields: true }],
-        '@babel/plugin-proposal-class-properties',
-        '@babel/plugin-proposal-nullish-coalescing-operator'
+        '@babel/plugin-transform-class-properties',
+        '@babel/plugin-transform-nullish-coalescing-operator'
       ]
     }
   ]
