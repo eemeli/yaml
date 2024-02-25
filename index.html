@@ -385,10 +385,10 @@
                     <a href="#creating-nodes" class="toc-h2 toc-link" data-title="Creating Nodes">Creating Nodes</a>
                   </li>
                   <li>
-                    <a href="#identifying-nodes" class="toc-h2 toc-link" data-title="Identifying Nodes">Identifying Nodes</a>
+                    <a href="#finding-and-modifying-nodes" class="toc-h2 toc-link" data-title="Finding and Modifying Nodes">Finding and Modifying Nodes</a>
                   </li>
                   <li>
-                    <a href="#modifying-nodes" class="toc-h2 toc-link" data-title="Modifying Nodes">Modifying Nodes</a>
+                    <a href="#identifying-node-types" class="toc-h2 toc-link" data-title="Identifying Node Types">Identifying Node Types</a>
                   </li>
                   <li>
                     <a href="#comments-and-blank-lines" class="toc-h2 toc-link" data-title="Comments and Blank Lines">Comments and Blank Lines</a>
@@ -430,6 +430,9 @@
                     <a href="#silencing-errors-and-warnings" class="toc-h2 toc-link" data-title="Silencing Errors and Warnings">Silencing Errors and Warnings</a>
                   </li>
               </ul>
+          </li>
+          <li>
+            <a href="#command-line-tool" class="toc-h1 toc-link" data-title="Command-line Tool">Command-line Tool</a>
           </li>
           <li>
             <a href="#yaml-syntax" class="toc-h1 toc-link" data-title="YAML Syntax">YAML Syntax</a>
@@ -493,6 +496,8 @@ This requirement may be updated between minor versions of the library.</p>
 <h2 id='api-overview'>API Overview</h2>
 <p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the underlying <a href="#parsing-yaml">Lexer/Parser/Composer</a>.
 The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library along with a decent <a href="#content-nodes">AST</a>, and the third lets you get progressively closer to YAML source, if that&#39;s your thing.</p>
+
+<p>A <a href="#command-line-tool">command-line tool</a> is also included.</p>
 
 <h3>Parse & Stringify</h3>
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">parse</span><span class="p">,</span> <span class="nx">stringify</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
@@ -1466,31 +1471,7 @@ If <code>name</code> is undefined, the generated anchor will use &#39;a&#39; as 
 <p>Once created, normal array operations may be used to modify the <code>items</code> array.
 New <code>Pair</code> objects may created either by importing the class from <code>yaml</code> and using its <code>new Pair(key, value)</code> constructor, or by using the <code>doc.createPair(key, value, options?)</code> method.
 The latter will recursively wrap the <code>key</code> and <code>value</code> as nodes, and accepts the same options as <code>doc.createNode()</code></p>
-<h2 id='identifying-nodes'>Identifying Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
-  <span class="nx">isAlias</span><span class="p">,</span>
-  <span class="nx">isCollection</span><span class="p">,</span> <span class="c1">// map or seq</span>
-  <span class="nx">isDocument</span><span class="p">,</span>
-  <span class="nx">isMap</span><span class="p">,</span>
-  <span class="nx">isNode</span><span class="p">,</span> <span class="c1">// alias, scalar, map or seq</span>
-  <span class="nx">isPair</span><span class="p">,</span>
-  <span class="nx">isScalar</span><span class="p">,</span>
-  <span class="nx">isSeq</span>
-<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
-
-<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Document</span><span class="p">({</span> <span class="na">foo</span><span class="p">:</span> <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">42</span><span class="p">]</span> <span class="p">})</span>
-<span class="nx">isDocument</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isNode</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="o">===</span> <span class="kc">false</span>
-<span class="nx">isMap</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isNode</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isPair</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isCollection</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">))</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isScalar</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span> <span class="o">===</span> <span class="kc">true</span>
-</code></pre></div><h4 id='isalias-x-unknown-boolean'><code>isAlias(x: unknown): boolean</code></h4><h4 id='iscollection-x-unknown-boolean'><code>isCollection(x: unknown): boolean</code></h4><h4 id='isdocument-x-unknown-boolean'><code>isDocument(x: unknown): boolean</code></h4><h4 id='ismap-x-unknown-boolean'><code>isMap(x: unknown): boolean</code></h4><h4 id='isnode-x-unknown-boolean'><code>isNode(x: unknown): boolean</code></h4><h4 id='ispair-x-unknown-boolean'><code>isPair(x: unknown): boolean</code></h4><h4 id='isscalar-x-unknown-boolean'><code>isScalar(x: unknown): boolean</code></h4><h4 id='isseq-x-unknown-boolean'><code>isSeq(x: unknown): boolean</code></h4>
-<p>To find out what you&#39;ve got, a family of custom type guard functions is provided.
-These should be preferred over other methods such as <code>instanceof</code> checks, as they&#39;ll work even if the nodes have been created by a different instance of the library.</p>
-
-<p>Internally, node identification uses property symbols that are set on instances during their construction.</p>
-<h2 id='modifying-nodes'>Modifying Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
+<h2 id='finding-and-modifying-nodes'>Finding and Modifying Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
   - some values
   - 42
   - "3": a string
@@ -1559,6 +1540,30 @@ Of all these, only the most specific defined one will be used for each node.</p>
 <p>The same as <code>visit()</code>,
 but allows for visitor functions that return a promise
 which resolves to one of the above-defined control values.</p>
+<h2 id='identifying-node-types'>Identifying Node Types</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">isAlias</span><span class="p">,</span>
+  <span class="nx">isCollection</span><span class="p">,</span> <span class="c1">// map or seq</span>
+  <span class="nx">isDocument</span><span class="p">,</span>
+  <span class="nx">isMap</span><span class="p">,</span>
+  <span class="nx">isNode</span><span class="p">,</span> <span class="c1">// alias, scalar, map or seq</span>
+  <span class="nx">isPair</span><span class="p">,</span>
+  <span class="nx">isScalar</span><span class="p">,</span>
+  <span class="nx">isSeq</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Document</span><span class="p">({</span> <span class="na">foo</span><span class="p">:</span> <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">42</span><span class="p">]</span> <span class="p">})</span>
+<span class="nx">isDocument</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isNode</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="o">===</span> <span class="kc">false</span>
+<span class="nx">isMap</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isNode</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isPair</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isCollection</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">))</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isScalar</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span> <span class="o">===</span> <span class="kc">true</span>
+</code></pre></div><h4 id='isalias-x-unknown-boolean'><code>isAlias(x: unknown): boolean</code></h4><h4 id='iscollection-x-unknown-boolean'><code>isCollection(x: unknown): boolean</code></h4><h4 id='isdocument-x-unknown-boolean'><code>isDocument(x: unknown): boolean</code></h4><h4 id='ismap-x-unknown-boolean'><code>isMap(x: unknown): boolean</code></h4><h4 id='isnode-x-unknown-boolean'><code>isNode(x: unknown): boolean</code></h4><h4 id='ispair-x-unknown-boolean'><code>isPair(x: unknown): boolean</code></h4><h4 id='isscalar-x-unknown-boolean'><code>isScalar(x: unknown): boolean</code></h4><h4 id='isseq-x-unknown-boolean'><code>isSeq(x: unknown): boolean</code></h4>
+<p>To find out what you&#39;ve got, a family of custom type guard functions is provided.
+These should be preferred over other methods such as <code>instanceof</code> checks, as they&#39;ll work even if the nodes have been created by a different instance of the library.</p>
+
+<p>Internally, node identification uses property symbols that are set on instances during their construction.</p>
 <h2 id='comments-and-blank-lines'>Comments and Blank Lines</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---
@@ -1618,6 +1623,16 @@ When creating, writing, and then reading a YAML file, comments may sometimes be 
 <p>The easiest way to extend a <a href="#data-schemas">schema</a> is by defining the additional <strong>tags</strong> that you wish to support. To do that, the <code>customTags</code> option allows you to provide an array of custom tag objects or tag identifiers. In particular, the built-in tags that are a part of the <code>core</code> and <code>yaml-1.1</code> schemas may be referred to by their string identifiers. For those tags that are available in both, only the <code>core</code> variant is provided as a custom tag.</p>
 
 <p>For further customisation, <code>customTags</code> may also be a function <code>(Tag[]) =&gt; (Tag[])</code> that may modify the schema&#39;s base tag array.</p>
+
+<p>Some additional data types are available separately via the <a href="https://github.com/eemeli/yaml-types"><code>yaml-types</code></a> package, including support for:</p>
+
+<ul>
+<li>BigInt values</li>
+<li>Error objects</li>
+<li>Objects with a null prototype</li>
+<li>RegExp values</li>
+<li>Symbols</li>
+</ul>
 <h2 id='built-in-custom-tags'>Built-in Custom Tags</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">[ one, true, 42 ]</span><span class="dl">'</span><span class="p">)</span>
 <span class="c1">// [ 'one', true, 42 ]</span>
 
@@ -1804,16 +1819,16 @@ When creating, writing, and then reading a YAML file, comments may sometimes be 
       <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">EvalError</span><span class="dl">'</span>
         <span class="p">?</span> <span class="nx">EvalError</span>
         <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">RangeError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">RangeError</span>
-        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">ReferenceError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">ReferenceError</span>
-        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">SyntaxError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">SyntaxError</span>
-        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">TypeError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">TypeError</span>
-        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">URIError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">URIError</span>
-        <span class="p">:</span> <span class="nb">Error</span>
+          <span class="p">?</span> <span class="nx">RangeError</span>
+          <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">ReferenceError</span><span class="dl">'</span>
+            <span class="p">?</span> <span class="nx">ReferenceError</span>
+            <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">SyntaxError</span><span class="dl">'</span>
+              <span class="p">?</span> <span class="nx">SyntaxError</span>
+              <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">TypeError</span><span class="dl">'</span>
+                <span class="p">?</span> <span class="nx">TypeError</span>
+                <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">URIError</span><span class="dl">'</span>
+                  <span class="p">?</span> <span class="nx">URIError</span>
+                  <span class="p">:</span> <span class="nb">Error</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">Cls</span><span class="p">.</span><span class="nx">name</span> <span class="o">!==</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
       <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">er</span><span class="p">,</span> <span class="dl">'</span><span class="s1">name</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
         <span class="na">value</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span>
@@ -1865,7 +1880,7 @@ When creating, writing, and then reading a YAML file, comments may sometimes be 
 </code></pre></div>
 <p>In YAML-speak, a custom data type is represented by a <em>tag</em>. To define your own tag, you need to account for the ways that your data is both parsed and stringified. Furthermore, both of those processes are split into two stages by the intermediate AST node structure.</p>
 
-<p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/binary.ts"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/set.ts"><code>!!set</code></a> tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.</p>
+<p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/binary.ts"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/set.ts"><code>!!set</code></a> tags as well as the <a href="https://github.com/eemeli/yaml-types"><code>yaml-types</code></a> package provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.</p>
 
 <p>Custom collection types (ie, Maps, Sets, objects, and arrays; anything with child properties that may not be propertly serialized to a scalar value) may provide a <code>nodeClass</code> property that extends the <a href="https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLMap.ts"><code>YAMLMap</code></a> and <a href="https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLSeq.ts"><code>YAMLSeq</code></a> classes, which will be used for parsing and stringifying objects with the specified tag.</p>
 <h3 id='parsing-custom-data'>Parsing Custom Data</h3>
@@ -2664,6 +2679,31 @@ To ignore these errors, use the <code>strict: false</code> option:</p>
 
 <p>For additional control, set the <code>logLevel</code> option to <code>&#39;error&#39;</code> (default: <code>&#39;warn&#39;</code>) to silence all warnings.
 Setting <code>logLevel: &#39;silent&#39;</code> will ignore parsing errors completely, resulting in output that may well be rather broken.</p>
+<h1 id='command-line-tool'>Command-line Tool</h1>
+<p>Available as <code>npx yaml</code> or <code>npm exec yaml</code>:</p>
+
+<pre id="cli-help" style="float: none">
+yaml: A command-line YAML processor and inspector
+
+Reads stdin and writes output to stdout and errors & warnings to stderr.
+
+Usage:
+  yaml          Process a YAML stream, outputting it as YAML
+  yaml cst      Parse the CST of a YAML stream
+  yaml lex      Parse the lexical tokens of a YAML stream
+  yaml valid    Validate a YAML stream, returning 0 on success
+
+Options:
+  --help, -h    Show this message.
+  --json, -j    Output JSON.
+
+Additional options for bare "yaml" command:
+  --doc, -d     Output pretty-printed JS Document objects.
+  --single, -1  Require the input to consist of a single YAML document.
+  --strict, -s  Stop on errors.
+  --visit, -v   Apply a visitor to each document (requires a path to import)
+  --yaml 1.1    Set the YAML version. (default: 1.2)
+</pre>
 <h1 id='yaml-syntax'>YAML Syntax</h1>
 <p>A YAML <em>schema</em> is a combination of a set of tags and a mechanism for resolving non-specific tags, i.e. values that do not have an explicit tag such as <code>!!int</code>.
 The <a href="#data-schemas">default schema</a> is the <code>&#39;core&#39;</code> schema, which is the recommended one for YAML 1.2.

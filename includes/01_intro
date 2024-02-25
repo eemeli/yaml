@@ -40,6 +40,8 @@ This requirement may be updated between minor versions of the library.</p>
 <p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the underlying <a href="#parsing-yaml">Lexer/Parser/Composer</a>.
 The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library along with a decent <a href="#content-nodes">AST</a>, and the third lets you get progressively closer to YAML source, if that&#39;s your thing.</p>
 
+<p>A <a href="#command-line-tool">command-line tool</a> is also included.</p>
+
 <h3>Parse & Stringify</h3>
 <div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">parse</span><span class="p">,</span> <span class="nx">stringify</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
 </code></pre></div>

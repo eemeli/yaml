@@ -250,31 +250,7 @@ If <code>name</code> is undefined, the generated anchor will use &#39;a&#39; as 
 <p>Once created, normal array operations may be used to modify the <code>items</code> array.
 New <code>Pair</code> objects may created either by importing the class from <code>yaml</code> and using its <code>new Pair(key, value)</code> constructor, or by using the <code>doc.createPair(key, value, options?)</code> method.
 The latter will recursively wrap the <code>key</code> and <code>value</code> as nodes, and accepts the same options as <code>doc.createNode()</code></p>
-<h2 id='identifying-nodes'>Identifying Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
-  <span class="nx">isAlias</span><span class="p">,</span>
-  <span class="nx">isCollection</span><span class="p">,</span> <span class="c1">// map or seq</span>
-  <span class="nx">isDocument</span><span class="p">,</span>
-  <span class="nx">isMap</span><span class="p">,</span>
-  <span class="nx">isNode</span><span class="p">,</span> <span class="c1">// alias, scalar, map or seq</span>
-  <span class="nx">isPair</span><span class="p">,</span>
-  <span class="nx">isScalar</span><span class="p">,</span>
-  <span class="nx">isSeq</span>
-<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
-
-<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Document</span><span class="p">({</span> <span class="na">foo</span><span class="p">:</span> <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">42</span><span class="p">]</span> <span class="p">})</span>
-<span class="nx">isDocument</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isNode</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="o">===</span> <span class="kc">false</span>
-<span class="nx">isMap</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isNode</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isPair</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isCollection</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">))</span> <span class="o">===</span> <span class="kc">true</span>
-<span class="nx">isScalar</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span> <span class="o">===</span> <span class="kc">true</span>
-</code></pre></div><h4 id='isalias-x-unknown-boolean'><code>isAlias(x: unknown): boolean</code></h4><h4 id='iscollection-x-unknown-boolean'><code>isCollection(x: unknown): boolean</code></h4><h4 id='isdocument-x-unknown-boolean'><code>isDocument(x: unknown): boolean</code></h4><h4 id='ismap-x-unknown-boolean'><code>isMap(x: unknown): boolean</code></h4><h4 id='isnode-x-unknown-boolean'><code>isNode(x: unknown): boolean</code></h4><h4 id='ispair-x-unknown-boolean'><code>isPair(x: unknown): boolean</code></h4><h4 id='isscalar-x-unknown-boolean'><code>isScalar(x: unknown): boolean</code></h4><h4 id='isseq-x-unknown-boolean'><code>isSeq(x: unknown): boolean</code></h4>
-<p>To find out what you&#39;ve got, a family of custom type guard functions is provided.
-These should be preferred over other methods such as <code>instanceof</code> checks, as they&#39;ll work even if the nodes have been created by a different instance of the library.</p>
-
-<p>Internally, node identification uses property symbols that are set on instances during their construction.</p>
-<h2 id='modifying-nodes'>Modifying Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
+<h2 id='finding-and-modifying-nodes'>Finding and Modifying Nodes</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
   - some values
   - 42
   - "3": a string
@@ -343,6 +319,30 @@ Of all these, only the most specific defined one will be used for each node.</p>
 <p>The same as <code>visit()</code>,
 but allows for visitor functions that return a promise
 which resolves to one of the above-defined control values.</p>
+<h2 id='identifying-node-types'>Identifying Node Types</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">isAlias</span><span class="p">,</span>
+  <span class="nx">isCollection</span><span class="p">,</span> <span class="c1">// map or seq</span>
+  <span class="nx">isDocument</span><span class="p">,</span>
+  <span class="nx">isMap</span><span class="p">,</span>
+  <span class="nx">isNode</span><span class="p">,</span> <span class="c1">// alias, scalar, map or seq</span>
+  <span class="nx">isPair</span><span class="p">,</span>
+  <span class="nx">isScalar</span><span class="p">,</span>
+  <span class="nx">isSeq</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Document</span><span class="p">({</span> <span class="na">foo</span><span class="p">:</span> <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">42</span><span class="p">]</span> <span class="p">})</span>
+<span class="nx">isDocument</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isNode</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="o">===</span> <span class="kc">false</span>
+<span class="nx">isMap</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isNode</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isPair</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isCollection</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">))</span> <span class="o">===</span> <span class="kc">true</span>
+<span class="nx">isScalar</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span> <span class="o">===</span> <span class="kc">true</span>
+</code></pre></div><h4 id='isalias-x-unknown-boolean'><code>isAlias(x: unknown): boolean</code></h4><h4 id='iscollection-x-unknown-boolean'><code>isCollection(x: unknown): boolean</code></h4><h4 id='isdocument-x-unknown-boolean'><code>isDocument(x: unknown): boolean</code></h4><h4 id='ismap-x-unknown-boolean'><code>isMap(x: unknown): boolean</code></h4><h4 id='isnode-x-unknown-boolean'><code>isNode(x: unknown): boolean</code></h4><h4 id='ispair-x-unknown-boolean'><code>isPair(x: unknown): boolean</code></h4><h4 id='isscalar-x-unknown-boolean'><code>isScalar(x: unknown): boolean</code></h4><h4 id='isseq-x-unknown-boolean'><code>isSeq(x: unknown): boolean</code></h4>
+<p>To find out what you&#39;ve got, a family of custom type guard functions is provided.
+These should be preferred over other methods such as <code>instanceof</code> checks, as they&#39;ll work even if the nodes have been created by a different instance of the library.</p>
+
+<p>Internally, node identification uses property symbols that are set on instances during their construction.</p>
 <h2 id='comments-and-blank-lines'>Comments and Blank Lines</h2><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">YAML</span><span class="p">.</span><span class="nx">parseDocument</span><span class="p">(</span><span class="s2">`
 # This is YAML.
 ---

@@ -13,6 +13,16 @@
 <p>The easiest way to extend a <a href="#data-schemas">schema</a> is by defining the additional <strong>tags</strong> that you wish to support. To do that, the <code>customTags</code> option allows you to provide an array of custom tag objects or tag identifiers. In particular, the built-in tags that are a part of the <code>core</code> and <code>yaml-1.1</code> schemas may be referred to by their string identifiers. For those tags that are available in both, only the <code>core</code> variant is provided as a custom tag.</p>
 
 <p>For further customisation, <code>customTags</code> may also be a function <code>(Tag[]) =&gt; (Tag[])</code> that may modify the schema&#39;s base tag array.</p>
+
+<p>Some additional data types are available separately via the <a href="https://github.com/eemeli/yaml-types"><code>yaml-types</code></a> package, including support for:</p>
+
+<ul>
+<li>BigInt values</li>
+<li>Error objects</li>
+<li>Objects with a null prototype</li>
+<li>RegExp values</li>
+<li>Symbols</li>
+</ul>
 <h2 id='built-in-custom-tags'>Built-in Custom Tags</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">parse</span><span class="p">(</span><span class="dl">'</span><span class="s1">[ one, true, 42 ]</span><span class="dl">'</span><span class="p">)</span>
 <span class="c1">// [ 'one', true, 42 ]</span>
 
@@ -199,16 +209,16 @@
       <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">EvalError</span><span class="dl">'</span>
         <span class="p">?</span> <span class="nx">EvalError</span>
         <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">RangeError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">RangeError</span>
-        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">ReferenceError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">ReferenceError</span>
-        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">SyntaxError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">SyntaxError</span>
-        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">TypeError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">TypeError</span>
-        <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">URIError</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">URIError</span>
-        <span class="p">:</span> <span class="nb">Error</span>
+          <span class="p">?</span> <span class="nx">RangeError</span>
+          <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">ReferenceError</span><span class="dl">'</span>
+            <span class="p">?</span> <span class="nx">ReferenceError</span>
+            <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">SyntaxError</span><span class="dl">'</span>
+              <span class="p">?</span> <span class="nx">SyntaxError</span>
+              <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">TypeError</span><span class="dl">'</span>
+                <span class="p">?</span> <span class="nx">TypeError</span>
+                <span class="p">:</span> <span class="nx">name</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">URIError</span><span class="dl">'</span>
+                  <span class="p">?</span> <span class="nx">URIError</span>
+                  <span class="p">:</span> <span class="nb">Error</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">Cls</span><span class="p">.</span><span class="nx">name</span> <span class="o">!==</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
       <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">er</span><span class="p">,</span> <span class="dl">'</span><span class="s1">name</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
         <span class="na">value</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span>
@@ -260,7 +270,7 @@
 </code></pre></div>
 <p>In YAML-speak, a custom data type is represented by a <em>tag</em>. To define your own tag, you need to account for the ways that your data is both parsed and stringified. Furthermore, both of those processes are split into two stages by the intermediate AST node structure.</p>
 
-<p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/binary.ts"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/set.ts"><code>!!set</code></a> tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.</p>
+<p>If you wish to implement your own custom tags, the <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/binary.ts"><code>!!binary</code></a> and <a href="https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/set.ts"><code>!!set</code></a> tags as well as the <a href="https://github.com/eemeli/yaml-types"><code>yaml-types</code></a> package provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.</p>
 
 <p>Custom collection types (ie, Maps, Sets, objects, and arrays; anything with child properties that may not be propertly serialized to a scalar value) may provide a <code>nodeClass</code> property that extends the <a href="https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLMap.ts"><code>YAMLMap</code></a> and <a href="https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLSeq.ts"><code>YAMLSeq</code></a> classes, which will be used for parsing and stringifying objects with the specified tag.</p>
 <h3 id='parsing-custom-data'>Parsing Custom Data</h3>
