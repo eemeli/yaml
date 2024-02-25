@@ -33,6 +33,8 @@ npm install yaml
 The API provided by `yaml` has three layers, depending on how deep you need to go: [Parse & Stringify](https://eemeli.org/yaml/#parse-amp-stringify), [Documents](https://eemeli.org/yaml/#documents), and the underlying [Lexer/Parser/Composer](https://eemeli.org/yaml/#parsing-yaml).
 The first has the simplest API and "just works", the second gets you all the bells and whistles supported by the library along with a decent [AST](https://eemeli.org/yaml/#content-nodes), and the third lets you get progressively closer to YAML source, if that's your thing.
 
+A [command-line tool](https://eemeli.org/yaml/#command-line-tool) is also included.
+
 ```js
 import { parse, stringify } from 'yaml'
 // or
@@ -55,26 +57,26 @@ const YAML = require('yaml')
   - [`#directives`](https://eemeli.org/yaml/#stream-directives)
   - [`#errors`](https://eemeli.org/yaml/#errors)
   - [`#warnings`](https://eemeli.org/yaml/#errors)
-- [`isDocument(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`isDocument(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
 - [`parseAllDocuments(str, options?): Document[]`](https://eemeli.org/yaml/#parsing-documents)
 - [`parseDocument(str, options?): Document`](https://eemeli.org/yaml/#parsing-documents)
 
 ### Content Nodes
 
-- [`isAlias(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
-- [`isCollection(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
-- [`isMap(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
-- [`isNode(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
-- [`isPair(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
-- [`isScalar(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
-- [`isSeq(foo): boolean`](https://eemeli.org/yaml/#identifying-nodes)
+- [`isAlias(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
+- [`isCollection(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
+- [`isMap(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
+- [`isNode(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
+- [`isPair(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
+- [`isScalar(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
+- [`isSeq(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
 - [`new Scalar(value)`](https://eemeli.org/yaml/#scalar-values)
 - [`new YAMLMap()`](https://eemeli.org/yaml/#collections)
 - [`new YAMLSeq()`](https://eemeli.org/yaml/#collections)
 - [`doc.createAlias(node, name?): Alias`](https://eemeli.org/yaml/#working-with-anchors)
 - [`doc.createNode(value, options?): Node`](https://eemeli.org/yaml/#creating-nodes)
 - [`doc.createPair(key, value): Pair`](https://eemeli.org/yaml/#creating-nodes)
-- [`visit(node, visitor)`](https://eemeli.org/yaml/#modifying-nodes)
+- [`visit(node, visitor)`](https://eemeli.org/yaml/#finding-and-modifying-nodes)
 
 ### Parsing YAML
 

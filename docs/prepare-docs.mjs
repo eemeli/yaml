@@ -1,11 +1,29 @@
 #!/usr/bin/env node
 
-import { lstat, mkdir, readdir, readFile, symlink, rm } from 'node:fs/promises'
+import {
+  lstat,
+  mkdir,
+  readdir,
+  readFile,
+  symlink,
+  rm,
+  writeFile
+} from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { help } from '../dist/cli.mjs'
 import { parseAllDocuments } from '../dist/index.js'
 
 const source = 'docs'
 const target = 'docs-slate/source'
+
+// Update CLI help
+const cli = resolve(source, '09_cli.md')
+const docs = await readFile(cli, 'utf-8')
+const update = docs.replace(
+  /(<pre id="cli-help".*?>).*?(<\/pre>)/s,
+  '$1\n' + help + '\n$2'
+)
+if (update !== docs) await writeFile(cli, update)
 
 // Create symlink for index.html.md
 const indexSource = resolve(source, 'index.html.md')
