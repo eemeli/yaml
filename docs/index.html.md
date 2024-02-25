@@ -15,7 +15,8 @@ includes:
   - 06_custom_tags
   - 07_parsing_yaml
   - 08_errors
-  - 09_yaml_syntax
+  - 09_cli
+  - 10_yaml_syntax
 
 search: true
 ---
