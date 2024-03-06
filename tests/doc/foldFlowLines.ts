@@ -2,6 +2,7 @@ import * as YAML from 'yaml'
 import { foldFlowLines as fold, FoldOptions } from 'yaml/util'
 import { source } from '../_utils'
 
+const FOLD_BLOCK = 'block'
 const FOLD_FLOW = 'flow'
 const FOLD_QUOTED = 'quoted'
 
@@ -278,31 +279,33 @@ describe('end-to-end', () => {
   const foldOptions = { lineWidth: 20, minContentWidth: 0 }
 
   test('more-indented folded block', () => {
-    const src = `> # comment with an excessive length that won't get folded
-Text on a line that
-should get folded
-with a line width of
-20 characters.
+    const src = source`
+      > # comment with an excessive length that won't get folded
+      Text on a line that
+      should get folded
+      with a line width of
+      20 characters.
 
-  Indented text
-  that appears to be
-folded but is not.
+        Indented text
+        that appears to be
+      folded but is not.
 
-  Text that is prevented from folding due to being more-indented.
+        Text that is prevented from folding due to being more-indented.
 
-Unfolded paragraph.\n`
+      Unfolded paragraph.
+    `
     const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-    expect(doc.contents.value).toBe(
-      `Text on a line that should get folded with a line width of 20 characters.
+    expect(doc.contents.value).toBe(source`
+      Text on a line that should get folded with a line width of 20 characters.
 
-  Indented text
-  that appears to be
-folded but is not.
+        Indented text
+        that appears to be
+      folded but is not.
 
-  Text that is prevented from folding due to being more-indented.
+        Text that is prevented from folding due to being more-indented.
 
-Unfolded paragraph.\n`
-    )
+      Unfolded paragraph.
+    `)
     expect(doc.toString(foldOptions)).toBe(src)
   })
 
@@ -313,10 +316,12 @@ Unfolded paragraph.\n`
   })
 
   test('plain string', () => {
-    const src = `- plain value with
-  enough length to
-  fold twice
-- plain with comment # that won't get folded\n`
+    const src = source`
+      - plain value with
+        enough length to
+        fold twice
+      - plain with comment # that won't get folded
+    `
     const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(src)
     expect(doc.contents.items[0].value).toBe(
       'plain value with enough length to fold twice'
@@ -326,7 +331,8 @@ Unfolded paragraph.\n`
   })
 
   test('long line width', () => {
-    const src = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. In laoreet massa eros, dignissim aliquam nunc elementum sit amet. Mauris pulvinar nunc eget ante sodales viverra. Vivamus quis convallis sapien, ut auctor magna. Cras volutpat erat eu lacus luctus facilisis. Aenean sapien leo, auctor sed tincidunt at, scelerisque a urna. Nunc ullamcorper, libero non mollis aliquet, nulla diam lobortis neque, ac rutrum dui nibh iaculis lectus. Aenean lobortis interdum arcu eget sollicitudin.
+    const src = `\
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. In laoreet massa eros, dignissim aliquam nunc elementum sit amet. Mauris pulvinar nunc eget ante sodales viverra. Vivamus quis convallis sapien, ut auctor magna. Cras volutpat erat eu lacus luctus facilisis. Aenean sapien leo, auctor sed tincidunt at, scelerisque a urna. Nunc ullamcorper, libero non mollis aliquet, nulla diam lobortis neque, ac rutrum dui nibh iaculis lectus. Aenean lobortis interdum arcu eget sollicitudin.
 
 Duis quam enim, ultricies a enim non, tincidunt lobortis ipsum. Mauris condimentum ultrices eros rutrum euismod. Fusce et mi eget quam dapibus blandit. Maecenas sodales tempor euismod. Phasellus vulputate purus felis, eleifend ullamcorper tortor semper sit amet. Sed nunc quam, iaculis et neque sit amet, consequat egestas lectus. Aenean dapibus lorem sed accumsan porttitor. Curabitur eu magna congue, mattis urna ac, lacinia eros. In in iaculis justo, nec faucibus enim. Fusce id viverra purus, nec ultricies mi. Aliquam eu risus risus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse potenti. \n`
 
@@ -337,5 +343,32 @@ Duis quam enim, ultricies a enim non, tincidunt lobortis ipsum. Mauris condiment
 
     for (const lineWidth of [1000, 0, -1])
       expect(YAML.stringify(src, { lineWidth })).toBe(exp)
+  })
+
+  test('multiple lines', () => {
+    const src = source`
+      first line which is long enough to be wrapped to another line
+      second line which is long enough to be wrapped to another line
+       third line which is not wrapped because it's indented
+      fourth line which is long enough to be wrapped to another line
+    `
+    expect(YAML.stringify({ src }, { lineWidth: 20, minContentWidth: 0 }))
+      .toBe(source`
+      src: >
+        first line which
+        is long enough to
+        be wrapped to
+        another line
+
+        second line which
+        is long enough to
+        be wrapped to
+        another line
+         third line which is not wrapped because it's indented
+        fourth line which
+        is long enough to
+        be wrapped to
+        another line
+    `)
   })
 })
