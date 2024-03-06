@@ -2,7 +2,6 @@ import * as YAML from 'yaml'
 import { foldFlowLines as fold, FoldOptions } from 'yaml/util'
 import { source } from '../_utils'
 
-const FOLD_BLOCK = 'block'
 const FOLD_FLOW = 'flow'
 const FOLD_QUOTED = 'quoted'
 
