@@ -21,7 +21,7 @@ export const falseTag: ScalarTag & { test: RegExp } = {
   identify: value => value === false,
   default: true,
   tag: 'tag:yaml.org,2002:bool',
-  test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
+  test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/,
   resolve: () => new Scalar(false),
   stringify: boolStringify
 }
