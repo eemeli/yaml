@@ -529,7 +529,11 @@ export class Parser {
     }
 
     if (this.indent >= map.indent) {
-      const atNextItem = !this.onKeyLine && this.indent === map.indent && it.sep
+      const atNextItem =
+        !this.onKeyLine &&
+        this.indent === map.indent &&
+        it.sep &&
+        this.type !== 'seq-item-ind'
 
       // For empty nodes, assign newline-separated not indented empty tokens to following node
       let start: SourceToken[] = []

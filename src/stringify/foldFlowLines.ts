@@ -67,7 +67,7 @@ export function foldFlowLines(
   let escStart = -1
   let escEnd = -1
   if (mode === FOLD_BLOCK) {
-    i = consumeMoreIndentedLines(text, i)
+    i = consumeMoreIndentedLines(text, i, indent.length)
     if (i !== -1) end = i + endStep
   }
   for (let ch; (ch = text[(i += 1)]); ) {
@@ -89,8 +89,9 @@ export function foldFlowLines(
       escEnd = i
     }
     if (ch === '\n') {
-      if (mode === FOLD_BLOCK) i = consumeMoreIndentedLines(text, i)
-      end = i + endStep
+      if (mode === FOLD_BLOCK)
+        i = consumeMoreIndentedLines(text, i, indent.length)
+      end = i + indent.length + endStep
       split = undefined
     } else {
       if (
@@ -151,13 +152,21 @@ export function foldFlowLines(
  * Presumes `i + 1` is at the start of a line
  * @returns index of last newline in more-indented block
  */
-function consumeMoreIndentedLines(text: string, i: number) {
-  let ch = text[i + 1]
+function consumeMoreIndentedLines(text: string, i: number, indent: number) {
+  let end = i
+  let start = i + 1
+  let ch = text[start]
   while (ch === ' ' || ch === '\t') {
-    do {
-      ch = text[(i += 1)]
-    } while (ch && ch !== '\n')
-    ch = text[i + 1]
+    if (i < start + indent) {
+      ch = text[++i]
+    } else {
+      do {
+        ch = text[++i]
+      } while (ch && ch !== '\n')
+      end = i
+      start = i + 1
+      ch = text[start]
+    }
   }
-  return i
+  return end
 }

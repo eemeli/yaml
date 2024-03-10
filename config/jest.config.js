@@ -1,6 +1,6 @@
 let moduleNameMapper
 const transform = {
-  '[/\\\\]tests[/\\\\].*\\.(js|ts)$': [
+  '[/\\\\]tests[/\\\\].*\\.(m?js|ts)$': [
     'babel-jest',
     { configFile: './config/babel.config.js' }
   ]
@@ -12,9 +12,14 @@ switch (process.env.npm_lifecycle_event) {
     console.log('Testing build output from dist/')
     moduleNameMapper = {
       '^yaml$': '<rootDir>/dist/index.js',
+      '^yaml/cli$': '<rootDir>/dist/cli.mjs',
       '^yaml/util$': '<rootDir>/dist/util.js',
       '^../src/test-events$': '<rootDir>/dist/test-events.js'
     }
+    transform['[/\\\\]dist[/\\\\].*\\.mjs$'] = [
+      'babel-jest',
+      { configFile: './config/babel.config.js' }
+    ]
     break
 
   case 'test':
@@ -22,6 +27,7 @@ switch (process.env.npm_lifecycle_event) {
     process.env.TRACE_LEVEL = 'log'
     moduleNameMapper = {
       '^yaml$': '<rootDir>/src/index.ts',
+      '^yaml/cli$': '<rootDir>/src/cli.ts',
       '^yaml/util$': '<rootDir>/src/util.ts'
     }
     transform['[/\\\\]src[/\\\\].*\\.ts$'] = [

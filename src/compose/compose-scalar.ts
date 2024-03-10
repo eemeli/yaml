@@ -28,8 +28,8 @@ export function composeScalar(
     tagToken && tagName
       ? findScalarTagByName(ctx.schema, value, tagName, tagToken, onError)
       : token.type === 'scalar'
-      ? findScalarTagByTest(ctx, value, token, onError)
-      : ctx.schema[SCALAR]
+        ? findScalarTagByTest(ctx, value, token, onError)
+        : ctx.schema[SCALAR]
 
   let scalar: Scalar
   try {

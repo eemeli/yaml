@@ -9,27 +9,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with: { submodules: true }
-      - uses: actions/setup-node@v3
-        with: { node-version: 16 }
-      - name: Cache BrowserStackLocal
-        uses: actions/cache@v1
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: browserstack/github-actions/setup-env@master
         with:
-          path: ~/.browserstack
-          key: bsl-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            bsl-${{ runner.os }}-
+          username:  ${{ secrets.BROWSERSTACK_USERNAME }}
+          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          project-name: yaml
+      - uses: browserstack/github-actions/setup-local@master
+        with:
+          local-testing: start
+          local-identifier: random
 
       - run: npm ci
       - run: npm run build:browser
       - name: Playground setup
         working-directory: ./playground
         run: npm ci
-
-      - name: Run tests on BrowserStack
+      - name: Playground build
         working-directory: ./playground
-        run: npm test
-        env:
-          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+        run: npm run build
+      - run: npx http-server site &
+        working-directory: ./playground
+
+      - run: npx browserstack-node-sdk jest
+        working-directory: ./playground
+
+      - uses: browserstack/github-actions/setup-local@master
+        if: always()
+        with:
+          local-testing: stop

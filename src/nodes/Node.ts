@@ -26,14 +26,14 @@ export type NodeType<T> = T extends
   | undefined
   ? Scalar<T>
   : T extends Date
-  ? Scalar<string | Date>
-  : T extends Array<any>
-  ? YAMLSeq<NodeType<T[number]>>
-  : T extends { [key: string]: any }
-  ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
-  : T extends { [key: number]: any } // Merge with previous once supported in all TS versions
-  ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
-  : Node
+    ? Scalar<string | Date>
+    : T extends Array<any>
+      ? YAMLSeq<NodeType<T[number]>>
+      : T extends { [key: string]: any }
+        ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
+        : T extends { [key: number]: any } // Merge with previous once supported in all TS versions
+          ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
+          : Node
 
 export type ParsedNode =
   | Alias.Parsed

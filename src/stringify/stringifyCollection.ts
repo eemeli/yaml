@@ -87,9 +87,9 @@ function stringifyBlockCollection(
 }
 
 function stringifyFlowCollection(
-  { comment, items }: Readonly<Collection>,
+  { items }: Readonly<Collection>,
   ctx: StringifyContext,
-  { flowChars, itemIndent, onComment }: StringifyCollectionOptions
+  { flowChars, itemIndent }: StringifyCollectionOptions
 ) {
   const {
     indent,
@@ -141,30 +141,23 @@ function stringifyFlowCollection(
     linesAtValue = lines.length
   }
 
-  let str: string
   const { start, end } = flowChars
   if (lines.length === 0) {
-    str = start + end
+    return start + end
   } else {
     if (!reqNewline) {
       const len = lines.reduce((sum, line) => sum + line.length + 2, 2)
       reqNewline = ctx.options.lineWidth > 0 && len > ctx.options.lineWidth
     }
     if (reqNewline) {
-      str = start
+      let str = start
       for (const line of lines)
         str += line ? `\n${indentStep}${indent}${line}` : '\n'
-      str += `\n${indent}${end}`
+      return `${str}\n${indent}${end}`
     } else {
-      str = `${start}${fcPadding}${lines.join(' ')}${fcPadding}${end}`
+      return `${start}${fcPadding}${lines.join(' ')}${fcPadding}${end}`
     }
   }
-
-  if (comment) {
-    str += lineComment(str, indent, commentString(comment))
-    if (onComment) onComment()
-  }
-  return str
 }
 
 function addCommentBefore(

@@ -28,8 +28,8 @@ function resolveCollection(
     token.type === 'block-map'
       ? resolveBlockMap(CN, ctx, token, onError, tag)
       : token.type === 'block-seq'
-      ? resolveBlockSeq(CN, ctx, token, onError, tag)
-      : resolveFlowCollection(CN, ctx, token, onError, tag)
+        ? resolveBlockSeq(CN, ctx, token, onError, tag)
+        : resolveFlowCollection(CN, ctx, token, onError, tag)
 
   const Coll = coll.constructor as typeof YAMLMap | typeof YAMLSeq
 
@@ -60,10 +60,10 @@ export function composeCollection(
     token.type === 'block-map'
       ? 'map'
       : token.type === 'block-seq'
-      ? 'seq'
-      : token.start.source === '{'
-      ? 'map'
-      : 'seq'
+        ? 'seq'
+        : token.start.source === '{'
+          ? 'map'
+          : 'seq'
 
   // shortcut: check if it's a generic YAMLMap or YAMLSeq
   // before jumping into the custom tag logic.

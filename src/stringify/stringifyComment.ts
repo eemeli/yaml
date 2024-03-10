@@ -17,5 +17,5 @@ export const lineComment = (str: string, indent: string, comment: string) =>
   str.endsWith('\n')
     ? indentComment(comment, indent)
     : comment.includes('\n')
-    ? '\n' + indentComment(comment, indent)
-    : (str.endsWith(' ') ? '' : ' ') + comment
+      ? '\n' + indentComment(comment, indent)
+      : (str.endsWith(' ') ? '' : ' ') + comment

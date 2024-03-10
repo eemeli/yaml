@@ -169,8 +169,15 @@ export function resolveFlowCollection(
       const valueNode = value
         ? composeNode(ctx, value, valueProps, onError)
         : valueProps.found
-        ? composeEmptyNode(ctx, valueProps.end, sep, null, valueProps, onError)
-        : null
+          ? composeEmptyNode(
+              ctx,
+              valueProps.end,
+              sep,
+              null,
+              valueProps,
+              onError
+            )
+          : null
       if (valueNode) {
         if (isBlock(value)) onError(valueNode.range, 'BLOCK_IN_FLOW', blockMsg)
       } else if (valueProps.comment) {

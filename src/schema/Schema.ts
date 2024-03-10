@@ -36,8 +36,8 @@ export class Schema {
     this.compat = Array.isArray(compat)
       ? getTags(compat, 'compat')
       : compat
-      ? getTags(null, compat)
-      : null
+        ? getTags(null, compat)
+        : null
     this.merge = !!merge
     this.name = (typeof schema === 'string' && schema) || 'core'
     this.knownTags = resolveKnownTags ? coreKnownTags : {}
@@ -53,8 +53,8 @@ export class Schema {
       typeof sortMapEntries === 'function'
         ? sortMapEntries
         : sortMapEntries === true
-        ? sortMapEntriesByKey
-        : null
+          ? sortMapEntriesByKey
+          : null
   }
 
   clone(): Schema {

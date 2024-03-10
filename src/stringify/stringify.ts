@@ -165,8 +165,8 @@ export function stringify(
     typeof tagObj.stringify === 'function'
       ? tagObj.stringify(node as Scalar, ctx, onComment, onChompKeep)
       : isScalar(node)
-      ? stringifyString(node, ctx, onComment, onChompKeep)
-      : node.toString(ctx, onComment, onChompKeep)
+        ? stringifyString(node, ctx, onComment, onChompKeep)
+        : node.toString(ctx, onComment, onChompKeep)
   if (!props) return str
   return isScalar(node) || str[0] === '{' || str[0] === '['
     ? `${props} ${str}`

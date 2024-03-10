@@ -633,7 +633,7 @@ describe('scalar styles', () => {
 
   test('bool Scalar styles on YAML1.1', () => {
     const doc = YAML.parseDocument(
-      '[ n, N, NO, no, No, False, false, FALSE, Off, off, OFF, y, Y, Yes, yes, YES, true, True, TRUE, ON, on, On ]',
+      '[ n, N, NO, no, No, False, false, FALSE, FALse, Off, off, OFF, OfF, y, Y, Yes, yes, YES, true, True, TRUE, ON, on, On ]',
       { schema: 'yaml-1.1' }
     )
     const str = `[
@@ -645,9 +645,11 @@ describe('scalar styles', () => {
   False,
   false,
   FALSE,
+  FALse,
   Off,
   off,
   OFF,
+  OfF,
   y,
   Y,
   Yes,
@@ -670,9 +672,11 @@ describe('scalar styles', () => {
       false,
       false,
       false,
+      'FALse',
       false,
       false,
       false,
+      'OfF',
       true,
       true,
       true,
@@ -874,7 +878,7 @@ describe('lineWidth', () => {
   )
 
   test('limit to 80 with overlong flow collection', () => {
-    expect(doc.toString({lineWidth: 80})).toBe(`[
+    expect(doc.toString({ lineWidth: 80 })).toBe(`[
   'Sed',
   'ut',
   'perspiciatis',
@@ -894,7 +898,9 @@ describe('lineWidth', () => {
   })
 
   test('limit > flow collection length', () => {
-    expect(doc.toString({lineWidth: 162})).toBe("[ 'Sed', 'ut', 'perspiciatis', 'unde', 'omnis', 'iste', 'natus', 'error', 'sit', 'voluptatem', 'accusantium', 'doloremque', 'laudantium,', 'totam' ]\n")
+    expect(doc.toString({ lineWidth: 162 })).toBe(
+      "[ 'Sed', 'ut', 'perspiciatis', 'unde', 'omnis', 'iste', 'natus', 'error', 'sit', 'voluptatem', 'accusantium', 'doloremque', 'laudantium,', 'totam' ]\n"
+    )
   })
 })
 

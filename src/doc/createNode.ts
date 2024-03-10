@@ -89,8 +89,8 @@ export function createNode(
       value instanceof Map
         ? schema[MAP]
         : Symbol.iterator in Object(value)
-        ? schema[SEQ]
-        : schema[MAP]
+          ? schema[SEQ]
+          : schema[MAP]
   }
   if (onTagObj) {
     onTagObj(tagObj)
@@ -100,8 +100,8 @@ export function createNode(
   const node = tagObj?.createNode
     ? tagObj.createNode(ctx.schema, value, ctx)
     : typeof tagObj?.nodeClass?.from === 'function'
-    ? tagObj.nodeClass.from(ctx.schema, value, ctx)
-    : new Scalar(value)
+      ? tagObj.nodeClass.from(ctx.schema, value, ctx)
+      : new Scalar(value)
   if (tagName) node.tag = tagName
   else if (!tagObj.default) node.tag = tagObj.tag
 

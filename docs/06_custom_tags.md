@@ -18,6 +18,14 @@ The easiest way to extend a [schema](#data-schemas) is by defining the additiona
 
 For further customisation, `customTags` may also be a function `(Tag[]) => (Tag[])` that may modify the schema's base tag array.
 
+Some additional data types are available separately via the [`yaml-types`](https://github.com/eemeli/yaml-types) package, including support for:
+
+- BigInt values
+- Error objects
+- Objects with a null prototype
+- RegExp values
+- Symbols
+
 ## Built-in Custom Tags
 
 ```js
@@ -118,16 +126,16 @@ class YAMLError extends YAMLMap {
       name === 'EvalError'
         ? EvalError
         : name === 'RangeError'
-        ? RangeError
-        : name === 'ReferenceError'
-        ? ReferenceError
-        : name === 'SyntaxError'
-        ? SyntaxError
-        : name === 'TypeError'
-        ? TypeError
-        : name === 'URIError'
-        ? URIError
-        : Error
+          ? RangeError
+          : name === 'ReferenceError'
+            ? ReferenceError
+            : name === 'SyntaxError'
+              ? SyntaxError
+              : name === 'TypeError'
+                ? TypeError
+                : name === 'URIError'
+                  ? URIError
+                  : Error
     if (Cls.name !== name) {
       Object.defineProperty(er, 'name', {
         value: name,
@@ -180,7 +188,7 @@ stringify(
 
 In YAML-speak, a custom data type is represented by a _tag_. To define your own tag, you need to account for the ways that your data is both parsed and stringified. Furthermore, both of those processes are split into two stages by the intermediate AST node structure.
 
-If you wish to implement your own custom tags, the [`!!binary`](https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/binary.ts) and [`!!set`](https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/set.ts) tags provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.
+If you wish to implement your own custom tags, the [`!!binary`](https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/binary.ts) and [`!!set`](https://github.com/eemeli/yaml/blob/main/src/schema/yaml-1.1/set.ts) tags as well as the [`yaml-types`](https://github.com/eemeli/yaml-types) package provide relatively cohesive examples to study in addition to the simple examples in the sidebar here.
 
 Custom collection types (ie, Maps, Sets, objects, and arrays; anything with child properties that may not be propertly serialized to a scalar value) may provide a `nodeClass` property that extends the [`YAMLMap`](https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLMap.ts) and [`YAMLSeq`](https://github.com/eemeli/yaml/blob/main/src/nodes/YAMLSeq.ts) classes, which will be used for parsing and stringifying objects with the specified tag.
 

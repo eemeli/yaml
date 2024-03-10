@@ -540,6 +540,19 @@ describe('stringify comments', () => {
       `)
     })
 
+    test('line comment after [], in seq', () => {
+      const doc = YAML.parseDocument(source`
+        [ [a], #c0
+          [b] #c1
+        ]`)
+      expect(String(doc)).toBe(source`
+        [
+          [ a ], #c0
+          [ b ] #c1
+        ]
+      `)
+    })
+
     test('line comment after , in map', () => {
       const doc = YAML.parseDocument(source`
         { a, #c0
@@ -550,6 +563,21 @@ describe('stringify comments', () => {
         {
           a, #c0
           b: c, #c1
+          d #c2
+        }
+      `)
+    })
+
+    test('line comment after {}, in map', () => {
+      const doc = YAML.parseDocument(source`
+        { {a: 1}, #c0
+          b: {c: 2}, #c1
+          d #c2
+        }`)
+      expect(String(doc)).toBe(source`
+        {
+          ? { a: 1 }, #c0
+          b: { c: 2 }, #c1
           d #c2
         }
       `)

@@ -195,3 +195,9 @@ describe('CST.visit', () => {
     expect(visits).toBe(3)
   })
 })
+
+test('Line comment before unindented block-seq in block-map (eemeli/yaml#525)', () => {
+  const src = 'a:\n#\n- b'
+  const [doc] = Array.from(new Parser().parse(src))
+  expect(CST.stringify(doc)).toBe(src)
+})
