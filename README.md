@@ -28,6 +28,12 @@ npm install yaml
 
 **Note:** These docs are for `yaml@2`. For v1, see the [v1.10.0 tag](https://github.com/eemeli/yaml/tree/v1.10.0) for the source and [eemeli.org/yaml/v1](https://eemeli.org/yaml/v1/) for the documentation.
 
+The development and maintenance of this library is [sponsored](https://github.com/sponsors/eemeli) by:
+
+<a href="https://www.scipress.io/">
+<img width=150 src="https://eemeli.org/yaml/images/scipress.svg" alt="Scipress" />
+</a>
+
 ## API Overview
 
 The API provided by `yaml` has three layers, depending on how deep you need to go: [Parse & Stringify](https://eemeli.org/yaml/#parse-amp-stringify), [Documents](https://eemeli.org/yaml/#documents), and the underlying [Lexer/Parser/Composer](https://eemeli.org/yaml/#parsing-yaml).
@@ -139,14 +145,6 @@ YAML.stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
 //   lines
 // `
 ```
-
----
-
-`yaml` is [sponsored](https://github.com/sponsors/eemeli) by:
-
-<a href="https://www.scipress.io/">
-<img width=150 src="https://eemeli.org/yaml/images/scipress.svg" alt="Scipress" />
-</a>
 
 ---
 
