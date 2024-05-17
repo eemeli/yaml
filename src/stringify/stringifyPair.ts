@@ -22,7 +22,7 @@ export function stringifyPair(
     if (keyComment) {
       throw new Error('With simple keys, key nodes cannot have comments')
     }
-    if (isCollection(key)) {
+    if (isCollection(key) || (!isNode(key) && typeof key === 'object')) {
       const msg = 'With simple keys, collection cannot be used as a key value'
       throw new Error(msg)
     }
