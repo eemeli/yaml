@@ -129,23 +129,23 @@ export function parseDocument<
  *   document, so Maps become objects, Sequences arrays, and scalars result in
  *   nulls, booleans, numbers and strings.
  */
-export function parse(
+export function parse<T extends any = any>(
   src: string,
   options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
-): any
-export function parse(
+): T
+export function parse<T extends any = any>(
   src: string,
   reviver: Reviver,
   options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
-): any
+): T
 
-export function parse(
+export function parse<T extends any = any>(
   src: string,
   reviver?:
     | Reviver
     | (ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions),
   options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
-): any {
+): T {
   let _reviver: Reviver | undefined = undefined
   if (typeof reviver === 'function') {
     _reviver = reviver
