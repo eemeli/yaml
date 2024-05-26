@@ -2,7 +2,7 @@ import { parseDocument, Scalar } from 'yaml'
 import { source } from './_utils'
 
 describe('%TAG', () => {
-  test('parse', () => {
+  test('parse local tags', () => {
     const doc = parseDocument(source`
       %TAG ! !foo:
       %TAG !bar! !bar:
@@ -20,6 +20,28 @@ describe('%TAG', () => {
       items: [
         { value: 'v1', tag: '!foo:bar' },
         { value: 'v2', tag: '!bar:foo' }
+      ]
+    })
+  })
+
+  test('parse global tags', () => {
+    const doc = parseDocument(source`
+      %TAG ! foo:
+      %TAG !bar! bar:bar#bar? #comment
+      ---
+      - !bar v1
+      - !bar!foo v2
+    `)
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.directives.tags).toMatchObject({
+      '!!': 'tag:yaml.org,2002:',
+      '!': 'foo:',
+      '!bar!': 'bar:bar#bar?'
+    })
+    expect(doc.contents).toMatchObject({
+      items: [
+        { value: 'v1', tag: 'foo:bar' },
+        { value: 'v2', tag: 'bar:bar#bar?foo' }
       ]
     })
   })

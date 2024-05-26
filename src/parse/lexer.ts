@@ -274,10 +274,15 @@ export class Lexer {
     }
     if (line[0] === '%') {
       let dirEnd = line.length
-      const cs = line.indexOf('#')
-      if (cs !== -1) {
+      let cs = line.indexOf('#')
+      while (cs !== -1) {
         const ch = line[cs - 1]
-        if (ch === ' ' || ch === '\t') dirEnd = cs - 1
+        if (ch === ' ' || ch === '\t') {
+          dirEnd = cs - 1
+          break
+        } else {
+          cs = line.indexOf('#', cs + 1)
+        }
       }
       while (true) {
         const ch = line[dirEnd - 1]
