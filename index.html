@@ -1036,7 +1036,15 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <span class="c1">//                range: [ 145, 180, 180 ] } ],</span>
 <span class="c1">//           range: [ 102, 180, 180 ] } } ],</span>
 <span class="c1">//   range: [ 0, 180, 180 ] }</span>
-</code></pre></div><h4 id='parsedocument-str-options-document'><code>parseDocument(str, options = {}): Document</code></h4>
+</code></pre></div>
+<p>These functions should never throw,
+provided that <code>str</code> is a string and the <code>options</code> are valid.
+Errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays.
+In particular, if <code>errors</code> is not empty
+it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
+
+<p>The <code>contents</code> of a parsed document will always consist of <code>Scalar</code>, <code>Map</code>, <code>Seq</code> or <code>null</code> values.</p>
+<h4 id='parsedocument-str-options-document'><code>parseDocument(str, options = {}): Document</code></h4>
 <p>Parses a single <code>Document</code> from the input <code>str</code>; used internally by <code>parse</code>.
 Will include an error if <code>str</code> contains more than one document.
 See <a href="#options">Options</a> for more information on the second parameter.</p>
@@ -1048,10 +1056,6 @@ See <a href="#options">Options</a> for more information on the second parameter.
 See <a href="#options">Options</a> for more information on the second parameter.</p>
 
 <p><br/></p>
-
-<p>These functions should never throw; errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays. In particular, if <code>errors</code> is not empty it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
-
-<p>The <code>contents</code> of a parsed document will always consist of <code>Scalar</code>, <code>Map</code>, <code>Seq</code> or <code>null</code> values.</p>
 <h2 id='creating-documents'>Creating Documents</h2><h4 id='new-document-value-replacer-options'><code>new Document(value, replacer?, options = {})</code></h4>
 <p>Creates a new document.
 If <code>value</code> is defined, the document <code>contents</code> are initialised with that value, wrapped recursively in appropriate <a href="#content-nodes">content nodes</a>.
