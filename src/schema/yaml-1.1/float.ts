@@ -6,7 +6,7 @@ export const floatNaN: ScalarTag = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
-  test: /^[-+]?\.(?:inf|Inf|INF|nan|NaN|NAN)$/,
+  test: /^(?:[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN)$/,
   resolve: (str: string) =>
     str.slice(-3).toLowerCase() === 'nan'
       ? NaN

@@ -373,19 +373,22 @@ option: TruE\n`)
     const src = `canonical: 6.8523015e+5
 fixed: 685230.15
 negative infinity: -.inf
-not a number: .NaN`
+not a number: .NaN
+not a NaN: -.NaN`
 
     const doc = parseDocument(src)
     expect(doc.toJS()).toMatchObject({
       canonical: 685230.15,
       fixed: 685230.15,
       'negative infinity': Number.NEGATIVE_INFINITY,
-      'not a number': NaN
+      'not a number': NaN,
+      'not a NaN': '-.NaN'
     })
     expect(String(doc)).toBe(`canonical: 6.8523015e+5
 fixed: 685230.15
 negative infinity: -.inf
-not a number: .nan\n`)
+not a number: .nan
+not a NaN: -.NaN\n`)
   })
 
   test('!!int', () => {
@@ -546,7 +549,8 @@ exponential: 685.230_15e+03
 fixed: 685_230.15
 sexagesimal: 190:20:30.15
 negative infinity: -.inf
-not a number: .NaN`
+not a number: .NaN
+not a NaN: -.NaN`
 
     const doc = parseDocument(src)
     expect(doc.toJS()).toMatchObject({
@@ -555,7 +559,8 @@ not a number: .NaN`
       fixed: 685230.15,
       sexagesimal: 685230.15,
       'negative infinity': Number.NEGATIVE_INFINITY,
-      'not a number': NaN
+      'not a number': NaN,
+      'not a NaN': '-.NaN'
     })
     expect(String(doc)).toBe(`%YAML 1.1
 ---
@@ -564,7 +569,8 @@ exponential: 6.8523015e+5
 fixed: 685230.15
 sexagesimal: 190:20:30.15
 negative infinity: -.inf
-not a number: .nan\n`)
+not a number: .nan
+not a NaN: -.NaN\n`)
   })
 
   test('!!int', () => {
