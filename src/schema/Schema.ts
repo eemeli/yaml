@@ -17,11 +17,11 @@ export class Schema {
   name: string
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
   tags: Array<CollectionTag | ScalarTag>
-  toStringOptions: Readonly<ToStringOptions> | null;
+  toStringOptions: Readonly<ToStringOptions> | null
 
   // Used by createNode() and composeScalar()
-  declare readonly [MAP]: CollectionTag;
-  declare readonly [SCALAR]: ScalarTag;
+  declare readonly [MAP]: CollectionTag
+  declare readonly [SCALAR]: ScalarTag
   declare readonly [SEQ]: CollectionTag
 
   constructor({
