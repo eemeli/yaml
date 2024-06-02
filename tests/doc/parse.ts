@@ -154,6 +154,15 @@ aliases:
   })
 })
 
+test('buffer as source (eemeli/yaml#459)', () => {
+  const buffer = readFileSync(
+    resolve(__dirname, '../artifacts/prettier-circleci-config.yml')
+  )
+  expect(() => YAML.parseDocument(buffer as any)).toThrow(
+    'source is not a string'
+  )
+})
+
 describe('eemeli/yaml#19', () => {
   test('map', () => {
     const src = 'a:\n  # 123'

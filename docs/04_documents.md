@@ -40,6 +40,14 @@ doc.contents
 //   range: [ 0, 180, 180 ] }
 ```
 
+These functions should never throw,
+provided that `str` is a string and the `options` are valid.
+Errors and warnings are included in the documents' `errors` and `warnings` arrays.
+In particular, if `errors` is not empty
+it's likely that the document's parsed `contents` are not entirely correct.
+
+The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq` or `null` values.
+
 #### `parseDocument(str, options = {}): Document`
 
 Parses a single `Document` from the input `str`; used internally by `parse`.
@@ -55,10 +63,6 @@ When parsing YAML, the input string `str` may consist of a stream of documents s
 See [Options](#options) for more information on the second parameter.
 
 <br/>
-
-These functions should never throw; errors and warnings are included in the documents' `errors` and `warnings` arrays. In particular, if `errors` is not empty it's likely that the document's parsed `contents` are not entirely correct.
-
-The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq` or `null` values.
 
 ## Creating Documents
 

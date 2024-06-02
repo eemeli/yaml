@@ -174,6 +174,7 @@ export class Lexer {
    */
   *lex(source: string, incomplete = false) {
     if (source) {
+      if (typeof source !== 'string') throw TypeError('source is not a string')
       this.buffer = this.buffer ? this.buffer + source : source
       this.lineEndPos = null
     }
