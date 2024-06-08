@@ -266,7 +266,7 @@ describe('parse comments', () => {
     })
   })
 
-  describe('flow collection commens', () => {
+  describe('flow collection comments', () => {
     test('line comment after , in seq', () => {
       const doc = YAML.parseDocument<YAML.YAMLSeq, false>(source`
         [ a, #c0
@@ -298,6 +298,20 @@ describe('parse comments', () => {
         { key: { commentBefore: 'c0\nc1', value: 'b' } }
       ])
     })
+  })
+
+  describe('line comments with leading tabs (#548)', () => {
+    for (const { name, src } of [
+      { name: 'after scalar', src: 'foo\n\t#c' },
+      { name: 'in seq', src: '- x\n\t#c\n- y\n\t #d\n- z' },
+      { name: 'in map value', src: 'x:\n\t#c\ny:' },
+      { name: 'in map', src: 'x: 1\n\t#c\ny: 2' }
+    ]) {
+      test(name, () => {
+        const doc = YAML.parseDocument(src)
+        expect(doc.errors).toHaveLength(0)
+      })
+    }
   })
 })
 

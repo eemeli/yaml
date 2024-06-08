@@ -22,6 +22,7 @@ export function resolveProps(
   let hasNewline = false
   let hasNewlineAfterProp = false
   let reqSpace = false
+  let tab: SourceToken | null = null
   let anchor: SourceToken | null = null
   let tag: SourceToken | null = null
   let comma: SourceToken | null = null
@@ -41,6 +42,12 @@ export function resolveProps(
         )
       reqSpace = false
     }
+    if (tab) {
+      if (token.type !== 'comment') {
+        onError(tab, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation')
+      }
+      tab = null
+    }
     switch (token.type) {
       case 'space':
         // At the doc level, tabs at line start may be parsed
@@ -51,8 +58,9 @@ export function resolveProps(
           atNewline &&
           indicator !== 'doc-start' &&
           token.source[0] === '\t'
-        )
-          onError(token, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation')
+        ) {
+          tab = token
+        }
         hasSpace = true
         break
       case 'comment': {
@@ -152,12 +160,14 @@ export function resolveProps(
     next.type !== 'newline' &&
     next.type !== 'comma' &&
     (next.type !== 'scalar' || next.source !== '')
-  )
+  ) {
     onError(
       next.offset,
       'MISSING_CHAR',
       'Tags and anchors must be separated from the next token by white space'
     )
+  }
+  if (tab) onError(tab, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation')
   return {
     comma,
     found,
