@@ -422,6 +422,16 @@ describe('odd indentations', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('?\n!!null')
     expect(doc.errors).not.toHaveLength(0)
   })
+
+  test('unindented block scalar header in mapping value (#553)', () => {
+    const doc = YAML.parseDocument<YAML.YAMLMap, false>('a:\n|\n x')
+    expect(doc.errors).not.toHaveLength(0)
+  })
+
+  test('unindented flow collection in mapping value', () => {
+    const doc = YAML.parseDocument<YAML.YAMLMap, false>('a:\n{x}')
+    expect(doc.errors).not.toHaveLength(0)
+  })
 })
 
 describe('Excessive entity expansion attacks', () => {

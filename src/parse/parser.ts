@@ -529,9 +529,9 @@ export class Parser {
     }
 
     if (this.indent >= map.indent) {
+      const atMapIndent = !this.onKeyLine && this.indent === map.indent
       const atNextItem =
-        !this.onKeyLine &&
-        this.indent === map.indent &&
+        atMapIndent &&
         (it.sep || it.explicitKey) &&
         this.type !== 'seq-item-ind'
 
@@ -673,7 +673,7 @@ export class Parser {
         default: {
           const bv = this.startBlockValue(map)
           if (bv) {
-            if (atNextItem && bv.type !== 'block-seq' && it.explicitKey) {
+            if (atMapIndent && bv.type !== 'block-seq') {
               map.items.push({ start })
             }
             this.stack.push(bv)
