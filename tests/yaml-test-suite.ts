@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from 'fs'
+import { readdirSync, readFileSync } from 'fs'
 import { resolve } from 'path'
 
 import { CST, Document, Lexer, parse, parseAllDocuments, Parser } from 'yaml'
