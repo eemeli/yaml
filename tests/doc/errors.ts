@@ -1,13 +1,22 @@
 import * as YAML from 'yaml'
 import { source } from '../_utils'
 
-test('fail on map value indented with tab', () => {
-  const src = 'a:\n\t1\nb:\n\t2\n'
-  const doc = YAML.parseDocument(src)
-  expect(doc.errors).not.toHaveLength(0)
-  expect(() => String(doc)).toThrow(
-    'Document with errors cannot be stringified'
-  )
+describe('tabs as indentation', () => {
+  test('fail on map value indented with tab', () => {
+    const src = 'a:\n\t1\nb:\n\t2\n'
+    const doc = YAML.parseDocument(src)
+    expect(doc.errors[0]).toMatchObject({ code: 'TAB_AS_INDENT' })
+  })
+
+  test('block sequence with leading tab', () => {
+    const doc = YAML.parseDocument('\t- x')
+    expect(doc.errors).toMatchObject([{ code: 'TAB_AS_INDENT' }])
+  })
+
+  test('block map with leading tab', () => {
+    const doc = YAML.parseDocument('\tx: y')
+    expect(doc.errors).toMatchObject([{ code: 'TAB_AS_INDENT' }])
+  })
 })
 
 test('eemeli/yaml#6', () => {

@@ -56,7 +56,7 @@ export function resolveProps(
         if (
           !flow &&
           atNewline &&
-          indicator !== 'doc-start' &&
+          (indicator !== 'doc-start' || next?.type !== 'flow-collection') &&
           token.source[0] === '\t'
         ) {
           tab = token
