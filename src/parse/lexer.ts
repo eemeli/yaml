@@ -91,14 +91,13 @@ function isEmpty(ch: string) {
   }
 }
 
-const hexDigits = '0123456789ABCDEFabcdef'.split('')
-const tagChars =
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-#;/?:@&=+$_.!~*'()".split(
-    ''
-  )
-const invalidFlowScalarChars = ',[]{}'.split('')
-const invalidAnchorChars = ' ,[]{}\n\r\t'.split('')
-const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.includes(ch)
+const hexDigits = new Set('0123456789ABCDEFabcdef')
+const tagChars = new Set(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-#;/?:@&=+$_.!~*'()"
+)
+const flowIndicatorChars = new Set(',[]{}')
+const invalidAnchorChars = new Set(' ,[]{}\n\r\t')
+const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.has(ch)
 
 /**
  * Splits an input string into lexical tokens, i.e. smaller strings that are
@@ -573,7 +572,7 @@ export class Lexer {
     while ((ch = this.buffer[++i])) {
       if (ch === ':') {
         const next = this.buffer[i + 1]
-        if (isEmpty(next) || (inFlow && next === ',')) break
+        if (isEmpty(next) || (inFlow && flowIndicatorChars.has(next))) break
         end = i
       } else if (isEmpty(ch)) {
         let next = this.buffer[i + 1]
@@ -584,15 +583,14 @@ export class Lexer {
             next = this.buffer[i + 1]
           } else end = i
         }
-        if (next === '#' || (inFlow && invalidFlowScalarChars.includes(next)))
-          break
+        if (next === '#' || (inFlow && flowIndicatorChars.has(next))) break
         if (ch === '\n') {
           const cs = this.continueScalar(i + 1)
           if (cs === -1) break
           i = Math.max(i, cs - 2) // to advance, but still account for ' #'
         }
       } else {
-        if (inFlow && invalidFlowScalarChars.includes(ch)) break
+        if (inFlow && flowIndicatorChars.has(ch)) break
         end = i
       }
     }
@@ -640,7 +638,7 @@ export class Lexer {
       case ':': {
         const inFlow = this.flowLevel > 0
         const ch1 = this.charAt(1)
-        if (isEmpty(ch1) || (inFlow && invalidFlowScalarChars.includes(ch1))) {
+        if (isEmpty(ch1) || (inFlow && flowIndicatorChars.has(ch1))) {
           if (!inFlow) this.indentNext = this.indentValue + 1
           else if (this.flowKey) this.flowKey = false
           return (
@@ -664,11 +662,11 @@ export class Lexer {
       let i = this.pos + 1
       let ch = this.buffer[i]
       while (ch) {
-        if (tagChars.includes(ch)) ch = this.buffer[++i]
+        if (tagChars.has(ch)) ch = this.buffer[++i]
         else if (
           ch === '%' &&
-          hexDigits.includes(this.buffer[i + 1]) &&
-          hexDigits.includes(this.buffer[i + 2])
+          hexDigits.has(this.buffer[i + 1]) &&
+          hexDigits.has(this.buffer[i + 2])
         ) {
           ch = this.buffer[(i += 3)]
         } else break

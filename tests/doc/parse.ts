@@ -259,6 +259,20 @@ describe('flow collection keys', () => {
       ]
     })
   })
+
+  test('empty scalar as last flow collection value (#550)', () => {
+    const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:}')
+    expect(doc.contents.items).toMatchObject([
+      { key: { value: 'c' }, value: { value: null } }
+    ])
+  })
+
+  test('plain key with no space before flow collection value (#550)', () => {
+    const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:[]}')
+    expect(doc.contents.items).toMatchObject([
+      { key: { value: 'c' }, value: { items: [] } }
+    ])
+  })
 })
 
 test('eemeli/yaml#38', () => {
