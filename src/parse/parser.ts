@@ -325,7 +325,7 @@ export class Parser {
             it.value = token
           } else {
             Object.assign(it, { key: token, sep: [] })
-            this.onKeyLine = !includesToken(it.start, 'explicit-key-ind')
+            this.onKeyLine = !it.explicitKey
             return
           }
           break
@@ -532,7 +532,7 @@ export class Parser {
       const atNextItem =
         !this.onKeyLine &&
         this.indent === map.indent &&
-        it.sep &&
+        (it.sep || it.explicitKey) &&
         this.type !== 'seq-item-ind'
 
       // For empty nodes, assign newline-separated not indented empty tokens to following node
@@ -572,24 +572,25 @@ export class Parser {
           return
 
         case 'explicit-key-ind':
-          if (!it.sep && !includesToken(it.start, 'explicit-key-ind')) {
+          if (!it.sep && !it.explicitKey) {
             it.start.push(this.sourceToken)
+            it.explicitKey = true
           } else if (atNextItem || it.value) {
             start.push(this.sourceToken)
-            map.items.push({ start })
+            map.items.push({ start, explicitKey: true })
           } else {
             this.stack.push({
               type: 'block-map',
               offset: this.offset,
               indent: this.indent,
-              items: [{ start: [this.sourceToken] }]
+              items: [{ start: [this.sourceToken], explicitKey: true }]
             })
           }
           this.onKeyLine = true
           return
 
         case 'map-value-ind':
-          if (includesToken(it.start, 'explicit-key-ind')) {
+          if (it.explicitKey) {
             if (!it.sep) {
               if (includesToken(it.start, 'newline')) {
                 Object.assign(it, { key: null, sep: [this.sourceToken] })
@@ -672,11 +673,7 @@ export class Parser {
         default: {
           const bv = this.startBlockValue(map)
           if (bv) {
-            if (
-              atNextItem &&
-              bv.type !== 'block-seq' &&
-              includesToken(it.start, 'explicit-key-ind')
-            ) {
+            if (atNextItem && bv.type !== 'block-seq' && it.explicitKey) {
               map.items.push({ start })
             }
             this.stack.push(bv)
@@ -888,7 +885,7 @@ export class Parser {
           type: 'block-map',
           offset: this.offset,
           indent: this.indent,
-          items: [{ start }]
+          items: [{ start, explicitKey: true }]
         } as BlockMap
       }
       case 'map-value-ind': {

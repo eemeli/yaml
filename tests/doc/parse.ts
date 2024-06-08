@@ -409,6 +409,21 @@ describe('maps with no values', () => {
   })
 })
 
+describe('odd indentations', () => {
+  test('Block map with empty explicit key (#551)', () => {
+    const doc = YAML.parseDocument<YAML.YAMLMap, false>('?\n? a')
+    expect(doc.contents.items).toMatchObject([
+      { key: { value: null }, value: null },
+      { key: { value: 'a' }, value: null }
+    ])
+  })
+
+  test('Block map with unindented !!null explicit key', () => {
+    const doc = YAML.parseDocument<YAML.YAMLMap, false>('?\n!!null')
+    expect(doc.errors).not.toHaveLength(0)
+  })
+})
+
 describe('Excessive entity expansion attacks', () => {
   const root = resolve(__dirname, '../artifacts/pr104')
   const src1 = readFileSync(resolve(root, 'case1.yml'), 'utf8')

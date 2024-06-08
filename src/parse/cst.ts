@@ -81,9 +81,16 @@ export interface BlockMap {
   offset: number
   indent: number
   items: Array<
-    | { start: SourceToken[]; key?: never; sep?: never; value?: never }
     | {
         start: SourceToken[]
+        explicitKey?: true
+        key?: never
+        sep?: never
+        value?: never
+      }
+    | {
+        start: SourceToken[]
+        explicitKey?: true
         key: Token | null
         sep: SourceToken[]
         value?: Token
