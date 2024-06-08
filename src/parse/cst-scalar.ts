@@ -1,3 +1,4 @@
+import type { ComposeContext } from '../compose/compose-node.js'
 import type { ComposeErrorHandler } from '../compose/composer.js'
 import { resolveBlockScalar } from '../compose/resolve-block-scalar.js'
 import { resolveFlowScalar } from '../compose/resolve-flow-scalar.js'
@@ -55,7 +56,11 @@ export function resolveAsScalar(
       case 'double-quoted-scalar':
         return resolveFlowScalar(token, strict, _onError)
       case 'block-scalar':
-        return resolveBlockScalar(token, strict, _onError)
+        return resolveBlockScalar(
+          { options: { strict } } as ComposeContext,
+          token,
+          _onError
+        )
     }
   }
   return null

@@ -7,12 +7,21 @@ export interface ResolvePropsArg {
   next: Token | null | undefined
   offset: number
   onError: ComposeErrorHandler
+  parentIndent: number
   startOnNewline: boolean
 }
 
 export function resolveProps(
   tokens: SourceToken[],
-  { flow, indicator, next, offset, onError, startOnNewline }: ResolvePropsArg
+  {
+    flow,
+    indicator,
+    next,
+    offset,
+    onError,
+    parentIndent,
+    startOnNewline
+  }: ResolvePropsArg
 ) {
   let spaceBefore = false
   let atNewline = startOnNewline
@@ -43,7 +52,7 @@ export function resolveProps(
       reqSpace = false
     }
     if (tab) {
-      if (token.type !== 'comment') {
+      if (atNewline && token.type !== 'comment' && token.type !== 'newline') {
         onError(tab, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation')
       }
       tab = null
@@ -55,9 +64,8 @@ export function resolveProps(
         // In a flow collection, only the parser handles indent.
         if (
           !flow &&
-          atNewline &&
           (indicator !== 'doc-start' || next?.type !== 'flow-collection') &&
-          token.source[0] === '\t'
+          token.source.includes('\t')
         ) {
           tab = token
         }
@@ -132,7 +140,8 @@ export function resolveProps(
             `Unexpected ${token.source} in ${flow ?? 'collection'}`
           )
         found = token
-        atNewline = false
+        atNewline =
+          indicator === 'seq-item-ind' || indicator === 'explicit-key-ind'
         hasSpace = false
         break
       case 'comma':
@@ -167,7 +176,13 @@ export function resolveProps(
       'Tags and anchors must be separated from the next token by white space'
     )
   }
-  if (tab) onError(tab, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation')
+  if (
+    tab &&
+    ((atNewline && tab.indent <= parentIndent) ||
+      next?.type === 'block-map' ||
+      next?.type === 'block-seq')
+  )
+    onError(tab, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation')
   return {
     comma,
     found,

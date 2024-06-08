@@ -551,13 +551,23 @@ export class Lexer {
         nl = this.buffer.length
       }
     }
-    if (!this.blockScalarKeep) {
+
+    // Trailing insufficiently indented tabs are invalid.
+    // To catch that during parsing, we include them in the block scalar value.
+    let i = nl + 1
+    ch = this.buffer[i]
+    while (ch === ' ') ch = this.buffer[++i]
+    if (ch === '\t') {
+      while (ch === '\t' || ch === ' ' || ch === '\r' || ch === '\n')
+        ch = this.buffer[++i]
+      nl = i - 1
+    } else if (!this.blockScalarKeep) {
       do {
         let i = nl - 1
         let ch = this.buffer[i]
         if (ch === '\r') ch = this.buffer[--i]
         const lastChar = i // Drop the line if last char not more indented
-        while (ch === ' ' || ch === '\t') ch = this.buffer[--i]
+        while (ch === ' ') ch = this.buffer[--i]
         if (ch === '\n' && i >= this.pos && i + 1 + indent > lastChar) nl = i
         else break
       } while (true)

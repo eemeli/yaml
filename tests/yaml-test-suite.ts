@@ -21,15 +21,6 @@ const skip: Record<string, boolean | string[]> = {
   'SF5V/0': ['errors'], // allow duplicate %YAML directives
 
   // FIXME recent upstream additions
-  'DK95/0': true,
-  'DK95/4': true,
-  'DK95/5': true,
-  'Y79Y/4': ['errors'],
-  'Y79Y/5': ['errors'],
-  'Y79Y/6': ['errors'],
-  'Y79Y/7': ['errors'],
-  'Y79Y/8': ['errors'],
-  'Y79Y/9': ['errors'],
   'ZYU8/2': ['errors']
 }
 

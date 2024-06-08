@@ -38,6 +38,7 @@ export function composeDoc<
     next: value ?? end?.[0],
     offset,
     onError,
+    parentIndent: 0,
     startOnNewline: true
   })
   if (props.found) {

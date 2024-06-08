@@ -34,6 +34,7 @@ export function resolveBlockMap(
       next: key ?? sep?.[0],
       offset,
       onError,
+      parentIndent: bm.indent,
       startOnNewline: true
     })
     const implicitKey = !keyProps.found
@@ -83,6 +84,7 @@ export function resolveBlockMap(
       next: value,
       offset: keyNode.range[2],
       onError,
+      parentIndent: bm.indent,
       startOnNewline: !key || key.type === 'block-scalar'
     })
     offset = valueProps.end

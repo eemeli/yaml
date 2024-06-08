@@ -44,6 +44,7 @@ export function resolveFlowCollection(
       next: key ?? sep?.[0],
       offset,
       onError,
+      parentIndent: fc.indent,
       startOnNewline: false
     })
     if (!props.found) {
@@ -130,6 +131,7 @@ export function resolveFlowCollection(
         next: value,
         offset: keyNode.range[2],
         onError,
+        parentIndent: fc.indent,
         startOnNewline: false
       })
 

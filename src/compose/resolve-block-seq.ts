@@ -25,6 +25,7 @@ export function resolveBlockSeq(
       next: value,
       offset,
       onError,
+      parentIndent: bs.indent,
       startOnNewline: true
     })
     if (!props.found) {

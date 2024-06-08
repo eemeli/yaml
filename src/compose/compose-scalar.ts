@@ -16,7 +16,7 @@ export function composeScalar(
 ) {
   const { value, type, comment, range } =
     token.type === 'block-scalar'
-      ? resolveBlockScalar(token, ctx.options.strict, onError)
+      ? resolveBlockScalar(ctx, token, onError)
       : resolveFlowScalar(token, ctx.options.strict, onError)
 
   const tagName = tagToken

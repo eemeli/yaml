@@ -1,11 +1,12 @@
 import { Range } from '../nodes/Node.js'
 import { Scalar } from '../nodes/Scalar.js'
 import type { BlockScalar } from '../parse/cst.js'
+import type { ComposeContext } from './compose-node.js'
 import type { ComposeErrorHandler } from './composer.js'
 
 export function resolveBlockScalar(
+  ctx: ComposeContext,
   scalar: BlockScalar,
-  strict: boolean,
   onError: ComposeErrorHandler
 ): {
   value: string
@@ -14,7 +15,7 @@ export function resolveBlockScalar(
   range: Range
 } {
   const start = scalar.offset
-  const header = parseBlockScalarHeader(scalar, strict, onError)
+  const header = parseBlockScalarHeader(scalar, ctx.options.strict, onError)
   if (!header)
     return { value: '', type: null, comment: '', range: [start, start, start] }
   const type = header.mode === '>' ? Scalar.BLOCK_FOLDED : Scalar.BLOCK_LITERAL
@@ -56,6 +57,10 @@ export function resolveBlockScalar(
       }
       if (header.indent === 0) trimIndent = indent.length
       contentStart = i
+      if (trimIndent === 0 && !ctx.atRoot) {
+        const message = 'Block scalar values in collections must be indented'
+        onError(offset, 'BAD_INDENT', message)
+      }
       break
     }
     offset += indent.length + content.length + 1
