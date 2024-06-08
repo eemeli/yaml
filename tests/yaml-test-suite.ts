@@ -13,15 +13,12 @@ type TestCase = {
   dump?: string
 }
 
-type TestFile = [TestCase & { name: string }, ...TestCase[]]
+type TestFile = [TestCase & { name: string; skip?: boolean }, ...TestCase[]]
 
 const skip: Record<string, boolean | string[]> = {
-  '2JQS/0': ['test.event', 'errors'], //
+  '2JQS/0': ['test.event', 'errors'], // duplicate empty keys are invalid
   '9MMA/0': ['errors'], // allow stream with directive & no docs
-  'SF5V/0': ['errors'], // allow duplicate %YAML directives
-
-  // FIXME recent upstream additions
-  'ZYU8/2': ['errors']
+  'SF5V/0': ['errors'] // allow duplicate %YAML directives
 }
 
 function testJsonMatch(docs: Document[], json: string) {
@@ -58,6 +55,7 @@ for (const fn of readdirSync(testRoot)) {
   const file = readFileSync(path, 'utf8')
   const testData = parse(file) as TestFile
   if (!Array.isArray(testData)) throw new Error(`Unsupported test file: ${fn}`)
+  if (testData[0].skip) continue
 
   const name = `${id}: ${testData[0].name}`
   for (let i = 0; i < testData.length; ++i) {
