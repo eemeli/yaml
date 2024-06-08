@@ -412,6 +412,7 @@ describe('maps with no values', () => {
 describe('odd indentations', () => {
   test('Block map with empty explicit key (#551)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('?\n? a')
+    expect(doc.errors).toHaveLength(0)
     expect(doc.contents.items).toMatchObject([
       { key: { value: null }, value: null },
       { key: { value: 'a' }, value: null }
@@ -431,6 +432,12 @@ describe('odd indentations', () => {
   test('unindented flow collection in mapping value', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('a:\n{x}')
     expect(doc.errors).not.toHaveLength(0)
+  })
+
+  test('comment after top-level block scalar with indentation indicator (#547)', () => {
+    const doc = YAML.parseDocument<YAML.Scalar, false>('|1\n x\n#c')
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.contents).toMatchObject({ value: 'x\n' })
   })
 })
 

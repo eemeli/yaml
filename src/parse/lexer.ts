@@ -537,7 +537,10 @@ export class Lexer {
     if (!ch && !this.atEnd) return this.setNext('block-scalar')
     if (indent >= this.indentNext) {
       if (this.blockScalarIndent === -1) this.indentNext = indent
-      else this.indentNext += this.blockScalarIndent
+      else {
+        this.indentNext =
+          this.blockScalarIndent + (this.indentNext === 0 ? 1 : this.indentNext)
+      }
       do {
         const cs = this.continueScalar(nl + 1)
         if (cs === -1) break
