@@ -378,6 +378,31 @@ describe('tags on invalid nodes', () => {
   })
 })
 
+describe('properties on block sequences without newline after props', () => {
+  test('valid properties with newline', () => {
+    const doc = YAML.parseDocument('! &a\n- b')
+    expect(doc.errors).toMatchObject([])
+  })
+
+  test('properties on sequence without newline', () => {
+    const doc = YAML.parseDocument('!\n&a - b')
+    expect(doc.errors).toMatchObject([
+      { code: 'MISSING_CHAR' },
+      { code: 'UNEXPECTED_TOKEN' }
+    ])
+  })
+
+  test('properties on empty sequence without newline', () => {
+    const doc = YAML.parseDocument('&a\n! -')
+    expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR' }])
+  })
+
+  test('properties on sequence with newline after item indicator', () => {
+    const doc = YAML.parseDocument('!\n&a -\n b')
+    expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR' }])
+  })
+})
+
 describe('invalid options', () => {
   test('unknown schema', () => {
     expect(() => new YAML.Document(undefined, { schema: 'foo' })).toThrow(

@@ -57,7 +57,7 @@ export function resolveBlockMap(
         }
         continue
       }
-      if (keyProps.hasNewlineAfterProp || containsNewline(key)) {
+      if (keyProps.newlineAfterProp || containsNewline(key)) {
         onError(
           key ?? start[start.length - 1],
           'MULTILINE_IMPLICIT_KEY',

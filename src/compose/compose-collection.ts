@@ -43,18 +43,39 @@ function resolveCollection(
   return coll
 }
 
+interface Props {
+  anchor: SourceToken | null
+  tag: SourceToken | null
+  newlineAfterProp: SourceToken | null
+}
+
 export function composeCollection(
   CN: ComposeNode,
   ctx: ComposeContext,
   token: BlockMap | BlockSequence | FlowCollection,
-  tagToken: SourceToken | null,
+  props: Props,
   onError: ComposeErrorHandler
 ) {
+  const tagToken = props.tag
   const tagName: string | null = !tagToken
     ? null
     : ctx.directives.tagName(tagToken.source, msg =>
         onError(tagToken, 'TAG_RESOLVE_FAILED', msg)
       )
+
+  if (token.type === 'block-seq') {
+    const { anchor, newlineAfterProp: nl } = props
+    const lastProp =
+      anchor && tagToken
+        ? anchor.offset > tagToken.offset
+          ? anchor
+          : tagToken
+        : anchor ?? tagToken
+    if (lastProp && (!nl || nl.offset < lastProp.offset)) {
+      const message = 'Missing newline after block sequence props'
+      onError(lastProp, 'MISSING_CHAR', message)
+    }
+  }
 
   const expType: 'map' | 'seq' =
     token.type === 'block-map'
@@ -72,8 +93,7 @@ export function composeCollection(
     !tagName ||
     tagName === '!' ||
     (tagName === YAMLMap.tagName && expType === 'map') ||
-    (tagName === YAMLSeq.tagName && expType === 'seq') ||
-    !expType
+    (tagName === YAMLSeq.tagName && expType === 'seq')
   ) {
     return resolveCollection(CN, ctx, token, onError, tagName)
   }

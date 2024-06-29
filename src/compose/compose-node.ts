@@ -22,6 +22,7 @@ interface Props {
   comment: string
   anchor: SourceToken | null
   tag: SourceToken | null
+  newlineAfterProp: SourceToken | null
   end: number
 }
 
@@ -57,7 +58,7 @@ export function composeNode(
     case 'block-map':
     case 'block-seq':
     case 'flow-collection':
-      node = composeCollection(CN, ctx, token, tag, onError)
+      node = composeCollection(CN, ctx, token, props, onError)
       if (anchor) node.anchor = anchor.source.substring(1)
       break
     default: {

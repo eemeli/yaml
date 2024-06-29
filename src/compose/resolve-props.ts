@@ -29,11 +29,11 @@ export function resolveProps(
   let comment = ''
   let commentSep = ''
   let hasNewline = false
-  let hasNewlineAfterProp = false
   let reqSpace = false
   let tab: SourceToken | null = null
   let anchor: SourceToken | null = null
   let tag: SourceToken | null = null
+  let newlineAfterProp: SourceToken | null = null
   let comma: SourceToken | null = null
   let found: SourceToken | null = null
   let start: number | null = null
@@ -92,7 +92,7 @@ export function resolveProps(
         } else commentSep += token.source
         atNewline = true
         hasNewline = true
-        if (anchor || tag) hasNewlineAfterProp = true
+        if (anchor || tag) newlineAfterProp = token
         hasSpace = true
         break
       case 'anchor':
@@ -189,9 +189,9 @@ export function resolveProps(
     spaceBefore,
     comment,
     hasNewline,
-    hasNewlineAfterProp,
     anchor,
     tag,
+    newlineAfterProp,
     end,
     start: start ?? end
   }
