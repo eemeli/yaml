@@ -114,6 +114,26 @@ const skip = Number(major) < 20
         ['[{"hello":"world"},42]']
       )
     })
+    describe('--pretty', () => {
+      ok(
+        'basic',
+        'hello: world',
+        ['--json', '--pretty'],
+        ['[\n  {\n    "hello": "world"\n  }\n]']
+      )
+      ok(
+        '--single',
+        'hello: world',
+        ['--json', '--pretty', '--single'],
+        ['{\n  "hello": "world"\n}']
+      )
+      ok(
+        'multiple',
+        'hello: world\n---\n42',
+        ['--json', '--pretty'],
+        ['[\n  {\n    "hello": "world"\n  },\n  42\n]']
+      )
+    })
     describe('--doc', () => {
       ok('basic', 'hello: world', ['--doc'], [{ contents: { items: [{}] } }])
       ok(
