@@ -24,6 +24,7 @@ Usage:
 Options:
   --help, -h    Show this message.
   --json, -j    Output JSON.
+  --pretty, -p  Output pretty-printed JSON.
 
 Additional options for bare "yaml" command:
   --doc, -d     Output pretty-printed JS Document objects.
@@ -56,6 +57,7 @@ export async function cli(
         doc: { type: 'boolean', short: 'd' },
         help: { type: 'boolean', short: 'h' },
         json: { type: 'boolean', short: 'j' },
+        pretty: { type: 'boolean', short: 'p' },
         single: { type: 'boolean', short: '1' },
         strict: { type: 'boolean', short: 's' },
         visit: { type: 'string', short: 'v' },
@@ -188,7 +190,8 @@ export async function cli(
           )
         }
         if (mode !== 'valid' && opt.json) {
-          console.log(JSON.stringify(opt.single ? data[0] : data))
+          const indent = opt.pretty ? 2 : 0
+          console.log(JSON.stringify(opt.single ? data[0] : data, null, indent))
         }
         done()
       })
