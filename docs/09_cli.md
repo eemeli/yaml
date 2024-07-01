@@ -16,7 +16,7 @@ Usage:
 Options:
   --help, -h    Show this message.
   --json, -j    Output JSON.
-  --pretty, -p  Output pretty-printed JSON.
+  --indent 2    Output pretty-printed data, indented by the given number of spaces.
 
 Additional options for bare "yaml" command:
   --doc, -d     Output pretty-printed JS Document objects.
