@@ -27,19 +27,21 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "node": {
-        "import": "./browser/index.js",
-        "require": "./dist/index.js"
-      },
+      "node": "./dist/index.js",
       "default": "./browser/index.js"
     },
     "./package.json": "./package.json",
     "./util": {
       "types": "./dist/util.d.ts",
-      "node": {
-        "import": "./browser/dist/util.js",
-        "require": "./dist/util.js"
-      },
+      "node": "./dist/util.js",
+      "default": "./browser/dist/util.js"
+    },
+    "./esm": {
+      "types": "./dist/index.d.ts",
+      "default": "./browser/index.js"
+    },
+    "./esm/util": {
+      "types": "./dist/util.d.ts",
       "default": "./browser/dist/util.js"
     }
   },
