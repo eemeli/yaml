@@ -24,6 +24,7 @@ Usage:
 Options:
   --help, -h    Show this message.
   --json, -j    Output JSON.
+  --indent 2    Output pretty-printed data, indented by the given number of spaces.
 
 Additional options for bare "yaml" command:
   --doc, -d     Output pretty-printed JS Document objects.
@@ -55,6 +56,7 @@ export async function cli(
       options: {
         doc: { type: 'boolean', short: 'd' },
         help: { type: 'boolean', short: 'h' },
+        indent: { type: 'string', short: 'i' },
         json: { type: 'boolean', short: 'j' },
         single: { type: 'boolean', short: '1' },
         strict: { type: 'boolean', short: 's' },
@@ -70,6 +72,8 @@ export async function cli(
     positionals: [mode],
     values: opt
   } = args
+
+  let indent = Number(opt.indent)
 
   stdin.setEncoding('utf-8')
 
@@ -92,7 +96,7 @@ export async function cli(
       })
       stdin.on('end', () => {
         for (const tok of lexer.lex('', false)) add(tok)
-        if (opt.json) console.log(JSON.stringify(data))
+        if (opt.json) console.log(JSON.stringify(data, null, indent))
         done()
       })
       break
@@ -110,7 +114,7 @@ export async function cli(
       })
       stdin.on('end', () => {
         for (const tok of parser.parse('', false)) add(tok)
-        if (opt.json) console.log(JSON.stringify(data))
+        if (opt.json) console.log(JSON.stringify(data, null, indent))
         done()
       })
       break
@@ -159,7 +163,8 @@ export async function cli(
         } else {
           if (reqDocEnd) console.log('...')
           try {
-            const str = String(doc)
+            indent ||= 2
+            const str = doc.toString({ indent })
             console.log(str.endsWith('\n') ? str.slice(0, -1) : str)
           } catch (error) {
             done(error as Error)
@@ -188,7 +193,7 @@ export async function cli(
           )
         }
         if (mode !== 'valid' && opt.json) {
-          console.log(JSON.stringify(opt.single ? data[0] : data))
+          console.log(JSON.stringify(opt.single ? data[0] : data, null, indent))
         }
         done()
       })
