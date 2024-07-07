@@ -147,7 +147,7 @@ const skip = Number(major) < 20
       )
       ok(
         'CST parser',
-        'hello: world',
+        'hello: world\n',
         ['cst', '--json', '--indent', '2'],
         [JSON.stringify([
           {
