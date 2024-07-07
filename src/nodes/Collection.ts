@@ -45,8 +45,6 @@ export const isEmptyPath = (
   (typeof path === 'object' && !!path[Symbol.iterator]().next().done)
 
 export abstract class Collection extends NodeBase {
-  static maxFlowStringSingleLineLength = 60
-
   schema: Schema | undefined;
 
   declare [NODE_TYPE]: symbol
