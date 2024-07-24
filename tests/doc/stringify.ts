@@ -920,6 +920,13 @@ describe('lineWidth', () => {
       "[ 'Sed', 'ut', 'perspiciatis', 'unde', 'omnis', 'iste', 'natus', 'error', 'sit', 'voluptatem', 'accusantium', 'doloremque', 'laudantium,', 'totam' ]\n"
     )
   })
+
+  test('less than minContentWidth (eemeli/yaml#562)', () => {
+    const doc = YAML.parseDocument('>\ntest test test test test')
+    expect(doc.toString({ lineWidth: 18, minContentWidth: 20 })).toBe(
+      '>\ntest test test\ntest test\n'
+    )
+  })
 })
 
 describe('collectionStyle', () => {

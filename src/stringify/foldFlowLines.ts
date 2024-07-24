@@ -51,6 +51,7 @@ export function foldFlowLines(
   }: FoldOptions = {}
 ) {
   if (!lineWidth || lineWidth < 0) return text
+  if (lineWidth < minContentWidth) minContentWidth = 0
   const endStep = Math.max(1 + minContentWidth, 1 + lineWidth - indent.length)
   if (text.length <= endStep) return text
   const folds = []
