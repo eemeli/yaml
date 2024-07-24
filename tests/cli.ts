@@ -143,63 +143,71 @@ const skip = Number(major) < 20
         'Lexer',
         'hello: world',
         ['lex', '--json', '--indent', '2'],
-        ['[\n  "\\u0002",\n  "\\u001f",\n  "hello",\n  ":",\n  " ",\n  "\\u001f",\n  "world"\n]']
+        [
+          '[\n  "\\u0002",\n  "\\u001f",\n  "hello",\n  ":",\n  " ",\n  "\\u001f",\n  "world"\n]'
+        ]
       )
       ok(
         'CST parser',
         'hello: world\n',
         ['cst', '--json', '--indent', '2'],
-        [JSON.stringify([
-          {
-            type: 'document',
-            offset: 0,
-            start: [],
-            value: {
-              type: 'block-map',
-              offset: 0,
-              indent: 0,
-              items: [
-                {
-                  start: [],
-                  key: {
-                    type: 'scalar',
-                    offset: 0,
-                    indent: 0,
-                    source: 'hello'
-                  },
-                  sep: [
+        [
+          JSON.stringify(
+            [
+              {
+                type: 'document',
+                offset: 0,
+                start: [],
+                value: {
+                  type: 'block-map',
+                  offset: 0,
+                  indent: 0,
+                  items: [
                     {
-                      type: 'map-value-ind',
-                      offset: 5,
-                      indent: 0,
-                      source: ':'
-                    },
-                    {
-                      type: "space",
-                      offset: 6,
-                      indent: 0,
-                      source: ' '
-                    }
-                  ],
-                  value: {
-                    type: 'scalar',
-                    offset: 7,
-                    indent: 0,
-                    source: 'world',
-                    end: [
-                      {
-                        type: 'newline',
-                        offset: 12,
+                      start: [],
+                      key: {
+                        type: 'scalar',
+                        offset: 0,
                         indent: 0,
-                        source: '\n'
+                        source: 'hello'
+                      },
+                      sep: [
+                        {
+                          type: 'map-value-ind',
+                          offset: 5,
+                          indent: 0,
+                          source: ':'
+                        },
+                        {
+                          type: 'space',
+                          offset: 6,
+                          indent: 0,
+                          source: ' '
+                        }
+                      ],
+                      value: {
+                        type: 'scalar',
+                        offset: 7,
+                        indent: 0,
+                        source: 'world',
+                        end: [
+                          {
+                            type: 'newline',
+                            offset: 12,
+                            indent: 0,
+                            source: '\n'
+                          }
+                        ]
                       }
-                    ]
-                  }
+                    }
+                  ]
                 }
-              ]
-            }
-          }
-        ], null, 2)]
+              }
+            ],
+            null,
+            2
+          )
+        ]
       )
     })
     describe('--doc', () => {

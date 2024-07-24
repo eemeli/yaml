@@ -70,7 +70,7 @@ export function composeCollection(
         ? anchor.offset > tagToken.offset
           ? anchor
           : tagToken
-        : anchor ?? tagToken
+        : (anchor ?? tagToken)
     if (lastProp && (!nl || nl.offset < lastProp.offset)) {
       const message = 'Missing newline after block sequence props'
       onError(lastProp, 'MISSING_CHAR', message)
