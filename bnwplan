@@ -1,0 +1,24 @@
+openapi: 3.1.0
+info:
+  title: Google Sheets Data API
+  description: API for getting data from Google Sheets
+  version: v1.0.0
+servers:
+  - url: 'https://script.google.com/macros/s/AKfycbxwI9uRlPCQdt3sSg4_4YxwGzjkeqmi10ixGoUr0ri9322ZBlNqNDN6GJ0W7TkQ-YaQ/exec'
+paths:
+  /getGoogleSheetData:
+    get:
+      summary: Get data from Google Sheets
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: string
+components:
+  schemas: {}
