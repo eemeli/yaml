@@ -16,7 +16,6 @@ export default {
     }),
     babel({
       babelHelpers: 'bundled',
-      configFile: './config/babel.config.js',
       presets: [['@babel/env', { modules: false }]]
     }),
     typescript({ declaration: false, outDir: 'browser/dist' })

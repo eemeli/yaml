@@ -1,9 +1,22 @@
 let moduleNameMapper
+
+const babel = [
+  'babel-jest',
+  {
+    overrides: [
+      {
+        test: '**/*.ts',
+        plugins: [
+          ['@babel/plugin-transform-typescript', { allowDeclareFields: true }]
+        ]
+      }
+    ],
+    presets: [['@babel/env', { targets: { node: 'current' } }]]
+  }
+]
+
 const transform = {
-  '[/\\\\]tests[/\\\\].*\\.(m?js|ts)$': [
-    'babel-jest',
-    { configFile: './config/babel.config.js' }
-  ]
+  '[/\\\\]tests[/\\\\].*\\.(m?js|ts)$': babel
 }
 
 // The npm script name is significant.
@@ -16,10 +29,7 @@ switch (process.env.npm_lifecycle_event) {
       '^yaml/util$': '<rootDir>/dist/util.js',
       '^../src/test-events$': '<rootDir>/dist/test-events.js'
     }
-    transform['[/\\\\]dist[/\\\\].*\\.mjs$'] = [
-      'babel-jest',
-      { configFile: './config/babel.config.js' }
-    ]
+    transform['[/\\\\]dist[/\\\\].*\\.mjs$'] = babel
     break
 
   case 'test':
@@ -30,10 +40,7 @@ switch (process.env.npm_lifecycle_event) {
       '^yaml/cli$': '<rootDir>/src/cli.ts',
       '^yaml/util$': '<rootDir>/src/util.ts'
     }
-    transform['[/\\\\]src[/\\\\].*\\.ts$'] = [
-      'babel-jest',
-      { configFile: './config/babel.config.js' }
-    ]
+    transform['[/\\\\]src[/\\\\].*\\.ts$'] = babel
 }
 
 module.exports = {
