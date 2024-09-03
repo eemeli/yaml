@@ -77,6 +77,7 @@ export function createNode(
   let tagObj = findTagObject(value, tagName, schema.tags)
   if (!tagObj) {
     if (value && typeof (value as any).toJSON === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       value = (value as any).toJSON()
     }
     if (!value || typeof value !== 'object') {

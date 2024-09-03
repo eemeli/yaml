@@ -41,7 +41,7 @@ const skip = Number(major) < 20
           }
         },
         args
-      )
+      ).catch(done)
     })
   }
 
@@ -67,7 +67,7 @@ const skip = Number(major) < 20
           }
         },
         args
-      )
+      ).catch(done)
     })
   }
 

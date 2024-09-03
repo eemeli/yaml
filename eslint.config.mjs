@@ -18,7 +18,7 @@ export default [
     ]
   },
   eslint.configs.recommended,
-  ...typescript.configs.recommended,
+  ...typescript.configs.recommendedTypeChecked,
   prettierConfig,
   {
     languageOptions: {
@@ -43,6 +43,9 @@ export default [
       'prefer-const': ['warn', { destructuring: 'all' }],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         { argsIgnorePattern: '^_' }
@@ -52,7 +55,8 @@ export default [
         'warn',
         { ignoreMixedLogicalExpressions: true }
       ],
-      '@typescript-eslint/prefer-optional-chain': 'warn'
+      '@typescript-eslint/prefer-optional-chain': 'warn',
+      '@typescript-eslint/restrict-template-expressions': 'off'
     }
   },
 
@@ -63,6 +67,11 @@ export default [
 
   {
     files: ['tests/**'],
-    rules: { camelcase: 0 }
+    rules: {
+      camelcase: 0,
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/unbound-method': 'off'
+    }
   }
 ]
