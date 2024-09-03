@@ -392,6 +392,12 @@ describe('maps with no values', () => {
     expect(doc.range).toEqual([0, 4, 4])
   })
 
+  test('pair in flow seq has correct range (#573)', () => {
+    const doc = YAML.parseDocument<any, false>('[a:]')
+    expect(doc.range).toEqual([0, 4, 4])
+    expect(doc.get(0).range).toEqual([1, 3, 3])
+  })
+
   test('implicit scalar key after explicit key with no value', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\nx:\n')
     expect(doc.contents.items).toMatchObject([

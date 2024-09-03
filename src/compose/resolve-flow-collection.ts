@@ -198,6 +198,8 @@ export function resolveFlowCollection(
         const map = new YAMLMap(ctx.schema)
         map.flow = true
         map.items.push(pair)
+        const endRange = (valueNode ?? keyNode).range
+        map.range = [keyNode.range[0], endRange[1], endRange[2]]
         ;(coll as YAMLSeq).items.push(map)
       }
       offset = valueNode ? valueNode.range[2] : valueProps.end
