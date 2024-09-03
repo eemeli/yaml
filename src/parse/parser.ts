@@ -621,7 +621,9 @@ export class Parser {
               const sep = it.sep
               sep.push(this.sourceToken)
               // @ts-expect-error type guard is wrong here
-              delete it.key, delete it.sep
+              delete it.key
+              // @ts-expect-error type guard is wrong here
+              delete it.sep
               this.stack.push({
                 type: 'block-map',
                 offset: this.offset,

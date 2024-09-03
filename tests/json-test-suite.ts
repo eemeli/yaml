@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-
 import { readdirSync, readFileSync } from 'fs'
 import { basename, resolve } from 'path'
 import { parseDocument } from 'yaml'

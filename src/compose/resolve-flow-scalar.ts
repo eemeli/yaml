@@ -114,7 +114,7 @@ function foldLines(source: string) {
   try {
     first = new RegExp('(.*?)(?<![ \t])[ \t]*\r?\n', 'sy')
     line = new RegExp('[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?\r?\n', 'sy')
-  } catch (_) {
+  } catch {
     first = /(.*?)[ \t]*\r?\n/sy
     line = /[ \t]*(.*?)[ \t]*\r?\n/sy
   }

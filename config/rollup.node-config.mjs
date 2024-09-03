@@ -1,4 +1,3 @@
-import { chmod, stat } from 'node:fs/promises'
 import typescript from '@rollup/plugin-typescript'
 
 export default [

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
 import { Readable } from 'node:stream'
 import { cli } from 'yaml/cli'
 
