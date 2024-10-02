@@ -83,12 +83,18 @@ export const timestamp: ScalarTag & { test: RegExp } = {
   // may be omitted altogether, resulting in a date format. In such a case, the time part is
   // assumed to be 00:00:00Z (start of day, UTC).
   test: RegExp(
-    '^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})' + // YYYY-Mm-Dd
+    '^([0-9]{4})-?([0-9]{1,2})-?([0-9]{1,2})' + // YYYY-?Mm-?Dd
       '(?:' + // time is optional
       '(?:t|T|[ \\t]+)' + // t | T | whitespace
-      '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2}(\\.[0-9]+)?)' + // Hh:Mm:Ss(.ss)?
-      '(?:[ \\t]*(Z|[-+][012]?[0-9](?::[0-9]{2})?))?' + // Z | +5 | -03:30
-      ')?$'
+      '([0-9]{1,2})' + // Hh
+      '(?:' + // minutes are optional
+      ':?([0-9]{1,2})' + // :?Mm
+      '(?:' + // seconds are optionals
+      ':?([0-9]{1,2}(\\.[0-9]{1,3})?)' + // :?Ss(.sss)?
+      ')?' + // end seconds
+      ')?' + // end minutes
+      '(?:[ \\t]*(Z|[-+][012]?[0-9](?::?[0-9]{2})?))?' + // Z | +5 | -03:30
+      ')?$' // end time
   ),
 
   resolve(str) {
@@ -116,5 +122,5 @@ export const timestamp: ScalarTag & { test: RegExp } = {
   },
 
   stringify: ({ value }) =>
-    (value as Date).toISOString().replace(/((T00:00)?:00)?\.000Z$/, '')
+    (value as Date).toISOString().replace(/(((T00)?:00)?:00)?\.000Z$/, '')
 }
