@@ -28,6 +28,7 @@ export function composeDoc<
   const opts = Object.assign({ _directives: directives }, options)
   const doc = new Document(undefined, opts) as Document.Parsed<Contents, Strict>
   const ctx: ComposeContext = {
+    atKey: false,
     atRoot: true,
     directives: doc.directives,
     options: doc.options,

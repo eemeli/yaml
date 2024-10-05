@@ -6,6 +6,7 @@ import { binary } from './binary.js'
 import { falseTag, trueTag } from './bool.js'
 import { float, floatExp, floatNaN } from './float.js'
 import { intBin, int, intHex, intOct } from './int.js'
+import { merge } from './merge.js'
 import { omap } from './omap.js'
 import { pairs } from './pairs.js'
 import { set } from './set.js'
@@ -26,6 +27,7 @@ export const schema = [
   floatExp,
   float,
   binary,
+  merge,
   omap,
   pairs,
   set,

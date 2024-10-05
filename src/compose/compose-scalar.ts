@@ -87,14 +87,16 @@ function findScalarTagByName(
 }
 
 function findScalarTagByTest(
-  { directives, schema }: ComposeContext,
+  { atKey, directives, schema }: ComposeContext,
   value: string,
   token: FlowScalar,
   onError: ComposeErrorHandler
 ) {
   const tag =
     (schema.tags.find(
-      tag => tag.default && tag.test?.test(value)
+      tag =>
+        (tag.default === true || (atKey && tag.default === 'key')) &&
+        tag.test?.test(value)
     ) as ScalarTag) || schema[SCALAR]
 
   if (schema.compat) {

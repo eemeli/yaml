@@ -7,7 +7,7 @@ import type { Alias } from './Alias.js'
 import { isDocument, NODE_TYPE } from './identity.js'
 import type { Scalar } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
-import type { YAMLMap } from './YAMLMap.js'
+import type { MapLike, YAMLMap } from './YAMLMap.js'
 import type { YAMLSeq } from './YAMLSeq.js'
 
 export type Node<T = unknown> =
@@ -69,6 +69,16 @@ export abstract class NodeBase {
 
   /** A fully qualified tag, if required */
   declare tag?: string
+
+  /**
+   * Customize the way that a key-value pair is resolved.
+   * Used for YAML 1.1 !!merge << handling.
+   */
+  declare addToJSMap?: (
+    ctx: ToJSContext | undefined,
+    map: MapLike,
+    value: unknown
+  ) => void
 
   /** A plain JS representation of this node */
   abstract toJSON(): any

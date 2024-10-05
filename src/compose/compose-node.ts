@@ -11,6 +11,7 @@ import { resolveEnd } from './resolve-end.js'
 import { emptyScalarPosition } from './util-empty-scalar-position.js'
 
 export interface ComposeContext {
+  atKey: boolean
   atRoot: boolean
   directives: Directives
   options: Readonly<Required<Omit<ParseOptions, 'lineCounter'>>>

@@ -14,10 +14,6 @@ export function mapIncludes(
     typeof uniqueKeys === 'function'
       ? uniqueKeys
       : (a: ParsedNode, b: ParsedNode) =>
-          a === b ||
-          (isScalar(a) &&
-            isScalar(b) &&
-            a.value === b.value &&
-            !(a.value === '<<' && ctx.schema.merge))
+          a === b || (isScalar(a) && isScalar(b) && a.value === b.value)
   return items.some(pair => isEqual(pair.key, search))
 }

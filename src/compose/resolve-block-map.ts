@@ -69,11 +69,13 @@ export function resolveBlockMap(
     }
 
     // key value
+    ctx.atKey = true
     const keyStart = keyProps.end
     const keyNode = key
       ? composeNode(ctx, key, keyProps, onError)
       : composeEmptyNode(ctx, keyStart, start, null, keyProps, onError)
     if (ctx.schema.compat) flowIndentCheck(bm.indent, key, onError)
+    ctx.atKey = false
 
     if (mapIncludes(ctx, map.items, keyNode))
       onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')

@@ -32,6 +32,7 @@ export function resolveFlowCollection(
   coll.flow = true
   const atRoot = ctx.atRoot
   if (atRoot) ctx.atRoot = false
+  if (ctx.atKey) ctx.atKey = false
 
   let offset = fc.offset + fc.start.source.length
   for (let i = 0; i < fc.items.length; ++i) {
@@ -118,11 +119,13 @@ export function resolveFlowCollection(
       // item is a key+value pair
 
       // key value
+      ctx.atKey = true
       const keyStart = props.end
       const keyNode = key
         ? composeNode(ctx, key, props, onError)
         : composeEmptyNode(ctx, keyStart, start, null, props, onError)
       if (isBlock(key)) onError(keyNode.range, 'BLOCK_IN_FLOW', blockMsg)
+      ctx.atKey = false
 
       // value properties
       const valueProps = resolveProps(sep ?? [], {

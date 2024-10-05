@@ -1,25 +1,20 @@
 import { warn } from '../log.js'
+import { addMergeToJSMap, isMergeKey } from '../schema/yaml-1.1/merge.js'
 import { createStringifyContext } from '../stringify/stringify.js'
-import { isAlias, isMap, isNode, isScalar, isSeq } from './identity.js'
+import { isNode } from './identity.js'
 import type { Pair } from './Pair.js'
-import { Scalar } from './Scalar.js'
 import { toJS, ToJSContext } from './toJS.js'
 import type { MapLike } from './YAMLMap.js'
-
-const MERGE_KEY = '<<'
 
 export function addPairToJSMap(
   ctx: ToJSContext | undefined,
   map: MapLike,
   { key, value }: Pair
 ) {
-  if (ctx?.doc.schema.merge && isMergeKey(key)) {
-    value = isAlias(value) ? value.resolve(ctx.doc) : value
-    if (isSeq(value)) for (const it of value.items) mergeToJSMap(ctx, map, it)
-    else if (Array.isArray(value))
-      for (const it of value) mergeToJSMap(ctx, map, it)
-    else mergeToJSMap(ctx, map, value)
-  } else {
+  if (isNode(key) && key.addToJSMap) key.addToJSMap(ctx, map, value)
+  // TODO: Should drop this special case for bare << handling
+  else if (isMergeKey(ctx, key)) addMergeToJSMap(ctx, map, value)
+  else {
     const jsKey = toJS(key, '', ctx)
     if (map instanceof Map) {
       map.set(jsKey, toJS(value, jsKey, ctx))
@@ -36,45 +31,6 @@ export function addPairToJSMap(
           configurable: true
         })
       else map[stringKey] = jsValue
-    }
-  }
-  return map
-}
-
-const isMergeKey = (key: unknown) =>
-  key === MERGE_KEY ||
-  (isScalar(key) &&
-    key.value === MERGE_KEY &&
-    (!key.type || key.type === Scalar.PLAIN))
-
-// If the value associated with a merge key is a single mapping node, each of
-// its key/value pairs is inserted into the current mapping, unless the key
-// already exists in it. If the value associated with the merge key is a
-// sequence, then this sequence is expected to contain mapping nodes and each
-// of these nodes is merged in turn according to its order in the sequence.
-// Keys in mapping nodes earlier in the sequence override keys specified in
-// later mapping nodes. -- http://yaml.org/type/merge.html
-function mergeToJSMap(
-  ctx: ToJSContext | undefined,
-  map: MapLike,
-  value: unknown
-) {
-  const source = ctx && isAlias(value) ? value.resolve(ctx.doc) : value
-  if (!isMap(source))
-    throw new Error('Merge sources must be maps or map aliases')
-  const srcMap = source.toJSON(null, ctx, Map)
-  for (const [key, value] of srcMap) {
-    if (map instanceof Map) {
-      if (!map.has(key)) map.set(key, value)
-    } else if (map instanceof Set) {
-      map.add(key)
-    } else if (!Object.prototype.hasOwnProperty.call(map, key)) {
-      Object.defineProperty(map, key, {
-        value,
-        writable: true,
-        enumerable: true,
-        configurable: true
-      })
     }
   }
   return map

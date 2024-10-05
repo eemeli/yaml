@@ -211,13 +211,21 @@ describe('merge <<', () => {
   << : [ *CENTER, *BIG ]
   label: center/big
 
-- # Override
-  << : [ *BIG, *LEFT, *SMALL ]
+- # Override with explicit tag
+  !!merge << : [ *BIG, *LEFT, *SMALL ]
   x: 1
   label: center/big`
 
-  test('YAML.parse', () => {
+  test('YAML.parse with merge:true', () => {
     const res = parse(src, { merge: true })
+    expect(res).toHaveLength(8)
+    for (let i = 4; i < res.length; ++i) {
+      expect(res[i]).toMatchObject({ x: 1, y: 2, r: 10, label: 'center/big' })
+    }
+  })
+
+  test('YAML.parse with customTags:["merge"]', () => {
+    const res = parse(src, { customTags: ['merge'] })
     expect(res).toHaveLength(8)
     for (let i = 4; i < res.length; ++i) {
       expect(res[i]).toMatchObject({ x: 1, y: 2, r: 10, label: 'center/big' })
@@ -227,9 +235,10 @@ describe('merge <<', () => {
   test('YAML.parse with merge:false', () => {
     const res = parse(src)
     expect(res).toHaveLength(8)
-    for (let i = 5; i < res.length; ++i) {
+    for (let i = 5; i < res.length - 1; ++i) {
       expect(res[i]).toHaveProperty('<<')
     }
+    expect(res.at(-1)).toMatchObject({ x: 1, y: 2, r: 10, label: 'center/big' })
   })
 
   test('YAML.parseDocument', () => {
@@ -279,6 +288,30 @@ describe('merge <<', () => {
       )
       const [a, b] = doc.contents.items
       const merge = doc.createPair('<<', doc.createAlias(a))
+      b.items.push(merge)
+      expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
+      expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
+    })
+
+    test('using customTags:["merge"]', () => {
+      const doc = parseDocument<YAMLSeq<YAMLMap>, false>(
+        '[{ a: A }, { b: B }]',
+        { customTags: ['merge'] }
+      )
+      const [a, b] = doc.contents.items
+      const merge = doc.createPair('<<', doc.createAlias(a))
+      b.items.push(merge)
+      expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
+      expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
+    })
+
+    test('symbol value', () => {
+      const doc = parseDocument<YAMLSeq<YAMLMap>, false>(
+        '[{ a: A }, { b: B }]',
+        { merge: true }
+      )
+      const [a, b] = doc.contents.items
+      const merge = doc.createPair(Symbol('<<'), doc.createAlias(a))
       b.items.push(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
