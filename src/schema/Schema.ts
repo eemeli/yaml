@@ -13,7 +13,6 @@ const sortMapEntriesByKey = (a: Pair<any>, b: Pair<any>) =>
 export class Schema {
   compat: Array<CollectionTag | ScalarTag> | null
   knownTags: Record<string, CollectionTag | ScalarTag>
-  merge: boolean
   name: string
   sortMapEntries: ((a: Pair, b: Pair) => number) | null
   tags: Array<CollectionTag | ScalarTag>
@@ -38,10 +37,9 @@ export class Schema {
       : compat
         ? getTags(null, compat)
         : null
-    this.merge = !!merge
     this.name = (typeof schema === 'string' && schema) || 'core'
     this.knownTags = resolveKnownTags ? coreKnownTags : {}
-    this.tags = getTags(customTags, this.name)
+    this.tags = getTags(customTags, this.name, merge)
     this.toStringOptions = toStringDefaults ?? null
 
     Object.defineProperty(this, MAP, { value: map })

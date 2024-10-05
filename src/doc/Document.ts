@@ -383,13 +383,13 @@ export class Document<
       case '1.1':
         if (this.directives) this.directives.yaml.version = '1.1'
         else this.directives = new Directives({ version: '1.1' })
-        opt = { merge: true, resolveKnownTags: false, schema: 'yaml-1.1' }
+        opt = { resolveKnownTags: false, schema: 'yaml-1.1' }
         break
       case '1.2':
       case 'next':
         if (this.directives) this.directives.yaml.version = version
         else this.directives = new Directives({ version })
-        opt = { merge: false, resolveKnownTags: true, schema: 'core' }
+        opt = { resolveKnownTags: true, schema: 'core' }
         break
       case null:
         if (this.directives) delete this.directives

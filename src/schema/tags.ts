@@ -9,6 +9,7 @@ import { int, intHex, intOct } from './core/int.js'
 import { schema as core } from './core/schema.js'
 import { schema as json } from './json/schema.js'
 import { binary } from './yaml-1.1/binary.js'
+import { merge } from './yaml-1.1/merge.js'
 import { omap } from './yaml-1.1/omap.js'
 import { pairs } from './yaml-1.1/pairs.js'
 import { schema as yaml11 } from './yaml-1.1/schema.js'
@@ -36,6 +37,7 @@ const tagsByName = {
   intOct,
   intTime,
   map,
+  merge,
   null: nullTag,
   omap,
   pairs,
@@ -50,6 +52,7 @@ export type Tags = Array<ScalarTag | CollectionTag | TagId>
 
 export const coreKnownTags = {
   'tag:yaml.org,2002:binary': binary,
+  'tag:yaml.org,2002:merge': merge,
   'tag:yaml.org,2002:omap': omap,
   'tag:yaml.org,2002:pairs': pairs,
   'tag:yaml.org,2002:set': set,
@@ -58,9 +61,17 @@ export const coreKnownTags = {
 
 export function getTags(
   customTags: SchemaOptions['customTags'] | undefined,
-  schemaName: string
+  schemaName: string,
+  addMergeTag?: boolean
 ) {
-  let tags: Tags | undefined = schemas.get(schemaName)
+  const schemaTags = schemas.get(schemaName)
+  if (schemaTags && !customTags) {
+    return addMergeTag && !schemaTags.includes(merge)
+      ? schemaTags.concat(merge)
+      : schemaTags.slice()
+  }
+
+  let tags: Tags | undefined = schemaTags
   if (!tags) {
     if (Array.isArray(customTags)) tags = []
     else {
@@ -79,14 +90,18 @@ export function getTags(
   } else if (typeof customTags === 'function') {
     tags = customTags(tags.slice())
   }
+  if (addMergeTag) tags = tags.concat(merge)
 
-  return tags.map(tag => {
-    if (typeof tag !== 'string') return tag
-    const tagObj = tagsByName[tag]
-    if (tagObj) return tagObj
-    const keys = Object.keys(tagsByName)
-      .map(key => JSON.stringify(key))
-      .join(', ')
-    throw new Error(`Unknown custom tag "${tag}"; use one of ${keys}`)
-  })
+  return tags.reduce<(CollectionTag | ScalarTag)[]>((tags, tag) => {
+    const tagObj = typeof tag === 'string' ? tagsByName[tag] : tag
+    if (!tagObj) {
+      const tagName = JSON.stringify(tag)
+      const keys = Object.keys(tagsByName)
+        .map(key => JSON.stringify(key))
+        .join(', ')
+      throw new Error(`Unknown custom tag ${tagName}; use one of ${keys}`)
+    }
+    if (!tags.includes(tagObj)) tags.push(tagObj)
+    return tags
+  }, [])
 }

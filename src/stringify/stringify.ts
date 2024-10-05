@@ -96,7 +96,11 @@ function getTagObject(tags: Array<ScalarTag | CollectionTag>, item: Node) {
   let obj: unknown
   if (isScalar(item)) {
     obj = item.value
-    const match = tags.filter(t => t.identify?.(obj))
+    let match = tags.filter(t => t.identify?.(obj))
+    if (match.length > 1) {
+      const testMatch = match.filter(t => t.test)
+      if (testMatch.length > 0) match = testMatch
+    }
     tagObj =
       match.find(t => t.format === item.format) ?? match.find(t => !t.format)
   } else {

@@ -17,6 +17,7 @@ export function resolveBlockSeq(
   const seq = new NodeClass(ctx.schema) as YAMLSeq
 
   if (ctx.atRoot) ctx.atRoot = false
+  if (ctx.atKey) ctx.atKey = false
   let offset = bs.offset
   let commentEnd: number | null = null
   for (const { start, value } of bs.items) {

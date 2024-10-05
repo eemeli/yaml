@@ -14,11 +14,13 @@ interface TagBase {
   createNode?: (schema: Schema, value: unknown, ctx: CreateNodeContext) => Node
 
   /**
-   * If `true`, together with `test` allows for values to be stringified without
-   * an explicit tag. For most cases, it's unlikely that you'll actually want to
-   * use this, even if you first think you do.
+   * If `true`, allows for values to be stringified without
+   * an explicit tag together with `test`.
+   * If `'key'`, this only applies if the value is used as a mapping key.
+   * For most cases, it's unlikely that you'll actually want to use this,
+   * even if you first think you do.
    */
-  default?: boolean
+  default?: boolean | 'key'
 
   /**
    * If a tag has multiple forms that should be parsed and/or stringified
