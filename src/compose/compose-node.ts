@@ -1,5 +1,6 @@
 import type { Directives } from '../doc/directives.js'
 import { Alias } from '../nodes/Alias.js'
+import { isScalar } from '../nodes/identity.js'
 import type { ParsedNode } from '../nodes/Node.js'
 import type { ParseOptions } from '../options.js'
 import type { FlowScalar, SourceToken, Token } from '../parse/cst.js'
@@ -36,6 +37,7 @@ export function composeNode(
   props: Props,
   onError: ComposeErrorHandler
 ) {
+  const atKey = ctx.atKey
   const { spaceBefore, comment, anchor, tag } = props
   let node: ParsedNode
   let isSrcToken = true
@@ -81,6 +83,16 @@ export function composeNode(
   }
   if (anchor && node.anchor === '')
     onError(anchor, 'BAD_ALIAS', 'Anchor cannot be an empty string')
+  if (
+    atKey &&
+    ctx.options.stringKeys &&
+    (!isScalar(node) ||
+      typeof node.value !== 'string' ||
+      (node.tag && node.tag !== 'tag:yaml.org,2002:str'))
+  ) {
+    const msg = 'With stringKeys, all keys must be strings'
+    onError(tag ?? token, 'NON_STRING_KEY', msg)
+  }
   if (spaceBefore) node.spaceBefore = true
   if (comment) {
     if (token.type === 'scalar' && token.source === '') node.comment = comment

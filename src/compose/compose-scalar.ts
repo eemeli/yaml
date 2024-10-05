@@ -24,12 +24,15 @@ export function composeScalar(
         onError(tagToken, 'TAG_RESOLVE_FAILED', msg)
       )
     : null
-  const tag =
-    tagToken && tagName
-      ? findScalarTagByName(ctx.schema, value, tagName, tagToken, onError)
-      : token.type === 'scalar'
-        ? findScalarTagByTest(ctx, value, token, onError)
-        : ctx.schema[SCALAR]
+
+  let tag: ScalarTag
+  if (ctx.options.stringKeys && ctx.atKey) {
+    tag = ctx.schema[SCALAR]
+  } else if (tagName)
+    tag = findScalarTagByName(ctx.schema, value, tagName, tagToken!, onError)
+  else if (token.type === 'scalar')
+    tag = findScalarTagByTest(ctx, value, token, onError)
+  else tag = ctx.schema[SCALAR]
 
   let scalar: Scalar
   try {
