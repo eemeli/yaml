@@ -37,7 +37,7 @@ The development and maintenance of this library is [sponsored](https://github.co
 </a>
 
 <a href="https://manifest.build/">
-<img width=150 src="https://eemeli.org/yaml/images/manifest.png" alt="Manifest" />
+<img width=150 src="https://eemeli.org/yaml/images/manifest-d7a58dae.png" alt="Manifest" />
 </a>
 
 </div>
