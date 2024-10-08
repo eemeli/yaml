@@ -356,7 +356,7 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <td>minContentWidth</td>
 <td><code>number</code></td>
 <td><code>20</code></td>
-<td>Minimum line width for highly-indented content (set to <code>0</code> to disable).</td>
+<td>Minimum line width for highly-indented content (set to <code>0</code> to disable). Ignored if greater than lineWidth.</td>
 </tr>
 <tr>
 <td>nullStr</td>

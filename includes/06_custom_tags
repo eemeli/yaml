@@ -132,6 +132,12 @@
 <td>Sexagesimal integer number format, e.g. <code>190:20:30</code>. To stringify with this tag, the node <code>format</code> must be <code>&#39;TIME&#39;</code>.</td>
 </tr>
 <tr>
+<td><code>&#39;merge&#39;</code></td>
+<td><a href="https://yaml.org/type/merge.html"><code>!!merge</code></a></td>
+<td><code>Symbol(&#39;&lt;&lt;&#39;)</code></td>
+<td>A <code>&lt;&lt;</code> merge key which allows one or more mappings to be merged with the current one.</td>
+</tr>
+<tr>
 <td><code>&#39;omap&#39;</code></td>
 <td><a href="https://yaml.org/type/omap.html"><code>!!omap</code></a></td>
 <td><code>Map</code></td>
