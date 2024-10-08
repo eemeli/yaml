@@ -30,9 +30,17 @@ npm install yaml
 
 The development and maintenance of this library is [sponsored](https://github.com/sponsors/eemeli) by:
 
+<div style="display: flex; justify-content: space-around">
+
 <a href="https://www.scipress.io/">
 <img width=150 src="https://eemeli.org/yaml/images/scipress.svg" alt="Scipress" />
 </a>
+
+<a href="https://manifest.build/">
+<img width=150 src="https://eemeli.org/yaml/images/manifest.png" alt="Manifest" />
+</a>
+
+</div>
 
 ## API Overview
 
