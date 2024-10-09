@@ -660,6 +660,9 @@ english: null
 ---
 canonical:        2001-12-15T02:59:43.1Z
 valid iso8601:    2001-12-14t21:59:43.10-05:00
+no secs:          2001-12-14T01:02
+no mins:          2001-12-14T01
+simplified iso:   20011214T215943.10-5
 space separated:  2001-12-14 21:59:43.10 -5
 no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
@@ -671,6 +674,9 @@ date (00:00:00Z): 2002-12-14`
       expect(doc.toJSON()).toMatchObject({
         canonical: '2001-12-15T02:59:43.100Z',
         'valid iso8601': '2001-12-15T02:59:43.100Z',
+        'no secs': '2001-12-14T01:02:00.000Z',
+        'no mins': '2001-12-14T01:00:00.000Z',
+        'simplified iso': '2001-12-15T02:59:43.100Z',
         'space separated': '2001-12-15T02:59:43.100Z',
         'no time zone (Z)': '2001-12-15T02:59:43.100Z',
         'date (00:00:00Z)': '2002-12-14T00:00:00.000Z'
@@ -679,6 +685,9 @@ date (00:00:00Z): 2002-12-14`
 ---
 canonical: 2001-12-15T02:59:43.100Z
 valid iso8601: 2001-12-15T02:59:43.100Z
+no secs: 2001-12-14T01:02
+no mins: 2001-12-14T01
+simplified iso: 2001-12-15T02:59:43.100Z
 space separated: 2001-12-15T02:59:43.100Z
 no time zone (Z): 2001-12-15T02:59:43.100Z
 date (00:00:00Z): 2002-12-14\n`)
