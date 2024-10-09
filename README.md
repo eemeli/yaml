@@ -43,7 +43,7 @@ The development and maintenance of this library is [sponsored](https://github.co
     ><img
       width="150"
       align="top"
-      src="https://eemeli.org/yaml/images/manifest-d7a58dae.png"
+      src="https://eemeli.org/yaml/images/manifest.svg"
       alt="Manifest"
   /></a>
 </p>
