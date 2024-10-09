@@ -39,13 +39,12 @@ The development and maintenance of this library is [sponsored](https://github.co
       alt="Scipress"
   /></a>
   &nbsp; &nbsp;
-  <a href="https://manifest.build/"
-    ><img
-      width="150"
-      align="top"
-      src="https://eemeli.org/yaml/images/manifest-d7a58dae.png"
-      alt="Manifest"
-  /></a>
+  <a href="https://manifest.build/#gh-light-mode-only">
+    <img alt="manifest" src="https://eemeli.org/yaml/images/manifest-transparent.svg" width="150px" alt="Manifest logo" title="Manifest - A backend so simple that it fits into a single YAML file" />
+  </a>s
+  <a href="https://manifest.build/#gh-dark-mode-only">
+    <img alt="manifest" src="https://eemeli.org/yaml/images/manifest-light.svg" width="150px" alt="Manifest logo" title="Manifest - A backend so simple that it fits into a single YAML file" />
+  </a>
 </p>
 
 ## API Overview
