@@ -33,7 +33,7 @@ The development and maintenance of this library is [sponsored](https://github.co
 <p align="center" width="100%">
   <a href="https://www.scipress.io/"
     ><img
-      width="166"
+      width="150"
       align="top"
       src="https://eemeli.org/yaml/images/scipress.svg"
       alt="Scipress"
@@ -41,7 +41,7 @@ The development and maintenance of this library is [sponsored](https://github.co
   &nbsp; &nbsp;
   <a href="https://manifest.build/"
     ><img
-      width="166"
+      width="150"
       align="top"
       src="https://eemeli.org/yaml/images/manifest.svg"
       alt="Manifest"
