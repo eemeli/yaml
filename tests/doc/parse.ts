@@ -880,3 +880,39 @@ describe('CRLF line endings', () => {
     expect(res).toBe('foo bar')
   })
 })
+
+describe('stringKeys', () => {
+  test('success', () => {
+    const doc = YAML.parseDocument<any>(
+      source`
+        x: x
+        !!str y: y
+        42: 42
+        true: true
+        null: null
+        ~: ~
+        :
+      `,
+      { stringKeys: true }
+    )
+    expect(doc.contents.items).toMatchObject([
+      { key: { value: 'x' }, value: { value: 'x' } },
+      { key: { value: 'y' }, value: { value: 'y' } },
+      { key: { value: '42' }, value: { value: 42 } },
+      { key: { value: 'true' }, value: { value: true } },
+      { key: { value: 'null' }, value: { value: null } },
+      { key: { value: '~' }, value: { value: null } },
+      { key: { value: '' }, value: { value: null } }
+    ])
+  })
+
+  test('explicit non-string tag', () => {
+    const doc = YAML.parseDocument('!!int 42: 42', { stringKeys: true })
+    expect(doc.errors).toMatchObject([{ code: 'NON_STRING_KEY' }])
+  })
+
+  test('collection key', () => {
+    const doc = YAML.parseDocument('{ x, y }: 42', { stringKeys: true })
+    expect(doc.errors).toMatchObject([{ code: 'NON_STRING_KEY' }])
+  })
+})
