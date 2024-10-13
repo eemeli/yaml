@@ -3,6 +3,7 @@ import type { Reviver } from './doc/applyReviver.js'
 import { Document, Replacer } from './doc/Document.js'
 import { prettifyError, YAMLParseError } from './errors.js'
 import { warn } from './log.js'
+import { isDocument } from './nodes/identity.js'
 import type { Node, ParsedNode } from './nodes/Node.js'
 import type {
   CreateNodeOptions,
@@ -225,5 +226,6 @@ export function stringify(
     const { keepUndefined } = options ?? (replacer as CreateNodeOptions) ?? {}
     if (!keepUndefined) return undefined
   }
+  if (isDocument(value) && !_replacer) return value.toString(options)
   return new Document(value, _replacer, options).toString(options)
 }

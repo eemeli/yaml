@@ -1405,6 +1405,12 @@ describe('YAML.stringify on ast Document', () => {
     const doc = YAML.parseDocument('null')
     expect(YAML.stringify(doc)).toBe('null\n')
   })
+
+  test('Document with comments', () => {
+    const src = 'a: 1\n\n# c\n'
+    const doc = YAML.parseDocument(src)
+    expect(YAML.stringify(doc)).toBe(src)
+  })
 })
 
 describe('flow collection padding', () => {
