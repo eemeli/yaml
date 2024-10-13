@@ -62,6 +62,10 @@ In particular, <code>TypeError</code> may occur when parsing invalid input using
 <td>An alias identifier must be a non-empty sequence of valid characters.</td>
 </tr>
 <tr>
+<td><code>BAD_COLLECTION_TYPE</code></td>
+<td>Explicit collection tag used on a collection type it does not support.</td>
+</tr>
+<tr>
 <td><code>BAD_DIRECTIVE</code></td>
 <td>Only the <code>%YAML</code> and <code>%TAG</code> directives are supported, and they need to follow the specified structure.</td>
 </tr>
@@ -102,10 +106,6 @@ In particular, <code>TypeError</code> may occur when parsing invalid input using
 <td>Due to legacy reasons, implicit keys must have their following <code>:</code> indicator after at most 1k characters.</td>
 </tr>
 <tr>
-<td><code>MISSING_ANCHOR</code></td>
-<td>Aliases can only dereference anchors that are before them in the document.</td>
-</tr>
-<tr>
 <td><code>MISSING_CHAR</code></td>
 <td>Some character or characters are missing here. See the error message for what you need to add.</td>
 </tr>
@@ -124,6 +124,10 @@ In particular, <code>TypeError</code> may occur when parsing invalid input using
 <tr>
 <td><code>MULTIPLE_TAGS</code></td>
 <td>A node is only allowed to have one tag.</td>
+</tr>
+<tr>
+<td><code>NON_STRING_KEY</code></td>
+<td>With the <code>stringKeys</code> option, all mapping keys must be strings</td>
 </tr>
 <tr>
 <td><code>TAB_AS_INDENT</code></td>

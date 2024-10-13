@@ -55,6 +55,12 @@ Options in various categories do not overlap, so it&#39;s fine to use a single &
 <td>When parsing, do not ignore errors <a href="#silencing-errors-and-warnings">required</a> by the YAML 1.2 spec, but caused by unambiguous content.</td>
 </tr>
 <tr>
+<td>stringKeys</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Parse all mapping keys as strings. Treat all non-scalar keys as errors.</td>
+</tr>
+<tr>
 <td>uniqueKeys</td>
 <td><code>boolean ⎮ (a, b) =&gt; boolean</code></td>
 <td><code>true</code></td>
