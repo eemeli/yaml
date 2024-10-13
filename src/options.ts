@@ -49,6 +49,13 @@ export type ParseOptions = {
   strict?: boolean
 
   /**
+   * Parse all mapping keys as strings. Treat all non-scalar keys as errors.
+   *
+   * Default: `false`
+   */
+  stringKeys?: boolean
+
+  /**
    * YAML requires map keys to be unique. By default, this is checked by
    * comparing scalar values with `===`; deep equality is not checked for
    * aliases or collections. If merge keys are enabled by the schema,

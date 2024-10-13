@@ -122,6 +122,7 @@ export class Document<
         logLevel: 'warn',
         prettyErrors: true,
         strict: true,
+        stringKeys: false,
         uniqueKeys: true,
         version: '1.2'
       },

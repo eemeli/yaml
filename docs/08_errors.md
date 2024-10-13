@@ -26,6 +26,7 @@ To identify errors for special handling, you should primarily use `code` to diff
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ALIAS_PROPS`            | Unlike scalars and collections, alias nodes cannot have an anchor or tag associated with it.                                                                                 |
 | `BAD_ALIAS`              | An alias identifier must be a non-empty sequence of valid characters.                                                                                                        |
+| `BAD_COLLECTION_TYPE`    | Explicit collection tag used on a collection type it does not support.                                                                                                       |
 | `BAD_DIRECTIVE`          | Only the `%YAML` and `%TAG` directives are supported, and they need to follow the specified structure.                                                                       |
 | `BAD_DQ_ESCAPE`          | Double-quotes strings may include `\` escaped content, but that needs to be valid.                                                                                           |
 | `BAD_INDENT`             | Indentation is important in YAML, and collection items need to all start at the same level. Block scalars are also picky about their leading content.                        |
@@ -36,12 +37,12 @@ To identify errors for special handling, you should primarily use `code` to diff
 | `DUPLICATE_KEY`          | Map keys must be unique. Use the `uniqueKeys` option to disable or customise this check when parsing.                                                                        |
 | `IMPOSSIBLE`             | This really should not happen. If you encounter this error code, please file a bug.                                                                                          |
 | `KEY_OVER_1024_CHARS`    | Due to legacy reasons, implicit keys must have their following `:` indicator after at most 1k characters.                                                                    |
-| `MISSING_ANCHOR`         | Aliases can only dereference anchors that are before them in the document.                                                                                                   |
 | `MISSING_CHAR`           | Some character or characters are missing here. See the error message for what you need to add.                                                                               |
 | `MULTILINE_IMPLICIT_KEY` | Implicit keys need to be on a single line. Does the input include a plain scalar with a `:` followed by whitespace, which is getting parsed as a map key?                    |
 | `MULTIPLE_ANCHORS`       | A node is only allowed to have one anchor.                                                                                                                                   |
 | `MULTIPLE_DOCS`          | A YAML stream may include multiple documents. If yours does, you'll need to use `parseAllDocuments()` to work with it.                                                       |
 | `MULTIPLE_TAGS`          | A node is only allowed to have one tag.                                                                                                                                      |
+| `NON_STRING_KEY`         | With the `stringKeys` option, all mapping keys must be strings                                                                                                               |
 | `TAB_AS_INDENT`          | Only spaces are allowed as indentation.                                                                                                                                      |
 | `TAG_RESOLVE_FAILED`     | Something went wrong when resolving a node's tag with the current schema.                                                                                                    |
 | `UNEXPECTED_TOKEN`       | A token was encountered in a place where it wasn't expected.                                                                                                                 |
