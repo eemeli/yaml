@@ -35,6 +35,14 @@
       "types": "./dist/util.d.ts",
       "node": "./dist/util.js",
       "default": "./browser/dist/util.js"
+    },
+    "./esm": {
+      "types": "./dist/index.d.ts",
+      "default": "./browser/index.js"
+    },
+    "./esm/util": {
+      "types": "./dist/util.d.ts",
+      "default": "./browser/dist/util.js"
     }
   },
   "scripts": {
