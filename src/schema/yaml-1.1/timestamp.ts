@@ -116,5 +116,5 @@ export const timestamp: ScalarTag & { test: RegExp } = {
   },
 
   stringify: ({ value }) =>
-    (value as Date).toISOString().replace(/((T00:00)?:00)?\.000Z$/, '')
+    (value as Date).toISOString().replace(/(T00:00:00)?\.000Z$/, '')
 }
