@@ -30,7 +30,7 @@ const jsonScalars: ScalarTag[] = [
     identify: value => typeof value === 'boolean',
     default: true,
     tag: 'tag:yaml.org,2002:bool',
-    test: /^true|false$/,
+    test: /^true$|^false$/,
     resolve: str => str === 'true',
     stringify: stringifyJSON
   },
