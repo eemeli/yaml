@@ -285,23 +285,23 @@ describe('json schema', () => {
     )
   })
 
-    test('!!bool: js-regex-missing-regexp-anchor', () => {
-    const src = `"canonical": true
+  test('!!bool: js-regex-missing-regexp-anchor', () => {
+    const src = `"canonical": truea
 "answer": ffalse
 "logical": Truea
 "option": TruEp`
 
     const doc = parseDocument(src, { schema: 'json' })
     expect(doc.toJS()).toMatchObject({
-      canonical: true,
+      canonical: 'truea',
       answer: 'ffalse',
       logical: 'Truea',
       option: 'TruEp'
     })
-    expect(doc.errors).toHaveLength(3)
+    expect(doc.errors).toHaveLength(4)
     doc.errors = []
     expect(String(doc)).toBe(
-      '"canonical": true\n"answer": "ffalse"\n"logical": "Truea"\n"option": "TruEp"\n'
+      '"canonical": "truea"\n"answer": "ffalse"\n"logical": "Truea"\n"option": "TruEp"\n'
     )
   })
 
