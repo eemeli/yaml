@@ -285,6 +285,26 @@ describe('json schema', () => {
     )
   })
 
+  test('!!bool: js-regex-missing-regexp-anchor', () => {
+    const src = `"canonical": truea
+"answer": ffalse
+"logical": Truea
+"option": TruEp`
+
+    const doc = parseDocument(src, { schema: 'json' })
+    expect(doc.toJS()).toMatchObject({
+      canonical: 'truea',
+      answer: 'ffalse',
+      logical: 'Truea',
+      option: 'TruEp'
+    })
+    expect(doc.errors).toHaveLength(4)
+    doc.errors = []
+    expect(String(doc)).toBe(
+      '"canonical": "truea"\n"answer": "ffalse"\n"logical": "Truea"\n"option": "TruEp"\n'
+    )
+  })
+
   test('!!float', () => {
     const src = `"canonical": 6.8523015e+5
 "fixed": 685230.15
