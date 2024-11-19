@@ -272,6 +272,16 @@ describe('block scalar', () => {
           }
       `)
   })
+
+  test('block scalar with very long lines (#585)', () => {
+    const str = ('a'.repeat(30) + '\n').repeat(3)
+    expect(YAML.stringify(str, { lineWidth: 20 })).toBe(source`
+      |
+      aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    `)
+  })
 })
 
 describe('end-to-end', () => {

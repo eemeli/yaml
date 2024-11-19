@@ -246,29 +246,37 @@ function blockString(
   }
 
   const indentSize = indent ? '2' : '1' // root is at -1
-  let header =
-    (literal ? '|' : '>') + (startWithSpace ? indentSize : '') + chomp
+  // Leading | or > is added later
+  let header = (startWithSpace ? indentSize : '') + chomp
   if (comment) {
     header += ' ' + commentString(comment.replace(/ ?[\r\n]+/g, ' '))
     if (onComment) onComment()
   }
 
-  if (literal) {
-    value = value.replace(/\n+/g, `$&${indent}`)
-    return `${header}\n${indent}${start}${value}${end}`
+  if (!literal) {
+    const foldedValue = value
+      .replace(/\n+/g, '\n$&')
+      .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
+      //                ^ more-ind. ^ empty     ^ capture next empty lines only at end of indent
+      .replace(/\n+/g, `$&${indent}`)
+    let literalFallback = false
+    const foldOptions = getFoldOptions(ctx, true)
+    if (blockQuote !== 'folded' && type !== Scalar.BLOCK_FOLDED) {
+      foldOptions.onOverflow = () => {
+        literalFallback = true
+      }
+    }
+    const body = foldFlowLines(
+      `${start}${foldedValue}${end}`,
+      indent,
+      FOLD_BLOCK,
+      foldOptions
+    )
+    if (!literalFallback) return `>${header}\n${indent}${body}`
   }
-  value = value
-    .replace(/\n+/g, '\n$&')
-    .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
-    //                ^ more-ind. ^ empty     ^ capture next empty lines only at end of indent
-    .replace(/\n+/g, `$&${indent}`)
-  const body = foldFlowLines(
-    `${start}${value}${end}`,
-    indent,
-    FOLD_BLOCK,
-    getFoldOptions(ctx, true)
-  )
-  return `${header}\n${indent}${body}`
+
+  value = value.replace(/\n+/g, `$&${indent}`)
+  return `|${header}\n${indent}${start}${value}${end}`
 }
 
 function plainString(
