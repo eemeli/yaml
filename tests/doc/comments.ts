@@ -685,6 +685,29 @@ describe('blank lines', () => {
     expect(String(doc)).toBe('- a\n\n- b\n\n- c\n')
   })
 
+  test('between seq indicator and value (#590)', () => {
+    const src = source`
+      key:
+        -
+        - a
+
+        -
+        -
+          b
+    `
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe(
+      source`
+        key:
+          -·
+          - a
+
+          -·
+          - b
+      `.replace(/·/g, ' ')
+    )
+  })
+
   test('between seq items with leading comments', () => {
     const src = source`
       #A
