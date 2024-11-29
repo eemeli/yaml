@@ -1,5 +1,6 @@
 import * as YAML from 'yaml'
-import { foldFlowLines as fold, type FoldOptions } from 'yaml/util'
+import type { FoldOptions } from 'yaml/util'
+import { foldFlowLines as fold } from 'yaml/util'
 import { source } from '../_utils.ts'
 
 const FOLD_FLOW = 'flow'

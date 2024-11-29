@@ -1,4 +1,5 @@
-import { Composer, type Document, Parser, parseDocument } from 'yaml'
+import type { Document } from 'yaml'
+import { Composer, Parser, parseDocument } from 'yaml'
 
 const src = `
 #c0\n \n

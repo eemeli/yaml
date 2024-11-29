@@ -1,5 +1,5 @@
-import { type Token } from '../parse/cst.ts'
-import { type ComposeErrorHandler } from './composer.ts'
+import type { Token } from '../parse/cst.ts'
+import type { ComposeErrorHandler } from './composer.ts'
 import { containsNewline } from './util-contains-newline.ts'
 
 export function flowIndentCheck(

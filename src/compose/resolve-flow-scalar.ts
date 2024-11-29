@@ -1,5 +1,5 @@
-import { type ErrorCode } from '../errors.ts'
-import { type Range } from '../nodes/Node.ts'
+import type { ErrorCode } from '../errors.ts'
+import type { Range } from '../nodes/Node.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { FlowScalar } from '../parse/cst.ts'
 import type { ComposeErrorHandler } from './composer.ts'

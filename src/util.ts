@@ -14,4 +14,3 @@ export type { FoldOptions } from './stringify/foldFlowLines.ts'
 export type { StringifyContext } from './stringify/stringify.ts'
 export { stringifyNumber } from './stringify/stringifyNumber.ts'
 export { stringifyString } from './stringify/stringifyString.ts'
-

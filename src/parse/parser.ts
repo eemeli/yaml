@@ -1,17 +1,16 @@
-import {
-  type SourceToken,
-  type Token,
-  type FlowScalar,
-  type FlowCollection,
-  type Document,
-  type BlockMap,
-  type BlockScalar,
-  type BlockSequence,
-  type DocumentEnd,
-  prettyToken,
-  tokenType,
-  type TokenType
+import type {
+  SourceToken,
+  Token,
+  FlowScalar,
+  FlowCollection,
+  Document,
+  BlockMap,
+  BlockScalar,
+  BlockSequence,
+  DocumentEnd,
+  TokenType
 } from './cst.ts'
+import { prettyToken, tokenType } from './cst.ts'
 import { Lexer } from './lexer.ts'
 
 function includesToken(list: SourceToken[], type: SourceToken['type']) {

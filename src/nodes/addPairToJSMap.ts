@@ -3,7 +3,8 @@ import { addMergeToJSMap, isMergeKey } from '../schema/yaml-1.1/merge.ts'
 import { createStringifyContext } from '../stringify/stringify.ts'
 import { isNode } from './identity.ts'
 import type { Pair } from './Pair.ts'
-import { toJS, type ToJSContext } from './toJS.ts'
+import type { ToJSContext } from './toJS.ts'
+import { toJS } from './toJS.ts'
 import type { MapLike } from './YAMLMap.ts'
 
 export function addPairToJSMap(

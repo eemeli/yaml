@@ -1,4 +1,4 @@
-import { type Range } from '../nodes/Node.ts'
+import type { Range } from '../nodes/Node.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { BlockScalar } from '../parse/cst.ts'
 import type { ComposeContext } from './compose-node.ts'

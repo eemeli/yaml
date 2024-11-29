@@ -1,4 +1,5 @@
-import { parseDocument, type Scalar } from 'yaml'
+import type { Scalar } from 'yaml'
+import { parseDocument } from 'yaml'
 import { source } from './_utils.ts'
 
 describe('%TAG', () => {

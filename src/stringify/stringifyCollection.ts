@@ -1,6 +1,7 @@
 import type { Collection } from '../nodes/Collection.ts'
 import { isNode, isPair } from '../nodes/identity.ts'
-import { stringify, type StringifyContext } from './stringify.ts'
+import type { StringifyContext } from './stringify.ts'
+import { stringify } from './stringify.ts'
 import { indentComment, lineComment } from './stringifyComment.ts'
 
 interface StringifyCollectionOptions {

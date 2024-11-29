@@ -9,7 +9,7 @@ import type {
   FlowCollection,
   SourceToken
 } from '../parse/cst.ts'
-import { type CollectionTag } from '../schema/types.ts'
+import type { CollectionTag } from '../schema/types.ts'
 import type { ComposeContext, ComposeNode } from './compose-node.ts'
 import type { ComposeErrorHandler } from './composer.ts'
 import { resolveBlockMap } from './resolve-block-map.ts'

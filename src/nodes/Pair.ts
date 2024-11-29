@@ -1,4 +1,5 @@
-import { createNode, type CreateNodeContext } from '../doc/createNode.ts'
+import type { CreateNodeContext } from '../doc/createNode.ts'
+import { createNode } from '../doc/createNode.ts'
 import type { CollectionItem } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'

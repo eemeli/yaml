@@ -11,7 +11,8 @@ import {
 import type { Node, NodeType, ParsedNode, Range } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
-import { toJS, type ToJSContext } from '../nodes/toJS.ts'
+import type { ToJSContext } from '../nodes/toJS.ts'
+import { toJS } from '../nodes/toJS.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
 import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type {
@@ -26,7 +27,8 @@ import { Schema } from '../schema/Schema.ts'
 import { stringifyDocument } from '../stringify/stringifyDocument.ts'
 import { anchorNames, createNodeAnchors, findNewAnchor } from './anchors.ts'
 import { applyReviver } from './applyReviver.ts'
-import { createNode, type CreateNodeContext } from './createNode.ts'
+import type { CreateNodeContext } from './createNode.ts'
+import { createNode } from './createNode.ts'
 import { Directives } from './directives.ts'
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)

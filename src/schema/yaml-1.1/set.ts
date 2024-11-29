@@ -5,7 +5,8 @@ import type { ToJSContext } from '../../nodes/toJS.ts'
 import { findPair, YAMLMap } from '../../nodes/YAMLMap.ts'
 import type { Schema } from '../../schema/Schema.ts'
 import type { StringifyContext } from '../../stringify/stringify.ts'
-import { type CreateNodeContext, createPair } from '../../util.ts'
+import type { CreateNodeContext } from '../../util.ts'
+import { createPair } from '../../util.ts'
 import type { CollectionTag } from '../types.ts'
 
 export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {

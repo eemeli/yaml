@@ -4,7 +4,7 @@ import type { Scalar } from '../nodes/Scalar.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
 import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import { visit } from '../visit.ts'
-import { type CreateNodeContext } from './createNode.ts'
+import type { CreateNodeContext } from './createNode.ts'
 import type { Document } from './Document.ts'
 
 /**

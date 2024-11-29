@@ -1,4 +1,5 @@
-import { Document, isSeq, parseDocument, type Scalar, visit, visitAsync } from 'yaml'
+import type { Scalar } from 'yaml'
+import { Document, isSeq, parseDocument, visit, visitAsync } from 'yaml'
 
 const coll = { items: {} }
 

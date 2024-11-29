@@ -55,7 +55,7 @@ export default [
       '@typescript-eslint/consistent-type-exports': 'error',
       '@typescript-eslint/consistent-type-imports': [
         'error',
-        { fixStyle: 'inline-type-imports' }
+        { fixStyle: 'separate-type-imports' }
       ],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-namespace': 'off',
