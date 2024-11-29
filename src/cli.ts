@@ -1,14 +1,14 @@
 import { resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 
-import { type Token, prettyToken } from './parse/cst.js'
-import { Lexer } from './parse/lexer.js'
-import { Parser } from './parse/parser.js'
-import { Composer } from './compose/composer.js'
-import { LineCounter } from './parse/line-counter.js'
-import { type Document } from './doc/Document.js'
-import { prettifyError } from './errors.js'
-import { visit, type visitor } from './visit.js'
+import { type Token, prettyToken } from './parse/cst.ts'
+import { Lexer } from './parse/lexer.ts'
+import { Parser } from './parse/parser.ts'
+import { Composer } from './compose/composer.ts'
+import { LineCounter } from './parse/line-counter.ts'
+import { type Document } from './doc/Document.ts'
+import { prettifyError } from './errors.ts'
+import { visit, type visitor } from './visit.ts'
 
 export const help = `\
 yaml: A command-line YAML processor and inspector

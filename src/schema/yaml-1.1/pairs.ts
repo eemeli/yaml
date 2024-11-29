@@ -1,12 +1,12 @@
-import type { CreateNodeContext } from '../../doc/createNode.js'
-import { isMap, isPair, isSeq } from '../../nodes/identity.js'
-import type { ParsedNode } from '../../nodes/Node.js'
-import { createPair, Pair } from '../../nodes/Pair.js'
-import { Scalar } from '../../nodes/Scalar.js'
-import { YAMLMap } from '../../nodes/YAMLMap.js'
-import { YAMLSeq } from '../../nodes/YAMLSeq.js'
-import type { Schema } from '../../schema/Schema.js'
-import type { CollectionTag } from '../types.js'
+import type { CreateNodeContext } from '../../doc/createNode.ts'
+import { isMap, isPair, isSeq } from '../../nodes/identity.ts'
+import type { ParsedNode } from '../../nodes/Node.ts'
+import { createPair, Pair } from '../../nodes/Pair.ts'
+import { Scalar } from '../../nodes/Scalar.ts'
+import { YAMLMap } from '../../nodes/YAMLMap.ts'
+import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
+import type { Schema } from '../../schema/Schema.ts'
+import type { CollectionTag } from '../types.ts'
 
 export function resolvePairs(
   seq:

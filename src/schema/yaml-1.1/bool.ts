@@ -1,6 +1,6 @@
-import { Scalar } from '../../nodes/Scalar.js'
-import type { StringifyContext } from '../../stringify/stringify.js'
-import type { ScalarTag } from '../types.js'
+import { Scalar } from '../../nodes/Scalar.ts'
+import type { StringifyContext } from '../../stringify/stringify.ts'
+import type { ScalarTag } from '../types.ts'
 
 function boolStringify({ value, source }: Scalar, ctx: StringifyContext) {
   const boolObj = value ? trueTag : falseTag

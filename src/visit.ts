@@ -1,5 +1,5 @@
-import type { Document } from './doc/Document.js'
-import type { Alias } from './nodes/Alias.js'
+import type { Document } from './doc/Document.ts'
+import type { Alias } from './nodes/Alias.ts'
 import {
   isAlias,
   isCollection,
@@ -9,12 +9,12 @@ import {
   isPair,
   isScalar,
   isSeq
-} from './nodes/identity.js'
-import { Node } from './nodes/Node.js'
-import type { Pair } from './nodes/Pair.js'
-import type { Scalar } from './nodes/Scalar.js'
-import type { YAMLMap } from './nodes/YAMLMap.js'
-import type { YAMLSeq } from './nodes/YAMLSeq.js'
+} from './nodes/identity.ts'
+import { Node } from './nodes/Node.ts'
+import type { Pair } from './nodes/Pair.ts'
+import type { Scalar } from './nodes/Scalar.ts'
+import type { YAMLMap } from './nodes/YAMLMap.ts'
+import type { YAMLSeq } from './nodes/YAMLSeq.ts'
 
 const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')

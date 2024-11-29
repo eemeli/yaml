@@ -1,9 +1,9 @@
-import { ErrorCode } from '../errors.js'
-import { Range } from '../nodes/Node.js'
-import { Scalar } from '../nodes/Scalar.js'
-import type { FlowScalar } from '../parse/cst.js'
-import type { ComposeErrorHandler } from './composer.js'
-import { resolveEnd } from './resolve-end.js'
+import { ErrorCode } from '../errors.ts'
+import { Range } from '../nodes/Node.ts'
+import { Scalar } from '../nodes/Scalar.ts'
+import type { FlowScalar } from '../parse/cst.ts'
+import type { ComposeErrorHandler } from './composer.ts'
+import { resolveEnd } from './resolve-end.ts'
 
 type FlowScalarErrorHandler = (
   offset: number,

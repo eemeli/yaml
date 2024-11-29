@@ -1,13 +1,13 @@
-import type { Document } from '../doc/Document.js'
-import { isNode } from '../nodes/identity.js'
-import type { Node } from '../nodes/Node.js'
-import type { ToStringOptions } from '../options.js'
+import type { Document } from '../doc/Document.ts'
+import { isNode } from '../nodes/identity.ts'
+import type { Node } from '../nodes/Node.ts'
+import type { ToStringOptions } from '../options.ts'
 import {
   createStringifyContext,
   stringify,
   StringifyContext
-} from './stringify.js'
-import { indentComment, lineComment } from './stringifyComment.js'
+} from './stringify.ts'
+import { indentComment, lineComment } from './stringifyComment.ts'
 
 export function stringifyDocument(
   doc: Readonly<Document<Node, boolean>>,

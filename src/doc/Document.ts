@@ -1,19 +1,19 @@
-import type { YAMLError, YAMLWarning } from '../errors.js'
-import { Alias } from '../nodes/Alias.js'
-import { collectionFromPath, isEmptyPath } from '../nodes/Collection.js'
+import type { YAMLError, YAMLWarning } from '../errors.ts'
+import { Alias } from '../nodes/Alias.ts'
+import { collectionFromPath, isEmptyPath } from '../nodes/Collection.ts'
 import {
   DOC,
   isCollection,
   isNode,
   isScalar,
   NODE_TYPE
-} from '../nodes/identity.js'
-import type { Node, NodeType, ParsedNode, Range } from '../nodes/Node.js'
-import { Pair } from '../nodes/Pair.js'
-import type { Scalar } from '../nodes/Scalar.js'
-import { toJS, ToJSContext } from '../nodes/toJS.js'
-import type { YAMLMap } from '../nodes/YAMLMap.js'
-import type { YAMLSeq } from '../nodes/YAMLSeq.js'
+} from '../nodes/identity.ts'
+import type { Node, NodeType, ParsedNode, Range } from '../nodes/Node.ts'
+import { Pair } from '../nodes/Pair.ts'
+import type { Scalar } from '../nodes/Scalar.ts'
+import { toJS, ToJSContext } from '../nodes/toJS.ts'
+import type { YAMLMap } from '../nodes/YAMLMap.ts'
+import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type {
   CreateNodeOptions,
   DocumentOptions,
@@ -21,13 +21,13 @@ import type {
   SchemaOptions,
   ToJSOptions,
   ToStringOptions
-} from '../options.js'
-import { Schema } from '../schema/Schema.js'
-import { stringifyDocument } from '../stringify/stringifyDocument.js'
-import { anchorNames, createNodeAnchors, findNewAnchor } from './anchors.js'
-import { applyReviver } from './applyReviver.js'
-import { createNode, CreateNodeContext } from './createNode.js'
-import { Directives } from './directives.js'
+} from '../options.ts'
+import { Schema } from '../schema/Schema.ts'
+import { stringifyDocument } from '../stringify/stringifyDocument.ts'
+import { anchorNames, createNodeAnchors, findNewAnchor } from './anchors.ts'
+import { applyReviver } from './applyReviver.ts'
+import { createNode, CreateNodeContext } from './createNode.ts'
+import { Directives } from './directives.ts'
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)
 

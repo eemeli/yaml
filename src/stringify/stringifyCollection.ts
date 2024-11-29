@@ -1,7 +1,7 @@
-import { Collection } from '../nodes/Collection.js'
-import { isNode, isPair } from '../nodes/identity.js'
-import { stringify, StringifyContext } from './stringify.js'
-import { indentComment, lineComment } from './stringifyComment.js'
+import { Collection } from '../nodes/Collection.ts'
+import { isNode, isPair } from '../nodes/identity.ts'
+import { stringify, StringifyContext } from './stringify.ts'
+import { indentComment, lineComment } from './stringifyComment.ts'
 
 interface StringifyCollectionOptions {
   blockItemPrefix: string

@@ -1,6 +1,6 @@
-import { isMap } from '../../nodes/identity.js'
-import { YAMLMap } from '../../nodes/YAMLMap.js'
-import type { CollectionTag } from '../types.js'
+import { isMap } from '../../nodes/identity.ts'
+import { YAMLMap } from '../../nodes/YAMLMap.ts'
+import type { CollectionTag } from '../types.ts'
 
 export const map: CollectionTag = {
   collection: 'map',

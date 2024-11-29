@@ -1,6 +1,6 @@
-import { Token } from '../parse/cst'
-import { ComposeErrorHandler } from './composer'
-import { containsNewline } from './util-contains-newline'
+import { Token } from '../parse/cst.ts'
+import { ComposeErrorHandler } from './composer.ts'
+import { containsNewline } from './util-contains-newline.ts'
 
 export function flowIndentCheck(
   indent: number,

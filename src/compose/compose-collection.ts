@@ -1,20 +1,20 @@
-import { isNode } from '../nodes/identity.js'
-import type { ParsedNode } from '../nodes/Node.js'
-import { Scalar } from '../nodes/Scalar.js'
-import { YAMLMap } from '../nodes/YAMLMap.js'
-import { YAMLSeq } from '../nodes/YAMLSeq.js'
+import { isNode } from '../nodes/identity.ts'
+import type { ParsedNode } from '../nodes/Node.ts'
+import { Scalar } from '../nodes/Scalar.ts'
+import { YAMLMap } from '../nodes/YAMLMap.ts'
+import { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type {
   BlockMap,
   BlockSequence,
   FlowCollection,
   SourceToken
-} from '../parse/cst.js'
-import { CollectionTag } from '../schema/types.js'
-import type { ComposeContext, ComposeNode } from './compose-node.js'
-import type { ComposeErrorHandler } from './composer.js'
-import { resolveBlockMap } from './resolve-block-map.js'
-import { resolveBlockSeq } from './resolve-block-seq.js'
-import { resolveFlowCollection } from './resolve-flow-collection.js'
+} from '../parse/cst.ts'
+import { CollectionTag } from '../schema/types.ts'
+import type { ComposeContext, ComposeNode } from './compose-node.ts'
+import type { ComposeErrorHandler } from './composer.ts'
+import { resolveBlockMap } from './resolve-block-map.ts'
+import { resolveBlockSeq } from './resolve-block-seq.ts'
+import { resolveFlowCollection } from './resolve-flow-collection.ts'
 
 function resolveCollection(
   CN: ComposeNode,

@@ -1,6 +1,6 @@
-import { Scalar } from '../../nodes/Scalar.js'
-import { stringifyNumber } from '../../stringify/stringifyNumber.js'
-import type { ScalarTag } from '../types.js'
+import { Scalar } from '../../nodes/Scalar.ts'
+import { stringifyNumber } from '../../stringify/stringifyNumber.ts'
+import type { ScalarTag } from '../types.ts'
 
 export const floatNaN: ScalarTag = {
   identify: value => typeof value === 'number',

@@ -1,4 +1,4 @@
-import { Document } from './doc/Document.js'
+import { Document } from './doc/Document.ts'
 import {
   isAlias,
   isCollection,
@@ -7,11 +7,11 @@ import {
   isPair,
   isScalar,
   isSeq
-} from './nodes/identity.js'
-import type { Node, ParsedNode } from './nodes/Node.js'
-import type { Pair } from './nodes/Pair.js'
-import { parseAllDocuments } from './public-api.js'
-import { visit } from './visit.js'
+} from './nodes/identity.ts'
+import type { Node, ParsedNode } from './nodes/Node.ts'
+import type { Pair } from './nodes/Pair.ts'
+import { parseAllDocuments } from './public-api.ts'
+import { visit } from './visit.ts'
 
 const scalarChar: Record<string, string> = {
   BLOCK_FOLDED: '>',

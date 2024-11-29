@@ -1,10 +1,10 @@
-import { Composer } from './compose/composer.js'
-import type { Reviver } from './doc/applyReviver.js'
-import { Document, Replacer } from './doc/Document.js'
-import { prettifyError, YAMLParseError } from './errors.js'
-import { warn } from './log.js'
-import { isDocument } from './nodes/identity.js'
-import type { Node, ParsedNode } from './nodes/Node.js'
+import { Composer } from './compose/composer.ts'
+import type { Reviver } from './doc/applyReviver.ts'
+import { Document, Replacer } from './doc/Document.ts'
+import { prettifyError, YAMLParseError } from './errors.ts'
+import { warn } from './log.ts'
+import { isDocument } from './nodes/identity.ts'
+import type { Node, ParsedNode } from './nodes/Node.ts'
 import type {
   CreateNodeOptions,
   DocumentOptions,
@@ -12,9 +12,9 @@ import type {
   SchemaOptions,
   ToJSOptions,
   ToStringOptions
-} from './options.js'
-import { LineCounter } from './parse/line-counter.js'
-import { Parser } from './parse/parser.js'
+} from './options.ts'
+import { LineCounter } from './parse/line-counter.ts'
+import { Parser } from './parse/parser.ts'
 
 export interface EmptyStream
   extends Array<Document.Parsed>,

@@ -1,7 +1,7 @@
-import type { BlockScalar, FlowScalar } from '../parse/cst.js'
-import { SCALAR } from './identity.js'
-import { NodeBase, Range } from './Node.js'
-import { toJS, ToJSContext } from './toJS.js'
+import type { BlockScalar, FlowScalar } from '../parse/cst.ts'
+import { SCALAR } from './identity.ts'
+import { NodeBase, Range } from './Node.ts'
+import { toJS, ToJSContext } from './toJS.ts'
 
 export const isScalarValue = (value: unknown) =>
   !value || (typeof value !== 'function' && typeof value !== 'object')

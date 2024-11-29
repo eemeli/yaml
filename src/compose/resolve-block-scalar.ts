@@ -1,8 +1,8 @@
-import { Range } from '../nodes/Node.js'
-import { Scalar } from '../nodes/Scalar.js'
-import type { BlockScalar } from '../parse/cst.js'
-import type { ComposeContext } from './compose-node.js'
-import type { ComposeErrorHandler } from './composer.js'
+import { Range } from '../nodes/Node.ts'
+import { Scalar } from '../nodes/Scalar.ts'
+import type { BlockScalar } from '../parse/cst.ts'
+import type { ComposeContext } from './compose-node.ts'
+import type { ComposeErrorHandler } from './composer.ts'
 
 export function resolveBlockScalar(
   ctx: ComposeContext,

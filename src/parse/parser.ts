@@ -11,8 +11,8 @@ import {
   prettyToken,
   tokenType,
   TokenType
-} from './cst.js'
-import { Lexer } from './lexer.js'
+} from './cst.ts'
+import { Lexer } from './lexer.ts'
 
 function includesToken(list: SourceToken[], type: SourceToken['type']) {
   for (let i = 0; i < list.length; ++i) if (list[i].type === type) return true

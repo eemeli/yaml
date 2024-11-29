@@ -1,13 +1,13 @@
-import type { ComposeContext } from '../compose/compose-node.js'
-import type { ComposeErrorHandler } from '../compose/composer.js'
-import { resolveBlockScalar } from '../compose/resolve-block-scalar.js'
-import { resolveFlowScalar } from '../compose/resolve-flow-scalar.js'
-import { ErrorCode, YAMLParseError } from '../errors.js'
-import { Range } from '../nodes/Node.js'
-import type { Scalar } from '../nodes/Scalar.js'
-import type { StringifyContext } from '../stringify/stringify.js'
-import { stringifyString } from '../stringify/stringifyString.js'
-import type { BlockScalar, FlowScalar, SourceToken, Token } from './cst.js'
+import type { ComposeContext } from '../compose/compose-node.ts'
+import type { ComposeErrorHandler } from '../compose/composer.ts'
+import { resolveBlockScalar } from '../compose/resolve-block-scalar.ts'
+import { resolveFlowScalar } from '../compose/resolve-flow-scalar.ts'
+import { ErrorCode, YAMLParseError } from '../errors.ts'
+import { Range } from '../nodes/Node.ts'
+import type { Scalar } from '../nodes/Scalar.ts'
+import type { StringifyContext } from '../stringify/stringify.ts'
+import { stringifyString } from '../stringify/stringifyString.ts'
+import type { BlockScalar, FlowScalar, SourceToken, Token } from './cst.ts'
 
 /**
  * If `token` is a CST flow or block scalar, determine its string value and a few other attributes.
