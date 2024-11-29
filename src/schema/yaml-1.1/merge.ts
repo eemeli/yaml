@@ -1,8 +1,8 @@
-import { isAlias, isMap, isScalar, isSeq } from '../../nodes/identity.js'
-import { Scalar } from '../../nodes/Scalar.js'
-import type { ToJSContext } from '../../nodes/toJS.js'
-import type { MapLike } from '../../nodes/YAMLMap.js'
-import type { ScalarTag } from '../types.js'
+import { isAlias, isMap, isScalar, isSeq } from '../../nodes/identity.ts'
+import { Scalar } from '../../nodes/Scalar.ts'
+import type { ToJSContext } from '../../nodes/toJS.ts'
+import type { MapLike } from '../../nodes/YAMLMap.ts'
+import type { ScalarTag } from '../types.ts'
 
 // If the value associated with a merge key is a single mapping node, each of
 // its key/value pairs is inserted into the current mapping, unless the key

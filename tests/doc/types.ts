@@ -1,22 +1,22 @@
 import {
-  CollectionTag,
+  type CollectionTag,
   Document,
-  DocumentOptions,
-  Node,
-  parse,
-  ParsedNode,
+  type DocumentOptions,
+  type Node,
   parseDocument as origParseDocument,
-  ParseOptions,
+  parse,
+  type ParsedNode,
+  type ParseOptions,
   Scalar,
-  ScalarTag,
+  type ScalarTag,
   Schema,
-  SchemaOptions,
+  type SchemaOptions,
   stringify,
   YAMLMap,
   YAMLSeq
 } from 'yaml'
 import { seqTag, stringifyString, stringTag } from 'yaml/util'
-import { source } from '../_utils'
+import { source } from '../_utils.ts'
 
 const parseDocument = <T extends Node = ParsedNode>(
   source: string,

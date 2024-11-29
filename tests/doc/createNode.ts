@@ -1,5 +1,6 @@
-import { Alias, Document, Node, Scalar, YAMLMap, YAMLSeq } from 'yaml'
-import { source } from '../_utils'
+import type { Alias, Node } from 'yaml'
+import { Document, Scalar, YAMLMap, YAMLSeq } from 'yaml'
+import { source } from '../_utils.ts'
 
 describe('createNode(value)', () => {
   test('boolean', () => {

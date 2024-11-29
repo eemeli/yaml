@@ -2,9 +2,10 @@ export {
   createScalarToken,
   resolveAsScalar,
   setScalarValue
-} from './cst-scalar.js'
-export { stringify } from './cst-stringify.js'
-export { visit, Visitor, VisitPath } from './cst-visit.js'
+} from './cst-scalar.ts'
+export { stringify } from './cst-stringify.ts'
+export type { Visitor, VisitPath } from './cst-visit.ts'
+export { visit } from './cst-visit.ts'
 
 export interface SourceToken {
   type:

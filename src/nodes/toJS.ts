@@ -1,6 +1,6 @@
-import type { Document } from '../doc/Document.js'
-import { hasAnchor } from './identity.js'
-import type { Node } from './Node.js'
+import type { Document } from '../doc/Document.ts'
+import { hasAnchor } from './identity.ts'
+import type { Node } from './Node.ts'
 
 export interface AnchorData {
   aliasCount: number

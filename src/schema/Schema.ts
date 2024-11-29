@@ -1,11 +1,11 @@
-import { MAP, SCALAR, SEQ } from '../nodes/identity.js'
-import type { Pair } from '../nodes/Pair.js'
-import type { SchemaOptions, ToStringOptions } from '../options.js'
-import { map } from './common/map.js'
-import { seq } from './common/seq.js'
-import { string } from './common/string.js'
-import { coreKnownTags, getTags } from './tags.js'
-import type { CollectionTag, ScalarTag } from './types.js'
+import { MAP, SCALAR, SEQ } from '../nodes/identity.ts'
+import type { Pair } from '../nodes/Pair.ts'
+import type { SchemaOptions, ToStringOptions } from '../options.ts'
+import { map } from './common/map.ts'
+import { seq } from './common/seq.ts'
+import { string } from './common/string.ts'
+import { coreKnownTags, getTags } from './tags.ts'
+import type { CollectionTag, ScalarTag } from './types.ts'
 
 const sortMapEntriesByKey = (a: Pair<any>, b: Pair<any>) =>
   a.key < b.key ? -1 : a.key > b.key ? 1 : 0

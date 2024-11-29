@@ -1,4 +1,4 @@
-import type { LineCounter } from './parse/line-counter'
+import type { LineCounter } from './parse/line-counter.ts'
 
 export type ErrorCode =
   | 'ALIAS_PROPS'

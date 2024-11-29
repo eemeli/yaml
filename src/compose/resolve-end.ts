@@ -1,5 +1,5 @@
-import type { SourceToken } from '../parse/cst.js'
-import type { ComposeErrorHandler } from './composer.js'
+import type { SourceToken } from '../parse/cst.ts'
+import type { ComposeErrorHandler } from './composer.ts'
 
 export function resolveEnd(
   end: SourceToken[] | undefined,

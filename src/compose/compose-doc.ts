@@ -1,20 +1,20 @@
-import type { Directives } from '../doc/directives.js'
-import { Document } from '../doc/Document.js'
-import type { ParsedNode } from '../nodes/Node.js'
+import type { Directives } from '../doc/directives.ts'
+import { Document } from '../doc/Document.ts'
+import type { ParsedNode } from '../nodes/Node.ts'
 import type {
   DocumentOptions,
   ParseOptions,
   SchemaOptions
-} from '../options.js'
-import type * as CST from '../parse/cst.js'
+} from '../options.ts'
+import type * as CST from '../parse/cst.ts'
 import {
-  ComposeContext,
+  type ComposeContext,
   composeEmptyNode,
   composeNode
-} from './compose-node.js'
-import type { ComposeErrorHandler } from './composer.js'
-import { resolveEnd } from './resolve-end.js'
-import { resolveProps } from './resolve-props.js'
+} from './compose-node.ts'
+import type { ComposeErrorHandler } from './composer.ts'
+import { resolveEnd } from './resolve-end.ts'
+import { resolveProps } from './resolve-props.ts'
 
 export function composeDoc<
   Contents extends ParsedNode = ParsedNode,

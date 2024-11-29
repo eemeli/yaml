@@ -1,5 +1,5 @@
-import { Scalar } from '../../nodes/Scalar.js'
-import type { ScalarTag } from '../types.js'
+import { Scalar } from '../../nodes/Scalar.ts'
+import type { ScalarTag } from '../types.ts'
 
 export const nullTag: ScalarTag & { test: RegExp } = {
   identify: value => value == null,

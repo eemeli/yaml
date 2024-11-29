@@ -1,4 +1,4 @@
-import type { CollectionItem, Document } from './cst.js'
+import type { CollectionItem, Document } from './cst.ts'
 
 const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')

@@ -1,5 +1,6 @@
-import { parseDocument, YAMLMap, YAMLSeq } from 'yaml'
-import { source } from './_utils'
+import type { YAMLMap, YAMLSeq } from 'yaml'
+import { parseDocument } from 'yaml'
+import { source } from './_utils.ts'
 
 describe('scalars', () => {
   test('plain', () => {

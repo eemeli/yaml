@@ -1,5 +1,6 @@
-import { isAlias, isScalar, parseDocument, Scalar, visit, YAMLMap } from 'yaml'
-import { source } from './_utils'
+import type { Scalar, YAMLMap } from 'yaml'
+import { isAlias, isScalar, parseDocument, visit } from 'yaml'
+import { source } from './_utils.ts'
 
 describe('doc.clone()', () => {
   test('has expected members', () => {

@@ -1,10 +1,10 @@
-import type { Document } from '../doc/Document.js'
-import type { Alias } from './Alias.js'
-import type { Node } from './Node.js'
-import type { Pair } from './Pair.js'
-import type { Scalar } from './Scalar.js'
-import type { YAMLMap } from './YAMLMap.js'
-import type { YAMLSeq } from './YAMLSeq.js'
+import type { Document } from '../doc/Document.ts'
+import type { Alias } from './Alias.ts'
+import type { Node } from './Node.ts'
+import type { Pair } from './Pair.ts'
+import type { Scalar } from './Scalar.ts'
+import type { YAMLMap } from './YAMLMap.ts'
+import type { YAMLSeq } from './YAMLSeq.ts'
 
 export const ALIAS = Symbol.for('yaml.alias')
 export const DOC = Symbol.for('yaml.document')

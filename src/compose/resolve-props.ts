@@ -1,5 +1,5 @@
-import type { SourceToken, Token } from '../parse/cst.js'
-import type { ComposeErrorHandler } from './composer.js'
+import type { SourceToken, Token } from '../parse/cst.ts'
+import type { ComposeErrorHandler } from './composer.ts'
 
 export interface ResolvePropsArg {
   flow?: 'flow map' | 'flow sequence'

@@ -1,11 +1,11 @@
-import type { CreateNodeContext } from '../doc/createNode.js'
-import type { Node } from '../nodes/Node.js'
-import type { Scalar } from '../nodes/Scalar.js'
-import type { YAMLMap } from '../nodes/YAMLMap.js'
-import type { YAMLSeq } from '../nodes/YAMLSeq.js'
-import type { ParseOptions } from '../options.js'
-import type { StringifyContext } from '../stringify/stringify.js'
-import type { Schema } from './Schema.js'
+import type { CreateNodeContext } from '../doc/createNode.ts'
+import type { Node } from '../nodes/Node.ts'
+import type { Scalar } from '../nodes/Scalar.ts'
+import type { YAMLMap } from '../nodes/YAMLMap.ts'
+import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
+import type { ParseOptions } from '../options.ts'
+import type { StringifyContext } from '../stringify/stringify.ts'
+import type { Schema } from './Schema.ts'
 
 interface TagBase {
   /**

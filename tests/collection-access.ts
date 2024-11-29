@@ -1,14 +1,14 @@
 import {
   Document,
-  parseDocument,
   Pair,
-  Scalar,
-  YAMLMap,
-  YAMLOMap,
-  YAMLSeq,
-  YAMLSet,
+  type Scalar,
+  type YAMLMap,
+  type YAMLOMap,
+  type YAMLSeq,
+  type YAMLSet,
+  isMap,
   isSeq,
-  isMap
+  parseDocument
 } from 'yaml'
 
 describe('Map', () => {

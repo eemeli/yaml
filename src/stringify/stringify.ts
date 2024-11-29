@@ -1,19 +1,19 @@
-import { anchorIsValid } from '../doc/anchors.js'
-import type { Document } from '../doc/Document.js'
-import type { Alias } from '../nodes/Alias.js'
+import { anchorIsValid } from '../doc/anchors.ts'
+import type { Document } from '../doc/Document.ts'
+import type { Alias } from '../nodes/Alias.ts'
 import {
   isAlias,
   isCollection,
   isNode,
   isPair,
   isScalar
-} from '../nodes/identity.js'
-import type { Node } from '../nodes/Node.js'
-import type { Scalar } from '../nodes/Scalar.js'
-import type { ToStringOptions } from '../options.js'
-import type { CollectionTag, ScalarTag } from '../schema/types.js'
-import { stringifyComment } from './stringifyComment.js'
-import { stringifyString } from './stringifyString.js'
+} from '../nodes/identity.ts'
+import type { Node } from '../nodes/Node.ts'
+import type { Scalar } from '../nodes/Scalar.ts'
+import type { ToStringOptions } from '../options.ts'
+import type { CollectionTag, ScalarTag } from '../schema/types.ts'
+import { stringifyComment } from './stringifyComment.ts'
+import { stringifyString } from './stringifyString.ts'
 
 export type StringifyContext = {
   actualString?: boolean

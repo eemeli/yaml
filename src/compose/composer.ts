@@ -1,16 +1,17 @@
-import { Directives } from '../doc/directives.js'
-import { Document } from '../doc/Document.js'
-import { ErrorCode, YAMLParseError, YAMLWarning } from '../errors.js'
-import { isCollection, isPair } from '../nodes/identity.js'
-import type { ParsedNode, Range } from '../nodes/Node.js'
+import { Directives } from '../doc/directives.ts'
+import { Document } from '../doc/Document.ts'
+import type { ErrorCode } from '../errors.ts'
+import { YAMLParseError, YAMLWarning } from '../errors.ts'
+import { isCollection, isPair } from '../nodes/identity.ts'
+import type { ParsedNode, Range } from '../nodes/Node.ts'
 import type {
   DocumentOptions,
   ParseOptions,
   SchemaOptions
-} from '../options.js'
-import type { Token } from '../parse/cst.js'
-import { composeDoc } from './compose-doc.js'
-import { resolveEnd } from './resolve-end.js'
+} from '../options.ts'
+import type { Token } from '../parse/cst.ts'
+import { composeDoc } from './compose-doc.ts'
+import { resolveEnd } from './resolve-end.ts'
 
 type ErrorSource =
   | number

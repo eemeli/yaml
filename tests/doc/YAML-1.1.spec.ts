@@ -1,4 +1,4 @@
-import { source } from '../_utils'
+import { source } from '../_utils.ts'
 import { parseAllDocuments } from 'yaml'
 
 test('Use preceding directives if none defined', () => {

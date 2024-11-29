@@ -1,8 +1,9 @@
-import { isCollection, isNode, isScalar, isSeq } from '../nodes/identity.js'
-import type { Pair } from '../nodes/Pair.js'
-import { Scalar } from '../nodes/Scalar.js'
-import { stringify, StringifyContext } from './stringify.js'
-import { indentComment, lineComment } from './stringifyComment.js'
+import { isCollection, isNode, isScalar, isSeq } from '../nodes/identity.ts'
+import type { Pair } from '../nodes/Pair.ts'
+import { Scalar } from '../nodes/Scalar.ts'
+import type { StringifyContext } from './stringify.ts'
+import { stringify } from './stringify.ts'
+import { indentComment, lineComment } from './stringifyComment.ts'
 
 export function stringifyPair(
   { key, value }: Readonly<Pair>,

@@ -1,0 +1,24 @@
+name: Deno
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        deno-version: [v1.x, v2.x]
+
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: true }
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ matrix.deno-version }}
+      - run: deno src/public-api.ts

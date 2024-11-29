@@ -1,5 +1,5 @@
-import { stringifyString } from '../../stringify/stringifyString.js'
-import type { ScalarTag } from '../types.js'
+import { stringifyString } from '../../stringify/stringifyString.ts'
+import type { ScalarTag } from '../types.ts'
 
 export const string: ScalarTag = {
   identify: value => typeof value === 'string',

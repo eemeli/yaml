@@ -1,12 +1,12 @@
-import { isScalar, SCALAR } from '../nodes/identity.js'
-import { Scalar } from '../nodes/Scalar.js'
-import type { BlockScalar, FlowScalar, SourceToken } from '../parse/cst.js'
-import type { Schema } from '../schema/Schema.js'
-import type { ScalarTag } from '../schema/types.js'
-import type { ComposeContext } from './compose-node.js'
-import type { ComposeErrorHandler } from './composer.js'
-import { resolveBlockScalar } from './resolve-block-scalar.js'
-import { resolveFlowScalar } from './resolve-flow-scalar.js'
+import { isScalar, SCALAR } from '../nodes/identity.ts'
+import { Scalar } from '../nodes/Scalar.ts'
+import type { BlockScalar, FlowScalar, SourceToken } from '../parse/cst.ts'
+import type { Schema } from '../schema/Schema.ts'
+import type { ScalarTag } from '../schema/types.ts'
+import type { ComposeContext } from './compose-node.ts'
+import type { ComposeErrorHandler } from './composer.ts'
+import { resolveBlockScalar } from './resolve-block-scalar.ts'
+import { resolveFlowScalar } from './resolve-flow-scalar.ts'
 
 export function composeScalar(
   ctx: ComposeContext,
