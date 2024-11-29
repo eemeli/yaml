@@ -27,7 +27,7 @@ switch (process.env.npm_lifecycle_event) {
       '^yaml$': '<rootDir>/dist/index.js',
       '^yaml/cli$': '<rootDir>/dist/cli.mjs',
       '^yaml/util$': '<rootDir>/dist/util.js',
-      '^../src/test-events$': '<rootDir>/dist/test-events.js'
+      '^../src/test-events.ts$': '<rootDir>/dist/test-events.js'
     }
     transform['[/\\\\]dist[/\\\\].*\\.mjs$'] = babel
     break
