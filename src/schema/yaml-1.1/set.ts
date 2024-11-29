@@ -1,11 +1,11 @@
 import { isMap, isPair, isScalar } from '../../nodes/identity.ts'
 import { Pair } from '../../nodes/Pair.ts'
-import { Scalar } from '../../nodes/Scalar.ts'
-import { ToJSContext } from '../../nodes/toJS.ts'
+import type { Scalar } from '../../nodes/Scalar.ts'
+import type { ToJSContext } from '../../nodes/toJS.ts'
 import { findPair, YAMLMap } from '../../nodes/YAMLMap.ts'
 import type { Schema } from '../../schema/Schema.ts'
 import type { StringifyContext } from '../../stringify/stringify.ts'
-import { CreateNodeContext, createPair } from '../../util.ts'
+import { type CreateNodeContext, createPair } from '../../util.ts'
 import type { CollectionTag } from '../types.ts'
 
 export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {

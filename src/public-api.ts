@@ -1,6 +1,6 @@
 import { Composer } from './compose/composer.ts'
 import type { Reviver } from './doc/applyReviver.ts'
-import { Document, Replacer } from './doc/Document.ts'
+import { Document, type Replacer } from './doc/Document.ts'
 import { prettifyError, YAMLParseError } from './errors.ts'
 import { warn } from './log.ts'
 import { isDocument } from './nodes/identity.ts'

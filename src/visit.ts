@@ -10,7 +10,7 @@ import {
   isScalar,
   isSeq
 } from './nodes/identity.ts'
-import { Node } from './nodes/Node.ts'
+import type { Node } from './nodes/Node.ts'
 import type { Pair } from './nodes/Pair.ts'
 import type { Scalar } from './nodes/Scalar.ts'
 import type { YAMLMap } from './nodes/YAMLMap.ts'

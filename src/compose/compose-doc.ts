@@ -8,7 +8,7 @@ import type {
 } from '../options.ts'
 import type * as CST from '../parse/cst.ts'
 import {
-  ComposeContext,
+  type ComposeContext,
   composeEmptyNode,
   composeNode
 } from './compose-node.ts'

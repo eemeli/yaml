@@ -3,7 +3,8 @@ export { Composer } from './compose/composer.ts'
 export { Document } from './doc/Document.ts'
 export { Schema } from './schema/Schema.ts'
 
-export { ErrorCode, YAMLError, YAMLParseError, YAMLWarning } from './errors.ts'
+export type { ErrorCode } from './errors.ts'
+export { YAMLError, YAMLParseError, YAMLWarning } from './errors.ts'
 
 export { Alias } from './nodes/Alias.ts'
 export {
@@ -16,7 +17,7 @@ export {
   isScalar,
   isSeq
 } from './nodes/identity.ts'
-export { Node, ParsedNode, Range } from './nodes/Node.ts'
+export type { Node, ParsedNode, Range } from './nodes/Node.ts'
 export { Pair } from './nodes/Pair.ts'
 export { Scalar } from './nodes/Scalar.ts'
 export { YAMLMap } from './nodes/YAMLMap.ts'
@@ -36,8 +37,8 @@ export { Lexer } from './parse/lexer.ts'
 export { LineCounter } from './parse/line-counter.ts'
 export { Parser } from './parse/parser.ts'
 
+export type { EmptyStream } from './public-api.ts'
 export {
-  EmptyStream,
   parse,
   parseAllDocuments,
   parseDocument,
@@ -49,11 +50,10 @@ export type { CollectionTag, ScalarTag } from './schema/types.ts'
 export type { YAMLOMap } from './schema/yaml-1.1/omap.ts'
 export type { YAMLSet } from './schema/yaml-1.1/set.ts'
 
-export {
+export type {
   asyncVisitor,
   asyncVisitorFn,
-  visit,
-  visitAsync,
   visitor,
   visitorFn
 } from './visit.ts'
+export { visit, visitAsync } from './visit.ts'

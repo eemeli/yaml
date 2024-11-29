@@ -1,10 +1,10 @@
 import { isPair, isScalar } from '../../nodes/identity.ts'
-import { toJS, ToJSContext } from '../../nodes/toJS.ts'
+import { toJS, type ToJSContext } from '../../nodes/toJS.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
-import { CreateNodeContext } from '../../util.ts'
+import { type CreateNodeContext } from '../../util.ts'
 import type { Schema } from '../Schema.ts'
-import { CollectionTag } from '../types.ts'
+import { type CollectionTag } from '../types.ts'
 import { createPairs, resolvePairs } from './pairs.ts'
 
 export class YAMLOMap extends YAMLSeq {

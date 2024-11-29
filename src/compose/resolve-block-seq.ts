@@ -1,6 +1,6 @@
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type { BlockSequence } from '../parse/cst.ts'
-import { CollectionTag } from '../schema/types.ts'
+import { type CollectionTag } from '../schema/types.ts'
 import type { ComposeContext, ComposeNode } from './compose-node.ts'
 import type { ComposeErrorHandler } from './composer.ts'
 import { resolveProps } from './resolve-props.ts'

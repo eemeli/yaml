@@ -4,7 +4,8 @@ export {
   setScalarValue
 } from './cst-scalar.ts'
 export { stringify } from './cst-stringify.ts'
-export { visit, Visitor, VisitPath } from './cst-visit.ts'
+export type { Visitor, VisitPath } from './cst-visit.ts'
+export { visit } from './cst-visit.ts'
 
 export interface SourceToken {
   type:

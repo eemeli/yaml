@@ -1,4 +1,4 @@
-import { Document } from './doc/Document.ts'
+import type { Document } from './doc/Document.ts'
 import {
   isAlias,
   isCollection,

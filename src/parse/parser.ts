@@ -1,16 +1,16 @@
 import {
-  SourceToken,
-  Token,
-  FlowScalar,
-  FlowCollection,
-  Document,
-  BlockMap,
-  BlockScalar,
-  BlockSequence,
-  DocumentEnd,
+  type SourceToken,
+  type Token,
+  type FlowScalar,
+  type FlowCollection,
+  type Document,
+  type BlockMap,
+  type BlockScalar,
+  type BlockSequence,
+  type DocumentEnd,
   prettyToken,
   tokenType,
-  TokenType
+  type TokenType
 } from './cst.ts'
 import { Lexer } from './lexer.ts'
 

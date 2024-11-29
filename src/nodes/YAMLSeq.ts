@@ -1,4 +1,4 @@
-import { createNode, CreateNodeContext } from '../doc/createNode.ts'
+import { createNode, type CreateNodeContext } from '../doc/createNode.ts'
 import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
@@ -7,8 +7,8 @@ import { Collection } from './Collection.ts'
 import { isScalar, SEQ } from './identity.ts'
 import type { ParsedNode, Range } from './Node.ts'
 import type { Pair } from './Pair.ts'
-import { isScalarValue, Scalar } from './Scalar.ts'
-import { toJS, ToJSContext } from './toJS.ts'
+import { isScalarValue, type Scalar } from './Scalar.ts'
+import { toJS, type ToJSContext } from './toJS.ts'
 
 export declare namespace YAMLSeq {
   interface Parsed<

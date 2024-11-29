@@ -1,12 +1,12 @@
 import { Scalar } from '../nodes/Scalar.ts'
+import type { CollectionTag, ScalarTag } from '../schema/types.ts'
 import {
-  foldFlowLines,
-  FoldOptions,
   FOLD_BLOCK,
   FOLD_FLOW,
-  FOLD_QUOTED
+  FOLD_QUOTED,
+  foldFlowLines,
+  type FoldOptions
 } from './foldFlowLines.ts'
-import type { CollectionTag, ScalarTag } from '../schema/types.ts'
 import type { StringifyContext } from './stringify.ts'
 
 interface StringifyScalar {

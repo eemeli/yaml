@@ -1,4 +1,4 @@
-import { SchemaOptions } from '../options.ts'
+import type { SchemaOptions } from '../options.ts'
 import { map } from './common/map.ts'
 import { nullTag } from './common/null.ts'
 import { seq } from './common/seq.ts'
@@ -8,6 +8,7 @@ import { float, floatExp, floatNaN } from './core/float.ts'
 import { int, intHex, intOct } from './core/int.ts'
 import { schema as core } from './core/schema.ts'
 import { schema as json } from './json/schema.ts'
+import type { CollectionTag, ScalarTag } from './types.ts'
 import { binary } from './yaml-1.1/binary.ts'
 import { merge } from './yaml-1.1/merge.ts'
 import { omap } from './yaml-1.1/omap.ts'
@@ -15,7 +16,6 @@ import { pairs } from './yaml-1.1/pairs.ts'
 import { schema as yaml11 } from './yaml-1.1/schema.ts'
 import { set } from './yaml-1.1/set.ts'
 import { floatTime, intTime, timestamp } from './yaml-1.1/timestamp.ts'
-import type { CollectionTag, ScalarTag } from './types.ts'
 
 const schemas = new Map<string, Array<CollectionTag | ScalarTag>>([
   ['core', core],

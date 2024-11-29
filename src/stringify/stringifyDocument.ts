@@ -5,7 +5,7 @@ import type { ToStringOptions } from '../options.ts'
 import {
   createStringifyContext,
   stringify,
-  StringifyContext
+  type StringifyContext
 } from './stringify.ts'
 import { indentComment, lineComment } from './stringifyComment.ts'
 

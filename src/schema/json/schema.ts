@@ -1,7 +1,7 @@
 import { Scalar } from '../../nodes/Scalar.ts'
 import { map } from '../common/map.ts'
 import { seq } from '../common/seq.ts'
-import { CollectionTag, ScalarTag } from '../types.ts'
+import type { CollectionTag, ScalarTag } from '../types.ts'
 
 function intIdentify(value: unknown): value is number | bigint {
   return typeof value === 'bigint' || Number.isInteger(value)
