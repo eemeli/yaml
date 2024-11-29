@@ -38,6 +38,17 @@ export default [
       'no-control-regex': 'off',
       'no-fallthrough': ['error', { commentPattern: 'fallthrough' }],
       'no-implicit-globals': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^\\..*(?<!\\.ts)$',
+              message: 'Relative imports must use .ts extension.'
+            }
+          ]
+        }
+      ],
       'no-template-curly-in-string': 'warn',
       'no-var': 'error',
       'prefer-const': ['warn', { destructuring: 'all' }],
