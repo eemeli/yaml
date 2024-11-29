@@ -2,6 +2,26 @@ import typescript from '@rollup/plugin-typescript'
 import * as ts from 'typescript'
 
 /**
+ * Drop .ts extension from import & export paths in .d.ts files
+ * to support older TS versions.
+ *
+ * @param {ts.TransformationContext} context
+ */
+function fixDeclarationImportPaths(context) {
+  /** @param {ts.SourceFile} source */
+  return function fixPaths(source) {
+    /** @param {ts.Node} node */
+    function visitor(node) {
+      if (ts.isStringLiteral(node) && /^\.+\/.*\.ts$/.test(node.text)) {
+        return ts.factory.createStringLiteral(node.text.slice(0, -3), true)
+      }
+      return ts.visitEachChild(node, visitor, context)
+    }
+    return ts.visitNode(source, visitor)
+  }
+}
+
+/**
  * Strip out TS relative import path rewrite helper from dynamic import() calls
  *
  * Required due to
@@ -42,7 +62,11 @@ export default [
       esModule: false,
       preserveModules: true
     },
-    plugins: [typescript()],
+    plugins: [
+      typescript({
+        transformers: { afterDeclarations: [fixDeclarationImportPaths] }
+      })
+    ],
     treeshake: { moduleSideEffects: false, propertyReadSideEffects: false }
   },
   {
@@ -50,7 +74,10 @@ export default [
     output: { file: 'dist/cli.mjs' },
     external: () => true,
     plugins: [
-      typescript({ transformers: { after: [fixDynamicImportRewrite] } })
+      typescript({
+        declaration: false,
+        transformers: { after: [fixDynamicImportRewrite] }
+      })
     ]
   }
 ]
