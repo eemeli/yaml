@@ -6,6 +6,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "outDir": "dist",
+    "rewriteRelativeImportExtensions": true,
     "rootDir": "src",
     "strict": true,
     "target": "ES2020",

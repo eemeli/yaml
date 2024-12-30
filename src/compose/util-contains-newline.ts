@@ -1,4 +1,4 @@
-import type { Token } from '../parse/cst.js'
+import type { Token } from '../parse/cst.ts'
 
 export function containsNewline(key: Token | null | undefined) {
   if (!key) return null

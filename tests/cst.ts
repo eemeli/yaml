@@ -1,5 +1,5 @@
 import { CST, Parser } from 'yaml'
-import { source } from './_utils'
+import { source } from './_utils.ts'
 
 function cstDoc(src: string) {
   const tokens = Array.from(new Parser().parse(src))

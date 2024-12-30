@@ -1,4 +1,4 @@
-import type { CollectionItem, Token } from './cst.js'
+import type { CollectionItem, Token } from './cst.ts'
 
 /**
  * Stringify a CST document, token, or collection item

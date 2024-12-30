@@ -1,6 +1,6 @@
-import { isNode } from '../nodes/identity.js'
-import { visit } from '../visit.js'
-import type { Document } from './Document.js'
+import { isNode } from '../nodes/identity.ts'
+import { visit } from '../visit.ts'
+import type { Document } from './Document.ts'
 
 const escapeChars: Record<string, string> = {
   '!': '%21',

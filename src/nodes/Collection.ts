@@ -1,13 +1,13 @@
-import { createNode } from '../doc/createNode.js'
-import type { Schema } from '../schema/Schema.js'
+import { createNode } from '../doc/createNode.ts'
+import type { Schema } from '../schema/Schema.ts'
 import {
   isCollection,
   isNode,
   isPair,
   isScalar,
   NODE_TYPE
-} from './identity.js'
-import { NodeBase } from './Node.js'
+} from './identity.ts'
+import { NodeBase } from './Node.ts'
 
 export function collectionFromPath(
   schema: Schema,

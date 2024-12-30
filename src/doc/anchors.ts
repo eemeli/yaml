@@ -1,11 +1,11 @@
-import { isCollection, isScalar } from '../nodes/identity.js'
-import type { Node } from '../nodes/Node.js'
-import type { Scalar } from '../nodes/Scalar.js'
-import type { YAMLMap } from '../nodes/YAMLMap.js'
-import type { YAMLSeq } from '../nodes/YAMLSeq.js'
-import { visit } from '../visit.js'
-import { CreateNodeContext } from './createNode.js'
-import type { Document } from './Document.js'
+import { isCollection, isScalar } from '../nodes/identity.ts'
+import type { Node } from '../nodes/Node.ts'
+import type { Scalar } from '../nodes/Scalar.ts'
+import type { YAMLMap } from '../nodes/YAMLMap.ts'
+import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
+import { visit } from '../visit.ts'
+import type { CreateNodeContext } from './createNode.ts'
+import type { Document } from './Document.ts'
 
 /**
  * Verify that the input string is a valid anchor.

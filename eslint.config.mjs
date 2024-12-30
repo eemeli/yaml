@@ -38,9 +38,25 @@ export default [
       'no-control-regex': 'off',
       'no-fallthrough': ['error', { commentPattern: 'fallthrough' }],
       'no-implicit-globals': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^\\..*(?<!\\.ts)$',
+              message: 'Relative imports must use .ts extension.'
+            }
+          ]
+        }
+      ],
       'no-template-curly-in-string': 'warn',
       'no-var': 'error',
       'prefer-const': ['warn', { destructuring: 'all' }],
+      '@typescript-eslint/consistent-type-exports': 'error',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { fixStyle: 'separate-type-imports' }
+      ],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-namespace': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',

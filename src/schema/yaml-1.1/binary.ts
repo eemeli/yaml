@@ -1,6 +1,6 @@
-import { Scalar } from '../../nodes/Scalar.js'
-import { stringifyString } from '../../stringify/stringifyString.js'
-import type { ScalarTag } from '../types.js'
+import { Scalar } from '../../nodes/Scalar.ts'
+import { stringifyString } from '../../stringify/stringifyString.ts'
+import type { ScalarTag } from '../types.ts'
 
 export const binary: ScalarTag = {
   identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array

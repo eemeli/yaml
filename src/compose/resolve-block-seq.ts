@@ -1,10 +1,10 @@
-import { YAMLSeq } from '../nodes/YAMLSeq.js'
-import type { BlockSequence } from '../parse/cst.js'
-import { CollectionTag } from '../schema/types.js'
-import type { ComposeContext, ComposeNode } from './compose-node.js'
-import type { ComposeErrorHandler } from './composer.js'
-import { resolveProps } from './resolve-props.js'
-import { flowIndentCheck } from './util-flow-indent-check.js'
+import { YAMLSeq } from '../nodes/YAMLSeq.ts'
+import type { BlockSequence } from '../parse/cst.ts'
+import type { CollectionTag } from '../schema/types.ts'
+import type { ComposeContext, ComposeNode } from './compose-node.ts'
+import type { ComposeErrorHandler } from './composer.ts'
+import { resolveProps } from './resolve-props.ts'
+import { flowIndentCheck } from './util-flow-indent-check.ts'
 
 export function resolveBlockSeq(
   { composeNode, composeEmptyNode }: ComposeNode,

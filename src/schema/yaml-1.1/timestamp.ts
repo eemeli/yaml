@@ -1,6 +1,6 @@
-import type { Scalar } from '../../nodes/Scalar.js'
-import { stringifyNumber } from '../../stringify/stringifyNumber.js'
-import type { ScalarTag } from '../types.js'
+import type { Scalar } from '../../nodes/Scalar.ts'
+import { stringifyNumber } from '../../stringify/stringifyNumber.ts'
+import type { ScalarTag } from '../types.ts'
 
 /** Internal types handle bigint as number, because TS can't figure it out. */
 function parseSexagesimal<B extends boolean>(str: string, asBigInt?: B) {

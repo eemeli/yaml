@@ -1,4 +1,5 @@
-import { Alias, Document, parse, parseDocument, YAMLMap, YAMLSeq } from 'yaml'
+import type { Alias, YAMLMap, YAMLSeq } from 'yaml'
+import { Document, parse, parseDocument } from 'yaml'
 
 test('basic', () => {
   const src = `- &a 1\n- *a\n`

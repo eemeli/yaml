@@ -1,11 +1,12 @@
-import { createNode, CreateNodeContext } from '../doc/createNode.js'
-import type { CollectionItem } from '../parse/cst.js'
-import type { Schema } from '../schema/Schema.js'
-import type { StringifyContext } from '../stringify/stringify.js'
-import { stringifyPair } from '../stringify/stringifyPair.js'
-import { addPairToJSMap } from './addPairToJSMap.js'
-import { isNode, NODE_TYPE, PAIR } from './identity.js'
-import type { ToJSContext } from './toJS.js'
+import type { CreateNodeContext } from '../doc/createNode.ts'
+import { createNode } from '../doc/createNode.ts'
+import type { CollectionItem } from '../parse/cst.ts'
+import type { Schema } from '../schema/Schema.ts'
+import type { StringifyContext } from '../stringify/stringify.ts'
+import { stringifyPair } from '../stringify/stringifyPair.ts'
+import { addPairToJSMap } from './addPairToJSMap.ts'
+import { isNode, NODE_TYPE, PAIR } from './identity.ts'
+import type { ToJSContext } from './toJS.ts'
 
 export function createPair(
   key: unknown,

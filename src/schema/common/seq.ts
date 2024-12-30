@@ -1,6 +1,6 @@
-import { isSeq } from '../../nodes/identity.js'
-import { YAMLSeq } from '../../nodes/YAMLSeq.js'
-import type { CollectionTag } from '../types.js'
+import { isSeq } from '../../nodes/identity.ts'
+import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
+import type { CollectionTag } from '../types.ts'
 
 export const seq: CollectionTag = {
   collection: 'seq',
