@@ -1,0 +1,16 @@
+name: JSR Publish
+on:
+  push:
+    tags:
+      - v2.*
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: npx jsr publish
