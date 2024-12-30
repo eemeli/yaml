@@ -20,7 +20,7 @@ export type MapLike =
 export function findPair<K = unknown, V = unknown>(
   items: Iterable<Pair<K, V>>,
   key: unknown
-) {
+): Pair<K, V> | undefined {
   const k = isScalar(key) ? key.value : key
   for (const it of items) {
     if (isPair(it)) {
@@ -57,7 +57,7 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
    * A generic collection parsing method that can be extended
    * to other node classes that inherit from YAMLMap
    */
-  static from(schema: Schema, obj: unknown, ctx: CreateNodeContext) {
+  static from(schema: Schema, obj: unknown, ctx: CreateNodeContext): YAMLMap {
     const { keepUndefined, replacer } = ctx
     const map = new this(schema)
     const add = (key: unknown, value: unknown) => {

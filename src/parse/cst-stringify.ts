@@ -6,10 +6,10 @@ import type { CollectionItem, Token } from './cst.ts'
  * Fair warning: This applies no validation whatsoever, and
  * simply concatenates the sources in their logical order.
  */
-export const stringify = (cst: Token | CollectionItem) =>
+export const stringify = (cst: Token | CollectionItem): string =>
   'type' in cst ? stringifyToken(cst) : stringifyItem(cst)
 
-function stringifyToken(token: Token) {
+function stringifyToken(token: Token): string {
   switch (token.type) {
     case 'block-scalar': {
       let res = ''
@@ -42,7 +42,7 @@ function stringifyToken(token: Token) {
   }
 }
 
-function stringifyItem({ start, key, sep, value }: CollectionItem) {
+function stringifyItem({ start, key, sep, value }: CollectionItem): string {
   let res = ''
   for (const st of start) res += st.source
   if (key) res += stringifyToken(key)

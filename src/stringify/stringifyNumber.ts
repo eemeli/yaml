@@ -5,7 +5,7 @@ export function stringifyNumber({
   minFractionDigits,
   tag,
   value
-}: Scalar) {
+}: Scalar): string {
   if (typeof value === 'bigint') return String(value)
   const num = typeof value === 'number' ? value : Number(value)
   if (!isFinite(num)) return isNaN(num) ? '.nan' : num < 0 ? '-.inf' : '.inf'

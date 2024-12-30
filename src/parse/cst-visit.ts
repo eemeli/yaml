@@ -1,4 +1,10 @@
-import type { CollectionItem, Document } from './cst.ts'
+import type {
+  BlockMap,
+  BlockSequence,
+  CollectionItem,
+  Document,
+  FlowCollection
+} from './cst.ts'
 
 const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')
@@ -39,7 +45,7 @@ export type Visitor = (
  *     visitor is called on item entry, next visitors are called after handling
  *     a non-empty `key` and when exiting the item.
  */
-export function visit(cst: Document | CollectionItem, visitor: Visitor) {
+export function visit(cst: Document | CollectionItem, visitor: Visitor): void {
   if ('type' in cst && cst.type === 'document')
     cst = { start: cst.start, value: cst.value }
   _visit(Object.freeze([]), cst, visitor)
@@ -59,7 +65,10 @@ visit.SKIP = SKIP as symbol
 visit.REMOVE = REMOVE as symbol
 
 /** Find the item at `path` from `cst` as the root */
-visit.itemAtPath = (cst: Document | CollectionItem, path: VisitPath) => {
+visit.itemAtPath = (
+  cst: Document | CollectionItem,
+  path: VisitPath
+): CollectionItem | undefined => {
   let item: CollectionItem = cst
   for (const [field, index] of path) {
     const tok = item?.[field]
@@ -75,7 +84,10 @@ visit.itemAtPath = (cst: Document | CollectionItem, path: VisitPath) => {
  *
  * Throws an error if the collection is not found, which should never happen if the item itself exists.
  */
-visit.parentCollection = (cst: Document | CollectionItem, path: VisitPath) => {
+visit.parentCollection = (
+  cst: Document | CollectionItem,
+  path: VisitPath
+): BlockMap | BlockSequence | FlowCollection => {
   const parent = visit.itemAtPath(cst, path.slice(0, -1))
   const field = path[path.length - 1][0]
   const coll = parent?.[field]

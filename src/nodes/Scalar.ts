@@ -61,7 +61,7 @@ export class Scalar<T = unknown> extends NodeBase {
     return ctx?.keep ? this.value : toJS(this.value, arg, ctx)
   }
 
-  toString() {
+  toString(): string {
     return String(this.value)
   }
 }

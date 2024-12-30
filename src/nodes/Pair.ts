@@ -6,13 +6,14 @@ import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyPair } from '../stringify/stringifyPair.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
 import { isNode, NODE_TYPE, PAIR } from './identity.ts'
+import type { Node } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
 
 export function createPair(
   key: unknown,
   value: unknown,
   ctx: CreateNodeContext
-) {
+): Pair<Node, Node> {
   const k = createNode(key, undefined, ctx)
   const v = createNode(value, undefined, ctx)
   return new Pair(k, v)

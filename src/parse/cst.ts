@@ -174,7 +174,7 @@ export const isScalar = (
 
 /* istanbul ignore next */
 /** Get a printable representation of a lexer token */
-export function prettyToken(token: string) {
+export function prettyToken(token: string): string {
   switch (token) {
     case BOM:
       return '<BOM>'

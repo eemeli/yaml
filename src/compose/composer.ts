@@ -133,7 +133,12 @@ export class Composer<
    *
    * Mostly useful at the end of input for an empty stream.
    */
-  streamInfo() {
+  streamInfo(): {
+    comment: string
+    directives: Directives
+    errors: YAMLParseError[]
+    warnings: YAMLWarning[]
+  } {
     return {
       comment: parsePrelude(this.prelude).comment,
       directives: this.directives,
@@ -148,13 +153,19 @@ export class Composer<
    * @param forceDoc - If the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.
    * @param endOffset - Should be set if `forceDoc` is also set, to set the document range end and to indicate errors correctly.
    */
-  *compose(tokens: Iterable<Token>, forceDoc = false, endOffset = -1) {
+  *compose(
+    tokens: Iterable<Token>,
+    forceDoc = false,
+    endOffset = -1
+  ): Generator<Document.Parsed<Contents, Strict>, void, unknown> {
     for (const token of tokens) yield* this.next(token)
     yield* this.end(forceDoc, endOffset)
   }
 
   /** Advance the composer by one CST token. */
-  *next(token: Token) {
+  *next(
+    token: Token
+  ): Generator<Document.Parsed<Contents, Strict>, void, unknown> {
     if (process.env.LOG_STREAM) console.dir(token, { depth: null })
     switch (token.type) {
       case 'directive':
@@ -245,7 +256,10 @@ export class Composer<
    * @param forceDoc - If the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.
    * @param endOffset - Should be set if `forceDoc` is also set, to set the document range end and to indicate errors correctly.
    */
-  *end(forceDoc = false, endOffset = -1) {
+  *end(
+    forceDoc = false,
+    endOffset = -1
+  ): Generator<Document.Parsed<Contents, Strict>, void, unknown> {
     if (this.doc) {
       this.decorate(this.doc, true)
       yield this.doc

@@ -163,7 +163,7 @@ export abstract class Collection extends NodeBase {
     else return isCollection(node) ? node.getIn(rest, keepScalar) : undefined
   }
 
-  hasAllNullValues(allowScalar?: boolean) {
+  hasAllNullValues(allowScalar?: boolean): boolean {
     return this.items.every(node => {
       if (!isPair(node)) return false
       const n = node.value

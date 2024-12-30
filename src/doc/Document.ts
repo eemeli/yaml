@@ -265,7 +265,7 @@ export class Document<
     key: unknown,
     value: unknown,
     options: CreateNodeOptions = {}
-  ) {
+  ): Pair<K, V> {
     const k = this.createNode(key, null, options) as K
     const v = this.createNode(value, null, options) as V
     return new Pair(k, v)

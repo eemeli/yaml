@@ -98,7 +98,7 @@ export class YAMLSeq<T = unknown> extends Collection {
     else this.items[idx] = value
   }
 
-  toJSON(_?: unknown, ctx?: ToJSContext) {
+  toJSON(_?: unknown, ctx?: ToJSContext): unknown[] {
     const seq: unknown[] = []
     if (ctx?.onCreate) ctx.onCreate(seq)
     let i = 0
@@ -121,7 +121,7 @@ export class YAMLSeq<T = unknown> extends Collection {
     })
   }
 
-  static from(schema: Schema, obj: unknown, ctx: CreateNodeContext) {
+  static from(schema: Schema, obj: unknown, ctx: CreateNodeContext): YAMLSeq {
     const { replacer } = ctx
     const seq = new this(schema)
     if (obj && Symbol.iterator in Object(obj)) {

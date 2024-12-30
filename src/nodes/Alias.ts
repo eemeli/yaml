@@ -49,7 +49,7 @@ export class Alias extends NodeBase {
     return found
   }
 
-  toJSON(_arg?: unknown, ctx?: ToJSContext) {
+  toJSON(_arg?: unknown, ctx?: ToJSContext): unknown {
     if (!ctx) return { source: this.source }
     const { anchors, doc, maxAliasCount } = ctx
     const source = this.resolve(doc)
@@ -85,7 +85,7 @@ export class Alias extends NodeBase {
     ctx?: StringifyContext,
     _onComment?: () => void,
     _onChompKeep?: () => void
-  ) {
+  ): string {
     const src = `*${this.source}`
     if (ctx) {
       anchorIsValid(this.source)

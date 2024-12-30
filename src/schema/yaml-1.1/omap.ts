@@ -16,17 +16,17 @@ export class YAMLOMap extends YAMLSeq {
     this.tag = YAMLOMap.tag
   }
 
-  add = YAMLMap.prototype.add.bind(this)
-  delete = YAMLMap.prototype.delete.bind(this)
-  get = YAMLMap.prototype.get.bind(this)
-  has = YAMLMap.prototype.has.bind(this)
-  set = YAMLMap.prototype.set.bind(this)
+  add: typeof YAMLMap.prototype.add = YAMLMap.prototype.add.bind(this)
+  delete: typeof YAMLMap.prototype.delete = YAMLMap.prototype.delete.bind(this)
+  get: typeof YAMLMap.prototype.get = YAMLMap.prototype.get.bind(this)
+  has: typeof YAMLMap.prototype.has = YAMLMap.prototype.has.bind(this)
+  set: typeof YAMLMap.prototype.set = YAMLMap.prototype.set.bind(this)
 
   /**
    * If `ctx` is given, the return type is actually `Map<unknown, unknown>`,
    * but TypeScript won't allow widening the signature of a child method.
    */
-  toJSON(_?: unknown, ctx?: ToJSContext) {
+  toJSON(_?: unknown, ctx?: ToJSContext): unknown[] {
     if (!ctx) return super.toJSON(_)
     const map = new Map()
     if (ctx?.onCreate) ctx.onCreate(map)
@@ -45,7 +45,11 @@ export class YAMLOMap extends YAMLSeq {
     return map as unknown as unknown[]
   }
 
-  static from(schema: Schema, iterable: unknown, ctx: CreateNodeContext) {
+  static from(
+    schema: Schema,
+    iterable: unknown,
+    ctx: CreateNodeContext
+  ): YAMLOMap {
     const pairs = createPairs(schema, iterable, ctx)
     const omap = new this()
     omap.items = pairs.items

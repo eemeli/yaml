@@ -11,7 +11,7 @@ export function addPairToJSMap(
   ctx: ToJSContext | undefined,
   map: MapLike,
   { key, value }: Pair
-) {
+): MapLike {
   if (isNode(key) && key.addToJSMap) key.addToJSMap(ctx, map, value)
   // TODO: Should drop this special case for bare << handling
   else if (isMergeKey(ctx, key)) addMergeToJSMap(ctx, map, value)

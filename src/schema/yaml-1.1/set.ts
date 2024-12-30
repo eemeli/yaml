@@ -76,7 +76,7 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
     ctx?: StringifyContext,
     onComment?: () => void,
     onChompKeep?: () => void
-  ) {
+  ): string {
     if (!ctx) return JSON.stringify(this)
     if (this.hasAllNullValues(true))
       return super.toString(
@@ -87,7 +87,11 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
     else throw new Error('Set items must all have null values')
   }
 
-  static from(schema: Schema, iterable: unknown, ctx: CreateNodeContext) {
+  static from(
+    schema: Schema,
+    iterable: unknown,
+    ctx: CreateNodeContext
+  ): YAMLSet {
     const { replacer } = ctx
     const set = new this(schema)
     if (iterable && Symbol.iterator in Object(iterable))

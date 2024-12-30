@@ -53,7 +53,7 @@ export class Directives {
    * During parsing, get a Directives instance for the current document and
    * update the stream state according to the current version's spec.
    */
-  atDocument() {
+  atDocument(): Directives {
     const res = new Directives(this.yaml, this.tags)
     switch (this.yaml.version) {
       case '1.1':
@@ -78,7 +78,7 @@ export class Directives {
   add(
     line: string,
     onError: (offset: number, message: string, warning?: boolean) => void
-  ) {
+  ): boolean {
     if (this.atNextDocument) {
       this.yaml = { explicit: Directives.defaultYaml.explicit, version: '1.1' }
       this.tags = Object.assign({}, Directives.defaultTags)
@@ -124,7 +124,7 @@ export class Directives {
    * @returns Resolved tag, which may also be the non-specific tag `'!'` or a
    *   `'!local'` tag, or `null` if unresolvable.
    */
-  tagName(source: string, onError: (message: string) => void) {
+  tagName(source: string, onError: (message: string) => void): string | null {
     if (source === '!') return '!' // non-specific tag
 
     if (source[0] !== '!') {
@@ -164,7 +164,7 @@ export class Directives {
    * Given a fully resolved tag, returns its printable string form,
    * taking into account current tag prefixes and defaults.
    */
-  tagString(tag: string) {
+  tagString(tag: string): string {
     for (const [handle, prefix] of Object.entries(this.tags)) {
       if (tag.startsWith(prefix))
         return handle + escapeTagName(tag.substring(prefix.length))
@@ -172,7 +172,7 @@ export class Directives {
     return tag[0] === '!' ? tag : `!<${tag}>`
   }
 
-  toString(doc?: Document) {
+  toString(doc?: Document): string {
     const lines = this.yaml.explicit
       ? [`%YAML ${this.yaml.version || '1.2'}`]
       : []

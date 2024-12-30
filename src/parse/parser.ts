@@ -176,7 +176,7 @@ export class Parser {
    *
    * @returns A generator of tokens representing each directive, document, and other structure.
    */
-  *parse(source: string, incomplete = false) {
+  *parse(source: string, incomplete = false): Generator<Token, void> {
     if (this.onNewLine && this.offset === 0) this.onNewLine(0)
     for (const lexeme of this.lexer.lex(source, incomplete))
       yield* this.next(lexeme)
@@ -186,7 +186,7 @@ export class Parser {
   /**
    * Advance the parser by the `source` of one lexical token.
    */
-  *next(source: string) {
+  *next(source: string): Generator<Token, void> {
     this.source = source
     if (env.LOG_TOKENS) console.log('|', prettyToken(source))
 
@@ -237,7 +237,7 @@ export class Parser {
   private lexer = new Lexer();
 
   /** Call at end of input to push out any remaining constructions */
-  *end() {
+  *end(): Generator<Token, void> {
     while (this.stack.length > 0) yield* this.pop()
   }
 

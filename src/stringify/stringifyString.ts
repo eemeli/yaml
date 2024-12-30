@@ -346,7 +346,7 @@ export function stringifyString(
   ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
-) {
+): string {
   const { implicitKey, inFlow } = ctx
   const ss: StringifyScalar =
     typeof item.value === 'string'

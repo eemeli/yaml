@@ -171,7 +171,7 @@ export class Lexer {
    *
    * @returns A generator of lexical tokens
    */
-  *lex(source: string, incomplete = false) {
+  *lex(source: string, incomplete = false): Generator<string, void> {
     if (source) {
       if (typeof source !== 'string') throw TypeError('source is not a string')
       this.buffer = this.buffer ? this.buffer + source : source
