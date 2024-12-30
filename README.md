@@ -55,24 +55,29 @@ The first has the simplest API and "just works", the second gets you all the bel
 
 A [command-line tool](https://eemeli.org/yaml/#command-line-tool) is also included.
 
+### Parse & Stringify
+
 ```js
 import { parse, stringify } from 'yaml'
-// or
-import YAML from 'yaml'
-// or
-const YAML = require('yaml')
 ```
-
-### Parse & Stringify
 
 - [`parse(str, reviver?, options?): value`](https://eemeli.org/yaml/#yaml-parse)
 - [`stringify(value, replacer?, options?): string`](https://eemeli.org/yaml/#yaml-stringify)
 
 ### Documents
 
+<!-- prettier-ignore -->
+```js
+import {
+  Document,
+  isDocument,
+  parseAllDocuments,
+  parseDocument
+} from 'yaml'
+```
+
 - [`Document`](https://eemeli.org/yaml/#documents)
   - [`constructor(value, replacer?, options?)`](https://eemeli.org/yaml/#creating-documents)
-  - [`#anchors`](https://eemeli.org/yaml/#working-with-anchors)
   - [`#contents`](https://eemeli.org/yaml/#content-nodes)
   - [`#directives`](https://eemeli.org/yaml/#stream-directives)
   - [`#errors`](https://eemeli.org/yaml/#errors)
@@ -82,6 +87,15 @@ const YAML = require('yaml')
 - [`parseDocument(str, options?): Document`](https://eemeli.org/yaml/#parsing-documents)
 
 ### Content Nodes
+
+<!-- prettier-ignore -->
+```js
+import {
+  isAlias, isCollection, isMap, isNode,
+  isPair, isScalar, isSeq, Scalar,
+  visit, visitAsync, YAMLMap, YAMLSeq
+} from 'yaml'
+```
 
 - [`isAlias(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
 - [`isCollection(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
@@ -93,12 +107,17 @@ const YAML = require('yaml')
 - [`new Scalar(value)`](https://eemeli.org/yaml/#scalar-values)
 - [`new YAMLMap()`](https://eemeli.org/yaml/#collections)
 - [`new YAMLSeq()`](https://eemeli.org/yaml/#collections)
-- [`doc.createAlias(node, name?): Alias`](https://eemeli.org/yaml/#working-with-anchors)
+- [`doc.createAlias(node, name?): Alias`](https://eemeli.org/yaml/#creating-nodes)
 - [`doc.createNode(value, options?): Node`](https://eemeli.org/yaml/#creating-nodes)
 - [`doc.createPair(key, value): Pair`](https://eemeli.org/yaml/#creating-nodes)
 - [`visit(node, visitor)`](https://eemeli.org/yaml/#finding-and-modifying-nodes)
+- [`visitAsync(node, visitor)`](https://eemeli.org/yaml/#finding-and-modifying-nodes)
 
 ### Parsing YAML
+
+```js
+import { Composer, Lexer, Parser } from 'yaml'
+```
 
 - [`new Lexer().lex(src)`](https://eemeli.org/yaml/#lexer)
 - [`new Parser(onNewLine?).parse(src)`](https://eemeli.org/yaml/#parser)

@@ -86,15 +86,15 @@ import {
 } from 'yaml'
 ```
 
-- [`isNode(foo): boolean`](#identifying-nodes)
+- [`is*(foo): boolean`](#identifying-node-types)
 - [`new Scalar(value)`](#scalar-values)
 - [`new YAMLMap()`](#collections)
 - [`new YAMLSeq()`](#collections)
 - [`doc.createAlias(node, name?): Alias`](#creating-nodes)
 - [`doc.createNode(value, options?): Node`](#creating-nodes)
 - [`doc.createPair(key, value): Pair`](#creating-nodes)
-- [`visit(node, visitor)`](#modifying-nodes)
-- [`visitAsync(node, visitor)`](#modifying-nodes)
+- [`visit(node, visitor)`](#finding-and-modifying-nodes)
+- [`visitAsync(node, visitor)`](#finding-and-modifying-nodes)
 
 <h3>Parsing YAML</h3>
 
