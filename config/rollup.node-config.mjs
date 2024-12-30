@@ -62,6 +62,7 @@ export default [
       esModule: false,
       preserveModules: true
     },
+    external: ['node:buffer', 'node:process'],
     plugins: [
       typescript({
         transformers: { afterDeclarations: [fixDeclarationImportPaths] }

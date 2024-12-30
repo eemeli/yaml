@@ -1,3 +1,4 @@
+import { env } from 'node:process'
 import type {
   SourceToken,
   Token,
@@ -187,7 +188,7 @@ export class Parser {
    */
   *next(source: string) {
     this.source = source
-    if (process.env.LOG_TOKENS) console.log('|', prettyToken(source))
+    if (env.LOG_TOKENS) console.log('|', prettyToken(source))
 
     if (this.atScalar) {
       this.atScalar = false

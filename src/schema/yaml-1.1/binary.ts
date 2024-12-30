@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer'
 import { Scalar } from '../../nodes/Scalar.ts'
 import { stringifyString } from '../../stringify/stringifyString.ts'
 import type { ScalarTag } from '../types.ts'
