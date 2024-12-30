@@ -1,3 +1,4 @@
+import { env } from 'node:process'
 import { Directives } from '../doc/directives.ts'
 import { Document } from '../doc/Document.ts'
 import type { ErrorCode } from '../errors.ts'
@@ -166,7 +167,7 @@ export class Composer<
   *next(
     token: Token
   ): Generator<Document.Parsed<Contents, Strict>, void, unknown> {
-    if (process.env.LOG_STREAM) console.dir(token, { depth: null })
+    if (env.LOG_STREAM) console.dir(token, { depth: null })
     switch (token.type) {
       case 'directive':
         this.directives.add(token.source, (offset, message, warning) => {
