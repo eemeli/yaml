@@ -5,7 +5,7 @@
 ```sh
 npm install yaml
 # or
-yarn add yaml
+deno add jsr:@eemeli/yaml
 ```
 
 > To use:
