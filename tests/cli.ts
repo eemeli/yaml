@@ -208,6 +208,14 @@ const skip = Number(major) < 20
         ]
       )
     })
+    describe('--merge', () => {
+      ok(
+        'basic',
+        'hello:\n  world: 2\nfoo:\n  world: 2',
+        ['--merge', '--json'],
+        ['[{"hello":{"world":2},"foo":{"world":2}}]']
+      )
+    })
     describe('--doc', () => {
       ok('basic', 'hello: world', ['--doc'], [{ contents: { items: [{}] } }])
       ok(
