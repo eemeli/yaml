@@ -34,6 +34,7 @@ export const binary: ScalarTag = {
   },
 
   stringify({ comment, type, value }, ctx, onComment, onChompKeep) {
+    if (!value) return ''
     const buf = value as Uint8Array // checked earlier by binary.identify()
     let str: string
     if (typeof Buffer === 'function') {

@@ -624,6 +624,24 @@ describe('handling complex keys', () => {
     expect(obj).toMatchObject([{ '[ foo ]': 'bar' }])
     expect(process.emitWarning).toHaveBeenCalled()
   })
+
+  test('Error on unresolved !!binary node with mapAsMap: false (#610)', () => {
+    process.emitWarning = jest.fn()
+    const doc = YAML.parseDocument('? ? !!binary ? !!binary')
+    expect(doc.warnings).toMatchObject([{ code: 'BAD_COLLECTION_TYPE' }])
+    doc.toJS()
+    expect(process.emitWarning).toHaveBeenCalled()
+  })
+
+  test('Error on unresolved !!timestamp node with mapAsMap: false (#610)', () => {
+    process.emitWarning = jest.fn()
+    const doc = YAML.parseDocument(
+      '? ? !!timestamp ? !!timestamp 2025-03-15T15:35:58.586Z'
+    )
+    expect(doc.warnings).toMatchObject([{ code: 'BAD_COLLECTION_TYPE' }])
+    doc.toJS()
+    expect(process.emitWarning).toHaveBeenCalled()
+  })
 })
 
 test('Document.toJS({ onAnchor })', () => {

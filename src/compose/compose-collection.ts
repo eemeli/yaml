@@ -108,11 +108,11 @@ export function composeCollection(
       ctx.schema.tags.push(Object.assign({}, kt, { default: false }))
       tag = kt
     } else {
-      if (kt?.collection) {
+      if (kt) {
         onError(
           tagToken,
           'BAD_COLLECTION_TYPE',
-          `${kt.tag} used for ${expType} collection, but expects ${kt.collection}`,
+          `${kt.tag} used for ${expType} collection, but expects ${kt.collection ?? 'scalar'}`,
           true
         )
       } else {
