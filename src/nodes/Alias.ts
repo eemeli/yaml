@@ -52,7 +52,17 @@ export class Alias extends NodeBase {
   toJSON(_arg?: unknown, ctx?: ToJSContext): unknown {
     if (!ctx) return { source: this.source }
     const { anchors, doc, maxAliasCount } = ctx
-    const source = this.resolve(doc)
+
+    let source: Scalar | YAMLMap | YAMLSeq | undefined = undefined
+    if (ctx.anchorAndAliasNodes) {
+      for (const node of ctx.anchorAndAliasNodes) {
+        if (node === this) break
+        if (node.anchor === this.source) source = node
+      }
+    } else {
+      source = this.resolve(doc)
+    }
+
     if (!source) {
       const msg = `Unresolved alias (the anchor must be set before the alias): ${this.source}`
       throw new ReferenceError(msg)

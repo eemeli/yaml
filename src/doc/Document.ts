@@ -433,7 +433,8 @@ export class Document<
       keep: !json,
       mapAsMap: mapAsMap === true,
       mapKeyWarned: false,
-      maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100
+      maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100,
+      anchorAndAliasNodes: []
     }
     const res = toJS(this.contents, jsonArg ?? '', ctx)
     if (typeof onAnchor === 'function')
