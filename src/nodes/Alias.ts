@@ -42,23 +42,21 @@ export class Alias extends NodeBase {
     doc: Document,
     ctx?: ToJSContext
   ): Scalar | YAMLMap | YAMLSeq | undefined {
-    let found: Scalar | YAMLMap | YAMLSeq | undefined = undefined
-
-    if (!ctx) {
+    let nodes: Node[]
+    if (ctx?.aliasResolveCache) {
+      nodes = ctx.aliasResolveCache
+    } else {
+      nodes = []
       visit(doc, {
         Node: (_key: unknown, node: Node) => {
-          if (node === this) return visit.BREAK
-          if (node.anchor === this.source) found = node
+          if (isAlias(node) || hasAnchor(node)) nodes.push(node)
         }
       })
-      return found
+      if (ctx) ctx.aliasResolveCache = nodes
     }
 
-    if (!ctx.aliasResolveCache) {
-      ctx.aliasResolveCache = buildCache(doc)
-    }
-
-    for (const node of ctx.aliasResolveCache) {
+    let found: Scalar | YAMLMap | YAMLSeq | undefined = undefined
+    for (const node of nodes) {
       if (node === this) break
       if (node.anchor === this.source) found = node
     }
@@ -138,16 +136,4 @@ function getAliasCount(
     return Math.max(kc, vc)
   }
   return 1
-}
-
-function buildCache(
-  doc: Document<Node, boolean>
-): (Scalar | YAMLMap | YAMLSeq | Alias)[] {
-  const found: (Scalar | YAMLMap | YAMLSeq | Alias)[] = []
-  visit(doc, {
-    Node: (_key: unknown, node: Node) => {
-      if (isAlias(node) || hasAnchor(node)) found.push(node)
-    }
-  })
-  return found
 }

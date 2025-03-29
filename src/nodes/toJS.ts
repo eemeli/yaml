@@ -1,10 +1,6 @@
 import type { Document } from '../doc/Document.ts'
 import { hasAnchor } from './identity.ts'
 import type { Node } from './Node.ts'
-import type { Alias } from './Alias.ts'
-import type { Scalar } from './Scalar.ts'
-import type { YAMLMap } from './YAMLMap.ts'
-import type { YAMLSeq } from './YAMLSeq.ts'
 
 export interface AnchorData {
   aliasCount: number
@@ -15,7 +11,7 @@ export interface AnchorData {
 export interface ToJSContext {
   anchors: Map<Node, AnchorData>
   /** Cached anchor and allias nodes in the order they occurred in the document */
-  aliasResolveCache?: (Alias | Scalar | YAMLMap | YAMLSeq)[]
+  aliasResolveCache?: Node[]
   doc: Document<Node, boolean>
   keep: boolean
   mapAsMap: boolean
