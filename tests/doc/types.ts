@@ -107,20 +107,20 @@ describe('tags', () => {
       })
     }
 
-    test('malformed URI (eemeli/yaml#498)', () => {
+    test('malformed URI (#498)', () => {
       const doc = parseDocument('!!%ee 0')
       expect(doc.errors).toHaveLength(1)
       expect(doc.errors[0].message).toMatch('URIError')
     })
 
-    test('CR in tag shorthand (eemeli/yaml#501', () => {
+    test('CR in tag shorthand (#501)', () => {
       const doc = parseDocument(': | !\r!')
       const err = doc.errors.find(err => err.code === 'TAG_RESOLVE_FAILED')
       expect(err).not.toBeFalsy()
     })
   })
 
-  test('eemeli/yaml#97', () => {
+  test('float with fraction digits (#97)', () => {
     const doc = parseDocument('foo: !!float 3.0')
     expect(String(doc)).toBe('foo: !!float 3.0\n')
   })
@@ -250,7 +250,7 @@ describe('number types', () => {
   })
 })
 
-test('eemeli/yaml#2', () => {
+test('Indented sequence with sequence values (#2)', () => {
   const src = `
 aliases:
   - docker:
@@ -844,7 +844,7 @@ date (00:00:00Z): 2002-12-14\n`)
       expect(str2).toBe(`- a\n- b\n- c\n`)
     })
 
-    test('eemeli/yaml#78', () => {
+    test('stringify in collection (#78)', () => {
       const set = new Set(['a', 'b', 'c'])
       const str = stringify({ set }, { version: '1.1' })
       expect(str).toBe(source`

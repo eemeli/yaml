@@ -19,13 +19,13 @@ describe('tabs as indentation', () => {
   })
 })
 
-test('eemeli/yaml#6', () => {
+test('end with missing block map : indicator (#6)', () => {
   const src = 'abc: 123\ndef'
   const doc = YAML.parseDocument(src)
   expect(doc.errors).toMatchObject([{ pos: [9, 12] }])
 })
 
-describe('eemeli/yaml#7', () => {
+describe('multiple trailing commas (#7)', () => {
   test('map', () => {
     const src = '{ , }\n---\n{ 123,,, }\n'
     const docs = YAML.parseAllDocuments(src)
@@ -132,7 +132,7 @@ describe('block collections', () => {
     ])
   })
 
-  test('key after long comment on empty value (eemeli/yaml#413)', () => {
+  test('key after long comment on empty value (#413)', () => {
     const doc = YAML.parseDocument(source`
       one:
         # large block of text, large block of text, large block of text, large block of text, large block of text,
@@ -150,7 +150,7 @@ describe('block collections', () => {
     expect(doc.errors).toMatchObject([])
   })
 
-  test('key after long comment on block map (eemeli/yaml#413)', () => {
+  test('key after long comment on block map (#413)', () => {
     const doc = YAML.parseDocument(source`
       one:
         sub: a
@@ -169,7 +169,7 @@ describe('block collections', () => {
     expect(doc.errors).toMatchObject([])
   })
 
-  test('key after long comment on block seq (eemeli/yaml#413)', () => {
+  test('key after long comment on block seq (#413)', () => {
     const doc = YAML.parseDocument(source`
       one:
         - a
@@ -190,12 +190,12 @@ describe('block collections', () => {
 })
 
 describe('flow collections', () => {
-  test('start only of flow map (eemeli/yaml#8)', () => {
+  test('start only of flow map (#8)', () => {
     const doc = YAML.parseDocument('{')
     expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR', pos: [1, 2] }])
   })
 
-  test('start only of flow sequence (eemeli/yaml#8)', () => {
+  test('start only of flow sequence (#8)', () => {
     const doc = YAML.parseDocument('[')
     expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR', pos: [1, 2] }])
   })
@@ -270,7 +270,7 @@ describe('comments', () => {
 })
 
 describe('pretty errors', () => {
-  test('eemeli/yaml#6', () => {
+  test('end with missing block map : indicator (#6)', () => {
     const src = 'abc: 123\ndef'
     const doc = YAML.parseDocument(src, { prettyErrors: true })
     expect(doc.errors).toMatchObject([
@@ -292,7 +292,7 @@ describe('pretty errors', () => {
     expect(doc.errors[0]).not.toHaveProperty('source')
   })
 
-  test('eemeli/yaml#7 maps', () => {
+  test('multiple trailing commas in mappings (#7)', () => {
     const src = '{ , }\n---\n{ 123,,, }\n'
     const docs = YAML.parseAllDocuments(src, { prettyErrors: true })
     expect(docs[0].errors).toMatchObject([

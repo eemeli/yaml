@@ -145,7 +145,7 @@ describe('double-quoted', () => {
   })
 
   describe('Folding double-quoted strings', () => {
-    describe('eemeli/yaml#48: Split \\" escape in double-quoted string', () => {
+    describe('Split \\" escape in double-quoted string (#48)', () => {
       test('minimal', () => {
         const src2 = '"01234567\\""'
         expect(fold(src2, '', FOLD_QUOTED, options)).toBe('"01234567\\\n\\""')
@@ -163,27 +163,25 @@ describe('double-quoted', () => {
       })
     })
 
-    describe('eemeli/yaml#57', () => {
-      test('minimal', () => {
+    describe('Fold on multiple escaped characters', () => {
+      test('minimal (#57)', () => {
         const str = `"0123\\"\\\\ '"`
         expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"0123\\"\\\\\n'"`)
       })
 
-      test('reported', () => {
+      test('reported (#57)', () => {
         const key2 = `!""""""""""""""""""""""""""""""""""#"\\ '`
         const str = YAML.stringify([{ key2 }])
         const res = YAML.parse(str)
         expect(res[0].key2).toBe(key2)
       })
-    })
-
-    describe('eemeli/yaml#59', () => {
-      test('minimal', () => {
+      
+      test('minimal (#59)', () => {
         const str = `"######\\\\P#"`
         expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"######\\\\\\\nP#"`)
       })
 
-      test('reported', () => {
+      test('reported (#59)', () => {
         const value =
           '>####################################"##########################\'####\\P#'
         const str = YAML.stringify({ key: [[value]] })
@@ -193,7 +191,7 @@ describe('double-quoted', () => {
       })
     })
 
-    describe('awslabs/cdk8s#494', () => {
+    describe('Fold on escaped character (awslabs/cdk8s#494)', () => {
       test('slash', () => {
         const str = `"1234567\\\\ab"`
         expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"1234567\\\n\\\\ab"`)
@@ -211,7 +209,7 @@ describe('double-quoted', () => {
     })
   })
 
-  describe('Folding input with excessive start indentation - eemeli/yaml#196', () => {
+  describe('Folding input with excessive start indentation (#196)', () => {
     test('quoted', () => {
       options.indentAtStart = 6
       options.minContentWidth = 6
@@ -251,7 +249,7 @@ describe('double-quoted', () => {
 })
 
 describe('block scalar', () => {
-  test('eemeli/yaml#422', () => {
+  test('Indented first line (#422)', () => {
     const obj = {
       'nginx.ingress.kubernetes.io/configuration-snippet': source`
           location ~* ^/sites/aaaaaaa.aa/files/(.+) {
@@ -319,7 +317,7 @@ describe('end-to-end', () => {
     expect(doc.toString(foldOptions)).toBe(src)
   })
 
-  test('eemeli/yaml#55', () => {
+  test('More-indented first line (#55)', () => {
     const str = ' first more-indented line\nnext line\n'
     const ys = YAML.stringify(str, foldOptions)
     expect(ys).toBe('>1\n first more-indented line\nnext line\n')

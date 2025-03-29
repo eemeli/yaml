@@ -519,14 +519,14 @@ z:
   })
 })
 
-test('eemeli/yaml#43: Quoting colons', () => {
+test('Quoting colons (#43)', () => {
   const doc = new YAML.Document({ key: ':' })
   const str = String(doc)
   expect(() => YAML.parse(str)).not.toThrow()
   expect(str).toBe('key: ":"\n')
 })
 
-test('eemeli/yaml#52: Quoting item markers', () => {
+test('Quoting item markers (#52)', () => {
   const doc = new YAML.Document({ key: '-' })
   const str = String(doc)
   expect(() => YAML.parse(str)).not.toThrow()
@@ -542,7 +542,7 @@ test('reserved names', () => {
   expect(str).toBe('comment: foo\n')
 })
 
-describe('eemeli/yaml#85', () => {
+describe('Collection pairs with single-line flow collections (#85)', () => {
   test('reported', () => {
     const str = `testArray: []\ntestObject: {}\ntestArray2: [ "hello" ]\n`
     const doc = YAML.parseDocument(str)
@@ -558,7 +558,7 @@ describe('eemeli/yaml#85', () => {
   })
 })
 
-test('eemeli/yaml#87', () => {
+test('set(object) in collection (#87)', () => {
   const doc = YAML.parseDocument('test: x')
   doc.set('test', { a: 'test' })
   expect(String(doc)).toBe('test:\n  a: test\n')
@@ -753,7 +753,7 @@ describe('simple keys', () => {
   })
 })
 
-test('eemeli/yaml#128: YAML node inside object', () => {
+test('YAML node inside object (#128)', () => {
   const doc = new YAML.Document()
   const seq = doc.createNode(['a'])
   seq.commentBefore = 'sc'
@@ -921,7 +921,7 @@ describe('lineWidth', () => {
     )
   })
 
-  test('less than minContentWidth (eemeli/yaml#562)', () => {
+  test('less than minContentWidth (#562)', () => {
     const doc = YAML.parseDocument('>\ntest test test test test')
     expect(doc.toString({ lineWidth: 18, minContentWidth: 20 })).toBe(
       '>\ntest test test\ntest test\n'
@@ -1197,7 +1197,7 @@ describe('Document markers in top-level scalars', () => {
   })
 })
 
-describe('Document markers in top-level map keys (eemeli/yaml#431)', () => {
+describe('Document markers in top-level map keys (#431)', () => {
   test('---', () => {
     const str = YAML.stringify({ '--- x': 42 })
     expect(str).toBe('"--- x": 42\n')

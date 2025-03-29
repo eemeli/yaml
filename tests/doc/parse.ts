@@ -15,15 +15,7 @@ describe('scalars', () => {
   })
 })
 
-test('eemeli/yaml#3', () => {
-  const src = '{ ? : 123 }'
-  const doc = YAML.parseDocument<any>(src)
-  expect(doc.errors).toHaveLength(0)
-  expect(doc.contents.items[0].key.value).toBeNull()
-  expect(doc.contents.items[0].value.value).toBe(123)
-})
-
-describe('eemeli/yaml#10', () => {
+describe('indented block sequence (#10)', () => {
   test('reported', () => {
     const src = `
 aliases:
@@ -154,7 +146,7 @@ aliases:
   })
 })
 
-test('buffer as source (eemeli/yaml#459)', () => {
+test('buffer as source (#459)', () => {
   const buffer = readFileSync(
     resolve(__dirname, '../artifacts/prettier-circleci-config.yml')
   )
@@ -163,39 +155,8 @@ test('buffer as source (eemeli/yaml#459)', () => {
   )
 })
 
-describe('eemeli/yaml#19', () => {
-  test('map', () => {
-    const src = 'a:\n  # 123'
-    const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('a: # 123\n')
-  })
-
-  test('seq', () => {
-    const src = '- a: # 123'
-    const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe('- a: # 123\n')
-  })
-})
-
-test('eemeli/yaml#32', () => {
-  expect(YAML.parse('[ ? ]')).toEqual([{ '': null }])
-  expect(YAML.parse('[? 123]')).toEqual([{ 123: null }])
-  expect(YAML.parse('[ 123, ? ]')).toEqual([123, { '': null }])
-  expect(YAML.parse('[ 123, ? 456 ]')).toEqual([123, { 456: null }])
-})
-
-describe('block scalars', () => {
-  test('eemeli/yaml#34', () => {
-    expect(YAML.parse('|')).toEqual('')
-  })
-
-  test('eemeli/yaml#313', () => {
-    expect(YAML.parse('|+\n   \n\n     \n')).toEqual('\n\n\n')
-  })
-})
-
-test('eemeli/yaml#36', () => {
-  expect(() => YAML.parse(`{ x: ${'x'.repeat(1024)} }`)).not.toThrowError()
+test('long scalar value in flow map (#36)', () => {
+  expect(() => YAML.parse(`{ x: ${'x'.repeat(1024)} }`)).not.toThrow()
 })
 
 describe('flow collection keys', () => {
@@ -275,7 +236,7 @@ describe('flow collection keys', () => {
   })
 })
 
-test('eemeli/yaml#38', () => {
+test('indented block sequnce with inner block sequence (#38)', () => {
   const src = `
   content:
     arrayOfArray:
@@ -305,7 +266,7 @@ test('eemeli/yaml#38', () => {
   })
 })
 
-test('eemeli/yaml#120', () => {
+test('stream end after : indicator (#120)', () => {
   const src = `test:
     - test1: test1
       test2:`
@@ -314,7 +275,7 @@ test('eemeli/yaml#120', () => {
   })
 })
 
-test('comment between key & : in flow collection (eemeli/yaml#149)', () => {
+test('comment between key & : in flow collection (#149)', () => {
   const src1 = '{"a"\n#c\n:1}'
   expect(YAML.parse(src1)).toEqual({ a: 1 })
 
@@ -323,7 +284,7 @@ test('comment between key & : in flow collection (eemeli/yaml#149)', () => {
   expect(doc.errors).toMatchObject([{ code: 'MISSING_CHAR' }])
 })
 
-describe('indented key with anchor (eemeli/yaml#378)', () => {
+describe('indented key with anchor (#378)', () => {
   test('followed by value', () => {
     const src1 = '&a foo: 1\n&b bar: 2'
     expect(YAML.parse(src1)).toEqual({ foo: 1, bar: 2 })
@@ -344,6 +305,45 @@ describe('indented key with anchor (eemeli/yaml#378)', () => {
 })
 
 describe('empty(ish) nodes', () => {
+  test('empty explicit key (#3)', () => {
+    const src = '{ ? : 123 }'
+    const doc = YAML.parseDocument<any>(src)
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.contents.items[0].key.value).toBeNull()
+    expect(doc.contents.items[0].value.value).toBe(123)
+  })
+
+  describe('comment on empty pair value (#19)', () => {
+    test('map', () => {
+      const src = 'a:\n  # 123'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('a: # 123\n')
+    })
+
+    test('seq', () => {
+      const src = '- a: # 123'
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe('- a: # 123\n')
+    })
+  })
+
+  test('explicit key with empty value (#32)', () => {
+    expect(YAML.parse('[ ? ]')).toEqual([{ '': null }])
+    expect(YAML.parse('[? 123]')).toEqual([{ 123: null }])
+    expect(YAML.parse('[ 123, ? ]')).toEqual([123, { '': null }])
+    expect(YAML.parse('[ 123, ? 456 ]')).toEqual([123, { 456: null }])
+  })
+
+  describe('empty block scalars', () => {
+    test('no body (#34)', () => {
+      expect(YAML.parse('|')).toEqual('')
+    })
+
+    test('whitespace with indents (#313)', () => {
+      expect(YAML.parse('|+\n   \n\n     \n')).toEqual('\n\n\n')
+    })
+  })
+
   test('empty node position', () => {
     const doc = YAML.parseDocument<any>('\r\na: # 123\r\n')
     const empty = doc.contents.items[0].value
@@ -699,7 +699,7 @@ describe('keepSourceTokens', () => {
     })
   }
 
-  test('allow for CST modifications (eemeli/yaml#903)', () => {
+  test('allow for CST modifications (#903)', () => {
     const src = 'foo:\n  [ 42 ]'
     const tokens = Array.from(new YAML.Parser().parse(src))
     const docs = new YAML.Composer<YAML.ParsedNode, false>({

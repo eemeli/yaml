@@ -597,7 +597,7 @@ describe('stringify comments', () => {
       `)
     })
 
-    test('line comment after flow collection (eemeli/yaml#443)', () => {
+    test('line comment after flow collection (#443)', () => {
       const doc = YAML.parseDocument(source`
         [ value1, value2 ] # comment
       `)
@@ -847,7 +847,7 @@ describe('blank lines', () => {
     })
   })
 
-  test('blank line after less-indented comment (eemeli/yaml#91)', () => {
+  test('blank line after less-indented comment (#91)', () => {
     const src = `
 map:
   foo0:
@@ -1088,7 +1088,7 @@ map:
     })
   })
 
-  test('eemeli/yaml#277', () => {
+  test('trailing comment with trailing empty line (#277)', () => {
     const src = source`
       environment:
         ### SESSION START ###
@@ -1107,7 +1107,7 @@ map:
   })
 })
 
-describe('eemeli/yaml#18', () => {
+describe('comment after mapping key (#18)', () => {
   test('reported', () => {
     const src = `test1:
   foo:
@@ -1124,7 +1124,7 @@ describe('eemeli/yaml#18', () => {
   })
 })
 
-describe('eemeli/yaml#28', () => {
+describe('trailing comments on collection (#28)', () => {
   test('reported', () => {
     const src = `# This comment is ok
 entryA:
