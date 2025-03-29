@@ -3,7 +3,7 @@ import type { Document } from '../doc/Document.ts'
 import type { FlowScalar } from '../parse/cst.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { visit } from '../visit.ts'
-import { ALIAS, isAlias, isCollection, isPair } from './identity.ts'
+import { ALIAS, hasAnchor, isAlias, isCollection, isPair } from './identity.ts'
 import type { Node, Range } from './Node.ts'
 import { NodeBase } from './Node.ts'
 import type { Scalar } from './Scalar.ts'
@@ -38,31 +38,38 @@ export class Alias extends NodeBase {
    * Resolve the value of this alias within `doc`, finding the last
    * instance of the `source` anchor before this node.
    */
-  resolve(doc: Document): Scalar | YAMLMap | YAMLSeq | undefined {
+  resolve(
+    doc: Document,
+    ctx?: ToJSContext
+  ): Scalar | YAMLMap | YAMLSeq | undefined {
     let found: Scalar | YAMLMap | YAMLSeq | undefined = undefined
-    visit(doc, {
-      Node: (_key: unknown, node: Node) => {
-        if (node === this) return visit.BREAK
-        if (node.anchor === this.source) found = node
-      }
-    })
+
+    if (!ctx) {
+      visit(doc, {
+        Node: (_key: unknown, node: Node) => {
+          if (node === this) return visit.BREAK
+          if (node.anchor === this.source) found = node
+        }
+      })
+      return found
+    }
+
+    if (!ctx.aliasResolveCache) {
+      ctx.aliasResolveCache = buildCache(doc)
+    }
+
+    for (const node of ctx.aliasResolveCache) {
+      if (node === this) break
+      if (node.anchor === this.source) found = node
+    }
+
     return found
   }
 
   toJSON(_arg?: unknown, ctx?: ToJSContext): unknown {
     if (!ctx) return { source: this.source }
     const { anchors, doc, maxAliasCount } = ctx
-
-    let source: Scalar | YAMLMap | YAMLSeq | undefined = undefined
-    if (ctx.anchorAndAliasNodes) {
-      for (const node of ctx.anchorAndAliasNodes) {
-        if (node === this) break
-        if (node.anchor === this.source) source = node
-      }
-    } else {
-      source = this.resolve(doc)
-    }
-
+    const source = this.resolve(doc, ctx)
     if (!source) {
       const msg = `Unresolved alias (the anchor must be set before the alias): ${this.source}`
       throw new ReferenceError(msg)
@@ -131,4 +138,16 @@ function getAliasCount(
     return Math.max(kc, vc)
   }
   return 1
+}
+
+function buildCache(
+  doc: Document<Node, boolean>
+): (Scalar | YAMLMap | YAMLSeq | Alias)[] {
+  const found: (Scalar | YAMLMap | YAMLSeq | Alias)[] = []
+  visit(doc, {
+    Node: (_key: unknown, node: Node) => {
+      if (isAlias(node) || hasAnchor(node)) found.push(node)
+    }
+  })
+  return found
 }

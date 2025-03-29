@@ -1,5 +1,5 @@
 import type { Document } from '../doc/Document.ts'
-import { hasAnchor, isAlias } from './identity.ts'
+import { hasAnchor } from './identity.ts'
 import type { Node } from './Node.ts'
 import type { Alias } from './Alias.ts'
 import type { Scalar } from './Scalar.ts'
@@ -15,7 +15,7 @@ export interface AnchorData {
 export interface ToJSContext {
   anchors: Map<Node, AnchorData>
   /** Cached anchor and allias nodes in the order they occurred in the document */
-  anchorAndAliasNodes?: (Alias | Scalar | YAMLMap | YAMLSeq)[]
+  aliasResolveCache?: (Alias | Scalar | YAMLMap | YAMLSeq)[]
   doc: Document<Node, boolean>
   keep: boolean
   mapAsMap: boolean
@@ -39,24 +39,13 @@ export function toJS(value: any, arg: string | null, ctx?: ToJSContext): any {
   if (Array.isArray(value)) return value.map((v, i) => toJS(v, String(i), ctx))
   if (value && typeof value.toJSON === 'function') {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    if (!ctx) return value.toJSON(arg, ctx)
-
-    if (!hasAnchor(value)) {
-      if (ctx.anchorAndAliasNodes && isAlias(value))
-        ctx.anchorAndAliasNodes.push(value)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      return value.toJSON(arg, ctx)
-    }
-
+    if (!ctx || !hasAnchor(value)) return value.toJSON(arg, ctx)
     const data: AnchorData = { aliasCount: 0, count: 1, res: undefined }
     ctx.anchors.set(value, data)
     ctx.onCreate = res => {
       data.res = res
       delete ctx.onCreate
     }
-
-    if (ctx.anchorAndAliasNodes) ctx.anchorAndAliasNodes.push(value)
-
     const res = value.toJSON(arg, ctx)
     if (ctx.onCreate) ctx.onCreate(res)
     return res
