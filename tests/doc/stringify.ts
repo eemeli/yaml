@@ -1035,6 +1035,29 @@ describe('Scalar options', () => {
     })
   })
 
+  describe('inlineIndentBeforeComment option', () => {
+    test('respects inlineIndentBeforeComment', () => {
+      const opt = {
+        indentBeforeInlineComment: 2
+      } as const
+      const yaml: string = `foo: bar  # a comment\n`
+      const doc = YAML.parseDocument(yaml)  
+      expect(doc.toString(opt)).toBe(yaml)
+    })
+    test('inlineIndentBeforeComment plays well with multiline comments', () => {
+      const opt = {
+        indentBeforeInlineComment: 2
+      } as const
+      const yaml: string = `# this is a comment
+# that extends
+# over multiple lines
+foo: bar  # a comment
+`  
+      const doc = YAML.parseDocument(yaml)
+      expect(doc.toString(opt)).toEqual(yaml)
+    })
+  })
+
   for (const { singleQuote, numeric, upgrade, parsed } of [
     {
       singleQuote: null,

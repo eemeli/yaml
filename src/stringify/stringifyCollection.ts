@@ -63,7 +63,7 @@ function stringifyBlockCollection(
       () => (comment = null),
       () => (chompKeep = true)
     )
-    if (comment) str += lineComment(str, itemIndent, commentString(comment))
+    if (comment) str += lineComment(str, itemIndent, commentString(comment), ctx.inlineIndentBeforeComment ?? 1)
     if (chompKeep && comment) chompKeep = false
     lines.push(blockItemPrefix + str)
   }
@@ -135,7 +135,7 @@ function stringifyFlowCollection(
     if (comment) reqNewline = true
     let str = stringify(item, itemCtx, () => (comment = null))
     if (i < items.length - 1) str += ','
-    if (comment) str += lineComment(str, itemIndent, commentString(comment))
+    if (comment) str += lineComment(str, itemIndent, commentString(comment), ctx.inlineIndentBeforeComment ?? 1)
     if (!reqNewline && (lines.length > linesAtValue || str.includes('\n')))
       reqNewline = true
     lines.push(str)

@@ -323,6 +323,13 @@ export type ToStringOptions = {
   indent?: number
 
   /**
+   * The number of spaces to use when indenting an inline comment.
+   *
+   * Default: `1`
+   */
+  indentBeforeInlineComment?: number
+
+  /**
    * Whether block sequences should be indented.
    *
    * Default: `true`

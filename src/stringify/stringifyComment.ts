@@ -13,9 +13,14 @@ export function indentComment(comment: string, indent: string) {
   return indent ? comment.replace(/^(?! *$)/gm, indent) : comment
 }
 
-export const lineComment = (str: string, indent: string, comment: string) =>
+export const lineComment = (
+  str: string, 
+  indent: string, 
+  comment: string,
+  inlineIndentBeforeComment: number,
+) =>
   str.endsWith('\n')
     ? indentComment(comment, indent)
     : comment.includes('\n')
       ? '\n' + indentComment(comment, indent)
-      : (str.endsWith(' ') ? '' : ' ') + comment
+      : (' '.repeat(inlineIndentBeforeComment - (str.endsWith(' ') ? 1 : 0))) + comment

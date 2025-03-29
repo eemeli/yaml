@@ -54,7 +54,7 @@ export function stringifyDocument(
       onChompKeep
     )
     if (contentComment)
-      body += lineComment(body, '', commentString(contentComment))
+      body += lineComment(body, '', commentString(contentComment), options.indentBeforeInlineComment ?? 1)
     if (
       (body[0] === '|' || body[0] === '>') &&
       lines[lines.length - 1] === '---'

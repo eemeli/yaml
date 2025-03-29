@@ -16,7 +16,7 @@ export function stringifyPair(
     doc,
     indent,
     indentStep,
-    options: { commentString, indentSeq, simpleKeys }
+    options: { indentBeforeInlineComment: inlineIndentBeforeComment, commentString, indentSeq, simpleKeys }
   } = ctx
   let keyComment = (isNode(key) && key.comment) || null
   if (simpleKeys) {
@@ -28,6 +28,7 @@ export function stringifyPair(
       throw new Error(msg)
     }
   }
+  
   let explicitKey =
     !simpleKeys &&
     (!key ||
@@ -67,7 +68,7 @@ export function stringifyPair(
   } else if ((allNullValues && !simpleKeys) || (value == null && explicitKey)) {
     str = `? ${str}`
     if (keyComment && !keyCommentDone) {
-      str += lineComment(str, ctx.indent, commentString(keyComment))
+      str += lineComment(str, ctx.indent, commentString(keyComment), inlineIndentBeforeComment)
     } else if (chompKeep && onChompKeep) onChompKeep()
     return str
   }
@@ -75,12 +76,12 @@ export function stringifyPair(
   if (keyCommentDone) keyComment = null
   if (explicitKey) {
     if (keyComment)
-      str += lineComment(str, ctx.indent, commentString(keyComment))
+      str += lineComment(str, ctx.indent, commentString(keyComment), inlineIndentBeforeComment)
     str = `? ${str}\n${indent}:`
   } else {
     str = `${str}:`
     if (keyComment)
-      str += lineComment(str, ctx.indent, commentString(keyComment))
+      str += lineComment(str, ctx.indent, commentString(keyComment), inlineIndentBeforeComment)
   }
 
   let vsb, vcb, valueComment
@@ -160,7 +161,7 @@ export function stringifyPair(
   if (ctx.inFlow) {
     if (valueCommentDone && onComment) onComment()
   } else if (valueComment && !valueCommentDone) {
-    str += lineComment(str, ctx.indent, commentString(valueComment))
+    str += lineComment(str, ctx.indent, commentString(valueComment), inlineIndentBeforeComment)
   } else if (chompKeep && onChompKeep) {
     onChompKeep()
   }

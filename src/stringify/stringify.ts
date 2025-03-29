@@ -26,6 +26,7 @@ export type StringifyContext = {
   indentStep: string
   indentAtStart?: number
   inFlow: boolean | null
+  inlineIndentBeforeComment?: number,
   inStringifyKey?: boolean
   flowCollectionPadding: string
   options: Readonly<
@@ -50,6 +51,7 @@ export function createStringifyContext(
       falseStr: 'false',
       flowCollectionPadding: true,
       indentSeq: true,
+      inlineIndentBeforeComment: 1,
       lineWidth: 80,
       minContentWidth: 20,
       nullStr: 'null',
