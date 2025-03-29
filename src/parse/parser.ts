@@ -675,7 +675,21 @@ export class Parser {
         default: {
           const bv = this.startBlockValue(map)
           if (bv) {
-            if (atMapIndent && bv.type !== 'block-seq') {
+            if (bv.type === 'block-seq') {
+              if (
+                !it.explicitKey &&
+                it.sep &&
+                !includesToken(it.sep, 'newline')
+              ) {
+                yield* this.pop({
+                  type: 'error',
+                  offset: this.offset,
+                  message: 'Unexpected block-seq-ind on same line with key',
+                  source: this.source
+                })
+                return
+              }
+            } else if (atMapIndent) {
               map.items.push({ start })
             }
             this.stack.push(bv)

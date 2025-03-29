@@ -89,17 +89,15 @@ describe('block collections', () => {
   test('seq item in mapping', () => {
     const src = 'foo: "1"\n- bar\n'
     const doc = YAML.parseDocument(src)
-    expect(doc.errors).toMatchObject(
-      [
-        'A block sequence may not be used as an implicit map key',
-        'Implicit keys need to be on a single line',
-        'Implicit map keys need to be followed by map values'
-      ].map(msg => ({ message: expect.stringContaining(msg) }))
-    )
+    expect(doc.errors).toMatchObject([
+      { code: 'MULTILINE_IMPLICIT_KEY' },
+      { code: 'UNEXPECTED_TOKEN' },
+      { code: 'MISSING_CHAR' }
+    ])
     expect(doc.contents).toMatchObject({
       items: [
         { key: { value: 'foo' }, value: { value: '1' } },
-        { key: { items: [{ value: 'bar' }] }, value: null }
+        { key: { value: null }, value: null }
       ]
     })
   })
@@ -186,6 +184,11 @@ describe('block collections', () => {
       two: b
     `)
     expect(doc.errors).toMatchObject([])
+  })
+
+  test('sequence with compact mapping value on same line with mapping key (#603)', () => {
+    const doc = YAML.parseDocument('abc: - foo: bar')
+    expect(doc.errors).toMatchObject([{ code: 'UNEXPECTED_TOKEN' }])
   })
 })
 

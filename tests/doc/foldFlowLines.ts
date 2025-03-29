@@ -175,7 +175,7 @@ describe('double-quoted', () => {
         const res = YAML.parse(str)
         expect(res[0].key2).toBe(key2)
       })
-      
+
       test('minimal (#59)', () => {
         const str = `"######\\\\P#"`
         expect(fold(str, '', FOLD_QUOTED, options)).toBe(`"######\\\\\\\nP#"`)
