@@ -445,6 +445,12 @@ describe('odd indentations', () => {
     expect(doc.errors).toHaveLength(0)
     expect(doc.contents).toMatchObject({ value: 'x\n' })
   })
+
+  test('tab after indent spaces for flow-in-block (#604)', () => {
+    const doc = YAML.parseDocument<YAML.YAMLMap, false>('foo:\n \tbar')
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.toJS()).toMatchObject({ foo: 'bar' })
+  })
 })
 
 describe('Excessive entity expansion attacks', () => {
