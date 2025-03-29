@@ -10,17 +10,14 @@ on:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [18, 20, latest]
-
     steps:
       - uses: actions/checkout@v4
         with: { submodules: true }
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
@@ -37,3 +34,60 @@ jobs:
         with: { node-version: 20 }
       - run: npm ci
       - run: npm run lint
+
+  node-16:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['16.0.0', '16']
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: true }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm install --no-save rollup@3
+      - run: npm test
+      - run: npm run test:dist
+
+  node-14-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['14.18.0']
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: true }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install --global npm@7
+      - run: npm ci
+      - run: npm install --no-save rollup@2
+      - run: npm run test:dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yaml-node14
+          path: dist/
+  node-14-run:
+    needs: node-14-build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['14.6.0', '14', '15.0.0']
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: true }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install --global npm@7
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: yaml-node14
+          path: dist/
+      - run: npx jest --config config/jest.config.js
+        env:
+          TEST: dist

@@ -49,6 +49,14 @@ function fixDynamicImportRewrite(context) {
   }
 }
 
+/**
+ * Leave out `node:` prefix as unsupported in Node.js < 14.18
+ *
+ * @param {string} id
+ */
+const fixNodePaths = id =>
+  id.startsWith('node:') ? id.substring(5) : undefined
+
 export default [
   {
     input: {
@@ -60,7 +68,8 @@ export default [
       dir: 'dist',
       format: 'cjs',
       esModule: false,
-      preserveModules: true
+      preserveModules: true,
+      paths: fixNodePaths
     },
     external: ['node:buffer', 'node:process'],
     plugins: [
@@ -72,7 +81,7 @@ export default [
   },
   {
     input: 'src/cli.ts',
-    output: { file: 'dist/cli.mjs' },
+    output: { file: 'dist/cli.mjs', paths: fixNodePaths },
     external: () => true,
     plugins: [
       typescript({

@@ -1,4 +1,4 @@
-import { Readable } from 'node:stream'
+import { Readable } from 'stream'
 import { cli } from 'yaml/cli'
 
 const [major] = process.versions.node.split('.')

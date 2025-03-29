@@ -239,7 +239,12 @@ describe('merge <<', () => {
     for (let i = 5; i < res.length - 1; ++i) {
       expect(res[i]).toHaveProperty('<<')
     }
-    expect(res.at(-1)).toMatchObject({ x: 1, y: 2, r: 10, label: 'center/big' })
+    expect(res[res.length - 1]).toMatchObject({
+      x: 1,
+      y: 2,
+      r: 10,
+      label: 'center/big'
+    })
   })
 
   test('YAML.parseDocument', () => {
