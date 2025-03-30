@@ -3,7 +3,7 @@ import { parseArgs } from 'node:util'
 
 import type { Token } from './parse/cst.ts'
 import { prettyToken } from './parse/cst.ts'
-import { Lexer } from './parse/lexer.ts'
+import { lex } from './parse/lexer.ts'
 import { Parser } from './parse/parser.ts'
 import { Composer } from './compose/composer.ts'
 import { LineCounter } from './parse/line-counter.ts'
@@ -89,17 +89,14 @@ export async function cli(
       break
 
     case 'lex': {
-      const lexer = new Lexer()
-      const data: string[] = []
-      const add = (tok: string) => {
-        if (opt.json) data.push(tok)
-        else console.log(prettyToken(tok))
-      }
-      stdin.on('data', (chunk: string) => {
-        for (const tok of lexer.lex(chunk, true)) add(tok)
-      })
+      const chunks: string[] = []
+      stdin.on('data', chunk => chunks.push(chunk))
       stdin.on('end', () => {
-        for (const tok of lexer.lex('', false)) add(tok)
+        const data: string[] = []
+        for (const tok of lex(chunks.join(''))) {
+          if (opt.json) data.push(tok)
+          else console.log(prettyToken(tok))
+        }
         if (opt.json) console.log(JSON.stringify(data, null, indent))
         done()
       })
@@ -107,17 +104,14 @@ export async function cli(
     }
 
     case 'cst': {
-      const parser = new Parser()
-      const data: Token[] = []
-      const add = (tok: Token) => {
-        if (opt.json) data.push(tok)
-        else console.dir(tok, { depth: null })
-      }
-      stdin.on('data', (chunk: string) => {
-        for (const tok of parser.parse(chunk, true)) add(tok)
-      })
+      const chunks: string[] = []
+      stdin.on('data', chunk => chunks.push(chunk))
       stdin.on('end', () => {
-        for (const tok of parser.parse('', false)) add(tok)
+        const data: Token[] = []
+        for (const tok of new Parser().parse(chunks.join(''))) {
+          if (opt.json) data.push(tok)
+          else console.dir(tok, { depth: null })
+        }
         if (opt.json) console.log(JSON.stringify(data, null, indent))
         done()
       })
@@ -127,7 +121,6 @@ export async function cli(
     case undefined:
     case 'valid': {
       const lineCounter = new LineCounter()
-      const parser = new Parser(lineCounter.addNewLine)
       // @ts-expect-error Version is validated at runtime
       const composer = new Composer({ version: opt.yaml, merge: opt.merge })
       const visitor: visitor | null = opt.visit
@@ -177,14 +170,9 @@ export async function cli(
         hasDoc = true
         reqDocEnd = !doc.directives?.docEnd
       }
-      stdin.on('data', (chunk: string) => {
-        source += chunk
-        for (const tok of parser.parse(chunk, true)) {
-          for (const doc of composer.next(tok)) add(doc)
-        }
-      })
+      stdin.on('data', chunk => (source += chunk))
       stdin.on('end', () => {
-        for (const tok of parser.parse('', false)) {
+        for (const tok of new Parser(lineCounter.addNewLine).parse(source)) {
           for (const doc of composer.next(tok)) add(doc)
         }
         for (const doc of composer.end(false)) add(doc)

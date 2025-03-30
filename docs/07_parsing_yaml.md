@@ -5,7 +5,7 @@
 import {
   Composer,
   CST,
-  Lexer,
+  lex,
   LineCounter,
   Parser,
 } from 'yaml'
@@ -16,20 +16,18 @@ If you'd like to retain the comments and other metadata, [`parseDocument()` and 
 If you're looking to do something more specific, this section might be for you.
 
 Internally, the process of turning a sequence of characters into Documents relies on three stages, each of which is also exposed to external users.
-First, the [Lexer](#lexer) splits the character stream into lexical tokens, i.e. sequences of characters and control codes.
+First, the [lexer](#lexer) splits the character stream into lexical tokens, i.e. sequences of characters and control codes.
 Next, the [Parser](#parser) builds concrete syntax tree representations of each document and directive in the stream.
 Finally, the [Composer](#composer) builds a more user-friendly and accessible [Document](#documents) representation of each document.
-
-Both the Lexer and Parser accept incomplete input, allowing for them and the Composer to be used with e.g. [Node.js streams](https://nodejs.org/api/stream.html) or other systems that handle data in chunks.
 
 ## Lexer
 
 <!-- prettier-ignore -->
 ```js
-import { Lexer } from 'yaml'
+import { lex } from 'yaml'
 
-const tokens = new Lexer().lex('foo: bar\nfee:\n  [24,"42"]\n')
-console.dir(Array.from(tokens))
+const tokens = lex('foo: bar\nfee:\n  [24,"42"]\n')
+console.dir(tokens)
 > [
     '\x02', '\x1F', 'foo',  ':',
     ' ',    '\x1F', 'bar',  '\n',
@@ -39,17 +37,13 @@ console.dir(Array.from(tokens))
   ]
 ```
 
-#### `new Lexer()`
+#### `lex(source: string): string[]`
 
-#### `lexer.lex(src: string, incomplete?: boolean): Generator<string>`
-
-The API for the lexer is rather minimal, and offers no configuration.
-If the input stream is chunked, the `lex()` method may be called separately for each chunk if the `incomplete` argument is `true`.
-At the end of input, `lex()` should be called a final time with `incomplete: false` to ensure that the remaining tokens are emitted.
+The lexer splits an input `source` string into lexical YAML tokens, i.e. smaller strings.
+It should never throw an error.
 
 Internally, the lexer operates a state machine that determines how it parses its input.
 Initially, the lexer is always in the `stream` state.
-The lexer constructor and its `lex()` method should never throw an error.
 
 All tokens are identifiable either by their exact value or their first character.
 In addition to slices of the input stream, a few control characters are additionally used within the output.
@@ -155,10 +149,9 @@ If the document contains errors, they will be included in the document's `errors
 Create a new parser.
 If defined, `onNewLine` is called separately with the start position of each new line (in `parse()`, including the start of input).
 
-#### `parser.parse(source: string, incomplete = false): Generator<Token, void>`
+#### `parser.parse(source: string): Generator<Token, void>`
 
-Parse `source` as a YAML stream, generating tokens for each directive, document and other structure as it is completely parsed.
-If `incomplete`, a part of the last line may be left as a buffer for the next call.
+Parse `source` as a YAML stream, generating tokens for each directive, document and other structure.
 
 Errors are not thrown, but are yielded as `{ type: 'error', offset, message }` tokens.
 

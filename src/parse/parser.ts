@@ -12,7 +12,7 @@ import type {
   TokenType
 } from './cst.ts'
 import { prettyToken, tokenType } from './cst.ts'
-import { Lexer } from './lexer.ts'
+import { lex } from './lexer.ts'
 
 function includesToken(list: SourceToken[], type: SourceToken['type']) {
   for (let i = 0; i < list.length; ++i) if (list[i].type === type) return true
@@ -170,17 +170,15 @@ export class Parser {
 
   /**
    * Parse `source` as a YAML stream.
-   * If `incomplete`, a part of the last line may be left as a buffer for the next call.
    *
    * Errors are not thrown, but yielded as `{ type: 'error', message }` tokens.
    *
    * @returns A generator of tokens representing each directive, document, and other structure.
    */
-  *parse(source: string, incomplete = false): Generator<Token, void> {
+  *parse(source: string): Generator<Token, void> {
     if (this.onNewLine && this.offset === 0) this.onNewLine(0)
-    for (const lexeme of this.lexer.lex(source, incomplete))
-      yield* this.next(lexeme)
-    if (!incomplete) yield* this.end()
+    for (const lexeme of lex(source)) yield* this.next(lexeme)
+    yield* this.end()
   }
 
   /**
@@ -232,9 +230,6 @@ export class Parser {
       this.offset += source.length
     }
   }
-
-  // Must be defined after `next()`
-  private lexer = new Lexer();
 
   /** Call at end of input to push out any remaining constructions */
   *end(): Generator<Token, void> {

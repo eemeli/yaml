@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'fs'
 import { resolve } from 'path'
 
 import type { Document } from 'yaml'
-import { CST, Lexer, parse, parseAllDocuments, Parser } from 'yaml'
+import { CST, lex, parse, parseAllDocuments, Parser } from 'yaml'
 import { testEvents } from '../src/test-events.ts' // no public export
 
 type TestCase = {
@@ -71,11 +71,10 @@ for (const fn of readdirSync(testRoot)) {
       const { fail, tree, json, emit } = testData[i]
 
       test('lexer completes', () => {
-        let n = 0
-        for (const lex of new Lexer().lex(yaml.replace(/(?<!\r)\n/g, '\r\n'))) {
-          expect(typeof lex).toBe('string')
-          if (++n === 9000) throw new Error('Lexer should produce fewer tokens')
-        }
+        const tokens = lex(yaml.replace(/(?<!\r)\n/g, '\r\n'))
+        expect(tokens).toBeInstanceOf(Array)
+        for (const token of tokens) expect(typeof token).toBe('string')
+        expect(tokens.length).toBeLessThan(9000)
       })
 
       test('cst stringify', () => {
