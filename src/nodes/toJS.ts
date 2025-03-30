@@ -10,6 +10,8 @@ export interface AnchorData {
 
 export interface ToJSContext {
   anchors: Map<Node, AnchorData>
+  /** Cached anchor and alias nodes in the order they occur in the document */
+  aliasResolveCache?: Node[]
   doc: Document<Node, boolean>
   keep: boolean
   mapAsMap: boolean
