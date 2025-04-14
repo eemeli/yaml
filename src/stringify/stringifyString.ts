@@ -330,7 +330,8 @@ function plainString(
   // Verify that output will be parsed as a string, as e.g. plain numbers and
   // booleans get parsed with those types in v1.2 (e.g. '42', 'true' & '0.9e-3'),
   // and others in v1.1.
-  if (actualString) {
+  // but respect explicitly set node type
+  if (actualString && type !== Scalar.PLAIN) {
     const test = (tag: CollectionTag | ScalarTag) =>
       tag.default && tag.tag !== 'tag:yaml.org,2002:str' && tag.test?.test(str)
     const { compat, tags } = ctx.doc.schema

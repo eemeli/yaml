@@ -983,6 +983,54 @@ describe('collectionStyle', () => {
 })
 
 describe('Scalar options', () => {
+  describe('Explicit node type takes precedence', () => {
+    const yamlDoc = new YAML.Document();
+    const rootNode = new YAML.YAMLMap();
+    // Add string, boolean and numeric values
+    rootNode.set('str', new YAML.Scalar('foo'));
+    rootNode.set('bool', new YAML.Scalar('true'));
+    rootNode.set('hex', new YAML.Scalar('0x020A'));
+    rootNode.set('dec', new YAML.Scalar('1234'));
+    rootNode.set('neg', new YAML.Scalar('-1234'));
+    rootNode.set('float', new YAML.Scalar('1.234'));
+    rootNode.set('exp', new YAML.Scalar('1.234e+2'));
+    yamlDoc.contents = rootNode;
+    test('Default: quotes added to the values looking as numeric and boolean strings ', () => {
+      const opt = {
+        defaultStringType: Scalar.PLAIN,
+        defaultKeyType: Scalar.PLAIN
+      } as const
+      expect(yamlDoc.toString(opt)).
+      toBe('str: foo\nbool: "true"\nhex: "0x020A"\ndec: "1234"\nneg: "-1234"\nfloat: "1.234"\nexp: "1.234e+2"\n')
+    })
+    test('Explicit PLAIN: quotes are NOT added to values ', () => {
+      const opt = {
+        defaultStringType: Scalar.QUOTE_DOUBLE,
+        defaultKeyType: Scalar.PLAIN
+      } as const
+      // Set PLAIN to all value nodes to ensure they are treated as strings
+      for (const pair of rootNode.items) {
+        if (pair.value instanceof YAML.Scalar) {
+          pair.value.type = Scalar.PLAIN;
+        }
+      }
+      expect(yamlDoc.toString(opt)).
+      toBe('str: foo\nbool: true\nhex: 0x020A\ndec: 1234\nneg: -1234\nfloat: 1.234\nexp: 1.234e+2\n')
+    })
+    test('Explicit QUOTE_DOUBLE: quotes are added to all values', () => {
+      const opt = {
+        defaultStringType: Scalar.PLAIN,
+        defaultKeyType: Scalar.PLAIN
+      } as const
+      // Set PLAIN to all value nodes to ensure they are treated as strings
+      for (const pair of rootNode.items) {
+        if (pair.value instanceof YAML.Scalar) {
+          pair.value.type = Scalar.QUOTE_DOUBLE;
+        }
+      }
+      expect(yamlDoc.toString(opt)).
+      toBe('str: "foo"\nbool: "true"\nhex: "0x020A"\ndec: "1234"\nneg: "-1234"\nfloat: "1.234"\nexp: "1.234e+2"\n')    })
+  })
   describe('defaultStringType & defaultKeyType', () => {
     test('PLAIN, PLAIN', () => {
       const opt = {
@@ -991,7 +1039,16 @@ describe('Scalar options', () => {
       } as const
       expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('foo: bar\n')
     })
-
+    test('PLAIN, PLAIN quote numeric-like and boolean-like string by default', () => {
+      const opt = {
+        defaultStringType: Scalar.PLAIN,
+        defaultKeyType: Scalar.PLAIN
+      } as const
+      expect(YAML.stringify({ hex: '0x02' }, opt)).toBe('hex: "0x02"\n')
+      expect(YAML.stringify({ dec: '1234' }, opt)).toBe('dec: "1234"\n')
+      expect(YAML.stringify({ float: '1.234e+2' }, opt)).toBe('float: "1.234e+2"\n')
+      expect(YAML.stringify({ bool: 'true' }, opt)).toBe('bool: "true"\n')
+    })
     test('BLOCK_FOLDED, BLOCK_FOLDED', () => {
       const opt = {
         defaultStringType: Scalar.BLOCK_FOLDED,

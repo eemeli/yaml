@@ -931,15 +931,9 @@ describe('custom tags', () => {
 
     test('stringify', () => {
       const doc = parseDocument(src)
-      expect(String(doc)).toBe(source`
-        %TAG !e! tag:example.com,2000:test/
-        ---
-        !e!x
-        - !y "2"
-        - !e!z "3"
-        - !<tag:example.com,2000:other/w> "4"
-        - '5'
-      `)
+      // by default sting quotation is preserved for custom tags
+      // emitter should write what is read
+      expect(String(doc)).toBe(src)
     })
 
     test('modify', () => {
@@ -964,10 +958,10 @@ describe('custom tags', () => {
         ---
         #c
         !e!x
-        - !y "2"
+        - !y 2
         - !g 6
         - "7"
-        - !f!w "4"
+        - !f!w 4
         - '5' #cc
       `)
     })
