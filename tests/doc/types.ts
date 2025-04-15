@@ -1225,6 +1225,12 @@ describe('schema changes', () => {
     expect(() => String(doc)).toThrow(/Tag not resolved for Date value/)
   })
 
+  test('fail for missing null type (#616)', () => {
+    const doc = parseDocument('foo:')
+    doc.setSchema('1.2', { schema: 'failsafe' })
+    expect(() => String(doc)).toThrow(/Tag not resolved for null value/)
+  })
+
   test('set schema + custom tags', () => {
     const doc = parseDocument('foo: 1971-02-03T12:13:14', {
       version: '1.1'
