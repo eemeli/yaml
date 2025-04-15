@@ -294,13 +294,12 @@ function plainString(
     return quotedString(value, ctx)
   }
   if (
-    !value ||
     /^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-]$|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t :]$/.test(
       value
     )
   ) {
     // not allowed:
-    // - empty string, '-' or '?'
+    // - '-' or '?'
     // - start with an indicator character (except [?:-]) or /[?-] /
     // - '\n ', ': ' or ' \n' anywhere
     // - '#' not preceded by a non-space char
