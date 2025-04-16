@@ -2,6 +2,10 @@
 
 Available as `npx yaml` or `npm exec yaml`:
 
+```bash
+$ npx yaml valid < file.yaml
+```
+
 <pre id="cli-help" style="float: none">
 yaml: A command-line YAML processor and inspector
 
