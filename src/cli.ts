@@ -27,6 +27,7 @@ Options:
   --help, -h    Show this message.
   --json, -j    Output JSON.
   --indent 2    Output pretty-printed data, indented by the given number of spaces.
+  --merge, -m   Enable support for "<<" merge keys.
 
 Additional options for bare "yaml" command:
   --doc, -d     Output pretty-printed JS Document objects.
@@ -59,6 +60,7 @@ export async function cli(
         doc: { type: 'boolean', short: 'd' },
         help: { type: 'boolean', short: 'h' },
         indent: { type: 'string', short: 'i' },
+        merge: { type: 'boolean', short: 'm' },
         json: { type: 'boolean', short: 'j' },
         single: { type: 'boolean', short: '1' },
         strict: { type: 'boolean', short: 's' },
@@ -127,7 +129,7 @@ export async function cli(
       const lineCounter = new LineCounter()
       const parser = new Parser(lineCounter.addNewLine)
       // @ts-expect-error Version is validated at runtime
-      const composer = new Composer({ version: opt.yaml })
+      const composer = new Composer({ version: opt.yaml, merge: opt.merge })
       const visitor: visitor | null = opt.visit
         ? (await import(resolve(opt.visit))).default
         : null
