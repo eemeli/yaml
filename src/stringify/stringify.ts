@@ -129,7 +129,7 @@ function stringifyProps(
     anchors.add(anchor)
     props.push(`&${anchor}`)
   }
-  const tag = node.tag ? node.tag : tagObj.default ? null : tagObj.tag
+  const tag = node.tag ?? (tagObj.default ? null : tagObj.tag)
   if (tag) props.push(doc.directives.tagString(tag))
   return props.join(' ')
 }
@@ -159,8 +159,7 @@ export function stringify(
   const node = isNode(item)
     ? item
     : ctx.doc.createNode(item, { onTagObj: o => (tagObj = o) })
-
-  if (!tagObj) tagObj = getTagObject(ctx.doc.schema.tags, node)
+  tagObj ??= getTagObject(ctx.doc.schema.tags, node)
 
   const props = stringifyProps(node, tagObj, ctx)
   if (props.length > 0)

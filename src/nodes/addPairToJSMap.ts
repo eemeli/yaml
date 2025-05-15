@@ -43,6 +43,7 @@ function stringifyKey(
   ctx: ToJSContext | undefined
 ) {
   if (jsKey === null) return ''
+  // eslint-disable-next-line @typescript-eslint/no-base-to-string
   if (typeof jsKey !== 'object') return String(jsKey)
   if (isNode(key) && ctx?.doc) {
     const strCtx = createStringifyContext(ctx.doc, {})

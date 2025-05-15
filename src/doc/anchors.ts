@@ -50,7 +50,7 @@ export function createNodeAnchors(
   return {
     onAnchor: (source: unknown) => {
       aliasObjects.push(source)
-      if (!prevAnchors) prevAnchors = anchorNames(doc)
+      prevAnchors ??= anchorNames(doc)
       const anchor = findNewAnchor(prefix, prevAnchors)
       prevAnchors.add(anchor)
       return anchor

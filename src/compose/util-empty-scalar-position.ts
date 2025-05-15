@@ -6,7 +6,7 @@ export function emptyScalarPosition(
   pos: number | null
 ) {
   if (before) {
-    if (pos === null) pos = before.length
+    pos ??= before.length
     for (let i = pos - 1; i >= 0; --i) {
       let st = before[i]
       switch (st.type) {

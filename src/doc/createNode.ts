@@ -64,7 +64,7 @@ export function createNode(
   if (aliasDuplicateObjects && value && typeof value === 'object') {
     ref = sourceObjects.get(value)
     if (ref) {
-      if (!ref.anchor) ref.anchor = onAnchor(value)
+      ref.anchor ??= onAnchor(value)
       return new Alias(ref.anchor)
     } else {
       ref = { anchor: null, node: null }

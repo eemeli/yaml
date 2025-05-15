@@ -52,7 +52,7 @@ export const binary: ScalarTag = {
       )
     }
 
-    if (!type) type = Scalar.BLOCK_LITERAL
+    type ??= Scalar.BLOCK_LITERAL
     if (type !== Scalar.QUOTE_DOUBLE) {
       const lineWidth = Math.max(
         ctx.options.lineWidth - ctx.indent.length,

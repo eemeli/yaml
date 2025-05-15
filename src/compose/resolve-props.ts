@@ -110,7 +110,7 @@ export function resolveProps(
             true
           )
         anchor = token
-        if (start === null) start = token.offset
+        start ??= token.offset
         atNewline = false
         hasSpace = false
         reqSpace = true
@@ -119,7 +119,7 @@ export function resolveProps(
         if (tag)
           onError(token, 'MULTIPLE_TAGS', 'A node can have at most one tag')
         tag = token
-        if (start === null) start = token.offset
+        start ??= token.offset
         atNewline = false
         hasSpace = false
         reqSpace = true
