@@ -210,9 +210,21 @@ const skip = Number(major) < 20
     })
     describe('--merge', () => {
       ok(
-        'basic',
+        'can be set',
         'hello:\n  world: 2\nfoo:\n  world: 2',
         ['--merge', '--json'],
+        ['[{"hello":{"world":2},"foo":{"world":2}}]']
+      )
+      ok(
+        'basic',
+        'hello: &a\n  world: 2\nfoo: *a',
+        ['--merge', '--json'],
+        ['[{"hello":{"world":2},"foo":{"world":2}}]']
+      )
+      ok(
+        'also enabled with --yaml=1.1',
+        'hello: &a\n  world: 2\nfoo: *a',
+        ['--yaml=1.1', '--json'],
         ['[{"hello":{"world":2},"foo":{"world":2}}]']
       )
     })
