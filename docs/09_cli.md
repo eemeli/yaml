@@ -17,6 +17,7 @@ Options:
   --help, -h    Show this message.
   --json, -j    Output JSON.
   --indent 2    Output pretty-printed data, indented by the given number of spaces.
+  --merge, -m   Enable support for "<<" merge keys.
 
 Additional options for bare "yaml" command:
   --doc, -d     Output pretty-printed JS Document objects.
