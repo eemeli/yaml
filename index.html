@@ -2699,10 +2699,11 @@ To ignore these errors, use the <code>strict: false</code> option:</p>
 
 <p>For additional control, set the <code>logLevel</code> option to <code>&#39;error&#39;</code> (default: <code>&#39;warn&#39;</code>) to silence all warnings.
 Setting <code>logLevel: &#39;silent&#39;</code> will ignore parsing errors completely, resulting in output that may well be rather broken.</p>
-<h1 id='command-line-tool'>Command-line Tool</h1>
+<h1 id='command-line-tool'>Command-line Tool</h1><div class="highlight"><pre class="highlight sh tab-shell"><code>npx yaml valid &lt; file.yaml
+</code></pre></div>
 <p>Available as <code>npx yaml</code> or <code>npm exec yaml</code>:</p>
 
-<pre id="cli-help" style="float: none">
+<pre id="cli-help" style="float: none; clear: none">
 yaml: A command-line YAML processor and inspector
 
 Reads stdin and writes output to stdout and errors & warnings to stderr.
@@ -2717,6 +2718,7 @@ Options:
   --help, -h    Show this message.
   --json, -j    Output JSON.
   --indent 2    Output pretty-printed data, indented by the given number of spaces.
+  --merge, -m   Enable support for "<<" merge keys.
 
 Additional options for bare "yaml" command:
   --doc, -d     Output pretty-printed JS Document objects.
