@@ -1,8 +1,12 @@
 # Command-line Tool
 
+```sh
+npx yaml valid < file.yaml
+```
+
 Available as `npx yaml` or `npm exec yaml`:
 
-<pre id="cli-help" style="float: none">
+<pre id="cli-help" style="float: none; clear: none">
 yaml: A command-line YAML processor and inspector
 
 Reads stdin and writes output to stdout and errors & warnings to stderr.
