@@ -217,15 +217,21 @@ const skip = Number(major) < 20
       )
       ok(
         'basic',
-        'hello: &a\n  world: 2\nfoo: *a',
+        'hello: &a\n  world: 2\nfoo:\n  <<: *a',
         ['--merge', '--json'],
         ['[{"hello":{"world":2},"foo":{"world":2}}]']
       )
       ok(
         'also enabled with --yaml=1.1',
-        'hello: &a\n  world: 2\nfoo: *a',
+        'hello: &a\n  world: 2\nfoo:\n  <<: *a',
         ['--yaml=1.1', '--json'],
         ['[{"hello":{"world":2},"foo":{"world":2}}]']
+      )
+      ok(
+        'not enabled by default',
+        'hello: &a\n  world: 2\nfoo:\n  <<: *a',
+        ['--json'],
+        ['[{"hello":{"world":2},"foo":{"<<":{"world":2}}}]']
       )
     })
     describe('--doc', () => {
