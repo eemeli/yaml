@@ -95,8 +95,11 @@ export function composeNode(
   }
   if (spaceBefore) node.spaceBefore = true
   if (comment) {
-    if (token.type === 'scalar' && token.source === '') node.comment = comment
-    else node.commentBefore = comment
+    if (token.type === 'scalar' && token.source === '') {
+      node.comment = comment
+    } else {
+      node.commentBefore = comment
+    }
   }
   // @ts-expect-error Type checking misses meaning of isSrcToken
   if (ctx.options.keepSourceTokens && isSrcToken) node.srcToken = token
@@ -124,9 +127,12 @@ export function composeEmptyNode(
       onError(anchor, 'BAD_ALIAS', 'Anchor cannot be an empty string')
   }
   if (spaceBefore) node.spaceBefore = true
+  // Extend the range to include any trailing content (like comments) if it's beyond the current range end
+  if (end > node.range[2]) {
+    node.range[2] = end
+  }
   if (comment) {
     node.comment = comment
-    node.range[2] = end
   }
   return node
 }
