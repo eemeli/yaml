@@ -131,23 +131,23 @@ export function parseDocument<
  *   document, so Maps become objects, Sequences arrays, and scalars result in
  *   nulls, booleans, numbers and strings.
  */
-export function parse(
+export function parse<R = any>(
   src: string,
   options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
-): any
-export function parse(
+): R | null
+export function parse<R = any>(
   src: string,
   reviver: Reviver,
   options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
-): any
+): R | null
 
-export function parse(
+export function parse<R = any>(
   src: string,
   reviver?:
     | Reviver
     | (ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions),
   options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
-): any {
+): R | null{
   let _reviver: Reviver | undefined = undefined
   if (typeof reviver === 'function') {
     _reviver = reviver
@@ -162,7 +162,7 @@ export function parse(
     if (doc.options.logLevel !== 'silent') throw doc.errors[0]
     else doc.errors = []
   }
-  return doc.toJS(Object.assign({ reviver: _reviver }, options))
+  return doc.toJS(Object.assign({ reviver: _reviver }, options)) as R
 }
 
 /**
