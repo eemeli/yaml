@@ -150,9 +150,9 @@ The <code>!!value</code> and <code>!!yaml</code> types are not supported.</p>
 </tr>
 <tr>
 <td>schema</td>
-<td><code>string</code></td>
+<td><code>string ⎮ Schema</code></td>
 <td>1.1:&nbsp;<code>&#39;yaml-1.1&#39;</code> 1.2:&nbsp;<code>&#39;core&#39;</code></td>
-<td>The base schema to use. Default value depends on YAML version. Built-in support is provided for <code>&#39;core&#39;</code>, <code>&#39;failsafe&#39;</code>, <code>&#39;json&#39;</code>, and <code>&#39;yaml-1.1&#39;</code>. If using another value, <code>customTags</code> must be an array of tags.</td>
+<td>The base schema to use. Default value depends on YAML version. Built-in support is provided for <code>&#39;core&#39;</code>, <code>&#39;failsafe&#39;</code>, <code>&#39;json&#39;</code>, and <code>&#39;yaml-1.1&#39;</code>. If using another string value, <code>customTags</code> must be an array of tags.</td>
 </tr>
 <tr>
 <td>sortMapEntries</td>

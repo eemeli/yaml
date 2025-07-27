@@ -35,6 +35,8 @@ Undocumented library internals may change between minor versions, and previous A
 for use in earlier versions you may need to set <code>skipLibCheck: true</code> in your config.
 This requirement may be updated between minor versions of the library.</p>
 
+<p>For build instructions and contribution guidelines, see <a href="https://github.com/eemeli/yaml/blob/main/docs/CONTRIBUTING.md">docs/CONTRIBUTING.md</a> in the repo.</p>
+
 <p><strong>Note:</strong> These docs are for <code>yaml@2</code>. For v1, see the <a href="https://github.com/eemeli/yaml/tree/v1.10.0">v1.10.0 tag</a> for the source and <a href="https://eemeli.org/yaml/v1/">eemeli.org/yaml/v1</a> for the documentation.</p>
 <h2 id='api-overview'>API Overview</h2>
 <p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the underlying <a href="#parsing-yaml">Lexer/Parser/Composer</a>.
