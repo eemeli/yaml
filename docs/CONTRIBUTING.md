@@ -19,7 +19,7 @@ To that end, the order of priorities is:
    This also means that we want to simultaneously maintain compatibility with multiple versions of the spec, in particular YAML 1.1 and YAML 1.2.
 
 4. **Keep it simple**.
-   Extending the library needs to be done carefully, and keep in all of its users.
+   Extending the library needs to be done carefully, and keep in mind all of its users.
    Different applications have different needs and so are provided with different APIs.
    In particular, custom tags are supported, but aren't part of the built-in schemas.
 
@@ -67,3 +67,6 @@ Note that the CI environment runs tests in both Node.js and browsers, so using n
 
 If you're intending to contribute to the upstream repo, please make sure that your code style matches the Prettier and ESLint rules.
 The easiest way to do that is to configure your editor to do that for you, but `lint` and `prettier` npm scripts are also provided.
+
+If you use an LLM when writing pull requests, this must be explicitly declared in the pull request.
+If there is indication of undeclared LLM assistance, the pull request will be declined.

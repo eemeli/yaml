@@ -20,6 +20,8 @@ This requirement may be updated between minor versions of the library.
 
 For more information, see the project's documentation site: [**eemeli.org/yaml**](https://eemeli.org/yaml/)
 
+For build instructions and contribution guidelines, see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
 To install:
 
 ```sh
@@ -29,26 +31,6 @@ deno add jsr:@eemeli/yaml
 ```
 
 **Note:** These docs are for `yaml@2`. For v1, see the [v1.10.0 tag](https://github.com/eemeli/yaml/tree/v1.10.0) for the source and [eemeli.org/yaml/v1](https://eemeli.org/yaml/v1/) for the documentation.
-
-The development and maintenance of this library is [sponsored](https://github.com/sponsors/eemeli) by:
-
-<p align="center" width="100%">
-  <a href="https://www.scipress.io/"
-    ><img
-      width="150"
-      align="top"
-      src="https://eemeli.org/yaml/images/scipress.svg"
-      alt="Scipress"
-  /></a>
-  &nbsp; &nbsp;
-  <a href="https://manifest.build/"
-    ><img
-      width="150"
-      align="top"
-      src="https://eemeli.org/yaml/images/manifest.svg"
-      alt="Manifest"
-  /></a>
-</p>
 
 ## API Overview
 
