@@ -36,6 +36,8 @@ The minimum supported TypeScript version of the included typings is 3.9;
 for use in earlier versions you may need to set `skipLibCheck: true` in your config.
 This requirement may be updated between minor versions of the library.
 
+For build instructions and contribution guidelines, see [docs/CONTRIBUTING.md](https://github.com/eemeli/yaml/blob/main/docs/CONTRIBUTING.md) in the repo.
+
 **Note:** These docs are for `yaml@2`. For v1, see the [v1.10.0 tag](https://github.com/eemeli/yaml/tree/v1.10.0) for the source and [eemeli.org/yaml/v1](https://eemeli.org/yaml/v1/) for the documentation.
 
 ## API Overview
