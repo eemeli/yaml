@@ -330,6 +330,36 @@ z:
     expect(String(doc)).toBe('? >+ #comment\n  foo\n\n: bar\n')
   })
 
+  test('Keep pipe when empty block literal is given', () => {
+    const doc = YAML.parseDocument('|-')
+    expect(String(doc)).toBe('|\n\n')
+  })
+
+  test('Keep pipe when pipe is provided', () => {
+    const doc = YAML.parseDocument('|')
+    expect(String(doc)).toBe('|\n\n')
+  })
+
+  test('Keep pipe when empty block literal is given yaml format', () => {
+    const src = source`
+      log4j_2: |-
+    `;
+    const expected = source`
+      log4j_2: |
+
+    `;
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe(expected)
+  })
+
+  test('Keep pipe when pipe is provided in yaml format', () => {
+    const src = source`
+      log4j_2: |
+    `
+    const doc = YAML.parseDocument(src)
+    expect(String(doc)).toBe(src+'\n')
+  })
+
   test('Document as key', () => {
     const doc = new YAML.Document({ a: 1 })
     doc.add(new YAML.Document({ b: 2, c: 3 }))
