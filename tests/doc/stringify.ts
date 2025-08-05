@@ -186,6 +186,16 @@ blah blah\n`)
             .map(line => line.length)
         ).toMatchObject([4, 20, 20, 20, 20, 10, 0])
       })
+
+      test('Keep pipe when empty block literal is given', () => {
+        const doc = YAML.parseDocument('|-')
+        expect(String(doc)).toBe('|\n\n')
+      })
+
+      test('Keep pipe when pipe is provided', () => {
+        const doc = YAML.parseDocument('|')
+        expect(String(doc)).toBe('|\n\n')
+      })
     })
   })
 }
