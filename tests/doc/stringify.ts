@@ -43,6 +43,9 @@ for (const [name, version] of [
       test('Number', () => {
         expect(YAML.stringify(new Number(3.141), { version })).toBe('3.141\n')
       })
+      test('negative zero', () => {
+        expect(YAML.stringify(-0, { version })).toBe('-0\n')
+      })
 
       test('float with trailing zeros', () => {
         const doc = new YAML.Document<YAML.Scalar, false>(3, { version })

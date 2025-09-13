@@ -9,7 +9,7 @@ export function stringifyNumber({
   if (typeof value === 'bigint') return String(value)
   const num = typeof value === 'number' ? value : Number(value)
   if (!isFinite(num)) return isNaN(num) ? '.nan' : num < 0 ? '-.inf' : '.inf'
-  let n = JSON.stringify(value)
+  let n = Object.is(value, -0) ? '-0' : JSON.stringify(value)
   if (
     !format &&
     minFractionDigits &&
