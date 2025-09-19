@@ -1,5 +1,7 @@
 name: Deno
 
+permissions: {}
+
 on:
   pull_request:
     branches: [main]

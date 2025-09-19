@@ -1,5 +1,7 @@
 name: TypeScript
 
+permissions: {}
+
 on:
   pull_request:
     branches: [main]
