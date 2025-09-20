@@ -54,6 +54,9 @@ export abstract class NodeBase {
   /** A comment before this */
   declare commentBefore?: string | null
 
+  /** A comment after key: */
+  declare commentAfterKey?: string | null
+
   /**
    * The `[start, value-end, node-end]` character offsets for the part of the
    * source parsed into this node (undefined if not parsed). The `value-end`

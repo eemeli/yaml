@@ -31,6 +31,11 @@ export interface SourceToken {
   offset: number
   indent: number
   source: string
+  commentAfterKey?: boolean
+  commentOnParentKey?: string
+  parentComment?: string
+  commentIsAfterKey?: boolean
+  context?: any
 }
 
 export interface ErrorToken {
