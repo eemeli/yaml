@@ -43,7 +43,7 @@ export type ParsedNode =
   | YAMLSeq.Parsed
 
 /** `[start, value-end, node-end]` */
-export type Range = [number, number, number]
+export type Range = [start: number, valueEnd: number, nodeEnd: number]
 
 export abstract class NodeBase {
   /** @internal */
