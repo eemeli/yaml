@@ -398,6 +398,19 @@ z:
         '{\n  a:\n    #c\n    ,\n  b:\n}\n'
       )
     })
+
+    test('Single newline after key with empty value', () => {
+      const src = source`
+      map:
+        item:
+
+      anothermap:
+        anotheritem:
+
+      `
+      const doc = YAML.parseDocument(src)
+      expect(String(doc)).toBe(src)
+    })
   })
 
   describe('properties on collections in block mapping', () => {
