@@ -717,6 +717,92 @@ describe('keepSourceTokens', () => {
     const res = tokens.map(YAML.CST.stringify).join('')
     expect(res).toBe('foo:\n  eek')
   })
+
+  describe('blockScalarHeader', () => {
+    test('not set without keepSourceTokens', () => {
+      const doc = YAML.parseDocument('|\n  foo\n')
+      expect(doc.contents).not.toHaveProperty('blockScalarHeader')
+    })
+
+    test('literal block scalar with clip (default)', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('|\n  foo\n', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents.blockScalarHeader).toBe('|')
+    })
+
+    test('literal block scalar with strip', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('|-\n  foo\n', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents.blockScalarHeader).toBe('|-')
+    })
+
+    test('literal block scalar with keep', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('|+\n  foo\n', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents.blockScalarHeader).toBe('|+')
+    })
+
+    test('folded block scalar with clip', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('>\n  foo\n', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents.blockScalarHeader).toBe('>')
+    })
+
+    test('folded block scalar with strip', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('>-\n  foo\n', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents.blockScalarHeader).toBe('>-')
+    })
+
+    test('folded block scalar with keep', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('>+\n  foo\n', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents.blockScalarHeader).toBe('>+')
+    })
+
+    test('block scalar with explicit indentation', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('|2\n  foo\n', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents.blockScalarHeader).toBe('|2')
+    })
+
+    test('block scalar with explicit indentation and strip', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('|2-\n  foo\n', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents.blockScalarHeader).toBe('|2-')
+    })
+
+    test('block scalar with explicit indentation and keep', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('|2+\n  foo\n', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents.blockScalarHeader).toBe('|2+')
+    })
+
+    test('flow scalar has no blockScalarHeader', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('foo', {
+        keepSourceTokens: true
+      })
+      expect(doc.contents).not.toHaveProperty('blockScalarHeader')
+    })
+
+    test('block scalar in collection', () => {
+      const src = 'key: |-\n  value\n'
+      const doc = YAML.parseDocument<any, false>(src, {
+        keepSourceTokens: true
+      })
+      const scalar = doc.get('key', true)
+      expect(scalar.blockScalarHeader).toBe('|-')
+    })
+  })
 })
 
 describe('reviver', () => {

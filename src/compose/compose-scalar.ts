@@ -53,6 +53,12 @@ export function composeScalar(
   if (tagName) scalar.tag = tagName
   if (tag.format) scalar.format = tag.format
   if (comment) scalar.comment = comment
+  if (ctx.options.keepSourceTokens && token.type === 'block-scalar') {
+    const headerToken = token.props[0]
+    if (headerToken.type === 'block-scalar-header') {
+      scalar.blockScalarHeader = headerToken.source
+    }
+  }
 
   return scalar as Scalar.Parsed
 }

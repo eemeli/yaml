@@ -13,6 +13,7 @@ export declare namespace Scalar {
     range: Range
     source: string
     srcToken?: FlowScalar | BlockScalar
+    blockScalarHeader?: string
   }
 
   type BLOCK_FOLDED = 'BLOCK_FOLDED'
@@ -51,6 +52,14 @@ export class Scalar<T = unknown> extends NodeBase {
 
   /** The scalar style used for the node's string representation */
   declare type?: Scalar.Type
+
+  /**
+   * The block scalar header, if this node was parsed from a block scalar.
+   * Only set when the `keepSourceTokens` option is enabled during parsing.
+   *
+   * Examples: `|`, `|-`, `|+`, `|2`, `>`, `>-`, `>+`, `>2`
+   */
+  declare blockScalarHeader?: string
 
   constructor(value: T) {
     super(SCALAR)
