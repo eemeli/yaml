@@ -127,7 +127,7 @@ export function stringifyPair(
       ws += `\n${indentComment(cs, ctx.indent)}`
     }
     if (valueStr === '' && !ctx.inFlow) {
-      if (ws === '\n') ws = '\n\n'
+      if (ws === '\n' && valueComment) ws = '\n\n'
     } else {
       ws += `\n${ctx.indent}`
     }
