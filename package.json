@@ -78,7 +78,6 @@
     "@types/jest": "^29.2.4",
     "@types/node": "^20.11.20",
     "babel-jest": "^29.0.1",
-    "cross-env": "^7.0.3",
     "eslint": "^9.9.1",
     "eslint-config-prettier": "^10.1.8",
     "fast-check": "^2.12.0",
