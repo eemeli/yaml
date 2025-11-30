@@ -1,6 +1,6 @@
 {
   "name": "@eemeli/yaml",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "license": "ISC",
   "exports": {
     ".": "./src/index.ts",
