@@ -1,5 +1,5 @@
 import eslint from '@eslint/js'
-import prettierConfig from 'eslint-config-prettier'
+import prettierConfig from 'eslint-config-prettier/flat'
 import typescript from 'typescript-eslint'
 
 export default [
