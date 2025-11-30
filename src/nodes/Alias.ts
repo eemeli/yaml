@@ -79,7 +79,7 @@ export class Alias extends NodeBase {
       data = anchors.get(source)
     }
     /* istanbul ignore if */
-    if (!data || data.res === undefined) {
+    if (data?.res === undefined) {
       const msg = 'This should not happen: Alias anchor was not resolved?'
       throw new ReferenceError(msg)
     }

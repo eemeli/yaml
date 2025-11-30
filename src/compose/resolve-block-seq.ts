@@ -31,7 +31,7 @@ export function resolveBlockSeq(
     })
     if (!props.found) {
       if (props.anchor || props.tag || value) {
-        if (value && value.type === 'block-seq')
+        if (value?.type === 'block-seq')
           onError(
             props.end,
             'BAD_INDENT',

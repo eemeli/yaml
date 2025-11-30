@@ -253,7 +253,7 @@ export class Parser {
 
   private *step(): Generator<Token, void> {
     const top = this.peek(1)
-    if (this.type === 'doc-end' && (!top || top.type !== 'doc-end')) {
+    if (this.type === 'doc-end' && top?.type !== 'doc-end') {
       while (this.stack.length > 0) yield* this.pop()
       this.stack.push({
         type: 'doc-end',
@@ -760,7 +760,7 @@ export class Parser {
       do {
         yield* this.pop()
         top = this.peek(1)
-      } while (top && top.type === 'flow-collection')
+      } while (top?.type === 'flow-collection')
     } else if (fc.end.length === 0) {
       switch (this.type) {
         case 'comma':

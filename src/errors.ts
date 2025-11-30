@@ -92,7 +92,7 @@ export const prettifyError =
     if (/[^ ]/.test(lineStr)) {
       let count = 1
       const end = error.linePos[1]
-      if (end && end.line === line && end.col > col) {
+      if (end?.line === line && end.col > col) {
         count = Math.max(1, Math.min(end.col - col, 80 - ci))
       }
       const pointer = ' '.repeat(ci) + '^'.repeat(count)

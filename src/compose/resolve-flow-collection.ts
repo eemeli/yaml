@@ -160,7 +160,7 @@ export function resolveFlowCollection(
             )
         }
       } else if (value) {
-        if ('source' in value && value.source && value.source[0] === ':')
+        if ('source' in value && value.source?.[0] === ':')
           onError(value, 'MISSING_CHAR', `Missing space after : in ${fcName}`)
         else
           onError(
@@ -212,7 +212,7 @@ export function resolveFlowCollection(
   const expectedEnd = isMap ? '}' : ']'
   const [ce, ...ee] = fc.end
   let cePos = offset
-  if (ce && ce.source === expectedEnd) cePos = ce.offset + ce.source.length
+  if (ce?.source === expectedEnd) cePos = ce.offset + ce.source.length
   else {
     const name = fcName[0].toUpperCase() + fcName.substring(1)
     const msg = atRoot

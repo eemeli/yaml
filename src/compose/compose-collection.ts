@@ -104,7 +104,7 @@ export function composeCollection(
 
   if (!tag) {
     const kt = ctx.schema.knownTags[tagName]
-    if (kt && kt.collection === expType) {
+    if (kt?.collection === expType) {
       ctx.schema.tags.push(Object.assign({}, kt, { default: false }))
       tag = kt
     } else {

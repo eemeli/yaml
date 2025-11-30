@@ -18,8 +18,7 @@ import { LineCounter } from './parse/line-counter.ts'
 import { Parser } from './parse/parser.ts'
 
 export interface EmptyStream
-  extends Array<Document.Parsed>,
-    ReturnType<Composer['streamInfo']> {
+  extends Array<Document.Parsed>, ReturnType<Composer['streamInfo']> {
   empty: true
 }
 
