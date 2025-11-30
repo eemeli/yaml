@@ -133,9 +133,9 @@ for (const token of new Parser().parse('foo: [24,"42"]\n'))
   }
 ```
 
-The parser by default uses an internal Lexer instance, and provides a similarly minimal API for producing a [Concrete Syntax Tree](https://en.wikipedia.org/wiki/Concrete_syntax_tree) representation of the input stream.
+The parser by default uses `lex()` internally, and provides a similarly minimal API for producing a [Concrete Syntax Tree](https://en.wikipedia.org/wiki/Concrete_syntax_tree) representation of the input stream.
 
-The tokens emitted by the parser are JavaScript objects, each of which has a `type` value that's one of the following: `directive-line`, `document`, `byte-order-mark`, `space`, `comment`, `newline`.
+The tokens returned by the parser are JavaScript objects, each of which has a `type` value that's one of the following: `directive-line`, `document`, `byte-order-mark`, `space`, `comment`, `newline`.
 Of these, only `directive-line` and `document` should be considered as content.
 
 The parser does not validate its output, trying instead to produce a most YAML-ish representation of any input.
@@ -149,18 +149,25 @@ If the document contains errors, they will be included in the document's `errors
 Create a new parser.
 If defined, `onNewLine` is called separately with the start position of each new line (in `parse()`, including the start of input).
 
-#### `parser.parse(source: string): Generator<Token, void>`
+#### `parser.parse(source: string): Token[]`
 
 Parse `source` as a YAML stream, generating tokens for each directive, document and other structure.
 
-Errors are not thrown, but are yielded as `{ type: 'error', offset, message }` tokens.
+Errors are not thrown, but are included in the result as `{ type: 'error', offset, message }` tokens.
 
-#### `parser.next(lexToken: string): Generator<Token, void>`
+#### `parser.next(lexToken: string): void`
 
 Advance the parser by one lexical token.
 Used internally by `parser.parse()`; exposed to allow for use with an external lexer.
 
 For debug purposes, if the `LOG_TOKENS` env var is true-ish, all lexical tokens will be pretty-printed using `console.log()` as they are being processed.
+
+#### `parser.end(): Token[]`
+
+For use together with `next()`; call at end of input to account for any remaining constructions,
+and to return the parsed tokens.
+
+Used internally by `parser.parse()`; exposed to allow for use with an external lexer.
 
 ### CST Nodes
 
@@ -194,7 +201,6 @@ import { LineCounter, Parser } from 'yaml'
 const lineCounter = new LineCounter()
 const parser = new Parser(lineCounter.addNewLine))
 const tokens = parser.parse('foo:\n- 24\n- "42"\n')
-Array.from(tokens) // forces iteration
 
 lineCounter.lineStarts
 > [ 0, 5, 10, 17 ]
