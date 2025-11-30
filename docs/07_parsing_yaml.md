@@ -235,7 +235,7 @@ const src = 'foo: bar\nfee: [24, "42"]'
 const tokens = new Parser().parse(src)
 const docs = new Composer().compose(tokens)
 
-Array.from(docs, doc => doc.toJS())
+console.log(docs.map(doc => doc.toJS()))
 > [{ foo: 'bar', fee: [24, '42'] }]
 ```
 
@@ -245,16 +245,16 @@ Create a new Document composer.
 Does not include an internal Parser instance, so an external one will be needed.
 `options` will be used during composition, and passed to the `new Document` constructor.
 
-#### `composer.compose(tokens: Iterable<Token>, forceDoc?: boolean, endOffset?: number): Generator<Document.Parsed>`
+#### `composer.compose(tokens: Iterable<Token>, forceDoc?: boolean, endOffset?: number): Document.Parsed[]`
 
 Compose tokens into documents.
 Convenience wrapper combining calls to `composer.next()` and `composer.end()`.
 
-#### `composer.next(token: Token): Generator<Document.Parsed>`
+#### `composer.next(token: Token): void`
 
 Advance the composed by one CST token.
 
-#### `composer.end(forceDoc?: boolean, offset?: number): Generator<Document.Parsed>`
+#### `composer.end(forceDoc?: boolean, offset?: number): Document.Parsed[]`
 
 Always call at end of input to push out any remaining document.
 If `forceDoc` is true and the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.

@@ -120,69 +120,59 @@ export async function cli(
 
     case undefined:
     case 'valid': {
-      const lineCounter = new LineCounter()
-      // @ts-expect-error Version is validated at runtime
-      const composer = new Composer({ version: opt.yaml, merge: opt.merge })
       const visitor: visitor | null = opt.visit
         ? (await import(resolve(opt.visit))).default
         : null
       let source = ''
-      let hasDoc = false
-      let reqDocEnd = false
-      const data: Document[] = []
-      const add = (doc: Document) => {
-        if (hasDoc && opt.single) {
-          return done(
-            new UserError(
-              UserError.SINGLE,
-              'Input stream contains multiple documents'
-            )
-          )
-        }
-        for (const error of doc.errors) {
-          prettifyError(source, lineCounter)(error)
-          if (opt.strict || mode === 'valid') return done(error)
-          console.error(error)
-        }
-        for (const warning of doc.warnings) {
-          prettifyError(source, lineCounter)(warning)
-          console.error(warning)
-        }
-        if (visitor) visit(doc, visitor)
-        if (mode === 'valid') doc.toJS()
-        else if (opt.json) data.push(doc)
-        else if (opt.doc) {
-          Object.defineProperties(doc, {
-            options: { enumerable: false },
-            schema: { enumerable: false }
-          })
-          console.dir(doc, { depth: null })
-        } else {
-          if (reqDocEnd) console.log('...')
-          try {
-            indent ||= 2
-            const str = doc.toString({ indent })
-            console.log(str.endsWith('\n') ? str.slice(0, -1) : str)
-          } catch (error) {
-            done(error as Error)
-          }
-        }
-        hasDoc = true
-        reqDocEnd = !doc.directives?.docEnd
-      }
       stdin.on('data', chunk => (source += chunk))
       stdin.on('end', () => {
-        for (const tok of new Parser(lineCounter.addNewLine).parse(source)) {
-          for (const doc of composer.next(tok)) add(doc)
+        const lineCounter = new LineCounter()
+        // @ts-expect-error Version is validated at runtime
+        const composer = new Composer({ version: opt.yaml, merge: opt.merge })
+        const parser = new Parser(lineCounter.addNewLine)
+        let hasDoc = false
+        let reqDocEnd = false
+        const data: Document[] = []
+        for (const tok of parser.parse(source)) composer.next(tok)
+        for (const doc of composer.end(false)) {
+          if (hasDoc && opt.single) {
+            const msg = 'Input stream contains multiple documents'
+            return done(new UserError(UserError.SINGLE, msg))
+          }
+          for (const error of doc.errors) {
+            prettifyError(source, lineCounter)(error)
+            if (opt.strict || mode === 'valid') return done(error)
+            console.error(error)
+          }
+          for (const warning of doc.warnings) {
+            prettifyError(source, lineCounter)(warning)
+            console.error(warning)
+          }
+          if (visitor) visit(doc, visitor)
+          if (mode === 'valid') doc.toJS()
+          else if (opt.json) data.push(doc)
+          else if (opt.doc) {
+            Object.defineProperties(doc, {
+              options: { enumerable: false },
+              schema: { enumerable: false }
+            })
+            console.dir(doc, { depth: null })
+          } else {
+            if (reqDocEnd) console.log('...')
+            try {
+              indent ||= 2
+              const str = doc.toString({ indent })
+              console.log(str.endsWith('\n') ? str.slice(0, -1) : str)
+            } catch (error) {
+              done(error as Error)
+            }
+          }
+          hasDoc = true
+          reqDocEnd = !doc.directives?.docEnd
         }
-        for (const doc of composer.end(false)) add(doc)
         if (opt.single && !hasDoc) {
-          return done(
-            new UserError(
-              UserError.SINGLE,
-              'Input stream contained no documents'
-            )
-          )
+          const msg = 'Input stream contained no documents'
+          return done(new UserError(UserError.SINGLE, msg))
         }
         if (mode !== 'valid' && opt.json) {
           console.log(JSON.stringify(opt.single ? data[0] : data, null, indent))
@@ -192,12 +182,9 @@ export async function cli(
       break
     }
 
-    default:
-      done(
-        new UserError(
-          UserError.ARGS,
-          `Unknown command: ${JSON.stringify(mode)}`
-        )
-      )
+    default: {
+      const msg = `Unknown command: ${JSON.stringify(mode)}`
+      done(new UserError(UserError.ARGS, msg))
+    }
   }
 }
