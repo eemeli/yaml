@@ -1,16 +1,5 @@
 import { BOM, DOCUMENT, FLOW_END, SCALAR } from './cst.ts'
 
-type State =
-  | 'stream'
-  | 'docStart'
-  | 'document'
-  | 'lineStart'
-  | 'blockStart'
-  | 'flow'
-  | 'quotedScalar'
-  | 'blockScalar'
-  | 'plainScalar'
-
 function isEmpty(ch: string) {
   switch (ch) {
     case undefined:
@@ -49,19 +38,9 @@ const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.has(ch)
 export function lex(source: string): string[] {
   if (typeof source !== 'string') throw TypeError('source is not a string')
   const lexer = new Lexer(source)
-  let state: State = 'stream'
-  while (state && lexer.pos + 1 <= source.length) {
-    switch (state) {
-      case 'stream':
-        state = lexer.stream()
-        break
-      case 'docStart':
-        state = lexer.document()
-        break
-      default:
-        state = lexer[state]() as State
-    }
-  }
+  const end = source.length
+  let state: 'stream' | 'document' | 'flow' = 'stream'
+  while (lexer.pos < end) state = lexer[state]()
   return lexer.tokens
 }
 
@@ -147,7 +126,7 @@ class Lexer {
     return this.source.substring(this.pos, end)
   }
 
-  stream(): 'stream' | 'docStart' | 'document' {
+  stream(): 'stream' | 'document' {
     const line = this.getLine()
 
     if (line[0] === BOM) {
@@ -199,7 +178,7 @@ class Lexer {
     return this.lineStart()
   }
 
-  lineStart(): 'stream' | 'docStart' | 'document' {
+  private lineStart(): 'stream' | 'document' {
     const ch = this.charAt(0)
     if (ch === '-' || ch === '.') {
       const s = this.source.substring(this.pos, this.pos + 3)
@@ -207,7 +186,7 @@ class Lexer {
         this.count(3)
         this.indentValue = 0
         this.indentNext = 0
-        return 'docStart'
+        return 'document'
       } else if (s === '...' && isEmpty(this.charAt(3))) {
         this.count(3)
         this.spaces(true)
@@ -225,21 +204,21 @@ class Lexer {
     this.indentValue = this.spaces(false)
     if (this.indentNext > this.indentValue && !isEmpty(this.charAt(1)))
       this.indentNext = this.indentValue
-    return this.blockStart()
-  }
-
-  blockStart(): 'document' {
-    const [ch0, ch1] = this.source.substring(this.pos, this.pos + 2)
-    if ((ch0 === '-' || ch0 === '?' || ch0 === ':') && isEmpty(ch1)) {
-      const n = this.count(1) + this.spaces(true)
-      this.indentNext = this.indentValue + 1
-      this.indentValue += n
-      return this.blockStart()
-    }
+    this.blockStart()
     return 'document'
   }
 
-  document(): 'stream' | 'docStart' | 'document' | 'flow' {
+  private blockStart(): void {
+    const ch = this.charAt(0)
+    if ((ch === '-' || ch === '?' || ch === ':') && isEmpty(this.charAt(1))) {
+      const n = this.count(1) + this.spaces(true)
+      this.indentNext = this.indentValue + 1
+      this.indentValue += n
+      this.blockStart()
+    }
+  }
+
+  document(): 'stream' | 'document' | 'flow' {
     this.spaces(true)
     const line = this.getLine()
     let n = this.indicators()
@@ -266,20 +245,23 @@ class Lexer {
         return 'document'
       case '"':
       case "'":
-        return this.quotedScalar()
+        this.quotedScalar()
+        return 'document'
       case '|':
       case '>':
         n += this.blockScalarHeader()
         n += this.spaces(true)
         this.count(line.length - n)
         this.newline()
-        return this.blockScalar()
+        this.blockScalar()
+        return this.lineStart()
       default:
-        return this.plainScalar()
+        this.plainScalar()
+        return 'document'
     }
   }
 
-  flow(): 'stream' | 'docStart' | 'document' | 'flow' {
+  flow(): 'stream' | 'document' | 'flow' {
     let nl: number, sp: number
     let indent = -1
     do {
@@ -322,16 +304,16 @@ class Lexer {
     n += this.indicators()
     switch (line[n]) {
       case undefined:
-        return 'flow'
+        break
       case '#':
         this.count(line.length - n)
-        return 'flow'
+        break
       case '{':
       case '[':
         this.count(1)
         this.flowKey = false
         this.flowLevel += 1
-        return 'flow'
+        break
       case '}':
       case ']':
         this.count(1)
@@ -340,28 +322,30 @@ class Lexer {
         return this.flowLevel ? 'flow' : 'document'
       case '*':
         this.until(isNotAnchorChar)
-        return 'flow'
+        break
       case '"':
       case "'":
         this.flowKey = true
-        return this.quotedScalar()
+        this.quotedScalar()
+        break
       case ':': {
         const next = this.charAt(1)
         if (this.flowKey || isEmpty(next) || next === ',') {
           this.flowKey = false
           this.count(1)
           this.spaces(true)
-          return 'flow'
+          break
         }
       }
       // fallthrough
       default:
         this.flowKey = false
-        return this.plainScalar()
+        this.plainScalar()
     }
+    return 'flow'
   }
 
-  quotedScalar(): 'document' | 'flow' {
+  private quotedScalar(): void {
     const quote = this.charAt(0)
     let end = this.source.indexOf(quote, this.pos + 1)
     if (quote === "'") {
@@ -392,7 +376,6 @@ class Lexer {
     }
     if (end === -1) end = this.source.length
     this.toIndex(end + 1, false)
-    return this.flowLevel ? 'flow' : 'document'
   }
 
   private blockScalarHeader(): number {
@@ -408,7 +391,7 @@ class Lexer {
     return this.until(ch => isEmpty(ch) || ch === '#')
   }
 
-  blockScalar(): 'stream' | 'docStart' | 'document' {
+  private blockScalar(): void {
     let nl = this.pos - 1 // may be -1 if this.pos === 0
     let indent = 0
     let ch: string
@@ -464,10 +447,9 @@ class Lexer {
     }
     this.tokens.push(SCALAR)
     this.toIndex(nl + 1, true)
-    return this.lineStart()
   }
 
-  plainScalar(): 'document' | 'flow' {
+  private plainScalar(): void {
     const inFlow = this.flowLevel > 0
     let end = this.pos - 1
     let i = this.pos - 1
@@ -499,7 +481,6 @@ class Lexer {
     }
     this.tokens.push(SCALAR)
     this.toIndex(end + 1, true)
-    return inFlow ? 'flow' : 'document'
   }
 
   private count(n: number): number {
