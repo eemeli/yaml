@@ -13,13 +13,18 @@ function isEmpty(ch: string) {
   }
 }
 
-const hexDigits = new Set('0123456789ABCDEFabcdef')
-const tagChars = new Set(
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-#;/?:@&=+$_.!~*'()"
-)
 const flowIndicatorChars = new Set(',[]{}')
 const invalidAnchorChars = new Set(' ,[]{}\n\r\t')
 const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.has(ch)
+
+const blockScalarHeader = /([|>][^\s#]*)([ \t]*)((?:.|\r(?!\n))*)$/my
+const blockStart = /([-?:])(?=[ \n\r\t]|$)([ \t]*)/y
+const directiveLine = /(%.*?)(?:([ \t]+)(#.*)?)?$/my
+const docMarker = /[-.]{3}(?=[ \n\r\t]|$)(?:([ \t]+)(#.*)?)?/y
+const emptyLineOrComment = /([ \t]*)(#.*)?$/my
+const indicator =
+  //  |anchor       |explicit tag |implicit tag                                 |block start           |block start in flow   |spaces
+  /(?:(&[^\s,[\]{}]*|!<[^\s>]*>?|!(?:[0-9a-z-#;/?:@&=+$_.!~*'()]|%[0-9a-f]{2})*)|([-?:])(?=[ \n\r\t]|$)|([-?:])(?=[,[\]{}]|$))([ \t]*)/iy
 
 /**
  * Splits an input `source` string into lexical YAML tokens,
@@ -45,20 +50,6 @@ export function lex(source: string): string[] {
 }
 
 class Lexer {
-  /**
-   * Explicit indent set in block scalar header, as an offset from the current
-   * minimum indent, so e.g. set to 1 from a header `|2+`. Set to -1 if not
-   * explicitly set.
-   */
-  private blockScalarIndent = -1
-
-  /**
-   * Block scalars that include a + (keep) chomping indicator in their header
-   * include trailing empty lines, which are otherwise excluded from the
-   * scalar's contents.
-   */
-  private blockScalarKeep = false
-
   /** Current input */
   private source = ''
 
@@ -80,9 +71,6 @@ class Lexer {
   /** Indentation level of the current line. */
   private indentValue = 0
 
-  /** Position of the next \n character. */
-  private lineEndPos: number | null = null
-
   /** A pointer to `source`; the current position of the lexer. */
   pos = 0
 
@@ -97,8 +85,8 @@ class Lexer {
   }
 
   private continueScalar(offset: number): number {
-    let ch = this.source[offset]
     if (this.indentNext > 0) {
+      let ch = this.source[offset]
       let indent = 0
       while (ch === ' ') ch = this.source[++indent + offset]
       if (ch === '\r') {
@@ -107,69 +95,37 @@ class Lexer {
       }
       return ch === '\n' || indent >= this.indentNext ? offset + indent : -1
     }
-    if (ch === '-' || ch === '.') {
-      const dt = this.source.substr(offset, 3)
-      if ((dt === '---' || dt === '...') && isEmpty(this.source[offset + 3]))
-        return -1
-    }
-    return offset
-  }
-
-  private getLine(): string {
-    let end = this.lineEndPos
-    if (typeof end !== 'number' || (end !== -1 && end < this.pos)) {
-      end = this.source.indexOf('\n', this.pos)
-      this.lineEndPos = end
-    }
-    if (end === -1) return this.source.substring(this.pos)
-    if (this.source[end - 1] === '\r') end -= 1
-    return this.source.substring(this.pos, end)
+    docMarker.lastIndex = offset
+    return docMarker.test(this.source) ? -1 : offset
   }
 
   stream(): 'stream' | 'document' {
-    const line = this.getLine()
-
-    if (line[0] === BOM) {
+    if (this.charAt(0) === BOM) {
       this.count(1)
       return 'stream'
     }
 
     // Directives
-    if (line[0] === '%') {
-      let dirEnd = line.length
-      let cs = line.indexOf('#')
-      while (cs !== -1) {
-        const ch = line[cs - 1]
-        if (ch === ' ' || ch === '\t') {
-          dirEnd = cs - 1
-          break
-        } else {
-          cs = line.indexOf('#', cs + 1)
-        }
-      }
-      while (true) {
-        const ch = line[dirEnd - 1]
-        if (ch === ' ' || ch === '\t') dirEnd -= 1
-        else break
-      }
-      const n = this.count(dirEnd) + this.spaces(true)
-      this.count(line.length - n) // possible comment
+    directiveLine.lastIndex = this.pos
+    let m = directiveLine.exec(this.source)
+    if (m) {
+      const [line, directive, spaces, comment] = m
+      this.tokens.push(directive)
+      if (spaces) this.tokens.push(spaces)
+      if (comment) this.tokens.push(comment)
+      this.pos += line.length
       this.newline()
       return 'stream'
     }
 
     // Comments and empty lines
-    let i = this.pos
-    let ch = this.source[i]
-    while (ch === ' ' || ch === '\t') ch = this.source[++i]
-    if (
-      !ch ||
-      ch === '#' ||
-      ch === '\n' ||
-      (ch === '\r' && this.source[i + 1] === '\n')
-    ) {
-      const sp = this.spaces(true)
-      this.count(line.length - sp)
+    emptyLineOrComment.lastIndex = this.pos
+    m = emptyLineOrComment.exec(this.source)
+    if (m) {
+      const [line, spaces, comment] = m
+      if (spaces) this.tokens.push(spaces)
+      if (comment) this.tokens.push(comment)
+      this.pos += line.length
       this.newline()
       return 'stream'
     }
@@ -179,53 +135,49 @@ class Lexer {
   }
 
   private lineStart(): 'stream' | 'document' {
-    const ch = this.charAt(0)
-    if (ch === '-' || ch === '.') {
-      const s = this.source.substring(this.pos, this.pos + 3)
-      if (s === '---' && isEmpty(this.charAt(3))) {
-        this.count(3)
-        this.indentValue = 0
-        this.indentNext = 0
-        return 'document'
-      } else if (s === '...' && isEmpty(this.charAt(3))) {
-        this.count(3)
-        this.spaces(true)
-        if (this.charAt(0) === '#') {
-          const line = this.getLine()
-          this.tokens.push(line)
-          this.pos += line.length
-        }
-        this.newline()
-        this.indentValue = 0
-        this.indentNext = 0
-        return 'stream'
+    docMarker.lastIndex = this.pos
+    const dmm = docMarker.exec(this.source)
+    if (dmm) {
+      const [line, spaces, comment] = dmm
+      this.count(3)
+      if (spaces) {
+        this.tokens.push(spaces)
+        this.pos += spaces.length
       }
+      if (comment) {
+        this.tokens.push(comment)
+        this.pos += comment.length
+      }
+      this.newline()
+      this.indentValue = 0
+      this.indentNext = 0
+      return line.startsWith('-') ? this.lineStart() : 'stream'
     }
+
     this.indentValue = this.spaces(false)
     if (this.indentNext > this.indentValue && !isEmpty(this.charAt(1)))
       this.indentNext = this.indentValue
-    this.blockStart()
-    return 'document'
-  }
-
-  private blockStart(): void {
-    const ch = this.charAt(0)
-    if ((ch === '-' || ch === '?' || ch === ':') && isEmpty(this.charAt(1))) {
-      const n = this.count(1) + this.spaces(true)
+    blockStart.lastIndex = this.pos
+    let bsm
+    while ((bsm = blockStart.exec(this.source))) {
+      const [line, indicator, spaces] = bsm
+      this.tokens.push(indicator)
+      if (spaces) this.tokens.push(spaces)
+      this.pos += line.length
       this.indentNext = this.indentValue + 1
-      this.indentValue += n
-      this.blockStart()
+      this.indentValue += line.length
     }
+    return 'document'
   }
 
   document(): 'stream' | 'document' | 'flow' {
     this.spaces(true)
-    const line = this.getLine()
-    let n = this.indicators()
-    switch (line[n]) {
+    this.indicators()
+    switch (this.charAt(0)) {
       case '#':
-        this.count(line.length - n)
+        this.toLineEnd()
       // fallthrough
+      case '\n':
       case undefined:
         this.newline()
         return this.lineStart()
@@ -249,12 +201,14 @@ class Lexer {
         return 'document'
       case '|':
       case '>':
-        n += this.blockScalarHeader()
-        n += this.spaces(true)
-        this.count(line.length - n)
-        this.newline()
         this.blockScalar()
         return this.lineStart()
+      case '\r':
+        if (this.charAt(1) === '\n') {
+          this.count(2)
+          return this.lineStart()
+        }
+      // fallthrough
       default:
         this.plainScalar()
         return 'document'
@@ -274,39 +228,47 @@ class Lexer {
       }
       sp += this.spaces(true)
     } while (nl + sp > 0)
-    const line = this.getLine()
+    let ch = this.charAt(0)
     if (
-      (indent !== -1 && indent < this.indentNext && line[0] !== '#') ||
-      (indent === 0 &&
-        (line.startsWith('---') || line.startsWith('...')) &&
-        isEmpty(line[3]))
-    ) {
+      indent !== -1 &&
+      indent < this.indentNext &&
+      ch !== '#' &&
       // Allowing for the terminal ] or } at the same (rather than greater)
       // indent level as the initial [ or { is technically invalid, but
       // failing here would be surprising to users.
-      const atFlowEndMarker =
+      !(
         indent === this.indentNext - 1 &&
         this.flowLevel === 1 &&
-        (line[0] === ']' || line[0] === '}')
-      if (!atFlowEndMarker) {
+        (ch === ']' || ch === '}')
+      )
+    ) {
+      // this is an error
+      this.flowLevel = 0
+      this.tokens.push(FLOW_END)
+      return this.lineStart()
+    }
+    if (indent === 0) {
+      docMarker.lastIndex = this.pos
+      if (docMarker.test(this.source)) {
         // this is an error
         this.flowLevel = 0
         this.tokens.push(FLOW_END)
         return this.lineStart()
       }
     }
-    let n = 0
-    while (line[n] === ',') {
-      n += this.count(1)
-      n += this.spaces(true)
+    while (ch === ',') {
+      this.count(1)
+      this.spaces(true)
       this.flowKey = false
+      ch = this.charAt(0)
     }
-    n += this.indicators()
-    switch (line[n]) {
+    if (this.indicators()) ch = this.charAt(0)
+    switch (ch) {
+      case '\n':
       case undefined:
         break
       case '#':
-        this.count(line.length - n)
+        this.toLineEnd()
         break
       case '{':
       case '[':
@@ -329,20 +291,51 @@ class Lexer {
         this.quotedScalar()
         break
       case ':': {
-        const next = this.charAt(1)
-        if (this.flowKey || isEmpty(next) || next === ',') {
+        if (this.flowKey) {
           this.flowKey = false
           this.count(1)
           this.spaces(true)
-          break
+        } else {
+          const next = this.charAt(1)
+          if (isEmpty(next) || next === ',') {
+            this.count(1)
+            this.spaces(true)
+          } else {
+            this.plainScalar()
+          }
         }
+        break
       }
+      case '\r':
+        if (this.charAt(1) === '\n') break
       // fallthrough
       default:
         this.flowKey = false
         this.plainScalar()
     }
     return 'flow'
+  }
+
+  private indicators(): boolean {
+    let hasIndicators = false
+    indicator.lastIndex = this.pos
+    let m
+    while ((m = indicator.exec(this.source))) {
+      hasIndicators ||= true
+      const [fm, tagOrAnchor, bsEmpty, bsInFlow, spaces] = m
+      if (tagOrAnchor) {
+        this.tokens.push(tagOrAnchor)
+      } else if (this.flowLevel > 0) {
+        this.tokens.push(bsEmpty ?? bsInFlow)
+        this.flowKey &&= false
+      } else if (bsEmpty) {
+        this.tokens.push(bsEmpty)
+        this.indentNext = this.indentValue + 1
+      } else break
+      if (spaces) this.tokens.push(spaces)
+      this.pos += fm.length
+    }
+    return hasIndicators
   }
 
   private quotedScalar(): void {
@@ -378,20 +371,21 @@ class Lexer {
     this.toIndex(end + 1, false)
   }
 
-  private blockScalarHeader(): number {
-    this.blockScalarIndent = -1
-    this.blockScalarKeep = false
-    let i = this.pos
-    while (true) {
-      const ch = this.source[++i]
-      if (ch === '+') this.blockScalarKeep = true
-      else if (ch > '0' && ch <= '9') this.blockScalarIndent = Number(ch) - 1
-      else if (ch !== '-') break
-    }
-    return this.until(ch => isEmpty(ch) || ch === '#')
-  }
-
   private blockScalar(): void {
+    let bsIndent = -1
+    let bsKeep = false
+    blockScalarHeader.lastIndex = this.pos
+    const [line, header, spaces, comment] = blockScalarHeader.exec(this.source)!
+    for (const ch of header) {
+      if (ch === '+') bsKeep = true
+      else if (ch > '0' && ch <= '9') bsIndent = Number(ch) - 1
+    }
+    this.tokens.push(header)
+    if (spaces) this.tokens.push(spaces)
+    if (comment) this.tokens.push(comment)
+    this.pos += line.length
+    this.newline()
+
     let nl = this.pos - 1 // may be -1 if this.pos === 0
     let indent = 0
     let ch: string
@@ -412,10 +406,10 @@ class Lexer {
       }
     }
     if (indent >= this.indentNext) {
-      if (this.blockScalarIndent === -1) this.indentNext = indent
+      if (bsIndent === -1) this.indentNext = indent
       else {
         this.indentNext =
-          this.blockScalarIndent + (this.indentNext === 0 ? 1 : this.indentNext)
+          bsIndent + (this.indentNext === 0 ? 1 : this.indentNext)
       }
       do {
         const cs = this.continueScalar(nl + 1)
@@ -434,7 +428,7 @@ class Lexer {
       while (ch === '\t' || ch === ' ' || ch === '\r' || ch === '\n')
         ch = this.source[++i]
       nl = i - 1
-    } else if (!this.blockScalarKeep) {
+    } else if (!bsKeep) {
       do {
         let i = nl - 1
         let ch = this.source[i]
@@ -504,50 +498,12 @@ class Lexer {
     return s.length
   }
 
-  private indicators(): number {
-    switch (this.charAt(0)) {
-      case '!':
-        return this.tag() + this.spaces(true) + this.indicators()
-      case '&':
-        return (
-          this.until(isNotAnchorChar) + this.spaces(true) + this.indicators()
-        )
-      case '-': // this is an error
-      case '?': // this is an error outside flow collections
-      case ':': {
-        const inFlow = this.flowLevel > 0
-        const ch1 = this.charAt(1)
-        if (isEmpty(ch1) || (inFlow && flowIndicatorChars.has(ch1))) {
-          if (!inFlow) this.indentNext = this.indentValue + 1
-          else if (this.flowKey) this.flowKey = false
-          return this.count(1) + this.spaces(true) + this.indicators()
-        }
-      }
-    }
-    return 0
-  }
-
-  private tag(): number {
-    if (this.charAt(1) === '<') {
-      let i = this.pos + 2
-      let ch = this.source[i]
-      while (!isEmpty(ch) && ch !== '>') ch = this.source[++i]
-      return this.toIndex(ch === '>' ? i + 1 : i, false)
-    } else {
-      let i = this.pos + 1
-      let ch = this.source[i]
-      while (ch) {
-        if (tagChars.has(ch)) ch = this.source[++i]
-        else if (
-          ch === '%' &&
-          hexDigits.has(this.source[i + 1]) &&
-          hexDigits.has(this.source[i + 2])
-        ) {
-          ch = this.source[(i += 3)]
-        } else break
-      }
-      return this.toIndex(i, false)
-    }
+  private toLineEnd(): number {
+    let i = this.pos
+    let ch = this.source[i]
+    while (ch && ch !== '\n') ch = this.source[++i]
+    if (this.source[i - 1] === '\r') --i
+    return this.toIndex(i, false)
   }
 
   private newline(): number {
