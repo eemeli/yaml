@@ -70,6 +70,7 @@ export default defineConfig({
     include: ['tests/**/*.{js,ts}'],
     exclude: [
       'tests/_*',
+      'tests/artifacts/',
       'tests/json-test-suite/',
       'tests/json-test-suite.ts',
       'tests/yaml-test-suite.ts',

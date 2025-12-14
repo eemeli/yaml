@@ -268,7 +268,7 @@ const skip = Number(major) < 20
       ok(
         'singlequote',
         '{"hello":"world"}',
-        ['--visit', './tests/artifacts/cli-singlequote.mjs'],
+        ['--visit', './tests/artifacts/cli-singlequote.js'],
         ["{ 'hello': 'world' }"]
       )
     })

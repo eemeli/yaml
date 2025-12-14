@@ -10,7 +10,7 @@ import {
   writeFile
 } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { help } from '../dist/cli.mjs'
+import { help } from '../dist/cli.js'
 import { parseAllDocuments } from '../dist/index.js'
 
 const source = 'docs'

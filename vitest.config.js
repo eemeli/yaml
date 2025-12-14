@@ -37,6 +37,6 @@ export default defineConfig({
     alias,
     globals: true,
     include: ['tests/**/*.{js,ts}'],
-    exclude: ['tests/_*', 'tests/json-test-suite/']
+    exclude: ['tests/_*', 'tests/artifacts/', 'tests/json-test-suite/']
   }
 })

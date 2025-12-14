@@ -13,12 +13,11 @@
   ],
   "homepage": "https://eemeli.org/yaml/",
   "files": [
-    "dist/",
-    "util.js"
+    "dist/"
   ],
   "type": "module",
   "main": "./dist/index.js",
-  "bin": "./bin.mjs",
+  "bin": "./bin.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -42,9 +41,9 @@
     "test:dist:types": "tsc --allowJs --moduleResolution node --noEmit --target es5 dist/index.js",
     "test:types": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
     "docs:install": "cd docs-slate && bundle install",
-    "predocs:deploy": "node docs/prepare-docs.mjs",
+    "predocs:deploy": "node docs/prepare-docs.js",
     "docs:deploy": "cd docs-slate && ./deploy.sh",
-    "predocs": "node docs/prepare-docs.mjs",
+    "predocs": "node docs/prepare-docs.js",
     "docs": "cd docs-slate && bundle exec middleman server",
     "preversion": "npm test && npm run build",
     "prepublishOnly": "npm run clean && npm test && npm run build"
