@@ -10,7 +10,6 @@ export default [
       'docs-slate/',
       'lib/',
       'package-lock.json',
-      'playground/dist/',
       'tests/artifacts/',
       'tests/json-test-suite/',
       'tests/yaml-test-suite/'

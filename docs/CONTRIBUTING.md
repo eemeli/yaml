@@ -30,7 +30,7 @@ To start hacking `yaml`, this should get you set up:
 ```sh
 git clone https://github.com/eemeli/yaml.git # or your own fork
 cd yaml
-git submodule update --init # required by tests; also fetches the docs & playground
+git submodule update --init # required by tests; also fetches the docs & test suite data
 npm install # npm v7 or later is required
 npm test # just to be sure
 ```
@@ -43,9 +43,6 @@ npm test # just to be sure
   Maintained as a git submodule to allow merges from its upstream source, [Slate](https://github.com/slatedocs/slate).
   See its [`README`](./docs-slate/README.md) for installation instructions.
   Note that the build target is the `gh-pages` branch of _this_ repo.
-- **`playground/`** - Source files for a browser-based [playground](https://eemeli.org/yaml-playground/) using this library.
-  Also contains the Selenium browser tests for the library.
-  Maintained as a git submodule to allow for easier publication.
 - **`src/`** - Source files for the library:
   - **`src/compose/`** - The AST composer. Consumes CST, produces documents while validating its inputs.
   - **`src/parse/`** - The lexer and CST parser. Does not depend on other parts of the library.
