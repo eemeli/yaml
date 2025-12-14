@@ -417,13 +417,18 @@ application specific tag: !something |
       tgt: [
         {
           'not-date': '2002-04-28',
-          picture: Buffer.from([
-            71, 73, 70, 56, 57, 97, 12, 0, 12, 0, 132, 0, 0, 255, 255, 247, 245,
-            245, 238, 233, 233, 229, 102, 102, 102, 0, 0, 0, 231, 231, 231, 94,
-            94, 94, 243, 243, 237, 142, 142, 142, 224, 224, 224, 159, 159, 159,
-            147, 147, 147, 167, 167, 167, 158, 158, 158, 105, 94, 16, 39, 32,
-            130, 10, 1, 0, 59
-          ]),
+          picture: (() => {
+            const data = [
+              71, 73, 70, 56, 57, 97, 12, 0, 12, 0, 132, 0, 0, 255, 255, 247,
+              245, 245, 238, 233, 233, 229, 102, 102, 102, 0, 0, 0, 231, 231,
+              231, 94, 94, 94, 243, 243, 237, 142, 142, 142, 224, 224, 224, 159,
+              159, 159, 147, 147, 147, 167, 167, 167, 158, 158, 158, 105, 94,
+              16, 39, 32, 130, 10, 1, 0, 59
+            ]
+            return typeof Buffer !== 'undefined'
+              ? Buffer.from(data)
+              : new Uint8Array(data)
+          })(),
           'application specific tag':
             'The semantics of the tag\nabove may be different for\ndifferent documents.\n'
         }
@@ -1810,9 +1815,10 @@ matches %: 20`,
   }
 }
 
-const mockWarn = vi
-  .spyOn(global.process, 'emitWarning')
-  .mockImplementation(() => {})
+const mockWarn =
+  typeof global !== 'undefined'
+    ? vi.spyOn(global.process, 'emitWarning').mockImplementation(() => {})
+    : vi.spyOn(console, 'warn').mockImplementation(() => {})
 beforeEach(() => mockWarn.mockClear())
 afterAll(() => mockWarn.mockRestore())
 

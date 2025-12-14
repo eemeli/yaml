@@ -38,7 +38,6 @@
     "start": "node -i -e 'YAML=require(\"./src/index.ts\");const{parse,parseDocument,parseAllDocuments,stringify}=YAML'",
     "test": "vitest run",
     "test:all": "npm test && npm run test:types && npm run test:dist && npm run test:dist:types",
-    "test:browsers": "cd playground && npm test",
     "test:dist": "npm run build && vitest run",
     "test:dist:types": "tsc --allowJs --moduleResolution node --noEmit --target es5 dist/index.js",
     "test:types": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
@@ -50,7 +49,6 @@
     "preversion": "npm test && npm run build",
     "prepublishOnly": "npm run clean && npm test && npm run build"
   },
-  "browserslist": "defaults, not ie 11",
   "prettier": {
     "arrowParens": "avoid",
     "semi": false,

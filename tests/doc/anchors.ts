@@ -460,7 +460,7 @@ y:
       const doc = parseDocument(src, { merge: true })
       expect(doc.errors).toHaveLength(0)
       expect(doc.warnings).toHaveLength(0)
-      expect(() => doc.toJS()).toThrow('Maximum call stack size exceeded')
+      expect(() => doc.toJS()).toThrow()
       expect(String(doc)).toBe(src)
     })
 

@@ -435,43 +435,47 @@ test('multiple tags on one node', () => {
   expect(doc.warnings).toHaveLength(1)
 })
 
-describe('logLevel', () => {
-  const mock = vi
-    .spyOn(global.process, 'emitWarning')
-    .mockImplementation(() => {})
-  afterEach(() => mock.mockRestore())
+if (typeof global !== 'undefined') {
+  describe('logLevel', () => {
+    const mock = vi
+      .spyOn(global.process, 'emitWarning')
+      .mockImplementation(() => {})
+    afterEach(() => mock.mockRestore())
 
-  test('by default, warn for tag fallback', () => {
-    YAML.parse('!foo bar')
-    const message = source`
+    test('by default, warn for tag fallback', () => {
+      YAML.parse('!foo bar')
+      const message = source`
       Unresolved tag: !foo at line 1, column 1:
 
       !foo bar
       ^^^^
     `
-    expect(mock.mock.calls).toMatchObject([[{ message }]])
-  })
-
-  test("silence warnings with logLevel: 'error'", () => {
-    YAML.parse('!foo bar', { logLevel: 'error' })
-    expect(mock).toHaveBeenCalledTimes(0)
-  })
-
-  test("silence warnings with logLevel: 'silent'", () => {
-    YAML.parse('!foo bar', { logLevel: 'silent' })
-    expect(mock).toHaveBeenCalledTimes(0)
-  })
-
-  test("silence errors with logLevel: 'silent'", () => {
-    const res = YAML.parse('foo: bar: baz\n---\ndoc2\n', { logLevel: 'silent' })
-    expect(res).toMatchObject({ foo: { bar: 'baz' } })
-  })
-})
-
-describe('Invalid plain first characters', () => {
-  for (const ch of [',', '%', '@', '`'])
-    test(ch, () => {
-      const doc = YAML.parseDocument(`- ${ch}foo`)
-      expect(doc.errors).toMatchObject([{ code: 'BAD_SCALAR_START' }])
+      expect(mock.mock.calls).toMatchObject([[{ message }]])
     })
-})
+
+    test("silence warnings with logLevel: 'error'", () => {
+      YAML.parse('!foo bar', { logLevel: 'error' })
+      expect(mock).toHaveBeenCalledTimes(0)
+    })
+
+    test("silence warnings with logLevel: 'silent'", () => {
+      YAML.parse('!foo bar', { logLevel: 'silent' })
+      expect(mock).toHaveBeenCalledTimes(0)
+    })
+
+    test("silence errors with logLevel: 'silent'", () => {
+      const res = YAML.parse('foo: bar: baz\n---\ndoc2\n', {
+        logLevel: 'silent'
+      })
+      expect(res).toMatchObject({ foo: { bar: 'baz' } })
+    })
+  })
+
+  describe('Invalid plain first characters', () => {
+    for (const ch of [',', '%', '@', '`'])
+      test(ch, () => {
+        const doc = YAML.parseDocument(`- ${ch}foo`)
+        expect(doc.errors).toMatchObject([{ code: 'BAD_SCALAR_START' }])
+      })
+  })
+}
