@@ -5,7 +5,6 @@ import typescript from 'typescript-eslint'
 export default [
   {
     ignores: [
-      'browser/',
       'dist/',
       'docs/',
       'docs-slate/',

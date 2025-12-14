@@ -19,6 +19,6 @@ jobs:
         uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm ci
-      - run: npm run build:node
+      - run: npm run build
       - run: npm run test:types
       - run: npm run test:dist:types

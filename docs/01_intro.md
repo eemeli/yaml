@@ -13,7 +13,7 @@ deno add jsr:@eemeli/yaml
 ```js
 import { parse, stringify } from 'yaml'
 // or
-import YAML from 'yaml'
+import * as YAML from 'yaml'
 // or
 const YAML = require('yaml')
 ```

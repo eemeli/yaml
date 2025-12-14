@@ -41,24 +41,59 @@ A [command-line tool](https://eemeli.org/yaml/#command-line-tool) is also includ
 
 ### Parse & Stringify
 
-```js
-import { parse, stringify } from 'yaml'
-```
+As far as possible, these functions work the same as `JSON.parse` and `JSON.stringify`.
 
 - [`parse(str, reviver?, options?): value`](https://eemeli.org/yaml/#yaml-parse)
 - [`stringify(value, replacer?, options?): string`](https://eemeli.org/yaml/#yaml-stringify)
 
-### Documents
-
-<!-- prettier-ignore -->
 ```js
-import {
-  Document,
-  isDocument,
-  parseAllDocuments,
-  parseDocument
-} from 'yaml'
+import { parse, stringify } from 'yaml'
+
+parse('[ true, false, maybe, null, 3.14159 ]')
+// [ true, false, 'maybe', null, 3.14159 ]
+
+stringify([true, false, 'maybe', null, 3.14159])
+// `- true
+// - false
+// - maybe
+// - null
+// - 3.14159
+// `
+
+stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
+// `number: 3
+// plain: string
+// block: |
+//   two
+//   lines
+// `
 ```
+
+```yaml
+# file.yml
+YAML:
+  - A human-readable data serialization language
+  - https://en.wikipedia.org/wiki/YAML
+yaml:
+  - A complete JavaScript implementation
+  - https://www.npmjs.com/package/yaml
+```
+
+```js
+import fs from 'node:fs'
+import { parse } from 'yaml'
+
+const file = fs.readFileSync('./file.yml', 'utf8')
+parse(file)
+// { YAML:
+//   [ 'A human-readable data serialization language',
+//     'https://en.wikipedia.org/wiki/YAML' ],
+//   yaml:
+//   [ 'A complete JavaScript implementation',
+//     'https://www.npmjs.com/package/yaml' ] }
+```
+
+### Documents
 
 - [`Document`](https://eemeli.org/yaml/#documents)
   - [`constructor(value, replacer?, options?)`](https://eemeli.org/yaml/#creating-documents)
@@ -70,16 +105,17 @@ import {
 - [`parseAllDocuments(str, options?): Document[]`](https://eemeli.org/yaml/#parsing-documents)
 - [`parseDocument(str, options?): Document`](https://eemeli.org/yaml/#parsing-documents)
 
-### Content Nodes
-
 <!-- prettier-ignore -->
 ```js
 import {
-  isAlias, isCollection, isMap, isNode,
-  isPair, isScalar, isSeq, Scalar,
-  visit, visitAsync, YAMLMap, YAMLSeq
+  Document,
+  isDocument,
+  parseAllDocuments,
+  parseDocument
 } from 'yaml'
 ```
+
+### Content Nodes
 
 - [`isAlias(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
 - [`isCollection(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
@@ -97,70 +133,23 @@ import {
 - [`visit(node, visitor)`](https://eemeli.org/yaml/#finding-and-modifying-nodes)
 - [`visitAsync(node, visitor)`](https://eemeli.org/yaml/#finding-and-modifying-nodes)
 
-### Parsing YAML
-
+<!-- prettier-ignore -->
 ```js
-import { Composer, Lexer, Parser } from 'yaml'
+import {
+  isAlias, isCollection, isMap, isNode,
+  isPair, isScalar, isSeq, Scalar,
+  visit, visitAsync, YAMLMap, YAMLSeq
+} from 'yaml'
 ```
+
+### Lexer, Concrete Syntax Tree, and AST Composer
 
 - [`new Lexer().lex(src)`](https://eemeli.org/yaml/#lexer)
 - [`new Parser(onNewLine?).parse(src)`](https://eemeli.org/yaml/#parser)
 - [`new Composer(options?).compose(tokens)`](https://eemeli.org/yaml/#composer)
 
-## YAML.parse
-
-```yaml
-# file.yml
-YAML:
-  - A human-readable data serialization language
-  - https://en.wikipedia.org/wiki/YAML
-yaml:
-  - A complete JavaScript implementation
-  - https://www.npmjs.com/package/yaml
-```
-
 ```js
-import fs from 'fs'
-import YAML from 'yaml'
-
-YAML.parse('3.14159')
-// 3.14159
-
-YAML.parse('[ true, false, maybe, null ]\n')
-// [ true, false, 'maybe', null ]
-
-const file = fs.readFileSync('./file.yml', 'utf8')
-YAML.parse(file)
-// { YAML:
-//   [ 'A human-readable data serialization language',
-//     'https://en.wikipedia.org/wiki/YAML' ],
-//   yaml:
-//   [ 'A complete JavaScript implementation',
-//     'https://www.npmjs.com/package/yaml' ] }
-```
-
-## YAML.stringify
-
-```js
-import YAML from 'yaml'
-
-YAML.stringify(3.14159)
-// '3.14159\n'
-
-YAML.stringify([true, false, 'maybe', null])
-// `- true
-// - false
-// - maybe
-// - null
-// `
-
-YAML.stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
-// `number: 3
-// plain: string
-// block: |
-//   two
-//   lines
-// `
+import { Composer, Lexer, Parser } from 'yaml'
 ```
 
 ---

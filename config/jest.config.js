@@ -42,7 +42,7 @@ if (
   transform['[/\\\\]src[/\\\\].*\\.ts$'] = babel
 }
 
-module.exports = {
+export default {
   collectCoverageFrom: ['src/**/*.{js,ts}', '!src/**/*.d.ts'],
   moduleNameMapper,
   resolver: 'jest-ts-webcompat-resolver',
