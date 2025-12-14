@@ -78,6 +78,7 @@ export class Composer<
 > {
   private directives: Directives
   private doc: Document.Parsed<Contents, Strict> | null = null
+  private docs: Document.Parsed<Contents, Strict>[] = []
   private options: ParseOptions & DocumentOptions & SchemaOptions
   private atDirectives = false
   private prelude: string[] = []
@@ -154,19 +155,18 @@ export class Composer<
    * @param forceDoc - If the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.
    * @param endOffset - Should be set if `forceDoc` is also set, to set the document range end and to indicate errors correctly.
    */
-  *compose(
+  compose(
     tokens: Iterable<Token>,
     forceDoc = false,
     endOffset = -1
-  ): Generator<Document.Parsed<Contents, Strict>, void, unknown> {
-    for (const token of tokens) yield* this.next(token)
-    yield* this.end(forceDoc, endOffset)
+  ): Document.Parsed<Contents, Strict>[] {
+    this.docs = []
+    for (const token of tokens) this.next(token)
+    return this.end(forceDoc, endOffset)
   }
 
   /** Advance the composer by one CST token. */
-  *next(
-    token: Token
-  ): Generator<Document.Parsed<Contents, Strict>, void, unknown> {
+  next(token: Token): void {
     if (env.LOG_STREAM) console.dir(token, { depth: null })
     switch (token.type) {
       case 'directive':
@@ -192,7 +192,7 @@ export class Composer<
             'Missing directives-end/doc-start indicator line'
           )
         this.decorate(doc, false)
-        if (this.doc) yield this.doc
+        if (this.doc) this.docs.push(this.doc)
         this.doc = doc
         this.atDirectives = false
         break
@@ -252,18 +252,15 @@ export class Composer<
   }
 
   /**
-   * Call at end of input to yield any remaining document.
+   * Call at end of input to handle any remaining document.
    *
    * @param forceDoc - If the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.
    * @param endOffset - Should be set if `forceDoc` is also set, to set the document range end and to indicate errors correctly.
    */
-  *end(
-    forceDoc = false,
-    endOffset = -1
-  ): Generator<Document.Parsed<Contents, Strict>, void, unknown> {
+  end(forceDoc = false, endOffset = -1): Document.Parsed<Contents, Strict>[] {
     if (this.doc) {
       this.decorate(this.doc, true)
-      yield this.doc
+      this.docs.push(this.doc)
       this.doc = null
     } else if (forceDoc) {
       const opts = Object.assign({ _directives: this.directives }, this.options)
@@ -279,7 +276,8 @@ export class Composer<
         )
       doc.range = [0, endOffset, endOffset]
       this.decorate(doc, false)
-      yield doc
+      this.docs.push(doc)
     }
+    return this.docs
   }
 }

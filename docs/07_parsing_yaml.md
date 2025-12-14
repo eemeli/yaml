@@ -5,7 +5,7 @@
 import {
   Composer,
   CST,
-  Lexer,
+  lex,
   LineCounter,
   Parser,
 } from 'yaml'
@@ -16,20 +16,18 @@ If you'd like to retain the comments and other metadata, [`parseDocument()` and 
 If you're looking to do something more specific, this section might be for you.
 
 Internally, the process of turning a sequence of characters into Documents relies on three stages, each of which is also exposed to external users.
-First, the [Lexer](#lexer) splits the character stream into lexical tokens, i.e. sequences of characters and control codes.
+First, the [lexer](#lexer) splits the character stream into lexical tokens, i.e. sequences of characters and control codes.
 Next, the [Parser](#parser) builds concrete syntax tree representations of each document and directive in the stream.
 Finally, the [Composer](#composer) builds a more user-friendly and accessible [Document](#documents) representation of each document.
-
-Both the Lexer and Parser accept incomplete input, allowing for them and the Composer to be used with e.g. [Node.js streams](https://nodejs.org/api/stream.html) or other systems that handle data in chunks.
 
 ## Lexer
 
 <!-- prettier-ignore -->
 ```js
-import { Lexer } from 'yaml'
+import { lex } from 'yaml'
 
-const tokens = new Lexer().lex('foo: bar\nfee:\n  [24,"42"]\n')
-console.dir(Array.from(tokens))
+const tokens = lex('foo: bar\nfee:\n  [24,"42"]\n')
+console.dir(tokens)
 > [
     '\x02', '\x1F', 'foo',  ':',
     ' ',    '\x1F', 'bar',  '\n',
@@ -39,17 +37,13 @@ console.dir(Array.from(tokens))
   ]
 ```
 
-#### `new Lexer()`
+#### `lex(source: string): string[]`
 
-#### `lexer.lex(src: string, incomplete?: boolean): Generator<string>`
-
-The API for the lexer is rather minimal, and offers no configuration.
-If the input stream is chunked, the `lex()` method may be called separately for each chunk if the `incomplete` argument is `true`.
-At the end of input, `lex()` should be called a final time with `incomplete: false` to ensure that the remaining tokens are emitted.
+The lexer splits an input `source` string into lexical YAML tokens, i.e. smaller strings.
+It should never throw an error.
 
 Internally, the lexer operates a state machine that determines how it parses its input.
 Initially, the lexer is always in the `stream` state.
-The lexer constructor and its `lex()` method should never throw an error.
 
 All tokens are identifiable either by their exact value or their first character.
 In addition to slices of the input stream, a few control characters are additionally used within the output.
@@ -139,9 +133,9 @@ for (const token of new Parser().parse('foo: [24,"42"]\n'))
   }
 ```
 
-The parser by default uses an internal Lexer instance, and provides a similarly minimal API for producing a [Concrete Syntax Tree](https://en.wikipedia.org/wiki/Concrete_syntax_tree) representation of the input stream.
+The parser by default uses `lex()` internally, and provides a similarly minimal API for producing a [Concrete Syntax Tree](https://en.wikipedia.org/wiki/Concrete_syntax_tree) representation of the input stream.
 
-The tokens emitted by the parser are JavaScript objects, each of which has a `type` value that's one of the following: `directive-line`, `document`, `byte-order-mark`, `space`, `comment`, `newline`.
+The tokens returned by the parser are JavaScript objects, each of which has a `type` value that's one of the following: `directive-line`, `document`, `byte-order-mark`, `space`, `comment`, `newline`.
 Of these, only `directive-line` and `document` should be considered as content.
 
 The parser does not validate its output, trying instead to produce a most YAML-ish representation of any input.
@@ -155,19 +149,25 @@ If the document contains errors, they will be included in the document's `errors
 Create a new parser.
 If defined, `onNewLine` is called separately with the start position of each new line (in `parse()`, including the start of input).
 
-#### `parser.parse(source: string, incomplete = false): Generator<Token, void>`
+#### `parser.parse(source: string): Token[]`
 
-Parse `source` as a YAML stream, generating tokens for each directive, document and other structure as it is completely parsed.
-If `incomplete`, a part of the last line may be left as a buffer for the next call.
+Parse `source` as a YAML stream, generating tokens for each directive, document and other structure.
 
-Errors are not thrown, but are yielded as `{ type: 'error', offset, message }` tokens.
+Errors are not thrown, but are included in the result as `{ type: 'error', offset, message }` tokens.
 
-#### `parser.next(lexToken: string): Generator<Token, void>`
+#### `parser.next(lexToken: string): void`
 
 Advance the parser by one lexical token.
 Used internally by `parser.parse()`; exposed to allow for use with an external lexer.
 
 For debug purposes, if the `LOG_TOKENS` env var is true-ish, all lexical tokens will be pretty-printed using `console.log()` as they are being processed.
+
+#### `parser.end(): Token[]`
+
+For use together with `next()`; call at end of input to account for any remaining constructions,
+and to return the parsed tokens.
+
+Used internally by `parser.parse()`; exposed to allow for use with an external lexer.
 
 ### CST Nodes
 
@@ -201,7 +201,6 @@ import { LineCounter, Parser } from 'yaml'
 const lineCounter = new LineCounter()
 const parser = new Parser(lineCounter.addNewLine))
 const tokens = parser.parse('foo:\n- 24\n- "42"\n')
-Array.from(tokens) // forces iteration
 
 lineCounter.lineStarts
 > [ 0, 5, 10, 17 ]
@@ -236,7 +235,7 @@ const src = 'foo: bar\nfee: [24, "42"]'
 const tokens = new Parser().parse(src)
 const docs = new Composer().compose(tokens)
 
-Array.from(docs, doc => doc.toJS())
+console.log(docs.map(doc => doc.toJS()))
 > [{ foo: 'bar', fee: [24, '42'] }]
 ```
 
@@ -246,16 +245,16 @@ Create a new Document composer.
 Does not include an internal Parser instance, so an external one will be needed.
 `options` will be used during composition, and passed to the `new Document` constructor.
 
-#### `composer.compose(tokens: Iterable<Token>, forceDoc?: boolean, endOffset?: number): Generator<Document.Parsed>`
+#### `composer.compose(tokens: Iterable<Token>, forceDoc?: boolean, endOffset?: number): Document.Parsed[]`
 
 Compose tokens into documents.
 Convenience wrapper combining calls to `composer.next()` and `composer.end()`.
 
-#### `composer.next(token: Token): Generator<Document.Parsed>`
+#### `composer.next(token: Token): void`
 
 Advance the composed by one CST token.
 
-#### `composer.end(forceDoc?: boolean, offset?: number): Generator<Document.Parsed>`
+#### `composer.end(forceDoc?: boolean, offset?: number): Document.Parsed[]`
 
 Always call at end of input to push out any remaining document.
 If `forceDoc` is true and the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.

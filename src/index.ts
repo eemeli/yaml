@@ -33,7 +33,7 @@ export type {
 } from './options.ts'
 
 export * as CST from './parse/cst.ts'
-export { Lexer } from './parse/lexer.ts'
+export { lex } from './parse/lexer.ts'
 export { LineCounter } from './parse/line-counter.ts'
 export { Parser } from './parse/parser.ts'
 
