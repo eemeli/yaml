@@ -1,5 +1,3 @@
-import { emitWarning } from 'node:process'
-
 export type LogLevelId = 'silent' | 'error' | 'warn' | 'debug'
 
 export function debug(logLevel: LogLevelId, ...messages: any[]) {
@@ -8,7 +6,13 @@ export function debug(logLevel: LogLevelId, ...messages: any[]) {
 
 export function warn(logLevel: LogLevelId, warning: string | Error) {
   if (logLevel === 'debug' || logLevel === 'warn') {
-    if (typeof emitWarning === 'function') emitWarning(warning)
-    else console.warn(warning)
+    if (
+      typeof process !== 'undefined' &&
+      typeof process.emitWarning === 'function'
+    ) {
+      process.emitWarning(warning)
+    } else {
+      console.warn(warning)
+    }
   }
 }

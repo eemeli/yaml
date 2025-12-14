@@ -1,4 +1,3 @@
-import { env } from 'node:process'
 import { Directives } from '../doc/directives.ts'
 import { Document } from '../doc/Document.ts'
 import type { ErrorCode } from '../errors.ts'
@@ -33,6 +32,11 @@ function getErrorPos(src: ErrorSource): [number, number] {
   const { offset, source } = src
   return [offset, offset + (typeof source === 'string' ? source.length : 1)]
 }
+
+const logToken =
+  typeof process !== 'undefined' && process.env?.LOG_STREAM
+    ? (token: Token) => console.dir(token, { depth: null })
+    : () => {}
 
 function parsePrelude(prelude: string[]) {
   let comment = ''
@@ -167,7 +171,7 @@ export class Composer<
 
   /** Advance the composer by one CST token. */
   next(token: Token): void {
-    if (env.LOG_STREAM) console.dir(token, { depth: null })
+    logToken(token)
     switch (token.type) {
       case 'directive':
         this.directives.add(token.source, (offset, message, warning) => {

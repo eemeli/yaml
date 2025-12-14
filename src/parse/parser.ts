@@ -1,4 +1,3 @@
-import { env } from 'node:process'
 import type {
   SourceToken,
   Token,
@@ -18,6 +17,11 @@ function includesToken(list: SourceToken[], type: SourceToken['type']) {
   for (let i = 0; i < list.length; ++i) if (list[i].type === type) return true
   return false
 }
+
+const logToken =
+  typeof process !== 'undefined' && process.env?.LOG_TOKENS
+    ? (token: string) => console.log('|', prettyToken(token))
+    : () => {}
 
 function findNonEmptyIndex(list: SourceToken[]) {
   for (let i = 0; i < list.length; ++i) {
@@ -186,7 +190,7 @@ export class Parser {
    */
   next(source: string) {
     this.source = source
-    if (env.LOG_TOKENS) console.log('|', prettyToken(source))
+    logToken(source)
 
     if (this.atScalar) {
       this.atScalar = false
