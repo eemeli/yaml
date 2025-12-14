@@ -476,7 +476,7 @@ describe('Excessive entity expansion attacks', () => {
       ['quadratic expansion', srcQ]
     ]) {
       test(name, () => {
-        process.emitWarning = jest.fn()
+        process.emitWarning = vi.fn()
         expect(() => YAML.parse(src)).toThrow(/Excessive alias count/)
       })
     }
@@ -484,7 +484,7 @@ describe('Excessive entity expansion attacks', () => {
 
   describe('Work sensibly even with disabled limits', () => {
     test('js-yaml case 1', () => {
-      process.emitWarning = jest.fn()
+      process.emitWarning = vi.fn()
       const obj = YAML.parse(src1, { maxAliasCount: -1 })
       expect(obj).toMatchObject({})
       const key = Object.keys(obj)[0]
@@ -597,7 +597,7 @@ describe('handling complex keys', () => {
   })
 
   test('emit warning when casting key in collection to string as JS Object key', () => {
-    const spy = (process.emitWarning = jest.fn())
+    const spy = (process.emitWarning = vi.fn())
     const doc = YAML.parseDocument('[foo]: bar', { prettyErrors: false })
     expect(doc.warnings).toHaveLength(0)
     expect(spy).not.toHaveBeenCalled()
@@ -610,7 +610,7 @@ describe('handling complex keys', () => {
   })
 
   test('do not add warning when using mapIsMap: true', () => {
-    process.emitWarning = jest.fn()
+    process.emitWarning = vi.fn()
     const doc = YAML.parseDocument('[foo]: bar')
     doc.toJS({ mapAsMap: true })
     expect(doc.warnings).toMatchObject([])
@@ -618,21 +618,21 @@ describe('handling complex keys', () => {
   })
 
   test('warn when casting key in collection to string', () => {
-    process.emitWarning = jest.fn()
+    process.emitWarning = vi.fn()
     const obj = YAML.parse('[foo]: bar')
     expect(Object.keys(obj)).toMatchObject(['[ foo ]'])
     expect(process.emitWarning).toHaveBeenCalled()
   })
 
   test('warn when casting key in sequence to string', () => {
-    process.emitWarning = jest.fn()
+    process.emitWarning = vi.fn()
     const obj = YAML.parse('[ [foo]: bar ]')
     expect(obj).toMatchObject([{ '[ foo ]': 'bar' }])
     expect(process.emitWarning).toHaveBeenCalled()
   })
 
   test('Error on unresolved !!binary node with mapAsMap: false (#610)', () => {
-    process.emitWarning = jest.fn()
+    process.emitWarning = vi.fn()
     const doc = YAML.parseDocument('? ? !!binary ? !!binary')
     expect(doc.warnings).toMatchObject([{ code: 'BAD_COLLECTION_TYPE' }])
     doc.toJS()
@@ -640,7 +640,7 @@ describe('handling complex keys', () => {
   })
 
   test('Error on unresolved !!timestamp node with mapAsMap: false (#610)', () => {
-    process.emitWarning = jest.fn()
+    process.emitWarning = vi.fn()
     const doc = YAML.parseDocument(
       '? ? !!timestamp ? !!timestamp 2025-03-15T15:35:58.586Z'
     )
@@ -653,7 +653,7 @@ describe('handling complex keys', () => {
 test('Document.toJS({ onAnchor })', () => {
   const src = 'foo: &a [&v foo]\nbar: *a\nbaz: *a\n'
   const doc = YAML.parseDocument(src)
-  const onAnchor = jest.fn()
+  const onAnchor = vi.fn()
   const res = doc.toJS({ onAnchor })
   expect(onAnchor.mock.calls).toMatchObject([
     [res.foo, 3],
@@ -721,7 +721,7 @@ describe('keepSourceTokens', () => {
 
 describe('reviver', () => {
   test('MDN exemple', () => {
-    const reviver = jest.fn((_key, value) => value)
+    const reviver = vi.fn((_key, value) => value)
     const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
     const obj = JSON.parse(src)
     YAML.parse(src, reviver)
@@ -746,7 +746,7 @@ describe('reviver', () => {
   })
 
   test('modify values', () => {
-    const reviver = jest.fn((_key, value) =>
+    const reviver = vi.fn((_key, value) =>
       typeof value === 'number' ? 2 * value : value
     )
     const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
@@ -758,7 +758,7 @@ describe('reviver', () => {
   })
 
   test('remove values', () => {
-    const reviver = jest.fn((key, value) =>
+    const reviver = vi.fn((key, value) =>
       key !== '' && key % 2 === 0 ? undefined : value
     )
     const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
@@ -769,7 +769,7 @@ describe('reviver', () => {
   })
 
   test('add values to this', () => {
-    const reviver = jest.fn(function (key, value) {
+    const reviver = vi.fn(function (this: any, key, value) {
       expect(key).not.toBe('9')
       this[9] = 9
       return value
@@ -785,7 +785,7 @@ describe('reviver', () => {
 
   test('sequence', () => {
     const these: unknown[][] = []
-    const reviver = jest.fn(function (key, value) {
+    const reviver = vi.fn(function (this: any, key, value) {
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === '0') return undefined
       if (key === '3') return 10
@@ -813,7 +813,7 @@ describe('reviver', () => {
 
   test('!!set', () => {
     const these: unknown[][] = []
-    const reviver = jest.fn(function (key, value) {
+    const reviver = vi.fn(function (this: any, key, value) {
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === 2) return undefined
       if (key === 8) return 10
@@ -841,7 +841,7 @@ describe('reviver', () => {
 
   test('!!omap', () => {
     const these: unknown[][] = []
-    const reviver = jest.fn(function (key, value) {
+    const reviver = vi.fn(function (this: any, key, value) {
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === 2) return undefined
       if (key === 8) return 10

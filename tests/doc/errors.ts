@@ -436,11 +436,9 @@ test('multiple tags on one node', () => {
 })
 
 describe('logLevel', () => {
-  // process.emitWarning will throw in Jest if `warning` is an Error instance
-  // due to https://github.com/facebook/jest/issues/2549
-
-  const mock = jest.spyOn(global.process, 'emitWarning').mockImplementation()
-  beforeEach(() => mock.mockClear())
+  const mock = vi
+    .spyOn(global.process, 'emitWarning')
+    .mockImplementation(() => {})
   afterEach(() => mock.mockRestore())
 
   test('by default, warn for tag fallback', () => {

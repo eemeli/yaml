@@ -37,7 +37,6 @@ npm test # just to be sure
 
 ## Repository Directory & File Structure
 
-- **`config/`** - Some of the build & test configuration files, so they don't pollute the root of the repo.
 - **`dist/`** - JS build of the library, which should work in Node.js 20.19 and modern browsers without polyfills.
 - **`docs/`** - Sources for the library's [documentation site](https://eemeli.org/yaml).
 - **`docs-slate/`** - Compiler for the library's [documentation site](https://eemeli.org/yaml).

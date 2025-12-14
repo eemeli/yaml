@@ -1329,7 +1329,7 @@ describe('replacer', () => {
   })
 
   test('function as logger', () => {
-    const spy = jest.fn((_key, value) => value)
+    const spy = vi.fn((_key, value) => value)
     const obj = { 1: 1, b: 2, c: [4] }
     YAML.stringify(obj, spy)
     expect(spy.mock.calls).toMatchObject([
@@ -1374,7 +1374,7 @@ describe('replacer', () => {
   })
 
   test('createNode, !!set', () => {
-    const replacer = jest.fn((_key, value) => value)
+    const replacer = vi.fn((_key, value) => value)
     const doc = new YAML.Document(null, { customTags: ['set'] })
     const set = new Set(['a', 'b', 1, [2]])
     doc.createNode(set, replacer)
@@ -1397,7 +1397,7 @@ describe('replacer', () => {
   })
 
   test('createNode, !!omap', () => {
-    const replacer = jest.fn((_key, value) => value)
+    const replacer = vi.fn((_key, value) => value)
     const doc = new YAML.Document(null, { customTags: ['omap'] })
     const omap = [
       ['a', 1],

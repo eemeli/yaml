@@ -9,7 +9,7 @@
       "yaml/util": ["src/util.ts"]
     },
     "rootDir": "..",
-    "types": ["jest", "node"]
+    "types": ["vitest/globals", "node"]
   },
   "include": ["**/*.ts", "artifacts/cli-*"]
 }

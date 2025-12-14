@@ -1810,7 +1810,9 @@ matches %: 20`,
   }
 }
 
-const mockWarn = jest.spyOn(global.process, 'emitWarning').mockImplementation()
+const mockWarn = vi
+  .spyOn(global.process, 'emitWarning')
+  .mockImplementation(() => {})
 beforeEach(() => mockWarn.mockClear())
 afterAll(() => mockWarn.mockRestore())
 

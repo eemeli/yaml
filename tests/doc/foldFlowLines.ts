@@ -2,16 +2,17 @@ import * as YAML from 'yaml'
 import type { FoldOptions } from 'yaml/util'
 import { foldFlowLines as fold } from 'yaml/util'
 import { source } from '../_utils.ts'
+import type { Mock } from 'vitest'
 
 const FOLD_FLOW = 'flow'
 const FOLD_QUOTED = 'quoted'
 
 describe('plain', () => {
   const src = 'abc def ghi jkl mno pqr stu vwx yz\n'
-  let onFold: jest.Mock
+  let onFold: Mock
   let options: FoldOptions
   beforeEach(() => {
-    onFold = jest.fn()
+    onFold = vi.fn()
     options = { indentAtStart: 0, lineWidth: 10, minContentWidth: 0, onFold }
   })
 
@@ -84,10 +85,10 @@ describe('plain', () => {
 
 describe('double-quoted', () => {
   const src = '"abc def ghi jkl mnopqrstuvwxyz\n"'
-  let onFold: jest.Mock
+  let onFold: Mock
   let options: FoldOptions
   beforeEach(() => {
-    onFold = jest.fn()
+    onFold = vi.fn()
     options = {
       indentAtStart: 0,
       lineWidth: 10,
