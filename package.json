@@ -30,7 +30,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rolldown -c",
     "clean": "git clean -fdxe node_modules",
     "lint": "eslint src/",
     "prettier": "prettier --write .",
@@ -38,7 +38,7 @@
     "test": "vitest run",
     "test:all": "npm test && npm run test:types && npm run test:dist && npm run test:dist:types",
     "test:dist": "npm run build && vitest run",
-    "test:dist:types": "tsc --allowJs --moduleResolution node --noEmit --target es5 dist/index.js",
+    "test:dist:types": "tsc --allowJs --moduleResolution node --noEmit --target es5 dist/cli.js dist/index.js dist/test-events.js dist/util.js",
     "test:types": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
     "docs:install": "cd docs-slate && bundle install",
     "predocs:deploy": "node docs/prepare-docs.js",
@@ -61,6 +61,8 @@
     "eslint-config-prettier": "^10.1.8",
     "fast-check": "^2.12.0",
     "prettier": "^3.0.2",
+    "rolldown": "^1.0.0-beta.54",
+    "rolldown-plugin-dts": "^0.18.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.4.0",
     "vitest": "^4.0.15"
