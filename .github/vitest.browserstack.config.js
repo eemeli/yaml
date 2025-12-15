@@ -37,6 +37,7 @@ export default defineConfig({
     browser: {
       enabled: true,
       provider: playwright(),
+      connectTimeout: 120_000,
       instances: [
         {
           name: 'Chrome Old',
