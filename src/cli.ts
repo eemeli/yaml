@@ -50,7 +50,7 @@ export async function cli(
   stdin: NodeJS.ReadableStream,
   done: (error?: Error) => void,
   argv?: string[]
-) {
+): Promise<void> {
   let args
   try {
     args = parseArgs({

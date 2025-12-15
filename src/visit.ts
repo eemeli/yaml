@@ -94,7 +94,7 @@ export type asyncVisitor =
  * and `Node` (alias, map, seq & scalar) targets. Of all these, only the most
  * specific defined one will be used for each node.
  */
-export function visit(node: Node | Document | null, visitor: visitor) {
+export function visit(node: Node | Document | null, visitor: visitor): void {
   const visitor_ = initVisitor(visitor)
   if (isDocument(node)) {
     const cd = visit_(null, node.contents, visitor_, Object.freeze([node]))
@@ -188,7 +188,7 @@ function visit_(
 export async function visitAsync(
   node: Node | Document | null,
   visitor: asyncVisitor
-) {
+): Promise<void> {
   const visitor_ = initVisitor(visitor)
   if (isDocument(node)) {
     const cd = await visitAsync_(

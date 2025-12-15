@@ -6,7 +6,7 @@ export function flowIndentCheck(
   indent: number,
   fc: Token | null | undefined,
   onError: ComposeErrorHandler
-) {
+): void {
   if (fc?.type === 'flow-collection') {
     const end = fc.end[0]
     if (

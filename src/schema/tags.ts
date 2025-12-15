@@ -63,7 +63,7 @@ export function getTags(
   customTags: SchemaOptions['customTags'] | undefined,
   schemaName: string,
   addMergeTag?: boolean
-) {
+): (ScalarTag | CollectionTag)[] {
   const schemaTags = schemas.get(schemaName)
   if (schemaTags && !customTags) {
     return addMergeTag && !schemaTags.includes(merge)

@@ -4,7 +4,7 @@ export function emptyScalarPosition(
   offset: number,
   before: Token[] | undefined,
   pos: number | null
-) {
+): number {
   if (before) {
     pos ??= before.length
     for (let i = pos - 1; i >= 0; --i) {

@@ -1,6 +1,6 @@
 import type { Token } from '../parse/cst.ts'
 
-export function containsNewline(key: Token | null | undefined) {
+export function containsNewline(key: Token | null | undefined): boolean | null {
   if (!key) return null
   switch (key.type) {
     case 'alias':

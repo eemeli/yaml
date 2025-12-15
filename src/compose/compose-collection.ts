@@ -55,7 +55,7 @@ export function composeCollection(
   token: BlockMap | BlockSequence | FlowCollection,
   props: Props,
   onError: ComposeErrorHandler
-) {
+): ParsedNode {
   const tagToken = props.tag
   const tagName: string | null = !tagToken
     ? null

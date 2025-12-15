@@ -35,7 +35,10 @@ function anchorExists(doc: Document, anchor: string): boolean {
 }
 
 // test harness for yaml-test-suite event tests
-export function testEvents(src: string) {
+export function testEvents(src: string): {
+  events: string[]
+  error: unknown
+} {
   const docs = parseAllDocuments(src)
   const errDoc = docs.find(doc => doc.errors.length > 0)
   const error = errDoc ? errDoc.errors[0].message : null

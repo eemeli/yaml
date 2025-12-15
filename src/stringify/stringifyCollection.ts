@@ -16,7 +16,7 @@ export function stringifyCollection(
   collection: Readonly<Collection>,
   ctx: StringifyContext,
   options: StringifyCollectionOptions
-) {
+): string {
   const flow = ctx.inFlow ?? collection.flow
   const stringify = flow ? stringifyFlowCollection : stringifyBlockCollection
   return stringify(collection, ctx, options)

@@ -188,7 +188,7 @@ export class Parser {
   /**
    * Advance the parser by the `source` of one lexical token.
    */
-  next(source: string) {
+  next(source: string): void {
     this.source = source
     logToken(source)
 

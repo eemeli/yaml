@@ -24,7 +24,7 @@ export function composeDoc<
   directives: Directives,
   { offset, start, value, end }: CST.Document,
   onError: ComposeErrorHandler
-) {
+): Document.Parsed<Contents, Strict> {
   const opts = Object.assign({ _directives: directives }, options)
   const doc = new Document(undefined, opts) as Document.Parsed<Contents, Strict>
   const ctx: ComposeContext = {

@@ -60,7 +60,8 @@ export class YAMLWarning extends YAMLError {
 }
 
 export const prettifyError =
-  (src: string, lc: LineCounter) => (error: YAMLError) => {
+  (src: string, lc: LineCounter) =>
+  (error: YAMLError): void => {
     if (error.pos[0] === -1) return
     error.linePos = error.pos.map(pos => lc.linePos(pos)) as
       | [LinePos]

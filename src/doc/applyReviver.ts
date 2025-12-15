@@ -12,7 +12,7 @@ export function applyReviver(
   obj: unknown,
   key: unknown,
   val: any
-) {
+): unknown {
   if (val && typeof val === 'object') {
     if (Array.isArray(val)) {
       for (let i = 0, len = val.length; i < len; ++i) {

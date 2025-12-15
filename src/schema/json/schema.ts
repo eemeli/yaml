@@ -64,7 +64,9 @@ const jsonError: ScalarTag = {
   }
 }
 
-export const schema = ([map, seq] as Array<CollectionTag | ScalarTag>).concat(
-  jsonScalars,
+export const schema: (CollectionTag | ScalarTag)[] = [
+  map,
+  seq,
+  ...jsonScalars,
   jsonError
-)
+]
