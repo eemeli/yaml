@@ -2,6 +2,7 @@
   "compilerOptions": {
     "declaration": true,
     "erasableSyntaxOnly": true,
+    "isolatedDeclarations": true,
     "isolatedModules": true,
     "module": "node20",
     "moduleDetection": "force",
@@ -13,6 +14,7 @@
     "rewriteRelativeImportExtensions": true,
     "rootDir": "src",
     "strict": true,
+    "stripInternal": true,
     "target": "es2023",
     "types": ["node"]
   },

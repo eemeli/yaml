@@ -18,9 +18,12 @@ export class Schema {
   tags: Array<CollectionTag | ScalarTag>
   toStringOptions: Readonly<ToStringOptions> | null
 
-  // Used by createNode() and composeScalar()
+  // These are used by createNode() and composeScalar()
+  /** @internal */
   declare readonly [MAP]: CollectionTag
+  /** @internal */
   declare readonly [SCALAR]: ScalarTag
+  /** @internal */
   declare readonly [SEQ]: CollectionTag
 
   constructor({

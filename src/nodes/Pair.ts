@@ -20,6 +20,7 @@ export function createPair(
 }
 
 export class Pair<K = unknown, V = unknown> {
+  /** @internal */
   declare readonly [NODE_TYPE]: symbol
 
   /** Always Node or null when parsed, but can be set to anything. */

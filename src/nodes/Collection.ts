@@ -47,6 +47,7 @@ export const isEmptyPath = (
 export abstract class Collection extends NodeBase {
   schema: Schema | undefined;
 
+  /** @internal */
   declare [NODE_TYPE]: symbol
 
   declare items: unknown[]

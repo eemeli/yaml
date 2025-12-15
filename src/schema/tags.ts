@@ -25,7 +25,26 @@ const schemas = new Map<string, Array<CollectionTag | ScalarTag>>([
   ['yaml-1.1', yaml11]
 ])
 
-const tagsByName = {
+const tagsByName: {
+  binary: ScalarTag
+  bool: ScalarTag & { test: RegExp }
+  float: ScalarTag
+  floatExp: ScalarTag
+  floatNaN: ScalarTag
+  floatTime: ScalarTag
+  int: ScalarTag
+  intHex: ScalarTag
+  intOct: ScalarTag
+  intTime: ScalarTag
+  map: CollectionTag
+  merge: ScalarTag & { identify(value: unknown): boolean; test: RegExp }
+  null: ScalarTag & { test: RegExp }
+  omap: CollectionTag
+  pairs: CollectionTag
+  seq: CollectionTag
+  set: CollectionTag
+  timestamp: ScalarTag & { test: RegExp }
+} = {
   binary,
   bool: boolTag,
   float,
@@ -50,7 +69,19 @@ export type TagId = keyof typeof tagsByName
 
 export type Tags = Array<ScalarTag | CollectionTag | TagId>
 
-export const coreKnownTags = {
+export const coreKnownTags: {
+  'tag:yaml.org,2002:binary': ScalarTag
+  'tag:yaml.org,2002:merge': ScalarTag & {
+    identify(value: unknown): boolean
+    test: RegExp
+  }
+  'tag:yaml.org,2002:omap': CollectionTag
+  'tag:yaml.org,2002:pairs': CollectionTag
+  'tag:yaml.org,2002:set': CollectionTag
+  'tag:yaml.org,2002:timestamp': ScalarTag & {
+    test: RegExp
+  }
+} = {
   'tag:yaml.org,2002:binary': binary,
   'tag:yaml.org,2002:merge': merge,
   'tag:yaml.org,2002:omap': omap,

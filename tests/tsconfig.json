@@ -2,7 +2,6 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "..",
-    "declaration": false,
     "paths": {
       "yaml": ["src/index.ts"],
       "yaml/cli": ["src/cli.ts"],

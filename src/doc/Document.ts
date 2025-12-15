@@ -49,6 +49,7 @@ export class Document<
   Contents extends Node = Node,
   Strict extends boolean = true
 > {
+  /** @internal */
   declare readonly [NODE_TYPE]: symbol
 
   /** A comment before this Document */

@@ -12,7 +12,7 @@ import { prettifyError } from './errors.ts'
 import type { visitor } from './visit.ts'
 import { visit } from './visit.ts'
 
-export const help = `\
+export const help: string = `\
 yaml: A command-line YAML processor and inspector
 
 Reads stdin and writes output to stdout and errors & warnings to stderr.

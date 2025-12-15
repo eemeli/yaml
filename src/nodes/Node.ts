@@ -46,6 +46,7 @@ export type ParsedNode =
 export type Range = [number, number, number]
 
 export abstract class NodeBase {
+  /** @internal */
   declare readonly [NODE_TYPE]: symbol
 
   /** A comment on or immediately after this */

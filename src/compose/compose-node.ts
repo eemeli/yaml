@@ -29,7 +29,10 @@ interface Props {
   end: number
 }
 
-const CN = { composeNode, composeEmptyNode }
+const CN: {
+  composeNode: typeof composeNode
+  composeEmptyNode: typeof composeEmptyNode
+} = { composeNode, composeEmptyNode }
 export type ComposeNode = typeof CN
 
 export function composeNode(
