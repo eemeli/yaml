@@ -11,10 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with: { submodules: true }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+      - uses: actions/setup-node@v6
       - uses: browserstack/github-actions/setup-env@master
         with:
           username:  ${{ secrets.BROWSERSTACK_USERNAME }}
@@ -26,18 +25,9 @@ jobs:
           local-identifier: random
 
       - run: npm ci
-      - run: npm run build:browser
-      - name: Playground setup
-        working-directory: ./playground
-        run: npm ci
-      - name: Playground build
-        working-directory: ./playground
-        run: npm run build
-      - run: npx http-server site &
-        working-directory: ./playground
-
-      - run: npx browserstack-node-sdk jest
-        working-directory: ./playground
+      - run: npm run build
+      - run: npm install --no-save @vitest/browser-playwright@4
+      - run: npx vitest run --config=.github/vitest.browserstack.config.js
 
       - uses: browserstack/github-actions/setup-local@master
         if: always()

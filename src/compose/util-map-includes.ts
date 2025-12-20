@@ -7,7 +7,7 @@ export function mapIncludes(
   ctx: ComposeContext,
   items: Pair<ParsedNode>[],
   search: ParsedNode
-) {
+): boolean {
   const { uniqueKeys } = ctx.options
   if (uniqueKeys === false) return false
   const isEqual =

@@ -2,14 +2,13 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "..",
-    "declaration": false,
     "paths": {
       "yaml": ["src/index.ts"],
       "yaml/cli": ["src/cli.ts"],
       "yaml/util": ["src/util.ts"]
     },
     "rootDir": "..",
-    "types": ["jest", "node"]
+    "types": ["vitest/globals", "node"]
   },
   "include": ["**/*.ts", "artifacts/cli-*"]
 }

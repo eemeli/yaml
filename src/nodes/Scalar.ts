@@ -5,7 +5,7 @@ import { NodeBase } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
 import { toJS } from './toJS.ts'
 
-export const isScalarValue = (value: unknown) =>
+export const isScalarValue = (value: unknown): boolean =>
   !value || (typeof value !== 'function' && typeof value !== 'object')
 
 export declare namespace Scalar {

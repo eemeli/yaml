@@ -1,7 +1,17 @@
-import { Buffer } from 'node:buffer'
 import { Scalar } from '../../nodes/Scalar.ts'
 import { stringifyString } from '../../stringify/stringifyString.ts'
 import type { ScalarTag } from '../types.ts'
+
+declare global {
+  interface Uint8Array {
+    /** https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64 */
+    toBase64(options?: unknown): string
+  }
+  interface Uint8ArrayConstructor {
+    /** https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64 */
+    fromBase64(string: string, options?: unknown): Uint8Array
+  }
+}
 
 export const binary: ScalarTag = {
   identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array
@@ -9,7 +19,7 @@ export const binary: ScalarTag = {
   tag: 'tag:yaml.org,2002:binary',
 
   /**
-   * Returns a Buffer in node and an Uint8Array in browsers
+   * Returns a Buffer in Node.js and an Uint8Array elsewhere
    *
    * To use the resulting buffer as an image, you'll want to do something like:
    *
@@ -19,6 +29,8 @@ export const binary: ScalarTag = {
   resolve(src, onError) {
     if (typeof Buffer === 'function') {
       return Buffer.from(src, 'base64')
+    } else if (typeof Uint8Array.fromBase64 === 'function') {
+      return Uint8Array.fromBase64(src)
     } else if (typeof atob === 'function') {
       // On IE 11, atob() can't handle newlines
       const str = atob(src.replace(/[\n\r]/g, ''))
@@ -37,7 +49,9 @@ export const binary: ScalarTag = {
     if (!value) return ''
     const buf = value as Uint8Array // checked earlier by binary.identify()
     let str: string
-    if (typeof Buffer === 'function') {
+    if (typeof buf.toBase64 === 'function') {
+      str = buf.toBase64()
+    } else if (typeof Buffer === 'function') {
       str =
         buf instanceof Buffer
           ? buf.toString('base64')

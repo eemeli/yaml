@@ -7,13 +7,13 @@ import {
   isScalar,
   NODE_TYPE
 } from './identity.ts'
-import { NodeBase } from './Node.ts'
+import { type Node, NodeBase } from './Node.ts'
 
 export function collectionFromPath(
   schema: Schema,
   path: unknown[],
   value: unknown
-) {
+): Node {
   let v = value
   for (let i = path.length - 1; i >= 0; --i) {
     const k = path[i]
@@ -47,6 +47,7 @@ export const isEmptyPath = (
 export abstract class Collection extends NodeBase {
   schema: Schema | undefined;
 
+  /** @internal */
   declare [NODE_TYPE]: symbol
 
   declare items: unknown[]
@@ -120,7 +121,7 @@ export abstract class Collection extends NodeBase {
    * be a Pair instance or a `{ key, value }` object, which may not have a key
    * that already exists in the map.
    */
-  addIn(path: Iterable<unknown>, value: unknown) {
+  addIn(path: Iterable<unknown>, value: unknown): void {
     if (isEmptyPath(path)) this.add(value)
     else {
       const [key, ...rest] = path
@@ -193,7 +194,7 @@ export abstract class Collection extends NodeBase {
    * Sets a value in this collection. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    */
-  setIn(path: Iterable<unknown>, value: unknown) {
+  setIn(path: Iterable<unknown>, value: unknown): void {
     const [key, ...rest] = path
     if (rest.length === 0) {
       this.set(key, value)

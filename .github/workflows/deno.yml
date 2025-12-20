@@ -23,4 +23,4 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ matrix.deno-version }}
-      - run: deno src/public-api.ts
+      - run: deno --allow-env src/public-api.ts

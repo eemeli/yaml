@@ -6,7 +6,7 @@ export function resolveEnd(
   offset: number,
   reqSpace: boolean,
   onError: ComposeErrorHandler
-) {
+): { comment: string; offset: number } {
   let comment = ''
   if (end) {
     let hasSpace = false

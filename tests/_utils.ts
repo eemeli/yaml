@@ -2,7 +2,7 @@
 export function source(
   strings: TemplateStringsArray,
   ...expressions: unknown[]
-) {
+): string {
   // concatenate
   let res = strings[0]
   for (let i = 1; i < strings.length; ++i)

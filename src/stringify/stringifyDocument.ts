@@ -12,7 +12,7 @@ import { indentComment, lineComment } from './stringifyComment.ts'
 export function stringifyDocument(
   doc: Readonly<Document<Node, boolean>>,
   options: ToStringOptions
-) {
+): string {
   const lines: string[] = []
   let hasDirectives = options.directives === true
   if (options.directives !== false && doc.directives) {

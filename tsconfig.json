@@ -1,15 +1,21 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "erasableSyntaxOnly": true,
+    "isolatedDeclarations": true,
+    "isolatedModules": true,
+    "module": "node20",
+    "moduleDetection": "force",
+    "moduleResolution": "nodenext",
+    "noUncheckedSideEffectImports": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "outDir": "dist",
     "rewriteRelativeImportExtensions": true,
     "rootDir": "src",
     "strict": true,
-    "target": "ES2020",
+    "stripInternal": true,
+    "target": "es2023",
     "types": ["node"]
   },
   "include": ["src/**/*.ts"]

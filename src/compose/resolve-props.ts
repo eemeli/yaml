@@ -22,7 +22,18 @@ export function resolveProps(
     parentIndent,
     startOnNewline
   }: ResolvePropsArg
-) {
+): {
+  comma: SourceToken | null
+  found: SourceToken | null
+  spaceBefore: boolean
+  comment: string
+  hasNewline: boolean
+  anchor: SourceToken | null
+  tag: SourceToken | null
+  newlineAfterProp: SourceToken | null
+  end: number
+  start: number
+} {
   let spaceBefore = false
   let atNewline = startOnNewline
   let hasSpace = startOnNewline

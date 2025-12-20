@@ -10,7 +10,7 @@ export function stringifyPair(
   ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
-) {
+): string {
   const {
     allNullValues,
     doc,

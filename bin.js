@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { UserError, cli, help } from './dist/cli.mjs'
+import { UserError, cli, help } from './dist/cli.js'
 
 cli(process.stdin, error => {
   if (error instanceof UserError) {

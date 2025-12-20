@@ -22,7 +22,7 @@ export function resolveFlowCollection(
   fc: FlowCollection,
   onError: ComposeErrorHandler,
   tag?: CollectionTag
-) {
+): YAMLMap.Parsed | YAMLSeq.Parsed {
   const isMap = fc.start.source === '{'
   const fcName = isMap ? 'flow map' : 'flow sequence'
   const NodeClass = (tag?.nodeClass ?? (isMap ? YAMLMap : YAMLSeq)) as {

@@ -8,13 +8,13 @@ const skip = Number(major) < 20
   const stdout: unknown[] = []
   const stderr: unknown[] = []
   beforeAll(() => {
-    jest.spyOn(global.console, 'log').mockImplementation(thing => {
+    vi.spyOn(global.console, 'log').mockImplementation(thing => {
       stdout.push(thing)
     })
-    jest.spyOn(global.console, 'dir').mockImplementation(thing => {
+    vi.spyOn(global.console, 'dir').mockImplementation(thing => {
       stdout.push(thing)
     })
-    jest.spyOn(global.console, 'error').mockImplementation(thing => {
+    vi.spyOn(global.console, 'error').mockImplementation(thing => {
       stderr.push(thing)
     })
   })
@@ -26,23 +26,27 @@ const skip = Number(major) < 20
     output: unknown[],
     errors: unknown[] = []
   ) {
-    test(name, done => {
-      stdout.length = 0
-      stderr.length = 0
-      cli(
-        Readable.from([input]),
-        error => {
-          try {
-            expect(stdout).toMatchObject(output)
-            expect(stderr).toMatchObject(errors)
-            expect(error).toBeUndefined()
-          } finally {
-            done()
-          }
-        },
-        args
-      ).catch(done)
-    })
+    test(
+      name,
+      () =>
+        new Promise(done => {
+          stdout.length = 0
+          stderr.length = 0
+          cli(
+            Readable.from([input]),
+            error => {
+              try {
+                expect(stdout).toMatchObject(output)
+                expect(stderr).toMatchObject(errors)
+                expect(error).toBeUndefined()
+              } finally {
+                done(undefined)
+              }
+            },
+            args
+          ).catch(done)
+        })
+    )
   }
 
   function fail(
@@ -51,24 +55,28 @@ const skip = Number(major) < 20
     args: string[],
     errors: unknown[]
   ) {
-    test(name, done => {
-      stderr.length = 0
-      let doned = false
-      cli(
-        Readable.from([input]),
-        error => {
-          if (doned) return
-          try {
-            expect(stderr).toMatchObject(errors)
-            expect(error).not.toBeUndefined()
-          } finally {
-            done()
-            doned = true
-          }
-        },
-        args
-      ).catch(done)
-    })
+    test(
+      name,
+      () =>
+        new Promise(done => {
+          stderr.length = 0
+          let doned = false
+          cli(
+            Readable.from([input]),
+            error => {
+              if (doned) return
+              try {
+                expect(stderr).toMatchObject(errors)
+                expect(error).not.toBeUndefined()
+              } finally {
+                done(undefined)
+                doned = true
+              }
+            },
+            args
+          ).catch(done)
+        })
+    )
   }
 
   describe('Bad arguments', () => {
@@ -260,7 +268,7 @@ const skip = Number(major) < 20
       ok(
         'singlequote',
         '{"hello":"world"}',
-        ['--visit', './tests/artifacts/cli-singlequote.mjs'],
+        ['--visit', './tests/artifacts/cli-singlequote.js'],
         ["{ 'hello': 'world' }"]
       )
     })

@@ -49,6 +49,7 @@ export class Document<
   Contents extends Node = Node,
   Strict extends boolean = true
 > {
+  /** @internal */
   declare readonly [NODE_TYPE]: symbol
 
   /** A comment before this Document */
@@ -168,12 +169,12 @@ export class Document<
   }
 
   /** Adds a value to the document. */
-  add(value: any) {
+  add(value: any): void {
     if (assertCollection(this.contents)) this.contents.add(value)
   }
 
   /** Adds a value to the document. */
-  addIn(path: Iterable<unknown>, value: unknown) {
+  addIn(path: Iterable<unknown>, value: unknown): void {
     if (assertCollection(this.contents)) this.contents.addIn(path, value)
   }
 
@@ -378,7 +379,7 @@ export class Document<
   setSchema(
     version: '1.1' | '1.2' | 'next' | null,
     options: SchemaOptions = {}
-  ) {
+  ): void {
     if (typeof version === 'number') version = String(version) as '1.1' | '1.2'
 
     let opt: (SchemaOptions & { schema: string }) | null

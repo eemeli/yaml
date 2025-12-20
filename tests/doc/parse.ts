@@ -1,7 +1,24 @@
-import { readFileSync } from 'fs'
-import { resolve } from 'path'
+import type { Mock } from 'vitest'
 import * as YAML from 'yaml'
 import { source } from '../_utils.ts'
+
+let readArtifact
+if (typeof window === 'undefined') {
+  const { readFile } = await import('node:fs/promises')
+  const { resolve } = await import('node:path')
+  readArtifact = (path: string, opt?: string): Promise<string> =>
+    // @ts-expect-error It's fine.
+    readFile(resolve(__dirname, '..', 'artifacts', path), opt)
+} else {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore -- @vitest/browser-playwright might not be installed
+  const { commands } = await import('vitest/browser')
+  readArtifact = (path: string, opt?: string): Promise<string> => {
+    return opt === 'utf8'
+      ? commands.readFile(`tests/artifacts/${path}`)
+      : Promise.resolve(new Uint8Array() as any)
+  }
+}
 
 describe('scalars', () => {
   test('empty block scalar at end of document', () => {
@@ -32,11 +49,8 @@ aliases:
     expect(docs[0].errors).toHaveLength(0)
   })
 
-  test('complete file', () => {
-    const src = readFileSync(
-      resolve(__dirname, '../artifacts/prettier-circleci-config.yml'),
-      'utf8'
-    )
+  test('complete file', async () => {
+    const src = await readArtifact('prettier-circleci-config.yml', 'utf8')
     const doc = YAML.parseDocument(src)
     expect(doc.toJS()).toMatchObject({
       aliases: [
@@ -146,10 +160,8 @@ aliases:
   })
 })
 
-test('buffer as source (#459)', () => {
-  const buffer = readFileSync(
-    resolve(__dirname, '../artifacts/prettier-circleci-config.yml')
-  )
+test('buffer as source (#459)', async () => {
+  const buffer = await readArtifact('prettier-circleci-config.yml')
   expect(() => YAML.parseDocument(buffer as any)).toThrow(
     'source is not a string'
   )
@@ -453,20 +465,11 @@ describe('odd indentations', () => {
   })
 })
 
-describe('Excessive entity expansion attacks', () => {
-  const root = resolve(__dirname, '../artifacts/pr104')
-  const src1 = readFileSync(resolve(root, 'case1.yml'), 'utf8')
-  const src2 = readFileSync(resolve(root, 'case2.yml'), 'utf8')
-  const srcB = readFileSync(resolve(root, 'billion-laughs.yml'), 'utf8')
-  const srcQ = readFileSync(resolve(root, 'quadratic.yml'), 'utf8')
-
-  let origEmitWarning: typeof process.emitWarning
-  beforeAll(() => {
-    origEmitWarning = process.emitWarning
-  })
-  afterAll(() => {
-    process.emitWarning = origEmitWarning
-  })
+describe('Excessive entity expansion attacks', async () => {
+  const src1 = await readArtifact('pr104/case1.yml', 'utf8')
+  const src2 = await readArtifact('pr104/case2.yml', 'utf8')
+  const srcB = await readArtifact('pr104/billion-laughs.yml', 'utf8')
+  const srcQ = await readArtifact('pr104/quadratic.yml', 'utf8')
 
   describe('Limit count by default', () => {
     for (const [name, src] of [
@@ -476,25 +479,30 @@ describe('Excessive entity expansion attacks', () => {
       ['quadratic expansion', srcQ]
     ]) {
       test(name, () => {
-        process.emitWarning = jest.fn()
-        expect(() => YAML.parse(src)).toThrow(/Excessive alias count/)
+        expect(() => YAML.parse(src, { logLevel: 'error' })).toThrow(
+          /Excessive alias count/
+        )
       })
     }
   })
 
   describe('Work sensibly even with disabled limits', () => {
     test('js-yaml case 1', () => {
-      process.emitWarning = jest.fn()
+      const mockWarn =
+        typeof process !== 'undefined'
+          ? vi.spyOn(process, 'emitWarning').mockImplementation(() => {})
+          : vi.spyOn(console, 'warn').mockImplementation(() => {})
       const obj = YAML.parse(src1, { maxAliasCount: -1 })
       expect(obj).toMatchObject({})
       const key = Object.keys(obj)[0]
       expect(key.length).toBeGreaterThan(2000)
       expect(key.length).toBeLessThan(8000)
-      expect(process.emitWarning).toHaveBeenCalled()
+      expect(mockWarn).toHaveBeenCalled()
+      mockWarn.mockRestore()
     })
 
     test('js-yaml case 2', () => {
-      const arr = YAML.parse(src2, { maxAliasCount: -1 })
+      const arr = YAML.parse(src2, { logLevel: 'error', maxAliasCount: -1 })
       expect(arr).toHaveLength(2)
       const key = Object.keys(arr[1])[0]
       expect(key).toBe('*id057')
@@ -588,72 +596,68 @@ describe('duplicate keys', () => {
 })
 
 describe('handling complex keys', () => {
-  let origEmitWarning: typeof process.emitWarning
+  let mockWarn: Mock<(...data: any[]) => void>
   beforeAll(() => {
-    origEmitWarning = process.emitWarning
+    mockWarn =
+      typeof process !== 'undefined'
+        ? vi.spyOn(global.process, 'emitWarning').mockImplementation(() => {})
+        : vi.spyOn(console, 'warn').mockImplementation(() => {})
   })
-  afterAll(() => {
-    process.emitWarning = origEmitWarning
-  })
+  beforeEach(() => mockWarn.mockReset().mockImplementation(() => {}))
+  afterAll(() => mockWarn.mockRestore())
 
   test('emit warning when casting key in collection to string as JS Object key', () => {
-    const spy = (process.emitWarning = jest.fn())
     const doc = YAML.parseDocument('[foo]: bar', { prettyErrors: false })
     expect(doc.warnings).toHaveLength(0)
-    expect(spy).not.toHaveBeenCalled()
+    expect(mockWarn).not.toHaveBeenCalled()
 
     doc.toJS()
-    expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy.mock.calls[0][0]).toMatch(
+    expect(mockWarn).toHaveBeenCalledTimes(1)
+    expect(mockWarn.mock.calls[0][0]).toMatch(
       /^Keys with collection values will be stringified due to JS Object restrictions/
     )
   })
 
   test('do not add warning when using mapIsMap: true', () => {
-    process.emitWarning = jest.fn()
     const doc = YAML.parseDocument('[foo]: bar')
     doc.toJS({ mapAsMap: true })
     expect(doc.warnings).toMatchObject([])
-    expect(process.emitWarning).not.toHaveBeenCalled()
+    expect(mockWarn).not.toHaveBeenCalled()
   })
 
   test('warn when casting key in collection to string', () => {
-    process.emitWarning = jest.fn()
     const obj = YAML.parse('[foo]: bar')
     expect(Object.keys(obj)).toMatchObject(['[ foo ]'])
-    expect(process.emitWarning).toHaveBeenCalled()
+    expect(mockWarn).toHaveBeenCalled()
   })
 
   test('warn when casting key in sequence to string', () => {
-    process.emitWarning = jest.fn()
     const obj = YAML.parse('[ [foo]: bar ]')
     expect(obj).toMatchObject([{ '[ foo ]': 'bar' }])
-    expect(process.emitWarning).toHaveBeenCalled()
+    expect(mockWarn).toHaveBeenCalled()
   })
 
   test('Error on unresolved !!binary node with mapAsMap: false (#610)', () => {
-    process.emitWarning = jest.fn()
     const doc = YAML.parseDocument('? ? !!binary ? !!binary')
     expect(doc.warnings).toMatchObject([{ code: 'BAD_COLLECTION_TYPE' }])
     doc.toJS()
-    expect(process.emitWarning).toHaveBeenCalled()
+    expect(mockWarn).toHaveBeenCalled()
   })
 
   test('Error on unresolved !!timestamp node with mapAsMap: false (#610)', () => {
-    process.emitWarning = jest.fn()
     const doc = YAML.parseDocument(
       '? ? !!timestamp ? !!timestamp 2025-03-15T15:35:58.586Z'
     )
     expect(doc.warnings).toMatchObject([{ code: 'BAD_COLLECTION_TYPE' }])
     doc.toJS()
-    expect(process.emitWarning).toHaveBeenCalled()
+    expect(mockWarn).toHaveBeenCalled()
   })
 })
 
 test('Document.toJS({ onAnchor })', () => {
   const src = 'foo: &a [&v foo]\nbar: *a\nbaz: *a\n'
   const doc = YAML.parseDocument(src)
-  const onAnchor = jest.fn()
+  const onAnchor = vi.fn()
   const res = doc.toJS({ onAnchor })
   expect(onAnchor.mock.calls).toMatchObject([
     [res.foo, 3],
@@ -721,7 +725,7 @@ describe('keepSourceTokens', () => {
 
 describe('reviver', () => {
   test('MDN exemple', () => {
-    const reviver = jest.fn((_key, value) => value)
+    const reviver = vi.fn((_key, value) => value)
     const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
     const obj = JSON.parse(src)
     YAML.parse(src, reviver)
@@ -746,7 +750,7 @@ describe('reviver', () => {
   })
 
   test('modify values', () => {
-    const reviver = jest.fn((_key, value) =>
+    const reviver = vi.fn((_key, value) =>
       typeof value === 'number' ? 2 * value : value
     )
     const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
@@ -758,7 +762,7 @@ describe('reviver', () => {
   })
 
   test('remove values', () => {
-    const reviver = jest.fn((key, value) =>
+    const reviver = vi.fn((key, value) =>
       key !== '' && key % 2 === 0 ? undefined : value
     )
     const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
@@ -769,7 +773,7 @@ describe('reviver', () => {
   })
 
   test('add values to this', () => {
-    const reviver = jest.fn(function (key, value) {
+    const reviver = vi.fn(function (this: any, key, value) {
       expect(key).not.toBe('9')
       this[9] = 9
       return value
@@ -785,7 +789,7 @@ describe('reviver', () => {
 
   test('sequence', () => {
     const these: unknown[][] = []
-    const reviver = jest.fn(function (key, value) {
+    const reviver = vi.fn(function (this: any, key, value) {
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === '0') return undefined
       if (key === '3') return 10
@@ -813,7 +817,7 @@ describe('reviver', () => {
 
   test('!!set', () => {
     const these: unknown[][] = []
-    const reviver = jest.fn(function (key, value) {
+    const reviver = vi.fn(function (this: any, key, value) {
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === 2) return undefined
       if (key === 8) return 10
@@ -841,7 +845,7 @@ describe('reviver', () => {
 
   test('!!omap', () => {
     const these: unknown[][] = []
-    const reviver = jest.fn(function (key, value) {
+    const reviver = vi.fn(function (this: any, key, value) {
       these.push(Array.from(key === '' ? this[''] : this))
       if (key === 2) return undefined
       if (key === 8) return 10

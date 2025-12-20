@@ -2,6 +2,7 @@ import type { Directives } from '../doc/directives.ts'
 import { Alias } from '../nodes/Alias.ts'
 import { isScalar } from '../nodes/identity.ts'
 import type { ParsedNode } from '../nodes/Node.ts'
+import type { Scalar } from '../nodes/Scalar.ts'
 import type { ParseOptions } from '../options.ts'
 import type { FlowScalar, SourceToken, Token } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
@@ -28,7 +29,10 @@ interface Props {
   end: number
 }
 
-const CN = { composeNode, composeEmptyNode }
+const CN: {
+  composeNode: typeof composeNode
+  composeEmptyNode: typeof composeEmptyNode
+} = { composeNode, composeEmptyNode }
 export type ComposeNode = typeof CN
 
 export function composeNode(
@@ -36,7 +40,7 @@ export function composeNode(
   token: Token,
   props: Props,
   onError: ComposeErrorHandler
-) {
+): ParsedNode {
   const atKey = ctx.atKey
   const { spaceBefore, comment, anchor, tag } = props
   let node: ParsedNode
@@ -110,7 +114,7 @@ export function composeEmptyNode(
   pos: number | null,
   { spaceBefore, comment, anchor, tag, end }: Props,
   onError: ComposeErrorHandler
-) {
+): Scalar.Parsed {
   const token: FlowScalar = {
     type: 'scalar',
     offset: emptyScalarPosition(offset, before, pos),

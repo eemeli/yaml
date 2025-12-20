@@ -45,26 +45,43 @@ export type Visitor = (
  *     visitor is called on item entry, next visitors are called after handling
  *     a non-empty `key` and when exiting the item.
  */
-export function visit(cst: Document | CollectionItem, visitor: Visitor): void {
+export const visit: {
+  (cst: Document | CollectionItem, visitor: Visitor): void
+
+  /** Terminate visit traversal completely */
+  BREAK: symbol
+
+  /** Do not visit the children of the current item */
+  SKIP: symbol
+
+  /** Remove the current item */
+  REMOVE: symbol
+
+  /** Find the item at `path` from `cst` as the root */
+  itemAtPath(
+    cst: Document | CollectionItem,
+    path: VisitPath
+  ): CollectionItem | undefined
+
+  /**
+   * Get the immediate parent collection of the item at `path` from `cst` as the root.
+   *
+   * Throws an error if the collection is not found, which should never happen if the item itself exists.
+   */
+  parentCollection(
+    cst: Document | CollectionItem,
+    path: VisitPath
+  ): BlockMap | BlockSequence | FlowCollection
+} = function visit(cst, visitor) {
   if ('type' in cst && cst.type === 'document')
     cst = { start: cst.start, value: cst.value }
   _visit(Object.freeze([]), cst, visitor)
 }
 
-// Without the `as symbol` casts, TS declares these in the `visit`
-// namespace using `var`, but then complains about that because
-// `unique symbol` must be `const`.
+visit.BREAK = BREAK
+visit.SKIP = SKIP
+visit.REMOVE = REMOVE
 
-/** Terminate visit traversal completely */
-visit.BREAK = BREAK as symbol
-
-/** Do not visit the children of the current item */
-visit.SKIP = SKIP as symbol
-
-/** Remove the current item */
-visit.REMOVE = REMOVE as symbol
-
-/** Find the item at `path` from `cst` as the root */
 visit.itemAtPath = (
   cst: Document | CollectionItem,
   path: VisitPath
@@ -79,11 +96,6 @@ visit.itemAtPath = (
   return item
 }
 
-/**
- * Get the immediate parent collection of the item at `path` from `cst` as the root.
- *
- * Throws an error if the collection is not found, which should never happen if the item itself exists.
- */
 visit.parentCollection = (
   cst: Document | CollectionItem,
   path: VisitPath

@@ -10,7 +10,7 @@ for (const [visit_, title] of [
   describe(title, () => {
     test('Map', async () => {
       const doc = parseDocument('{ one: 1, two }')
-      const fn = jest.fn()
+      const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
         [null, coll, [{}]],
@@ -24,7 +24,7 @@ for (const [visit_, title] of [
 
     test('Seq', async () => {
       const doc = parseDocument('- 1\n- two\n')
-      const fn = jest.fn()
+      const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
         [null, coll, [{ contents: {} }]],
@@ -35,7 +35,7 @@ for (const [visit_, title] of [
 
     test('Alias', async () => {
       const doc = parseDocument('- &a 1\n- *a\n')
-      const fn = jest.fn()
+      const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
         [null, coll, [{}]],
@@ -46,7 +46,7 @@ for (const [visit_, title] of [
 
     test('Seq in Map', async () => {
       const doc = parseDocument('foo:\n  - "one"\n  - \'two\'\n')
-      const fn = jest.fn()
+      const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
         [null, coll, [{}]],
@@ -60,7 +60,7 @@ for (const [visit_, title] of [
 
     test('Visit called with non-Document root', async () => {
       const doc = parseDocument('foo:\n  - "one"\n  - \'two\'\n')
-      const fn = jest.fn()
+      const fn = vi.fn()
       await visit_(doc.get('foo') as Scalar, fn)
       expect(fn.mock.calls).toMatchObject([
         [null, coll, []],
@@ -71,7 +71,7 @@ for (const [visit_, title] of [
 
     test('Visiting a constructed document', async () => {
       const doc = new Document([1, 'two'])
-      const fn = jest.fn()
+      const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
         [null, { items: [{}, {}] }, [{}]],
@@ -83,7 +83,7 @@ for (const [visit_, title] of [
 
     test('Only Scalar defined', async () => {
       const doc = parseDocument('foo:\n  - "one"\n  - \'two\'\n')
-      const Scalar = jest.fn()
+      const Scalar = vi.fn()
       await visit_(doc, { Scalar })
       expect(Scalar.mock.calls).toMatchObject([
         ['key', { type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
@@ -94,7 +94,7 @@ for (const [visit_, title] of [
 
     test('Function as visitor', async () => {
       const doc = parseDocument('{ one: 1, two }')
-      const fn = jest.fn()
+      const fn = vi.fn()
       await visit_(doc, fn)
       expect(fn.mock.calls).toMatchObject([
         [null, coll, [{}]],
@@ -130,7 +130,7 @@ for (const [visit_, title] of [
 
     test('Add item to Seq', async () => {
       const doc = parseDocument('- one\n- two\n')
-      const Scalar = jest.fn()
+      const Scalar = vi.fn()
       await visit_(doc, {
         Seq(_, seq) {
           seq.items.push(doc.createNode('three'))
@@ -147,7 +147,7 @@ for (const [visit_, title] of [
 
     test('Do not visit block seq items', async () => {
       const doc = parseDocument('foo:\n  - one\n  - two\nbar:\n')
-      const fn = jest.fn((_, node) => (isSeq(node) ? visit_.SKIP : undefined))
+      const fn = vi.fn((_, node) => (isSeq(node) ? visit_.SKIP : undefined))
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
         [null, coll, [{}]],
@@ -162,7 +162,7 @@ for (const [visit_, title] of [
 
     test('Break visit on command', async () => {
       const doc = parseDocument('- one\n- two\n- three\n')
-      const Scalar = jest.fn((_, node) =>
+      const Scalar = vi.fn((_, node) =>
         node.value === 'two' ? visit_.BREAK : undefined
       )
       await visit_(doc, { Scalar })
@@ -174,7 +174,7 @@ for (const [visit_, title] of [
 
     test('Modify seq item', async () => {
       const doc = parseDocument('- one\n- two\n- three\n')
-      const Scalar = jest.fn((_, node) =>
+      const Scalar = vi.fn((_, node) =>
         node.value === 'two' ? doc.createNode(42) : undefined
       )
       await visit_(doc, { Scalar })
@@ -189,7 +189,7 @@ for (const [visit_, title] of [
 
     test('Skip seq item', async () => {
       const doc = parseDocument('- one\n- two\n- three\n')
-      const Scalar = jest.fn(key => (key === 0 ? 2 : undefined))
+      const Scalar = vi.fn(key => (key === 0 ? 2 : undefined))
       await visit_(doc, { Scalar })
       expect(Scalar.mock.calls).toMatchObject([
         [0, { type: 'PLAIN', value: 'one' }, [{}, {}]],
@@ -199,7 +199,7 @@ for (const [visit_, title] of [
 
     test('Remove seq item', async () => {
       const doc = parseDocument('- one\n- two\n- three\n')
-      const Scalar = jest.fn((_, node) =>
+      const Scalar = vi.fn((_, node) =>
         node.value === 'two' ? visit_.REMOVE : undefined
       )
       await visit_(doc, { Scalar })
@@ -213,7 +213,7 @@ for (const [visit_, title] of [
 
     test('Remove map value', async () => {
       const doc = parseDocument('one: 1\ntwo: 2\n')
-      const Scalar = jest.fn((key, node) =>
+      const Scalar = vi.fn((key, node) =>
         key === 'value' && node.value === 2 ? visit_.REMOVE : undefined
       )
       await visit_(doc, { Scalar })
@@ -228,7 +228,7 @@ for (const [visit_, title] of [
 
     test('Fail to replace root node', async () => {
       const doc = parseDocument('- one\n- two\n- three\n')
-      const Seq = jest.fn(() => doc.createNode(42))
+      const Seq = vi.fn(() => doc.createNode(42))
       if (visit_ === visit) {
         expect(() => visit_(doc.contents, { Seq })).toThrow(
           'Cannot replace node with scalar parent'

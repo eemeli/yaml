@@ -94,7 +94,18 @@ export type asyncVisitor =
  * and `Node` (alias, map, seq & scalar) targets. Of all these, only the most
  * specific defined one will be used for each node.
  */
-export function visit(node: Node | Document | null, visitor: visitor) {
+export const visit: {
+  (node: Node | Document | null, visitor: visitor): void
+
+  /** Terminate visit traversal completely */
+  BREAK: symbol
+
+  /** Do not visit the children of the current node */
+  SKIP: symbol
+
+  /** Remove the current node */
+  REMOVE: symbol
+} = function visit(node, visitor) {
   const visitor_ = initVisitor(visitor)
   if (isDocument(node)) {
     const cd = visit_(null, node.contents, visitor_, Object.freeze([node]))
@@ -102,18 +113,9 @@ export function visit(node: Node | Document | null, visitor: visitor) {
   } else visit_(null, node, visitor_, Object.freeze([]))
 }
 
-// Without the `as symbol` casts, TS declares these in the `visit`
-// namespace using `var`, but then complains about that because
-// `unique symbol` must be `const`.
-
-/** Terminate visit traversal completely */
-visit.BREAK = BREAK as symbol
-
-/** Do not visit the children of the current node */
-visit.SKIP = SKIP as symbol
-
-/** Remove the current node */
-visit.REMOVE = REMOVE as symbol
+visit.BREAK = BREAK
+visit.SKIP = SKIP
+visit.REMOVE = REMOVE
 
 function visit_(
   key: number | 'key' | 'value' | null,
@@ -168,10 +170,11 @@ function visit_(
  * The return value of the visitor may be used to control the traversal:
  *   - `Promise`: Must resolve to one of the following values
  *   - `undefined` (default): Do nothing and continue
- *   - `visit.SKIP`: Do not visit the children of this node, continue with next
- *     sibling
- *   - `visit.BREAK`: Terminate traversal completely
- *   - `visit.REMOVE`: Remove the current node, then continue with the next one
+ *   - `visitAsync.SKIP`: Do not visit the children of this node,
+ *     continue with next sibling
+ *   - `visitAsync.BREAK`: Terminate traversal completely
+ *   - `visitAsync.REMOVE`: Remove the current node,
+ *     then continue with the next one
  *   - `Node`: Replace the current node, then continue by visiting it
  *   - `number`: While iterating the items of a sequence or map, set the index
  *     of the next step. This is useful especially if the index of the current
@@ -185,10 +188,18 @@ function visit_(
  * and `Node` (alias, map, seq & scalar) targets. Of all these, only the most
  * specific defined one will be used for each node.
  */
-export async function visitAsync(
-  node: Node | Document | null,
-  visitor: asyncVisitor
-) {
+export const visitAsync: {
+  (node: Node | Document | null, visitor: asyncVisitor): Promise<void>
+
+  /** Terminate visit traversal completely */
+  BREAK: symbol
+
+  /** Do not visit the children of the current node */
+  SKIP: symbol
+
+  /** Remove the current node */
+  REMOVE: symbol
+} = async function visitAsync(node, visitor) {
   const visitor_ = initVisitor(visitor)
   if (isDocument(node)) {
     const cd = await visitAsync_(
@@ -201,18 +212,9 @@ export async function visitAsync(
   } else await visitAsync_(null, node, visitor_, Object.freeze([]))
 }
 
-// Without the `as symbol` casts, TS declares these in the `visit`
-// namespace using `var`, but then complains about that because
-// `unique symbol` must be `const`.
-
-/** Terminate visit traversal completely */
-visitAsync.BREAK = BREAK as symbol
-
-/** Do not visit the children of the current node */
-visitAsync.SKIP = SKIP as symbol
-
-/** Remove the current node */
-visitAsync.REMOVE = REMOVE as symbol
+visitAsync.BREAK = BREAK
+visitAsync.SKIP = SKIP
+visitAsync.REMOVE = REMOVE
 
 async function visitAsync_(
   key: number | 'key' | 'value' | null,

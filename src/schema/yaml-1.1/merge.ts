@@ -31,18 +31,23 @@ export const merge: ScalarTag & {
   stringify: () => MERGE_KEY
 }
 
-export const isMergeKey = (ctx: ToJSContext | undefined, key: unknown) =>
+export const isMergeKey = (
+  ctx: ToJSContext | undefined,
+  key: unknown
+): boolean =>
   (merge.identify(key) ||
     (isScalar(key) &&
       (!key.type || key.type === Scalar.PLAIN) &&
       merge.identify(key.value))) &&
-  ctx?.doc.schema.tags.some(tag => tag.tag === merge.tag && tag.default)
+  Boolean(
+    ctx?.doc.schema.tags.some(tag => tag.tag === merge.tag && tag.default)
+  )
 
 export function addMergeToJSMap(
   ctx: ToJSContext | undefined,
   map: MapLike,
   value: unknown
-) {
+): void {
   value = ctx && isAlias(value) ? value.resolve(ctx.doc) : value
   if (isSeq(value)) for (const it of value.items) mergeValue(ctx, map, it)
   else if (Array.isArray(value))

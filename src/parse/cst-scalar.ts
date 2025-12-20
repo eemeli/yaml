@@ -158,7 +158,7 @@ export function setScalarValue(
     inFlow?: boolean
     type?: Scalar.Type
   } = {}
-) {
+): void {
   let { afterKey = false, implicitKey = false, inFlow = false, type } = context
   let indent = 'indent' in token ? token.indent : null
   if (afterKey && typeof indent === 'number') indent += 2

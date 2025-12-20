@@ -5,15 +5,19 @@
  * lines consisting of a single space are replaced by `#`,
  * and all other lines are prefixed with a `#`.
  */
-export const stringifyComment = (str: string) =>
+export const stringifyComment = (str: string): string =>
   str.replace(/^(?!$)(?: $)?/gm, '#')
 
-export function indentComment(comment: string, indent: string) {
+export function indentComment(comment: string, indent: string): string {
   if (/^\n+$/.test(comment)) return comment.substring(1)
   return indent ? comment.replace(/^(?! *$)/gm, indent) : comment
 }
 
-export const lineComment = (str: string, indent: string, comment: string) =>
+export const lineComment = (
+  str: string,
+  indent: string,
+  comment: string
+): string =>
   str.endsWith('\n')
     ? indentComment(comment, indent)
     : comment.includes('\n')

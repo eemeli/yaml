@@ -6,13 +6,13 @@ import type { Scalar } from './Scalar.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
 
-export const ALIAS = Symbol.for('yaml.alias')
-export const DOC = Symbol.for('yaml.document')
-export const MAP = Symbol.for('yaml.map')
-export const PAIR = Symbol.for('yaml.pair')
-export const SCALAR = Symbol.for('yaml.scalar')
-export const SEQ = Symbol.for('yaml.seq')
-export const NODE_TYPE = Symbol.for('yaml.node.type')
+export const ALIAS: unique symbol = Symbol.for('yaml.alias')
+export const DOC: unique symbol = Symbol.for('yaml.document')
+export const MAP: unique symbol = Symbol.for('yaml.map')
+export const PAIR: unique symbol = Symbol.for('yaml.pair')
+export const SCALAR: unique symbol = Symbol.for('yaml.scalar')
+export const SEQ: unique symbol = Symbol.for('yaml.seq')
+export const NODE_TYPE: unique symbol = Symbol.for('yaml.node.type')
 
 export const isAlias = (node: any): node is Alias =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === ALIAS

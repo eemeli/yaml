@@ -22,7 +22,7 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
       | T
       | Pair<T, Scalar<null> | null>
       | { key: T; value: Scalar<null> | null }
-  ) {
+  ): void {
     let pair: Pair<T, Scalar<null> | null>
     if (isPair(key)) pair = key
     else if (

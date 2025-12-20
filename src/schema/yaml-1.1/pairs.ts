@@ -45,7 +45,7 @@ export function createPairs(
   schema: Schema,
   iterable: unknown,
   ctx: CreateNodeContext
-) {
+): YAMLSeq {
   const { replacer } = ctx
   const pairs = new YAMLSeq(schema)
   pairs.tag = 'tag:yaml.org,2002:pairs'

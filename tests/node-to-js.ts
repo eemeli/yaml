@@ -82,7 +82,7 @@ describe('options', () => {
       two: &b { key: *a }
       three: *b
     `)
-    const onAnchor = jest.fn()
+    const onAnchor = vi.fn()
     doc.get('three').toJS(doc, { onAnchor })
     expect(onAnchor.mock.calls).toMatchObject([
       [{ key: 42 }, 2],
@@ -96,7 +96,7 @@ describe('options', () => {
       two: &b { key: *a }
       three: *b
     `)
-    const reviver = jest.fn((_key, value) => value)
+    const reviver = vi.fn((_key, value) => value)
     doc.get('three').toJS(doc, { reviver })
     expect(reviver.mock.calls).toMatchObject([
       ['key', 42],

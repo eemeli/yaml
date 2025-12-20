@@ -21,7 +21,7 @@ export function anchorIsValid(anchor: string): true {
   return true
 }
 
-export function anchorNames(root: Document<Node, boolean> | Node) {
+export function anchorNames(root: Document<Node, boolean> | Node): Set<string> {
   const anchors = new Set<string>()
   visit(root, {
     Value(_key: unknown, node: Scalar | YAMLMap | YAMLSeq) {
@@ -32,7 +32,7 @@ export function anchorNames(root: Document<Node, boolean> | Node) {
 }
 
 /** Find a new anchor name with the given `prefix` and a one-indexed suffix. */
-export function findNewAnchor(prefix: string, exclude: Set<string>) {
+export function findNewAnchor(prefix: string, exclude: Set<string>): string {
   for (let i = 1; true; ++i) {
     const name = `${prefix}${i}`
     if (!exclude.has(name)) return name
@@ -42,7 +42,11 @@ export function findNewAnchor(prefix: string, exclude: Set<string>) {
 export function createNodeAnchors(
   doc: Document<Node, boolean>,
   prefix: string
-) {
+): {
+  onAnchor: (source: unknown) => string
+  setAnchors: () => void
+  sourceObjects: CreateNodeContext['sourceObjects']
+} {
   const aliasObjects: unknown[] = []
   const sourceObjects: CreateNodeContext['sourceObjects'] = new Map()
   let prevAnchors: Set<string> | null = null

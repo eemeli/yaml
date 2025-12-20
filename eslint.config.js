@@ -5,13 +5,11 @@ import typescript from 'typescript-eslint'
 export default [
   {
     ignores: [
-      'browser/',
       'dist/',
       'docs/',
       'docs-slate/',
       'lib/',
       'package-lock.json',
-      'playground/dist/',
       'tests/artifacts/',
       'tests/json-test-suite/',
       'tests/yaml-test-suite/'
@@ -24,7 +22,7 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['*js', 'config/*js'],
+          allowDefaultProject: ['*js'],
           defaultProject: 'tsconfig.json'
         }
       }
@@ -77,7 +75,7 @@ export default [
   },
 
   {
-    files: ['config/**'],
+    files: ['*.config.*'],
     languageOptions: { globals: { console: true, module: true, process: true } }
   },
 
