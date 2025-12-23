@@ -440,8 +440,7 @@ z:
       `
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe(source`
-        key:
-          #comment
+        key: #comment
           - one
           - two
       `)
@@ -455,8 +454,7 @@ z:
       `
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe(source`
-        key:
-          #comment
+        key: #comment
           !tag
           - one
           - two

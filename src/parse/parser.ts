@@ -13,6 +13,8 @@ import type {
 import { prettyToken, tokenType } from './cst.ts'
 import { lex } from './lexer.ts'
 
+const DEBUG = false
+
 function includesToken(list: SourceToken[], type: SourceToken['type']) {
   for (let i = 0; i < list.length; ++i) if (list[i].type === type) return true
   return false
@@ -241,6 +243,36 @@ export class Parser {
     return this.tokens
   }
 
+  private getCurrentContext(parent: Token) {
+    const top = parent
+    if (!top) return { context: 'stream' }
+
+    switch (top.type) {
+      case 'block-map': {
+        const it = top.items[top.items.length - 1]
+        if (!it) return { context: 'map-start' }
+        if (it.value) return { context: 'map-value', key: it.key }
+        if (it.sep) return { context: 'map-separator', sep: it.sep }
+        return { context: 'map-key', key: it.key }
+      }
+      case 'block-seq': {
+        const it = top.items[top.items.length - 1]
+        if (!it) return { context: 'seq-start' }
+        if (it.value) return { context: 'seq-value' }
+        return { context: 'seq-item' }
+      }
+      case 'flow-collection': {
+        const it = top.items[top.items.length - 1]
+        if (!it) return { context: 'flow-start' }
+        if (it.value) return { context: 'flow-value', key: it.key }
+        if (it.sep) return { context: 'flow-separator' }
+        return { context: 'flow-key', key: it.key }
+      }
+      default:
+        return { context: 'other', parentType: top.type }
+    }
+  }
+
   private get sourceToken() {
     const st: SourceToken = {
       type: this.type as SourceToken['type'],
@@ -248,6 +280,44 @@ export class Parser {
       indent: this.indent,
       source: this.source
     }
+
+    if (this.type === 'comment') {
+      const parent = this.peek(1)
+      const currentContext = this.getCurrentContext(parent)
+
+      if (DEBUG) {
+        st.context = currentContext
+      }
+
+      if (parent && 'items' in parent && parent.items && currentContext.context === 'map-separator') {
+        const it = parent.items[parent.items.length - 1]
+        if (it?.sep) {
+          if (DEBUG) st.parentComment = (it?.sep.find(st => st.type === 'comment') ?? {})?.source
+          // Check if this comment appears right after a map-value-ind token
+          const mapValueIndIndex = it.sep.findIndex(token => token.type === 'map-value-ind')
+          if (mapValueIndIndex !== -1) {
+            // Check if all tokens after map-value-ind are spaces (no newlines) followed by this comment
+            let allSpacesAfterMapValue = true
+            for (let i = mapValueIndIndex + 1; i < it.sep.length; i++) {
+              const token = it.sep[i]
+              if (token.type === 'newline') {
+                allSpacesAfterMapValue = false
+                break
+              } else if (token.type !== 'space') {
+                allSpacesAfterMapValue = false
+                break
+              }
+            }
+
+            // If all tokens after map-value-ind are spaces (no newlines), this comment is commentIsAfterKey
+            if (allSpacesAfterMapValue) {
+              st.commentIsAfterKey = true
+            }
+          }
+        }
+      }
+    }
+
     return st
   }
 

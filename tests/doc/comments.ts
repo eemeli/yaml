@@ -237,7 +237,6 @@ describe('parse comments', () => {
             {
               key: { commentBefore: 'c0', value: 'k1' },
               value: {
-                commentBefore: 'c1',
                 items: [{ value: 'v1' }, { commentBefore: 'c2', value: 'v2' }],
                 comment: 'c3'
               }
@@ -252,8 +251,7 @@ describe('parse comments', () => {
       })
       expect(String(doc)).toBe(source`
         #c0
-        k1:
-          #c1
+        k1: #c1
           - v1
           #c2
           - v2
@@ -1148,9 +1146,17 @@ entryB:
   })
 
   test('collection end comment', () => {
-    const src = `a: b #c\n#d\n`
+    const src = source`
+    a: b #c
+
+    #d
+    `
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(`a: b #c\n\n#d\n`)
+    expect(String(doc)).toBe(source`
+    a: b #c
+
+    #d
+    `)
   })
 
   test('blank line after seq in map', () => {
