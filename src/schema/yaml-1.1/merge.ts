@@ -12,7 +12,7 @@ import type { ScalarTag } from '../types.ts'
 // Keys in mapping nodes earlier in the sequence override keys specified in
 // later mapping nodes. -- http://yaml.org/type/merge.html
 
-const MERGE_KEY = '<<'
+export const MERGE_KEY = '<<'
 
 export const merge: ScalarTag & {
   identify(value: unknown): boolean
