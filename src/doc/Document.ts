@@ -9,7 +9,7 @@ import {
   NODE_TYPE
 } from '../nodes/identity.ts'
 import type { Node, NodeType, ParsedNode, Range } from '../nodes/Node.ts'
-import { Pair } from '../nodes/Pair.ts'
+import type { Pair } from '../nodes/Pair.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
 import type { ToJSContext } from '../nodes/toJS.ts'
 import { toJS } from '../nodes/toJS.ts'
@@ -25,10 +25,9 @@ import type {
 } from '../options.ts'
 import { Schema } from '../schema/Schema.ts'
 import { stringifyDocument } from '../stringify/stringifyDocument.ts'
-import { anchorNames, createNodeAnchors, findNewAnchor } from './anchors.ts'
+import { anchorNames, findNewAnchor } from './anchors.ts'
 import { applyReviver } from './applyReviver.ts'
-import type { CreateNodeContext } from './createNode.ts'
-import { createNode } from './createNode.ts'
+import { NodeCreator } from './NodeCreator.ts'
 import { Directives } from './directives.ts'
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)
@@ -215,46 +214,22 @@ export class Document<
     replacer?: Replacer | CreateNodeOptions | null,
     options?: CreateNodeOptions
   ): Node {
-    let _replacer: Replacer | undefined = undefined
+    let nc: NodeCreator
     if (typeof replacer === 'function') {
       value = replacer.call({ '': value }, '', value)
-      _replacer = replacer
+      nc = new NodeCreator(this, options, replacer)
     } else if (Array.isArray(replacer)) {
       const keyToStr = (v: unknown) =>
         typeof v === 'number' || v instanceof String || v instanceof Number
       const asStr = replacer.filter(keyToStr).map(String)
       if (asStr.length > 0) replacer = replacer.concat(asStr)
-      _replacer = replacer
-    } else if (options === undefined && replacer) {
-      options = replacer
-      replacer = undefined
+      nc = new NodeCreator(this, options, replacer)
+    } else {
+      options ??= replacer ?? undefined
+      nc = new NodeCreator(this, options)
     }
-
-    const {
-      aliasDuplicateObjects,
-      anchorPrefix,
-      flow,
-      keepUndefined,
-      onTagObj,
-      tag
-    } = options ?? {}
-    const { onAnchor, setAnchors, sourceObjects } = createNodeAnchors(
-      this,
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      anchorPrefix || 'a'
-    )
-    const ctx: CreateNodeContext = {
-      aliasDuplicateObjects: aliasDuplicateObjects ?? true,
-      keepUndefined: keepUndefined ?? false,
-      onAnchor,
-      onTagObj,
-      replacer: _replacer,
-      schema: this.schema,
-      sourceObjects
-    }
-    const node = createNode(value, tag, ctx)
-    if (flow && isCollection(node)) node.flow = true
-    setAnchors()
+    const node = nc.create(value, options?.tag)
+    nc.setAnchors()
     return node
   }
 
@@ -267,9 +242,10 @@ export class Document<
     value: unknown,
     options: CreateNodeOptions = {}
   ): Pair<K, V> {
-    const k = this.createNode(key, null, options) as K
-    const v = this.createNode(value, null, options) as V
-    return new Pair(k, v)
+    const nc = new NodeCreator(this, options)
+    const pair = nc.createPair(key, value) as Pair<K, V>
+    nc.setAnchors()
+    return pair
   }
 
   /**

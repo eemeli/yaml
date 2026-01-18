@@ -1,4 +1,4 @@
-import type { CreateNodeContext } from '../doc/createNode.ts'
+import type { NodeCreator } from '../doc/NodeCreator.ts'
 import type { Node } from '../nodes/Node.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
@@ -11,7 +11,7 @@ interface TagBase {
   /**
    * An optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.
    */
-  createNode?: (schema: Schema, value: unknown, ctx: CreateNodeContext) => Node
+  createNode?: (nc: NodeCreator, value: unknown) => Node
 
   /**
    * If `true`, allows for values to be stringified without
@@ -100,7 +100,7 @@ export interface CollectionTag extends TagBase {
    */
   nodeClass?: {
     new (schema?: Schema): Node
-    from?: (schema: Schema, obj: unknown, ctx: CreateNodeContext) => Node
+    from?: (nc: NodeCreator, obj: unknown) => Node
   }
 
   /**

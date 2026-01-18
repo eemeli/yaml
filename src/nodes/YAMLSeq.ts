@@ -1,5 +1,4 @@
-import type { CreateNodeContext } from '../doc/createNode.ts'
-import { createNode } from '../doc/createNode.ts'
+import type { NodeCreator } from '../doc/NodeCreator.ts'
 import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
@@ -121,17 +120,16 @@ export class YAMLSeq<T = unknown> extends Collection {
     })
   }
 
-  static from(schema: Schema, obj: unknown, ctx: CreateNodeContext): YAMLSeq {
-    const { replacer } = ctx
-    const seq = new this(schema)
+  static from(nc: NodeCreator, obj: unknown): YAMLSeq {
+    const seq = new this(nc.schema)
     if (obj && Symbol.iterator in Object(obj)) {
       let i = 0
       for (let it of obj as Iterable<unknown>) {
-        if (typeof replacer === 'function') {
+        if (typeof nc.replacer === 'function') {
           const key = obj instanceof Set ? it : String(i++)
-          it = replacer.call(obj, key, it)
+          it = nc.replacer.call(obj, key, it)
         }
-        seq.items.push(createNode(it, undefined, ctx))
+        seq.items.push(nc.create(it))
       }
     }
     return seq

@@ -3,8 +3,7 @@ import type { ToJSContext } from '../../nodes/toJS.ts'
 import { toJS } from '../../nodes/toJS.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
-import type { CreateNodeContext } from '../../util.ts'
-import type { Schema } from '../Schema.ts'
+import type { NodeCreator } from '../../util.ts'
 import type { CollectionTag } from '../types.ts'
 import { createPairs, resolvePairs } from './pairs.ts'
 
@@ -45,12 +44,8 @@ export class YAMLOMap extends YAMLSeq {
     return map as unknown as unknown[]
   }
 
-  static from(
-    schema: Schema,
-    iterable: unknown,
-    ctx: CreateNodeContext
-  ): YAMLOMap {
-    const pairs = createPairs(schema, iterable, ctx)
+  static from(nc: NodeCreator, iterable: unknown): YAMLOMap {
+    const pairs = createPairs(nc, iterable)
     const omap = new this()
     omap.items = pairs.items
     return omap
@@ -78,5 +73,5 @@ export const omap: CollectionTag = {
     }
     return Object.assign(new YAMLOMap(), pairs)
   },
-  createNode: (schema, iterable, ctx) => YAMLOMap.from(schema, iterable, ctx)
+  createNode: (nc, iterable) => YAMLOMap.from(nc, iterable)
 }

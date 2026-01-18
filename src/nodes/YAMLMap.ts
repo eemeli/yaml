@@ -2,12 +2,12 @@ import type { BlockMap, FlowCollection } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
-import type { CreateNodeContext } from '../util.ts'
+import type { NodeCreator } from '../util.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
 import { Collection } from './Collection.ts'
 import { isPair, isScalar, MAP } from './identity.ts'
 import type { ParsedNode, Range } from './Node.ts'
-import { createPair, Pair } from './Pair.ts'
+import { Pair } from './Pair.ts'
 import type { Scalar } from './Scalar.ts'
 import { isScalarValue } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
@@ -57,22 +57,22 @@ export class YAMLMap<K = unknown, V = unknown> extends Collection {
    * A generic collection parsing method that can be extended
    * to other node classes that inherit from YAMLMap
    */
-  static from(schema: Schema, obj: unknown, ctx: CreateNodeContext): YAMLMap {
-    const { keepUndefined, replacer } = ctx
-    const map = new this(schema)
+  static from(nc: NodeCreator, obj: unknown): YAMLMap {
+    const { replacer } = nc
+    const map = new this(nc.schema)
     const add = (key: unknown, value: unknown) => {
       if (typeof replacer === 'function') value = replacer.call(obj, key, value)
       else if (Array.isArray(replacer) && !replacer.includes(key)) return
-      if (value !== undefined || keepUndefined)
-        map.items.push(createPair(key, value, ctx))
+      if (value !== undefined || nc.keepUndefined)
+        map.items.push(nc.createPair(key, value))
     }
     if (obj instanceof Map) {
       for (const [key, value] of obj) add(key, value)
     } else if (obj && typeof obj === 'object') {
       for (const key of Object.keys(obj)) add(key, (obj as any)[key])
     }
-    if (typeof schema.sortMapEntries === 'function') {
-      map.items.sort(schema.sortMapEntries)
+    if (typeof nc.schema.sortMapEntries === 'function') {
+      map.items.sort(nc.schema.sortMapEntries)
     }
     return map
   }

@@ -1,4 +1,4 @@
-import { createNode } from '../doc/createNode.ts'
+import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { Schema } from '../schema/Schema.ts'
 import {
   isCollection,
@@ -25,15 +25,7 @@ export function collectionFromPath(
       v = new Map<unknown, unknown>([[k, v]])
     }
   }
-  return createNode(v, undefined, {
-    aliasDuplicateObjects: false,
-    keepUndefined: false,
-    onAnchor: () => {
-      throw new Error('This should not happen, please report a bug.')
-    },
-    schema,
-    sourceObjects: new Map()
-  })
+  return new NodeCreator(schema, { aliasDuplicateObjects: false }).create(v)
 }
 
 // Type guard is intentionally a little wrong so as to be more useful,

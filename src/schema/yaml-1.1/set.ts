@@ -5,8 +5,7 @@ import type { ToJSContext } from '../../nodes/toJS.ts'
 import { findPair, YAMLMap } from '../../nodes/YAMLMap.ts'
 import type { Schema } from '../../schema/Schema.ts'
 import type { StringifyContext } from '../../stringify/stringify.ts'
-import type { CreateNodeContext } from '../../util.ts'
-import { createPair } from '../../util.ts'
+import type { NodeCreator } from '../../util.ts'
 import type { CollectionTag } from '../types.ts'
 
 export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
@@ -87,19 +86,14 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
     else throw new Error('Set items must all have null values')
   }
 
-  static from(
-    schema: Schema,
-    iterable: unknown,
-    ctx: CreateNodeContext
-  ): YAMLSet {
-    const { replacer } = ctx
-    const set = new this(schema)
+  static from(nc: NodeCreator, iterable: unknown): YAMLSet {
+    const set = new this(nc.schema)
     if (iterable && Symbol.iterator in Object(iterable))
       for (let value of iterable as Iterable<unknown>) {
-        if (typeof replacer === 'function')
-          value = replacer.call(iterable, value, value)
+        if (typeof nc.replacer === 'function')
+          value = nc.replacer.call(iterable, value, value)
         set.items.push(
-          createPair(value, null, ctx) as Pair<unknown, Scalar<null>>
+          nc.createPair(value, null) as Pair<unknown, Scalar<null>>
         )
       }
     return set
@@ -112,7 +106,7 @@ export const set: CollectionTag = {
   nodeClass: YAMLSet,
   default: false,
   tag: 'tag:yaml.org,2002:set',
-  createNode: (schema, iterable, ctx) => YAMLSet.from(schema, iterable, ctx),
+  createNode: (nc, iterable) => YAMLSet.from(nc, iterable),
   resolve(map, onError) {
     if (isMap(map)) {
       if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map)

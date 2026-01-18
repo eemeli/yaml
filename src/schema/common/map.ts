@@ -11,5 +11,5 @@ export const map: CollectionTag = {
     if (!isMap(map)) onError('Expected a mapping for this tag')
     return map
   },
-  createNode: (schema, obj, ctx) => YAMLMap.from(schema, obj, ctx)
+  createNode: (nc, obj) => YAMLMap.from(nc, obj)
 }
