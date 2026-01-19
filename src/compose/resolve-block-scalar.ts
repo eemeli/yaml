@@ -201,16 +201,13 @@ function parseBlockScalarHeader(
 
 /** @returns Array of lines split up as `[indent, content]` */
 function splitLines(source: string) {
-  // split on all line break types: \n, \r\n, or standalone \r
-  const split = source.split(/\r?\n|\r(?!\n)/)
-  const lines: [string, string][] = []
-  for (const line of split) {
-    const m = line.match(/^( *)/)
-    if (m?.[1]) {
-      lines.push([m[1], line.slice(m[1].length)])
-    } else {
-      lines.push(['', line])
-    }
-  }
+  const split = source.split(/(?:\r?\n|\r(?!\n))( *)/)
+  const first = split[0]
+  const m = first.match(/^( *)/)
+  const line0: [string, string] = m?.[1]
+    ? [m[1], first.slice(m[1].length)]
+    : ['', first]
+  const lines = [line0]
+  for (let i = 1; i < split.length; i += 2) lines.push([split[i], split[i + 1]])
   return lines
 }
