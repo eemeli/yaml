@@ -114,7 +114,10 @@ function foldLines(source: string) {
   try {
     // match all line breaks: \r\n, \n, or standalone \r
     first = new RegExp('(.*?)(?<![ \t])[ \t]*(?:\r?\n|\r(?!\n))', 'sy')
-    line = new RegExp('[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?(?:\r?\n|\r(?!\n))', 'sy')
+    line = new RegExp(
+      '[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?(?:\r?\n|\r(?!\n))',
+      'sy'
+    )
   } catch {
     first = /(.*?)[ \t]*(?:\r?\n|\r(?!\n))/sy
     line = /[ \t]*(.*?)[ \t]*(?:\r?\n|\r(?!\n))/sy

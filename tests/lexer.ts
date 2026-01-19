@@ -90,7 +90,22 @@ test('plain scalar + standalone CR + comment', () => {
 
 test('standalone CR in document', () => {
   const src = 'a: 1\rb: 2'
-  expect(lex(src)).toEqual([DOC, SCALAR, 'a', ':', ' ', SCALAR, '1', '\r', SCALAR, 'b', ':', ' ', SCALAR, '2'])
+  expect(lex(src)).toEqual([
+    DOC,
+    SCALAR,
+    'a',
+    ':',
+    ' ',
+    SCALAR,
+    '1',
+    '\r',
+    SCALAR,
+    'b',
+    ':',
+    ' ',
+    SCALAR,
+    '2'
+  ])
 })
 
 test('standalone CR in flow collection', () => {

@@ -958,7 +958,12 @@ describe('standalone CR line break handling (#595)', () => {
     })
 
     test('mixed CR, LF, and CRLF line breaks', () => {
-      expect(YAML.parse('a: 1\rb: 2\nc: 3\r\nd: 4')).toEqual({ a: 1, b: 2, c: 3, d: 4 })
+      expect(YAML.parse('a: 1\rb: 2\nc: 3\r\nd: 4')).toEqual({
+        a: 1,
+        b: 2,
+        c: 3,
+        d: 4
+      })
     })
 
     test('CR in block sequence', () => {
