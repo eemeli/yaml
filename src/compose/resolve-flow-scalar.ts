@@ -159,16 +159,12 @@ function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
       let next = source[++i]
       const cc = escapeCodes[next]
       if (cc) res += cc
-      else if (next === '\n') {
-        // skip escaped newlines, but still trim the following line
-        next = source[i + 1]
-        while (next === ' ' || next === '\t') next = source[++i + 1]
-      } else if (next === '\r' && source[i + 1] === '\n') {
-        // skip escaped CRLF newlines, but still trim the following line
+      else if (next === '\r' && source[i + 1] === '\n') {
+        // skip escaped CRLF, but still trim the following line
         next = source[++i + 1]
         while (next === ' ' || next === '\t') next = source[++i + 1]
-      } else if (next === '\r') {
-        // skip escaped standalone CR, but still trim the following line
+      } else if (next === '\n' || next === '\r') {
+        // skip escaped newline (LF or CR), but still trim the following line
         next = source[i + 1]
         while (next === ' ' || next === '\t') next = source[++i + 1]
       } else if (next === 'x' || next === 'u' || next === 'U') {
@@ -204,18 +200,10 @@ function foldNewline(source: string, offset: number) {
   let fold = ''
   let ch = source[offset + 1]
   while (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
-    if (ch === '\r') {
-      // \r\n counts as one newline, standalone \r also counts as one
-      if (source[offset + 2] === '\n') {
-        fold += '\n'
-        offset += 2
-      } else {
-        fold += '\n'
-        offset += 1
-      }
-    } else if (ch === '\n') {
+    if (ch === '\n' || ch === '\r') {
       fold += '\n'
-      offset += 1
+      if (ch === '\r' && source[offset + 2] === '\n') offset += 2
+      else offset += 1
     } else {
       offset += 1
     }

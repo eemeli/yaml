@@ -515,15 +515,10 @@ class Lexer {
   }
 
   private findLineBreak(str: string, pos: number): number {
-    for (let i = pos; i < str.length; i++) {
-      const ch = str[i]
-      if (ch === '\n') return i
-      if (ch === '\r') {
-        if (str[i + 1] === '\n') return i + 1 // \r\n is a single line break
-        return i // standalone \r
-      }
-    }
-    return -1
+    const nl = str.indexOf('\n', pos)
+    const cr = str.indexOf('\r', pos)
+    if (cr !== -1 && (nl === -1 || cr < nl - 1)) return cr
+    return nl
   }
 
   private newline(): number {
