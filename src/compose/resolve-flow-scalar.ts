@@ -112,11 +112,12 @@ function foldLines(source: string) {
    */
   let first: RegExp, line: RegExp
   try {
-    first = new RegExp('(.*?)(?<![ \t])[ \t]*\r?\n', 'sy')
-    line = new RegExp('[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?\r?\n', 'sy')
+    // match all line breaks: \r\n, \n, or standalone \r
+    first = new RegExp('(.*?)(?<![ \t])[ \t]*(?:\r?\n|\r(?!\n))', 'sy')
+    line = new RegExp('[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?(?:\r?\n|\r(?!\n))', 'sy')
   } catch {
-    first = /(.*?)[ \t]*\r?\n/sy
-    line = /[ \t]*(.*?)[ \t]*\r?\n/sy
+    first = /(.*?)[ \t]*(?:\r?\n|\r(?!\n))/sy
+    line = /[ \t]*(.*?)[ \t]*(?:\r?\n|\r(?!\n))/sy
   }
   let match = first.exec(source)
   if (!match) return source
@@ -147,7 +148,7 @@ function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
   for (let i = 1; i < source.length - 1; ++i) {
     const ch = source[i]
     if (ch === '\r' && source[i + 1] === '\n') continue
-    if (ch === '\n') {
+    if (ch === '\n' || (ch === '\r' && source[i + 1] !== '\n')) {
       const { fold, offset } = foldNewline(source, i)
       res += fold
       i = offset
@@ -163,6 +164,10 @@ function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
         // skip escaped CRLF newlines, but still trim the following line
         next = source[++i + 1]
         while (next === ' ' || next === '\t') next = source[++i + 1]
+      } else if (next === '\r') {
+        // skip escaped standalone CR, but still trim the following line
+        next = source[i + 1]
+        while (next === ' ' || next === '\t') next = source[++i + 1]
       } else if (next === 'x' || next === 'u' || next === 'U') {
         const length = { x: 2, u: 4, U: 8 }[next]
         res += parseCharCode(source, i + 1, length, onError)
@@ -177,7 +182,7 @@ function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
       const wsStart = i
       let next = source[i + 1]
       while (next === ' ' || next === '\t') next = source[++i + 1]
-      if (next !== '\n' && !(next === '\r' && source[i + 2] === '\n'))
+      if (next !== '\n' && next !== '\r')
         res += i > wsStart ? source.slice(wsStart, i + 1) : ch
     } else {
       res += ch
@@ -190,15 +195,27 @@ function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
 
 /**
  * Fold a single newline into a space, multiple newlines to N - 1 newlines.
- * Presumes `source[offset] === '\n'`
+ * Presumes `source[offset] === '\n'` or `source[offset] === '\r'`
  */
 function foldNewline(source: string, offset: number) {
   let fold = ''
   let ch = source[offset + 1]
   while (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
-    if (ch === '\r' && source[offset + 2] !== '\n') break
-    if (ch === '\n') fold += '\n'
-    offset += 1
+    if (ch === '\r') {
+      // \r\n counts as one newline, standalone \r also counts as one
+      if (source[offset + 2] === '\n') {
+        fold += '\n'
+        offset += 2
+      } else {
+        fold += '\n'
+        offset += 1
+      }
+    } else if (ch === '\n') {
+      fold += '\n'
+      offset += 1
+    } else {
+      offset += 1
+    }
     ch = source[offset + 1]
   }
   if (!fold) fold = ' '

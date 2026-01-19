@@ -207,6 +207,7 @@ export function tokenType(source: string): TokenType | null {
     case '':
     case '\n':
     case '\r\n':
+    case '\r':
       return 'newline'
     case '-':
       return 'seq-item-ind'

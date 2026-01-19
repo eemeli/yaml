@@ -201,3 +201,19 @@ test('Line comment before unindented block-seq in block-map (#525)', () => {
   const [doc] = Array.from(new Parser().parse(src))
   expect(CST.stringify(doc)).toBe(src)
 })
+
+describe('standalone CR line break handling (#595)', () => {
+  test('tokenType recognizes standalone CR as newline', () => {
+    expect(CST.tokenType('\r')).toBe('newline')
+    expect(CST.tokenType('\n')).toBe('newline')
+    expect(CST.tokenType('\r\n')).toBe('newline')
+  })
+
+  test('Parser produces newline tokens for CR', () => {
+    const tokens = Array.from(new Parser().parse('a: 1\rb: 2'))
+    expect(tokens).toHaveLength(1)
+    const doc = tokens[0] as CST.Document
+    expect(doc.type).toBe('document')
+    expect(doc.value?.type).toBe('block-map')
+  })
+})

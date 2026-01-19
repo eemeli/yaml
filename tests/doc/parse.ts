@@ -28,7 +28,7 @@ describe('scalars', () => {
 
   test('carriage returns in double-quotes', () => {
     const src = '"a\nb\n\rc\n\r\nd\n\r\n\re\n\r\n\r\nf"'
-    expect(YAML.parse(src)).toBe('a b \rc\nd\n\re\n\nf')
+    expect(YAML.parse(src)).toBe('a b\nc\nd\n\ne\n\nf')
   })
 })
 
@@ -942,5 +942,111 @@ describe('stringKeys', () => {
   test('collection key', () => {
     const doc = YAML.parseDocument('{ x, y }: 42', { stringKeys: true })
     expect(doc.errors).toMatchObject([{ code: 'NON_STRING_KEY' }])
+  })
+})
+
+describe('standalone CR line break handling (#595)', () => {
+  describe('basic document parsing', () => {
+    test('CR-separated key-value pairs', () => {
+      expect(YAML.parse('a: 1\rb: 2\rc: 3')).toEqual({ a: 1, b: 2, c: 3 })
+    })
+
+    test('CR produces same result as LF', () => {
+      const crDoc = 'a: 1\rb: 2'
+      const lfDoc = 'a: 1\nb: 2'
+      expect(YAML.parse(crDoc)).toEqual(YAML.parse(lfDoc))
+    })
+
+    test('mixed CR, LF, and CRLF line breaks', () => {
+      expect(YAML.parse('a: 1\rb: 2\nc: 3\r\nd: 4')).toEqual({ a: 1, b: 2, c: 3, d: 4 })
+    })
+
+    test('CR in block sequence', () => {
+      expect(YAML.parse('- a\r- b\r- c')).toEqual(['a', 'b', 'c'])
+    })
+
+    test('CR at end of document', () => {
+      expect(YAML.parse('foo: bar\r')).toEqual({ foo: 'bar' })
+    })
+  })
+
+  describe('double-quoted strings', () => {
+    test('unescaped CR folds to space', () => {
+      expect(YAML.parse('"a\rb"')).toBe('a b')
+    })
+
+    test('multiple unescaped CRs fold to newlines', () => {
+      expect(YAML.parse('"a\r\rb"')).toBe('a\nb')
+      expect(YAML.parse('"a\r\r\rb"')).toBe('a\n\nb')
+    })
+
+    test('CR matches LF folding behavior', () => {
+      expect(YAML.parse('"a\rb"')).toBe(YAML.parse('"a\nb"'))
+      expect(YAML.parse('"a\r\rb"')).toBe(YAML.parse('"a\n\nb"'))
+    })
+
+    test('escaped CR is line continuation', () => {
+      expect(YAML.parse('"a\\\rb"')).toBe('ab')
+      expect(YAML.parse('"a\\\r  b"')).toBe('ab') // trims following whitespace
+    })
+
+    test('escaped CR matches escaped LF behavior', () => {
+      expect(YAML.parse('"a\\\rb"')).toBe(YAML.parse('"a\\\nb"'))
+    })
+  })
+
+  describe('single-quoted strings', () => {
+    test('CR folds to space in single-quoted string', () => {
+      expect(YAML.parse("'a\rb'")).toBe('a b')
+    })
+
+    test('multiple CRs fold correctly', () => {
+      expect(YAML.parse("'a\r\rb'")).toBe('a\nb')
+    })
+  })
+
+  describe('block scalars', () => {
+    test('literal block scalar with CR', () => {
+      expect(YAML.parse('|\ra\rb')).toBe('a\nb\n')
+    })
+
+    test('folded block scalar with CR', () => {
+      expect(YAML.parse('>\ra\rb')).toBe('a b\n')
+    })
+
+    test('block scalar content with CR line breaks', () => {
+      expect(YAML.parse('|\r  line1\r  line2')).toBe('line1\nline2\n')
+    })
+  })
+
+  describe('flow collections', () => {
+    test('CR in flow sequence', () => {
+      expect(YAML.parse('[\r1\r,\r2\r]')).toEqual([1, 2])
+    })
+
+    test('CR in flow mapping', () => {
+      expect(YAML.parse('{\ra: 1\r,\rb: 2\r}')).toEqual({ a: 1, b: 2 })
+    })
+  })
+
+  describe('comments', () => {
+    test('CR before comment', () => {
+      expect(YAML.parse('foo\r# comment')).toBe('foo')
+    })
+
+    test('CR after comment', () => {
+      expect(YAML.parse('a: 1 # comment\rb: 2')).toEqual({ a: 1, b: 2 })
+    })
+  })
+
+  describe('LF followed by CR (\\n\\r)', () => {
+    test('\\n\\r is two separate line breaks', () => {
+      // \n\r = LF + CR = two line breaks, folds to one newline
+      expect(YAML.parse('"a\n\rb"')).toBe('a\nb')
+    })
+
+    test('\\n\\r in document structure', () => {
+      expect(YAML.parse('a: 1\n\rb: 2')).toEqual({ a: 1, b: 2 })
+    })
   })
 })

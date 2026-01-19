@@ -114,9 +114,10 @@ describe('tags', () => {
     })
 
     test('CR in tag shorthand (#501)', () => {
+      // \r is now a line break, so !\r! is parsed as ! + newline + !
       const doc = parseDocument(': | !\r!')
-      const err = doc.errors.find(err => err.code === 'TAG_RESOLVE_FAILED')
-      expect(err).not.toBeFalsy()
+      const err = doc.errors.find(err => err.code === 'MULTILINE_IMPLICIT_KEY')
+      expect(err).toBeDefined()
     })
   })
 

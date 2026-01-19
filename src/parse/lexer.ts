@@ -17,7 +17,7 @@ const flowIndicatorChars = new Set(',[]{}')
 const invalidAnchorChars = new Set(' ,[]{}\n\r\t')
 const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.has(ch)
 
-const blockScalarHeader = /([|>][^\s#]*)([ \t]*)((?:.|\r(?!\n))*)$/my
+const blockScalarHeader = /([|>][^\s#]*)([ \t]*)([^\r\n]*)$/my
 const blockStart = /([-?:])(?=[ \n\r\t]|$)([ \t]*)/y
 const directiveLine = /(%.*?)(?:([ \t]+)(#.*)?)?$/my
 const docMarker = /[-.]{3}(?=[ \n\r\t]|$)(?:([ \t]+)(#.*)?)?/y
@@ -91,7 +91,10 @@ class Lexer {
       while (ch === ' ') ch = this.source[++indent + offset]
       if (ch === '\r') {
         const next = this.source[indent + offset + 1]
+        // \r\n is a single line break
         if (next === '\n') return offset + indent + 1
+        // standalone \r is also a line break per YAML 1.2 spec
+        return offset + indent
       }
       return ch === '\n' || indent >= this.indentNext ? offset + indent : -1
     }
@@ -204,11 +207,13 @@ class Lexer {
         this.blockScalar()
         return this.lineStart()
       case '\r':
+        // \r\n and standalone \r are both line breaks
         if (this.charAt(1) === '\n') {
           this.count(2)
-          return this.lineStart()
+        } else {
+          this.count(1)
         }
-      // fallthrough
+        return this.lineStart()
       default:
         this.plainScalar()
         return 'document'
@@ -307,8 +312,8 @@ class Lexer {
         break
       }
       case '\r':
-        if (this.charAt(1) === '\n') break
-      // fallthrough
+        // standalone \r is a line break, handled by newline() in loop
+        break
       default:
         this.flowKey = false
         this.plainScalar()
@@ -355,12 +360,12 @@ class Lexer {
     }
     // Only looking for newlines within the quotes
     const qb = this.source.substring(0, end)
-    let nl = qb.indexOf('\n', this.pos)
+    let nl = this.findLineBreak(qb, this.pos)
     if (nl !== -1) {
       while (nl !== -1) {
         const cs = this.continueScalar(nl + 1)
         if (cs === -1) break
-        nl = qb.indexOf('\n', cs)
+        nl = this.findLineBreak(qb, cs)
       }
       if (nl !== -1) {
         // this is an error caused by an unexpected unindent
@@ -399,8 +404,10 @@ class Lexer {
           indent = 0
           break
         case '\r':
-          if (this.source[i + 1] === '\n') break
-        // fallthrough
+          nl = i
+          indent = 0
+          if (this.source[i + 1] === '\n') i++ // skip \n in \r\n
+          break
         default:
           break loop
       }
@@ -414,7 +421,7 @@ class Lexer {
       do {
         const cs = this.continueScalar(nl + 1)
         if (cs === -1) break
-        nl = this.source.indexOf('\n', cs)
+        nl = this.findLineBreak(this.source, cs)
       } while (nl !== -1)
       if (nl === -1) nl = this.source.length
     }
@@ -460,10 +467,11 @@ class Lexer {
             i += 1
             ch = '\n'
             next = this.source[i + 1]
-          } else end = i
+          }
+          // standalone \r is also a line break
         }
         if (next === '#' || (inFlow && flowIndicatorChars.has(next))) break
-        if (ch === '\n') {
+        if (ch === '\n' || ch === '\r') {
           const cs = this.continueScalar(i + 1)
           if (cs === -1) break
           i = Math.max(i, cs - 2) // to advance, but still account for ' #'
@@ -501,16 +509,31 @@ class Lexer {
   private toLineEnd(): number {
     let i = this.pos
     let ch = this.source[i]
-    while (ch && ch !== '\n') ch = this.source[++i]
-    if (this.source[i - 1] === '\r') --i
+    // stop at \n or standalone \r
+    while (ch && ch !== '\n' && ch !== '\r') ch = this.source[++i]
     return this.toIndex(i, false)
+  }
+
+  private findLineBreak(str: string, pos: number): number {
+    for (let i = pos; i < str.length; i++) {
+      const ch = str[i]
+      if (ch === '\n') return i
+      if (ch === '\r') {
+        if (str[i + 1] === '\n') return i + 1 // \r\n is a single line break
+        return i // standalone \r
+      }
+    }
+    return -1
   }
 
   private newline(): number {
     const ch = this.source[this.pos]
     if (ch === '\n') return this.count(1)
-    else if (ch === '\r' && this.charAt(1) === '\n') return this.count(2)
-    else return 0
+    if (ch === '\r') {
+      if (this.charAt(1) === '\n') return this.count(2)
+      return this.count(1)
+    }
+    return 0
   }
 
   private spaces(allowTabs: boolean): number {
