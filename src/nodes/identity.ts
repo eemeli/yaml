@@ -6,6 +6,8 @@ import type { Scalar } from './Scalar.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
 
+export { isMergeKey, MERGE_KEY } from '../schema/yaml-1.1/merge.ts'
+
 export const ALIAS: unique symbol = Symbol.for('yaml.alias')
 export const DOC: unique symbol = Symbol.for('yaml.document')
 export const MAP: unique symbol = Symbol.for('yaml.map')

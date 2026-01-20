@@ -15,6 +15,8 @@ export {
   isNode,
   isPair,
   isScalar,
+  isMergeKey,
+  MERGE_KEY,
   isSeq
 } from './nodes/identity.ts'
 export type { Node, ParsedNode, Range } from './nodes/Node.ts'
