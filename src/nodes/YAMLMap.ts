@@ -5,11 +5,10 @@ import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
-import { Collection, type Primitive } from './Collection.ts'
+import { Collection, type NodeOf, type Primitive } from './Collection.ts'
 import { isNode, isPair, isScalar, MAP } from './identity.ts'
 import type { NodeBase } from './Node.ts'
 import { Pair } from './Pair.ts'
-import type { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
 
 export type MapLike =
@@ -99,15 +98,9 @@ export class YAMLMap<
     return del.length > 0
   }
 
-  get(key: unknown, keepScalar: true): Scalar<V> | undefined
-  get(key: unknown, keepScalar?: false): V | undefined
-  get(key: unknown, keepScalar?: boolean): V | Scalar<V> | undefined
-  get(key: unknown, keepScalar?: boolean): V | Scalar<V> | undefined {
+  get(key: unknown): NodeOf<V> | undefined {
     const it = findPair(this.items, key)
-    const node = it?.value
-    return (
-      (!keepScalar && isScalar(node) ? (node.value as V) : node) ?? undefined
-    )
+    return it?.value ?? undefined
   }
 
   has(key: unknown): boolean {

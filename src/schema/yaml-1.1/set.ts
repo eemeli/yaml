@@ -12,7 +12,7 @@ import type { CollectionTag } from '../types.ts'
 
 export class YAMLSet<
   T extends Primitive | NodeBase = Primitive | NodeBase
-> extends YAMLMap<T, null> {
+> extends YAMLMap<T, T> {
   static tag = 'tag:yaml.org,2002:set'
 
   constructor(schema?: Schema) {
@@ -37,21 +37,16 @@ export class YAMLSet<
       throw new TypeError('set pair values must be null')
     } else {
       const prev = findPair(this.items, value.key)
-      if (!prev) this.items.push(value as Pair<T, null>)
+      if (!prev) this.items.push(value as Pair<T, T>)
     }
   }
 
   /**
-   * If `keepPair` is `true`, returns the Pair matching `key`.
-   * Otherwise, returns the value of that Pair's key.
+   * Returns the value matching `key`.
    */
-  get(key: unknown, keepPair?: boolean): any {
+  get(key: unknown): NodeOf<T> | undefined {
     const pair = findPair(this.items, key)
-    return !keepPair && isPair(pair)
-      ? isScalar(pair.key)
-        ? pair.key.value
-        : pair.key
-      : pair
+    return pair?.key
   }
 
   /**

@@ -1,4 +1,4 @@
-import type { Scalar, YAMLMap } from 'yaml'
+import { Scalar, type YAMLMap } from 'yaml'
 import { isAlias, isScalar, parseDocument, visit } from 'yaml'
 import { source } from './_utils.ts'
 
@@ -33,8 +33,8 @@ describe('doc.clone()', () => {
     const doc = parseDocument('foo: bar')
     const copy = doc.clone()
     copy.set('foo', 'fizz')
-    expect(doc.get('foo')).toBe('bar')
-    expect(copy.get('foo')).toBe('fizz')
+    expect(doc.get('foo')).toMatchObject(new Scalar('bar'))
+    expect(copy.get('foo')).toMatchObject(new Scalar('fizz'))
   })
 
   test('has separate directives from original', () => {

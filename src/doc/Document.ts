@@ -5,13 +5,7 @@ import {
   isEmptyPath,
   type Primitive
 } from '../nodes/Collection.ts'
-import {
-  DOC,
-  isCollection,
-  isNode,
-  isScalar,
-  NODE_TYPE
-} from '../nodes/identity.ts'
+import { DOC, isCollection, isNode, NODE_TYPE } from '../nodes/identity.ts'
 import type {
   Node,
   NodeBase,
@@ -286,32 +280,20 @@ export class Document<
   }
 
   /**
-   * Returns item at `key`, or `undefined` if not found. By default unwraps
-   * scalar values from their surrounding node; to disable set `keepScalar` to
-   * `true` (collections are always returned intact).
+   * Returns item at `key`, or `undefined` if not found.
    */
-  get(key: any, keepScalar?: boolean): Strict extends true ? unknown : any {
-    return isCollection(this.contents)
-      ? this.contents.get(key, keepScalar)
-      : undefined
+  get(key: any): Strict extends true ? NodeBase | Pair | undefined : any {
+    return isCollection(this.contents) ? this.contents.get(key) : undefined
   }
 
   /**
-   * Returns item at `path`, or `undefined` if not found. By default unwraps
-   * scalar values from their surrounding node; to disable set `keepScalar` to
-   * `true` (collections are always returned intact).
+   * Returns item at `path`, or `undefined` if not found.
    */
   getIn(
-    path: Iterable<unknown> | null,
-    keepScalar?: boolean
-  ): Strict extends true ? unknown : any {
-    if (isEmptyPath(path))
-      return !keepScalar && isScalar(this.contents)
-        ? this.contents.value
-        : this.contents
-    return isCollection(this.contents)
-      ? this.contents.getIn(path, keepScalar)
-      : undefined
+    path: Iterable<unknown> | null
+  ): Strict extends true ? NodeBase | Pair | null | undefined : any {
+    if (isEmptyPath(path)) return this.contents
+    return isCollection(this.contents) ? this.contents.getIn(path) : undefined
   }
 
   /**

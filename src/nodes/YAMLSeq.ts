@@ -8,7 +8,6 @@ import { Collection, type NodeOf, type Primitive } from './Collection.ts'
 import { isNode, isScalar, SEQ } from './identity.ts'
 import type { NodeBase } from './Node.ts'
 import type { Pair } from './Pair.ts'
-import type { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
 import { toJS } from './toJS.ts'
 
@@ -61,21 +60,15 @@ export class YAMLSeq<
   }
 
   /**
-   * Returns item at `key`, or `undefined` if not found. By default unwraps
-   * scalar values from their surrounding node; to disable set `keepScalar` to
-   * `true` (collections are always returned intact).
+   * Returns item at `key`, or `undefined` if not found.
    *
    * Throws if `idx` is not a non-negative integer.
    */
-  get(idx: number, keepScalar: true): Scalar<T> | undefined
-  get(idx: number, keepScalar?: false): T | undefined
-  get(idx: number, keepScalar?: boolean): T | Scalar<T> | undefined
-  get(idx: number, keepScalar?: boolean): T | Scalar<T> | undefined {
+  get(idx: number): NodeOf<T> | undefined {
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    const it = this.items[idx]
-    return !keepScalar && isScalar(it) ? (it.value as T) : it
+    return this.items[idx]
   }
 
   /**

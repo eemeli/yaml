@@ -1,6 +1,6 @@
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { Schema } from '../schema/Schema.ts'
-import { isCollection, isScalar, NODE_TYPE } from './identity.ts'
+import { isCollection, NODE_TYPE } from './identity.ts'
 import { type Node, NodeBase } from './Node.ts'
 import type { Pair } from './Pair.ts'
 import type { Scalar } from './Scalar.ts'
@@ -88,11 +88,9 @@ export abstract class Collection extends NodeBase {
   abstract delete(key: unknown): boolean
 
   /**
-   * Returns item at `key`, or `undefined` if not found. By default unwraps
-   * scalar values from their surrounding node; to disable set `keepScalar` to
-   * `true` (collections are always returned intact).
+   * Returns item at `key`, or `undefined` if not found.
    */
-  abstract get(key: unknown, keepScalar?: boolean): unknown
+  abstract get(key: unknown): NodeBase | Pair | undefined
 
   /**
    * Checks if the collection includes a value with the key `key`.
@@ -113,7 +111,7 @@ export abstract class Collection extends NodeBase {
     if (isEmptyPath(path)) this.add(value)
     else {
       const [key, ...rest] = path
-      const node = this.get(key, true)
+      const node = this.get(key)
       if (isCollection(node)) node.addIn(rest, value)
       else if (node === undefined && this.schema)
         this.set(key, collectionFromPath(this.schema, rest, value))
@@ -132,7 +130,7 @@ export abstract class Collection extends NodeBase {
   deleteIn(path: Iterable<unknown>): boolean {
     const [key, ...rest] = path
     if (rest.length === 0) return this.delete(key)
-    const node = this.get(key, true)
+    const node = this.get(key)
     if (isCollection(node)) return node.deleteIn(rest)
     else
       throw new Error(
@@ -141,16 +139,13 @@ export abstract class Collection extends NodeBase {
   }
 
   /**
-   * Returns item at `key`, or `undefined` if not found. By default unwraps
-   * scalar values from their surrounding node; to disable set `keepScalar` to
-   * `true` (collections are always returned intact).
+   * Returns item at `key`, or `undefined` if not found.
    */
-  getIn(path: Iterable<unknown>, keepScalar?: boolean): unknown {
+  getIn(path: Iterable<unknown>): NodeBase | Pair | undefined {
     const [key, ...rest] = path
-    const node = this.get(key, true)
-    if (rest.length === 0)
-      return !keepScalar && isScalar(node) ? node.value : node
-    else return isCollection(node) ? node.getIn(rest, keepScalar) : undefined
+    const node = this.get(key)
+    if (rest.length === 0) return node
+    else return isCollection(node) ? node.getIn(rest) : undefined
   }
 
   /**
@@ -159,7 +154,7 @@ export abstract class Collection extends NodeBase {
   hasIn(path: Iterable<unknown>): boolean {
     const [key, ...rest] = path
     if (rest.length === 0) return this.has(key)
-    const node = this.get(key, true)
+    const node = this.get(key)
     return isCollection(node) ? node.hasIn(rest) : false
   }
 
@@ -171,7 +166,7 @@ export abstract class Collection extends NodeBase {
     if (rest.length === 0) {
       this.set(key, value)
     } else {
-      const node = this.get(key, true)
+      const node = this.get(key)
       if (isCollection(node)) node.setIn(rest, value)
       else if (node === undefined && this.schema)
         this.set(key, collectionFromPath(this.schema, rest, value))

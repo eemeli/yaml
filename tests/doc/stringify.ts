@@ -375,7 +375,7 @@ z:
     test('Block map, with value.commentBefore', () => {
       const doc = getDoc()
       doc.set('a', new Scalar(null))
-      doc.get('a', true).commentBefore = 'c'
+      doc.get('a').commentBefore = 'c'
       expect(doc.toString({ nullStr: '' })).toBe('a:\n  #c\nb:\n')
     })
 
@@ -396,7 +396,7 @@ z:
       const doc = getDoc()
       doc.contents.flow = true
       doc.set('a', new Scalar(null))
-      doc.get('a', true).commentBefore = 'c'
+      doc.get('a').commentBefore = 'c'
       expect(doc.toString({ nullStr: '' })).toBe(
         '{\n  a:\n    #c\n    ,\n  b:\n}\n'
       )

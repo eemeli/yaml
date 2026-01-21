@@ -49,8 +49,8 @@ describe('%TAG', () => {
 
   test('create & stringify', () => {
     const doc = parseDocument('[ v1, v2 ]\n')
-    ;(doc.get(0, true) as Scalar).tag = '!foo:foo'
-    ;(doc.get(1, true) as Scalar).tag = '!bar:bar'
+    ;(doc.get(0) as Scalar).tag = '!foo:foo'
+    ;(doc.get(1) as Scalar).tag = '!bar:bar'
     doc.directives.tags['!'] = '!foo:'
     doc.directives.tags['!bar!'] = '!bar:'
     expect(String(doc)).toBe(source`

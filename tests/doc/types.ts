@@ -268,7 +268,7 @@ describe('failsafe schema', () => {
   test('empty scalars (#616)', () => {
     const doc = parseDocument('empty:\n', { schema: 'failsafe' })
     expect(doc.errors).toMatchObject([])
-    expect(doc.get('empty', true)).toMatchObject({ value: '' })
+    expect(doc.get('empty')).toMatchObject({ value: '' })
     expect(doc.toJS()).toMatchObject({ empty: '' })
     expect(doc.toString()).toEqual('empty:\n')
   })

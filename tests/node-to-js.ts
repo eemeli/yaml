@@ -10,7 +10,7 @@ describe('scalars', () => {
 
   test('plain in map', () => {
     const doc = parseDocument<YAMLMap, false>('key: 42')
-    expect(doc.get('key', true).toJS(doc)).toBe(42)
+    expect(doc.get('key').toJS(doc)).toBe(42)
   })
 })
 

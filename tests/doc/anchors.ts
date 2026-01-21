@@ -60,9 +60,9 @@ describe('create', () => {
   test('node.anchor', () => {
     const doc = parseDocument<YAMLSeq, false>('[{ a: A }, { b: B }]')
     doc.get(0).anchor = 'AA'
-    doc.getIn([0, 'a'], true).anchor = 'a'
-    doc.getIn([0, 'a'], true).anchor = ''
-    doc.getIn([1, 'b'], true).anchor = 'BB'
+    doc.getIn([0, 'a']).anchor = 'a'
+    doc.getIn([0, 'a']).anchor = ''
+    doc.getIn([1, 'b']).anchor = 'BB'
     expect(String(doc)).toBe('[ &AA { a: A }, { b: &BB B } ]\n')
   })
 
@@ -340,7 +340,7 @@ describe('merge <<', () => {
       const doc = parseDocument<YAMLSeq, false>('[{ a: A }, { b: B }]', {
         merge: true
       })
-      const alias = doc.createAlias(doc.getIn([0, 'a'], true))
+      const alias = doc.createAlias(doc.getIn([0, 'a']))
       doc.addIn([1], doc.createPair('<<', alias))
       expect(String(doc)).toBe('[ { a: &a1 A }, { b: B, <<: *a1 } ]\n')
       expect(() => doc.toJS()).toThrow(

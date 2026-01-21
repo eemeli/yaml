@@ -693,7 +693,7 @@ describe('keepSourceTokens', () => {
       const doc = YAML.parseDocument<any>(src)
       expect(doc.contents).not.toHaveProperty('srcToken')
       expect(doc.contents.items[0]).not.toHaveProperty('srcToken')
-      expect(doc.get('foo', true)).not.toHaveProperty('srcToken')
+      expect(doc.get('foo')).not.toHaveProperty('srcToken')
     })
 
     test(`${type}: included when set`, () => {
@@ -705,7 +705,7 @@ describe('keepSourceTokens', () => {
         key: { type: 'scalar' },
         value: { type: 'scalar' }
       })
-      expect(doc.get('foo', true).srcToken).toMatchObject({ type: 'scalar' })
+      expect(doc.get('foo').srcToken).toMatchObject({ type: 'scalar' })
     })
   }
 
@@ -716,7 +716,7 @@ describe('keepSourceTokens', () => {
       keepSourceTokens: true
     }).compose(tokens)
     const doc = Array.from(docs)[0]
-    const node = doc.get('foo', true)
+    const node = doc.get('foo')
     YAML.CST.setScalarValue(node.srcToken, 'eek')
     const res = tokens.map(YAML.CST.stringify).join('')
     expect(res).toBe('foo:\n  eek')
