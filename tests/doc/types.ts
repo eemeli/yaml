@@ -472,11 +472,11 @@ one: 1
         '{ 3: 4 }': 'many'
       })
       expect(doc.errors).toHaveLength(0)
-      doc.contents.items[2].key = { 3: 4 }
+      doc.contents.items[2].key = doc.createNode({ 3: 4 })
       expect(doc.toJS()).toMatchObject({
         one: 1,
         2: 'two',
-        '{"3":4}': 'many'
+        '{ "3": 4 }': 'many'
       })
     })
 
@@ -494,12 +494,12 @@ one: 1
         ])
       )
       expect(doc.errors).toHaveLength(0)
-      doc.contents.items[2].key = { 3: 4 }
+      doc.contents.items[2].key = doc.createNode({ 5: 6 })
       expect(doc.toJS({ mapAsMap: true })).toMatchObject(
         new Map<unknown, unknown>([
           ['one', 1],
           [2, 'two'],
-          [{ 3: 4 }, 'many']
+          [new Map([[5, 6]]), 'many']
         ])
       )
     })
@@ -1033,12 +1033,12 @@ describe('custom tags', () => {
     }
   }
 
-  class YAMLNullObject<S, T> extends YAMLMap<S, T> {
+  class YAMLNullObject extends YAMLMap {
     tag: string = '!nullobject'
     toJSON(_?: unknown, ctx?: any): any {
       const obj = super.toJSON<Record<any, any>>(
         _,
-        { ...(ctx || {}), mapAsMap: false },
+        { ...ctx, mapAsMap: false },
         Object
       )
       return Object.assign(Object.create(null), obj)

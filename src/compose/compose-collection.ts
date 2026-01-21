@@ -136,9 +136,7 @@ export function composeCollection(
       ctx.options
     ) ?? coll
 
-  const node = isNode(res)
-    ? (res as ParsedNode)
-    : (new Scalar(res) as Scalar.Parsed)
+  const node = isNode(res) ? (res as ParsedNode) : new Scalar(res)
   node.range = coll.range
   node.tag = tagName
   if (tag?.format) (node as Scalar).format = tag.format

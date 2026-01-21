@@ -2,6 +2,7 @@ import { applyReviver } from '../doc/applyReviver.ts'
 import type { Document } from '../doc/Document.ts'
 import type { ToJSOptions } from '../options.ts'
 import type { Token } from '../parse/cst.ts'
+import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import type { Alias } from './Alias.ts'
 import { isDocument, NODE_TYPE } from './identity.ts'
@@ -11,11 +12,7 @@ import { toJS } from './toJS.ts'
 import type { MapLike, YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
 
-export type Node<T = unknown> =
-  | Alias
-  | Scalar<T>
-  | YAMLMap<unknown, T>
-  | YAMLSeq<T>
+export type Node = Alias | Scalar | YAMLSeq | YAMLMap
 
 /** Utility type mapper */
 export type NodeType<T> = T extends
@@ -36,11 +33,7 @@ export type NodeType<T> = T extends
           ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
           : Node
 
-export type ParsedNode =
-  | Alias.Parsed
-  | Scalar.Parsed
-  | YAMLMap.Parsed
-  | YAMLSeq.Parsed
+export type ParsedNode = Alias | Scalar | YAMLMap | YAMLSeq
 
 /** `[start, value-end, node-end]` */
 export type Range = [number, number, number]
@@ -96,7 +89,7 @@ export abstract class NodeBase {
   }
 
   /** Create a copy of this node.  */
-  clone(): NodeBase {
+  clone(_schema?: Schema): NodeBase {
     const copy: NodeBase = Object.create(
       Object.getPrototypeOf(this),
       Object.getOwnPropertyDescriptors(this)

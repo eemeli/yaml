@@ -13,7 +13,7 @@ export function composeScalar(
   token: FlowScalar | BlockScalar,
   tagToken: SourceToken | null,
   onError: ComposeErrorHandler
-) {
+): Scalar {
   const { value, type, comment, range } =
     token.type === 'block-scalar'
       ? resolveBlockScalar(ctx, token, onError)
@@ -54,7 +54,7 @@ export function composeScalar(
   if (tag.format) scalar.format = tag.format
   if (comment) scalar.comment = comment
 
-  return scalar as Scalar.Parsed
+  return scalar
 }
 
 function findScalarTagByName(

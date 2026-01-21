@@ -3,32 +3,33 @@ import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyPair } from '../stringify/stringifyPair.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
-import { isNode, NODE_TYPE, PAIR } from './identity.ts'
+import type { NodeOf, Primitive } from './Collection.ts'
+import { NODE_TYPE, PAIR } from './identity.ts'
+import type { NodeBase } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
 
-export class Pair<K = unknown, V = unknown> {
+export class Pair<
+  K extends Primitive | NodeBase = Primitive | NodeBase,
+  V extends Primitive | NodeBase = Primitive | NodeBase
+> {
   /** @internal */
   declare readonly [NODE_TYPE]: symbol
 
-  /** Always Node or null when parsed, but can be set to anything. */
-  key: K
-
-  /** Always Node or null when parsed, but can be set to anything. */
-  value: V | null
+  key: NodeOf<K>
+  value: NodeOf<V> | null
 
   /** The CST token that was composed into this pair.  */
   declare srcToken?: CollectionItem
 
-  constructor(key: K, value: V | null = null) {
+  constructor(key: NodeOf<K>, value: NodeOf<V> | null = null) {
     Object.defineProperty(this, NODE_TYPE, { value: PAIR })
     this.key = key
     this.value = value
   }
 
   clone(schema?: Schema): Pair<K, V> {
-    let { key, value } = this
-    if (isNode(key)) key = key.clone(schema) as unknown as K
-    if (isNode(value)) value = value.clone(schema) as unknown as V
+    const key = this.key.clone(schema) as NodeOf<K>
+    const value = (this.value?.clone(schema) ?? null) as NodeOf<V>
     return new Pair(key, value)
   }
 

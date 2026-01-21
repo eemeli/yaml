@@ -10,6 +10,5 @@ export const seq: CollectionTag = {
   resolve(seq, onError) {
     if (!isSeq(seq)) onError('Expected a sequence for this tag')
     return seq
-  },
-  createNode: (nc, obj) => YAMLSeq.from(nc, obj)
+  }
 }

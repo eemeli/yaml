@@ -114,7 +114,7 @@ export function composeEmptyNode(
   pos: number | null,
   { spaceBefore, comment, anchor, tag, end }: Props,
   onError: ComposeErrorHandler
-): Scalar.Parsed {
+): Scalar {
   const token: FlowScalar = {
     type: 'scalar',
     offset: emptyScalarPosition(offset, before, pos),
@@ -130,7 +130,7 @@ export function composeEmptyNode(
   if (spaceBefore) node.spaceBefore = true
   if (comment) {
     node.comment = comment
-    node.range[2] = end
+    node.range![2] = end
   }
   return node
 }
@@ -154,5 +154,5 @@ function composeAlias(
   const re = resolveEnd(end, valueEnd, options.strict, onError)
   alias.range = [offset, valueEnd, re.offset]
   if (re.comment) alias.comment = re.comment
-  return alias as Alias.Parsed
+  return alias
 }

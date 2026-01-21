@@ -1,6 +1,6 @@
 import { source } from '../_utils.ts'
 import * as YAML from 'yaml'
-import { Pair, Scalar } from 'yaml'
+import { Scalar } from 'yaml'
 
 for (const [name, version] of [
   ['YAML 1.1', '1.1'],
@@ -345,7 +345,7 @@ z:
 
   test('Document as key', () => {
     const doc = new YAML.Document({ a: 1 })
-    doc.add(new YAML.Document({ b: 2, c: 3 }))
+    doc.set(new YAML.Document({ b: 2, c: 3 }), null)
     expect(String(doc)).toBe('a: 1\n? b: 2\n  c: 3\n')
   })
 
@@ -356,7 +356,7 @@ z:
 
   describe('No extra whitespace for empty values', () => {
     const getDoc = () =>
-      new YAML.Document<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>, false>({
+      new YAML.Document<YAML.YAMLMap, false>({
         a: null,
         b: null
       })
@@ -367,12 +367,14 @@ z:
 
     test('Block map, with key.comment', () => {
       const doc = getDoc()
+      doc.set('a', new Scalar(null))
       doc.contents.items[0].key.comment = 'c'
       expect(doc.toString({ nullStr: '' })).toBe('a: #c\nb:\n')
     })
 
     test('Block map, with value.commentBefore', () => {
       const doc = getDoc()
+      doc.set('a', new Scalar(null))
       doc.get('a', true).commentBefore = 'c'
       expect(doc.toString({ nullStr: '' })).toBe('a:\n  #c\nb:\n')
     })
@@ -387,12 +389,13 @@ z:
       const doc = getDoc()
       doc.contents.flow = true
       doc.contents.items[0].key.comment = 'c'
-      expect(doc.toString({ nullStr: '' })).toBe('{\n  a: #c\n    ,\n  b:\n}\n')
+      expect(doc.toString({ nullStr: '' })).toBe('{\n  a:, #c\n  b:\n}\n')
     })
 
     test('Flow map, with value.commentBefore', () => {
       const doc = getDoc()
       doc.contents.flow = true
+      doc.set('a', new Scalar(null))
       doc.get('a', true).commentBefore = 'c'
       expect(doc.toString({ nullStr: '' })).toBe(
         '{\n  a:\n    #c\n    ,\n  b:\n}\n'
@@ -721,7 +724,7 @@ describe('scalar styles', () => {
 describe('simple keys', () => {
   test('key with no value', () => {
     const doc = YAML.parseDocument('? ~')
-    expect(doc.toString()).toBe('? ~\n')
+    expect(doc.toString()).toBe('~: null\n')
     expect(doc.toString({ simpleKeys: true })).toBe('~: null\n')
   })
 
@@ -815,7 +818,7 @@ describe('sortMapEntries', () => {
   })
   test('doc.add', () => {
     const doc = new YAML.Document(obj, { sortMapEntries: true })
-    doc.add(new Pair('bb', 4))
+    doc.add(doc.createPair('bb', 4))
     expect(String(doc)).toBe('a: 1\nb: 2\nbb: 4\nc: 3\n')
   })
   test('doc.set', () => {
@@ -1050,13 +1053,15 @@ describe('Scalar options', () => {
       expect(YAML.stringify({ foo: 'bar' }, opt)).toBe('"foo": "bar"\n')
     })
 
-    test('Use defaultType for explicit keys', () => {
+    test('Use defaultStringType for explicit keys', () => {
       const opt = {
+        blockQuote: false,
         defaultStringType: Scalar.QUOTE_DOUBLE,
         defaultKeyType: Scalar.QUOTE_SINGLE
       } as const
       const doc = new YAML.Document<YAML.YAMLMap, false>({ foo: null })
-      doc.contents.items[0].value = null
+      const key = doc.contents.items[0].key as Scalar
+      key.type = Scalar.BLOCK_LITERAL
       expect(doc.toString(opt)).toBe('? "foo"\n')
     })
   })
@@ -1442,7 +1447,7 @@ describe('YAML.stringify on ast Document', () => {
 describe('flow collection padding', () => {
   const doc = new YAML.Document()
   doc.contents = new YAML.YAMLSeq()
-  doc.contents.items = [1, 2]
+  doc.contents.items = [new Scalar(1), new Scalar(2)]
   doc.contents.flow = true
 
   test('default', () => {

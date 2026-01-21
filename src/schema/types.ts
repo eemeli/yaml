@@ -110,7 +110,7 @@ export interface CollectionTag extends TagBase {
    * Note: this is required if nodeClass is not provided.
    */
   resolve?: (
-    value: YAMLMap.Parsed | YAMLSeq.Parsed,
+    value: YAMLMap | YAMLSeq,
     onError: (message: string) => void,
     options: ParseOptions
   ) => unknown

@@ -8,7 +8,7 @@ import {
   MAP,
   SEQ
 } from '../nodes/identity.ts'
-import type { Node } from '../nodes/Node.ts'
+import type { Node, NodeBase } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
@@ -148,10 +148,10 @@ export class NodeCreator {
     return node
   }
 
-  createPair(key: unknown, value: unknown): Pair<Node, Node> {
+  createPair(key: unknown, value: unknown): Pair<NodeBase, NodeBase | null> {
     const k = this.create(key)
-    const v = this.create(value)
-    return new Pair(k, v)
+    const v = value == null ? null : this.create(value)
+    return new Pair<NodeBase, NodeBase | null>(k, v)
   }
 
   /**

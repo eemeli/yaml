@@ -12,10 +12,10 @@ export function stringifyPair(
   onChompKeep?: () => void
 ): string {
   const {
-    allNullValues,
     doc,
     indent,
     indentStep,
+    noValues,
     options: { commentString, indentSeq, simpleKeys }
   } = ctx
   let keyComment = (isNode(key) && key.comment) || null
@@ -31,17 +31,16 @@ export function stringifyPair(
   let explicitKey =
     !simpleKeys &&
     (!key ||
-      (keyComment && value == null && !ctx.inFlow) ||
-      isCollection(key) ||
-      (isScalar(key)
-        ? key.type === Scalar.BLOCK_FOLDED || key.type === Scalar.BLOCK_LITERAL
-        : typeof key === 'object'))
+      !isScalar(key) ||
+      key.type === Scalar.BLOCK_FOLDED ||
+      key.type === Scalar.BLOCK_LITERAL)
 
-  ctx = Object.assign({}, ctx, {
-    allNullValues: false,
-    implicitKey: !explicitKey && (simpleKeys || !allNullValues),
-    indent: indent + indentStep
-  })
+  ctx = {
+    ...ctx,
+    implicitKey: !explicitKey && (simpleKeys || !noValues),
+    indent: indent + indentStep,
+    noValues: false
+  }
   let keyCommentDone = false
   let chompKeep = false
   let str = stringify(
@@ -60,11 +59,17 @@ export function stringifyPair(
   }
 
   if (ctx.inFlow) {
-    if (allNullValues || value == null) {
+    if (noValues || value == null) {
       if (keyCommentDone && onComment) onComment()
-      return str === '' ? '?' : explicitKey ? `? ${str}` : str
+      return str === ''
+        ? '?'
+        : explicitKey
+          ? `? ${str}`
+          : noValues
+            ? str
+            : `${str}:`
     }
-  } else if ((allNullValues && !simpleKeys) || (value == null && explicitKey)) {
+  } else if ((noValues && !simpleKeys) || (value == null && explicitKey)) {
     str = `? ${str}`
     if (keyComment && !keyCommentDone) {
       str += lineComment(str, ctx.indent, commentString(keyComment))

@@ -17,7 +17,6 @@ import { stringifyString } from './stringifyString.ts'
 
 export type StringifyContext = {
   actualString?: boolean
-  allNullValues?: boolean
   anchors: Set<string>
   doc: Document
   forceBlockIndent?: boolean
@@ -28,6 +27,7 @@ export type StringifyContext = {
   inFlow: boolean | null
   inStringifyKey?: boolean
   flowCollectionPadding: string
+  noValues?: boolean
   options: Readonly<
     Required<Omit<ToStringOptions, 'collectionStyle' | 'indent'>>
   >

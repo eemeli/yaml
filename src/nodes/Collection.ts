@@ -1,13 +1,12 @@
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { Schema } from '../schema/Schema.ts'
-import {
-  isCollection,
-  isNode,
-  isPair,
-  isScalar,
-  NODE_TYPE
-} from './identity.ts'
+import { isCollection, isScalar, NODE_TYPE } from './identity.ts'
 import { type Node, NodeBase } from './Node.ts'
+import type { Pair } from './Pair.ts'
+import type { Scalar } from './Scalar.ts'
+
+export type Primitive = boolean | number | bigint | string | null
+export type NodeOf<T> = T extends Primitive ? Scalar<T> : T
 
 export function collectionFromPath(
   schema: Schema,
@@ -42,7 +41,7 @@ export abstract class Collection extends NodeBase {
   /** @internal */
   declare [NODE_TYPE]: symbol
 
-  declare items: unknown[]
+  declare items: (NodeBase | Pair)[]
 
   /** An optional anchor on this node. Used by alias nodes. */
   declare anchor?: string
@@ -74,9 +73,7 @@ export abstract class Collection extends NodeBase {
       Object.getOwnPropertyDescriptors(this)
     )
     if (schema) copy.schema = schema
-    copy.items = copy.items.map(it =>
-      isNode(it) || isPair(it) ? it.clone(schema) : it
-    )
+    copy.items = copy.items.map(it => it.clone(schema))
     if (this.range) copy.range = this.range.slice() as NodeBase['range']
     return copy
   }
@@ -103,15 +100,14 @@ export abstract class Collection extends NodeBase {
   abstract has(key: unknown): boolean
 
   /**
-   * Sets a value in this collection. For `!!set`, `value` needs to be a
-   * boolean to add/remove the item from the set.
+   * Sets a value in this collection.
    */
   abstract set(key: unknown, value: unknown): void
 
   /**
-   * Adds a value to the collection. For `!!map` and `!!omap` the value must
-   * be a Pair instance or a `{ key, value }` object, which may not have a key
-   * that already exists in the map.
+   * Adds a value to the collection.
+   *
+   * For `!!map` and `!!omap` the value must be a Pair instance.
    */
   addIn(path: Iterable<unknown>, value: unknown): void {
     if (isEmptyPath(path)) this.add(value)
@@ -130,6 +126,7 @@ export abstract class Collection extends NodeBase {
 
   /**
    * Removes a value from the collection.
+   *
    * @returns `true` if the item was found and removed.
    */
   deleteIn(path: Iterable<unknown>): boolean {
@@ -156,22 +153,6 @@ export abstract class Collection extends NodeBase {
     else return isCollection(node) ? node.getIn(rest, keepScalar) : undefined
   }
 
-  hasAllNullValues(allowScalar?: boolean): boolean {
-    return this.items.every(node => {
-      if (!isPair(node)) return false
-      const n = node.value
-      return (
-        n == null ||
-        (allowScalar &&
-          isScalar(n) &&
-          n.value == null &&
-          !n.commentBefore &&
-          !n.comment &&
-          !n.tag)
-      )
-    })
-  }
-
   /**
    * Checks if the collection includes a value with the key `key`.
    */
@@ -183,8 +164,7 @@ export abstract class Collection extends NodeBase {
   }
 
   /**
-   * Sets a value in this collection. For `!!set`, `value` needs to be a
-   * boolean to add/remove the item from the set.
+   * Sets a value in this collection.
    */
   setIn(path: Iterable<unknown>, value: unknown): void {
     const [key, ...rest] = path

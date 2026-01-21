@@ -17,30 +17,22 @@ export const NODE_TYPE: unique symbol = Symbol.for('yaml.node.type')
 export const isAlias = (node: any): node is Alias =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === ALIAS
 
-export const isDocument = <T extends Node = Node>(
-  node: any
-): node is Document<T> =>
+export const isDocument = (node: any): node is Document =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === DOC
 
-export const isMap = <K = unknown, V = unknown>(
-  node: any
-): node is YAMLMap<K, V> =>
+export const isMap = (node: any): node is YAMLMap =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === MAP
 
-export const isPair = <K = unknown, V = unknown>(
-  node: any
-): node is Pair<K, V> =>
+export const isPair = (node: any): node is Pair =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === PAIR
 
-export const isScalar = <T = unknown>(node: any): node is Scalar<T> =>
+export const isScalar = (node: any): node is Scalar =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === SCALAR
 
-export const isSeq = <T = unknown>(node: any): node is YAMLSeq<T> =>
+export const isSeq = (node: any): node is YAMLSeq =>
   !!node && typeof node === 'object' && node[NODE_TYPE] === SEQ
 
-export function isCollection<K = unknown, V = unknown>(
-  node: any
-): node is YAMLMap<K, V> | YAMLSeq<V> {
+export function isCollection(node: any): node is YAMLMap | YAMLSeq {
   if (node && typeof node === 'object')
     switch (node[NODE_TYPE]) {
       case MAP:
@@ -50,7 +42,7 @@ export function isCollection<K = unknown, V = unknown>(
   return false
 }
 
-export function isNode<T = unknown>(node: any): node is Node<T> {
+export function isNode(node: any): node is Node {
   if (node && typeof node === 'object')
     switch (node[NODE_TYPE]) {
       case ALIAS:
@@ -62,7 +54,5 @@ export function isNode<T = unknown>(node: any): node is Node<T> {
   return false
 }
 
-export const hasAnchor = <K = unknown, V = unknown>(
-  node: unknown
-): node is Scalar<V> | YAMLMap<K, V> | YAMLSeq<V> =>
+export const hasAnchor = (node: unknown): node is Scalar | YAMLMap | YAMLSeq =>
   (isScalar(node) || isCollection(node)) && !!node.anchor

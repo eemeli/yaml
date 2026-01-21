@@ -4,7 +4,7 @@ import type { FlowScalar } from '../parse/cst.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { visit } from '../visit.ts'
 import { ALIAS, hasAnchor, isAlias, isCollection, isPair } from './identity.ts'
-import type { Node, Range } from './Node.ts'
+import type { Node } from './Node.ts'
 import { NodeBase } from './Node.ts'
 import type { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
@@ -12,17 +12,11 @@ import { toJS } from './toJS.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
 
-export declare namespace Alias {
-  interface Parsed extends Alias {
-    range: Range
-    srcToken?: FlowScalar & { type: 'alias' }
-  }
-}
-
 export class Alias extends NodeBase {
   source: string
 
   declare anchor?: never
+  declare srcToken?: FlowScalar & { type: 'alias' }
 
   constructor(source: string) {
     super(ALIAS)

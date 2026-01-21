@@ -128,12 +128,12 @@ for (const { fn, exp } of [
     })
 
     test('parsed alias', () => {
-      const doc = parseDocument<YAMLSeq.Parsed>('[ &a foo, *a ]')
+      const doc = parseDocument<YAMLSeq>('[ &a foo, *a ]')
       expect(fn(doc.contents?.items[1])).toBe(exp.alias)
     })
 
     test('parsed pair', () => {
-      const doc = parseDocument<YAMLMap.Parsed>('foo: bar')
+      const doc = parseDocument<YAMLMap>('foo: bar')
       expect(fn(doc.contents?.items[0])).toBe(exp.pair)
     })
 
@@ -158,7 +158,7 @@ for (const { fn, exp } of [
     })
 
     test('created pair', () => {
-      expect(fn(new Pair(null))).toBe(exp.pair)
+      expect(fn(new Pair(new Scalar(null)))).toBe(exp.pair)
     })
 
     test('null', () => {

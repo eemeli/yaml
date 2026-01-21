@@ -384,7 +384,7 @@ describe('maps with no values', () => {
   test('block map', () => {
     const src = `a: null\n? b #c`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(`a: null\n? b #c\n`)
+    expect(String(doc)).toBe(`a: null\nb: #c\n  null\n`)
     doc.set('b', 'x')
     expect(String(doc)).toBe(`a: null\nb: #c\n  x\n`)
   })
@@ -392,9 +392,9 @@ describe('maps with no values', () => {
   test('flow map', () => {
     const src = `{\na: null,\n? b\n}`
     const doc = YAML.parseDocument<any>(src)
-    expect(String(doc)).toBe(`{ a: null, b }\n`)
+    expect(String(doc)).toBe(`{ a: null, b: }\n`)
     doc.contents.items[1].key.comment = 'c'
-    expect(String(doc)).toBe(`{\n  a: null,\n  b #c\n}\n`)
+    expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n}\n`)
     doc.set('b', 'x')
     expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n    x\n}\n`)
   })

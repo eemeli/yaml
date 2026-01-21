@@ -1,53 +1,61 @@
-import type { NodeCreator } from '../doc/NodeCreator.ts'
+import { NodeCreator } from '../doc/NodeCreator.ts'
+import type { CreateNodeOptions } from '../options.ts'
 import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
-import { Collection } from './Collection.ts'
-import { isScalar, SEQ } from './identity.ts'
-import type { ParsedNode, Range } from './Node.ts'
+import { Collection, type NodeOf, type Primitive } from './Collection.ts'
+import { isNode, isScalar, SEQ } from './identity.ts'
+import type { NodeBase } from './Node.ts'
 import type { Pair } from './Pair.ts'
 import type { Scalar } from './Scalar.ts'
-import { isScalarValue } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
 import { toJS } from './toJS.ts'
 
-export declare namespace YAMLSeq {
-  interface Parsed<
-    T extends ParsedNode | Pair<ParsedNode, ParsedNode | null> = ParsedNode
-  > extends YAMLSeq<T> {
-    items: T[]
-    range: Range
-    srcToken?: BlockSequence | FlowCollection
-  }
-}
+const isScalarValue = (value: unknown): boolean =>
+  !value || (typeof value !== 'function' && typeof value !== 'object')
 
-export class YAMLSeq<T = unknown> extends Collection {
+export class YAMLSeq<
+  T extends Primitive | NodeBase | Pair = Primitive | NodeBase | Pair
+> extends Collection {
   static get tagName(): 'tag:yaml.org,2002:seq' {
     return 'tag:yaml.org,2002:seq'
   }
 
-  items: T[] = []
+  items: NodeOf<T>[] = []
+  declare srcToken?: BlockSequence | FlowCollection
 
   constructor(schema?: Schema) {
     super(SEQ, schema)
   }
 
-  add(value: T): void {
-    this.items.push(value)
+  add(
+    value: T,
+    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
+  ): void {
+    if (isNode(value)) this.items.push(value as NodeOf<T>)
+    else if (!this.schema) throw new Error('Schema is required')
+    else {
+      const nc = new NodeCreator(this.schema, {
+        ...options,
+        aliasDuplicateObjects: false
+      })
+      this.items.push(nc.create(value) as NodeOf<T>)
+      nc.setAnchors()
+    }
   }
 
   /**
    * Removes a value from the collection.
    *
-   * `key` must contain a representation of an integer for this to succeed.
-   * It may be wrapped in a `Scalar`.
+   * Throws if `idx` is not a non-negative integer.
    *
    * @returns `true` if the item was found and removed.
    */
-  delete(key: unknown): boolean {
-    const idx = asItemIndex(key)
-    if (typeof idx !== 'number') return false
+  delete(idx: number): boolean {
+    if (!Number.isInteger(idx))
+      throw new TypeError(`Expected an integer, not ${idx}.`)
+    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
     const del = this.items.splice(idx, 1)
     return del.length > 0
   }
@@ -57,44 +65,57 @@ export class YAMLSeq<T = unknown> extends Collection {
    * scalar values from their surrounding node; to disable set `keepScalar` to
    * `true` (collections are always returned intact).
    *
-   * `key` must contain a representation of an integer for this to succeed.
-   * It may be wrapped in a `Scalar`.
+   * Throws if `idx` is not a non-negative integer.
    */
-  get(key: unknown, keepScalar: true): Scalar<T> | undefined
-  get(key: unknown, keepScalar?: false): T | undefined
-  get(key: unknown, keepScalar?: boolean): T | Scalar<T> | undefined
-  get(key: unknown, keepScalar?: boolean): T | Scalar<T> | undefined {
-    const idx = asItemIndex(key)
-    if (typeof idx !== 'number') return undefined
+  get(idx: number, keepScalar: true): Scalar<T> | undefined
+  get(idx: number, keepScalar?: false): T | undefined
+  get(idx: number, keepScalar?: boolean): T | Scalar<T> | undefined
+  get(idx: number, keepScalar?: boolean): T | Scalar<T> | undefined {
+    if (!Number.isInteger(idx))
+      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
+    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
     const it = this.items[idx]
-    return !keepScalar && isScalar<T>(it) ? it.value : it
+    return !keepScalar && isScalar(it) ? (it.value as T) : it
   }
 
   /**
    * Checks if the collection includes a value with the key `key`.
    *
-   * `key` must contain a representation of an integer for this to succeed.
-   * It may be wrapped in a `Scalar`.
+   * Throws if `idx` is not a non-negative integer.
    */
-  has(key: unknown): boolean {
-    const idx = asItemIndex(key)
-    return typeof idx === 'number' && idx < this.items.length
+  has(idx: number): boolean {
+    if (!Number.isInteger(idx))
+      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
+    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
+    return idx < this.items.length
   }
 
   /**
    * Sets a value in this collection. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    *
-   * If `key` does not contain a representation of an integer, this will throw.
-   * It may be wrapped in a `Scalar`.
+   * Throws if `idx` is not a non-negative integer.
    */
-  set(key: unknown, value: T): void {
-    const idx = asItemIndex(key)
-    if (typeof idx !== 'number')
-      throw new Error(`Expected a valid index, not ${key}.`)
+  set(
+    idx: number,
+    value: T,
+    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
+  ): void {
+    if (!Number.isInteger(idx))
+      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
+    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
     const prev = this.items[idx]
     if (isScalar(prev) && isScalarValue(value)) prev.value = value
-    else this.items[idx] = value
+    else if (isNode(value)) this.items[idx] = value as NodeOf<T>
+    else if (!this.schema) throw new Error('Schema is required')
+    else {
+      const nc = new NodeCreator(this.schema, {
+        ...options,
+        aliasDuplicateObjects: false
+      })
+      this.items[idx] = nc.create(value) as NodeOf<T>
+      nc.setAnchors()
+    }
   }
 
   toJSON(_?: unknown, ctx?: ToJSContext): unknown[] {
@@ -134,12 +155,4 @@ export class YAMLSeq<T = unknown> extends Collection {
     }
     return seq
   }
-}
-
-function asItemIndex(key: unknown): number | null {
-  let idx = isScalar(key) ? key.value : key
-  if (idx && typeof idx === 'string') idx = Number(idx)
-  return typeof idx === 'number' && Number.isInteger(idx) && idx >= 0
-    ? idx
-    : null
 }

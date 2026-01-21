@@ -1,7 +1,7 @@
 import type { Reviver } from './doc/applyReviver.ts'
 import type { Directives } from './doc/directives.ts'
 import type { LogLevelId } from './log.ts'
-import type { ParsedNode } from './nodes/Node.ts'
+import type { NodeBase } from './nodes/Node.ts'
 import type { Pair } from './nodes/Pair.ts'
 import type { Scalar } from './nodes/Scalar.ts'
 import type { LineCounter } from './parse/line-counter.ts'
@@ -62,12 +62,12 @@ export type ParseOptions = {
    * multiple `<<` keys are allowed.
    *
    * Set `false` to disable, or provide your own comparator function to
-   * customise. The comparator will be passed two `ParsedNode` values, and
+   * customise. The comparator will be passed two node values, and
    * is expected to return a `boolean` indicating their equality.
    *
    * Default: `true`
    */
-  uniqueKeys?: boolean | ((a: ParsedNode, b: ParsedNode) => boolean)
+  uniqueKeys?: boolean | ((a: NodeBase, b: NodeBase) => boolean)
 }
 
 export type DocumentOptions = {

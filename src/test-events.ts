@@ -8,7 +8,7 @@ import {
   isScalar,
   isSeq
 } from './nodes/identity.ts'
-import type { Node, ParsedNode } from './nodes/Node.ts'
+import type { Node, NodeBase } from './nodes/Node.ts'
 import type { Pair } from './nodes/Pair.ts'
 import { parseAllDocuments } from './public-api.ts'
 import { visit } from './visit.ts'
@@ -55,7 +55,7 @@ export function testEvents(src: string): {
       if (doc.directives.docStart) docStart += ' ---'
       else if (
         doc.contents &&
-        doc.contents.range[2] === doc.contents.range[0] &&
+        doc.contents.range![2] === doc.contents.range![0] &&
         !doc.contents.anchor &&
         !doc.contents.tag
       )
@@ -78,13 +78,13 @@ function addEvents(
   events: string[],
   doc: Document,
   errPos: number,
-  node: ParsedNode | Pair<ParsedNode, ParsedNode | null> | null
+  node: NodeBase | Pair | null
 ) {
   if (!node) {
     events.push('=VAL :')
     return
   }
-  if (errPos !== -1 && isNode(node) && node.range[0] >= errPos)
+  if (errPos !== -1 && isNode(node) && node.range![0] >= errPos)
     throw new Error()
   let props = ''
   let anchor = isScalar(node) || isCollection(node) ? node.anchor : undefined
@@ -124,11 +124,11 @@ function addEvents(
       if (anchorExists(doc, alt)) alias = alt
     }
     events.push(`=ALI${props} *${alias}`)
-  } else {
+  } else if (isScalar(node)) {
     const scalar = scalarChar[String(node.type)]
     if (!scalar) throw new Error(`Unexpected node type ${node.type}`)
-    const value = node.source
-      .replace(/\\/g, '\\\\')
+    const value = node
+      .source!.replace(/\\/g, '\\\\')
       .replace(/\0/g, '\\0')
       .replace(/\x07/g, '\\a')
       .replace(/\x08/g, '\\b')
@@ -139,5 +139,7 @@ function addEvents(
       .replace(/\r/g, '\\r')
       .replace(/\x1b/g, '\\e')
     events.push(`=VAL${props} ${scalar}${value}`)
+  } else {
+    throw new Error(`Unexpected node ${node}`)
   }
 }

@@ -1,17 +1,24 @@
+import type { Primitive } from '../../nodes/Collection.ts'
 import { isPair, isScalar } from '../../nodes/identity.ts'
+import type { NodeBase } from '../../nodes/Node.ts'
+import type { Pair } from '../../nodes/Pair.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
 import { toJS } from '../../nodes/toJS.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
 import type { NodeCreator } from '../../util.ts'
+import type { Schema } from '../Schema.ts'
 import type { CollectionTag } from '../types.ts'
 import { createPairs, resolvePairs } from './pairs.ts'
 
-export class YAMLOMap extends YAMLSeq {
+export class YAMLOMap<
+  K extends Primitive | NodeBase = Primitive | NodeBase,
+  V extends Primitive | NodeBase = Primitive | NodeBase
+> extends YAMLSeq<Pair<K, V>> {
   static tag = 'tag:yaml.org,2002:omap'
 
-  constructor() {
-    super()
+  constructor(schema?: Schema) {
+    super(schema)
     this.tag = YAMLOMap.tag
   }
 
@@ -46,7 +53,7 @@ export class YAMLOMap extends YAMLSeq {
 
   static from(nc: NodeCreator, iterable: unknown): YAMLOMap {
     const pairs = createPairs(nc, iterable)
-    const omap = new this()
+    const omap = new this(nc.schema)
     omap.items = pairs.items
     return omap
   }
@@ -72,6 +79,5 @@ export const omap: CollectionTag = {
       }
     }
     return Object.assign(new YAMLOMap(), pairs)
-  },
-  createNode: (nc, iterable) => YAMLOMap.from(nc, iterable)
+  }
 }

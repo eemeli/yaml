@@ -60,7 +60,7 @@ export function composeDoc<
     ? composeNode(ctx, value, props, onError)
     : composeEmptyNode(ctx, props.end, start, null, props, onError)
 
-  const contentEnd = doc.contents.range[2]
+  const contentEnd = doc.contents.range![2]
   const re = resolveEnd(end, contentEnd, false, onError)
   if (re.comment) doc.comment = re.comment
   doc.range = [offset, contentEnd, re.offset]

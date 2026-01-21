@@ -1,6 +1,10 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
-import { collectionFromPath, isEmptyPath } from '../nodes/Collection.ts'
+import {
+  collectionFromPath,
+  isEmptyPath,
+  type Primitive
+} from '../nodes/Collection.ts'
 import {
   DOC,
   isCollection,
@@ -8,7 +12,13 @@ import {
   isScalar,
   NODE_TYPE
 } from '../nodes/identity.ts'
-import type { Node, NodeType, ParsedNode, Range } from '../nodes/Node.ts'
+import type {
+  Node,
+  NodeBase,
+  NodeType,
+  ParsedNode,
+  Range
+} from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
 import type { ToJSContext } from '../nodes/toJS.ts'
@@ -237,22 +247,25 @@ export class Document<
    * Convert a key and a value into a `Pair` using the current schema,
    * recursively wrapping all values as `Scalar` or `Collection` nodes.
    */
-  createPair<K extends Node = Node, V extends Node = Node>(
-    key: unknown,
-    value: unknown,
+  createPair<K = unknown, V = unknown>(
+    key: K,
+    value: V,
     options: CreateNodeOptions = {}
-  ): Pair<K, V> {
+  ) {
     const nc = new NodeCreator(this, options)
-    const pair = nc.createPair(key, value) as Pair<K, V>
+    const pair = nc.createPair(key, value)
     nc.setAnchors()
-    return pair
+    return pair as Pair<
+      K extends Primitive | NodeBase ? K : NodeBase,
+      V extends Primitive | NodeBase ? V : NodeBase
+    >
   }
 
   /**
    * Removes a value from the document.
    * @returns `true` if the item was found and removed.
    */
-  delete(key: unknown): boolean {
+  delete(key: any): boolean {
     return assertCollection(this.contents) ? this.contents.delete(key) : false
   }
 
@@ -277,7 +290,7 @@ export class Document<
    * scalar values from their surrounding node; to disable set `keepScalar` to
    * `true` (collections are always returned intact).
    */
-  get(key: unknown, keepScalar?: boolean): Strict extends true ? unknown : any {
+  get(key: any, keepScalar?: boolean): Strict extends true ? unknown : any {
     return isCollection(this.contents)
       ? this.contents.get(key, keepScalar)
       : undefined
@@ -304,7 +317,7 @@ export class Document<
   /**
    * Checks if the document includes a value with the key `key`.
    */
-  has(key: unknown): boolean {
+  has(key: any): boolean {
     return isCollection(this.contents) ? this.contents.has(key) : false
   }
 
@@ -320,7 +333,7 @@ export class Document<
    * Sets a value in this document. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    */
-  set(key: any, value: unknown): void {
+  set(key: any, value: any): void {
     if (this.contents == null) {
       // @ts-expect-error We can't really know that this matches Contents.
       this.contents = collectionFromPath(this.schema, [key], value)

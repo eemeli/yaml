@@ -575,9 +575,9 @@ describe('stringify comments', () => {
         }`)
       expect(String(doc)).toBe(source`
         {
-          a, #c0
+          a:, #c0
           b: c, #c1
-          d #c2
+          d: #c2
         }
       `)
     })
@@ -592,7 +592,7 @@ describe('stringify comments', () => {
         {
           ? { a: 1 }, #c0
           b: { c: 2 }, #c1
-          d #c2
+          d: #c2
         }
       `)
     })

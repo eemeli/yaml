@@ -12,7 +12,7 @@ import {
 } from './nodes/identity.ts'
 import type { Node } from './nodes/Node.ts'
 import type { Pair } from './nodes/Pair.ts'
-import type { Scalar } from './nodes/Scalar.ts'
+import { Scalar } from './nodes/Scalar.ts'
 import type { YAMLMap } from './nodes/YAMLMap.ts'
 import type { YAMLSeq } from './nodes/YAMLSeq.ts'
 
@@ -146,7 +146,7 @@ function visit_(
       path = Object.freeze(path.concat(node))
       const ck = visit_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
-      else if (ck === REMOVE) node.key = null
+      else if (ck === REMOVE) node.key = new Scalar(null)
       const cv = visit_('value', node.value, visitor, path)
       if (cv === BREAK) return BREAK
       else if (cv === REMOVE) node.value = null
@@ -245,7 +245,7 @@ async function visitAsync_(
       path = Object.freeze(path.concat(node))
       const ck = await visitAsync_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
-      else if (ck === REMOVE) node.key = null
+      else if (ck === REMOVE) node.key = new Scalar(null)
       const cv = await visitAsync_('value', node.value, visitor, path)
       if (cv === BREAK) return BREAK
       else if (cv === REMOVE) node.value = null
@@ -319,8 +319,12 @@ function replaceNode(
   if (isCollection(parent)) {
     parent.items[key as number] = node
   } else if (isPair(parent)) {
-    if (key === 'key') parent.key = node
-    else parent.value = node
+    if (isNode(node)) {
+      if (key === 'key') parent.key = node
+      else parent.value = node
+    } else {
+      throw new Error(`Cannot replace pair ${key} with non-node value`)
+    }
   } else if (isDocument(parent)) {
     parent.contents = node as Node
   } else {

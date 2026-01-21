@@ -1,4 +1,3 @@
-import type { ParsedNode } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import type { BlockMap } from '../parse/cst.ts'
@@ -18,9 +17,9 @@ export function resolveBlockMap(
   bm: BlockMap,
   onError: ComposeErrorHandler,
   tag?: CollectionTag
-) {
+): YAMLMap {
   const NodeClass = tag?.nodeClass ?? YAMLMap
-  const map = new NodeClass(ctx.schema) as YAMLMap<ParsedNode, ParsedNode>
+  const map = new NodeClass(ctx.schema) as YAMLMap
 
   if (ctx.atRoot) ctx.atRoot = false
   let offset = bm.offset
@@ -84,7 +83,7 @@ export function resolveBlockMap(
     const valueProps = resolveProps(sep ?? [], {
       indicator: 'map-value-ind',
       next: value,
-      offset: keyNode.range[2],
+      offset: keyNode.range![2],
       onError,
       parentIndent: bm.indent,
       startOnNewline: !key || key.type === 'block-scalar'
@@ -104,7 +103,7 @@ export function resolveBlockMap(
           keyProps.start < valueProps.found.offset - 1024
         )
           onError(
-            keyNode.range,
+            keyNode.range!,
             'KEY_OVER_1024_CHARS',
             'The : indicator must be at most 1024 chars after the start of an implicit block mapping key'
           )
@@ -114,7 +113,7 @@ export function resolveBlockMap(
         ? composeNode(ctx, value, valueProps, onError)
         : composeEmptyNode(ctx, offset, sep, null, valueProps, onError)
       if (ctx.schema.compat) flowIndentCheck(bm.indent, value, onError)
-      offset = valueNode.range[2]
+      offset = valueNode.range![2]
       const pair = new Pair(keyNode, valueNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
       map.items.push(pair)
@@ -122,7 +121,7 @@ export function resolveBlockMap(
       // key with no value
       if (implicitKey)
         onError(
-          keyNode.range,
+          keyNode.range!,
           'MISSING_CHAR',
           'Implicit map keys need to be followed by map values'
         )
@@ -130,7 +129,7 @@ export function resolveBlockMap(
         if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
         else keyNode.comment = valueProps.comment
       }
-      const pair: Pair<ParsedNode, ParsedNode> = new Pair(keyNode)
+      const pair = new Pair(keyNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
       map.items.push(pair)
     }
@@ -139,5 +138,5 @@ export function resolveBlockMap(
   if (commentEnd && commentEnd < offset)
     onError(commentEnd, 'IMPOSSIBLE', 'Map comment with trailing content')
   map.range = [bm.offset, offset, commentEnd ?? offset]
-  return map as YAMLMap.Parsed
+  return map
 }

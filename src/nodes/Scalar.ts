@@ -1,20 +1,10 @@
 import type { BlockScalar, FlowScalar } from '../parse/cst.ts'
 import { SCALAR } from './identity.ts'
-import type { Range } from './Node.ts'
 import { NodeBase } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
 import { toJS } from './toJS.ts'
 
-export const isScalarValue = (value: unknown): boolean =>
-  !value || (typeof value !== 'function' && typeof value !== 'object')
-
 export declare namespace Scalar {
-  interface Parsed extends Scalar {
-    range: Range
-    source: string
-    srcToken?: FlowScalar | BlockScalar
-  }
-
   type BLOCK_FOLDED = 'BLOCK_FOLDED'
   type BLOCK_LITERAL = 'BLOCK_LITERAL'
   type PLAIN = 'PLAIN'
@@ -48,6 +38,8 @@ export class Scalar<T = unknown> extends NodeBase {
 
   /** Set during parsing to the source string value */
   declare source?: string
+
+  declare srcToken?: FlowScalar | BlockScalar
 
   /** The scalar style used for the node's string representation */
   declare type?: Scalar.Type

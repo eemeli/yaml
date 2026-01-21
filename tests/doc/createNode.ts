@@ -138,7 +138,7 @@ describe('objects', () => {
     expect(s).toBeInstanceOf(YAMLMap)
     expect(s.items).toMatchObject([
       { key: { value: 'x' }, value: { value: true } },
-      { key: { value: 'y' }, value: { value: null } }
+      { key: { value: 'y' }, value: null }
     ])
   })
 

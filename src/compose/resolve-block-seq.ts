@@ -12,7 +12,7 @@ export function resolveBlockSeq(
   bs: BlockSequence,
   onError: ComposeErrorHandler,
   tag?: CollectionTag
-) {
+): YAMLSeq {
   const NodeClass = tag?.nodeClass ?? YAMLSeq
   const seq = new NodeClass(ctx.schema) as YAMLSeq
 
@@ -49,9 +49,9 @@ export function resolveBlockSeq(
       ? composeNode(ctx, value, props, onError)
       : composeEmptyNode(ctx, props.end, start, null, props, onError)
     if (ctx.schema.compat) flowIndentCheck(bs.indent, value, onError)
-    offset = node.range[2]
+    offset = node.range![2]
     seq.items.push(node)
   }
   seq.range = [bs.offset, offset, commentEnd ?? offset]
-  return seq as YAMLSeq.Parsed
+  return seq
 }
