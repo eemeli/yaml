@@ -26,11 +26,9 @@ export type NodeType<T> = T extends
     ? Scalar<string | Date>
     : T extends Array<any>
       ? YAMLSeq<NodeType<T[number]>>
-      : T extends { [key: string]: any }
+      : T extends { [key: string | number]: any }
         ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
-        : T extends { [key: number]: any } // Merge with previous once supported in all TS versions
-          ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
-          : Node
+        : Node
 
 /** `[start, value-end, node-end]` */
 export type Range = [number, number, number]
