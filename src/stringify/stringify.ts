@@ -1,15 +1,10 @@
 import { anchorIsValid } from '../doc/anchors.ts'
 import type { Document } from '../doc/Document.ts'
-import type { Alias } from '../nodes/Alias.ts'
-import {
-  isAlias,
-  isCollection,
-  isNode,
-  isPair,
-  isScalar
-} from '../nodes/identity.ts'
-import type { Node } from '../nodes/Node.ts'
-import type { Scalar } from '../nodes/Scalar.ts'
+import { Alias } from '../nodes/Alias.ts'
+import { Collection } from '../nodes/Collection.ts'
+import { NodeBase, type Node } from '../nodes/Node.ts'
+import { Pair } from '../nodes/Pair.ts'
+import { Scalar } from '../nodes/Scalar.ts'
 import type { ToStringOptions } from '../options.ts'
 import type { CollectionTag, ScalarTag } from '../schema/types.ts'
 import { stringifyComment } from './stringifyComment.ts'
@@ -94,7 +89,7 @@ function getTagObject(tags: Array<ScalarTag | CollectionTag>, item: Node) {
 
   let tagObj: ScalarTag | CollectionTag | undefined = undefined
   let obj: unknown
-  if (isScalar(item)) {
+  if (item instanceof Scalar) {
     obj = item.value
     let match = tags.filter(t => t.identify?.(obj))
     if (match.length > 1) {
@@ -124,7 +119,8 @@ function stringifyProps(
 ) {
   if (!doc.directives) return ''
   const props = []
-  const anchor = (isScalar(node) || isCollection(node)) && node.anchor
+  const anchor =
+    (node instanceof Scalar || node instanceof Collection) && node.anchor
   if (anchor && anchorIsValid(anchor)) {
     anchors.add(anchor)
     props.push(`&${anchor}`)
@@ -140,8 +136,8 @@ export function stringify(
   onComment?: () => void,
   onChompKeep?: () => void
 ): string {
-  if (isPair(item)) return item.toString(ctx, onComment, onChompKeep)
-  if (isAlias(item)) {
+  if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
+  if (item instanceof Alias) {
     if (ctx.doc.directives) return item.toString(ctx)
 
     if (ctx.resolvedAliases?.has(item)) {
@@ -156,9 +152,10 @@ export function stringify(
   }
 
   let tagObj: ScalarTag | CollectionTag | undefined = undefined
-  const node = isNode(item)
-    ? item
-    : ctx.doc.createNode(item, { onTagObj: o => (tagObj = o) })
+  const node =
+    item instanceof NodeBase
+      ? (item as Node)
+      : ctx.doc.createNode(item, { onTagObj: o => (tagObj = o) })
   tagObj ??= getTagObject(ctx.doc.schema.tags, node)
 
   const props = stringifyProps(node, tagObj, ctx)
@@ -168,11 +165,11 @@ export function stringify(
   const str =
     typeof tagObj.stringify === 'function'
       ? tagObj.stringify(node as Scalar, ctx, onComment, onChompKeep)
-      : isScalar(node)
+      : node instanceof Scalar
         ? stringifyString(node, ctx, onComment, onChompKeep)
         : node.toString(ctx, onComment, onChompKeep)
   if (!props) return str
-  return isScalar(node) || str[0] === '{' || str[0] === '['
+  return node instanceof Scalar || str[0] === '{' || str[0] === '['
     ? `${props} ${str}`
     : `${props}\n${ctx.indent}${str}`
 }

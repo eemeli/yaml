@@ -1,20 +1,10 @@
-import type { Document } from './doc/Document.ts'
-import type { Alias } from './nodes/Alias.ts'
-import {
-  isAlias,
-  isCollection,
-  isDocument,
-  isMap,
-  isNode,
-  isPair,
-  isScalar,
-  isSeq
-} from './nodes/identity.ts'
-import type { Node } from './nodes/Node.ts'
-import type { Pair } from './nodes/Pair.ts'
+import { Document } from './doc/Document.ts'
+import { Alias } from './nodes/Alias.ts'
+import { NodeBase, type Node } from './nodes/Node.ts'
+import { Pair } from './nodes/Pair.ts'
 import { Scalar } from './nodes/Scalar.ts'
-import type { YAMLMap } from './nodes/YAMLMap.ts'
-import type { YAMLSeq } from './nodes/YAMLSeq.ts'
+import { YAMLMap } from './nodes/YAMLMap.ts'
+import { YAMLSeq } from './nodes/YAMLSeq.ts'
 
 const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')
@@ -107,7 +97,7 @@ export const visit: {
   REMOVE: symbol
 } = function visit(node, visitor) {
   const visitor_ = initVisitor(visitor)
-  if (isDocument(node)) {
+  if (node instanceof Document) {
     const cd = visit_(null, node.contents, visitor_, Object.freeze([node]))
     if (cd === REMOVE) node.contents = null
   } else visit_(null, node, visitor_, Object.freeze([]))
@@ -125,13 +115,13 @@ function visit_(
 ): number | symbol | void {
   const ctrl = callVisitor(key, node, visitor, path)
 
-  if (isNode(ctrl) || isPair(ctrl)) {
+  if (ctrl instanceof NodeBase || ctrl instanceof Pair) {
     replaceNode(key, path, ctrl)
     return visit_(key, ctrl, visitor, path)
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (isCollection(node)) {
+    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
       path = Object.freeze(path.concat(node))
       for (let i = 0; i < node.items.length; ++i) {
         const ci = visit_(i, node.items[i], visitor, path)
@@ -142,7 +132,7 @@ function visit_(
           i -= 1
         }
       }
-    } else if (isPair(node)) {
+    } else if (node instanceof Pair) {
       path = Object.freeze(path.concat(node))
       const ck = visit_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
@@ -201,7 +191,7 @@ export const visitAsync: {
   REMOVE: symbol
 } = async function visitAsync(node, visitor) {
   const visitor_ = initVisitor(visitor)
-  if (isDocument(node)) {
+  if (node instanceof Document) {
     const cd = await visitAsync_(
       null,
       node.contents,
@@ -224,13 +214,13 @@ async function visitAsync_(
 ): Promise<number | symbol | void> {
   const ctrl = await callVisitor(key, node, visitor, path)
 
-  if (isNode(ctrl) || isPair(ctrl)) {
+  if (ctrl instanceof NodeBase || ctrl instanceof Pair) {
     replaceNode(key, path, ctrl)
     return visitAsync_(key, ctrl, visitor, path)
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (isCollection(node)) {
+    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
       path = Object.freeze(path.concat(node))
       for (let i = 0; i < node.items.length; ++i) {
         const ci = await visitAsync_(i, node.items[i], visitor, path)
@@ -241,7 +231,7 @@ async function visitAsync_(
           i -= 1
         }
       }
-    } else if (isPair(node)) {
+    } else if (node instanceof Pair) {
       path = Object.freeze(path.concat(node))
       const ck = await visitAsync_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
@@ -302,11 +292,11 @@ function callVisitor(
   path: readonly (Document | Node | Pair)[]
 ): ReturnType<visitorFn<unknown>> | ReturnType<asyncVisitorFn<unknown>> {
   if (typeof visitor === 'function') return visitor(key, node, path)
-  if (isMap(node)) return visitor.Map?.(key, node, path)
-  if (isSeq(node)) return visitor.Seq?.(key, node, path)
-  if (isPair(node)) return visitor.Pair?.(key, node, path)
-  if (isScalar(node)) return visitor.Scalar?.(key, node, path)
-  if (isAlias(node)) return visitor.Alias?.(key, node, path)
+  if (node instanceof YAMLMap) return visitor.Map?.(key, node, path)
+  if (node instanceof YAMLSeq) return visitor.Seq?.(key, node, path)
+  if (node instanceof Pair) return visitor.Pair?.(key, node, path)
+  if (node instanceof Scalar) return visitor.Scalar?.(key, node, path)
+  if (node instanceof Alias) return visitor.Alias?.(key, node, path)
   return undefined
 }
 
@@ -316,19 +306,19 @@ function replaceNode(
   node: Node | Pair
 ): number | symbol | void {
   const parent = path[path.length - 1]
-  if (isCollection(parent)) {
+  if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
     parent.items[key as number] = node
-  } else if (isPair(parent)) {
-    if (isNode(node)) {
+  } else if (parent instanceof Pair) {
+    if (node instanceof NodeBase) {
       if (key === 'key') parent.key = node
       else parent.value = node
     } else {
       throw new Error(`Cannot replace pair ${key} with non-node value`)
     }
-  } else if (isDocument(parent)) {
+  } else if (parent instanceof Document) {
     parent.contents = node as Node
   } else {
-    const pt = isAlias(parent) ? 'alias' : 'scalar'
+    const pt = parent instanceof Alias ? 'alias' : 'scalar'
     throw new Error(`Cannot replace node with ${pt} parent`)
   }
 }

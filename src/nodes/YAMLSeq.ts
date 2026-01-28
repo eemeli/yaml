@@ -1,13 +1,12 @@
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { CreateNodeOptions } from '../options.ts'
 import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
-import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
 import { Collection, type NodeOf, type Primitive } from './Collection.ts'
-import { isNode, isScalar, SEQ } from './identity.ts'
-import type { NodeBase } from './Node.ts'
+import { NodeBase } from './Node.ts'
 import type { Pair } from './Pair.ts'
+import { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
 import { toJS } from './toJS.ts'
 
@@ -24,15 +23,11 @@ export class YAMLSeq<
   items: NodeOf<T>[] = []
   declare srcToken?: BlockSequence | FlowCollection
 
-  constructor(schema?: Schema) {
-    super(SEQ, schema)
-  }
-
   add(
     value: T,
     options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
   ): void {
-    if (isNode(value)) this.items.push(value as NodeOf<T>)
+    if (value instanceof NodeBase) this.items.push(value as NodeOf<T>)
     else if (!this.schema) throw new Error('Schema is required')
     else {
       const nc = new NodeCreator(this.schema, {
@@ -98,8 +93,8 @@ export class YAMLSeq<
       throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
     const prev = this.items[idx]
-    if (isScalar(prev) && isScalarValue(value)) prev.value = value
-    else if (isNode(value)) this.items[idx] = value as NodeOf<T>
+    if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
+    else if (value instanceof NodeBase) this.items[idx] = value as NodeOf<T>
     else if (!this.schema) throw new Error('Schema is required')
     else {
       const nc = new NodeCreator(this.schema, {

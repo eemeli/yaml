@@ -62,7 +62,6 @@ import { parse, stringify } from 'yaml'
 ```js
 import {
   Document,
-  isDocument,
   parseAllDocuments,
   parseDocument
 } from 'yaml'
@@ -82,13 +81,14 @@ import {
 <!-- prettier-ignore -->
 ```js
 import {
-  isAlias, isCollection, isMap, isNode,
-  isPair, isScalar, isSeq, Scalar,
-  visit, visitAsync, YAMLMap, YAMLSeq
+  Scalar,
+  visit,
+  visitAsync,
+  YAMLMap,
+  YAMLSeq
 } from 'yaml'
 ```
 
-- [`is*(foo): boolean`](#identifying-node-types)
 - [`new Scalar(value)`](#scalar-values)
 - [`new YAMLMap()`](#collections)
 - [`new YAMLSeq()`](#collections)

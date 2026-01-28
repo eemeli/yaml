@@ -1,8 +1,7 @@
 import type { Directives } from '../doc/directives.ts'
 import { Alias } from '../nodes/Alias.ts'
-import { isScalar } from '../nodes/identity.ts'
 import type { ParsedNode } from '../nodes/Node.ts'
-import type { Scalar } from '../nodes/Scalar.ts'
+import { Scalar } from '../nodes/Scalar.ts'
 import type { ParseOptions } from '../options.ts'
 import type { FlowScalar, SourceToken, Token } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
@@ -90,7 +89,7 @@ export function composeNode(
   if (
     atKey &&
     ctx.options.stringKeys &&
-    (!isScalar(node) ||
+    (!(node instanceof Scalar) ||
       typeof node.value !== 'string' ||
       (node.tag && node.tag !== 'tag:yaml.org,2002:str'))
   ) {

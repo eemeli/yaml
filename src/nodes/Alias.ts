@@ -3,9 +3,9 @@ import type { Document } from '../doc/Document.ts'
 import type { FlowScalar } from '../parse/cst.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { visit } from '../visit.ts'
-import { ALIAS, hasAnchor, isAlias, isCollection, isPair } from './identity.ts'
 import type { Node } from './Node.ts'
 import { NodeBase } from './Node.ts'
+import { Pair } from './Pair.ts'
 import type { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
 import { toJS } from './toJS.ts'
@@ -19,7 +19,7 @@ export class Alias extends NodeBase {
   declare srcToken?: FlowScalar & { type: 'alias' }
 
   constructor(source: string) {
-    super(ALIAS)
+    super()
     this.source = source
     Object.defineProperty(this, 'tag', {
       set() {
@@ -43,7 +43,7 @@ export class Alias extends NodeBase {
       nodes = []
       visit(doc, {
         Node: (_key: unknown, node: Node) => {
-          if (isAlias(node) || hasAnchor(node)) nodes.push(node)
+          if (node instanceof Alias || node.anchor) nodes.push(node)
         }
       })
       if (ctx) ctx.aliasResolveCache = nodes
@@ -113,18 +113,19 @@ function getAliasCount(
   node: unknown,
   anchors: ToJSContext['anchors']
 ): number {
-  if (isAlias(node)) {
+  if (node instanceof Alias) {
     const source = node.resolve(doc)
     const anchor = anchors && source && anchors.get(source)
     return anchor ? anchor.count * anchor.aliasCount : 0
-  } else if (isCollection(node)) {
+  } else if (node instanceof NodeBase && 'items' in node) {
+    const coll = node as YAMLMap | YAMLSeq
     let count = 0
-    for (const item of node.items) {
+    for (const item of coll.items) {
       const c = getAliasCount(doc, item, anchors)
       if (c > count) count = c
     }
     return count
-  } else if (isPair(node)) {
+  } else if (node instanceof Pair) {
     const kc = getAliasCount(doc, node.key, anchors)
     const vc = getAliasCount(doc, node.value, anchors)
     return Math.max(kc, vc)

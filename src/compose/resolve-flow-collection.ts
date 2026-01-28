@@ -1,4 +1,3 @@
-import { isPair } from '../nodes/identity.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
@@ -95,7 +94,7 @@ export function resolveFlowCollection(
         }
         if (prevItemComment) {
           let prev = coll.items[coll.items.length - 1]
-          if (isPair(prev)) prev = prev.value ?? prev.key
+          if (prev instanceof Pair) prev = prev.value ?? prev.key
           if (prev.comment) prev.comment += '\n' + prevItemComment
           else prev.comment = prevItemComment
           props.comment = props.comment.substring(prevItemComment.length + 1)

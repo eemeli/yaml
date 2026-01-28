@@ -1,8 +1,8 @@
 import { NodeCreator } from '../../doc/NodeCreator.ts'
 import type { NodeOf, Primitive } from '../../nodes/Collection.ts'
-import { isMap, isNode, isPair, isScalar } from '../../nodes/identity.ts'
-import type { NodeBase } from '../../nodes/Node.ts'
+import { NodeBase } from '../../nodes/Node.ts'
 import { Pair } from '../../nodes/Pair.ts'
+import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
 import { findPair, YAMLMap } from '../../nodes/YAMLMap.ts'
 import type { CreateNodeOptions } from '../../options.ts'
@@ -31,7 +31,7 @@ export class YAMLSet<
     value: unknown,
     options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
   ): void {
-    if (!isPair(value)) {
+    if (!(value instanceof Pair)) {
       this.set(value, true, options)
     } else if (value.value !== null) {
       throw new TypeError('set pair values must be null')
@@ -64,7 +64,7 @@ export class YAMLSet<
       this.items.splice(this.items.indexOf(prev), 1)
     } else if (!prev && value) {
       let node: NodeBase
-      if (isNode(key)) {
+      if (key instanceof NodeBase) {
         node = key
       } else if (!this.schema) {
         throw new Error('Schema is required')
@@ -109,7 +109,7 @@ const hasAllNullValues = (map: YAMLMap): boolean =>
   map.items.every(
     ({ value }) =>
       value == null ||
-      (isScalar(value) &&
+      (value instanceof Scalar &&
         value.value == null &&
         !value.commentBefore &&
         !value.comment &&
@@ -123,7 +123,7 @@ export const set: CollectionTag = {
   default: false,
   tag: 'tag:yaml.org,2002:set',
   resolve(map, onError) {
-    if (!isMap(map)) {
+    if (!(map instanceof YAMLMap)) {
       onError('Expected a mapping for this tag')
       return map
     } else if (!hasAllNullValues(map)) {

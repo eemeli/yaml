@@ -1,5 +1,6 @@
 import type { Collection } from '../nodes/Collection.ts'
-import { isNode, isPair } from '../nodes/identity.ts'
+import { NodeBase } from '../nodes/Node.ts'
+import { Pair } from '../nodes/Pair.ts'
 import type { StringifyContext } from './stringify.ts'
 import { stringify } from './stringify.ts'
 import { indentComment, lineComment } from './stringifyComment.ts'
@@ -44,12 +45,12 @@ function stringifyBlockCollection(
   for (let i = 0; i < items.length; ++i) {
     const item = items[i]
     let comment: string | null = null
-    if (isNode(item)) {
+    if (item instanceof NodeBase) {
       if (!chompKeep && item.spaceBefore) lines.push('')
       addCommentBefore(ctx, lines, item.commentBefore, chompKeep)
       if (item.comment) comment = item.comment
-    } else if (isPair(item)) {
-      const ik = isNode(item.key) ? item.key : null
+    } else if (item instanceof Pair) {
+      const ik = item.key instanceof NodeBase ? item.key : null
       if (ik) {
         if (!chompKeep && ik.spaceBefore) lines.push('')
         addCommentBefore(ctx, lines, ik.commentBefore, chompKeep)
@@ -111,19 +112,19 @@ function stringifyFlowCollection(
   for (let i = 0; i < items.length; ++i) {
     const item = items[i]
     let comment: string | null = null
-    if (isNode(item)) {
+    if (item instanceof NodeBase) {
       if (item.spaceBefore) lines.push('')
       addCommentBefore(ctx, lines, item.commentBefore, false)
       if (item.comment) comment = item.comment
-    } else if (isPair(item)) {
-      const ik = isNode(item.key) ? item.key : null
+    } else if (item instanceof Pair) {
+      const ik = item.key instanceof NodeBase ? item.key : null
       if (ik) {
         if (ik.spaceBefore) lines.push('')
         addCommentBefore(ctx, lines, ik.commentBefore, false)
         if (ik.comment) reqNewline = true
       }
 
-      const iv = isNode(item.value) ? item.value : null
+      const iv = item.value instanceof NodeBase ? item.value : null
       if (iv) {
         if (iv.comment) comment = iv.comment
         if (iv.commentBefore) reqNewline = true

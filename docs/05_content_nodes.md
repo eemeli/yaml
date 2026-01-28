@@ -332,51 +332,6 @@ The same as `visit()`,
 but allows for visitor functions that return a promise
 which resolves to one of the above-defined control values.
 
-## Identifying Node Types
-
-```js
-import {
-  isAlias,
-  isCollection, // map or seq
-  isDocument,
-  isMap,
-  isNode, // alias, scalar, map or seq
-  isPair,
-  isScalar,
-  isSeq
-} from 'yaml'
-
-const doc = new Document({ foo: [13, 42] })
-isDocument(doc) === true
-isNode(doc) === false
-isMap(doc.contents) === true
-isNode(doc.contents) === true
-isPair(doc.contents.items[0]) === true
-isCollection(doc.get('foo')) === true
-isScalar(doc.getIn(['foo', 1])) === true
-```
-
-#### `isAlias(x: unknown): boolean`
-
-#### `isCollection(x: unknown): boolean`
-
-#### `isDocument(x: unknown): boolean`
-
-#### `isMap(x: unknown): boolean`
-
-#### `isNode(x: unknown): boolean`
-
-#### `isPair(x: unknown): boolean`
-
-#### `isScalar(x: unknown): boolean`
-
-#### `isSeq(x: unknown): boolean`
-
-To find out what you've got, a family of custom type guard functions is provided.
-These should be preferred over other methods such as `instanceof` checks, as they'll work even if the nodes have been created by a different instance of the library.
-
-Internally, node identification uses property symbols that are set on instances during their construction.
-
 ## Comments and Blank Lines
 
 ```js

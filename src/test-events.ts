@@ -1,15 +1,11 @@
 import type { Document } from './doc/Document.ts'
-import {
-  isAlias,
-  isCollection,
-  isMap,
-  isNode,
-  isPair,
-  isScalar,
-  isSeq
-} from './nodes/identity.ts'
-import type { Node, NodeBase } from './nodes/Node.ts'
-import type { Pair } from './nodes/Pair.ts'
+import { Alias } from './nodes/Alias.ts'
+import { Collection } from './nodes/Collection.ts'
+import { type Node, NodeBase } from './nodes/Node.ts'
+import { Pair } from './nodes/Pair.ts'
+import { Scalar } from './nodes/Scalar.ts'
+import { YAMLMap } from './nodes/YAMLMap.ts'
+import { YAMLSeq } from './nodes/YAMLSeq.ts'
 import { parseAllDocuments } from './public-api.ts'
 import { visit } from './visit.ts'
 
@@ -84,10 +80,13 @@ function addEvents(
     events.push('=VAL :')
     return
   }
-  if (errPos !== -1 && isNode(node) && node.range![0] >= errPos)
+  if (errPos !== -1 && node instanceof NodeBase && node.range![0] >= errPos)
     throw new Error()
   let props = ''
-  let anchor = isScalar(node) || isCollection(node) ? node.anchor : undefined
+  let anchor =
+    node instanceof Scalar || node instanceof Collection
+      ? node.anchor
+      : undefined
   if (anchor) {
     if (/\d$/.test(anchor)) {
       const alt = anchor.replace(/\d$/, '')
@@ -95,9 +94,9 @@ function addEvents(
     }
     props = ` &${anchor}`
   }
-  if (isNode(node) && node.tag) props += ` <${node.tag}>`
+  if (node instanceof NodeBase && node.tag) props += ` <${node.tag}>`
 
-  if (isMap(node)) {
+  if (node instanceof YAMLMap) {
     const ev = node.flow ? '+MAP {}' : '+MAP'
     events.push(`${ev}${props}`)
     node.items.forEach(({ key, value }) => {
@@ -105,26 +104,26 @@ function addEvents(
       addEvents(events, doc, errPos, value)
     })
     events.push('-MAP')
-  } else if (isSeq(node)) {
+  } else if (node instanceof YAMLSeq) {
     const ev = node.flow ? '+SEQ []' : '+SEQ'
     events.push(`${ev}${props}`)
     node.items.forEach(item => {
       addEvents(events, doc, errPos, item)
     })
     events.push('-SEQ')
-  } else if (isPair(node)) {
+  } else if (node instanceof Pair) {
     events.push(`+MAP${props}`)
     addEvents(events, doc, errPos, node.key)
     addEvents(events, doc, errPos, node.value)
     events.push('-MAP')
-  } else if (isAlias(node)) {
+  } else if (node instanceof Alias) {
     let alias = node.source
     if (alias && /\d$/.test(alias)) {
       const alt = alias.replace(/\d$/, '')
       if (anchorExists(doc, alt)) alias = alt
     }
     events.push(`=ALI${props} *${alias}`)
-  } else if (isScalar(node)) {
+  } else if (node instanceof Scalar) {
     const scalar = scalarChar[String(node.type)]
     if (!scalar) throw new Error(`Unexpected node type ${node.type}`)
     const value = node

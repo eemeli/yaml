@@ -1,18 +1,13 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
 import {
+  Collection,
   collectionFromPath,
   isEmptyPath,
   type Primitive
 } from '../nodes/Collection.ts'
-import { DOC, isCollection, isNode, NODE_TYPE } from '../nodes/identity.ts'
-import type {
-  Node,
-  NodeBase,
-  NodeType,
-  ParsedNode,
-  Range
-} from '../nodes/Node.ts'
+import type { Node, NodeType, ParsedNode, Range } from '../nodes/Node.ts'
+import { NodeBase } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
 import type { ToJSContext } from '../nodes/toJS.ts'
@@ -31,8 +26,8 @@ import { Schema } from '../schema/Schema.ts'
 import { stringifyDocument } from '../stringify/stringifyDocument.ts'
 import { anchorNames, findNewAnchor } from './anchors.ts'
 import { applyReviver } from './applyReviver.ts'
-import { NodeCreator } from './NodeCreator.ts'
 import { Directives } from './directives.ts'
+import { NodeCreator } from './NodeCreator.ts'
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)
 
@@ -52,9 +47,6 @@ export class Document<
   Contents extends Node = Node,
   Strict extends boolean = true
 > {
-  /** @internal */
-  declare readonly [NODE_TYPE]: symbol
-
   /** A comment before this Document */
   commentBefore: string | null = null
 
@@ -112,7 +104,6 @@ export class Document<
       | null,
     options?: DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions
   ) {
-    Object.defineProperty(this, NODE_TYPE, { value: DOC })
     let _replacer: Replacer | null = null
     if (typeof replacer === 'function' || Array.isArray(replacer)) {
       _replacer = replacer
@@ -153,9 +144,7 @@ export class Document<
    * Custom Node values that inherit from `Object` still refer to their original instances.
    */
   clone(): Document<Contents, Strict> {
-    const copy: Document<Contents, Strict> = Object.create(Document.prototype, {
-      [NODE_TYPE]: { value: DOC }
-    })
+    const copy: Document<Contents, Strict> = Object.create(Document.prototype)
     copy.commentBefore = this.commentBefore
     copy.comment = this.comment
     copy.errors = this.errors.slice()
@@ -164,9 +153,10 @@ export class Document<
     if (this.directives) copy.directives = this.directives.clone()
     copy.schema = this.schema.clone()
     // @ts-expect-error We can't really know that this matches Contents.
-    copy.contents = isNode(this.contents)
-      ? this.contents.clone(copy.schema)
-      : this.contents
+    copy.contents =
+      this.contents instanceof NodeBase
+        ? this.contents.clone(copy.schema)
+        : this.contents
     if (this.range) copy.range = this.range.slice() as Document['range']
     return copy
   }
@@ -283,7 +273,9 @@ export class Document<
    * Returns item at `key`, or `undefined` if not found.
    */
   get(key: any): Strict extends true ? NodeBase | Pair | undefined : any {
-    return isCollection(this.contents) ? this.contents.get(key) : undefined
+    return this.contents instanceof Collection
+      ? this.contents.get(key)
+      : undefined
   }
 
   /**
@@ -293,14 +285,16 @@ export class Document<
     path: Iterable<unknown> | null
   ): Strict extends true ? NodeBase | Pair | null | undefined : any {
     if (isEmptyPath(path)) return this.contents
-    return isCollection(this.contents) ? this.contents.getIn(path) : undefined
+    return this.contents instanceof Collection
+      ? this.contents.getIn(path)
+      : undefined
   }
 
   /**
    * Checks if the document includes a value with the key `key`.
    */
   has(key: any): boolean {
-    return isCollection(this.contents) ? this.contents.has(key) : false
+    return this.contents instanceof Collection ? this.contents.has(key) : false
   }
 
   /**
@@ -308,7 +302,9 @@ export class Document<
    */
   hasIn(path: Iterable<unknown> | null): boolean {
     if (isEmptyPath(path)) return this.contents !== undefined
-    return isCollection(this.contents) ? this.contents.hasIn(path) : false
+    return this.contents instanceof Collection
+      ? this.contents.hasIn(path)
+      : false
   }
 
   /**
@@ -441,6 +437,6 @@ export class Document<
 }
 
 function assertCollection(contents: unknown): contents is YAMLMap | YAMLSeq {
-  if (isCollection(contents)) return true
+  if (contents instanceof Collection) return true
   throw new Error('Expected a YAML collection as document contents')
 }

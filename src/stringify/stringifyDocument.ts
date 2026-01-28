@@ -1,6 +1,5 @@
 import type { Document } from '../doc/Document.ts'
-import { isNode } from '../nodes/identity.ts'
-import type { Node } from '../nodes/Node.ts'
+import { NodeBase, type Node } from '../nodes/Node.ts'
 import type { ToStringOptions } from '../options.ts'
 import {
   createStringifyContext,
@@ -36,7 +35,7 @@ export function stringifyDocument(
   let chompKeep = false
   let contentComment = null
   if (doc.contents) {
-    if (isNode(doc.contents)) {
+    if (doc.contents instanceof NodeBase) {
       if (doc.contents.spaceBefore && hasDirectives) lines.push('')
       if (doc.contents.commentBefore) {
         const cs = commentString(doc.contents.commentBefore)

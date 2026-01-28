@@ -2,12 +2,10 @@ import {
   Document,
   Pair,
   Scalar,
-  type YAMLMap,
+  YAMLMap,
   type YAMLOMap,
-  type YAMLSeq,
+  YAMLSeq,
   type YAMLSet,
-  isMap,
-  isSeq,
   parseDocument
 } from 'yaml'
 
@@ -50,26 +48,20 @@ describe('Map', () => {
   test('get with value', () => {
     expect(map.get('a')).toMatchObject({ value: 1 })
     const subMap = map.get('b')
-    if (isMap(subMap)) {
-      expect(subMap.toJSON()).toMatchObject({
-        c: 3,
-        d: 4
-      })
-      expect(map.get('c')).toBeUndefined()
-    } else {
-      throw new Error('Expected subMap to be a Map')
-    }
+    expect(subMap).toBeInstanceOf(YAMLMap)
+    expect(subMap!.toJSON()).toMatchObject({
+      c: 3,
+      d: 4
+    })
+    expect(map.get('c')).toBeUndefined()
   })
 
   test('get with node', () => {
     expect(map.get(doc.createNode('a'))).toMatchObject({ value: 1 })
     const subMap = map.get(doc.createNode('b'))
-    if (isMap(subMap)) {
-      expect(subMap.toJSON()).toMatchObject({ c: 3, d: 4 })
-      expect(map.get(doc.createNode('c'))).toBeUndefined()
-    } else {
-      throw new Error('Expected subMap to be a Map')
-    }
+    expect(subMap).toBeInstanceOf(YAMLMap)
+    expect(subMap!.toJSON()).toMatchObject({ c: 3, d: 4 })
+    expect(map.get(doc.createNode('c'))).toBeUndefined()
   })
 
   test('has with value', () => {
@@ -147,12 +139,9 @@ describe('Seq', () => {
   test('get with integer', () => {
     expect(seq.get(0)).toMatchObject({ value: 1 })
     const subSeq = seq.get(1)
-    if (isSeq(subSeq)) {
-      expect(subSeq.toJSON()).toMatchObject([2, 3])
-      expect(seq.get(2)).toBeUndefined()
-    } else {
-      throw new Error('not a seq')
-    }
+    expect(subSeq).toBeInstanceOf(YAMLSeq)
+    expect(subSeq!.toJSON()).toMatchObject([2, 3])
+    expect(seq.get(2)).toBeUndefined()
   })
 
   test('get with non-integer', () => {
@@ -279,12 +268,9 @@ describe('OMap', () => {
   test('get', () => {
     expect(omap.get('a')).toMatchObject({ value: 1 })
     const subMap = omap.get('b')
-    if (isMap(subMap)) {
-      expect(subMap.toJSON()).toMatchObject({ c: 3, d: 4 })
-      expect(omap.get('c')).toBeUndefined()
-    } else {
-      throw new Error('Expected subMap to be a map')
-    }
+    expect(subMap).toBeInstanceOf(YAMLMap)
+    expect(subMap.toJSON()).toMatchObject({ c: 3, d: 4 })
+    expect(omap.get('c')).toBeUndefined()
   })
 
   test('has', () => {
@@ -324,11 +310,8 @@ describe('Collection', () => {
     map.addIn(['b', 3], 6)
     expect(map.items).toHaveLength(3)
     const seq = map.getIn(['b'])
-    if (isSeq(seq)) {
-      expect(seq.items).toHaveLength(4)
-    } else {
-      throw new Error('Expected seq to be a seq')
-    }
+    expect(seq).toBeInstanceOf(YAMLSeq)
+    expect((seq as any).items).toHaveLength(4)
   })
 
   test('deleteIn', () => {
@@ -341,11 +324,8 @@ describe('Collection', () => {
     expect(() => map.deleteIn(['a', 'e'])).toThrow(/Expected YAML collection/)
     expect(map.items).toHaveLength(1)
     const subSeq = map.getIn(['b'])
-    if (isSeq(subSeq)) {
-      expect(subSeq.items).toHaveLength(1)
-    } else {
-      throw new Error('Expected subSeq to be a seq')
-    }
+    expect(subSeq).toBeInstanceOf(YAMLSeq)
+    expect((subSeq as any).items).toHaveLength(1)
   })
 
   test('getIn', () => {
@@ -380,11 +360,8 @@ describe('Collection', () => {
     expect(() => map.setIn(['a', 'e'], 8)).toThrow(/Expected YAML collection/)
     expect(map.items).toHaveLength(4)
     const subSeq = map.getIn(['b'])
-    if (isSeq(subSeq)) {
-      expect(subSeq.items).toHaveLength(3)
-    } else {
-      throw new Error('Expected subSeq to be a seq')
-    }
+    expect(subSeq).toBeInstanceOf(YAMLSeq)
+    expect((subSeq as any).items).toHaveLength(3)
   })
 })
 

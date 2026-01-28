@@ -1,6 +1,5 @@
 import type { Document } from '../doc/Document.ts'
-import { hasAnchor } from './identity.ts'
-import type { Node } from './Node.ts'
+import { NodeBase, type Node } from './Node.ts'
 
 export interface AnchorData {
   aliasCount: number
@@ -34,15 +33,18 @@ export function toJS(value: any, arg: string | null, ctx?: ToJSContext): any {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   if (Array.isArray(value)) return value.map((v, i) => toJS(v, String(i), ctx))
   if (value && typeof value.toJSON === 'function') {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    if (!ctx || !hasAnchor(value)) return value.toJSON(arg, ctx)
+    const node = value as Node
+    if (!ctx || !(node instanceof NodeBase) || !node.anchor) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      return value.toJSON(arg, ctx)
+    }
     const data: AnchorData = { aliasCount: 0, count: 1, res: undefined }
-    ctx.anchors.set(value, data)
+    ctx.anchors.set(node, data)
     ctx.onCreate = res => {
       data.res = res
       delete ctx.onCreate
     }
-    const res = value.toJSON(arg, ctx)
+    const res = node.toJSON(arg, ctx)
     if (ctx.onCreate) ctx.onCreate(res)
     return res
   }

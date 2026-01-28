@@ -1,7 +1,7 @@
 import type { Primitive } from '../../nodes/Collection.ts'
-import { isPair, isScalar } from '../../nodes/identity.ts'
 import type { NodeBase } from '../../nodes/Node.ts'
-import type { Pair } from '../../nodes/Pair.ts'
+import { Pair } from '../../nodes/Pair.ts'
+import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
 import { toJS } from '../../nodes/toJS.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
@@ -38,7 +38,7 @@ export class YAMLOMap<
     if (ctx?.onCreate) ctx.onCreate(map)
     for (const pair of this.items) {
       let key, value
-      if (isPair(pair)) {
+      if (pair instanceof Pair) {
         key = toJS(pair.key, '', ctx)
         value = toJS(pair.value, key, ctx)
       } else {
@@ -70,7 +70,7 @@ export const omap: CollectionTag = {
     const pairs = resolvePairs(seq, onError)
     const seenKeys: unknown[] = []
     for (const { key } of pairs.items) {
-      if (isScalar(key)) {
+      if (key instanceof Scalar) {
         if (seenKeys.includes(key.value)) {
           onError(`Ordered maps must not include duplicate keys: ${key.value}`)
         } else {

@@ -1,5 +1,5 @@
-import { Scalar, type YAMLMap } from 'yaml'
-import { isAlias, isScalar, parseDocument, visit } from 'yaml'
+import { Alias, Scalar, type YAMLMap } from 'yaml'
+import { parseDocument, visit } from 'yaml'
 import { source } from './_utils.ts'
 
 describe('doc.clone()', () => {
@@ -21,11 +21,11 @@ describe('doc.clone()', () => {
     expect(copy.toJS()).toEqual({ foo: 'bar' })
 
     const node = copy.createNode(42)
-    expect(isScalar(node)).toBe(true)
+    expect(node).toBeInstanceOf(Scalar)
     expect(node).toMatchObject({ value: 42 })
 
     const alias = copy.createAlias(node as Scalar, 'foo')
-    expect(isAlias(alias)).toBe(true)
+    expect(alias).toBeInstanceOf(Alias)
     expect(alias).toMatchObject({ source: 'foo' })
   })
 

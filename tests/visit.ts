@@ -1,5 +1,11 @@
-import type { Scalar } from 'yaml'
-import { Document, isSeq, parseDocument, visit, visitAsync } from 'yaml'
+import {
+  Document,
+  parseDocument,
+  visit,
+  visitAsync,
+  YAMLSeq,
+  type Scalar
+} from 'yaml'
 
 const coll = { items: {} }
 
@@ -147,7 +153,9 @@ for (const [visit_, title] of [
 
     test('Do not visit block seq items', async () => {
       const doc = parseDocument('foo:\n  - one\n  - two\nbar:\n')
-      const fn = vi.fn((_, node) => (isSeq(node) ? visit_.SKIP : undefined))
+      const fn = vi.fn((_, node) =>
+        node instanceof YAMLSeq ? visit_.SKIP : undefined
+      )
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
         [null, coll, [{}]],

@@ -5,7 +5,6 @@ import type { Token } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import type { Alias } from './Alias.ts'
-import { isDocument, NODE_TYPE } from './identity.ts'
 import type { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
 import { toJS } from './toJS.ts'
@@ -39,9 +38,6 @@ export type ParsedNode = Alias | Scalar | YAMLMap | YAMLSeq
 export type Range = [number, number, number]
 
 export abstract class NodeBase {
-  /** @internal */
-  declare readonly [NODE_TYPE]: symbol
-
   /** A comment on or immediately after this */
   declare comment?: string | null
 
@@ -84,10 +80,6 @@ export abstract class NodeBase {
     onChompKeep?: () => void
   ): string
 
-  constructor(type: symbol) {
-    Object.defineProperty(this, NODE_TYPE, { value: type })
-  }
-
   /** Create a copy of this node.  */
   clone(_schema?: Schema): NodeBase {
     const copy: NodeBase = Object.create(
@@ -103,7 +95,7 @@ export abstract class NodeBase {
     doc: Document<Node, boolean>,
     { mapAsMap, maxAliasCount, onAnchor, reviver }: ToJSOptions = {}
   ): any {
-    if (!isDocument(doc)) throw new TypeError('A document argument is required')
+    if (!doc?.schema) throw new TypeError('A document argument is required')
     const ctx: ToJSContext = {
       anchors: new Map(),
       doc,

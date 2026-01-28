@@ -1,9 +1,8 @@
 import type { NodeCreator } from '../../doc/NodeCreator.ts'
-import { isMap, isPair, isSeq } from '../../nodes/identity.ts'
 import type { NodeBase } from '../../nodes/Node.ts'
 import { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
-import type { YAMLMap } from '../../nodes/YAMLMap.ts'
+import { YAMLMap } from '../../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
 import type { CollectionTag } from '../types.ts'
 
@@ -11,11 +10,11 @@ export function resolvePairs(
   seq: YAMLSeq | YAMLMap,
   onError: (message: string) => void
 ): YAMLSeq<Pair> {
-  if (isSeq(seq)) {
+  if (seq instanceof YAMLSeq) {
     for (let i = 0; i < seq.items.length; ++i) {
       const item = seq.items[i]
-      if (isPair(item)) continue
-      else if (isMap(item)) {
+      if (item instanceof Pair) continue
+      else if (item instanceof YAMLMap) {
         if (item.items.length > 1)
           onError('Each pair must have its own sequence indicator')
         const pair = item.items[0] || new Pair(new Scalar(null))

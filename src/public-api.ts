@@ -4,7 +4,6 @@ import type { Replacer } from './doc/Document.ts'
 import { Document } from './doc/Document.ts'
 import { prettifyError, YAMLParseError } from './errors.ts'
 import { warn } from './log.ts'
-import { isDocument } from './nodes/identity.ts'
 import type { Node, ParsedNode } from './nodes/Node.ts'
 import type {
   CreateNodeOptions,
@@ -226,6 +225,6 @@ export function stringify(
     const { keepUndefined } = options ?? (replacer as CreateNodeOptions) ?? {}
     if (!keepUndefined) return undefined
   }
-  if (isDocument(value) && !_replacer) return value.toString(options)
+  if (value instanceof Document && !_replacer) return value.toString(options)
   return new Document(value, _replacer, options).toString(options)
 }

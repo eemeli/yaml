@@ -101,7 +101,6 @@ parse(file)
   - [`#directives`](https://eemeli.org/yaml/#stream-directives)
   - [`#errors`](https://eemeli.org/yaml/#errors)
   - [`#warnings`](https://eemeli.org/yaml/#errors)
-- [`isDocument(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
 - [`parseAllDocuments(str, options?): Document[]`](https://eemeli.org/yaml/#parsing-documents)
 - [`parseDocument(str, options?): Document`](https://eemeli.org/yaml/#parsing-documents)
 
@@ -109,7 +108,6 @@ parse(file)
 ```js
 import {
   Document,
-  isDocument,
   parseAllDocuments,
   parseDocument
 } from 'yaml'
@@ -117,13 +115,6 @@ import {
 
 ### Content Nodes
 
-- [`isAlias(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
-- [`isCollection(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
-- [`isMap(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
-- [`isNode(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
-- [`isPair(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
-- [`isScalar(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
-- [`isSeq(foo): boolean`](https://eemeli.org/yaml/#identifying-node-types)
 - [`new Scalar(value)`](https://eemeli.org/yaml/#scalar-values)
 - [`new YAMLMap()`](https://eemeli.org/yaml/#collections)
 - [`new YAMLSeq()`](https://eemeli.org/yaml/#collections)
@@ -136,9 +127,11 @@ import {
 <!-- prettier-ignore -->
 ```js
 import {
-  isAlias, isCollection, isMap, isNode,
-  isPair, isScalar, isSeq, Scalar,
-  visit, visitAsync, YAMLMap, YAMLSeq
+  Scalar,
+  visit,
+  visitAsync,
+  YAMLMap,
+  YAMLSeq
 } from 'yaml'
 ```
 

@@ -4,7 +4,6 @@ import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyPair } from '../stringify/stringifyPair.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
 import type { NodeOf, Primitive } from './Collection.ts'
-import { NODE_TYPE, PAIR } from './identity.ts'
 import type { NodeBase } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
 
@@ -12,9 +11,6 @@ export class Pair<
   K extends Primitive | NodeBase = Primitive | NodeBase,
   V extends Primitive | NodeBase = Primitive | NodeBase
 > {
-  /** @internal */
-  declare readonly [NODE_TYPE]: symbol
-
   key: NodeOf<K>
   value: NodeOf<V> | null
 
@@ -22,7 +18,6 @@ export class Pair<
   declare srcToken?: CollectionItem
 
   constructor(key: NodeOf<K>, value: NodeOf<V> | null = null) {
-    Object.defineProperty(this, NODE_TYPE, { value: PAIR })
     this.key = key
     this.value = value
   }

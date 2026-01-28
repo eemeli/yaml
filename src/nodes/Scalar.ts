@@ -1,5 +1,4 @@
 import type { BlockScalar, FlowScalar } from '../parse/cst.ts'
-import { SCALAR } from './identity.ts'
 import { NodeBase } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
 import { toJS } from './toJS.ts'
@@ -45,7 +44,7 @@ export class Scalar<T = unknown> extends NodeBase {
   declare type?: Scalar.Type
 
   constructor(value: T) {
-    super(SCALAR)
+    super()
     this.value = value
   }
 

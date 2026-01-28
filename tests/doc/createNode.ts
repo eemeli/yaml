@@ -142,6 +142,15 @@ describe('objects', () => {
     ])
   })
 
+  test('createNode(pair)', () => {
+    const pair = new Document().createPair('x', true)
+    const s = new Document().createNode(pair)
+    expect(s).toBeInstanceOf(YAMLMap)
+    expect(s.items).toMatchObject([
+      { key: { value: 'x' }, value: { value: true } }
+    ])
+  })
+
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {
     const object = { x: 3, y: [4], z: { w: 'five', v: 6 } }
     test('createNode(value)', () => {

@@ -1,6 +1,8 @@
-import { isCollection, isNode, isScalar, isSeq } from '../nodes/identity.ts'
+import { Collection } from '../nodes/Collection.ts'
+import { NodeBase } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
+import { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type { StringifyContext } from './stringify.ts'
 import { stringify } from './stringify.ts'
 import { indentComment, lineComment } from './stringifyComment.ts'
@@ -18,12 +20,15 @@ export function stringifyPair(
     noValues,
     options: { commentString, indentSeq, simpleKeys }
   } = ctx
-  let keyComment = (isNode(key) && key.comment) || null
+  let keyComment = (key instanceof NodeBase && key.comment) || null
   if (simpleKeys) {
     if (keyComment) {
       throw new Error('With simple keys, key nodes cannot have comments')
     }
-    if (isCollection(key) || (!isNode(key) && typeof key === 'object')) {
+    if (
+      key instanceof Collection ||
+      (!(key instanceof NodeBase) && typeof key === 'object')
+    ) {
       const msg = 'With simple keys, collection cannot be used as a key value'
       throw new Error(msg)
     }
@@ -31,7 +36,7 @@ export function stringifyPair(
   let explicitKey =
     !simpleKeys &&
     (!key ||
-      !isScalar(key) ||
+      !(key instanceof Scalar) ||
       key.type === Scalar.BLOCK_FOLDED ||
       key.type === Scalar.BLOCK_LITERAL)
 
@@ -89,7 +94,7 @@ export function stringifyPair(
   }
 
   let vsb, vcb, valueComment
-  if (isNode(value)) {
+  if (value instanceof NodeBase) {
     vsb = !!value.spaceBefore
     vcb = value.commentBefore
     valueComment = value.comment
@@ -100,7 +105,7 @@ export function stringifyPair(
     if (value && typeof value === 'object') value = doc.createNode(value)
   }
   ctx.implicitKey = false
-  if (!explicitKey && !keyComment && isScalar(value))
+  if (!explicitKey && !keyComment && value instanceof Scalar)
     ctx.indentAtStart = str.length + 1
   chompKeep = false
   if (
@@ -108,7 +113,7 @@ export function stringifyPair(
     indentStep.length >= 2 &&
     !ctx.inFlow &&
     !explicitKey &&
-    isSeq(value) &&
+    value instanceof YAMLSeq &&
     !value.flow &&
     !value.tag &&
     !value.anchor
@@ -136,7 +141,7 @@ export function stringifyPair(
     } else {
       ws += `\n${ctx.indent}`
     }
-  } else if (!explicitKey && isCollection(value)) {
+  } else if (!explicitKey && value instanceof Collection) {
     const vs0 = valueStr[0]
     const nl0 = valueStr.indexOf('\n')
     const hasNewline = nl0 !== -1

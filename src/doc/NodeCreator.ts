@@ -1,14 +1,6 @@
 import { Alias } from '../nodes/Alias.ts'
-import {
-  isCollection,
-  isDocument,
-  isNode,
-  isPair,
-  isScalar,
-  MAP,
-  SEQ
-} from '../nodes/identity.ts'
-import type { Node, NodeBase } from '../nodes/Node.ts'
+import { Collection } from '../nodes/Collection.ts'
+import { type Node, NodeBase } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
@@ -16,7 +8,7 @@ import type { CreateNodeOptions } from '../options.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { CollectionTag, ScalarTag } from '../schema/types.ts'
 import { anchorNames, findNewAnchor } from './anchors.ts'
-import type { Document, Replacer } from './Document.ts'
+import { Document, type Replacer } from './Document.ts'
 
 const defaultTagPrefix = 'tag:yaml.org,2002:'
 
@@ -58,7 +50,7 @@ export class NodeCreator {
     this.#aliasDuplicateObjects = options.aliasDuplicateObjects ?? true
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     this.#anchorPrefix = options.anchorPrefix || 'a'
-    if (isDocument(docOrSchema)) {
+    if (docOrSchema instanceof Document) {
       this.#doc = docOrSchema
       this.schema = docOrSchema.schema
     } else {
@@ -67,10 +59,13 @@ export class NodeCreator {
   }
 
   create(value: unknown, tagName?: string): Node {
-    if (isDocument(value)) value = value.contents
-    if (isNode(value)) return value
-    if (isPair(value)) {
-      const map = this.schema[MAP].createNode?.(this, null) as YAMLMap
+    if (value instanceof Document) value = value.contents
+    if (value instanceof NodeBase) return value as Node
+    if (value instanceof Pair) {
+      const map = (this.schema.map.nodeClass! as typeof YAMLMap).from(
+        this,
+        null
+      )
       map.items.push(value)
       return map
     }
@@ -126,10 +121,10 @@ export class NodeCreator {
       }
       tagObj =
         value instanceof Map
-          ? this.schema[MAP]
+          ? this.schema.map
           : Symbol.iterator in Object(value)
-            ? this.schema[SEQ]
-            : this.schema[MAP]
+            ? this.schema.seq
+            : this.schema.map
     }
     if (this.#onTagObj) {
       this.#onTagObj(tagObj)
@@ -144,7 +139,7 @@ export class NodeCreator {
     else if (!tagObj.default) node.tag = tagObj.tag
 
     if (ref) ref.node = node
-    if (this.#flow && isCollection(node)) node.flow = true
+    if (this.#flow && node instanceof Collection) node.flow = true
     return node
   }
 
@@ -165,7 +160,7 @@ export class NodeCreator {
       if (
         typeof ref === 'object' &&
         ref.anchor &&
-        (isScalar(ref.node) || isCollection(ref.node))
+        (ref.node instanceof Scalar || ref.node instanceof Collection)
       ) {
         ref.node.anchor = ref.anchor
       } else {

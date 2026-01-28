@@ -1,6 +1,5 @@
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { Schema } from '../schema/Schema.ts'
-import { isCollection, NODE_TYPE } from './identity.ts'
 import { type Node, NodeBase } from './Node.ts'
 import type { Pair } from './Pair.ts'
 import type { Scalar } from './Scalar.ts'
@@ -36,10 +35,7 @@ export const isEmptyPath = (
   (typeof path === 'object' && !!path[Symbol.iterator]().next().done)
 
 export abstract class Collection extends NodeBase {
-  schema: Schema | undefined;
-
-  /** @internal */
-  declare [NODE_TYPE]: symbol
+  schema: Schema | undefined
 
   declare items: (NodeBase | Pair)[]
 
@@ -52,8 +48,8 @@ export abstract class Collection extends NodeBase {
    */
   declare flow?: boolean
 
-  constructor(type: symbol, schema?: Schema) {
-    super(type)
+  constructor(schema?: Schema) {
+    super()
     Object.defineProperty(this, 'schema', {
       value: schema,
       configurable: true,
@@ -112,7 +108,7 @@ export abstract class Collection extends NodeBase {
     else {
       const [key, ...rest] = path
       const node = this.get(key)
-      if (isCollection(node)) node.addIn(rest, value)
+      if (node instanceof Collection) node.addIn(rest, value)
       else if (node === undefined && this.schema)
         this.set(key, collectionFromPath(this.schema, rest, value))
       else
@@ -131,7 +127,7 @@ export abstract class Collection extends NodeBase {
     const [key, ...rest] = path
     if (rest.length === 0) return this.delete(key)
     const node = this.get(key)
-    if (isCollection(node)) return node.deleteIn(rest)
+    if (node instanceof Collection) return node.deleteIn(rest)
     else
       throw new Error(
         `Expected YAML collection at ${key}. Remaining path: ${rest}`
@@ -145,7 +141,7 @@ export abstract class Collection extends NodeBase {
     const [key, ...rest] = path
     const node = this.get(key)
     if (rest.length === 0) return node
-    else return isCollection(node) ? node.getIn(rest) : undefined
+    else return node instanceof Collection ? node.getIn(rest) : undefined
   }
 
   /**
@@ -155,7 +151,7 @@ export abstract class Collection extends NodeBase {
     const [key, ...rest] = path
     if (rest.length === 0) return this.has(key)
     const node = this.get(key)
-    return isCollection(node) ? node.hasIn(rest) : false
+    return node instanceof Collection ? node.hasIn(rest) : false
   }
 
   /**
@@ -167,7 +163,7 @@ export abstract class Collection extends NodeBase {
       this.set(key, value)
     } else {
       const node = this.get(key)
-      if (isCollection(node)) node.setIn(rest, value)
+      if (node instanceof Collection) node.setIn(rest, value)
       else if (node === undefined && this.schema)
         this.set(key, collectionFromPath(this.schema, rest, value))
       else

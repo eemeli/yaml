@@ -2,8 +2,9 @@ import { Directives } from '../doc/directives.ts'
 import { Document } from '../doc/Document.ts'
 import type { ErrorCode } from '../errors.ts'
 import { YAMLParseError, YAMLWarning } from '../errors.ts'
-import { isCollection, isPair } from '../nodes/identity.ts'
+import { Collection } from '../nodes/Collection.ts'
 import type { ParsedNode, Range } from '../nodes/Node.ts'
+import { Pair } from '../nodes/Pair.ts'
 import type {
   DocumentOptions,
   ParseOptions,
@@ -110,9 +111,9 @@ export class Composer<
         doc.comment = doc.comment ? `${doc.comment}\n${comment}` : comment
       } else if (afterEmptyLine || doc.directives.docStart || !dc) {
         doc.commentBefore = comment
-      } else if (isCollection(dc) && !dc.flow && dc.items.length > 0) {
+      } else if (dc instanceof Collection && !dc.flow && dc.items.length > 0) {
         let it = dc.items[0]
-        if (isPair(it)) it = it.key
+        if (it instanceof Pair) it = it.key
         const cb = it.commentBefore
         it.commentBefore = cb ? `${comment}\n${cb}` : comment
       } else {

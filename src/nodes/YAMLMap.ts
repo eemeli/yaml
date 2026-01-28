@@ -1,29 +1,28 @@
 import type { CreateNodeOptions } from '../options.ts'
 import type { BlockMap, FlowCollection } from '../parse/cst.ts'
-import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
 import { Collection, type NodeOf, type Primitive } from './Collection.ts'
-import { isNode, isPair, isScalar, MAP } from './identity.ts'
-import type { NodeBase } from './Node.ts'
+import { NodeBase } from './Node.ts'
 import { Pair } from './Pair.ts'
 import type { ToJSContext } from './toJS.ts'
+import { Scalar } from './Scalar.ts'
 
 export type MapLike =
-  | Map<unknown, unknown>
-  | Set<unknown>
-  | Record<string | number | symbol, unknown>
+  | Map<any, any>
+  | Set<any>
+  | Record<string | number | symbol, any>
 
 export function findPair<
   K extends Primitive | NodeBase = Primitive | NodeBase,
   V extends Primitive | NodeBase = Primitive | NodeBase
 >(items: Iterable<Pair<K, V>>, key: unknown): Pair<K, V> | undefined {
-  const k = isScalar(key) ? key.value : key
+  const k = key instanceof Scalar ? key.value : key
   for (const it of items) {
     if (it.key === key || it.key === k) return it
-    if (isScalar(it.key) && it.key.value === k) return it
+    if (it.key instanceof Scalar && it.key.value === k) return it
   }
   return undefined
 }
@@ -38,10 +37,6 @@ export class YAMLMap<
 
   items: Pair<K, V>[] = []
   declare srcToken?: BlockMap | FlowCollection
-
-  constructor(schema?: Schema) {
-    super(MAP, schema)
-  }
 
   /**
    * A generic collection parsing method that can be extended
@@ -73,13 +68,13 @@ export class YAMLMap<
    * Using a key that is already in the collection overwrites the previous value.
    */
   add(pair: Pair<K, V>): void {
-    if (!isPair(pair)) throw new TypeError('Expected a Pair')
+    if (!(pair instanceof Pair)) throw new TypeError('Expected a Pair')
 
     const prev = findPair(this.items, pair.key)
     const sortEntries = this.schema?.sortMapEntries
     if (prev) {
       // For scalars, keep the old node & its comments and anchors
-      if (isScalar(prev.value) && isScalar(pair.value))
+      if (prev.value instanceof Scalar && pair.value instanceof Scalar)
         prev.value.value = pair.value.value
       else prev.value = pair.value
     } else if (sortEntries) {
@@ -113,7 +108,10 @@ export class YAMLMap<
     options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
   ): void {
     let pair: Pair
-    if (isNode(key) && (isNode(value) || value === null)) {
+    if (
+      key instanceof NodeBase &&
+      (value instanceof NodeBase || value === null)
+    ) {
       pair = new Pair(key, value)
     } else if (!this.schema) {
       throw new Error('Schema is required')
@@ -133,11 +131,17 @@ export class YAMLMap<
    * @param {Class} Type - If set, forces the returned collection type
    * @returns Instance of Type, Map, or Object
    */
-  toJSON<T extends MapLike = Map<unknown, unknown>>(
+  toJSON<T extends MapLike = Map<any, any>>(
+    _: unknown,
+    ctx: ToJSContext | undefined,
+    Type: { new (): T }
+  ): T
+  toJSON(_?: unknown, ctx?: ToJSContext): any
+  toJSON<T extends MapLike>(
     _?: unknown,
     ctx?: ToJSContext,
     Type?: { new (): T }
-  ): any {
+  ) {
     const map = Type ? new Type() : ctx?.mapAsMap ? new Map() : {}
     if (ctx?.onCreate) ctx.onCreate(map)
     for (const item of this.items) addPairToJSMap(ctx, map, item)
@@ -151,7 +155,7 @@ export class YAMLMap<
   ): string {
     if (!ctx) return JSON.stringify(this)
     for (const item of this.items) {
-      if (!isPair(item))
+      if (!(item instanceof Pair))
         throw new Error(
           `Map items must all be pairs; found ${JSON.stringify(item)} instead`
         )
