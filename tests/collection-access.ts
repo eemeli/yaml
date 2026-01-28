@@ -369,7 +369,7 @@ describe('Document', () => {
   let doc: Document<YAMLMap<string, Scalar<number> | YAMLSeq<Scalar<number>>>>
   beforeEach(() => {
     doc = new Document({ a: 1, b: [2, 3] })
-    expect(doc.contents?.items).toMatchObject([
+    expect(doc.contents.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
         key: { value: 'b' },
@@ -381,7 +381,7 @@ describe('Document', () => {
   test('add', () => {
     doc.add(doc.createPair('c', 'x'))
     expect(doc.get('c')).toMatchObject({ value: 'x' })
-    expect(doc.contents?.items).toHaveLength(3)
+    expect(doc.contents.items).toHaveLength(3)
   })
 
   test('addIn', () => {
@@ -391,7 +391,7 @@ describe('Document', () => {
     expect(doc.get('c')).toMatchObject({ value: 5 })
     expect(() => doc.addIn(['a'], -1)).toThrow(/Expected YAML collection/)
     doc.addIn(['b', 3], 6)
-    expect(doc.contents?.items).toHaveLength(3)
+    expect(doc.contents.items).toHaveLength(3)
     expect((doc.get('b') as any).items).toHaveLength(4)
   })
 
@@ -399,7 +399,7 @@ describe('Document', () => {
     expect(doc.delete('a')).toBe(true)
     expect(doc.delete('a')).toBe(false)
     expect(doc.get('a')).toBeUndefined()
-    expect(doc.contents?.items).toHaveLength(1)
+    expect(doc.contents.items).toHaveLength(1)
   })
 
   test('delete on scalar contents', () => {
@@ -415,10 +415,9 @@ describe('Document', () => {
     expect(doc.deleteIn([1])).toBe(false)
     expect(doc.deleteIn(['b', 2])).toBe(false)
     expect(() => doc.deleteIn(['a', 'e'])).toThrow(/Expected/)
-    expect(doc.contents?.items).toHaveLength(1)
+    expect(doc.contents.items).toHaveLength(1)
     expect((doc.get('b') as any).items).toHaveLength(1)
-    expect(doc.deleteIn(null)).toBe(true)
-    expect(doc.deleteIn(null)).toBe(false)
+    expect(() => doc.deleteIn(null as any)).toThrow()
   })
 
   test('get', () => {
@@ -442,7 +441,7 @@ describe('Document', () => {
   test('getIn scalar', () => {
     const doc = new Document('s')
     expect(doc.getIn([])).toMatchObject({ value: 's' })
-    expect(doc.getIn(null)).toMatchObject({ value: 's' })
+    expect(() => doc.getIn(null as any)).toThrow()
     expect(doc.getIn([0])).toBeUndefined()
   })
 
@@ -469,18 +468,12 @@ describe('Document', () => {
     expect(doc.get('a')).toMatchObject({ value: 2 })
     doc.set('c', 6)
     expect(doc.get('c')).toMatchObject({ value: 6 })
-    expect(doc.contents?.items).toHaveLength(3)
+    expect(doc.contents.items).toHaveLength(3)
   })
 
   test('set on scalar contents', () => {
     const doc = new Document('s')
     expect(() => doc.set('a', 1)).toThrow(/document contents/)
-  })
-
-  test('set on empty document', () => {
-    doc.contents = null
-    doc.set('a', 1)
-    expect(doc.get('a')).toMatchObject({ value: 1 })
   })
 
   test('setIn', () => {
@@ -493,7 +486,7 @@ describe('Document', () => {
     doc.setIn(['e', 1, 'e'], 7)
     expect(doc.getIn(['e', 1, 'e'])).toMatchObject({ value: 7 })
     expect(() => doc.setIn(['a', 'e'], 8)).toThrow(/Expected YAML collection/)
-    expect(doc.contents?.items).toHaveLength(4)
+    expect(doc.contents.items).toHaveLength(4)
     expect((doc.get('b') as any).items).toHaveLength(2)
     expect(String(doc)).toBe(
       'a: 2\nb:\n  - 2\n  - 5\nc: 6\ne:\n  - null\n  - e: 7\n'
@@ -503,14 +496,6 @@ describe('Document', () => {
   test('setIn on scalar contents', () => {
     const doc = new Document('s')
     expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
-  })
-
-  test('setIn on empty document', () => {
-    doc.contents = null
-    doc.setIn(['a', 2], 1)
-    expect(doc.get('a')).toMatchObject({
-      items: [{ value: null }, { value: null }, { value: 1 }]
-    })
   })
 
   test('setIn on parsed document', () => {
@@ -525,11 +510,10 @@ describe('Document', () => {
   })
 
   test('setIn with object key', () => {
-    doc.contents = null
+    doc.contents = doc.createNode({})
     const foo = { foo: 'FOO' }
     doc.setIn([foo], 'BAR')
-    // @ts-expect-error - Doesn't see that setIn() changes contents
-    expect(doc.contents?.items).toMatchObject([
+    expect(doc.contents.items).toMatchObject([
       {
         key: { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] },
         value: { value: 'BAR' }
@@ -538,11 +522,10 @@ describe('Document', () => {
   })
 
   test('setIn with repeated object key', () => {
-    doc.contents = null
+    doc.contents = doc.createNode({})
     const foo = { foo: 'FOO' }
     doc.setIn([foo, foo], 'BAR')
-    // @ts-expect-error - Doesn't see that setIn() changes contents
-    expect(doc.contents?.items).toMatchObject([
+    expect(doc.contents.items).toMatchObject([
       {
         key: { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] },
         value: {

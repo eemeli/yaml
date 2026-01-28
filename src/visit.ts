@@ -99,7 +99,7 @@ export const visit: {
   const visitor_ = initVisitor(visitor)
   if (node instanceof Document) {
     const cd = visit_(null, node.contents, visitor_, Object.freeze([node]))
-    if (cd === REMOVE) node.contents = null
+    if (cd === REMOVE) node.contents = new Scalar(null)
   } else visit_(null, node, visitor_, Object.freeze([]))
 }
 
@@ -198,7 +198,7 @@ export const visitAsync: {
       visitor_,
       Object.freeze([node])
     )
-    if (cd === REMOVE) node.contents = null
+    if (cd === REMOVE) node.contents = new Scalar(null)
   } else await visitAsync_(null, node, visitor_, Object.freeze([]))
 }
 

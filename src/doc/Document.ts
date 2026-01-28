@@ -1,15 +1,10 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
-import {
-  Collection,
-  collectionFromPath,
-  isEmptyPath,
-  type Primitive
-} from '../nodes/Collection.ts'
+import { Collection, type Primitive } from '../nodes/Collection.ts'
 import type { Node, NodeType, ParsedNode, Range } from '../nodes/Node.ts'
-import { NodeBase } from '../nodes/Node.ts'
+import type { NodeBase } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
-import type { Scalar } from '../nodes/Scalar.ts'
+import { Scalar } from '../nodes/Scalar.ts'
 import type { ToJSContext } from '../nodes/toJS.ts'
 import { toJS } from '../nodes/toJS.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
@@ -54,7 +49,7 @@ export class Document<
   comment: string | null = null
 
   /** The document contents. */
-  contents: Strict extends true ? Contents | null : Contents
+  contents: Contents
 
   directives: Strict extends true ? Directives | undefined : Directives
 
@@ -133,9 +128,7 @@ export class Document<
     } else this.directives = new Directives({ version })
     this.setSchema(version, options)
 
-    // @ts-expect-error We can't really know that this matches Contents.
-    this.contents =
-      value === undefined ? null : this.createNode(value, _replacer, options)
+    this.contents = this.createNode(value, _replacer, options) as Contents
   }
 
   /**
@@ -152,11 +145,7 @@ export class Document<
     copy.options = Object.assign({}, this.options)
     if (this.directives) copy.directives = this.directives.clone()
     copy.schema = this.schema.clone()
-    // @ts-expect-error We can't really know that this matches Contents.
-    copy.contents =
-      this.contents instanceof NodeBase
-        ? this.contents.clone(copy.schema)
-        : this.contents
+    copy.contents = this.contents.clone(copy.schema) as Contents
     if (this.range) copy.range = this.range.slice() as Document['range']
     return copy
   }
@@ -167,7 +156,7 @@ export class Document<
   }
 
   /** Adds a value to the document. */
-  addIn(path: Iterable<unknown>, value: unknown): void {
+  addIn(path: unknown[], value: unknown): void {
     if (assertCollection(this.contents)) this.contents.addIn(path, value)
   }
 
@@ -257,11 +246,9 @@ export class Document<
    * Removes a value from the document.
    * @returns `true` if the item was found and removed.
    */
-  deleteIn(path: Iterable<unknown> | null): boolean {
-    if (isEmptyPath(path)) {
-      if (this.contents == null) return false
-      // @ts-expect-error Presumed impossible if Strict extends false
-      this.contents = null
+  deleteIn(path: unknown[]): boolean {
+    if (!path.length) {
+      this.contents = new Scalar(null) as Contents
       return true
     }
     return assertCollection(this.contents)
@@ -282,9 +269,9 @@ export class Document<
    * Returns item at `path`, or `undefined` if not found.
    */
   getIn(
-    path: Iterable<unknown> | null
+    path: unknown[]
   ): Strict extends true ? NodeBase | Pair | null | undefined : any {
-    if (isEmptyPath(path)) return this.contents
+    if (!path.length) return this.contents
     return this.contents instanceof Collection
       ? this.contents.getIn(path)
       : undefined
@@ -300,8 +287,8 @@ export class Document<
   /**
    * Checks if the document includes a value at `path`.
    */
-  hasIn(path: Iterable<unknown> | null): boolean {
-    if (isEmptyPath(path)) return this.contents !== undefined
+  hasIn(path: unknown[]): boolean {
+    if (!path.length) return true
     return this.contents instanceof Collection
       ? this.contents.hasIn(path)
       : false
@@ -312,25 +299,16 @@ export class Document<
    * boolean to add/remove the item from the set.
    */
   set(key: any, value: any): void {
-    if (this.contents == null) {
-      // @ts-expect-error We can't really know that this matches Contents.
-      this.contents = collectionFromPath(this.schema, [key], value)
-    } else if (assertCollection(this.contents)) {
-      this.contents.set(key, value)
-    }
+    if (assertCollection(this.contents)) this.contents.set(key, value)
   }
 
   /**
    * Sets a value in this document. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    */
-  setIn(path: Iterable<unknown> | null, value: unknown): void {
-    if (isEmptyPath(path)) {
-      // @ts-expect-error We can't really know that this matches Contents.
-      this.contents = value
-    } else if (this.contents == null) {
-      // @ts-expect-error We can't really know that this matches Contents.
-      this.contents = collectionFromPath(this.schema, Array.from(path), value)
+  setIn(path: unknown[], value: unknown): void {
+    if (!path.length) {
+      this.contents = value as Contents
     } else if (assertCollection(this.contents)) {
       this.contents.setIn(path, value)
     }

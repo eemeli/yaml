@@ -59,12 +59,12 @@ class Collection extends NodeBase {
   anchor?: string  // an anchor associated with this node
   flow?: boolean   // use flow style when stringifying this
   schema?: Schema
-  addIn(path: Iterable<unknown>, value: unknown): void
+  addIn(path: unknown[], value: unknown): void
   clone(schema?: Schema): NodeBase  // a deep copy of this collection
-  deleteIn(path: Iterable<unknown>): boolean
-  getIn(path: Iterable<unknown>, keepScalar?: boolean): unknown
-  hasIn(path: Iterable<unknown>): boolean
-  setIn(path: Iterable<unknown>, value: unknown): void
+  deleteIn(path: unknown[]): boolean
+  getIn(path: unknown[], keepScalar?: boolean): unknown
+  hasIn(path: unknown[]): boolean
+  setIn(path: unknown[], value: unknown): void
 }
 
 class YAMLMap<K = unknown, V = unknown> extends Collection {

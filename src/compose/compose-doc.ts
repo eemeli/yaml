@@ -55,10 +55,16 @@ export function composeDoc<
         'Block collection cannot start on same line with directives-end marker'
       )
   }
-  // @ts-expect-error If Contents is set, let's trust the user
   doc.contents = value
-    ? composeNode(ctx, value, props, onError)
-    : composeEmptyNode(ctx, props.end, start, null, props, onError)
+    ? (composeNode(ctx, value, props, onError) as Contents)
+    : (composeEmptyNode(
+        ctx,
+        props.end,
+        start,
+        null,
+        props,
+        onError
+      ) as Contents)
 
   const contentEnd = doc.contents.range![2]
   const re = resolveEnd(end, contentEnd, false, onError)

@@ -5,7 +5,7 @@ test('basic', () => {
   const src = `- &a 1\n- *a\n`
   const doc = parseDocument<YAMLSeq>(src)
   expect(doc.errors).toHaveLength(0)
-  expect(doc.contents?.items).toMatchObject([
+  expect(doc.contents.items).toMatchObject([
     { anchor: 'a', value: 1 },
     { source: 'a' }
   ])
@@ -16,7 +16,7 @@ test('re-defined anchor', () => {
   const src = '- &a 1\n- &a 2\n- *a\n'
   const doc = parseDocument<YAMLSeq>(src)
   expect(doc.errors).toHaveLength(0)
-  expect(doc.contents?.items).toMatchObject([
+  expect(doc.contents.items).toMatchObject([
     { anchor: 'a', value: 1 },
     { anchor: 'a', value: 2 },
     { source: 'a' }
@@ -69,7 +69,7 @@ describe('create', () => {
   test('doc.createAlias', () => {
     const doc = parseDocument<YAMLSeq, false>('[{ a: A }, { b: B }]')
     const alias = doc.createAlias(doc.get(0), 'AA')
-    doc.contents?.items.push(alias)
+    doc.contents.items.push(alias)
     expect(doc.toJS()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
     const alias2 = doc.createAlias(doc.get(1), 'AA')
     expect(doc.get(1).anchor).toBe('AA1')
@@ -167,7 +167,7 @@ describe('__proto__ as anchor name', () => {
     const src = `- &__proto__ 1\n- *__proto__\n`
     const doc = parseDocument<YAMLSeq>(src)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.contents?.items).toMatchObject([
+    expect(doc.contents.items).toMatchObject([
       { anchor: '__proto__', value: 1 },
       { source: '__proto__' }
     ])

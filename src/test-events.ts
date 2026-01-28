@@ -42,19 +42,13 @@ export function testEvents(src: string): {
   try {
     for (let i = 0; i < docs.length; ++i) {
       const doc = docs[i]
-      let root = doc.contents
-      if (Array.isArray(root)) root = root[0]
+      const root = doc.contents
       const [rootStart] = doc.range || [0]
       const error = doc.errors[0]
       if (error && (!error.pos || error.pos[0] < rootStart)) throw new Error()
       let docStart = '+DOC'
       if (doc.directives.docStart) docStart += ' ---'
-      else if (
-        doc.contents &&
-        doc.contents.range![2] === doc.contents.range![0] &&
-        !doc.contents.anchor &&
-        !doc.contents.tag
-      )
+      else if (root.range![2] === root.range![0] && !root.anchor && !root.tag)
         continue
       events.push(docStart)
       addEvents(events, doc, error?.pos[0] ?? -1, root)

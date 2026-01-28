@@ -109,7 +109,7 @@ export class Composer<
       const dc = doc.contents
       if (afterDoc) {
         doc.comment = doc.comment ? `${doc.comment}\n${comment}` : comment
-      } else if (afterEmptyLine || doc.directives.docStart || !dc) {
+      } else if (afterEmptyLine || doc.directives.docStart) {
         doc.commentBefore = comment
       } else if (dc instanceof Collection && !dc.flow && dc.items.length > 0) {
         let it = dc.items[0]

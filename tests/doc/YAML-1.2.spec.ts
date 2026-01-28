@@ -673,7 +673,7 @@ mapping: { sky: blue, sea: green }`,
       tgt: [],
       special(src) {
         const doc = YAML.parseDocument(src)
-        expect(doc.commentBefore).toBe(' Comment only.')
+        expect(doc.contents.commentBefore).toBe(' Comment only.')
       }
     },
 
