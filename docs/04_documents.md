@@ -10,7 +10,7 @@ import { parseAllDocuments, parseDocument } from 'yaml'
 
 const file = fs.readFileSync('./file.yml', 'utf8')
 const doc = parseDocument(file)
-doc.contents
+doc.value
 // YAMLMap {
 //   items:
 //    [ Pair {
@@ -44,9 +44,9 @@ These functions should never throw,
 provided that `str` is a string and the `options` are valid.
 Errors and warnings are included in the documents' `errors` and `warnings` arrays.
 In particular, if `errors` is not empty
-it's likely that the document's parsed `contents` are not entirely correct.
+it's likely that the document's parsed `value` are not entirely correct.
 
-The `contents` of a parsed document will always consist of `Scalar`, `Map`, `Seq` or `null` values.
+The `value` of a parsed document will always consist of `Scalar`, `Map`, or `Seq` values.
 
 #### `parseDocument(str, options = {}): Document`
 
@@ -69,16 +69,15 @@ See [Options](#options) for more information on the second parameter.
 #### `new Document(value, replacer?, options = {})`
 
 Creates a new document.
-If `value` is defined, the document `contents` are initialised with that value, wrapped recursively in appropriate [content nodes](#content-nodes).
-If `value` is `undefined`, the document's `contents` is initialised as `null`.
-If defined, a `replacer` may filter or modify the initial document contents, following the same algorithm as the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter).
+The document `value` is initialised with `value`, wrapped recursively in appropriate [content nodes](#content-nodes).
+If defined, a `replacer` may filter or modify the initial document value, following the same algorithm as the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter).
 See [Options](#options) for more information on the last argument.
 
 | Member        | Type                               | Description                                                                                                                                                         |
 | ------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | commentBefore | `string?`                          | A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line or the doc-start indicator when stringified. |
 | comment       | `string?`                          | A comment at the end of the document. If not empty, separated from the rest of the document by a blank line when stringified.                                       |
-| contents      | [`Node`](#content-nodes) `⎮ any`   | The document contents.                                                                                                                                              |
+| value         | [`Node`](#content-nodes) `⎮ any`   | The document value.                                                                                                                                                 |
 | directives    | [`Directives`](#stream-directives) | Controls for the `%YAML` and `%TAG` directives, as well as the doc-start marker `---`.                                                                              |
 | errors        | [`Error[]`](#errors)               | Errors encountered during parsing.                                                                                                                                  |
 | schema        | `Schema`                           | The schema used with the document.                                                                                                                                  |
@@ -99,21 +98,21 @@ String(doc)
 ```
 
 The Document members are all modifiable, though it's unlikely that you'll have reason to change `errors`, `schema` or `warnings`.
-In particular you may be interested in both reading and writing **`contents`**.
-Although `parseDocument()` and `parseAllDocuments()` will leave it with `YAMLMap`, `YAMLSeq`, `Scalar` or `null` contents, it can be set to anything.
+In particular you may be interested in both reading and writing **`value`**,
+which is expected to always contain a `YAMLMap`, `YAMLSeq`, or `Scalar` value.
 
 ## Document Methods
 
-| Method                                     | Returns    | Description                                                                                                                                  |
-| ------------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| clone()                                    | `Document` | Create a deep copy of this Document and its contents. Custom Node values that inherit from `Object` still refer to their original instances. |
-| createAlias(node: Node, name?: string)     | `Alias`    | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated.                   |
-| createNode(value,&nbsp;options?)           | `Node`     | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.                   |
-| createPair(key,&nbsp;value,&nbsp;options?) | `Pair`     | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.                         |
-| setSchema(version,&nbsp;options?)          | `void`     | Change the YAML version and schema used by the document. `version` must be either `'1.1'` or `'1.2'`; accepts all Schema options.            |
-| toJS(options?)                             | `any`      | A plain JavaScript representation of the document `contents`.                                                                                |
-| toJSON()                                   | `any`      | A JSON representation of the document `contents`.                                                                                            |
-| toString(options?)                         | `string`   | A YAML representation of the document.                                                                                                       |
+| Method                                     | Returns    | Description                                                                                                                               |
+| ------------------------------------------ | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| clone()                                    | `Document` | Create a deep copy of this Document and its value. Custom Node values that inherit from `Object` still refer to their original instances. |
+| createAlias(node: Node, name?: string)     | `Alias`    | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated.                |
+| createNode(value,&nbsp;options?)           | `Node`     | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.                |
+| createPair(key,&nbsp;value,&nbsp;options?) | `Pair`     | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.                      |
+| setSchema(version,&nbsp;options?)          | `void`     | Change the YAML version and schema used by the document. `version` must be either `'1.1'` or `'1.2'`; accepts all Schema options.         |
+| toJS(options?)                             | `any`      | A plain JavaScript representation of the document `value`.                                                                                |
+| toJSON()                                   | `any`      | A JSON representation of the document `value`.                                                                                            |
+| toString(options?)                         | `string`   | A YAML representation of the document.                                                                                                    |
 
 ```js
 const doc = parseDocument('a: 1\nb: [2, 3]\n')
@@ -127,7 +126,7 @@ doc.getIn(['b', 1]) // 4
 
 In addition to the above, the document object also provides the same **accessor methods** as [collections](#collections), based on the top-level collection:
 `add`, `delete`, `get`, `has`, and `set`, along with their deeper variants `addIn`, `deleteIn`, `getIn`, `hasIn`, and `setIn`.
-For the `*In` methods using an empty `path` value (i.e. `null`, `undefined`, or `[]`) will refer to the document's top-level `contents`.
+For the `*In` methods using an empty `path` value (i.e. `[]`) will refer to the document's top-level `value`.
 
 #### `Document#toJS()`, `Document#toJSON()` and `Document#toString()`
 
@@ -177,5 +176,5 @@ The contents of `doc.directives.tags` are used both for the `%TAG` directives an
 Each of the handles must start and end with a `!` character; `!` is by default the local tag and `!!` is used for default tags.
 See the section on [custom tags](#writing-custom-tags) for more on this topic.
 
-`doc.contents.yaml` determines if an explicit `%YAML` directive should be included in the output, and what version it should use.
+`doc.directives.yaml` determines if an explicit `%YAML` directive should be included in the output, and what version it should use.
 If changing the version after the document's creation, you'll probably want to use `doc.setSchema()` as it will also update the schema accordingly.

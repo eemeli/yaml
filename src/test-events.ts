@@ -42,7 +42,7 @@ export function testEvents(src: string): {
   try {
     for (let i = 0; i < docs.length; ++i) {
       const doc = docs[i]
-      const root = doc.contents
+      const root = doc.value
       const [rootStart] = doc.range || [0]
       const error = doc.errors[0]
       if (error && (!error.pos || error.pos[0] < rootStart)) throw new Error()

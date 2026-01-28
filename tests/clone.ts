@@ -29,7 +29,7 @@ describe('doc.clone()', () => {
     expect(alias).toMatchObject({ source: 'foo' })
   })
 
-  test('has separate contents from original', () => {
+  test('has separate value from original', () => {
     const doc = parseDocument('foo: bar')
     const copy = doc.clone()
     copy.set('foo', 'fizz')

@@ -1,6 +1,6 @@
 # Content Nodes
 
-After parsing, the `contents` value of each `YAML.Document` is the root of an [Abstract Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree) of nodes representing the document (or `null` for an empty document).
+After parsing, the `value` value of each `YAML.Document` is the root of an [Abstract Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree) of nodes representing the document.
 
 Both scalar and collection values may have an `anchor` associated with them; this is rendered in the string representation with a `&` prefix, so e.g. in `foo: &aa bar`, the value `bar` has the anchor `aa`.
 Anchors are used by [Alias nodes](#alias-nodes) to allow for the same value to be used in multiple places in the document.
@@ -41,7 +41,7 @@ class Scalar<T = unknown> extends NodeBase {
 }
 ```
 
-A parsed document's contents will have all of its non-object values wrapped in `Scalar` objects, which themselves may be in some hierarchy of `YAMLMap` and `YAMLSeq` collections.
+A parsed document's value will have all of its non-object values wrapped in `Scalar` objects, which themselves may be in some hierarchy of `YAMLMap` and `YAMLSeq` collections.
 However, this is not a requirement for the document's stringification, which is rather tolerant regarding its input values, and will use [`doc.createNode()`](#creating-nodes) when encountering an unwrapped value.
 
 When stringifying, the node `type` will be taken into account by `!!str` and `!!binary` values, and ignored by other scalars.
@@ -50,9 +50,9 @@ On the other hand, `!!int` and `!!float` stringifiers will take `format` into ac
 ## Collections
 
 ```js
-class Pair<K = unknown, V = unknown> {
-  key: K    // When parsed, key and value are always
-  value: V  // Node or null, but can be set to anything
+class Pair {
+  key: Node
+  value: Node | null
 }
 
 class Collection extends NodeBase {
@@ -87,8 +87,8 @@ class YAMLSeq<T = unknown> extends Collection {
 ```
 
 Within all YAML documents, two forms of collections are supported: sequential `YAMLSeq` collections and key-value `YAMLMap` collections.
-The JavaScript representations of these collections both have an `items` array, which may (`YAMLSeq`) or must (`YAMLMap`) consist of `Pair` objects that contain a `key` and a `value` of any type, including `null`.
-The `items` array of a `YAMLSeq` object may contain values of any type.
+The JavaScript representations of these collections both have an `items` array, which may (`YAMLSeq`) or must (`YAMLMap`) consist of `Pair` objects that contain a `key` and a `value` of any node type, or `null` for `value`.
+The `items` array of a `YAMLSeq` object may contain any node values.
 
 When stringifying collections, by default block notation will be used.
 Flow notation will be selected if `flow` is `true`, the collection is within a surrounding flow collection, or if the collection is in an implicit key.
@@ -169,7 +169,7 @@ When nodes are constructed from JS structures (e.g. during `YAML.stringify()`), 
 ```js
 const doc = new YAML.Document(['some', 'values'])
 // Document {
-//   contents:
+//   value:
 //     YAMLSeq {
 //       items:
 //        [ Scalar { value: 'some' },
@@ -209,8 +209,7 @@ For all available options, see the [CreateNode Options](#createnode-options) sec
 [replacer]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter
 
 The primary purpose of this method is to enable attaching comments or other metadata to a value, or to otherwise exert more fine-grained control over the stringified output.
-To that end, you'll need to assign its return value to the `contents` of a document (or somewhere within said contents), as the document's schema is required for YAML string output.
-If you're not interested in working with such metadata, document `contents` may also include non-`Node` values at any level.
+To that end, you'll need to assign its return value to the `value` of a document (or somewhere within said value), as the document's schema is required for YAML string output.
 
 <h4 style="clear:both"><code>doc.createAlias(node, name?): Alias</code></h4>
 
@@ -236,12 +235,11 @@ You should make sure to only add alias nodes to the document after the nodes to 
 ```js
 import { Document, YAMLSeq } from 'yaml'
 
-const doc = new Document(new YAMLSeq())
-doc.contents.items = [
+const doc = new Document([
   'some values',
   42,
   { including: 'objects', 3: 'a string' }
-]
+])
 doc.add(doc.createPair(1, 'a number'))
 
 doc.toString()
@@ -320,7 +318,7 @@ The return value of the visitor may be used to control the traversal:
 - `number`: While iterating the items of a sequence or map, set the index of the next step.
   This is useful especially if the index of the current node has changed.
 
-If `visitor` is a single function, it will be called with all values encountered in the tree, including e.g. `null` values.
+If `visitor` is a single function, it will be called with all values encountered in the tree, including `null` values.
 Alternatively, separate visitor functions may be defined for each `Map`, `Pair`, `Seq`, `Alias` and `Scalar` node.
 To define the same visitor function for more than one node type,
 use the `Collection` (map and seq), `Value` (map, seq & scalar) and `Node` (alias, map, seq & scalar) targets.

@@ -33,9 +33,9 @@ for (const [visit_, title] of [
       const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
-        [null, coll, [{ contents: {} }]],
-        [0, { type: 'PLAIN', value: 1 }, [{ contents: {} }, coll]],
-        [1, { type: 'PLAIN', value: 'two' }, [{ contents: {} }, coll]]
+        [null, coll, [{ value: {} }]],
+        [0, { type: 'PLAIN', value: 1 }, [{ value: {} }, coll]],
+        [1, { type: 'PLAIN', value: 'two' }, [{ value: {} }, coll]]
       ])
     })
 
@@ -238,11 +238,11 @@ for (const [visit_, title] of [
       const doc = parseDocument('- one\n- two\n- three\n')
       const Seq = vi.fn(() => doc.createNode(42))
       if (visit_ === visit) {
-        expect(() => visit_(doc.contents, { Seq })).toThrow(
+        expect(() => visit_(doc.value, { Seq })).toThrow(
           'Cannot replace node with scalar parent'
         )
       } else {
-        await expect(visit_(doc.contents, { Seq })).rejects.toMatchObject({
+        await expect(visit_(doc.value, { Seq })).rejects.toMatchObject({
           message: 'Cannot replace node with scalar parent'
         })
       }

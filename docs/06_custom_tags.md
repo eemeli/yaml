@@ -10,7 +10,7 @@ parse('!!timestamp 2001-12-15 2:59:43')
 // 2001-12-15T02:59:43.000Z (Date instance)
 
 const doc = parseDocument('2001-12-15 2:59:43', { customTags: ['timestamp'] })
-doc.contents.value.toDateString()
+doc.value.value.toDateString()
 // 'Sat Dec 15 2001'
 ```
 

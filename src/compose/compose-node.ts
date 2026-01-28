@@ -1,6 +1,6 @@
 import type { Directives } from '../doc/directives.ts'
 import { Alias } from '../nodes/Alias.ts'
-import type { ParsedNode } from '../nodes/Node.ts'
+import type { Node } from '../nodes/Node.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { ParseOptions } from '../options.ts'
 import type { FlowScalar, SourceToken, Token } from '../parse/cst.ts'
@@ -39,10 +39,10 @@ export function composeNode(
   token: Token,
   props: Props,
   onError: ComposeErrorHandler
-): ParsedNode {
+): Node {
   const atKey = ctx.atKey
   const { spaceBefore, comment, anchor, tag } = props
-  let node: ParsedNode
+  let node: Node
   let isSrcToken = true
   switch (token.type) {
     case 'alias':

@@ -69,7 +69,7 @@ import {
 
 - [`Document`](#documents)
   - [`constructor(value, replacer?, options?)`](#creating-documents)
-  - [`#contents`](#content-nodes)
+  - [`#value`](#content-nodes)
   - [`#directives`](#stream-directives)
   - [`#errors`](#errors)
   - [`#warnings`](#errors)

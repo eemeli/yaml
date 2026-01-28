@@ -2,10 +2,9 @@ import {
   type CollectionTag,
   Document,
   type DocumentOptions,
-  type Node,
+  type DocValue,
   parseDocument as origParseDocument,
   parse,
-  type ParsedNode,
   type ParseOptions,
   Scalar,
   type ScalarTag,
@@ -18,7 +17,7 @@ import {
 import { seqTag, stringifyString, stringTag } from 'yaml/util'
 import { source } from '../_utils.ts'
 
-const parseDocument = <T extends Node = ParsedNode>(
+const parseDocument = <T extends DocValue = DocValue>(
   source: string,
   options?: ParseOptions & DocumentOptions & SchemaOptions
 ) => origParseDocument<T, false>(source, options)
@@ -27,66 +26,66 @@ describe('tags', () => {
   describe('implicit tags', () => {
     test('plain string', () => {
       const doc = parseDocument<Scalar>('foo')
-      expect(doc.contents.tag).toBeUndefined()
-      expect(doc.contents.value).toBe('foo')
+      expect(doc.value.tag).toBeUndefined()
+      expect(doc.value.value).toBe('foo')
     })
     test('quoted string', () => {
       const doc = parseDocument<Scalar>('"foo"')
-      expect(doc.contents.tag).toBeUndefined()
-      expect(doc.contents.value).toBe('foo')
+      expect(doc.value.tag).toBeUndefined()
+      expect(doc.value.value).toBe('foo')
     })
     test('flow map', () => {
       const doc = parseDocument('{ foo }')
-      expect(doc.contents.tag).toBeUndefined()
-      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+      expect(doc.value.tag).toBeUndefined()
+      expect(doc.value.toJSON()).toMatchObject({ foo: null })
     })
     test('flow seq', () => {
       const doc = parseDocument('[ foo ]')
-      expect(doc.contents.tag).toBeUndefined()
-      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+      expect(doc.value.tag).toBeUndefined()
+      expect(doc.value.toJSON()).toMatchObject(['foo'])
     })
     test('block map', () => {
       const doc = parseDocument('foo:\n')
-      expect(doc.contents.tag).toBeUndefined()
-      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+      expect(doc.value.tag).toBeUndefined()
+      expect(doc.value.toJSON()).toMatchObject({ foo: null })
     })
     test('block seq', () => {
       const doc = parseDocument('- foo')
-      expect(doc.contents.tag).toBeUndefined()
-      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+      expect(doc.value.tag).toBeUndefined()
+      expect(doc.value.toJSON()).toMatchObject(['foo'])
     })
   })
 
   describe('explicit tags', () => {
     test('plain string', () => {
       const doc = parseDocument<Scalar>('!!str foo')
-      expect(doc.contents.tag).toBe('tag:yaml.org,2002:str')
-      expect(doc.contents.value).toBe('foo')
+      expect(doc.value.tag).toBe('tag:yaml.org,2002:str')
+      expect(doc.value.value).toBe('foo')
     })
     test('quoted string', () => {
       const doc = parseDocument<Scalar>('!!str "foo"')
-      expect(doc.contents.tag).toBe('tag:yaml.org,2002:str')
-      expect(doc.contents.value).toBe('foo')
+      expect(doc.value.tag).toBe('tag:yaml.org,2002:str')
+      expect(doc.value.value).toBe('foo')
     })
     test('flow map', () => {
       const doc = parseDocument('!!map { foo }')
-      expect(doc.contents.tag).toBe('tag:yaml.org,2002:map')
-      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+      expect(doc.value.tag).toBe('tag:yaml.org,2002:map')
+      expect(doc.value.toJSON()).toMatchObject({ foo: null })
     })
     test('flow seq', () => {
       const doc = parseDocument('!!seq [ foo ]')
-      expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
-      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+      expect(doc.value.tag).toBe('tag:yaml.org,2002:seq')
+      expect(doc.value.toJSON()).toMatchObject(['foo'])
     })
     test('block map', () => {
       const doc = parseDocument('!!map\nfoo:\n')
-      expect(doc.contents.tag).toBe('tag:yaml.org,2002:map')
-      expect(doc.contents.toJSON()).toMatchObject({ foo: null })
+      expect(doc.value.tag).toBe('tag:yaml.org,2002:map')
+      expect(doc.value.toJSON()).toMatchObject({ foo: null })
     })
     test('block seq', () => {
       const doc = parseDocument('!!seq\n- foo')
-      expect(doc.contents.tag).toBe('tag:yaml.org,2002:seq')
-      expect(doc.contents.toJSON()).toMatchObject(['foo'])
+      expect(doc.value.tag).toBe('tag:yaml.org,2002:seq')
+      expect(doc.value.toJSON()).toMatchObject(['foo'])
     })
   })
 
@@ -144,7 +143,7 @@ describe('number types', () => {
         intAsBigInt: false,
         version: '1.1'
       })
-      expect(doc.contents.items).toMatchObject([
+      expect(doc.value.items).toMatchObject([
         { value: 10, format: 'BIN' },
         { value: 83, format: 'OCT' },
         { value: -0, format: 'OCT' },
@@ -156,10 +155,10 @@ describe('number types', () => {
         { value: 0.42 },
         { value: 0.4 }
       ])
-      expect(doc.contents.items[3]).not.toHaveProperty('format')
-      expect(doc.contents.items[6]).not.toHaveProperty('format')
-      expect(doc.contents.items[6]).not.toHaveProperty('minFractionDigits')
-      expect(doc.contents.items[7]).not.toHaveProperty('format')
+      expect(doc.value.items[3]).not.toHaveProperty('format')
+      expect(doc.value.items[6]).not.toHaveProperty('format')
+      expect(doc.value.items[6]).not.toHaveProperty('minFractionDigits')
+      expect(doc.value.items[7]).not.toHaveProperty('format')
     })
 
     test('Version 1.2', () => {
@@ -177,7 +176,7 @@ describe('number types', () => {
         intAsBigInt: false,
         version: '1.2'
       })
-      expect(doc.contents.items).toMatchObject([
+      expect(doc.value.items).toMatchObject([
         { value: 83, format: 'OCT' },
         { value: 0, format: 'OCT' },
         { value: 123456 },
@@ -188,10 +187,10 @@ describe('number types', () => {
         { value: 0.42 },
         { value: 0.4 }
       ])
-      expect(doc.contents.items[2]).not.toHaveProperty('format')
-      expect(doc.contents.items[5]).not.toHaveProperty('format')
-      expect(doc.contents.items[5]).not.toHaveProperty('minFractionDigits')
-      expect(doc.contents.items[6]).not.toHaveProperty('format')
+      expect(doc.value.items[2]).not.toHaveProperty('format')
+      expect(doc.value.items[5]).not.toHaveProperty('format')
+      expect(doc.value.items[5]).not.toHaveProperty('minFractionDigits')
+      expect(doc.value.items[6]).not.toHaveProperty('format')
     })
   })
 
@@ -209,7 +208,7 @@ describe('number types', () => {
         intAsBigInt: true,
         version: '1.1'
       })
-      expect(doc.contents.items).toMatchObject([
+      expect(doc.value.items).toMatchObject([
         { value: 10n, format: 'BIN' },
         { value: 83n, format: 'OCT' },
         { value: 0n, format: 'OCT' },
@@ -218,9 +217,9 @@ describe('number types', () => {
         { value: 0.5123, format: 'EXP' },
         { value: 4.02 }
       ])
-      expect(doc.contents.items[3]).not.toHaveProperty('format')
-      expect(doc.contents.items[6]).not.toHaveProperty('format')
-      expect(doc.contents.items[6]).not.toHaveProperty('minFractionDigits')
+      expect(doc.value.items[3]).not.toHaveProperty('format')
+      expect(doc.value.items[6]).not.toHaveProperty('format')
+      expect(doc.value.items[6]).not.toHaveProperty('minFractionDigits')
     })
 
     test('Version 1.2', () => {
@@ -235,7 +234,7 @@ describe('number types', () => {
         intAsBigInt: true,
         version: '1.2'
       })
-      expect(doc.contents.items).toMatchObject([
+      expect(doc.value.items).toMatchObject([
         { value: 83n, format: 'OCT' },
         { value: 0n, format: 'OCT' },
         { value: 123456n },
@@ -243,9 +242,9 @@ describe('number types', () => {
         { value: 0.5123, format: 'EXP' },
         { value: 4.02 }
       ])
-      expect(doc.contents.items[2]).not.toHaveProperty('format')
-      expect(doc.contents.items[5]).not.toHaveProperty('format')
-      expect(doc.contents.items[5]).not.toHaveProperty('minFractionDigits')
+      expect(doc.value.items[2]).not.toHaveProperty('format')
+      expect(doc.value.items[5]).not.toHaveProperty('format')
+      expect(doc.value.items[5]).not.toHaveProperty('minFractionDigits')
     })
   })
 })
@@ -330,7 +329,7 @@ describe('json schema', () => {
     })
     expect(doc.errors).toHaveLength(2)
     doc.errors = []
-    doc.contents.items[1].value!.tag = 'tag:yaml.org,2002:float'
+    doc.value.items[1].value!.tag = 'tag:yaml.org,2002:float'
     expect(String(doc)).toBe(
       '"canonical": 685230.15\n"fixed": !!float 685230.15\n"negative infinity": "-.inf"\n"not a number": ".NaN"\n'
     )
@@ -472,7 +471,7 @@ one: 1
         '{ 3: 4 }': 'many'
       })
       expect(doc.errors).toHaveLength(0)
-      doc.contents.items[2].key = doc.createNode({ 3: 4 })
+      doc.value.items[2].key = doc.createNode({ 3: 4 })
       expect(doc.toJS()).toMatchObject({
         one: 1,
         2: 'two',
@@ -494,7 +493,7 @@ one: 1
         ])
       )
       expect(doc.errors).toHaveLength(0)
-      doc.contents.items[2].key = doc.createNode({ 5: 6 })
+      doc.value.items[2].key = doc.createNode({ 5: 6 })
       expect(doc.toJS({ mapAsMap: true })).toMatchObject(
         new Map<unknown, unknown>([
           ['one', 1],
@@ -524,8 +523,8 @@ description:
     const doc = parseDocument<YAMLMap<Scalar, Scalar<Uint8Array>>>(src, {
       schema: 'yaml-1.1'
     })
-    const canonical = doc.contents.items[0].value!.value
-    const generic = doc.contents.items[1].value!.value
+    const canonical = doc.value.items[0].value!.value
+    const generic = doc.value.items[1].value!.value
     expect(canonical).toBeInstanceOf(Uint8Array)
     expect(generic).toBeInstanceOf(Uint8Array)
     expect(canonical).toHaveLength(185)
@@ -696,7 +695,7 @@ no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
       const doc = parseDocument<YAMLMap<Scalar, Scalar>>(src)
-      doc.contents.items.forEach(item => {
+      doc.value.items.forEach(item => {
         expect(item.value!.value).toBeInstanceOf(Date)
       })
       expect(doc.toJSON()).toMatchObject({
@@ -733,8 +732,8 @@ date (00:00:00Z): 2002-12-14\n`)
     ])
       test(name, () => {
         const doc = parseDocument<YAMLSeq>(src, { version: '1.1' })
-        expect(doc.contents).toBeInstanceOf(YAMLSeq)
-        expect(doc.contents.items).toMatchObject([
+        expect(doc.value).toBeInstanceOf(YAMLSeq)
+        expect(doc.value.items).toMatchObject([
           { key: { value: 'a' }, value: { value: 1 } },
           { key: { value: 'b' }, value: { value: 2 } },
           { key: { value: 'a' }, value: { value: 3 } }
@@ -746,7 +745,7 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('stringify', () => {
       const doc = new Document(null, { version: '1.1' })
-      doc.contents = doc.createNode(
+      doc.value = doc.createNode(
         [
           ['a', 1],
           ['b', 2],
@@ -754,7 +753,7 @@ date (00:00:00Z): 2002-12-14\n`)
         ],
         { tag: '!!pairs' }
       )
-      expect(doc.contents.tag).toBe('tag:yaml.org,2002:pairs')
+      expect(doc.value.tag).toBe('tag:yaml.org,2002:pairs')
       expect(String(doc)).toBe(`!!pairs\n- a: 1\n- b: 2\n- a: 3\n`)
     })
   })
@@ -766,7 +765,7 @@ date (00:00:00Z): 2002-12-14\n`)
     ])
       test(name, () => {
         const doc = parseDocument<any>(src, { version: '1.1' })
-        expect(doc.contents.constructor.tag).toBe('tag:yaml.org,2002:omap')
+        expect(doc.value.constructor.tag).toBe('tag:yaml.org,2002:omap')
         expect(doc.toJS()).toBeInstanceOf(Map)
         expect(doc.toJS()).toMatchObject(
           new Map([
@@ -806,7 +805,7 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('stringify Array', () => {
       const doc = new Document<any>(null, { version: '1.1' })
-      doc.contents = doc.createNode(
+      doc.value = doc.createNode(
         [
           ['a', 1],
           ['b', 2],
@@ -814,7 +813,7 @@ date (00:00:00Z): 2002-12-14\n`)
         ],
         { tag: '!!omap' }
       )
-      expect(doc.contents.constructor.tag).toBe('tag:yaml.org,2002:omap')
+      expect(doc.value.constructor.tag).toBe('tag:yaml.org,2002:omap')
       expect(String(doc)).toBe(`!!omap\n- a: 1\n- b: 2\n- a: 3\n`)
     })
   })
@@ -826,7 +825,7 @@ date (00:00:00Z): 2002-12-14\n`)
     ])
       test(name, () => {
         const doc = parseDocument<any>(src, { version: '1.1' })
-        expect(doc.contents.constructor.tag).toBe('tag:yaml.org,2002:set')
+        expect(doc.value.constructor.tag).toBe('tag:yaml.org,2002:set')
         expect(doc.toJS()).toBeInstanceOf(Set)
         expect(doc.toJS()).toMatchObject(new Set(['a', 'b', 'c']))
         expect(String(doc)).toBe(src)
@@ -929,9 +928,9 @@ describe('custom tags', () => {
 
     test('parse', () => {
       const doc = parseDocument<YAMLSeq<Scalar>>(src)
-      expect(doc.contents).toBeInstanceOf(YAMLSeq)
-      expect(doc.contents.tag).toBe('tag:example.com,2000:test/x')
-      const { items } = doc.contents
+      expect(doc.value).toBeInstanceOf(YAMLSeq)
+      expect(doc.value.tag).toBe('tag:example.com,2000:test/x')
+      const { items } = doc.value
       expect(items).toHaveLength(4)
       items.forEach(item => expect(typeof item.value).toBe('string'))
       expect(items[0].tag).toBe('!y')
@@ -962,12 +961,12 @@ describe('custom tags', () => {
         '!f!': prefix
       })
 
-      doc.contents.commentBefore = 'c'
-      doc.contents.items[3].comment = 'cc'
+      doc.value.commentBefore = 'c'
+      doc.value.items[3].comment = 'cc'
       const s = new Scalar(6)
       s.tag = '!g'
       // @ts-expect-error TS should complain here
-      doc.contents.items.splice(1, 1, s, '7')
+      doc.value.items.splice(1, 1, s, '7')
       expect(String(doc)).toBe(source`
         %TAG !e! tag:example.com,2000:test/
         %TAG !f! tag:example.com,2000:other/

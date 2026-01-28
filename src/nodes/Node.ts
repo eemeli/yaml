@@ -32,8 +32,6 @@ export type NodeType<T> = T extends
           ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
           : Node
 
-export type ParsedNode = Alias | Scalar | YAMLMap | YAMLSeq
-
 /** `[start, value-end, node-end]` */
 export type Range = [number, number, number]
 
@@ -92,7 +90,7 @@ export abstract class NodeBase {
 
   /** A plain JavaScript representation of this node. */
   toJS(
-    doc: Document<Node, boolean>,
+    doc: Document,
     { mapAsMap, maxAliasCount, onAnchor, reviver }: ToJSOptions = {}
   ): any {
     if (!doc?.schema) throw new TypeError('A document argument is required')

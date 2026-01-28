@@ -18,7 +18,7 @@ describe('parse comments', () => {
         string
       `
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      expect(doc.contents.commentBefore).toBe('comment\ncomment')
+      expect(doc.value.commentBefore).toBe('comment\ncomment')
       expect(String(doc)).toBe(src)
     })
 
@@ -31,7 +31,7 @@ describe('parse comments', () => {
         string
       `
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      expect(doc.contents.commentBefore).toBe('comment\n \ncomment')
+      expect(doc.value.commentBefore).toBe('comment\n \ncomment')
       expect(String(doc)).toBe(source`
         ---
         #comment
@@ -53,31 +53,31 @@ describe('parse comments', () => {
     test('plain', () => {
       const src = '#c0\nvalue #c1\n#c2'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      expect(doc.contents.commentBefore).toBe('c0')
-      expect(doc.contents.comment).toBe('c1')
+      expect(doc.value.commentBefore).toBe('c0')
+      expect(doc.value.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
-      expect(doc.contents.value).toBe('value')
-      expect(doc.contents.range).toMatchObject([4, 9, 14])
+      expect(doc.value.value).toBe('value')
+      expect(doc.value.range).toMatchObject([4, 9, 14])
     })
 
     test('"quoted"', () => {
       const src = '#c0\n"value" #c1\n#c2'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      expect(doc.contents.commentBefore).toBe('c0')
-      expect(doc.contents.comment).toBe('c1')
+      expect(doc.value.commentBefore).toBe('c0')
+      expect(doc.value.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
-      expect(doc.contents.value).toBe('value')
-      expect(doc.contents.range).toMatchObject([4, 11, 16])
+      expect(doc.value.value).toBe('value')
+      expect(doc.value.range).toMatchObject([4, 11, 16])
     })
 
     test('block', () => {
       const src = '#c0\n>- #c1\n value\n#c2\n'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      expect(doc.contents.commentBefore).toBe('c0')
-      expect(doc.contents.comment).toBe('c1')
+      expect(doc.value.commentBefore).toBe('c0')
+      expect(doc.value.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
-      expect(doc.contents.value).toBe('value')
-      expect(doc.contents.range).toMatchObject([4, 18, 18])
+      expect(doc.value.value).toBe('value')
+      expect(doc.value.range).toMatchObject([4, 18, 18])
     })
   })
 
@@ -94,7 +94,7 @@ describe('parse comments', () => {
       `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
-        contents: {
+        value: {
           items: [
             { commentBefore: 'c0', value: 'value 1', comment: 'c1' },
             { value: 'value 2' }
@@ -119,7 +119,7 @@ describe('parse comments', () => {
       `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
-        contents: {
+        value: {
           items: [{ comment: 'c0' }, { commentBefore: 'c1\n\nc2' }]
         },
         comment: 'c3\nc4'
@@ -140,7 +140,7 @@ describe('parse comments', () => {
       `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
-        contents: {
+        value: {
           items: [
             { key: { commentBefore: 'c0' }, value: { comment: 'c1' } },
             { key: {}, value: {} }
@@ -164,7 +164,7 @@ describe('parse comments', () => {
       `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
-        contents: {
+        value: {
           items: [
             { value: { comment: 'c0' } },
             { key: { commentBefore: 'c1\n\nc2' } }
@@ -189,7 +189,7 @@ describe('parse comments', () => {
       `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
-        contents: {
+        value: {
           items: [
             {
               commentBefore: 'c0\nc1',
@@ -232,7 +232,7 @@ describe('parse comments', () => {
       `
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
-        contents: {
+        value: {
           items: [
             {
               key: { commentBefore: 'c0', value: 'k1' },
@@ -272,7 +272,7 @@ describe('parse comments', () => {
         [ a, #c0
           b #c1
         ]`)
-      expect(doc.contents.items).toMatchObject([
+      expect(doc.value.items).toMatchObject([
         { value: 'a', comment: 'c0' },
         { value: 'b', comment: 'c1' }
       ])
@@ -284,7 +284,7 @@ describe('parse comments', () => {
           b: c, #c1
           d #c2
         }`)
-      expect(doc.contents.items).toMatchObject([
+      expect(doc.value.items).toMatchObject([
         { key: { value: 'a', comment: 'c0' } },
         { key: { value: 'b' }, value: { value: 'c', comment: 'c1' } },
         { key: { value: 'd', comment: 'c2' } }
@@ -293,7 +293,7 @@ describe('parse comments', () => {
 
     test('multi-line comments', () => {
       const doc = YAML.parseDocument<YAML.YAMLMap, false>('{ a,\n#c0\n#c1\nb }')
-      expect(doc.contents.items).toMatchObject([
+      expect(doc.value.items).toMatchObject([
         { key: { value: 'a' } },
         { key: { commentBefore: 'c0\nc1', value: 'b' } }
       ])
@@ -320,21 +320,21 @@ describe('stringify comments', () => {
     test('plain', () => {
       const src = 'string'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      doc.contents.comment = 'comment'
+      doc.value.comment = 'comment'
       expect(String(doc)).toBe('string #comment\n')
     })
 
     test('"quoted"', () => {
       const src = '"string\\u0000"'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      doc.contents.comment = 'comment'
+      doc.value.comment = 'comment'
       expect(String(doc)).toBe('"string\\0" #comment\n')
     })
 
     test('block', () => {
       const src = '>\nstring\n'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      doc.contents.comment = 'comment'
+      doc.value.comment = 'comment'
       expect(String(doc)).toBe('> #comment\nstring\n')
     })
   })
@@ -343,21 +343,21 @@ describe('stringify comments', () => {
     test('plain', () => {
       const src = 'string'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      doc.contents.comment = 'comment\nlines'
+      doc.value.comment = 'comment\nlines'
       expect(String(doc)).toBe('string\n#comment\n#lines\n')
     })
 
     test('"quoted"', () => {
       const src = '"string\\u0000"'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      doc.contents.comment = 'comment\nlines'
+      doc.value.comment = 'comment\nlines'
       expect(String(doc)).toBe('"string\\0"\n#comment\n#lines\n')
     })
 
     test('block', () => {
       const src = '>\nstring\n'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-      doc.contents.comment = 'comment\nlines'
+      doc.value.comment = 'comment\nlines'
       expect(String(doc)).toBe('> #comment lines\nstring\n')
     })
   })
@@ -385,10 +385,10 @@ describe('stringify comments', () => {
     test('plain', () => {
       const src = '- value 1\n- value 2\n'
       const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(src)
-      doc.contents.commentBefore = 'c0'
-      doc.contents.items[0].commentBefore = 'c1'
-      doc.contents.items[1].commentBefore = 'c2'
-      doc.contents.comment = 'c3'
+      doc.value.commentBefore = 'c0'
+      doc.value.items[0].commentBefore = 'c1'
+      doc.value.items[1].commentBefore = 'c2'
+      doc.value.comment = 'c3'
       expect(String(doc)).toBe(source`
         #c0
         #c1
@@ -402,9 +402,9 @@ describe('stringify comments', () => {
     test('multiline', () => {
       const src = '- value 1\n- value 2\n'
       const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(src)
-      doc.contents.items[0].commentBefore = 'c0\nc1'
-      doc.contents.items[1].commentBefore = ' \nc2\n\nc3'
-      doc.contents.comment = 'c4\nc5'
+      doc.value.items[0].commentBefore = 'c0\nc1'
+      doc.value.items[1].commentBefore = ' \nc2\n\nc3'
+      doc.value.comment = 'c4\nc5'
       expect(String(doc)).toBe(source`
         #c0
         #c1
@@ -425,9 +425,9 @@ describe('stringify comments', () => {
         YAML.YAMLMap<YAML.Scalar, YAML.YAMLSeq<YAML.Scalar>>,
         false
       >(src)
-      doc.contents.items[0].key.commentBefore = 'c0'
-      doc.contents.items[0].key.comment = 'c1'
-      const seq = doc.contents.items[0].value!
+      doc.value.items[0].key.commentBefore = 'c0'
+      doc.value.items[0].key.comment = 'c1'
+      const seq = doc.value.items[0].value!
       seq.commentBefore = 'c2'
       seq.items[0].commentBefore = 'c3'
       seq.items[1].commentBefore = 'c4'
@@ -448,9 +448,9 @@ describe('stringify comments', () => {
       const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(
         '- a\n- b\n'
       )
-      doc.contents.commentBefore = 'c0'
-      doc.contents.items[0].commentBefore = 'c1'
-      doc.contents.items[1].commentBefore = 'c2\nc3'
+      doc.value.commentBefore = 'c0'
+      doc.value.items[0].commentBefore = 'c1'
+      doc.value.items[1].commentBefore = 'c2\nc3'
       expect(doc.toString({ commentString: str => str.replace(/^/gm, '// ') }))
         .toBe(source`
         // c0
@@ -470,11 +470,11 @@ describe('stringify comments', () => {
         YAML.YAMLMap<YAML.Scalar, YAML.Scalar>,
         false
       >(src)
-      doc.contents.items[0].key.commentBefore = 'c0'
-      doc.contents.items[1].key.commentBefore = 'c1'
-      doc.contents.items[1].key.comment = 'c2'
-      doc.contents.items[1].value!.spaceBefore = true
-      doc.contents.comment = 'c3'
+      doc.value.items[0].key.commentBefore = 'c0'
+      doc.value.items[1].key.commentBefore = 'c1'
+      doc.value.items[1].key.comment = 'c2'
+      doc.value.items[1].value!.spaceBefore = true
+      doc.value.comment = 'c3'
       expect(String(doc)).toBe(source`
         #c0
         key1: value 1
@@ -492,12 +492,12 @@ describe('stringify comments', () => {
         YAML.YAMLMap<YAML.Scalar, YAML.Scalar>,
         false
       >(src)
-      doc.contents.items[0].key.commentBefore = 'c0\nc1'
-      doc.contents.items[1].key.commentBefore = ' \nc2\n\nc3'
-      doc.contents.items[1].key.comment = 'c4\nc5'
-      doc.contents.items[1].value!.spaceBefore = true
-      doc.contents.items[1].value!.commentBefore = 'c6'
-      doc.contents.comment = 'c7\nc8'
+      doc.value.items[0].key.commentBefore = 'c0\nc1'
+      doc.value.items[1].key.commentBefore = ' \nc2\n\nc3'
+      doc.value.items[1].key.comment = 'c4\nc5'
+      doc.value.items[1].value!.spaceBefore = true
+      doc.value.items[1].value!.commentBefore = 'c6'
+      doc.value.comment = 'c7\nc8'
       expect(String(doc)).toBe(source`
         #c0
         #c1
@@ -636,25 +636,25 @@ describe('blank lines', () => {
   })
 
   describe('drop trailing blank lines', () => {
-    test('empty contents', () => {
+    test('empty value', () => {
       const src = '\n\n\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('null\n')
     })
 
-    test('scalar contents', () => {
+    test('scalar value', () => {
       const src = 'str\n\n\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('str\n')
     })
 
-    test('seq contents', () => {
+    test('seq value', () => {
       const src = '- a\n- b\n\n\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('- a\n- b\n')
     })
 
-    test('empty/comment contents', () => {
+    test('empty/comment value', () => {
       const src = '#cc\n\n\n'
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe('#cc\n\nnull\n')
@@ -675,7 +675,7 @@ describe('blank lines', () => {
 
   test('before first node in document with directives', () => {
     const doc = YAML.parseDocument<YAML.Scalar, false>('str\n')
-    doc.contents.spaceBefore = true
+    doc.value.spaceBefore = true
     expect(doc.toString({ directives: true })).toBe('---\n\nstr\n')
   })
 
@@ -745,7 +745,7 @@ describe('blank lines', () => {
       test(name, () => {
         const doc = YAML.parseDocument<any>(src)
         expect(String(doc)).toBe(src)
-        let it = doc.contents.items[1]
+        let it = doc.value.items[1]
         if (it.key) it = it.key
         expect(it).not.toHaveProperty('spaceBefore', true)
         it.spaceBefore = true
@@ -755,12 +755,12 @@ describe('blank lines', () => {
       })
     }
 
-    test('as contents', () => {
+    test('as value', () => {
       const src = '|+\n  a\n\n#c\n'
       const doc = YAML.parseDocument(src)
       expect(doc).toMatchObject({
         comment: 'c',
-        contents: { value: 'a\n\n' }
+        value: { value: 'a\n\n' }
       })
       expect(String(doc)).toBe(src)
       doc.comment = '\n\nc'
@@ -771,7 +771,7 @@ describe('blank lines', () => {
   test('before block map values', () => {
     const src = 'a:\n\n  1\nb:\n\n  #c\n  2\n'
     const doc = YAML.parseDocument(src)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         {
           key: { value: 'a' },
@@ -806,7 +806,7 @@ describe('blank lines', () => {
     test('flow seq', () => {
       const src = '[1,\n\n2,\n3,\n\n4\n\n]'
       const doc = YAML.parseDocument(src)
-      expect(doc.contents).toMatchObject({
+      expect(doc.value).toMatchObject({
         items: [
           { value: 1 },
           { value: 2, spaceBefore: true },
@@ -820,7 +820,7 @@ describe('blank lines', () => {
     test('flow map', () => {
       const src = '{\n\na: 1,\n\nb: 2 }'
       const doc = YAML.parseDocument(src)
-      expect(doc.contents).toMatchObject({
+      expect(doc.value).toMatchObject({
         items: [
           { key: { value: 'a', spaceBefore: true }, value: { value: 1 } },
           { key: { value: 'b', spaceBefore: true }, value: { value: 2 } }
@@ -831,7 +831,7 @@ describe('blank lines', () => {
     test('flow map value comments & spaces', () => {
       const src = '{\n  a:\n    #c\n    1,\n  b:\n\n    #d\n    2\n}\n'
       const doc = YAML.parseDocument(src)
-      expect(doc.contents).toMatchObject({
+      expect(doc.value).toMatchObject({
         items: [
           {
             key: { value: 'a' },
@@ -931,7 +931,7 @@ map:
           # c4
       `
       const doc = YAML.parseDocument(src)
-      expect(doc.contents).toMatchObject({
+      expect(doc.value).toMatchObject({
         items: [
           { value: { commentBefore: ' c1\n \n c2\n', comment: ' c3\n \n c4' } }
         ]
@@ -963,7 +963,7 @@ map:
           # c4
       `
       const doc = YAML.parseDocument(src)
-      expect(doc.contents).toMatchObject({
+      expect(doc.value).toMatchObject({
         items: [
           { value: { commentBefore: ' c1\n\n c2\n', comment: ' c3\n\n c4' } }
         ]
@@ -993,7 +993,7 @@ map:
         - v2
       `
       const doc = YAML.parseDocument(src)
-      expect(doc.contents).toMatchObject({
+      expect(doc.value).toMatchObject({
         items: [
           { commentBefore: ' c1\n \n c2', comment: ' c3\n ' },
           { commentBefore: ' c4' }
@@ -1023,7 +1023,7 @@ map:
         - v2
       `
       const doc = YAML.parseDocument(src)
-      expect(doc.contents).toMatchObject({
+      expect(doc.value).toMatchObject({
         items: [
           { commentBefore: ' c1\n\n c2', comment: ' c3' },
           { commentBefore: ' c4', spaceBefore: true }
@@ -1046,7 +1046,7 @@ map:
       const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(
         '- v1\n- v2\n'
       )
-      const [v1, v2] = doc.contents.items
+      const [v1, v2] = doc.value.items
       v1.commentBefore = '\n'
       v1.comment = '\n'
       v2.commentBefore = '\n'
@@ -1066,7 +1066,7 @@ map:
         YAML.YAMLMap<YAML.Scalar, YAML.Scalar>,
         false
       >('k1: v1\nk2: v2')
-      const [p1, p2] = doc.contents.items
+      const [p1, p2] = doc.value.items
       p1.key.commentBefore = '\n'
       p1.value!.commentBefore = '\n'
       p1.value!.comment = '\n'
@@ -1189,7 +1189,7 @@ describe('collection end comments', () => {
       - d
     `
     const doc = YAML.parseDocument(src)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         { items: [{ value: 'a' }, { value: 'b' }], comment: '1\n\n2' },
         { value: 'd' }
@@ -1217,7 +1217,7 @@ describe('collection end comments', () => {
       - d
     `
     const doc = YAML.parseDocument(src)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         {
           items: [
@@ -1252,7 +1252,7 @@ describe('collection end comments', () => {
       d: 1
     `
     const doc = YAML.parseDocument(src)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         {
           key: { value: 'a' },
@@ -1285,7 +1285,7 @@ describe('collection end comments', () => {
       d: 1
     `
     const doc = YAML.parseDocument(src)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         {
           key: { value: 'a' },
@@ -1322,7 +1322,7 @@ a:
   #2
   - e\n`
     const doc = YAML.parseDocument(src)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         {
           key: { value: 'a' },

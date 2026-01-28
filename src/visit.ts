@@ -1,4 +1,4 @@
-import { Document } from './doc/Document.ts'
+import { Document, type DocValue } from './doc/Document.ts'
 import { Alias } from './nodes/Alias.ts'
 import { NodeBase, type Node } from './nodes/Node.ts'
 import { Pair } from './nodes/Pair.ts'
@@ -98,8 +98,8 @@ export const visit: {
 } = function visit(node, visitor) {
   const visitor_ = initVisitor(visitor)
   if (node instanceof Document) {
-    const cd = visit_(null, node.contents, visitor_, Object.freeze([node]))
-    if (cd === REMOVE) node.contents = new Scalar(null)
+    const cd = visit_(null, node.value, visitor_, Object.freeze([node]))
+    if (cd === REMOVE) node.value = new Scalar(null)
   } else visit_(null, node, visitor_, Object.freeze([]))
 }
 
@@ -194,11 +194,11 @@ export const visitAsync: {
   if (node instanceof Document) {
     const cd = await visitAsync_(
       null,
-      node.contents,
+      node.value,
       visitor_,
       Object.freeze([node])
     )
-    if (cd === REMOVE) node.contents = new Scalar(null)
+    if (cd === REMOVE) node.value = new Scalar(null)
   } else await visitAsync_(null, node, visitor_, Object.freeze([]))
 }
 
@@ -316,7 +316,7 @@ function replaceNode(
       throw new Error(`Cannot replace pair ${key} with non-node value`)
     }
   } else if (parent instanceof Document) {
-    parent.contents = node as Node
+    parent.value = node as DocValue
   } else {
     const pt = parent instanceof Alias ? 'alias' : 'scalar'
     throw new Error(`Cannot replace node with ${pt} parent`)

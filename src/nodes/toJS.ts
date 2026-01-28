@@ -1,4 +1,4 @@
-import type { Document } from '../doc/Document.ts'
+import type { Document, DocValue } from '../doc/Document.ts'
 import { NodeBase, type Node } from './Node.ts'
 
 export interface AnchorData {
@@ -11,7 +11,7 @@ export interface ToJSContext {
   anchors: Map<Node, AnchorData>
   /** Cached anchor and alias nodes in the order they occur in the document */
   aliasResolveCache?: Node[]
-  doc: Document<Node, boolean>
+  doc: Document<DocValue, boolean>
   keep: boolean
   mapAsMap: boolean
   mapKeyWarned: boolean

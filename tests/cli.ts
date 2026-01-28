@@ -243,18 +243,18 @@ const skip = Number(major) < 20
       )
     })
     describe('--doc', () => {
-      ok('basic', 'hello: world', ['--doc'], [{ contents: { items: [{}] } }])
+      ok('basic', 'hello: world', ['--doc'], [{ value: { items: [{}] } }])
       ok(
         'multiple',
         'hello: world\n---\n42',
         ['--doc'],
-        [{ contents: { items: [{}] } }, { contents: { value: 42 } }]
+        [{ value: { items: [{}] } }, { value: { value: 42 } }]
       )
       ok(
         'error',
         'hello: world: 2',
         ['--doc'],
-        [{ contents: { items: [{}] } }],
+        [{ value: { items: [{}] } }],
         [{ name: 'YAMLParseError' }]
       )
     })

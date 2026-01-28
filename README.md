@@ -97,7 +97,7 @@ parse(file)
 
 - [`Document`](https://eemeli.org/yaml/#documents)
   - [`constructor(value, replacer?, options?)`](https://eemeli.org/yaml/#creating-documents)
-  - [`#contents`](https://eemeli.org/yaml/#content-nodes)
+  - [`#value`](https://eemeli.org/yaml/#content-nodes)
   - [`#directives`](https://eemeli.org/yaml/#stream-directives)
   - [`#errors`](https://eemeli.org/yaml/#errors)
   - [`#warnings`](https://eemeli.org/yaml/#errors)

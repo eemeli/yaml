@@ -14,7 +14,7 @@ describe('Map', () => {
   let map: YAMLMap<string, number | string | YAMLMap<string, number>>
   beforeEach(() => {
     doc = new Document({ a: 1, b: { c: 3, d: 4 } })
-    map = doc.contents as any
+    map = doc.value as any
     expect(map.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
@@ -114,7 +114,7 @@ describe('Seq', () => {
   let seq: YAMLSeq<number | Scalar<number> | YAMLSeq<number | Scalar<number>>>
   beforeEach(() => {
     doc = new Document([1, [2, 3]])
-    seq = doc.contents as any
+    seq = doc.value as any
     expect(seq.items).toMatchObject([
       { value: 1 },
       { items: [{ value: 2 }, { value: 3 }] }
@@ -189,7 +189,7 @@ describe('Set', () => {
   beforeEach(() => {
     doc = new Document(null, { version: '1.1' })
     set = doc.createNode([1, 2, 3], { tag: '!!set' }) as any
-    doc.contents = set
+    doc.value = set
     expect(set.items).toMatchObject([
       { key: { value: 1 }, value: null },
       { key: { value: 2 }, value: null },
@@ -235,7 +235,7 @@ describe('OMap', () => {
     omap = doc.createNode([{ a: 1 }, { b: { c: 3, d: 4 } }], {
       tag: '!!omap'
     }) as any
-    doc.contents = omap
+    doc.value = omap
     expect(omap.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
@@ -298,7 +298,7 @@ describe('Collection', () => {
   let map: YAMLMap<string, Scalar<number> | YAMLSeq<Scalar<number>>>
   beforeEach(() => {
     doc = new Document({ a: 1, b: [2, 3] })
-    map = doc.contents as any
+    map = doc.value as any
   })
 
   test('addIn', () => {
@@ -369,7 +369,7 @@ describe('Document', () => {
   let doc: Document<YAMLMap<string, Scalar<number> | YAMLSeq<Scalar<number>>>>
   beforeEach(() => {
     doc = new Document({ a: 1, b: [2, 3] })
-    expect(doc.contents.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
         key: { value: 'b' },
@@ -381,7 +381,7 @@ describe('Document', () => {
   test('add', () => {
     doc.add(doc.createPair('c', 'x'))
     expect(doc.get('c')).toMatchObject({ value: 'x' })
-    expect(doc.contents.items).toHaveLength(3)
+    expect(doc.value.items).toHaveLength(3)
   })
 
   test('addIn', () => {
@@ -391,7 +391,7 @@ describe('Document', () => {
     expect(doc.get('c')).toMatchObject({ value: 5 })
     expect(() => doc.addIn(['a'], -1)).toThrow(/Expected YAML collection/)
     doc.addIn(['b', 3], 6)
-    expect(doc.contents.items).toHaveLength(3)
+    expect(doc.value.items).toHaveLength(3)
     expect((doc.get('b') as any).items).toHaveLength(4)
   })
 
@@ -399,12 +399,12 @@ describe('Document', () => {
     expect(doc.delete('a')).toBe(true)
     expect(doc.delete('a')).toBe(false)
     expect(doc.get('a')).toBeUndefined()
-    expect(doc.contents.items).toHaveLength(1)
+    expect(doc.value.items).toHaveLength(1)
   })
 
-  test('delete on scalar contents', () => {
+  test('delete on scalar value', () => {
     const doc = new Document('s')
-    expect(() => doc.set('a', 1)).toThrow(/document contents/)
+    expect(() => doc.set('a', 1)).toThrow(/document value/)
   })
 
   test('deleteIn', () => {
@@ -415,7 +415,7 @@ describe('Document', () => {
     expect(doc.deleteIn([1])).toBe(false)
     expect(doc.deleteIn(['b', 2])).toBe(false)
     expect(() => doc.deleteIn(['a', 'e'])).toThrow(/Expected/)
-    expect(doc.contents.items).toHaveLength(1)
+    expect(doc.value.items).toHaveLength(1)
     expect((doc.get('b') as any).items).toHaveLength(1)
     expect(() => doc.deleteIn(null as any)).toThrow()
   })
@@ -425,7 +425,7 @@ describe('Document', () => {
     expect(doc.get('c')).toBeUndefined()
   })
 
-  test('get on scalar contents', () => {
+  test('get on scalar value', () => {
     const doc = new Document('s')
     expect(doc.get('a')).toBeUndefined()
   })
@@ -450,7 +450,7 @@ describe('Document', () => {
     expect(doc.has('c')).toBe(false)
   })
 
-  test('has on scalar contents', () => {
+  test('has on scalar value', () => {
     const doc = new Document('s')
     expect(doc.has('a')).toBe(false)
   })
@@ -468,12 +468,12 @@ describe('Document', () => {
     expect(doc.get('a')).toMatchObject({ value: 2 })
     doc.set('c', 6)
     expect(doc.get('c')).toMatchObject({ value: 6 })
-    expect(doc.contents.items).toHaveLength(3)
+    expect(doc.value.items).toHaveLength(3)
   })
 
-  test('set on scalar contents', () => {
+  test('set on scalar value', () => {
     const doc = new Document('s')
-    expect(() => doc.set('a', 1)).toThrow(/document contents/)
+    expect(() => doc.set('a', 1)).toThrow(/document value/)
   })
 
   test('setIn', () => {
@@ -486,16 +486,16 @@ describe('Document', () => {
     doc.setIn(['e', 1, 'e'], 7)
     expect(doc.getIn(['e', 1, 'e'])).toMatchObject({ value: 7 })
     expect(() => doc.setIn(['a', 'e'], 8)).toThrow(/Expected YAML collection/)
-    expect(doc.contents.items).toHaveLength(4)
+    expect(doc.value.items).toHaveLength(4)
     expect((doc.get('b') as any).items).toHaveLength(2)
     expect(String(doc)).toBe(
       'a: 2\nb:\n  - 2\n  - 5\nc: 6\ne:\n  - null\n  - e: 7\n'
     )
   })
 
-  test('setIn on scalar contents', () => {
+  test('setIn on scalar value', () => {
     const doc = new Document('s')
-    expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
+    expect(() => doc.setIn(['a'], 1)).toThrow(/document value/)
   })
 
   test('setIn on parsed document', () => {
@@ -510,10 +510,10 @@ describe('Document', () => {
   })
 
   test('setIn with object key', () => {
-    doc.contents = doc.createNode({})
+    doc.value = doc.createNode({})
     const foo = { foo: 'FOO' }
     doc.setIn([foo], 'BAR')
-    expect(doc.contents.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       {
         key: { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] },
         value: { value: 'BAR' }
@@ -522,10 +522,10 @@ describe('Document', () => {
   })
 
   test('setIn with repeated object key', () => {
-    doc.contents = doc.createNode({})
+    doc.value = doc.createNode({})
     const foo = { foo: 'FOO' }
     doc.setIn([foo, foo], 'BAR')
-    expect(doc.contents.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       {
         key: { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] },
         value: {

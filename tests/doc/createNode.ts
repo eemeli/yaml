@@ -56,7 +56,7 @@ describe('arrays', () => {
     const s = doc.createNode([true])
     expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toMatchObject([{ value: true }])
-    doc.contents = s
+    doc.value = s
     expect(String(doc)).toBe('- true\n')
   })
 
@@ -65,7 +65,7 @@ describe('arrays', () => {
     const s = doc.createNode([true], { flow: true })
     expect(s).toBeInstanceOf(YAMLSeq)
     expect(s.items).toMatchObject([{ value: true }])
-    doc.contents = s
+    doc.value = s
     expect(String(doc)).toBe('[ true ]\n')
   })
 
@@ -81,13 +81,13 @@ describe('arrays', () => {
       expect(s.items[1].items[0].value).toBe('four')
       expect(s.items[1].items[1].value).toBe(5)
     })
-    test('set doc contents', () => {
+    test('set doc value', () => {
       const res = '- 3\n- - four\n  - 5\n'
       const doc = new Document(array)
       expect(String(doc)).toBe(res)
-      doc.contents = array as any
+      doc.value = array as any
       expect(String(doc)).toBe(res)
-      doc.contents = doc.createNode(array)
+      doc.value = doc.createNode(array)
       expect(String(doc)).toBe(res)
     })
   })
@@ -107,7 +107,7 @@ describe('objects', () => {
     expect(s.items).toMatchObject([
       { key: { value: 'x' }, value: { value: true } }
     ])
-    doc.contents = s
+    doc.value = s
     expect(String(doc)).toBe('x: true\n')
   })
 
@@ -118,7 +118,7 @@ describe('objects', () => {
     expect(s.items).toMatchObject([
       { key: { value: 'x' }, value: { value: true } }
     ])
-    doc.contents = s
+    doc.value = s
     expect(String(doc)).toBe('{ x: true }\n')
   })
 
@@ -171,7 +171,7 @@ describe('objects', () => {
         }
       ])
     })
-    test('set doc contents', () => {
+    test('set doc value', () => {
       const res = `x: 3
 y:
   - 4
@@ -180,9 +180,9 @@ z:
   v: 6\n`
       const doc = new Document(object)
       expect(String(doc)).toBe(res)
-      doc.contents = object as any
+      doc.value = object as any
       expect(String(doc)).toBe(res)
-      doc.contents = doc.createNode(object)
+      doc.value = doc.createNode(object)
       expect(String(doc)).toBe(res)
     })
   })
@@ -211,13 +211,13 @@ describe('Set', () => {
       expect(s.items[1].items[0].value).toBe('four')
       expect(s.items[1].items[1].value).toBe(5)
     })
-    test('set doc contents', () => {
+    test('set doc value', () => {
       const res = '- 3\n- - four\n  - 5\n'
       const doc = new Document(set)
       expect(String(doc)).toBe(res)
-      doc.contents = set as any
+      doc.value = set as any
       expect(String(doc)).toBe(res)
-      doc.contents = doc.createNode(set)
+      doc.value = doc.createNode(set)
       expect(String(doc)).toBe(res)
     })
     test('Schema#createNode() - YAML 1.2', () => {
@@ -284,7 +284,7 @@ describe('Map', () => {
         }
       ])
     })
-    test('set doc contents', () => {
+    test('set doc value', () => {
       const res = `x: 3
 y:
   - 4
@@ -293,9 +293,9 @@ y:
 : z\n`
       const doc = new Document(map)
       expect(String(doc)).toBe(res)
-      doc.contents = map as any
+      doc.value = map as any
       expect(String(doc)).toBe(res)
-      doc.contents = doc.createNode(map)
+      doc.value = doc.createNode(map)
       expect(String(doc)).toBe(res)
     })
   })
@@ -341,7 +341,7 @@ describe('circular references', () => {
     const map: any = { foo: 'bar' }
     map.map = map
     const doc = new Document(map)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       anchor: 'a1',
       items: [
         { key: { value: 'foo' }, value: { value: 'bar' } },
@@ -380,7 +380,7 @@ describe('circular references', () => {
     const two = ['two']
     const seq = [one, two, one, one, two]
     const doc = new Document(seq)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         { items: [{ value: 'one' }] },
         { items: [{ value: 'two' }] },

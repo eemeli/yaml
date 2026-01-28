@@ -5,7 +5,7 @@ import { source } from './_utils.ts'
 describe('scalars', () => {
   test('plain', () => {
     const doc = parseDocument('42')
-    expect(doc.contents.toJS(doc)).toBe(42)
+    expect(doc.value.toJS(doc)).toBe(42)
   })
 
   test('plain in map', () => {
@@ -17,7 +17,7 @@ describe('scalars', () => {
 describe('collections', () => {
   test('map', () => {
     const doc = parseDocument('key: 42')
-    expect(doc.contents.toJS(doc)).toMatchObject({ key: 42 })
+    expect(doc.value.toJS(doc)).toMatchObject({ key: 42 })
   })
 
   test('map in seq', () => {
@@ -66,7 +66,7 @@ describe('alias', () => {
 describe('options', () => {
   test('mapAsMap', () => {
     const doc = parseDocument('key: 42')
-    expect(doc.contents.toJS(doc, { mapAsMap: true })).toMatchObject(
+    expect(doc.value.toJS(doc, { mapAsMap: true })).toMatchObject(
       new Map([['key', 42]])
     )
   })

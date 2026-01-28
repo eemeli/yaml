@@ -8,7 +8,7 @@ import type { CreateNodeOptions } from '../options.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { CollectionTag, ScalarTag } from '../schema/types.ts'
 import { anchorNames, findNewAnchor } from './anchors.ts'
-import { Document, type Replacer } from './Document.ts'
+import { Document, type DocValue, type Replacer } from './Document.ts'
 
 const defaultTagPrefix = 'tag:yaml.org,2002:'
 
@@ -20,7 +20,7 @@ export class NodeCreator {
   #aliasDuplicateObjects: boolean
   #anchorPrefix: string
   #aliasObjects: unknown[] = []
-  #doc?: Document<Node, boolean>
+  #doc?: Document<DocValue, boolean>
   #flow: boolean
   #onTagObj?: (tagObj: ScalarTag | CollectionTag) => void
   #prevAnchors: Set<string> | null = null
@@ -28,7 +28,7 @@ export class NodeCreator {
     new Map()
 
   constructor(
-    doc: Document<Node, boolean>,
+    doc: Document<DocValue, boolean>,
     options?: CreateNodeOptions,
     replacer?: Replacer
   )
@@ -37,7 +37,7 @@ export class NodeCreator {
     options: CreateNodeOptions & { aliasDuplicateObjects: false }
   )
   constructor(
-    docOrSchema: Document<Node, boolean> | Schema,
+    docOrSchema: Document<DocValue, boolean> | Schema,
     options: CreateNodeOptions = {},
     replacer?: Replacer
   ) {
@@ -59,7 +59,7 @@ export class NodeCreator {
   }
 
   create(value: unknown, tagName?: string): Node {
-    if (value instanceof Document) value = value.contents
+    if (value instanceof Document) value = value.value
     if (value instanceof NodeBase) return value as Node
     if (value instanceof Pair) {
       const map = (this.schema.map.nodeClass! as typeof YAMLMap).from(

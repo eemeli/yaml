@@ -1,10 +1,9 @@
 import { Composer } from './compose/composer.ts'
 import type { Reviver } from './doc/applyReviver.ts'
-import type { Replacer } from './doc/Document.ts'
+import type { DocValue, Replacer } from './doc/Document.ts'
 import { Document } from './doc/Document.ts'
 import { prettifyError, YAMLParseError } from './errors.ts'
 import { warn } from './log.ts'
-import type { Node, ParsedNode } from './nodes/Node.ts'
 import type {
   CreateNodeOptions,
   DocumentOptions,
@@ -38,18 +37,12 @@ function parseOptions(options: ParseOptions) {
  *   TypeScript, you should use `'empty' in docs` as a type guard for it.
  */
 export function parseAllDocuments<
-  Contents extends Node = ParsedNode,
+  Value extends DocValue = DocValue,
   Strict extends boolean = true
 >(
   source: string,
   options: ParseOptions & DocumentOptions & SchemaOptions = {}
-):
-  | Array<
-      Contents extends ParsedNode
-        ? Document.Parsed<Contents, Strict>
-        : Document<Contents, Strict>
-    >
-  | EmptyStream {
+): Document.Parsed<Value, Strict>[] | EmptyStream {
   const { lineCounter, prettyErrors } = parseOptions(options)
   const parser = new Parser(lineCounter?.addNewLine)
   const composer = new Composer(options)
@@ -61,9 +54,7 @@ export function parseAllDocuments<
       doc.warnings.forEach(prettifyError(source, lineCounter))
     }
 
-  type DocType = Contents extends ParsedNode
-    ? Document.Parsed<Contents, Strict>
-    : Document<Contents, Strict>
+  type DocType = Document.Parsed<Value, Strict>
   if (docs.length > 0) return docs as DocType[]
   return Object.assign<
     DocType[],
@@ -74,21 +65,17 @@ export function parseAllDocuments<
 
 /** Parse an input string into a single YAML.Document */
 export function parseDocument<
-  Contents extends Node = ParsedNode,
+  Value extends DocValue = DocValue,
   Strict extends boolean = true
 >(
   source: string,
   options: ParseOptions & DocumentOptions & SchemaOptions = {}
-): Contents extends ParsedNode
-  ? Document.Parsed<Contents, Strict>
-  : Document<Contents, Strict> {
+): Document.Parsed<Value, Strict> {
   const { lineCounter, prettyErrors } = parseOptions(options)
   const parser = new Parser(lineCounter?.addNewLine)
   const composer = new Composer(options)
 
-  type DocType = Contents extends ParsedNode
-    ? Document.Parsed<Contents, Strict>
-    : Document<Contents, Strict>
+  type DocType = Document.Parsed<Value, Strict>
   // `doc` is always set by compose.end(true) at the very latest
   let doc: DocType = null as any
   for (const _doc of composer.compose(

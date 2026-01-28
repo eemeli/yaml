@@ -1,9 +1,6 @@
 import type { Node } from '../nodes/Node.ts'
-import type { Scalar } from '../nodes/Scalar.ts'
-import type { YAMLMap } from '../nodes/YAMLMap.ts'
-import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import { visit } from '../visit.ts'
-import type { Document } from './Document.ts'
+import type { Document, DocValue } from './Document.ts'
 
 /**
  * Verify that the input string is a valid anchor.
@@ -19,10 +16,12 @@ export function anchorIsValid(anchor: string): true {
   return true
 }
 
-export function anchorNames(root: Document<Node, boolean> | Node): Set<string> {
+export function anchorNames(
+  root: Document<DocValue, boolean> | Node
+): Set<string> {
   const anchors = new Set<string>()
   visit(root, {
-    Value(_key: unknown, node: Scalar | YAMLMap | YAMLSeq) {
+    Value(_key, node) {
       if (node.anchor) anchors.add(node.anchor)
     }
   })

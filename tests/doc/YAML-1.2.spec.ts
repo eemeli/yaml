@@ -436,7 +436,7 @@ application specific tag: !something |
       warnings: [['Unresolved tag: !something']],
       special(src) {
         const doc = YAML.parseDocument<any>(src, { schema: 'yaml-1.1' })
-        const data = doc.contents.items[1].value.value
+        const data = doc.value.items[1].value.value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)
       }
@@ -673,7 +673,7 @@ mapping: { sky: blue, sea: green }`,
       tgt: [],
       special(src) {
         const doc = YAML.parseDocument(src)
-        expect(doc.contents.commentBefore).toBe(' Comment only.')
+        expect(doc.value.commentBefore).toBe(' Comment only.')
       }
     },
 
@@ -1717,12 +1717,12 @@ mapping: !!map
       ],
       special(src) {
         const doc = YAML.parseDocument<YAML.YAMLSeq<any>, false>(src)
-        expect(doc.contents.tag).toBeUndefined()
-        expect(doc.contents.items[0].value.tag).toBe('tag:yaml.org,2002:seq')
-        expect(doc.contents.items[0].value.items[1].tag).toBe(
+        expect(doc.value.tag).toBeUndefined()
+        expect(doc.value.items[0].value.tag).toBe('tag:yaml.org,2002:seq')
+        expect(doc.value.items[0].value.items[1].tag).toBe(
           'tag:yaml.org,2002:seq'
         )
-        expect(doc.contents.items[1].value.tag).toBe('tag:yaml.org,2002:map')
+        expect(doc.value.items[1].value.tag).toBe('tag:yaml.org,2002:map')
       }
     }
   },
