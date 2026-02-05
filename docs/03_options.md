@@ -30,6 +30,7 @@ Used by: `parse()`, `parseDocument()`, `parseAllDocuments()`, `new Composer()`, 
 | prettyErrors     | `boolean`                     | `true`  | Include line/col position in errors, along with an extract of the source string.                                                                                           |
 | strict           | `boolean`                     | `true`  | When parsing, do not ignore errors [required](#silencing-errors-and-warnings) by the YAML 1.2 spec, but caused by unambiguous content.                                     |
 | stringKeys       | `boolean`                     | `false` | Parse all mapping keys as strings. Treat all non-scalar keys as errors.                                                                                                    |
+| keepIndentStep   | `boolean`                     | `false` | Include an `indentStep` value on each parsed `Pair`, preserving the original indentation between keys and values in block maps.                                            |
 | uniqueKeys       | `boolean ⎮ (a, b) => boolean` | `true`  | Whether key uniqueness is checked, or customised. If set to be a function, it will be passed two parsed nodes and should return a boolean value indicating their equality. |
 
 [bigint]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/BigInt

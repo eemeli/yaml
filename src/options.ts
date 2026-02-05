@@ -68,6 +68,17 @@ export type ParseOptions = {
    * Default: `true`
    */
   uniqueKeys?: boolean | ((a: Node, b: Node) => boolean)
+
+  /**
+   * Include a `indentStep` value on each parsed `Pair`.
+   *
+   * This helps keep the original indentation and formatting after making
+   * transformations to the document. Currently, this only adds formatting
+   * information to Pairs found in block maps.
+   *
+   * Default: `false`
+   */
+  keepIndentStep?: boolean
 }
 
 export type DocumentOptions = {

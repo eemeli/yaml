@@ -52,6 +52,7 @@ On the other hand, `!!int` and `!!float` stringifiers will take `format` into ac
 class Pair {
   key: Node
   value: Node | null
+  indentStep?: number  // set when parsed with keepIndentStep: true
 }
 
 class Collection implements NodeBase {
