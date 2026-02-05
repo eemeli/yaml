@@ -871,6 +871,128 @@ describe('custom indent', () => {
   })
 })
 
+describe('keepIndent: true', () => {
+  test('keep object indentation', () => {
+    const src = source`
+      key:
+              super: indented
+    `
+    const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+    expect(doc.toString({ keepIndent: true })).toBe(src)
+  })
+
+  test('keep array indentation', () => {
+    const src = source`
+      key:
+      - name: foo
+      - name: bar
+      - name: bam
+      - name: baz
+    `
+    const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+    expect(doc.toString({ keepIndent: true })).toBe(src)
+  })
+
+  test('keep complex indentation', () => {
+    const src = source`
+      key:
+              super:
+              - name: foo
+              - name: bar
+              - name: bam
+              - name: baz
+                metadata:
+                    foo: why
+    `
+    const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+    expect(doc.toString({ keepIndent: true })).toBe(src)
+  })
+
+  test('handles multiline seq flow on same line', () => {
+    const src = source`
+      key: [
+        aaaaaaaa,
+        bbbbbbbb,
+        cccccccc,
+        dddddddd,
+        eeeeeeee,
+        ffffffff,
+        gggggggg,
+        hhhhhhhh
+      ]
+    `
+    const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+    expect(doc.toString({ keepIndent: true })).toBe(src)
+  })
+  test('handles multiline flow on same line', () => {
+    const src = source`
+      key: !tag {
+        one: aaaaaaaa,
+        two: bbbbbbbb,
+        three: cccccccc,
+        four: dddddddd,
+        five: eeeeeeee
+      }
+    `
+    const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+    expect(doc.toString({ keepIndent: true })).toBe(src)
+  })
+
+  test('handles multiline flow on next line', () => {
+    const src = source`
+      key:
+           !tag {
+             one: aaaaaaaa,
+             two: bbbbbbbb,
+             three: cccccccc,
+             four: dddddddd,
+             five: eeeeeeee
+           }
+    `
+    const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+    expect(doc.toString({ keepIndent: true })).toBe(src)
+  })
+
+  test('handles multiline flow on next line', () => {
+    const src = source`
+      key:
+           !tag {
+             one: aaaaaaaa,
+             two: bbbbbbbb,
+             three: cccccccc,
+             four: dddddddd,
+             five: eeeeeeee
+           }
+    `
+    const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+    expect(doc.toString({ keepIndent: true })).toBe(src)
+  })
+
+  test('handles explicit key map with no indent', () => {
+    const src = source`
+      foo:
+        ? [ key ]
+        : !tag
+        - foo
+        - bar
+    `
+    const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+    expect(doc.toString({ keepIndent: true })).toBe(src)
+  })
+
+  test('handles explicit key map with indent', () => {
+    const src = source`
+      foo:
+          ? [ key ]
+          : !tag
+                - foo
+                - bar
+    `
+    const doc = YAML.parseDocument(src, { keepSourceTokens: true })
+    expect(doc.toString({ keepIndent: true })).toBe(src)
+  })
+})
+
 describe('indentSeq: false', () => {
   let obj: unknown
   beforeEach(() => {

@@ -15,9 +15,9 @@ export function stringifyPair(
     allNullValues,
     doc,
     indent,
-    indentStep,
-    options: { commentString, indentSeq, simpleKeys }
+    options: { commentString, indentSeq, keepIndent, simpleKeys }
   } = ctx
+
   let keyComment = (isNode(key) && key.comment) || null
   if (simpleKeys) {
     if (keyComment) {
@@ -36,6 +36,17 @@ export function stringifyPair(
       (isScalar(key)
         ? key.type === Scalar.BLOCK_FOLDED || key.type === Scalar.BLOCK_LITERAL
         : typeof key === 'object'))
+
+  let indentStep = ctx.indentStep
+  if (
+    keepIndent &&
+    isNode(value) &&
+    value.srcToken &&
+    'indent' in value.srcToken
+  ) {
+    const diff = value.srcToken.indent - indent.length
+    indentStep = ' '.repeat(diff)
+  }
 
   ctx = Object.assign({}, ctx, {
     allNullValues: false,
@@ -150,7 +161,8 @@ export function stringifyPair(
         }
         if (sp0 === -1 || nl0 < sp0) hasPropsLine = true
       }
-      if (!hasPropsLine) ws = `\n${ctx.indent}`
+      if (!hasPropsLine && (indentStep.length > 0 || !value.flow))
+        ws = `\n${ctx.indent}`
     }
   } else if (valueStr === '' || valueStr[0] === '\n') {
     ws = ''

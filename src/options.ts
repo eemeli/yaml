@@ -330,6 +330,15 @@ export type ToStringOptions = {
   indentSeq?: boolean
 
   /**
+   * Whether indentation in srcToken should be preserved.
+   *
+   * For this to work, you need to have parsed the yaml document with keepSourceTokens: true
+   *
+   * Default: `false`
+   */
+  keepIndent?: boolean
+
+  /**
    * Maximum line width (set to `0` to disable folding).
    *
    * This is a soft limit, as only double-quoted semantics allow for inserting

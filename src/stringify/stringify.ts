@@ -50,6 +50,7 @@ export function createStringifyContext(
       falseStr: 'false',
       flowCollectionPadding: true,
       indentSeq: true,
+      keepIndent: false,
       lineWidth: 80,
       minContentWidth: 20,
       nullStr: 'null',
