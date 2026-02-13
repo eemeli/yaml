@@ -1,0 +1,222 @@
+<h1 id='documents'>Documents</h1>
+<p>In order to work with YAML features not directly supported by native JavaScript data types, such as comments, anchors and aliases, <code>yaml</code> provides the <code>Document</code> API.</p>
+<h2 id='parsing-documents'>Parsing Documents</h2><div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="nx">fs</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">fs</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">parseAllDocuments</span><span class="p">,</span> <span class="nx">parseDocument</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="dl">'</span><span class="s1">./file.yml</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">utf8</span><span class="dl">'</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">parseDocument</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">contents</span>
+<span class="c1">// YAMLMap {</span>
+<span class="c1">//   items:</span>
+<span class="c1">//    [ Pair {</span>
+<span class="c1">//        key: Scalar { value: 'YAML', range: [ 0, 4, 4 ] },</span>
+<span class="c1">//        value:</span>
+<span class="c1">//         YAMLSeq {</span>
+<span class="c1">//           items:</span>
+<span class="c1">//            [ Scalar {</span>
+<span class="c1">//                value: 'A human-readable data serialization language',</span>
+<span class="c1">//                range: [ 10, 54, 55 ] },</span>
+<span class="c1">//              Scalar {</span>
+<span class="c1">//                value: 'https://en.wikipedia.org/wiki/YAML',</span>
+<span class="c1">//                range: [ 59, 93, 94 ] } ],</span>
+<span class="c1">//           range: [ 8, 94, 94 ] } },</span>
+<span class="c1">//      Pair {</span>
+<span class="c1">//        key: Scalar { value: 'yaml', range: [ 94, 98, 98 ] },</span>
+<span class="c1">//        value:</span>
+<span class="c1">//         YAMLSeq {</span>
+<span class="c1">//           items:</span>
+<span class="c1">//            [ Scalar {</span>
+<span class="c1">//                value: 'A complete JavaScript implementation',</span>
+<span class="c1">//                range: [ 104, 140, 141 ] },</span>
+<span class="c1">//              Scalar {</span>
+<span class="c1">//                value: 'https://www.npmjs.com/package/yaml',</span>
+<span class="c1">//                range: [ 145, 180, 180 ] } ],</span>
+<span class="c1">//           range: [ 102, 180, 180 ] } } ],</span>
+<span class="c1">//   range: [ 0, 180, 180 ] }</span>
+</code></pre></div>
+<p>These functions should never throw,
+provided that <code>str</code> is a string and the <code>options</code> are valid.
+Errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays.
+In particular, if <code>errors</code> is not empty
+it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
+
+<p>The <code>contents</code> of a parsed document will always consist of <code>Scalar</code>, <code>Map</code>, <code>Seq</code> or <code>null</code> values.</p>
+<h4 id='parsedocument-str-options-document'><code>parseDocument(str, options = {}): Document</code></h4>
+<p>Parses a single <code>Document</code> from the input <code>str</code>; used internally by <code>parse</code>.
+Will include an error if <code>str</code> contains more than one document.
+See <a href="#options">Options</a> for more information on the second parameter.</p>
+
+<p><br/></p>
+<h4 id='parsealldocuments-str-options-document'><code>parseAllDocuments(str, options = {}): Document[]</code></h4>
+<p>When parsing YAML, the input string <code>str</code> may consist of a stream of documents separated from each other by <code>...</code> document end marker lines.
+<code>parseAllDocuments</code> will return an array of <code>Document</code> objects that allow these documents to be parsed and manipulated with more control.
+See <a href="#options">Options</a> for more information on the second parameter.</p>
+
+<p><br/></p>
+<h2 id='creating-documents'>Creating Documents</h2><h4 id='new-document-value-replacer-options'><code>new Document(value, replacer?, options = {})</code></h4>
+<p>Creates a new document.
+If <code>value</code> is defined, the document <code>contents</code> are initialised with that value, wrapped recursively in appropriate <a href="#content-nodes">content nodes</a>.
+If <code>value</code> is <code>undefined</code>, the document&#39;s <code>contents</code> is initialised as <code>null</code>.
+If defined, a <code>replacer</code> may filter or modify the initial document contents, following the same algorithm as the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter">JSON implementation</a>.
+See <a href="#options">Options</a> for more information on the last argument.</p>
+
+<table><thead>
+<tr>
+<th>Member</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>commentBefore</td>
+<td><code>string?</code></td>
+<td>A comment at the very beginning of the document. If not empty, separated from the rest of the document by a blank line or the doc-start indicator when stringified.</td>
+</tr>
+<tr>
+<td>comment</td>
+<td><code>string?</code></td>
+<td>A comment at the end of the document. If not empty, separated from the rest of the document by a blank line when stringified.</td>
+</tr>
+<tr>
+<td>contents</td>
+<td><a href="#content-nodes"><code>Node</code></a> <code>⎮ any</code></td>
+<td>The document contents.</td>
+</tr>
+<tr>
+<td>directives</td>
+<td><a href="#stream-directives"><code>Directives</code></a></td>
+<td>Controls for the <code>%YAML</code> and <code>%TAG</code> directives, as well as the doc-start marker <code>---</code>.</td>
+</tr>
+<tr>
+<td>errors</td>
+<td><a href="#errors"><code>Error[]</code></a></td>
+<td>Errors encountered during parsing.</td>
+</tr>
+<tr>
+<td>schema</td>
+<td><code>Schema</code></td>
+<td>The schema used with the document.</td>
+</tr>
+<tr>
+<td>warnings</td>
+<td><a href="#errors"><code>Error[]</code></a></td>
+<td>Warnings encountered during parsing.</td>
+</tr>
+</tbody></table>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Document</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Document</span><span class="p">([</span><span class="dl">'</span><span class="s1">some</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">values</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">balloons</span><span class="p">:</span> <span class="mi">99</span> <span class="p">}])</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">commentBefore</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> A commented document</span><span class="dl">'</span>
+
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// # A commented document</span>
+<span class="c1">//</span>
+<span class="c1">// - some</span>
+<span class="c1">// - values</span>
+<span class="c1">// - balloons: 99</span>
+</code></pre></div>
+<p>The Document members are all modifiable, though it&#39;s unlikely that you&#39;ll have reason to change <code>errors</code>, <code>schema</code> or <code>warnings</code>.
+In particular you may be interested in both reading and writing <strong><code>contents</code></strong>.
+Although <code>parseDocument()</code> and <code>parseAllDocuments()</code> will leave it with <code>YAMLMap</code>, <code>YAMLSeq</code>, <code>Scalar</code> or <code>null</code> contents, it can be set to anything.</p>
+<h2 id='document-methods'>Document Methods</h2>
+<table><thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>clone()</td>
+<td><code>Document</code></td>
+<td>Create a deep copy of this Document and its contents. Custom Node values that inherit from <code>Object</code> still refer to their original instances.</td>
+</tr>
+<tr>
+<td>createAlias(node: Node, name?: string)</td>
+<td><code>Alias</code></td>
+<td>Create a new <code>Alias</code> node, adding the required anchor for <code>node</code>. If <code>name</code> is empty, a new anchor name will be generated.</td>
+</tr>
+<tr>
+<td>createNode(value,&nbsp;options?)</td>
+<td><code>Node</code></td>
+<td>Recursively wrap any input with appropriate <code>Node</code> containers. See <a href="#creating-nodes">Creating Nodes</a> for more information.</td>
+</tr>
+<tr>
+<td>createPair(key,&nbsp;value,&nbsp;options?)</td>
+<td><code>Pair</code></td>
+<td>Recursively wrap <code>key</code> and <code>value</code> into a <code>Pair</code> object. See <a href="#creating-nodes">Creating Nodes</a> for more information.</td>
+</tr>
+<tr>
+<td>setSchema(version,&nbsp;options?)</td>
+<td><code>void</code></td>
+<td>Change the YAML version and schema used by the document. <code>version</code> must be either <code>&#39;1.1&#39;</code> or <code>&#39;1.2&#39;</code>; accepts all Schema options.</td>
+</tr>
+<tr>
+<td>toJS(options?)</td>
+<td><code>any</code></td>
+<td>A plain JavaScript representation of the document <code>contents</code>.</td>
+</tr>
+<tr>
+<td>toJSON()</td>
+<td><code>any</code></td>
+<td>A JSON representation of the document <code>contents</code>.</td>
+</tr>
+<tr>
+<td>toString(options?)</td>
+<td><code>string</code></td>
+<td>A YAML representation of the document.</td>
+</tr>
+</tbody></table>
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">parseDocument</span><span class="p">(</span><span class="dl">'</span><span class="s1">a: 1</span><span class="se">\n</span><span class="s1">b: [2, 3]</span><span class="se">\n</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">doc</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// 1</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([])</span> <span class="c1">// YAMLMap { items: [Pair, Pair], ... }</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">hasIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="c1">// true</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">addIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span> <span class="c1">// -&gt; doc.get('b').items.length === 3</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">deleteIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// true</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1">// 4</span>
+</code></pre></div>
+<p>In addition to the above, the document object also provides the same <strong>accessor methods</strong> as <a href="#collections">collections</a>, based on the top-level collection:
+<code>add</code>, <code>delete</code>, <code>get</code>, <code>has</code>, and <code>set</code>, along with their deeper variants <code>addIn</code>, <code>deleteIn</code>, <code>getIn</code>, <code>hasIn</code>, and <code>setIn</code>.
+For the <code>*In</code> methods using an empty <code>path</code> value (i.e. <code>null</code>, <code>undefined</code>, or <code>[]</code>) will refer to the document&#39;s top-level <code>contents</code>.</p>
+<h4 id='document-tojs-document-tojson-and-document-tostring'><code>Document#toJS()</code>, <code>Document#toJSON()</code> and <code>Document#toString()</code></h4><div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">1969-07-21T02:56:15Z</span><span class="dl">'</span>
+<span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">parseDocument</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="p">{</span> <span class="na">customTags</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">timestamp</span><span class="dl">'</span><span class="p">]</span> <span class="p">})</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span>
+<span class="c1">// Date { 1969-07-21T02:56:15.000Z }</span>
+
+<span class="nx">doc</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()</span>
+<span class="c1">// '1969-07-21T02:56:15.000Z'</span>
+
+<span class="nb">String</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+<span class="c1">// '1969-07-21T02:56:15\n'</span>
+</code></pre></div>
+<p>For a plain JavaScript representation of the document, <strong><code>toJS(options = {})</code></strong> is your friend.
+Its output may include <code>Map</code> and <code>Set</code> collections (e.g. if the <code>mapAsMap</code> option is true) and complex scalar values like <code>Date</code> for <code>!!timestamp</code>, but all YAML nodes will be resolved.
+See <a href="#options">Options</a> for more information on the optional parameter.</p>
+
+<p>For a representation consisting only of JSON values, use <strong><code>toJSON()</code></strong>.</p>
+
+<p>To stringify a document as YAML, use <strong><code>toString(options = {})</code></strong>.
+This will also be called by <code>String(doc)</code> (with no options).
+This method will throw if the <code>errors</code> array is not empty.
+See <a href="#options">Options</a> for more information on the optional parameter.</p>
+<h2 id='stream-directives'>Stream Directives</h2>
+<!-- prettier-ignore -->
+<div class="highlight"><pre class="highlight javascript"><code><span class="kd">const</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Document</span><span class="p">()</span>
+<span class="nx">doc</span><span class="p">.</span><span class="nx">directives</span>
+<span class="o">&gt;</span> <span class="p">{</span>
+    <span class="na">docStart</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> <span class="c1">// set true to force the doc-start marker</span>
+    <span class="na">docEnd</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// set true to force the doc-end marker</span>
+    <span class="na">tags</span><span class="p">:</span> <span class="p">{</span> <span class="dl">'</span><span class="s1">!!</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">tag:yaml.org,2002:</span><span class="dl">'</span> <span class="p">},</span> <span class="c1">// Record&lt;handle, prefix&gt;</span>
+    <span class="na">yaml</span><span class="p">:</span> <span class="p">{</span> <span class="na">explicit</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="na">version</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1.2</span><span class="dl">'</span> <span class="p">}</span>
+  <span class="p">}</span>
+</code></pre></div>
+<p>A YAML document may be preceded by <code>%YAML</code> and <code>%TAG</code> directives; their state is accessible via the <code>directives</code> member of a <code>Document</code>.
+After parsing or other creation, the contents of <code>doc.directives</code> are mutable, and will influence the YAML string representation of the document.</p>
+
+<p>The contents of <code>doc.directives.tags</code> are used both for the <code>%TAG</code> directives and when stringifying tags within the document.
+Each of the handles must start and end with a <code>!</code> character; <code>!</code> is by default the local tag and <code>!!</code> is used for default tags.
+See the section on <a href="#writing-custom-tags">custom tags</a> for more on this topic.</p>
+
+<p><code>doc.contents.yaml</code> determines if an explicit <code>%YAML</code> directive should be included in the output, and what version it should use.
+If changing the version after the document&#39;s creation, you&#39;ll probably want to use <code>doc.setSchema()</code> as it will also update the schema accordingly.</p>

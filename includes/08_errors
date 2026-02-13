@@ -1,0 +1,155 @@
+<h1 id='errors'>Errors</h1>
+<p>Nearly all errors and warnings produced by the <code>yaml</code> parser functions contain the following fields:</p>
+
+<table><thead>
+<tr>
+<th>Member</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>code</td>
+<td><code>string</code></td>
+<td>An identifier for the error type.</td>
+</tr>
+<tr>
+<td>linePos</td>
+<td><code>[LinePos, LinePos] ⎮</code> <code>undefined</code></td>
+<td>If <code>prettyErrors</code> is enabled and <code>offset</code> is known, the one-indexed human-friendly source location <code>{ line: number, col: number }</code>.</td>
+</tr>
+<tr>
+<td>name</td>
+<td><code>&#39;YAMLParseError&#39; ⎮</code> <code>&#39;YAMLWarning&#39;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>message</td>
+<td><code>string</code></td>
+<td>A human-readable description of the error</td>
+</tr>
+<tr>
+<td>pos</td>
+<td><code>[number, number]</code></td>
+<td>The position in the source at which this error or warning was encountered.</td>
+</tr>
+</tbody></table>
+
+<p>A <code>YAMLParseError</code> is an error encountered while parsing a source as YAML.
+They are included in the <code>doc.errors</code> array.
+If that array is not empty when constructing a native representation of a document, the first error will be thrown.</p>
+
+<p>A <code>YAMLWarning</code> is not an error, but a spec-mandated warning about unsupported directives or a fallback resolution being used for a node with an unavailable tag.
+They are included in the <code>doc.warnings</code> array.</p>
+
+<p>In rare cases, the library may produce a more generic error.
+In particular, <code>TypeError</code> may occur when parsing invalid input using the <code>json</code> schema, and <code>ReferenceError</code> when the <code>maxAliasCount</code> limit is enountered.</p>
+
+<p>To identify errors for special handling, you should primarily use <code>code</code> to differentiate them from each other.</p>
+
+<table><thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>ALIAS_PROPS</code></td>
+<td>Unlike scalars and collections, alias nodes cannot have an anchor or tag associated with it.</td>
+</tr>
+<tr>
+<td><code>BAD_ALIAS</code></td>
+<td>An alias identifier must be a non-empty sequence of valid characters.</td>
+</tr>
+<tr>
+<td><code>BAD_COLLECTION_TYPE</code></td>
+<td>Explicit collection tag used on a collection type it does not support.</td>
+</tr>
+<tr>
+<td><code>BAD_DIRECTIVE</code></td>
+<td>Only the <code>%YAML</code> and <code>%TAG</code> directives are supported, and they need to follow the specified structure.</td>
+</tr>
+<tr>
+<td><code>BAD_DQ_ESCAPE</code></td>
+<td>Double-quotes strings may include <code>\</code> escaped content, but that needs to be valid.</td>
+</tr>
+<tr>
+<td><code>BAD_INDENT</code></td>
+<td>Indentation is important in YAML, and collection items need to all start at the same level. Block scalars are also picky about their leading content.</td>
+</tr>
+<tr>
+<td><code>BAD_PROP_ORDER</code></td>
+<td>Anchors and tags must be placed after the <code>?</code>, <code>:</code> and <code>-</code> indicators.</td>
+</tr>
+<tr>
+<td><code>BAD_SCALAR_START</code></td>
+<td>Plain scalars cannot start with a block scalar indicator, or one of the two reserved characters: <code>@</code> and <code>`</code>. To fix, use a block or quoted scalar for the value.</td>
+</tr>
+<tr>
+<td><code>BLOCK_AS_IMPLICIT_KEY</code></td>
+<td>There&#39;s probably something wrong with the indentation, or you&#39;re trying to parse something like <code>a: b: c</code>, where it&#39;s not clear what&#39;s the key and what&#39;s the value.</td>
+</tr>
+<tr>
+<td><code>BLOCK_IN_FLOW</code></td>
+<td>YAML scalars and collections both have block and flow styles. Flow is allowed within block, but not the other way around.</td>
+</tr>
+<tr>
+<td><code>DUPLICATE_KEY</code></td>
+<td>Map keys must be unique. Use the <code>uniqueKeys</code> option to disable or customise this check when parsing.</td>
+</tr>
+<tr>
+<td><code>IMPOSSIBLE</code></td>
+<td>This really should not happen. If you encounter this error code, please file a bug.</td>
+</tr>
+<tr>
+<td><code>KEY_OVER_1024_CHARS</code></td>
+<td>Due to legacy reasons, implicit keys must have their following <code>:</code> indicator after at most 1k characters.</td>
+</tr>
+<tr>
+<td><code>MISSING_CHAR</code></td>
+<td>Some character or characters are missing here. See the error message for what you need to add.</td>
+</tr>
+<tr>
+<td><code>MULTILINE_IMPLICIT_KEY</code></td>
+<td>Implicit keys need to be on a single line. Does the input include a plain scalar with a <code>:</code> followed by whitespace, which is getting parsed as a map key?</td>
+</tr>
+<tr>
+<td><code>MULTIPLE_ANCHORS</code></td>
+<td>A node is only allowed to have one anchor.</td>
+</tr>
+<tr>
+<td><code>MULTIPLE_DOCS</code></td>
+<td>A YAML stream may include multiple documents. If yours does, you&#39;ll need to use <code>parseAllDocuments()</code> to work with it.</td>
+</tr>
+<tr>
+<td><code>MULTIPLE_TAGS</code></td>
+<td>A node is only allowed to have one tag.</td>
+</tr>
+<tr>
+<td><code>NON_STRING_KEY</code></td>
+<td>With the <code>stringKeys</code> option, all mapping keys must be strings</td>
+</tr>
+<tr>
+<td><code>TAB_AS_INDENT</code></td>
+<td>Only spaces are allowed as indentation.</td>
+</tr>
+<tr>
+<td><code>TAG_RESOLVE_FAILED</code></td>
+<td>Something went wrong when resolving a node&#39;s tag with the current schema.</td>
+</tr>
+<tr>
+<td><code>UNEXPECTED_TOKEN</code></td>
+<td>A token was encountered in a place where it wasn&#39;t expected.</td>
+</tr>
+</tbody></table>
+<h2 id='silencing-errors-and-warnings'>Silencing Errors and Warnings</h2>
+<p>Some of the errors encountered during parsing are required by the spec, but are caused by content that may be parsed unambiguously.
+To ignore these errors, use the <code>strict: false</code> option:</p>
+
+<ul>
+<li><code>MULTILINE_IMPLICIT_KEY</code>: Implicit keys of flow sequence pairs need to be on a single line</li>
+<li><code>KEY_OVER_1024_CHARS</code>: The : indicator must be at most 1024 chars after the start of an implicit block mapping key</li>
+</ul>
+
+<p>For additional control, set the <code>logLevel</code> option to <code>&#39;error&#39;</code> (default: <code>&#39;warn&#39;</code>) to silence all warnings.
+Setting <code>logLevel: &#39;silent&#39;</code> will ignore parsing errors completely, resulting in output that may well be rather broken.</p>

@@ -1,0 +1,107 @@
+<h1 id='yaml'>YAML</h1>
+<blockquote>
+<p>To install:</p>
+</blockquote>
+<div class="highlight"><pre class="highlight sh tab-shell"><code>npm <span class="nb">install </span>yaml
+<span class="c"># or</span>
+deno add jsr:@eemeli/yaml
+</code></pre></div>
+<blockquote>
+<p>To use:</p>
+</blockquote>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">parse</span><span class="p">,</span> <span class="nx">stringify</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+<span class="c1">// or</span>
+<span class="k">import</span> <span class="nx">YAML</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+<span class="c1">// or</span>
+<span class="kd">const</span> <span class="nx">YAML</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span><span class="p">)</span>
+</code></pre></div>
+<p><code>yaml</code> is a definitive library for <a href="http://yaml.org/">YAML</a>, the human friendly data serialization standard.
+This library:</p>
+
+<ul>
+<li>Supports both YAML 1.1 and YAML 1.2 and all common data schemas,</li>
+<li>Passes all of the <a href="https://github.com/yaml/yaml-test-suite">yaml-test-suite</a> tests,</li>
+<li>Can accept any string as input without throwing, parsing as much YAML out of it as it can, and</li>
+<li>Supports parsing, modifying, and writing YAML comments and blank lines.</li>
+</ul>
+
+<p>The library is released under the ISC open source license, and the code is <a href="https://github.com/eemeli/yaml/">available on GitHub</a>.
+It has no external dependencies and runs on Node.js as well as modern browsers.</p>
+
+<p>For the purposes of versioning, any changes that break any of the endpoints or APIs documented here will be considered semver-major breaking changes.
+Undocumented library internals may change between minor versions, and previous APIs may be deprecated (but not removed).</p>
+
+<p>The minimum supported TypeScript version of the included typings is 3.9;
+for use in earlier versions you may need to set <code>skipLibCheck: true</code> in your config.
+This requirement may be updated between minor versions of the library.</p>
+
+<p>For build instructions and contribution guidelines, see <a href="https://github.com/eemeli/yaml/blob/main/docs/CONTRIBUTING.md">docs/CONTRIBUTING.md</a> in the repo.</p>
+
+<p><strong>Note:</strong> These docs are for <code>yaml@2</code>. For v1, see the <a href="https://github.com/eemeli/yaml/tree/v1.10.0">v1.10.0 tag</a> for the source and <a href="https://eemeli.org/yaml/v1/">eemeli.org/yaml/v1</a> for the documentation.</p>
+<h2 id='api-overview'>API Overview</h2>
+<p>The API provided by <code>yaml</code> has three layers, depending on how deep you need to go: <a href="#parse-amp-stringify">Parse &amp; Stringify</a>, <a href="#documents">Documents</a>, and the underlying <a href="#parsing-yaml">Lexer/Parser/Composer</a>.
+The first has the simplest API and &quot;just works&quot;, the second gets you all the bells and whistles supported by the library along with a decent <a href="#content-nodes">AST</a>, and the third lets you get progressively closer to YAML source, if that&#39;s your thing.</p>
+
+<p>A <a href="#command-line-tool">command-line tool</a> is also included.</p>
+
+<h3>Parse & Stringify</h3>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">parse</span><span class="p">,</span> <span class="nx">stringify</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+</code></pre></div>
+<ul>
+<li><a href="#yaml-parse"><code>parse(str, reviver?, options?): value</code></a></li>
+<li><a href="#yaml-stringify"><code>stringify(value, replacer?, options?): string</code></a></li>
+</ul>
+
+<h3>Documents</h3>
+
+<!-- prettier-ignore -->
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">Document</span><span class="p">,</span>
+  <span class="nx">isDocument</span><span class="p">,</span>
+  <span class="nx">parseAllDocuments</span><span class="p">,</span>
+  <span class="nx">parseDocument</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+</code></pre></div>
+<ul>
+<li><a href="#documents"><code>Document</code></a>
+
+<ul>
+<li><a href="#creating-documents"><code>constructor(value, replacer?, options?)</code></a></li>
+<li><a href="#content-nodes"><code>#contents</code></a></li>
+<li><a href="#stream-directives"><code>#directives</code></a></li>
+<li><a href="#errors"><code>#errors</code></a></li>
+<li><a href="#errors"><code>#warnings</code></a></li>
+</ul></li>
+<li><a href="#parsing-documents"><code>parseAllDocuments(str, options?): Document[]</code></a></li>
+<li><a href="#parsing-documents"><code>parseDocument(str, options?): Document</code></a></li>
+</ul>
+
+<h3>Content Nodes</h3>
+
+<!-- prettier-ignore -->
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">isAlias</span><span class="p">,</span> <span class="nx">isCollection</span><span class="p">,</span> <span class="nx">isMap</span><span class="p">,</span> <span class="nx">isNode</span><span class="p">,</span>
+  <span class="nx">isPair</span><span class="p">,</span> <span class="nx">isScalar</span><span class="p">,</span> <span class="nx">isSeq</span><span class="p">,</span> <span class="nx">Scalar</span><span class="p">,</span>
+  <span class="nx">visit</span><span class="p">,</span> <span class="nx">visitAsync</span><span class="p">,</span> <span class="nx">YAMLMap</span><span class="p">,</span> <span class="nx">YAMLSeq</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+</code></pre></div>
+<ul>
+<li><a href="#identifying-node-types"><code>is*(foo): boolean</code></a></li>
+<li><a href="#scalar-values"><code>new Scalar(value)</code></a></li>
+<li><a href="#collections"><code>new YAMLMap()</code></a></li>
+<li><a href="#collections"><code>new YAMLSeq()</code></a></li>
+<li><a href="#creating-nodes"><code>doc.createAlias(node, name?): Alias</code></a></li>
+<li><a href="#creating-nodes"><code>doc.createNode(value, options?): Node</code></a></li>
+<li><a href="#creating-nodes"><code>doc.createPair(key, value): Pair</code></a></li>
+<li><a href="#finding-and-modifying-nodes"><code>visit(node, visitor)</code></a></li>
+<li><a href="#finding-and-modifying-nodes"><code>visitAsync(node, visitor)</code></a></li>
+</ul>
+
+<h3>Parsing YAML</h3>
+<div class="highlight"><pre class="highlight javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Composer</span><span class="p">,</span> <span class="nx">Lexer</span><span class="p">,</span> <span class="nx">Parser</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">yaml</span><span class="dl">'</span>
+</code></pre></div>
+<ul>
+<li><a href="#lexer"><code>new Lexer().lex(src)</code></a></li>
+<li><a href="#parser"><code>new Parser(onNewLine?).parse(src)</code></a></li>
+<li><a href="#composer"><code>new Composer(options?).compose(tokens)</code></a></li>
+</ul>
