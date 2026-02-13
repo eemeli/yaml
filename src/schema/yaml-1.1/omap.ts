@@ -1,18 +1,24 @@
-import { isPair, isScalar } from '../../nodes/identity.ts'
+import type { Primitive } from '../../nodes/Collection.ts'
+import type { NodeBase } from '../../nodes/Node.ts'
+import { Pair } from '../../nodes/Pair.ts'
+import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
 import { toJS } from '../../nodes/toJS.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
-import type { CreateNodeContext } from '../../util.ts'
+import type { NodeCreator } from '../../util.ts'
 import type { Schema } from '../Schema.ts'
 import type { CollectionTag } from '../types.ts'
 import { createPairs, resolvePairs } from './pairs.ts'
 
-export class YAMLOMap extends YAMLSeq {
+export class YAMLOMap<
+  K extends Primitive | NodeBase = Primitive | NodeBase,
+  V extends Primitive | NodeBase = Primitive | NodeBase
+> extends YAMLSeq<Pair<K, V>> {
   static tag = 'tag:yaml.org,2002:omap'
 
-  constructor() {
-    super()
+  constructor(schema?: Schema) {
+    super(schema)
     this.tag = YAMLOMap.tag
   }
 
@@ -32,7 +38,7 @@ export class YAMLOMap extends YAMLSeq {
     if (ctx?.onCreate) ctx.onCreate(map)
     for (const pair of this.items) {
       let key, value
-      if (isPair(pair)) {
+      if (pair instanceof Pair) {
         key = toJS(pair.key, '', ctx)
         value = toJS(pair.value, key, ctx)
       } else {
@@ -45,13 +51,9 @@ export class YAMLOMap extends YAMLSeq {
     return map as unknown as unknown[]
   }
 
-  static from(
-    schema: Schema,
-    iterable: unknown,
-    ctx: CreateNodeContext
-  ): YAMLOMap {
-    const pairs = createPairs(schema, iterable, ctx)
-    const omap = new this()
+  static from(nc: NodeCreator, iterable: unknown): YAMLOMap {
+    const pairs = createPairs(nc, iterable)
+    const omap = new this(nc.schema)
     omap.items = pairs.items
     return omap
   }
@@ -68,7 +70,7 @@ export const omap: CollectionTag = {
     const pairs = resolvePairs(seq, onError)
     const seenKeys: unknown[] = []
     for (const { key } of pairs.items) {
-      if (isScalar(key)) {
+      if (key instanceof Scalar) {
         if (seenKeys.includes(key.value)) {
           onError(`Ordered maps must not include duplicate keys: ${key.value}`)
         } else {
@@ -77,6 +79,5 @@ export const omap: CollectionTag = {
       }
     }
     return Object.assign(new YAMLOMap(), pairs)
-  },
-  createNode: (schema, iterable, ctx) => YAMLOMap.from(schema, iterable, ctx)
+  }
 }

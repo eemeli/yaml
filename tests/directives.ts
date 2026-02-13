@@ -17,7 +17,7 @@ describe('%TAG', () => {
       '!': '!foo:',
       '!bar!': '!bar:'
     })
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         { value: 'v1', tag: '!foo:bar' },
         { value: 'v2', tag: '!bar:foo' }
@@ -39,7 +39,7 @@ describe('%TAG', () => {
       '!': 'foo:',
       '!bar!': 'bar:bar#bar?'
     })
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         { value: 'v1', tag: 'foo:bar' },
         { value: 'v2', tag: 'bar:bar#bar?foo' }
@@ -49,8 +49,8 @@ describe('%TAG', () => {
 
   test('create & stringify', () => {
     const doc = parseDocument('[ v1, v2 ]\n')
-    ;(doc.get(0, true) as Scalar).tag = '!foo:foo'
-    ;(doc.get(1, true) as Scalar).tag = '!bar:bar'
+    ;(doc.get(0) as Scalar).tag = '!foo:foo'
+    ;(doc.get(1) as Scalar).tag = '!bar:bar'
     doc.directives.tags['!'] = '!foo:'
     doc.directives.tags['!bar!'] = '!bar:'
     expect(String(doc)).toBe(source`
@@ -74,7 +74,7 @@ describe('broken directives', () => {
     expect(doc.errors).toMatchObject([{ pos: [10, 11] }])
   })
 
-  test('missing separator before doc contents', () => {
+  test('missing separator before doc value', () => {
     const doc = parseDocument(`%YAML 1.2\nfoo\n`)
     expect(doc.errors).toMatchObject([{ pos: [10, 11] }])
   })

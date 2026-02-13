@@ -160,7 +160,7 @@ describe('double-quoted', () => {
         const str = YAML.stringify({ x })
         const doc = YAML.parseDocument<any>(str)
         expect(doc.errors).toHaveLength(0)
-        expect(doc.contents.items[0].value.value).toBe(x)
+        expect(doc.value.items[0].value.value).toBe(x)
       })
     })
 
@@ -188,7 +188,7 @@ describe('double-quoted', () => {
         const str = YAML.stringify({ key: [[value]] })
         const doc = YAML.parseDocument<any>(str)
         expect(doc.errors).toHaveLength(0)
-        expect(doc.contents.items[0].value.items[0].items[0].value).toBe(value)
+        expect(doc.value.items[0].value.items[0].items[0].value).toBe(value)
       })
     })
 
@@ -304,7 +304,7 @@ describe('end-to-end', () => {
       Unfolded paragraph.
     `
     const doc = YAML.parseDocument<YAML.Scalar, false>(src)
-    expect(doc.contents.value).toBe(source`
+    expect(doc.value.value).toBe(source`
       Text on a line that should get folded with a line width of 20 characters.
 
         Indented text
@@ -332,10 +332,10 @@ describe('end-to-end', () => {
       - plain with comment # that won't get folded
     `
     const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(src)
-    expect(doc.contents.items[0].value).toBe(
+    expect(doc.value.items[0].value).toBe(
       'plain value with enough length to fold twice'
     )
-    expect(doc.contents.items[1].value).toBe('plain with comment')
+    expect(doc.value.items[1].value).toBe('plain with comment')
     expect(doc.toString(foldOptions)).toBe(src)
   })
 

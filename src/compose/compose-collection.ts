@@ -1,5 +1,4 @@
-import { isNode } from '../nodes/identity.ts'
-import type { ParsedNode } from '../nodes/Node.ts'
+import { NodeBase, type Node } from '../nodes/Node.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
@@ -55,7 +54,7 @@ export function composeCollection(
   token: BlockMap | BlockSequence | FlowCollection,
   props: Props,
   onError: ComposeErrorHandler
-): ParsedNode {
+): Node {
   const tagToken = props.tag
   const tagName: string | null = !tagToken
     ? null
@@ -136,9 +135,7 @@ export function composeCollection(
       ctx.options
     ) ?? coll
 
-  const node = isNode(res)
-    ? (res as ParsedNode)
-    : (new Scalar(res) as Scalar.Parsed)
+  const node = res instanceof NodeBase ? (res as Node) : new Scalar(res)
   node.range = coll.range
   node.tag = tagName
   if (tag?.format) (node as Scalar).format = tag.format

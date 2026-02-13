@@ -1,28 +1,20 @@
 import {
   Document,
   Pair,
-  type Scalar,
-  type YAMLMap,
+  Scalar,
+  YAMLMap,
   type YAMLOMap,
-  type YAMLSeq,
+  YAMLSeq,
   type YAMLSet,
-  isMap,
-  isSeq,
   parseDocument
 } from 'yaml'
 
 describe('Map', () => {
   let doc: Document
-  let map: YAMLMap<
-    string | Scalar<string>,
-    | number
-    | string
-    | Scalar<number | string>
-    | YAMLMap<string | Scalar<string>, number | Scalar<number>>
-  >
+  let map: YAMLMap<string, number | string | YAMLMap<string, number>>
   beforeEach(() => {
     doc = new Document({ a: 1, b: { c: 3, d: 4 } })
-    map = doc.contents as any
+    map = doc.value as any
     expect(map.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
@@ -38,11 +30,10 @@ describe('Map', () => {
   })
 
   test('add', () => {
-    map.add({ key: 'c', value: 'x' })
-    expect(map.get('c')).toBe('x')
-    // @ts-expect-error TS should complain here
-    expect(() => map.add('a')).toThrow(/already set/)
-    expect(() => map.add(new Pair('c', 'y'))).toThrow(/already set/)
+    map.add(doc.createPair('c', 'x'))
+    expect(map.get('c')).toMatchObject({ value: 'x' })
+    map.add(doc.createPair('c', 'y'))
+    expect(map.get('c')).toMatchObject({ value: 'y' })
     expect(map.items).toHaveLength(3)
   })
 
@@ -55,30 +46,22 @@ describe('Map', () => {
   })
 
   test('get with value', () => {
-    expect(map.get('a')).toBe(1)
-    expect(map.get('a', true)).toMatchObject({ value: 1 })
+    expect(map.get('a')).toMatchObject({ value: 1 })
     const subMap = map.get('b')
-    if (isMap<string, number>(subMap)) {
-      expect(subMap.toJSON()).toMatchObject({
-        c: 3,
-        d: 4
-      })
-      expect(map.get('c')).toBeUndefined()
-    } else {
-      throw new Error('Expected subMap to be a Map')
-    }
+    expect(subMap).toBeInstanceOf(YAMLMap)
+    expect(subMap!.toJSON()).toMatchObject({
+      c: 3,
+      d: 4
+    })
+    expect(map.get('c')).toBeUndefined()
   })
 
   test('get with node', () => {
-    expect(map.get(doc.createNode('a'))).toBe(1)
-    expect(map.get(doc.createNode('a'), true)).toMatchObject({ value: 1 })
+    expect(map.get(doc.createNode('a'))).toMatchObject({ value: 1 })
     const subMap = map.get(doc.createNode('b'))
-    if (isMap<string, number>(subMap)) {
-      expect(subMap.toJSON()).toMatchObject({ c: 3, d: 4 })
-      expect(map.get(doc.createNode('c'))).toBeUndefined()
-    } else {
-      throw new Error('Expected subMap to be a Map')
-    }
+    expect(subMap).toBeInstanceOf(YAMLMap)
+    expect(subMap!.toJSON()).toMatchObject({ c: 3, d: 4 })
+    expect(map.get(doc.createNode('c'))).toBeUndefined()
   })
 
   test('has with value', () => {
@@ -100,30 +83,28 @@ describe('Map', () => {
 
   test('set with value', () => {
     map.set('a', 2)
-    expect(map.get('a')).toBe(2)
-    expect(map.get('a', true)).toMatchObject({ value: 2 })
+    expect(map.get('a')).toMatchObject({ value: 2 })
     map.set('b', 5)
-    expect(map.get('b')).toBe(5)
+    expect(map.get('b')).toMatchObject({ value: 5 })
     map.set('c', 6)
-    expect(map.get('c')).toBe(6)
+    expect(map.get('c')).toMatchObject({ value: 6 })
     expect(map.items).toHaveLength(3)
   })
 
   test('set with node', () => {
     map.set(doc.createNode('a'), 2)
-    expect(map.get('a')).toBe(2)
-    expect(map.get('a', true)).toMatchObject({ value: 2 })
+    expect(map.get('a')).toMatchObject({ value: 2 })
     map.set(doc.createNode('b'), 5)
-    expect(map.get('b')).toBe(5)
+    expect(map.get('b')).toMatchObject({ value: 5 })
     map.set(doc.createNode('c'), 6)
-    expect(map.get('c')).toBe(6)
+    expect(map.get('c')).toMatchObject({ value: 6 })
     expect(map.items).toHaveLength(3)
   })
 
   test('set scalar node with anchor', () => {
     doc = parseDocument('a: &A value\nb: *A\n')
     doc.set('a', 'foo')
-    expect(doc.get('a', true)).toMatchObject({ value: 'foo' })
+    expect(doc.get('a')).toMatchObject({ value: 'foo' })
     expect(String(doc)).toBe('a: &A foo\nb: *A\n')
   })
 })
@@ -133,7 +114,7 @@ describe('Seq', () => {
   let seq: YAMLSeq<number | Scalar<number> | YAMLSeq<number | Scalar<number>>>
   beforeEach(() => {
     doc = new Document([1, [2, 3]])
-    seq = doc.contents as any
+    seq = doc.value as any
     expect(seq.items).toMatchObject([
       { value: 1 },
       { items: [{ value: 2 }, { value: 3 }] }
@@ -142,7 +123,7 @@ describe('Seq', () => {
 
   test('add', () => {
     seq.add(9)
-    expect(seq.get(2)).toBe(9)
+    expect(seq.get(2)).toMatchObject({ value: 9 })
     seq.add(1)
     expect(seq.items).toHaveLength(4)
   })
@@ -150,124 +131,98 @@ describe('Seq', () => {
   test('delete', () => {
     expect(seq.delete(0)).toBe(true)
     expect(seq.delete(2)).toBe(false)
-    expect(seq.delete('a')).toBe(false)
+    expect(() => seq.delete('a' as any)).toThrow(TypeError)
     expect(seq.get(0)).toMatchObject({ items: [{ value: 2 }, { value: 3 }] })
     expect(seq.items).toHaveLength(1)
   })
 
-  test('get with value', () => {
-    expect(seq.get(0)).toBe(1)
-    expect(seq.get('0')).toBe(1)
-    expect(seq.get(0, true)).toMatchObject({ value: 1 })
+  test('get with integer', () => {
+    expect(seq.get(0)).toMatchObject({ value: 1 })
     const subSeq = seq.get(1)
-    if (isSeq<number>(subSeq)) {
-      expect(subSeq.toJSON()).toMatchObject([2, 3])
-      expect(seq.get(2)).toBeUndefined()
-    } else {
-      throw new Error('not a seq')
-    }
+    expect(subSeq).toBeInstanceOf(YAMLSeq)
+    expect(subSeq!.toJSON()).toMatchObject([2, 3])
+    expect(seq.get(2)).toBeUndefined()
   })
 
-  test('get with node', () => {
-    expect(seq.get(doc.createNode(0))).toBe(1)
-    expect(seq.get(doc.createNode('0'))).toBe(1)
-    expect(seq.get(doc.createNode(0), true)).toMatchObject({ value: 1 })
-    const subSeq = seq.get(doc.createNode(1))
-    if (isSeq<number>(subSeq)) {
-      expect(subSeq.toJSON()).toMatchObject([2, 3])
-      expect(seq.get(doc.createNode(2))).toBeUndefined()
-    } else {
-      throw new Error('not a seq')
-    }
+  test('get with non-integer', () => {
+    expect(() => seq.get(-1)).toThrow(RangeError)
+    expect(() => seq.get(0.5)).toThrow(TypeError)
+    expect(() => seq.get('0' as any)).toThrow(TypeError)
+    expect(() => seq.get(doc.createNode(0) as any)).toThrow(TypeError)
   })
 
-  test('has with value', () => {
+  test('has with integer', () => {
     expect(seq.has(0)).toBe(true)
     expect(seq.has(1)).toBe(true)
     expect(seq.has(2)).toBe(false)
-    expect(seq.has('0')).toBe(true)
-    expect(seq.has('')).toBe(false)
-    // @ts-expect-error TS should complain here
-    expect(seq.has()).toBe(false)
   })
 
-  test('has with node', () => {
-    expect(seq.has(doc.createNode(0))).toBe(true)
-    expect(seq.has(doc.createNode('0'))).toBe(true)
-    expect(seq.has(doc.createNode(2))).toBe(false)
-    expect(seq.has(doc.createNode(''))).toBe(false)
-    // @ts-expect-error TS should complain here
-    expect(seq.has(doc.createNode())).toBe(false)
+  test('has with non-integer', () => {
+    expect(() => seq.has(-1)).toThrow(RangeError)
+    expect(() => seq.has(0.5)).toThrow(TypeError)
+    expect(() => seq.has('0' as any)).toThrow(TypeError)
+    // @ts-expect-error TS complains, as it should.
+    expect(() => seq.has()).toThrow(TypeError)
+    expect(() => seq.has(doc.createNode(0) as any)).toThrow(TypeError)
   })
 
-  test('set with value', () => {
+  test('set with integer', () => {
     seq.set(0, 2)
-    expect(seq.get(0)).toBe(2)
-    expect(seq.get(0, true)).toMatchObject({ value: 2 })
-    seq.set('1', 5)
-    expect(seq.get(1)).toBe(5)
+    expect(seq.get(0)).toMatchObject({ value: 2 })
+    seq.set(1, 5)
+    expect(seq.get(1)).toMatchObject({ value: 5 })
     seq.set(2, 6)
-    expect(seq.get(2)).toBe(6)
+    expect(seq.get(2)).toMatchObject({ value: 6 })
     expect(seq.items).toHaveLength(3)
   })
 
-  test('set with node', () => {
-    seq.set(doc.createNode(0), 2)
-    expect(seq.get(0)).toBe(2)
-    expect(seq.get(0, true)).toMatchObject({ value: 2 })
-    seq.set(doc.createNode('1'), 5)
-    expect(seq.get(1)).toBe(5)
-    seq.set(doc.createNode(2), 6)
-    expect(seq.get(2)).toBe(6)
-    expect(seq.items).toHaveLength(3)
+  test('set with non-integer', () => {
+    expect(() => seq.set(-1, 2)).toThrow(RangeError)
+    expect(() => seq.set(0.5, 2)).toThrow(TypeError)
+    expect(() => seq.set(doc.createNode(0) as any, 2)).toThrow(TypeError)
   })
 })
 
 describe('Set', () => {
   let doc: Document
-  let set: YAMLSet<number | string | Scalar<number> | Pair>
+  let set: YAMLSet<number | string>
   beforeEach(() => {
     doc = new Document(null, { version: '1.1' })
     set = doc.createNode([1, 2, 3], { tag: '!!set' }) as any
-    doc.contents = set
+    doc.value = set
     expect(set.items).toMatchObject([
-      { key: { value: 1 }, value: { value: null } },
-      { key: { value: 2 }, value: { value: null } },
-      { key: { value: 3 }, value: { value: null } }
+      { key: { value: 1 }, value: null },
+      { key: { value: 2 }, value: null },
+      { key: { value: 3 }, value: null }
     ])
   })
 
   test('add', () => {
     set.add('x')
-    expect(set.get('x')).toBe('x')
+    expect(set.get('x')).toMatchObject({ value: 'x' })
     set.add('x')
-    const y0 = new Pair('y')
-    set.add(y0)
-    set.add(new Pair('y'))
-    expect(set.get('y', true)).toBe(y0)
+    const y0 = new Scalar('y')
+    set.add(new Pair(y0))
+    set.add(new Pair(new Scalar('y')))
+    expect(set.get('y')).toBe(y0)
     expect(set.items).toHaveLength(5)
   })
 
   test('get', () => {
-    expect(set.get(1)).toBe(1)
-    expect(set.get(1, true)).toMatchObject({
-      key: { value: 1 },
-      value: { value: null }
-    })
+    expect(set.get(1)).toMatchObject({ value: 1 })
     expect(set.get(0)).toBeUndefined()
     expect(set.get('1')).toBeUndefined()
   })
 
   test('set', () => {
     set.set(1, true)
-    expect(set.get(1)).toBe(1)
+    expect(set.get(1)).toMatchObject({ value: 1 })
     set.set(1, false)
     expect(set.get(1)).toBeUndefined()
     set.set(4, false)
     expect(set.get(4)).toBeUndefined()
     set.set(4, true)
-    expect(set.get(4)).toBe(4)
-    expect(set.get(4, true)).toMatchObject({ key: 4, value: null })
+    expect(set.get(4)).toMatchObject(new Scalar(4))
     expect(set.items).toHaveLength(3)
   })
 })
@@ -280,7 +235,7 @@ describe('OMap', () => {
     omap = doc.createNode([{ a: 1 }, { b: { c: 3, d: 4 } }], {
       tag: '!!omap'
     }) as any
-    doc.contents = omap
+    doc.value = omap
     expect(omap.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
@@ -296,11 +251,9 @@ describe('OMap', () => {
   })
 
   test('add', () => {
-    omap.add({ key: 'c', value: 'x' })
-    expect(omap.get('c')).toBe('x')
-    // @ts-expect-error TS should complain here
-    expect(() => omap.add('a')).toThrow(/already set/)
-    expect(() => omap.add(new Pair('c', 'y'))).toThrow(/already set/)
+    omap.add(doc.createPair('c', 'x'))
+    expect(omap.get('c')).toMatchObject({ value: 'x' })
+    omap.add(doc.createPair('c', 'y'))
     expect(omap.items).toHaveLength(3)
   })
 
@@ -313,15 +266,11 @@ describe('OMap', () => {
   })
 
   test('get', () => {
-    expect(omap.get('a')).toBe(1)
-    expect(omap.get('a', true)).toMatchObject({ value: 1 })
+    expect(omap.get('a')).toMatchObject({ value: 1 })
     const subMap = omap.get('b')
-    if (isMap(subMap)) {
-      expect(subMap.toJSON()).toMatchObject({ c: 3, d: 4 })
-      expect(omap.get('c')).toBeUndefined()
-    } else {
-      throw new Error('Expected subMap to be a map')
-    }
+    expect(subMap).toBeInstanceOf(YAMLMap)
+    expect(subMap.toJSON()).toMatchObject({ c: 3, d: 4 })
+    expect(omap.get('c')).toBeUndefined()
   })
 
   test('has', () => {
@@ -335,12 +284,11 @@ describe('OMap', () => {
 
   test('set', () => {
     omap.set('a', 2)
-    expect(omap.get('a')).toBe(2)
-    expect(omap.get('a', true)).toMatchObject({ value: 2 })
+    expect(omap.get('a')).toMatchObject({ value: 2 })
     omap.set('b', 5)
-    expect(omap.get('b')).toBe(5)
+    expect(omap.get('b')).toMatchObject({ value: 5 })
     omap.set('c', 6)
-    expect(omap.get('c')).toBe(6)
+    expect(omap.get('c')).toMatchObject({ value: 6 })
     expect(omap.items).toHaveLength(3)
   })
 })
@@ -350,23 +298,20 @@ describe('Collection', () => {
   let map: YAMLMap<string, Scalar<number> | YAMLSeq<Scalar<number>>>
   beforeEach(() => {
     doc = new Document({ a: 1, b: [2, 3] })
-    map = doc.contents as any
+    map = doc.value as any
   })
 
   test('addIn', () => {
     map.addIn(['b'], 4)
-    expect(map.getIn(['b', 2])).toBe(4)
-    map.addIn([], new Pair('c', 5))
-    expect(map.get('c')).toBe(5)
+    expect(map.getIn(['b', 2])).toMatchObject({ value: 4 })
+    map.addIn([], doc.createPair('c', 5))
+    expect(map.get('c')).toMatchObject({ value: 5 })
     expect(() => map.addIn(['a'], -1)).toThrow(/Expected YAML collection/)
     map.addIn(['b', 3], 6)
     expect(map.items).toHaveLength(3)
     const seq = map.getIn(['b'])
-    if (isSeq(seq)) {
-      expect(seq.items).toHaveLength(4)
-    } else {
-      throw new Error('Expected seq to be a seq')
-    }
+    expect(seq).toBeInstanceOf(YAMLSeq)
+    expect((seq as any).items).toHaveLength(4)
   })
 
   test('deleteIn', () => {
@@ -379,19 +324,14 @@ describe('Collection', () => {
     expect(() => map.deleteIn(['a', 'e'])).toThrow(/Expected YAML collection/)
     expect(map.items).toHaveLength(1)
     const subSeq = map.getIn(['b'])
-    if (isSeq(subSeq)) {
-      expect(subSeq.items).toHaveLength(1)
-    } else {
-      throw new Error('Expected subSeq to be a seq')
-    }
+    expect(subSeq).toBeInstanceOf(YAMLSeq)
+    expect((subSeq as any).items).toHaveLength(1)
   })
 
   test('getIn', () => {
-    expect(map.getIn(['a'])).toBe(1)
-    expect(map.getIn(['a'], true)).toMatchObject({ value: 1 })
-    expect(map.getIn(['b', 1])).toBe(3)
-    expect(map.getIn(['b', '1'])).toBe(3)
-    expect(map.getIn(['b', 1], true)).toMatchObject({ value: 3 })
+    expect(map.getIn(['a'])).toMatchObject({ value: 1 })
+    expect(map.getIn(['b', 1])).toMatchObject({ value: 3 })
+    expect(() => map.getIn(['b', '1'])).toThrow(TypeError)
     expect(map.getIn(['b', 2])).toBeUndefined()
     expect(map.getIn(['c', 'e'])).toBeUndefined()
     expect(map.getIn(['a', 'e'])).toBeUndefined()
@@ -400,7 +340,7 @@ describe('Collection', () => {
   test('hasIn', () => {
     expect(map.hasIn(['a'])).toBe(true)
     expect(map.hasIn(['b', 1])).toBe(true)
-    expect(map.hasIn(['b', '1'])).toBe(true)
+    expect(() => map.hasIn(['b', '1'])).toThrow(TypeError)
     expect(map.hasIn(['b', 2])).toBe(false)
     expect(map.hasIn(['c', 'e'])).toBe(false)
     expect(map.hasIn(['a', 'e'])).toBe(false)
@@ -408,24 +348,20 @@ describe('Collection', () => {
 
   test('setIn', () => {
     map.setIn(['a'], 2)
-    expect(map.get('a')).toBe(2)
-    expect(map.get('a', true)).toMatchObject({ value: 2 })
+    expect(map.get('a')).toMatchObject({ value: 2 })
     map.setIn(['b', 1], 5)
-    expect(map.getIn(['b', 1])).toBe(5)
+    expect(map.getIn(['b', 1])).toMatchObject({ value: 5 })
     map.setIn([1], 6)
-    expect(map.get(1)).toBe(6)
+    expect(map.get(1)).toMatchObject({ value: 6 })
     map.setIn(['b', 2], 6)
-    expect(map.getIn(['b', 2])).toBe(6)
+    expect(map.getIn(['b', 2])).toMatchObject({ value: 6 })
     map.setIn(['e', 'e'], 7)
-    expect(map.getIn(['e', 'e'])).toBe(7)
+    expect(map.getIn(['e', 'e'])).toMatchObject({ value: 7 })
     expect(() => map.setIn(['a', 'e'], 8)).toThrow(/Expected YAML collection/)
     expect(map.items).toHaveLength(4)
     const subSeq = map.getIn(['b'])
-    if (isSeq(subSeq)) {
-      expect(subSeq.items).toHaveLength(3)
-    } else {
-      throw new Error('Expected subSeq to be a seq')
-    }
+    expect(subSeq).toBeInstanceOf(YAMLSeq)
+    expect((subSeq as any).items).toHaveLength(3)
   })
 })
 
@@ -433,7 +369,7 @@ describe('Document', () => {
   let doc: Document<YAMLMap<string, Scalar<number> | YAMLSeq<Scalar<number>>>>
   beforeEach(() => {
     doc = new Document({ a: 1, b: [2, 3] })
-    expect(doc.contents?.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       { key: { value: 'a' }, value: { value: 1 } },
       {
         key: { value: 'b' },
@@ -443,21 +379,19 @@ describe('Document', () => {
   })
 
   test('add', () => {
-    doc.add({ key: 'c', value: 'x' })
-    expect(doc.get('c')).toBe('x')
-    expect(() => doc.add('a')).toThrow(/already set/)
-    expect(() => doc.add(new Pair('c', 'y'))).toThrow(/already set/)
-    expect(doc.contents?.items).toHaveLength(3)
+    doc.add(doc.createPair('c', 'x'))
+    expect(doc.get('c')).toMatchObject({ value: 'x' })
+    expect(doc.value.items).toHaveLength(3)
   })
 
   test('addIn', () => {
     doc.addIn(['b'], 4)
-    expect(doc.getIn(['b', 2])).toBe(4)
-    doc.addIn([], new Pair('c', 5))
-    expect(doc.get('c')).toBe(5)
+    expect(doc.getIn(['b', 2])).toMatchObject({ value: 4 })
+    doc.addIn([], doc.createPair('c', 5))
+    expect(doc.get('c')).toMatchObject({ value: 5 })
     expect(() => doc.addIn(['a'], -1)).toThrow(/Expected YAML collection/)
     doc.addIn(['b', 3], 6)
-    expect(doc.contents?.items).toHaveLength(3)
+    expect(doc.value.items).toHaveLength(3)
     expect((doc.get('b') as any).items).toHaveLength(4)
   })
 
@@ -465,12 +399,12 @@ describe('Document', () => {
     expect(doc.delete('a')).toBe(true)
     expect(doc.delete('a')).toBe(false)
     expect(doc.get('a')).toBeUndefined()
-    expect(doc.contents?.items).toHaveLength(1)
+    expect(doc.value.items).toHaveLength(1)
   })
 
-  test('delete on scalar contents', () => {
+  test('delete on scalar value', () => {
     const doc = new Document('s')
-    expect(() => doc.set('a', 1)).toThrow(/document contents/)
+    expect(() => doc.set('a', 1)).toThrow(/document value/)
   })
 
   test('deleteIn', () => {
@@ -481,37 +415,33 @@ describe('Document', () => {
     expect(doc.deleteIn([1])).toBe(false)
     expect(doc.deleteIn(['b', 2])).toBe(false)
     expect(() => doc.deleteIn(['a', 'e'])).toThrow(/Expected/)
-    expect(doc.contents?.items).toHaveLength(1)
+    expect(doc.value.items).toHaveLength(1)
     expect((doc.get('b') as any).items).toHaveLength(1)
-    expect(doc.deleteIn(null)).toBe(true)
-    expect(doc.deleteIn(null)).toBe(false)
+    expect(() => doc.deleteIn(null as any)).toThrow()
   })
 
   test('get', () => {
-    expect(doc.get('a')).toBe(1)
-    expect(doc.get('a', true)).toMatchObject({ value: 1 })
+    expect(doc.get('a')).toMatchObject({ value: 1 })
     expect(doc.get('c')).toBeUndefined()
   })
 
-  test('get on scalar contents', () => {
+  test('get on scalar value', () => {
     const doc = new Document('s')
     expect(doc.get('a')).toBeUndefined()
   })
 
   test('getIn collection', () => {
-    expect(doc.getIn(['a'])).toBe(1)
-    expect(doc.getIn(['a'], true)).toMatchObject({ value: 1 })
-    expect(doc.getIn(['b', 1])).toBe(3)
-    expect(doc.getIn(['b', 1], true)).toMatchObject({ value: 3 })
-    expect(doc.getIn(['b', 'e'])).toBeUndefined()
+    expect(doc.getIn(['a'])).toMatchObject({ value: 1 })
+    expect(doc.getIn(['b', 1])).toMatchObject({ value: 3 })
+    expect(() => doc.getIn(['b', 'e'])).toThrow(TypeError)
     expect(doc.getIn(['c', 'e'])).toBeUndefined()
     expect(doc.getIn(['a', 'e'])).toBeUndefined()
   })
 
   test('getIn scalar', () => {
     const doc = new Document('s')
-    expect(doc.getIn([])).toBe('s')
-    expect(doc.getIn(null, true)).toMatchObject({ value: 's' })
+    expect(doc.getIn([])).toMatchObject({ value: 's' })
+    expect(() => doc.getIn(null as any)).toThrow()
     expect(doc.getIn([0])).toBeUndefined()
   })
 
@@ -520,7 +450,7 @@ describe('Document', () => {
     expect(doc.has('c')).toBe(false)
   })
 
-  test('has on scalar contents', () => {
+  test('has on scalar value', () => {
     const doc = new Document('s')
     expect(doc.has('a')).toBe(false)
   })
@@ -528,60 +458,44 @@ describe('Document', () => {
   test('hasIn', () => {
     expect(doc.hasIn(['a'])).toBe(true)
     expect(doc.hasIn(['b', 1])).toBe(true)
-    expect(doc.hasIn(['b', 'e'])).toBe(false)
+    expect(() => doc.hasIn(['b', 'e'])).toThrow(TypeError)
     expect(doc.hasIn(['c', 'e'])).toBe(false)
     expect(doc.hasIn(['a', 'e'])).toBe(false)
   })
 
   test('set', () => {
     doc.set('a', 2)
-    expect(doc.get('a')).toBe(2)
-    expect(doc.get('a', true)).toMatchObject({ value: 2 })
+    expect(doc.get('a')).toMatchObject({ value: 2 })
     doc.set('c', 6)
-    expect(doc.get('c')).toBe(6)
-    expect(doc.contents?.items).toHaveLength(3)
+    expect(doc.get('c')).toMatchObject({ value: 6 })
+    expect(doc.value.items).toHaveLength(3)
   })
 
-  test('set on scalar contents', () => {
+  test('set on scalar value', () => {
     const doc = new Document('s')
-    expect(() => doc.set('a', 1)).toThrow(/document contents/)
-  })
-
-  test('set on empty document', () => {
-    doc.contents = null
-    doc.set('a', 1)
-    expect(doc.get('a')).toBe(1)
+    expect(() => doc.set('a', 1)).toThrow(/document value/)
   })
 
   test('setIn', () => {
     doc.setIn(['a'], 2)
-    expect(doc.getIn(['a'])).toBe(2)
-    expect(doc.getIn(['a'], true)).toMatchObject({ value: 2 })
+    expect(doc.getIn(['a'])).toMatchObject({ value: 2 })
     doc.setIn(['b', 1], 5)
-    expect(doc.getIn(['b', 1])).toBe(5)
+    expect(doc.getIn(['b', 1])).toMatchObject({ value: 5 })
     doc.setIn(['c'], 6)
-    expect(doc.getIn(['c'])).toBe(6)
+    expect(doc.getIn(['c'])).toMatchObject({ value: 6 })
     doc.setIn(['e', 1, 'e'], 7)
-    expect(doc.getIn(['e', 1, 'e'])).toBe(7)
+    expect(doc.getIn(['e', 1, 'e'])).toMatchObject({ value: 7 })
     expect(() => doc.setIn(['a', 'e'], 8)).toThrow(/Expected YAML collection/)
-    expect(doc.contents?.items).toHaveLength(4)
+    expect(doc.value.items).toHaveLength(4)
     expect((doc.get('b') as any).items).toHaveLength(2)
     expect(String(doc)).toBe(
       'a: 2\nb:\n  - 2\n  - 5\nc: 6\ne:\n  - null\n  - e: 7\n'
     )
   })
 
-  test('setIn on scalar contents', () => {
+  test('setIn on scalar value', () => {
     const doc = new Document('s')
-    expect(() => doc.setIn(['a'], 1)).toThrow(/document contents/)
-  })
-
-  test('setIn on empty document', () => {
-    doc.contents = null
-    doc.setIn(['a', 2], 1)
-    expect(doc.get('a')).toMatchObject({
-      items: [{ value: null }, { value: null }, { value: 1 }]
-    })
+    expect(() => doc.setIn(['a'], 1)).toThrow(/document value/)
   })
 
   test('setIn on parsed document', () => {
@@ -596,11 +510,10 @@ describe('Document', () => {
   })
 
   test('setIn with object key', () => {
-    doc.contents = null
+    doc.value = doc.createNode({})
     const foo = { foo: 'FOO' }
     doc.setIn([foo], 'BAR')
-    // @ts-expect-error - Doesn't see that setIn() changes contents
-    expect(doc.contents?.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       {
         key: { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] },
         value: { value: 'BAR' }
@@ -609,11 +522,10 @@ describe('Document', () => {
   })
 
   test('setIn with repeated object key', () => {
-    doc.contents = null
+    doc.value = doc.createNode({})
     const foo = { foo: 'FOO' }
     doc.setIn([foo, foo], 'BAR')
-    // @ts-expect-error - Doesn't see that setIn() changes contents
-    expect(doc.contents?.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       {
         key: { items: [{ key: { value: 'foo' }, value: { value: 'FOO' } }] },
         value: {

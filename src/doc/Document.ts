@@ -1,16 +1,10 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
-import { collectionFromPath, isEmptyPath } from '../nodes/Collection.ts'
-import {
-  DOC,
-  isCollection,
-  isNode,
-  isScalar,
-  NODE_TYPE
-} from '../nodes/identity.ts'
-import type { Node, NodeType, ParsedNode, Range } from '../nodes/Node.ts'
-import { Pair } from '../nodes/Pair.ts'
-import type { Scalar } from '../nodes/Scalar.ts'
+import { Collection, type Primitive } from '../nodes/Collection.ts'
+import type { Node, NodeType, Range } from '../nodes/Node.ts'
+import type { NodeBase } from '../nodes/Node.ts'
+import type { Pair } from '../nodes/Pair.ts'
+import { Scalar } from '../nodes/Scalar.ts'
 import type { ToJSContext } from '../nodes/toJS.ts'
 import { toJS } from '../nodes/toJS.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
@@ -25,11 +19,12 @@ import type {
 } from '../options.ts'
 import { Schema } from '../schema/Schema.ts'
 import { stringifyDocument } from '../stringify/stringifyDocument.ts'
-import { anchorNames, createNodeAnchors, findNewAnchor } from './anchors.ts'
+import { anchorNames, findNewAnchor } from './anchors.ts'
 import { applyReviver } from './applyReviver.ts'
-import type { CreateNodeContext } from './createNode.ts'
-import { createNode } from './createNode.ts'
 import { Directives } from './directives.ts'
+import { NodeCreator } from './NodeCreator.ts'
+
+export type DocValue = Scalar | YAMLSeq | YAMLMap
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)
 
@@ -37,29 +32,26 @@ export declare namespace Document {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   /** @ts-ignore The typing of directives fails in TS <= 4.2 */
   interface Parsed<
-    Contents extends ParsedNode = ParsedNode,
+    Value extends DocValue = DocValue,
     Strict extends boolean = true
-  > extends Document<Contents, Strict> {
+  > extends Document<Value, Strict> {
     directives: Directives
     range: Range
   }
 }
 
 export class Document<
-  Contents extends Node = Node,
+  Value extends DocValue = DocValue,
   Strict extends boolean = true
 > {
-  /** @internal */
-  declare readonly [NODE_TYPE]: symbol
-
   /** A comment before this Document */
   commentBefore: string | null = null
 
   /** A comment immediately after this Document */
   comment: string | null = null
 
-  /** The document contents. */
-  contents: Strict extends true ? Contents | null : Contents
+  /** The document value. */
+  value: Value
 
   directives: Strict extends true ? Directives | undefined : Directives
 
@@ -109,7 +101,6 @@ export class Document<
       | null,
     options?: DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions
   ) {
-    Object.defineProperty(this, NODE_TYPE, { value: DOC })
     let _replacer: Replacer | null = null
     if (typeof replacer === 'function' || Array.isArray(replacer)) {
       _replacer = replacer
@@ -139,20 +130,16 @@ export class Document<
     } else this.directives = new Directives({ version })
     this.setSchema(version, options)
 
-    // @ts-expect-error We can't really know that this matches Contents.
-    this.contents =
-      value === undefined ? null : this.createNode(value, _replacer, options)
+    this.value = this.createNode(value, _replacer, options) as Value
   }
 
   /**
-   * Create a deep copy of this Document and its contents.
+   * Create a deep copy of this Document and its value.
    *
    * Custom Node values that inherit from `Object` still refer to their original instances.
    */
-  clone(): Document<Contents, Strict> {
-    const copy: Document<Contents, Strict> = Object.create(Document.prototype, {
-      [NODE_TYPE]: { value: DOC }
-    })
+  clone(): Document<Value, Strict> {
+    const copy: Document<Value, Strict> = Object.create(Document.prototype)
     copy.commentBefore = this.commentBefore
     copy.comment = this.comment
     copy.errors = this.errors.slice()
@@ -160,22 +147,19 @@ export class Document<
     copy.options = Object.assign({}, this.options)
     if (this.directives) copy.directives = this.directives.clone()
     copy.schema = this.schema.clone()
-    // @ts-expect-error We can't really know that this matches Contents.
-    copy.contents = isNode(this.contents)
-      ? this.contents.clone(copy.schema)
-      : this.contents
+    copy.value = this.value.clone(copy.schema) as Value
     if (this.range) copy.range = this.range.slice() as Document['range']
     return copy
   }
 
   /** Adds a value to the document. */
   add(value: any): void {
-    if (assertCollection(this.contents)) this.contents.add(value)
+    assertCollection(this.value).add(value)
   }
 
   /** Adds a value to the document. */
-  addIn(path: Iterable<unknown>, value: unknown): void {
-    if (assertCollection(this.contents)) this.contents.addIn(path, value)
+  addIn(path: unknown[], value: unknown): void {
+    assertCollection(this.value).addIn(path, value)
   }
 
   /**
@@ -188,7 +172,7 @@ export class Document<
    * If `name` is undefined, the generated anchor will use 'a' as a prefix.
    */
   createAlias(
-    node: Strict extends true ? Scalar | YAMLMap | YAMLSeq : Node,
+    node: Strict extends true ? DocValue : Node,
     name?: string
   ): Alias {
     if (!node.anchor) {
@@ -215,46 +199,22 @@ export class Document<
     replacer?: Replacer | CreateNodeOptions | null,
     options?: CreateNodeOptions
   ): Node {
-    let _replacer: Replacer | undefined = undefined
+    let nc: NodeCreator
     if (typeof replacer === 'function') {
       value = replacer.call({ '': value }, '', value)
-      _replacer = replacer
+      nc = new NodeCreator(this, options, replacer)
     } else if (Array.isArray(replacer)) {
       const keyToStr = (v: unknown) =>
         typeof v === 'number' || v instanceof String || v instanceof Number
       const asStr = replacer.filter(keyToStr).map(String)
       if (asStr.length > 0) replacer = replacer.concat(asStr)
-      _replacer = replacer
-    } else if (options === undefined && replacer) {
-      options = replacer
-      replacer = undefined
+      nc = new NodeCreator(this, options, replacer)
+    } else {
+      options ??= replacer ?? undefined
+      nc = new NodeCreator(this, options)
     }
-
-    const {
-      aliasDuplicateObjects,
-      anchorPrefix,
-      flow,
-      keepUndefined,
-      onTagObj,
-      tag
-    } = options ?? {}
-    const { onAnchor, setAnchors, sourceObjects } = createNodeAnchors(
-      this,
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      anchorPrefix || 'a'
-    )
-    const ctx: CreateNodeContext = {
-      aliasDuplicateObjects: aliasDuplicateObjects ?? true,
-      keepUndefined: keepUndefined ?? false,
-      onAnchor,
-      onTagObj,
-      replacer: _replacer,
-      schema: this.schema,
-      sourceObjects
-    }
-    const node = createNode(value, tag, ctx)
-    if (flow && isCollection(node)) node.flow = true
-    setAnchors()
+    const node = nc.create(value, options?.tag)
+    nc.setAnchors()
     return node
   }
 
@@ -262,110 +222,89 @@ export class Document<
    * Convert a key and a value into a `Pair` using the current schema,
    * recursively wrapping all values as `Scalar` or `Collection` nodes.
    */
-  createPair<K extends Node = Node, V extends Node = Node>(
-    key: unknown,
-    value: unknown,
+  createPair<K = unknown, V = unknown>(
+    key: K,
+    value: V,
     options: CreateNodeOptions = {}
-  ): Pair<K, V> {
-    const k = this.createNode(key, null, options) as K
-    const v = this.createNode(value, null, options) as V
-    return new Pair(k, v)
+  ) {
+    const nc = new NodeCreator(this, options)
+    const pair = nc.createPair(key, value)
+    nc.setAnchors()
+    return pair as Pair<
+      K extends Primitive | NodeBase ? K : NodeBase,
+      V extends Primitive | NodeBase ? V : NodeBase
+    >
   }
 
   /**
    * Removes a value from the document.
    * @returns `true` if the item was found and removed.
    */
-  delete(key: unknown): boolean {
-    return assertCollection(this.contents) ? this.contents.delete(key) : false
+  delete(key: any): boolean {
+    return assertCollection(this.value).delete(key)
   }
 
   /**
    * Removes a value from the document.
    * @returns `true` if the item was found and removed.
    */
-  deleteIn(path: Iterable<unknown> | null): boolean {
-    if (isEmptyPath(path)) {
-      if (this.contents == null) return false
-      // @ts-expect-error Presumed impossible if Strict extends false
-      this.contents = null
+  deleteIn(path: unknown[]): boolean {
+    if (!path.length) {
+      this.value = new Scalar(null) as Value
       return true
     }
-    return assertCollection(this.contents)
-      ? this.contents.deleteIn(path)
-      : false
+    return assertCollection(this.value).deleteIn(path)
   }
 
   /**
-   * Returns item at `key`, or `undefined` if not found. By default unwraps
-   * scalar values from their surrounding node; to disable set `keepScalar` to
-   * `true` (collections are always returned intact).
+   * Returns item at `key`, or `undefined` if not found.
    */
-  get(key: unknown, keepScalar?: boolean): Strict extends true ? unknown : any {
-    return isCollection(this.contents)
-      ? this.contents.get(key, keepScalar)
-      : undefined
+  get(key: any): Strict extends true ? NodeBase | Pair | undefined : any {
+    return this.value instanceof Collection ? this.value.get(key) : undefined
   }
 
   /**
-   * Returns item at `path`, or `undefined` if not found. By default unwraps
-   * scalar values from their surrounding node; to disable set `keepScalar` to
-   * `true` (collections are always returned intact).
+   * Returns item at `path`, or `undefined` if not found.
    */
   getIn(
-    path: Iterable<unknown> | null,
-    keepScalar?: boolean
-  ): Strict extends true ? unknown : any {
-    if (isEmptyPath(path))
-      return !keepScalar && isScalar(this.contents)
-        ? this.contents.value
-        : this.contents
-    return isCollection(this.contents)
-      ? this.contents.getIn(path, keepScalar)
-      : undefined
+    path: unknown[]
+  ): Strict extends true ? NodeBase | Pair | null | undefined : any {
+    if (!path.length) return this.value
+    return this.value instanceof Collection ? this.value.getIn(path) : undefined
   }
 
   /**
    * Checks if the document includes a value with the key `key`.
    */
-  has(key: unknown): boolean {
-    return isCollection(this.contents) ? this.contents.has(key) : false
+  has(key: any): boolean {
+    return this.value instanceof Collection ? this.value.has(key) : false
   }
 
   /**
    * Checks if the document includes a value at `path`.
    */
-  hasIn(path: Iterable<unknown> | null): boolean {
-    if (isEmptyPath(path)) return this.contents !== undefined
-    return isCollection(this.contents) ? this.contents.hasIn(path) : false
+  hasIn(path: unknown[]): boolean {
+    if (!path.length) return true
+    return this.value instanceof Collection ? this.value.hasIn(path) : false
   }
 
   /**
    * Sets a value in this document. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    */
-  set(key: any, value: unknown): void {
-    if (this.contents == null) {
-      // @ts-expect-error We can't really know that this matches Contents.
-      this.contents = collectionFromPath(this.schema, [key], value)
-    } else if (assertCollection(this.contents)) {
-      this.contents.set(key, value)
-    }
+  set(key: any, value: any): void {
+    assertCollection(this.value).set(key, value)
   }
 
   /**
    * Sets a value in this document. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    */
-  setIn(path: Iterable<unknown> | null, value: unknown): void {
-    if (isEmptyPath(path)) {
-      // @ts-expect-error We can't really know that this matches Contents.
-      this.contents = value
-    } else if (this.contents == null) {
-      // @ts-expect-error We can't really know that this matches Contents.
-      this.contents = collectionFromPath(this.schema, Array.from(path), value)
-    } else if (assertCollection(this.contents)) {
-      this.contents.setIn(path, value)
+  setIn(path: unknown[], value: unknown): void {
+    if (!path.length) {
+      this.value = value as Value
+    } else {
+      assertCollection(this.value).setIn(path, value)
     }
   }
 
@@ -416,7 +355,7 @@ export class Document<
       )
   }
 
-  /** A plain JavaScript representation of the document `contents`. */
+  /** A plain JavaScript representation of the document `value`. */
   toJS(opt?: ToJSOptions & { [ignored: string]: unknown }): any
 
   // json & jsonArg are only used from toJSON()
@@ -436,7 +375,7 @@ export class Document<
       mapKeyWarned: false,
       maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100
     }
-    const res = toJS(this.contents, jsonArg ?? '', ctx)
+    const res = toJS(this.value, jsonArg ?? '', ctx)
     if (typeof onAnchor === 'function')
       for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
     return typeof reviver === 'function'
@@ -445,7 +384,7 @@ export class Document<
   }
 
   /**
-   * A JSON representation of the document `contents`.
+   * A JSON representation of the document `value`.
    *
    * @param jsonArg Used by `JSON.stringify` to indicate the array index or
    *   property name.
@@ -469,7 +408,7 @@ export class Document<
   }
 }
 
-function assertCollection(contents: unknown): contents is YAMLMap | YAMLSeq {
-  if (isCollection(contents)) return true
-  throw new Error('Expected a YAML collection as document contents')
+function assertCollection(value: unknown) {
+  if (value instanceof Collection) return value as YAMLMap | YAMLSeq
+  throw new Error('Expected a YAML collection as document value')
 }

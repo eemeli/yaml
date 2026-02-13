@@ -1,4 +1,3 @@
-import { MAP, SCALAR, SEQ } from '../nodes/identity.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import type { SchemaOptions, ToStringOptions } from '../options.ts'
 import { map } from './common/map.ts'
@@ -20,11 +19,11 @@ export class Schema {
 
   // These are used by createNode() and composeScalar()
   /** @internal */
-  declare readonly [MAP]: CollectionTag
+  declare readonly map: CollectionTag
   /** @internal */
-  declare readonly [SCALAR]: ScalarTag
+  declare readonly scalar: ScalarTag
   /** @internal */
-  declare readonly [SEQ]: CollectionTag
+  declare readonly seq: CollectionTag
 
   constructor({
     compat,
@@ -45,9 +44,9 @@ export class Schema {
     this.tags = getTags(customTags, this.name, merge)
     this.toStringOptions = toStringDefaults ?? null
 
-    Object.defineProperty(this, MAP, { value: map })
-    Object.defineProperty(this, SCALAR, { value: string })
-    Object.defineProperty(this, SEQ, { value: seq })
+    Object.defineProperty(this, 'map', { value: map })
+    Object.defineProperty(this, 'scalar', { value: string })
+    Object.defineProperty(this, 'seq', { value: seq })
 
     // Used by createMap()
     this.sortMapEntries =

@@ -1,9 +1,7 @@
-import { isPair } from '../nodes/identity.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type { FlowCollection, Token } from '../parse/cst.ts'
-import type { Schema } from '../schema/Schema.ts'
 import type { CollectionTag } from '../schema/types.ts'
 import type { ComposeContext, ComposeNode } from './compose-node.ts'
 import type { ComposeErrorHandler } from './composer.ts'
@@ -22,13 +20,11 @@ export function resolveFlowCollection(
   fc: FlowCollection,
   onError: ComposeErrorHandler,
   tag?: CollectionTag
-): YAMLMap.Parsed | YAMLSeq.Parsed {
+): YAMLMap | YAMLSeq {
   const isMap = fc.start.source === '{'
   const fcName = isMap ? 'flow map' : 'flow sequence'
-  const NodeClass = (tag?.nodeClass ?? (isMap ? YAMLMap : YAMLSeq)) as {
-    new (schema: Schema): YAMLMap.Parsed | YAMLSeq.Parsed
-  }
-  const coll = new NodeClass(ctx.schema)
+  const NodeClass = tag?.nodeClass ?? (isMap ? YAMLMap : YAMLSeq)
+  const coll = new NodeClass(ctx.schema) as YAMLMap | YAMLSeq
   coll.flow = true
   const atRoot = ctx.atRoot
   if (atRoot) ctx.atRoot = false
@@ -98,7 +94,7 @@ export function resolveFlowCollection(
         }
         if (prevItemComment) {
           let prev = coll.items[coll.items.length - 1]
-          if (isPair(prev)) prev = prev.value ?? prev.key
+          if (prev instanceof Pair) prev = prev.value ?? prev.key
           if (prev.comment) prev.comment += '\n' + prevItemComment
           else prev.comment = prevItemComment
           props.comment = props.comment.substring(prevItemComment.length + 1)
@@ -113,8 +109,8 @@ export function resolveFlowCollection(
         ? composeNode(ctx, value, props, onError)
         : composeEmptyNode(ctx, props.end, sep, null, props, onError)
       ;(coll as YAMLSeq).items.push(valueNode)
-      offset = valueNode.range[2]
-      if (isBlock(value)) onError(valueNode.range, 'BLOCK_IN_FLOW', blockMsg)
+      offset = valueNode.range![2]
+      if (isBlock(value)) onError(valueNode.range!, 'BLOCK_IN_FLOW', blockMsg)
     } else {
       // item is a key+value pair
 
@@ -124,7 +120,7 @@ export function resolveFlowCollection(
       const keyNode = key
         ? composeNode(ctx, key, props, onError)
         : composeEmptyNode(ctx, keyStart, start, null, props, onError)
-      if (isBlock(key)) onError(keyNode.range, 'BLOCK_IN_FLOW', blockMsg)
+      if (isBlock(key)) onError(keyNode.range!, 'BLOCK_IN_FLOW', blockMsg)
       ctx.atKey = false
 
       // value properties
@@ -132,7 +128,7 @@ export function resolveFlowCollection(
         flow: fcName,
         indicator: 'map-value-ind',
         next: value,
-        offset: keyNode.range[2],
+        offset: keyNode.range![2],
         onError,
         parentIndent: fc.indent,
         startOnNewline: false
@@ -184,7 +180,7 @@ export function resolveFlowCollection(
             )
           : null
       if (valueNode) {
-        if (isBlock(value)) onError(valueNode.range, 'BLOCK_IN_FLOW', blockMsg)
+        if (isBlock(value)) onError(valueNode.range!, 'BLOCK_IN_FLOW', blockMsg)
       } else if (valueProps.comment) {
         if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
         else keyNode.comment = valueProps.comment
@@ -193,7 +189,7 @@ export function resolveFlowCollection(
       const pair = new Pair(keyNode, valueNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
       if (isMap) {
-        const map = coll as YAMLMap.Parsed
+        const map = coll as YAMLMap
         if (mapIncludes(ctx, map.items, keyNode))
           onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
         map.items.push(pair)
@@ -201,11 +197,11 @@ export function resolveFlowCollection(
         const map = new YAMLMap(ctx.schema)
         map.flow = true
         map.items.push(pair)
-        const endRange = (valueNode ?? keyNode).range
-        map.range = [keyNode.range[0], endRange[1], endRange[2]]
+        const endRange = (valueNode ?? keyNode).range!
+        map.range = [keyNode.range![0], endRange[1], endRange[2]]
         ;(coll as YAMLSeq).items.push(map)
       }
-      offset = valueNode ? valueNode.range[2] : valueProps.end
+      offset = valueNode ? valueNode.range![2] : valueProps.end
     }
   }
 

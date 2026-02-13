@@ -1,23 +1,13 @@
 export { Composer } from './compose/composer.ts'
 
-export { Document } from './doc/Document.ts'
+export { Document, type DocValue } from './doc/Document.ts'
 export { Schema } from './schema/Schema.ts'
 
 export type { ErrorCode } from './errors.ts'
 export { YAMLError, YAMLParseError, YAMLWarning } from './errors.ts'
 
 export { Alias } from './nodes/Alias.ts'
-export {
-  isAlias,
-  isCollection,
-  isDocument,
-  isMap,
-  isNode,
-  isPair,
-  isScalar,
-  isSeq
-} from './nodes/identity.ts'
-export type { Node, ParsedNode, Range } from './nodes/Node.ts'
+export type { Node, Range } from './nodes/Node.ts'
 export { Pair } from './nodes/Pair.ts'
 export { Scalar } from './nodes/Scalar.ts'
 export { YAMLMap } from './nodes/YAMLMap.ts'

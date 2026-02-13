@@ -1,4 +1,4 @@
-import { isNode } from '../nodes/identity.ts'
+import { NodeBase } from '../nodes/Node.ts'
 import { visit } from '../visit.ts'
 import type { Document } from './Document.ts'
 
@@ -180,10 +180,10 @@ export class Directives {
     const tagEntries = Object.entries(this.tags)
 
     let tagNames: string[]
-    if (doc && tagEntries.length > 0 && isNode(doc.contents)) {
+    if (doc && tagEntries.length > 0) {
       const tags: Record<string, boolean> = {}
-      visit(doc.contents, (_key, node) => {
-        if (isNode(node) && node.tag) tags[node.tag] = true
+      visit(doc.value, (_key, node) => {
+        if (node instanceof NodeBase && node.tag) tags[node.tag] = true
       })
       tagNames = Object.keys(tags)
     } else tagNames = []

@@ -1,8 +1,7 @@
 import type { Directives } from '../doc/directives.ts'
 import { Alias } from '../nodes/Alias.ts'
-import { isScalar } from '../nodes/identity.ts'
-import type { ParsedNode } from '../nodes/Node.ts'
-import type { Scalar } from '../nodes/Scalar.ts'
+import type { Node } from '../nodes/Node.ts'
+import { Scalar } from '../nodes/Scalar.ts'
 import type { ParseOptions } from '../options.ts'
 import type { FlowScalar, SourceToken, Token } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
@@ -40,10 +39,10 @@ export function composeNode(
   token: Token,
   props: Props,
   onError: ComposeErrorHandler
-): ParsedNode {
+): Node {
   const atKey = ctx.atKey
   const { spaceBefore, comment, anchor, tag } = props
-  let node: ParsedNode
+  let node: Node
   let isSrcToken = true
   switch (token.type) {
     case 'alias':
@@ -90,7 +89,7 @@ export function composeNode(
   if (
     atKey &&
     ctx.options.stringKeys &&
-    (!isScalar(node) ||
+    (!(node instanceof Scalar) ||
       typeof node.value !== 'string' ||
       (node.tag && node.tag !== 'tag:yaml.org,2002:str'))
   ) {
@@ -114,7 +113,7 @@ export function composeEmptyNode(
   pos: number | null,
   { spaceBefore, comment, anchor, tag, end }: Props,
   onError: ComposeErrorHandler
-): Scalar.Parsed {
+): Scalar {
   const token: FlowScalar = {
     type: 'scalar',
     offset: emptyScalarPosition(offset, before, pos),
@@ -130,7 +129,7 @@ export function composeEmptyNode(
   if (spaceBefore) node.spaceBefore = true
   if (comment) {
     node.comment = comment
-    node.range[2] = end
+    node.range![2] = end
   }
   return node
 }
@@ -154,5 +153,5 @@ function composeAlias(
   const re = resolveEnd(end, valueEnd, options.strict, onError)
   alias.range = [offset, valueEnd, re.offset]
   if (re.comment) alias.comment = re.comment
-  return alias as Alias.Parsed
+  return alias
 }

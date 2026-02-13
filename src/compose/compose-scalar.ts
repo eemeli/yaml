@@ -1,4 +1,3 @@
-import { isScalar, SCALAR } from '../nodes/identity.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { BlockScalar, FlowScalar, SourceToken } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
@@ -13,7 +12,7 @@ export function composeScalar(
   token: FlowScalar | BlockScalar,
   tagToken: SourceToken | null,
   onError: ComposeErrorHandler
-) {
+): Scalar {
   const { value, type, comment, range } =
     token.type === 'block-scalar'
       ? resolveBlockScalar(ctx, token, onError)
@@ -27,12 +26,12 @@ export function composeScalar(
 
   let tag: ScalarTag
   if (ctx.options.stringKeys && ctx.atKey) {
-    tag = ctx.schema[SCALAR]
+    tag = ctx.schema.scalar
   } else if (tagName)
     tag = findScalarTagByName(ctx.schema, value, tagName, tagToken!, onError)
   else if (token.type === 'scalar')
     tag = findScalarTagByTest(ctx, value, token, onError)
-  else tag = ctx.schema[SCALAR]
+  else tag = ctx.schema.scalar
 
   let scalar: Scalar
   try {
@@ -41,7 +40,7 @@ export function composeScalar(
       msg => onError(tagToken ?? token, 'TAG_RESOLVE_FAILED', msg),
       ctx.options
     )
-    scalar = isScalar(res) ? res : new Scalar(res)
+    scalar = res instanceof Scalar ? res : new Scalar(res)
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
     onError(tagToken ?? token, 'TAG_RESOLVE_FAILED', msg)
@@ -54,7 +53,7 @@ export function composeScalar(
   if (tag.format) scalar.format = tag.format
   if (comment) scalar.comment = comment
 
-  return scalar as Scalar.Parsed
+  return scalar
 }
 
 function findScalarTagByName(
@@ -64,7 +63,7 @@ function findScalarTagByName(
   tagToken: SourceToken,
   onError: ComposeErrorHandler
 ) {
-  if (tagName === '!') return schema[SCALAR] // non-specific tag
+  if (tagName === '!') return schema.scalar // non-specific tag
   const matchWithTest: ScalarTag[] = []
   for (const tag of schema.tags) {
     if (!tag.collection && tag.tag === tagName) {
@@ -86,7 +85,7 @@ function findScalarTagByName(
     `Unresolved tag: ${tagName}`,
     tagName !== 'tag:yaml.org,2002:str'
   )
-  return schema[SCALAR]
+  return schema.scalar
 }
 
 function findScalarTagByTest(
@@ -100,12 +99,12 @@ function findScalarTagByTest(
       tag =>
         (tag.default === true || (atKey && tag.default === 'key')) &&
         tag.test?.test(value)
-    ) as ScalarTag) || schema[SCALAR]
+    ) as ScalarTag) || schema.scalar
 
   if (schema.compat) {
     const compat =
       schema.compat.find(tag => tag.default && tag.test?.test(value)) ??
-      schema[SCALAR]
+      schema.scalar
     if (tag.tag !== compat.tag) {
       const ts = directives.tagString(tag.tag)
       const cs = directives.tagString(compat.tag)

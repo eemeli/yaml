@@ -66,7 +66,7 @@ describe('block collections', () => {
     expect(doc.errors[0].message).toMatch(
       'All mapping items must start at the same column'
     )
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         { key: { value: 'foo' }, value: { value: '1' } },
         { key: { value: 'bar' }, value: { value: 2 } }
@@ -81,7 +81,7 @@ describe('block collections', () => {
     expect(doc.errors[0].message).toMatch(
       'All sequence items must start at the same column'
     )
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [{ value: 'foo' }, { items: [{ value: 'bar' }] }]
     })
   })
@@ -94,7 +94,7 @@ describe('block collections', () => {
       { code: 'UNEXPECTED_TOKEN' },
       { code: 'MISSING_CHAR' }
     ])
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         { key: { value: 'foo' }, value: { value: '1' } },
         { key: { value: null }, value: null }
@@ -430,7 +430,7 @@ test('broken document with comment before first node', () => {
 
 test('multiple tags on one node', () => {
   const doc = YAML.parseDocument('!foo !bar baz\n')
-  expect(doc.contents).toMatchObject({ value: 'baz', type: 'PLAIN' })
+  expect(doc.value).toMatchObject({ value: 'baz', type: 'PLAIN' })
   expect(doc.errors).toHaveLength(1)
   expect(doc.warnings).toHaveLength(1)
 })

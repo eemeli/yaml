@@ -1,4 +1,3 @@
-import { isMap } from '../../nodes/identity.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
 import type { CollectionTag } from '../types.ts'
 
@@ -8,8 +7,7 @@ export const map: CollectionTag = {
   nodeClass: YAMLMap,
   tag: 'tag:yaml.org,2002:map',
   resolve(map, onError) {
-    if (!isMap(map)) onError('Expected a mapping for this tag')
+    if (!(map instanceof YAMLMap)) onError('Expected a mapping for this tag')
     return map
-  },
-  createNode: (schema, obj, ctx) => YAMLMap.from(schema, obj, ctx)
+  }
 }

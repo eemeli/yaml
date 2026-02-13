@@ -1,28 +1,23 @@
-import type { CreateNodeContext } from '../../doc/createNode.ts'
-import { isMap, isPair, isSeq } from '../../nodes/identity.ts'
-import type { ParsedNode } from '../../nodes/Node.ts'
-import { createPair, Pair } from '../../nodes/Pair.ts'
+import type { NodeCreator } from '../../doc/NodeCreator.ts'
+import type { NodeBase } from '../../nodes/Node.ts'
+import { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
-import type { YAMLMap } from '../../nodes/YAMLMap.ts'
+import { YAMLMap } from '../../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
-import type { Schema } from '../../schema/Schema.ts'
 import type { CollectionTag } from '../types.ts'
 
 export function resolvePairs(
-  seq:
-    | YAMLSeq.Parsed<ParsedNode | Pair<ParsedNode, ParsedNode | null>>
-    | YAMLMap.Parsed,
+  seq: YAMLSeq | YAMLMap,
   onError: (message: string) => void
-) {
-  if (isSeq(seq)) {
+): YAMLSeq<Pair> {
+  if (seq instanceof YAMLSeq) {
     for (let i = 0; i < seq.items.length; ++i) {
-      let item = seq.items[i]
-      if (isPair(item)) continue
-      else if (isMap(item)) {
+      const item = seq.items[i]
+      if (item instanceof Pair) continue
+      else if (item instanceof YAMLMap) {
         if (item.items.length > 1)
           onError('Each pair must have its own sequence indicator')
-        const pair =
-          item.items[0] || new Pair(new Scalar(null) as Scalar.Parsed)
+        const pair = item.items[0] || new Pair(new Scalar(null))
         if (item.commentBefore)
           pair.key.commentBefore = pair.key.commentBefore
             ? `${item.commentBefore}\n${pair.key.commentBefore}`
@@ -33,27 +28,23 @@ export function resolvePairs(
             ? `${item.comment}\n${cn.comment}`
             : item.comment
         }
-        item = pair
+        seq.items[i] = pair
+      } else {
+        seq.items[i] = new Pair<NodeBase, null>(item, null)
       }
-      seq.items[i] = isPair(item) ? item : new Pair(item)
     }
   } else onError('Expected a sequence for this tag')
-  return seq as YAMLSeq.Parsed<Pair<ParsedNode, ParsedNode | null>>
+  return seq as YAMLSeq<Pair>
 }
 
-export function createPairs(
-  schema: Schema,
-  iterable: unknown,
-  ctx: CreateNodeContext
-): YAMLSeq {
-  const { replacer } = ctx
-  const pairs = new YAMLSeq(schema)
+export function createPairs(nc: NodeCreator, iterable: unknown): YAMLSeq<Pair> {
+  const pairs = new YAMLSeq<Pair>(nc.schema)
   pairs.tag = 'tag:yaml.org,2002:pairs'
   let i = 0
   if (iterable && Symbol.iterator in Object(iterable))
     for (let it of iterable as Iterable<unknown>) {
-      if (typeof replacer === 'function')
-        it = replacer.call(iterable, String(i++), it)
+      if (typeof nc.replacer === 'function')
+        it = nc.replacer.call(iterable, String(i++), it)
       let key: unknown, value: unknown
       if (Array.isArray(it)) {
         if (it.length === 2) {
@@ -73,7 +64,7 @@ export function createPairs(
       } else {
         key = it
       }
-      pairs.items.push(createPair(key, value, ctx))
+      pairs.items.push(nc.createPair(key, value))
     }
   return pairs
 }

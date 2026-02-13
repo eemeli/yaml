@@ -1,6 +1,5 @@
 import type { Directives } from '../doc/directives.ts'
-import { Document } from '../doc/Document.ts'
-import type { ParsedNode } from '../nodes/Node.ts'
+import { Document, type DocValue } from '../doc/Document.ts'
 import type {
   DocumentOptions,
   ParseOptions,
@@ -17,16 +16,16 @@ import { resolveEnd } from './resolve-end.ts'
 import { resolveProps } from './resolve-props.ts'
 
 export function composeDoc<
-  Contents extends ParsedNode = ParsedNode,
+  Value extends DocValue = DocValue,
   Strict extends boolean = true
 >(
   options: ParseOptions & DocumentOptions & SchemaOptions,
   directives: Directives,
   { offset, start, value, end }: CST.Document,
   onError: ComposeErrorHandler
-): Document.Parsed<Contents, Strict> {
+): Document.Parsed<Value, Strict> {
   const opts = Object.assign({ _directives: directives }, options)
-  const doc = new Document(undefined, opts) as Document.Parsed<Contents, Strict>
+  const doc = new Document(undefined, opts) as Document.Parsed<Value, Strict>
   const ctx: ComposeContext = {
     atKey: false,
     atRoot: true,
@@ -55,12 +54,11 @@ export function composeDoc<
         'Block collection cannot start on same line with directives-end marker'
       )
   }
-  // @ts-expect-error If Contents is set, let's trust the user
-  doc.contents = value
-    ? composeNode(ctx, value, props, onError)
-    : composeEmptyNode(ctx, props.end, start, null, props, onError)
+  doc.value = value
+    ? (composeNode(ctx, value, props, onError) as Value)
+    : (composeEmptyNode(ctx, props.end, start, null, props, onError) as Value)
 
-  const contentEnd = doc.contents.range[2]
+  const contentEnd = doc.value.range![2]
   const re = resolveEnd(end, contentEnd, false, onError)
   if (re.comment) doc.comment = re.comment
   doc.range = [offset, contentEnd, re.offset]

@@ -1,15 +1,11 @@
 import type { Document } from './doc/Document.ts'
-import {
-  isAlias,
-  isCollection,
-  isMap,
-  isNode,
-  isPair,
-  isScalar,
-  isSeq
-} from './nodes/identity.ts'
-import type { Node, ParsedNode } from './nodes/Node.ts'
-import type { Pair } from './nodes/Pair.ts'
+import { Alias } from './nodes/Alias.ts'
+import { Collection } from './nodes/Collection.ts'
+import { type Node, NodeBase } from './nodes/Node.ts'
+import { Pair } from './nodes/Pair.ts'
+import { Scalar } from './nodes/Scalar.ts'
+import { YAMLMap } from './nodes/YAMLMap.ts'
+import { YAMLSeq } from './nodes/YAMLSeq.ts'
 import { parseAllDocuments } from './public-api.ts'
 import { visit } from './visit.ts'
 
@@ -46,19 +42,13 @@ export function testEvents(src: string): {
   try {
     for (let i = 0; i < docs.length; ++i) {
       const doc = docs[i]
-      let root = doc.contents
-      if (Array.isArray(root)) root = root[0]
+      const root = doc.value
       const [rootStart] = doc.range || [0]
       const error = doc.errors[0]
       if (error && (!error.pos || error.pos[0] < rootStart)) throw new Error()
       let docStart = '+DOC'
       if (doc.directives.docStart) docStart += ' ---'
-      else if (
-        doc.contents &&
-        doc.contents.range[2] === doc.contents.range[0] &&
-        !doc.contents.anchor &&
-        !doc.contents.tag
-      )
+      else if (root.range![2] === root.range![0] && !root.anchor && !root.tag)
         continue
       events.push(docStart)
       addEvents(events, doc, error?.pos[0] ?? -1, root)
@@ -78,16 +68,19 @@ function addEvents(
   events: string[],
   doc: Document,
   errPos: number,
-  node: ParsedNode | Pair<ParsedNode, ParsedNode | null> | null
+  node: NodeBase | Pair | null
 ) {
   if (!node) {
     events.push('=VAL :')
     return
   }
-  if (errPos !== -1 && isNode(node) && node.range[0] >= errPos)
+  if (errPos !== -1 && node instanceof NodeBase && node.range![0] >= errPos)
     throw new Error()
   let props = ''
-  let anchor = isScalar(node) || isCollection(node) ? node.anchor : undefined
+  let anchor =
+    node instanceof Scalar || node instanceof Collection
+      ? node.anchor
+      : undefined
   if (anchor) {
     if (/\d$/.test(anchor)) {
       const alt = anchor.replace(/\d$/, '')
@@ -95,9 +88,9 @@ function addEvents(
     }
     props = ` &${anchor}`
   }
-  if (isNode(node) && node.tag) props += ` <${node.tag}>`
+  if (node instanceof NodeBase && node.tag) props += ` <${node.tag}>`
 
-  if (isMap(node)) {
+  if (node instanceof YAMLMap) {
     const ev = node.flow ? '+MAP {}' : '+MAP'
     events.push(`${ev}${props}`)
     node.items.forEach(({ key, value }) => {
@@ -105,30 +98,30 @@ function addEvents(
       addEvents(events, doc, errPos, value)
     })
     events.push('-MAP')
-  } else if (isSeq(node)) {
+  } else if (node instanceof YAMLSeq) {
     const ev = node.flow ? '+SEQ []' : '+SEQ'
     events.push(`${ev}${props}`)
     node.items.forEach(item => {
       addEvents(events, doc, errPos, item)
     })
     events.push('-SEQ')
-  } else if (isPair(node)) {
+  } else if (node instanceof Pair) {
     events.push(`+MAP${props}`)
     addEvents(events, doc, errPos, node.key)
     addEvents(events, doc, errPos, node.value)
     events.push('-MAP')
-  } else if (isAlias(node)) {
+  } else if (node instanceof Alias) {
     let alias = node.source
     if (alias && /\d$/.test(alias)) {
       const alt = alias.replace(/\d$/, '')
       if (anchorExists(doc, alt)) alias = alt
     }
     events.push(`=ALI${props} *${alias}`)
-  } else {
+  } else if (node instanceof Scalar) {
     const scalar = scalarChar[String(node.type)]
     if (!scalar) throw new Error(`Unexpected node type ${node.type}`)
-    const value = node.source
-      .replace(/\\/g, '\\\\')
+    const value = node
+      .source!.replace(/\\/g, '\\\\')
       .replace(/\0/g, '\\0')
       .replace(/\x07/g, '\\a')
       .replace(/\x08/g, '\\b')
@@ -139,5 +132,7 @@ function addEvents(
       .replace(/\r/g, '\\r')
       .replace(/\x1b/g, '\\e')
     events.push(`=VAL${props} ${scalar}${value}`)
+  } else {
+    throw new Error(`Unexpected node ${node}`)
   }
 }

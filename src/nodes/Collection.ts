@@ -1,13 +1,11 @@
-import { createNode } from '../doc/createNode.ts'
+import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { Schema } from '../schema/Schema.ts'
-import {
-  isCollection,
-  isNode,
-  isPair,
-  isScalar,
-  NODE_TYPE
-} from './identity.ts'
 import { type Node, NodeBase } from './Node.ts'
+import type { Pair } from './Pair.ts'
+import type { Scalar } from './Scalar.ts'
+
+export type Primitive = boolean | number | bigint | string | null
+export type NodeOf<T> = T extends Primitive ? Scalar<T> : T
 
 export function collectionFromPath(
   schema: Schema,
@@ -25,32 +23,13 @@ export function collectionFromPath(
       v = new Map<unknown, unknown>([[k, v]])
     }
   }
-  return createNode(v, undefined, {
-    aliasDuplicateObjects: false,
-    keepUndefined: false,
-    onAnchor: () => {
-      throw new Error('This should not happen, please report a bug.')
-    },
-    schema,
-    sourceObjects: new Map()
-  })
+  return new NodeCreator(schema, { aliasDuplicateObjects: false }).create(v)
 }
 
-// Type guard is intentionally a little wrong so as to be more useful,
-// as it does not cover untypable empty non-string iterables (e.g. []).
-export const isEmptyPath = (
-  path: Iterable<unknown> | null | undefined
-): path is null | undefined =>
-  path == null ||
-  (typeof path === 'object' && !!path[Symbol.iterator]().next().done)
-
 export abstract class Collection extends NodeBase {
-  schema: Schema | undefined;
+  schema: Schema | undefined
 
-  /** @internal */
-  declare [NODE_TYPE]: symbol
-
-  declare items: unknown[]
+  declare items: (NodeBase | Pair)[]
 
   /** An optional anchor on this node. Used by alias nodes. */
   declare anchor?: string
@@ -61,8 +40,8 @@ export abstract class Collection extends NodeBase {
    */
   declare flow?: boolean
 
-  constructor(type: symbol, schema?: Schema) {
-    super(type)
+  constructor(schema?: Schema) {
+    super()
     Object.defineProperty(this, 'schema', {
       value: schema,
       configurable: true,
@@ -82,9 +61,7 @@ export abstract class Collection extends NodeBase {
       Object.getOwnPropertyDescriptors(this)
     )
     if (schema) copy.schema = schema
-    copy.items = copy.items.map(it =>
-      isNode(it) || isPair(it) ? it.clone(schema) : it
-    )
+    copy.items = copy.items.map(it => it.clone(schema))
     if (this.range) copy.range = this.range.slice() as NodeBase['range']
     return copy
   }
@@ -99,11 +76,9 @@ export abstract class Collection extends NodeBase {
   abstract delete(key: unknown): boolean
 
   /**
-   * Returns item at `key`, or `undefined` if not found. By default unwraps
-   * scalar values from their surrounding node; to disable set `keepScalar` to
-   * `true` (collections are always returned intact).
+   * Returns item at `key`, or `undefined` if not found.
    */
-  abstract get(key: unknown, keepScalar?: boolean): unknown
+  abstract get(key: unknown): NodeBase | Pair | undefined
 
   /**
    * Checks if the collection includes a value with the key `key`.
@@ -111,22 +86,21 @@ export abstract class Collection extends NodeBase {
   abstract has(key: unknown): boolean
 
   /**
-   * Sets a value in this collection. For `!!set`, `value` needs to be a
-   * boolean to add/remove the item from the set.
+   * Sets a value in this collection.
    */
   abstract set(key: unknown, value: unknown): void
 
   /**
-   * Adds a value to the collection. For `!!map` and `!!omap` the value must
-   * be a Pair instance or a `{ key, value }` object, which may not have a key
-   * that already exists in the map.
+   * Adds a value to the collection.
+   *
+   * For `!!map` and `!!omap` the value must be a Pair instance.
    */
-  addIn(path: Iterable<unknown>, value: unknown): void {
-    if (isEmptyPath(path)) this.add(value)
+  addIn(path: unknown[], value: unknown): void {
+    if (!path.length) this.add(value)
     else {
       const [key, ...rest] = path
-      const node = this.get(key, true)
-      if (isCollection(node)) node.addIn(rest, value)
+      const node = this.get(key)
+      if (node instanceof Collection) node.addIn(rest, value)
       else if (node === undefined && this.schema)
         this.set(key, collectionFromPath(this.schema, rest, value))
       else
@@ -138,13 +112,14 @@ export abstract class Collection extends NodeBase {
 
   /**
    * Removes a value from the collection.
+   *
    * @returns `true` if the item was found and removed.
    */
-  deleteIn(path: Iterable<unknown>): boolean {
+  deleteIn(path: unknown[]): boolean {
     const [key, ...rest] = path
     if (rest.length === 0) return this.delete(key)
-    const node = this.get(key, true)
-    if (isCollection(node)) return node.deleteIn(rest)
+    const node = this.get(key)
+    if (node instanceof Collection) return node.deleteIn(rest)
     else
       throw new Error(
         `Expected YAML collection at ${key}. Remaining path: ${rest}`
@@ -152,55 +127,35 @@ export abstract class Collection extends NodeBase {
   }
 
   /**
-   * Returns item at `key`, or `undefined` if not found. By default unwraps
-   * scalar values from their surrounding node; to disable set `keepScalar` to
-   * `true` (collections are always returned intact).
+   * Returns item at `key`, or `undefined` if not found.
    */
-  getIn(path: Iterable<unknown>, keepScalar?: boolean): unknown {
+  getIn(path: unknown[]): NodeBase | Pair | undefined {
     const [key, ...rest] = path
-    const node = this.get(key, true)
-    if (rest.length === 0)
-      return !keepScalar && isScalar(node) ? node.value : node
-    else return isCollection(node) ? node.getIn(rest, keepScalar) : undefined
-  }
-
-  hasAllNullValues(allowScalar?: boolean): boolean {
-    return this.items.every(node => {
-      if (!isPair(node)) return false
-      const n = node.value
-      return (
-        n == null ||
-        (allowScalar &&
-          isScalar(n) &&
-          n.value == null &&
-          !n.commentBefore &&
-          !n.comment &&
-          !n.tag)
-      )
-    })
+    const node = this.get(key)
+    if (rest.length === 0) return node
+    else return node instanceof Collection ? node.getIn(rest) : undefined
   }
 
   /**
    * Checks if the collection includes a value with the key `key`.
    */
-  hasIn(path: Iterable<unknown>): boolean {
+  hasIn(path: unknown[]): boolean {
     const [key, ...rest] = path
     if (rest.length === 0) return this.has(key)
-    const node = this.get(key, true)
-    return isCollection(node) ? node.hasIn(rest) : false
+    const node = this.get(key)
+    return node instanceof Collection ? node.hasIn(rest) : false
   }
 
   /**
-   * Sets a value in this collection. For `!!set`, `value` needs to be a
-   * boolean to add/remove the item from the set.
+   * Sets a value in this collection.
    */
-  setIn(path: Iterable<unknown>, value: unknown): void {
+  setIn(path: unknown[], value: unknown): void {
     const [key, ...rest] = path
     if (rest.length === 0) {
       this.set(key, value)
     } else {
-      const node = this.get(key, true)
-      if (isCollection(node)) node.setIn(rest, value)
+      const node = this.get(key)
+      if (node instanceof Collection) node.setIn(rest, value)
       else if (node === undefined && this.schema)
         this.set(key, collectionFromPath(this.schema, rest, value))
       else

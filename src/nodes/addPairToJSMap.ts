@@ -1,7 +1,7 @@
 import { warn } from '../log.ts'
 import { addMergeToJSMap, isMergeKey } from '../schema/yaml-1.1/merge.ts'
 import { createStringifyContext } from '../stringify/stringify.ts'
-import { isNode } from './identity.ts'
+import { NodeBase } from './Node.ts'
 import type { Pair } from './Pair.ts'
 import type { ToJSContext } from './toJS.ts'
 import { toJS } from './toJS.ts'
@@ -12,7 +12,7 @@ export function addPairToJSMap(
   map: MapLike,
   { key, value }: Pair
 ): MapLike {
-  if (isNode(key) && key.addToJSMap) key.addToJSMap(ctx, map, value)
+  if (key instanceof NodeBase && key.addToJSMap) key.addToJSMap(ctx, map, value)
   // TODO: Should drop this special case for bare << handling
   else if (isMergeKey(ctx, key)) addMergeToJSMap(ctx, map, value)
   else {
@@ -45,7 +45,7 @@ function stringifyKey(
   if (jsKey === null) return ''
   // eslint-disable-next-line @typescript-eslint/no-base-to-string
   if (typeof jsKey !== 'object') return String(jsKey)
-  if (isNode(key) && ctx?.doc) {
+  if (key instanceof NodeBase && ctx?.doc) {
     const strCtx = createStringifyContext(ctx.doc, {})
     strCtx.anchors = new Set()
     for (const node of ctx.anchors.keys())

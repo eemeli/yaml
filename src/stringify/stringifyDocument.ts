@@ -1,6 +1,4 @@
-import type { Document } from '../doc/Document.ts'
-import { isNode } from '../nodes/identity.ts'
-import type { Node } from '../nodes/Node.ts'
+import type { Document, DocValue } from '../doc/Document.ts'
 import type { ToStringOptions } from '../options.ts'
 import {
   createStringifyContext,
@@ -10,7 +8,7 @@ import {
 import { indentComment, lineComment } from './stringifyComment.ts'
 
 export function stringifyDocument(
-  doc: Readonly<Document<Node, boolean>>,
+  doc: Readonly<Document<DocValue, boolean>>,
   options: ToStringOptions
 ): string {
   const lines: string[] = []
@@ -35,37 +33,31 @@ export function stringifyDocument(
 
   let chompKeep = false
   let contentComment = null
-  if (doc.contents) {
-    if (isNode(doc.contents)) {
-      if (doc.contents.spaceBefore && hasDirectives) lines.push('')
-      if (doc.contents.commentBefore) {
-        const cs = commentString(doc.contents.commentBefore)
-        lines.push(indentComment(cs, ''))
-      }
-      // top-level block scalars need to be indented if followed by a comment
-      ctx.forceBlockIndent = !!doc.comment
-      contentComment = doc.contents.comment
-    }
-    const onChompKeep = contentComment ? undefined : () => (chompKeep = true)
-    let body = stringify(
-      doc.contents,
-      ctx,
-      () => (contentComment = null),
-      onChompKeep
-    )
-    if (contentComment)
-      body += lineComment(body, '', commentString(contentComment))
-    if (
-      (body[0] === '|' || body[0] === '>') &&
-      lines[lines.length - 1] === '---'
-    ) {
-      // Top-level block scalars with a preceding doc marker ought to use the
-      // same line for their header.
-      lines[lines.length - 1] = `--- ${body}`
-    } else lines.push(body)
-  } else {
-    lines.push(stringify(doc.contents, ctx))
+  if (doc.value.spaceBefore && hasDirectives) lines.push('')
+  if (doc.value.commentBefore) {
+    const cs = commentString(doc.value.commentBefore)
+    lines.push(indentComment(cs, ''))
   }
+  // top-level block scalars need to be indented if followed by a comment
+  ctx.forceBlockIndent = !!doc.comment
+  contentComment = doc.value.comment
+  const onChompKeep = contentComment ? undefined : () => (chompKeep = true)
+  let body = stringify(
+    doc.value,
+    ctx,
+    () => (contentComment = null),
+    onChompKeep
+  )
+  if (contentComment)
+    body += lineComment(body, '', commentString(contentComment))
+  if (
+    (body[0] === '|' || body[0] === '>') &&
+    lines[lines.length - 1] === '---'
+  ) {
+    // Top-level block scalars with a preceding doc marker ought to use the
+    // same line for their header.
+    lines[lines.length - 1] = `--- ${body}`
+  } else lines.push(body)
   if (doc.directives?.docEnd) {
     if (doc.comment) {
       const cs = commentString(doc.comment)

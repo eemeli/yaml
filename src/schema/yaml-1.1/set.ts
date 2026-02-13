@@ -1,15 +1,18 @@
-import { isMap, isPair, isScalar } from '../../nodes/identity.ts'
+import { NodeCreator } from '../../doc/NodeCreator.ts'
+import type { NodeOf, Primitive } from '../../nodes/Collection.ts'
+import { NodeBase } from '../../nodes/Node.ts'
 import { Pair } from '../../nodes/Pair.ts'
-import type { Scalar } from '../../nodes/Scalar.ts'
+import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
 import { findPair, YAMLMap } from '../../nodes/YAMLMap.ts'
+import type { CreateNodeOptions } from '../../options.ts'
 import type { Schema } from '../../schema/Schema.ts'
 import type { StringifyContext } from '../../stringify/stringify.ts'
-import type { CreateNodeContext } from '../../util.ts'
-import { createPair } from '../../util.ts'
 import type { CollectionTag } from '../types.ts'
 
-export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
+export class YAMLSet<
+  T extends Primitive | NodeBase = Primitive | NodeBase
+> extends YAMLMap<T, T> {
   static tag = 'tag:yaml.org,2002:set'
 
   constructor(schema?: Schema) {
@@ -17,54 +20,63 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
     this.tag = YAMLSet.tag
   }
 
+  /**
+   * Add a value to the set.
+   *
+   * If `value` is a Pair, its `.value` must be null and `options` is ignored.
+   *
+   * If the set already includes a matching value, no value is added.
+   */
   add(
-    key:
-      | T
-      | Pair<T, Scalar<null> | null>
-      | { key: T; value: Scalar<null> | null }
+    value: unknown,
+    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
   ): void {
-    let pair: Pair<T, Scalar<null> | null>
-    if (isPair(key)) pair = key
-    else if (
-      key &&
-      typeof key === 'object' &&
-      'key' in key &&
-      'value' in key &&
-      key.value === null
-    )
-      pair = new Pair(key.key, null)
-    else pair = new Pair(key as T, null)
-    const prev = findPair(this.items, pair.key)
-    if (!prev) this.items.push(pair)
+    if (!(value instanceof Pair)) {
+      this.set(value, true, options)
+    } else if (value.value !== null) {
+      throw new TypeError('set pair values must be null')
+    } else {
+      const prev = findPair(this.items, value.key)
+      if (!prev) this.items.push(value as Pair<T, T>)
+    }
   }
 
   /**
-   * If `keepPair` is `true`, returns the Pair matching `key`.
-   * Otherwise, returns the value of that Pair's key.
+   * Returns the value matching `key`.
    */
-  get(key: unknown, keepPair?: boolean): any {
+  get(key: unknown): NodeOf<T> | undefined {
     const pair = findPair(this.items, key)
-    return !keepPair && isPair(pair)
-      ? isScalar(pair.key)
-        ? pair.key.value
-        : pair.key
-      : pair
+    return pair?.key
   }
 
-  set(key: T, value: boolean): void
-
-  /** @deprecated Will throw; `value` must be boolean */
-  set(key: T, value: null): void
-  set(key: T, value: boolean | null) {
+  /**
+   * `value` needs to be true/false to add/remove the item from the set.
+   */
+  set(
+    key: unknown,
+    value: boolean,
+    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
+  ): void {
     if (typeof value !== 'boolean')
-      throw new Error(
-        `Expected boolean value for set(key, value) in a YAML set, not ${typeof value}`
-      )
+      throw new Error(`Expected a boolean value, not ${typeof value}`)
     const prev = findPair(this.items, key)
     if (prev && !value) {
       this.items.splice(this.items.indexOf(prev), 1)
     } else if (!prev && value) {
-      this.items.push(new Pair(key))
+      let node: NodeBase
+      if (key instanceof NodeBase) {
+        node = key
+      } else if (!this.schema) {
+        throw new Error('Schema is required')
+      } else {
+        const nc = new NodeCreator(this.schema, {
+          ...options,
+          aliasDuplicateObjects: false
+        })
+        node = nc.create(key)
+        nc.setAnchors()
+      }
+      this.items.push(new Pair(node as NodeOf<T>))
     }
   }
 
@@ -78,33 +90,31 @@ export class YAMLSet<T = unknown> extends YAMLMap<T, Scalar<null> | null> {
     onChompKeep?: () => void
   ): string {
     if (!ctx) return JSON.stringify(this)
-    if (this.hasAllNullValues(true))
-      return super.toString(
-        Object.assign({}, ctx, { allNullValues: true }),
-        onComment,
-        onChompKeep
-      )
-    else throw new Error('Set items must all have null values')
+    return super.toString({ ...ctx, noValues: true }, onComment, onChompKeep)
   }
 
-  static from(
-    schema: Schema,
-    iterable: unknown,
-    ctx: CreateNodeContext
-  ): YAMLSet {
-    const { replacer } = ctx
-    const set = new this(schema)
+  static from(nc: NodeCreator, iterable: unknown): YAMLSet {
+    const set = new this(nc.schema)
     if (iterable && Symbol.iterator in Object(iterable))
       for (let value of iterable as Iterable<unknown>) {
-        if (typeof replacer === 'function')
-          value = replacer.call(iterable, value, value)
-        set.items.push(
-          createPair(value, null, ctx) as Pair<unknown, Scalar<null>>
-        )
+        if (typeof nc.replacer === 'function')
+          value = nc.replacer.call(iterable, value, value)
+        set.items.push(nc.createPair(value, null) as Pair<NodeBase, null>)
       }
     return set
   }
 }
+
+const hasAllNullValues = (map: YAMLMap): boolean =>
+  map.items.every(
+    ({ value }) =>
+      value == null ||
+      (value instanceof Scalar &&
+        value.value == null &&
+        !value.commentBefore &&
+        !value.comment &&
+        !value.tag)
+  )
 
 export const set: CollectionTag = {
   collection: 'map',
@@ -112,12 +122,17 @@ export const set: CollectionTag = {
   nodeClass: YAMLSet,
   default: false,
   tag: 'tag:yaml.org,2002:set',
-  createNode: (schema, iterable, ctx) => YAMLSet.from(schema, iterable, ctx),
   resolve(map, onError) {
-    if (isMap(map)) {
-      if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map)
-      else onError('Set items must all have null values')
-    } else onError('Expected a mapping for this tag')
-    return map
+    if (!(map instanceof YAMLMap)) {
+      onError('Expected a mapping for this tag')
+      return map
+    } else if (!hasAllNullValues(map)) {
+      onError('Set items must all have null values')
+      return map
+    } else {
+      const set = Object.assign(new YAMLSet(), map)
+      for (const pair of map.items) pair.value &&= null
+      return set
+    }
   }
 }

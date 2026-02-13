@@ -1,11 +1,6 @@
-import { isCollection, isScalar } from '../nodes/identity.ts'
 import type { Node } from '../nodes/Node.ts'
-import type { Scalar } from '../nodes/Scalar.ts'
-import type { YAMLMap } from '../nodes/YAMLMap.ts'
-import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import { visit } from '../visit.ts'
-import type { CreateNodeContext } from './createNode.ts'
-import type { Document } from './Document.ts'
+import type { Document, DocValue } from './Document.ts'
 
 /**
  * Verify that the input string is a valid anchor.
@@ -21,10 +16,12 @@ export function anchorIsValid(anchor: string): true {
   return true
 }
 
-export function anchorNames(root: Document<Node, boolean> | Node): Set<string> {
+export function anchorNames(
+  root: Document<DocValue, boolean> | Node
+): Set<string> {
   const anchors = new Set<string>()
   visit(root, {
-    Value(_key: unknown, node: Scalar | YAMLMap | YAMLSeq) {
+    Value(_key, node) {
       if (node.anchor) anchors.add(node.anchor)
     }
   })
@@ -36,54 +33,5 @@ export function findNewAnchor(prefix: string, exclude: Set<string>): string {
   for (let i = 1; true; ++i) {
     const name = `${prefix}${i}`
     if (!exclude.has(name)) return name
-  }
-}
-
-export function createNodeAnchors(
-  doc: Document<Node, boolean>,
-  prefix: string
-): {
-  onAnchor: (source: unknown) => string
-  setAnchors: () => void
-  sourceObjects: CreateNodeContext['sourceObjects']
-} {
-  const aliasObjects: unknown[] = []
-  const sourceObjects: CreateNodeContext['sourceObjects'] = new Map()
-  let prevAnchors: Set<string> | null = null
-
-  return {
-    onAnchor: (source: unknown) => {
-      aliasObjects.push(source)
-      prevAnchors ??= anchorNames(doc)
-      const anchor = findNewAnchor(prefix, prevAnchors)
-      prevAnchors.add(anchor)
-      return anchor
-    },
-
-    /**
-     * With circular references, the source node is only resolved after all
-     * of its child nodes are. This is why anchors are set only after all of
-     * the nodes have been created.
-     */
-    setAnchors: () => {
-      for (const source of aliasObjects) {
-        const ref = sourceObjects.get(source)
-        if (
-          typeof ref === 'object' &&
-          ref.anchor &&
-          (isScalar(ref.node) || isCollection(ref.node))
-        ) {
-          ref.node.anchor = ref.anchor
-        } else {
-          const error = new Error(
-            'Failed to resolve repeated object (this should not happen)'
-          ) as Error & { source: unknown }
-          error.source = source
-          throw error
-        }
-      }
-    },
-
-    sourceObjects
   }
 }

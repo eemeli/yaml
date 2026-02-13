@@ -5,19 +5,19 @@ import { source } from './_utils.ts'
 describe('scalars', () => {
   test('plain', () => {
     const doc = parseDocument('42')
-    expect(doc.contents?.toJS(doc)).toBe(42)
+    expect(doc.value.toJS(doc)).toBe(42)
   })
 
   test('plain in map', () => {
     const doc = parseDocument<YAMLMap, false>('key: 42')
-    expect(doc.get('key', true).toJS(doc)).toBe(42)
+    expect(doc.get('key').toJS(doc)).toBe(42)
   })
 })
 
 describe('collections', () => {
   test('map', () => {
     const doc = parseDocument('key: 42')
-    expect(doc.contents?.toJS(doc)).toMatchObject({ key: 42 })
+    expect(doc.value.toJS(doc)).toMatchObject({ key: 42 })
   })
 
   test('map in seq', () => {
@@ -64,14 +64,9 @@ describe('alias', () => {
 })
 
 describe('options', () => {
-  test('doc is required', () => {
-    const doc = parseDocument('key: 42')
-    expect(() => doc.contents?.toJS({} as any)).toThrow(TypeError)
-  })
-
   test('mapAsMap', () => {
     const doc = parseDocument('key: 42')
-    expect(doc.contents?.toJS(doc, { mapAsMap: true })).toMatchObject(
+    expect(doc.value.toJS(doc, { mapAsMap: true })).toMatchObject(
       new Map([['key', 42]])
     )
   })

@@ -175,7 +175,7 @@ describe('flow collection keys', () => {
   test('block map with flow collection key as explicit key', () => {
     const doc = YAML.parseDocument(`? []: x`)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         {
           key: {
@@ -194,7 +194,7 @@ describe('flow collection keys', () => {
         c: d
     `)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         {
           key: { value: 'a' },
@@ -217,7 +217,7 @@ describe('flow collection keys', () => {
         c: d
     `)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.contents).toMatchObject({
+    expect(doc.value).toMatchObject({
       items: [
         { key: { value: 'x' }, value: { value: 'y' } },
         {
@@ -235,14 +235,14 @@ describe('flow collection keys', () => {
 
   test('empty scalar as last flow collection value (#550)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:}')
-    expect(doc.contents.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       { key: { value: 'c' }, value: { value: null } }
     ])
   })
 
   test('plain key with no space before flow collection value (#550)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:[]}')
-    expect(doc.contents.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       { key: { value: 'c' }, value: { items: [] } }
     ])
   })
@@ -321,8 +321,8 @@ describe('empty(ish) nodes', () => {
     const src = '{ ? : 123 }'
     const doc = YAML.parseDocument<any>(src)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.contents.items[0].key.value).toBeNull()
-    expect(doc.contents.items[0].value.value).toBe(123)
+    expect(doc.value.items[0].key.value).toBeNull()
+    expect(doc.value.items[0].value.value).toBe(123)
   })
 
   describe('comment on empty pair value (#19)', () => {
@@ -358,7 +358,7 @@ describe('empty(ish) nodes', () => {
 
   test('empty node position', () => {
     const doc = YAML.parseDocument<any>('\r\na: # 123\r\n')
-    const empty = doc.contents.items[0].value
+    const empty = doc.value.items[0].value
     expect(empty.range).toEqual([5, 5, 12])
   })
 
@@ -384,7 +384,7 @@ describe('maps with no values', () => {
   test('block map', () => {
     const src = `a: null\n? b #c`
     const doc = YAML.parseDocument(src)
-    expect(String(doc)).toBe(`a: null\n? b #c\n`)
+    expect(String(doc)).toBe(`a: null\nb: #c\n  null\n`)
     doc.set('b', 'x')
     expect(String(doc)).toBe(`a: null\nb: #c\n  x\n`)
   })
@@ -392,9 +392,9 @@ describe('maps with no values', () => {
   test('flow map', () => {
     const src = `{\na: null,\n? b\n}`
     const doc = YAML.parseDocument<any>(src)
-    expect(String(doc)).toBe(`{ a: null, b }\n`)
-    doc.contents.items[1].key.comment = 'c'
-    expect(String(doc)).toBe(`{\n  a: null,\n  b #c\n}\n`)
+    expect(String(doc)).toBe(`{ a: null, b: }\n`)
+    doc.value.items[1].key.comment = 'c'
+    expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n}\n`)
     doc.set('b', 'x')
     expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n    x\n}\n`)
   })
@@ -412,7 +412,7 @@ describe('maps with no values', () => {
 
   test('implicit scalar key after explicit key with no value', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\nx:\n')
-    expect(doc.contents.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       { key: { items: [{ value: 1 }] }, value: null },
       { key: { value: 'x' }, value: { value: null } }
     ])
@@ -420,7 +420,7 @@ describe('maps with no values', () => {
 
   test('implicit flow collection key after explicit key with no value', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\n[x]: y\n')
-    expect(doc.contents.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       { key: { items: [{ value: 1 }] }, value: null },
       { key: { items: [{ value: 'x' }] }, value: { value: 'y' } }
     ])
@@ -431,7 +431,7 @@ describe('odd indentations', () => {
   test('Block map with empty explicit key (#551)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('?\n? a')
     expect(doc.errors).toHaveLength(0)
-    expect(doc.contents.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       { key: { value: null }, value: null },
       { key: { value: 'a' }, value: null }
     ])
@@ -455,7 +455,7 @@ describe('odd indentations', () => {
   test('comment after top-level block scalar with indentation indicator (#547)', () => {
     const doc = YAML.parseDocument<YAML.Scalar, false>('|1\n x\n#c')
     expect(doc.errors).toHaveLength(0)
-    expect(doc.contents).toMatchObject({ value: 'x\n' })
+    expect(doc.value).toMatchObject({ value: 'x\n' })
   })
 
   test('tab after indent spaces for flow-in-block (#604)', () => {
@@ -691,32 +691,32 @@ describe('keepSourceTokens', () => {
   ]) {
     test(`${type}: default false`, () => {
       const doc = YAML.parseDocument<any>(src)
-      expect(doc.contents).not.toHaveProperty('srcToken')
-      expect(doc.contents.items[0]).not.toHaveProperty('srcToken')
-      expect(doc.get('foo', true)).not.toHaveProperty('srcToken')
+      expect(doc.value).not.toHaveProperty('srcToken')
+      expect(doc.value.items[0]).not.toHaveProperty('srcToken')
+      expect(doc.get('foo')).not.toHaveProperty('srcToken')
     })
 
     test(`${type}: included when set`, () => {
       const doc = YAML.parseDocument<any, false>(src, {
         keepSourceTokens: true
       })
-      expect(doc.contents.srcToken).toMatchObject({ type })
-      expect(doc.contents.items[0].srcToken).toMatchObject({
+      expect(doc.value.srcToken).toMatchObject({ type })
+      expect(doc.value.items[0].srcToken).toMatchObject({
         key: { type: 'scalar' },
         value: { type: 'scalar' }
       })
-      expect(doc.get('foo', true).srcToken).toMatchObject({ type: 'scalar' })
+      expect(doc.get('foo').srcToken).toMatchObject({ type: 'scalar' })
     })
   }
 
   test('allow for CST modifications (#903)', () => {
     const src = 'foo:\n  [ 42 ]'
     const tokens = Array.from(new YAML.Parser().parse(src))
-    const docs = new YAML.Composer<YAML.ParsedNode, false>({
+    const docs = new YAML.Composer<any, false>({
       keepSourceTokens: true
     }).compose(tokens)
     const doc = Array.from(docs)[0]
-    const node = doc.get('foo', true)
+    const node = doc.get('foo')
     YAML.CST.setScalarValue(node.srcToken, 'eek')
     const res = tokens.map(YAML.CST.stringify).join('')
     expect(res).toBe('foo:\n  eek')
@@ -923,7 +923,7 @@ describe('stringKeys', () => {
       `,
       { stringKeys: true }
     )
-    expect(doc.contents.items).toMatchObject([
+    expect(doc.value.items).toMatchObject([
       { key: { value: 'x' }, value: { value: 'x' } },
       { key: { value: 'y' }, value: { value: 'y' } },
       { key: { value: '42' }, value: { value: 42 } },
