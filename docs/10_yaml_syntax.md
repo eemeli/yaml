@@ -117,5 +117,5 @@ Additionally, the formal description of the language describing the document str
 - The `\^` escape has been removed
 - Directives now use a blank space `' '` rather than `:` as the separator between the name and its parameter/value.
 
-`yaml@1` supports parsing and stringifying YAML 1.0 documents, but does not expand tags using the `^` notation.
-As there is no indication that _anyone_ is still using YAML 1.0, explicit support has been dropped in `yaml@2`.
+`yaml` v1 supports parsing and stringifying YAML 1.0 documents, but does not expand tags using the `^` notation.
+As there is no indication that _anyone_ is still using YAML 1.0, explicit support has been dropped in `yaml` v2.
