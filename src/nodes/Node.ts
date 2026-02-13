@@ -30,8 +30,7 @@ export type NodeType<T> = T extends
         ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
         : Node
 
-/** `[start, value-end, node-end]` */
-export type Range = [number, number, number]
+export type Range = [start: number, valueEnd: number, nodeEnd: number]
 
 export abstract class NodeBase {
   /** A comment on or immediately after this */
