@@ -17,18 +17,11 @@ const bsDefaults = {
 const instances = env.BROWSERS.split(' ').map(name => {
   let [browser, browser_version] = name.split(':')
   if (browser !== 'chrome') browser = `playwright-${browser}`
-  const provider = bsProvider({ browser, browser_version })
+  const caps = JSON.stringify({ ...bsDefaults, browser, browser_version })
+  const wsEndpoint = `wss://cdp.browserstack.com/playwright?caps=${encodeURIComponent(caps)}`
+  const provider = playwright({ connectOptions: { wsEndpoint } })
   return { name, browser: 'chromium', provider }
 })
-
-const bsProvider = opts =>
-  playwright({
-    connectOptions: {
-      wsEndpoint: `wss://cdp.browserstack.com/playwright?caps=${encodeURIComponent(
-        JSON.stringify({ ...bsDefaults, ...opts })
-      )}`
-    }
-  })
 
 export default defineConfig({
   test: {
