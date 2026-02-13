@@ -42,7 +42,6 @@ export type ParsedNode =
   | YAMLMap.Parsed
   | YAMLSeq.Parsed
 
-/** `[start, value-end, node-end]` */
 export type Range = [start: number, valueEnd: number, nodeEnd: number]
 
 export abstract class NodeBase {
