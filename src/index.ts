@@ -1,3 +1,11 @@
+/**
+ * This is a definitive library for [YAML](https://yaml.org/), the human friendly data serialization standard.
+ *
+ * For more information, see the project's documentation site: [eemeli.org/yaml](https://eemeli.org/yaml/).
+ *
+ * @module YAML
+ */
+
 export { Composer } from './compose/composer.ts'
 
 export { Document, type DocValue } from './doc/Document.ts'

@@ -10,17 +10,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  deno-v1:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        deno-version: [v1.x, v2.x]
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with: { submodules: true }
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: ${{ matrix.deno-version }}
+          deno-version: v1.x
       - run: deno --allow-env src/public-api.ts
+
+  deno-v2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with: { submodules: true }
+      - uses: denoland/setup-deno@v2
+      - run: deno --allow-env src/public-api.ts
+      - run: deno publish --no-check --dry-run

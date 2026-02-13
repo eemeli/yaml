@@ -1,3 +1,12 @@
+/**
+ * This module provides utilities that are likely to be of interest to
+ * those wishing to implement their own [custom data types](https://eemeli.org/yaml/#custom-data-types).
+ *
+ * See also the [yaml-types](https://www.npmjs.com/package/yaml-types) package.
+ *
+ * @module
+ */
+
 export type { NodeCreator } from './doc/NodeCreator.ts'
 export { debug, warn } from './log.ts'
 export type { LogLevelId } from './log.ts'

@@ -226,14 +226,17 @@ export class Document<
     key: K,
     value: V,
     options: CreateNodeOptions = {}
-  ) {
+  ): Pair<
+    K extends Primitive | NodeBase ? K : NodeBase,
+    V extends Primitive | NodeBase ? V : NodeBase
+  > {
     const nc = new NodeCreator(this, options)
-    const pair = nc.createPair(key, value)
-    nc.setAnchors()
-    return pair as Pair<
+    const pair = nc.createPair(key, value) as Pair<
       K extends Primitive | NodeBase ? K : NodeBase,
       V extends Primitive | NodeBase ? V : NodeBase
     >
+    nc.setAnchors()
+    return pair
   }
 
   /**
