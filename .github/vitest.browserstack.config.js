@@ -13,6 +13,14 @@ const bsDefaults = {
   'browserstack.accessKey': env.BROWSERSTACK_ACCESS_KEY || env.BROWSERSTACK_KEY
 }
 
+// e.g. BROWSERS="chrome:93 chrome:latest firefox:94 firefox:latest"
+const instances = env.BROWSERS.split(' ').map(name => {
+  let [browser, browser_version] = name.split(':')
+  if (browser !== 'chrome') browser = `playwright-${browser}`
+  const provider = bsProvider({ browser, browser_version })
+  return { name, browser: 'chromium', provider }
+})
+
 const bsProvider = opts =>
   playwright({
     connectOptions: {
@@ -38,34 +46,7 @@ export default defineConfig({
       enabled: true,
       provider: playwright(),
       connectTimeout: 300_000,
-      instances: [
-        {
-          name: 'Chrome Old',
-          browser: 'chromium',
-          provider: bsProvider({ browser: 'chrome', browser_version: '93' })
-        },
-        {
-          name: 'Chrome New',
-          browser: 'chromium',
-          provider: bsProvider({ browser: 'chrome', browser_version: 'latest' })
-        },
-        {
-          name: 'Firefox Old',
-          browser: 'chromium',
-          provider: bsProvider({
-            browser: 'playwright-firefox',
-            browser_version: '94'
-          })
-        },
-        {
-          name: 'Firefox New',
-          browser: 'chromium',
-          provider: bsProvider({
-            browser: 'playwright-firefox',
-            browser_version: 'latest'
-          })
-        }
-      ]
+      instances
     },
     globals: true,
     include: ['tests/**/*.{js,ts}'],

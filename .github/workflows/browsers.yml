@@ -28,6 +28,37 @@ jobs:
       - run: npm run build
       - run: npm install --no-save @vitest/browser-playwright@4
       - run: npx vitest run --config=.github/vitest.browserstack.config.js
+        env:
+          BROWSERS: chrome:93 chrome:latest firefox:latest
+
+      - uses: browserstack/github-actions/setup-local@master
+        if: always()
+        with:
+          local-testing: stop
+
+  legacy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with: { submodules: true }
+      - uses: actions/setup-node@v6
+      - uses: browserstack/github-actions/setup-env@master
+        with:
+          username:  ${{ secrets.BROWSERSTACK_USERNAME }}
+          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          project-name: yaml
+      - uses: browserstack/github-actions/setup-local@master
+        with:
+          local-testing: start
+          local-identifier: random
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm install --no-save @vitest/browser-playwright@4
+      - run: npx vitest run --config=.github/vitest.browserstack.config.js
+        env:
+          BROWSERS: firefox:94
 
       - uses: browserstack/github-actions/setup-local@master
         if: always()
