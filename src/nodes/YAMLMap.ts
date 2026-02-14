@@ -2,12 +2,13 @@ import type { Document, DocValue } from '../doc/Document.ts'
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { CreateNodeOptions } from '../options.ts'
 import type { BlockMap, FlowCollection } from '../parse/cst.ts'
+import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
-import { Collection, type NodeOf, type Primitive } from './Collection.ts'
+import type { CollectionBase, NodeOf, Primitive } from './Collection.ts'
 import { isNode } from './identity.ts'
-import type { Node, NodeBase } from './Node.ts'
+import type { Node, Range } from './Node.ts'
 import { Pair } from './Pair.ts'
 import { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
@@ -32,16 +33,45 @@ export function findPair<
 export class YAMLMap<
   K extends Primitive | Node = Primitive | Node,
   V extends Primitive | Node = Primitive | Node
->
-  extends Collection
-  implements NodeBase
-{
+> implements CollectionBase {
+  items: Pair<K, V>[] = []
+
+  schema: Schema | undefined
+
+  /** An optional anchor on this collection. Used by alias nodes. */
+  declare anchor?: string
+
+  /**
+   * If true, stringify this and all child nodes using flow rather than
+   * block styles.
+   */
+  declare flow?: boolean
+
+  /** A comment on or immediately after this collection. */
+  declare comment?: string | null
+
+  /** A comment before this collection. */
+  declare commentBefore?: string | null
+
+  /**
+   * The `[start, value-end, node-end]` character offsets for
+   * the part of the source parsed into this collection (undefined if not parsed).
+   * The `value-end` and `node-end` positions are themselves not included in their respective ranges.
+   */
+  declare range?: Range | null
+
+  /** A blank line before this collection and its commentBefore */
+  declare spaceBefore?: boolean
+
+  /** The CST token that was composed into this collection.  */
+  declare srcToken?: BlockMap | FlowCollection
+
+  /** A fully qualified tag, if required */
+  declare tag?: string
+
   static get tagName(): 'tag:yaml.org,2002:map' {
     return 'tag:yaml.org,2002:map'
   }
-
-  items: Pair<K, V>[] = []
-  declare srcToken?: BlockMap | FlowCollection
 
   /**
    * A generic collection parsing method that can be extended
@@ -65,6 +95,31 @@ export class YAMLMap<
       map.items.sort(nc.schema.sortMapEntries)
     }
     return map
+  }
+
+  constructor(schema?: Schema) {
+    Object.defineProperty(this, 'schema', {
+      value: schema,
+      configurable: true,
+      enumerable: false,
+      writable: true
+    })
+  }
+
+  /**
+   * Create a copy of this collection.
+   *
+   * @param schema - If defined, overwrites the original's schema
+   */
+  clone(schema?: Schema): this {
+    const copy: this = Object.create(
+      Object.getPrototypeOf(this),
+      Object.getOwnPropertyDescriptors(this)
+    )
+    if (schema) copy.schema = schema
+    copy.items = copy.items.map(it => it.clone(schema))
+    if (this.range) copy.range = [...this.range]
+    return copy
   }
 
   /**

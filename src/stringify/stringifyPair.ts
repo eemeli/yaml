@@ -1,4 +1,4 @@
-import { Collection } from '../nodes/Collection.ts'
+import { isCollection } from '../nodes/identity.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
@@ -22,7 +22,7 @@ export function stringifyPair(
     if (key.comment) {
       throw new Error('With simple keys, key nodes cannot have comments')
     }
-    if (key instanceof Collection) {
+    if (isCollection(key)) {
       const msg = 'With simple keys, collection cannot be used as a key value'
       throw new Error(msg)
     }
@@ -134,7 +134,7 @@ export function stringifyPair(
     } else {
       ws += `\n${ctx.indent}`
     }
-  } else if (!explicitKey && value instanceof Collection) {
+  } else if (!explicitKey && isCollection(value)) {
     const vs0 = valueStr[0]
     const nl0 = valueStr.indexOf('\n')
     const hasNewline = nl0 !== -1

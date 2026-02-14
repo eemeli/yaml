@@ -1,6 +1,7 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
-import { Collection, type Primitive } from '../nodes/Collection.ts'
+import type { Primitive } from '../nodes/Collection.ts'
+import { isCollection } from '../nodes/identity.ts'
 import type { Node, NodeType, Range } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
@@ -245,14 +246,14 @@ export class Document<
    */
   get(key?: any): Strict extends true ? Node | Pair | undefined : any {
     if (key === undefined) return this.value
-    return this.value instanceof Collection ? this.value.get(key) : undefined
+    return isCollection(this.value) ? this.value.get(key) : undefined
   }
 
   /**
    * Checks if the document includes a value with the key `key`.
    */
   has(key: any): boolean {
-    return this.value instanceof Collection ? this.value.has(key) : false
+    return isCollection(this.value) ? this.value.has(key) : false
   }
 
   /**
@@ -343,6 +344,6 @@ export class Document<
 }
 
 function assertCollection(value: unknown) {
-  if (value instanceof Collection) return value as YAMLMap | YAMLSeq
+  if (isCollection(value)) return value
   throw new Error('Expected a YAML collection as document value')
 }

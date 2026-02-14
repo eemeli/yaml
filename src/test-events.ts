@@ -1,6 +1,5 @@
 import type { Document } from './doc/Document.ts'
 import { Alias } from './nodes/Alias.ts'
-import { Collection } from './nodes/Collection.ts'
 import { isNode } from './nodes/identity.ts'
 import type { Node } from './nodes/Node.ts'
 import { Pair } from './nodes/Pair.ts'
@@ -78,10 +77,7 @@ function addEvents(
   if (errPos !== -1 && isNode(node) && node.range![0] >= errPos)
     throw new Error()
   let props = ''
-  let anchor =
-    node instanceof Scalar || node instanceof Collection
-      ? node.anchor
-      : undefined
+  let anchor = isNode(node) ? node.anchor : undefined
   if (anchor) {
     if (/\d$/.test(anchor)) {
       const alt = anchor.replace(/\d$/, '')

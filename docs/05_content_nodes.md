@@ -54,14 +54,14 @@ class Pair {
   value: Node | null
 }
 
-class Collection implements NodeBase {
+interface CollectionBase extends NodeBase {
   anchor?: string  // an anchor associated with this node
   flow?: boolean   // use flow style when stringifying this
   schema?: Schema
   clone(schema?: Schema): this  // a deep copy of this collection
 }
 
-class YAMLMap<K = unknown, V = unknown> extends Collection {
+class YAMLMap<K = unknown, V = unknown> implements CollectionBase {
   items: Pair<K, V>[]
   add(pair: Pair<K, V> | { key: K; value: V }, overwrite?: boolean): void
   delete(key: K): boolean
@@ -70,7 +70,7 @@ class YAMLMap<K = unknown, V = unknown> extends Collection {
   set(key: K, value: V): void
 }
 
-class YAMLSeq<T = unknown> extends Collection {
+class YAMLSeq<T = unknown> implements CollectionBase {
   items: T[]
   add(value: T): void
   delete(key: number | Scalar<number>): boolean

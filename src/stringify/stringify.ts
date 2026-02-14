@@ -1,7 +1,6 @@
 import { anchorIsValid } from '../doc/anchors.ts'
 import type { Document } from '../doc/Document.ts'
 import { Alias } from '../nodes/Alias.ts'
-import { Collection } from '../nodes/Collection.ts'
 import type { Node } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
@@ -119,8 +118,7 @@ function stringifyProps(
 ) {
   if (!doc.directives) return ''
   const props = []
-  const anchor =
-    (node instanceof Scalar || node instanceof Collection) && node.anchor
+  const anchor = node.anchor
   if (anchor && anchorIsValid(anchor)) {
     anchors.add(anchor)
     props.push(`&${anchor}`)

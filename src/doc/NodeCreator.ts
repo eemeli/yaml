@@ -1,6 +1,5 @@
 import { Alias } from '../nodes/Alias.ts'
-import { Collection } from '../nodes/Collection.ts'
-import { isNode } from '../nodes/identity.ts'
+import { isCollection, isNode } from '../nodes/identity.ts'
 import { type Node } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
@@ -140,7 +139,7 @@ export class NodeCreator {
     else if (!tagObj.default) node.tag = tagObj.tag
 
     if (ref) ref.node = node
-    if (this.#flow && node instanceof Collection) node.flow = true
+    if (this.#flow && isCollection(node)) node.flow = true
     return node
   }
 
@@ -161,7 +160,7 @@ export class NodeCreator {
       if (
         typeof ref === 'object' &&
         ref.anchor &&
-        (ref.node instanceof Scalar || ref.node instanceof Collection)
+        (ref.node instanceof Scalar || isCollection(ref.node))
       ) {
         ref.node.anchor = ref.anchor
       } else {
