@@ -1,3 +1,4 @@
+import type { Document, DocValue } from '../doc/Document.ts'
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { CreateNodeOptions } from '../options.ts'
 import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
@@ -7,8 +8,7 @@ import { Collection, type NodeOf, type Primitive } from './Collection.ts'
 import { NodeBase } from './Node.ts'
 import type { Pair } from './Pair.ts'
 import { Scalar } from './Scalar.ts'
-import type { ToJSContext } from './toJS.ts'
-import { toJS } from './toJS.ts'
+import { ToJSContext } from './toJS.ts'
 
 const isScalarValue = (value: unknown): boolean =>
   !value || (typeof value !== 'function' && typeof value !== 'object')
@@ -106,12 +106,13 @@ export class YAMLSeq<
     }
   }
 
-  toJSON(_?: unknown, ctx?: ToJSContext): unknown[] {
-    const seq: unknown[] = []
-    if (ctx?.onCreate) ctx.onCreate(seq)
-    let i = 0
-    for (const item of this.items) seq.push(toJS(item, String(i++), ctx))
-    return seq
+  /** A plain JavaScript representation of this node. */
+  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any[] {
+    ctx ??= new ToJSContext()
+    const res: unknown[] = []
+    if (this.anchor) ctx.setAnchor(this, res)
+    for (const item of this.items) res.push(item.toJS(doc, ctx))
+    return res
   }
 
   toString(

@@ -1,3 +1,4 @@
+import type { Document, DocValue } from '../../doc/Document.ts'
 import { Alias } from '../../nodes/Alias.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
@@ -33,37 +34,37 @@ export const merge: ScalarTag & {
 }
 
 export const isMergeKey = (
-  ctx: ToJSContext | undefined,
+  doc: Document<DocValue, boolean>,
   key: unknown
 ): boolean =>
   (merge.identify(key) ||
     (key instanceof Scalar &&
       (!key.type || key.type === Scalar.PLAIN) &&
       merge.identify(key.value))) &&
-  Boolean(
-    ctx?.doc.schema.tags.some(tag => tag.tag === merge.tag && tag.default)
-  )
+  Boolean(doc.schema.tags.some(tag => tag.tag === merge.tag && tag.default))
 
 export function addMergeToJSMap(
-  ctx: ToJSContext | undefined,
+  doc: Document<DocValue, boolean>,
+  ctx: ToJSContext,
   map: MapLike,
   value: unknown
 ): void {
-  value = ctx && value instanceof Alias ? value.resolve(ctx.doc) : value
+  value = ctx && value instanceof Alias ? value.resolve(doc) : value
   if (value instanceof YAMLSeq)
-    for (const it of value.items) mergeValue(ctx, map, it)
+    for (const it of value.items) mergeValue(doc, ctx, map, it)
   else if (Array.isArray(value))
-    for (const it of value) mergeValue(ctx, map, it)
-  else mergeValue(ctx, map, value)
+    for (const it of value) mergeValue(doc, ctx, map, it)
+  else mergeValue(doc, ctx, map, value)
 }
 
 function mergeValue(
-  ctx: ToJSContext | undefined,
+  doc: Document<DocValue, boolean>,
+  ctx: ToJSContext,
   map: MapLike,
   value: unknown
 ) {
-  const source = ctx && value instanceof Alias ? value.resolve(ctx.doc) : value
-  const srcMap = (source as YAMLMap).toJSON(null, ctx, Map<any, any>)
+  const source = value instanceof Alias ? value.resolve(doc) : value
+  const srcMap = (source as YAMLMap).toJS(doc, ctx, Map<any, any>)
   if (!(srcMap instanceof Map))
     throw new Error('Merge sources must be maps or map aliases')
   for (const [key, value] of srcMap) {

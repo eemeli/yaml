@@ -1,7 +1,6 @@
 import type { BlockScalar, FlowScalar } from '../parse/cst.ts'
 import { NodeBase } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
-import { toJS } from './toJS.ts'
 
 export declare namespace Scalar {
   type BLOCK_FOLDED = 'BLOCK_FOLDED'
@@ -48,8 +47,12 @@ export class Scalar<T = unknown> extends NodeBase {
     this.value = value
   }
 
-  toJSON(arg?: any, ctx?: ToJSContext): any {
-    return ctx?.keep ? this.value : toJS(this.value, arg, ctx)
+  /** A plain JavaScript representation of this node. */
+  toJS(_doc?: unknown, ctx?: ToJSContext): T {
+    if (ctx && this.anchor) {
+      ctx.anchors.set(this, { aliasCount: 0, count: 1, res: this.value })
+    }
+    return this.value
   }
 
   toString(): string {

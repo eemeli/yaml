@@ -1,5 +1,5 @@
 import { anchorIsValid } from '../doc/anchors.ts'
-import type { Document } from '../doc/Document.ts'
+import type { Document, DocValue } from '../doc/Document.ts'
 import type { FlowScalar } from '../parse/cst.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { visit } from '../visit.ts'
@@ -7,8 +7,7 @@ import type { Node } from './Node.ts'
 import { NodeBase } from './Node.ts'
 import { Pair } from './Pair.ts'
 import type { Scalar } from './Scalar.ts'
-import type { ToJSContext } from './toJS.ts'
-import { toJS } from './toJS.ts'
+import { ToJSContext } from './toJS.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
 
@@ -58,18 +57,22 @@ export class Alias extends NodeBase {
     return found
   }
 
-  toJSON(_arg?: unknown, ctx?: ToJSContext): unknown {
-    if (!ctx) return { source: this.source }
-    const { anchors, doc, maxAliasCount } = ctx
+  /** A plain JavaScript representation of the resolved value of this alias. */
+  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any {
+    if (!doc?.schema) throw new TypeError('A document argument is required')
+    ctx ??= new ToJSContext()
+    const { anchors, maxAliasCount } = ctx
+
     const source = this.resolve(doc, ctx)
     if (!source) {
       const msg = `Unresolved alias (the anchor must be set before the alias): ${this.source}`
       throw new ReferenceError(msg)
     }
+
     let data = anchors.get(source)
     if (!data) {
       // Resolve anchors for Node.prototype.toJS()
-      toJS(source, null, ctx)
+      source.toJS(doc, ctx)
       data = anchors.get(source)
     }
     /* istanbul ignore if */
@@ -87,6 +90,7 @@ export class Alias extends NodeBase {
         throw new ReferenceError(msg)
       }
     }
+
     return data.res
   }
 

@@ -29,22 +29,24 @@ const skip = Number(major) < 20
     test(
       name,
       () =>
-        new Promise(done => {
+        new Promise((resolve, reject) => {
           stdout.length = 0
           stderr.length = 0
-          cli(
+          void cli(
             Readable.from([input]),
             error => {
               try {
                 expect(stdout).toMatchObject(output)
                 expect(stderr).toMatchObject(errors)
                 expect(error).toBeUndefined()
-              } finally {
-                done(undefined)
+                resolve(undefined)
+              } catch (err) {
+                // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+                reject(err)
               }
             },
             args
-          ).catch(done)
+          )
         })
     )
   }

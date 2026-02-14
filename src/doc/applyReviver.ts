@@ -11,6 +11,18 @@ export function applyReviver(
   reviver: Reviver,
   obj: unknown,
   key: unknown,
+  val: any[]
+): unknown[]
+export function applyReviver(
+  reviver: Reviver,
+  obj: unknown,
+  key: unknown,
+  val: any
+): unknown
+export function applyReviver(
+  reviver: Reviver,
+  obj: unknown,
+  key: unknown,
   val: any
 ): unknown {
   if (val && typeof val === 'object') {

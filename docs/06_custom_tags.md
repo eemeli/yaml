@@ -100,8 +100,8 @@ const sharedSymbol = {
 
 class YAMLNullObject extends YAMLMap {
   tag = '!nullobject'
-  toJSON(_, ctx) {
-    const obj = super.toJSON(_, { ...ctx, mapAsMap: false }, Object)
+  toJS(doc, ctx) {
+    const obj = super.toJS(doc, ctx, Object)
     return Object.assign(Object.create(null), obj)
   }
 }
@@ -116,12 +116,8 @@ const nullObject = {
 // slightly more complicated object type
 class YAMLError extends YAMLMap {
   tag = '!error'
-  toJSON(_, ctx) {
-    const { name, message, stack, ...rest } = super.toJSON(
-      _,
-      { ...ctx, mapAsMap: false },
-      Object
-    )
+  toJS(doc, ctx) {
+    const { name, message, stack, ...rest } = super.toJS(doc, ctx, Object)
     // craft the appropriate error type
     const Cls =
       name === 'EvalError'
@@ -208,7 +204,7 @@ A custom tag should verify that value is of its expected type.
 
 Note that during the CST -> AST composition, the anchors and comments attached to each node are also resolved for each node.
 This metadata will unfortunately be lost when converting the values to JS objects, so collections should have values that extend one of the existing collection classes.
-Collections should therefore either fall back to their parent classes' `toJSON()` methods, or define their own in order to allow their contents to be expressed as the appropriate JS object.
+Collections should therefore either fall back to their parent classes' `toJS()` methods, or define their own in order to allow their contents to be expressed as the appropriate JS object.
 
 ### Creating Nodes and Stringifying Custom Data
 
