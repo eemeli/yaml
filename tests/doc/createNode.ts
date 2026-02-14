@@ -354,8 +354,8 @@ describe('circular references', () => {
     const baz: any = {}
     const map = { foo: { bar: { baz } } }
     baz.map = map
-    const doc = new Document(map)
-    expect(doc.getIn(['foo', 'bar', 'baz', 'map'])).toMatchObject({
+    const doc = new Document<any, false>(map)
+    expect(doc.get('foo').get('bar').get('baz').get('map')).toMatchObject({
       source: 'a1'
     })
     expect(doc.toString()).toBe(source`
@@ -396,9 +396,9 @@ describe('circular references', () => {
     const baz = { a: 1 }
     const seq = [{ foo: { bar: { baz } } }, { fe: { fi: { fo: { baz } } } }]
     const doc = new Document(null)
-    const node = doc.createNode(seq)
-    const source = node.getIn([0, 'foo', 'bar', 'baz']) as Node
-    const alias = node.getIn([1, 'fe', 'fi', 'fo', 'baz']) as Alias
+    const node = doc.createNode(seq) as any
+    const source = node.get(0).get('foo').get('bar').get('baz') as Node
+    const alias = node.get(1).get('fe').get('fi').get('fo').get('baz') as Alias
     expect(source).toMatchObject({
       items: [{ key: { value: 'a' }, value: { value: 1 } }]
     })

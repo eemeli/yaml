@@ -58,12 +58,7 @@ class Collection implements NodeBase {
   anchor?: string  // an anchor associated with this node
   flow?: boolean   // use flow style when stringifying this
   schema?: Schema
-  addIn(path: unknown[], value: unknown): void
   clone(schema?: Schema): this  // a deep copy of this collection
-  deleteIn(path: unknown[]): boolean
-  getIn(path: unknown[], keepScalar?: boolean): unknown
-  hasIn(path: unknown[]): boolean
-  setIn(path: unknown[], value: unknown): void
 }
 
 class YAMLMap<K = unknown, V = unknown> extends Collection {
@@ -96,45 +91,34 @@ The `yaml-1.1` schema includes [additional collections](https://yaml.org/type/in
 
 All of the collections provide the following accessor methods:
 
-| Method                                          | Returns   | Description                                                                                                                                                                                      |
-| ----------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| add(value), addIn(path, value)                  | `void`    | Adds a value to the collection. For `!!map` and `!!omap` the value must be a Pair instance or a `{ key, value }` object, which may not have a key that already exists in the map.                |
-| delete(key), deleteIn(path)                     | `boolean` | Removes a value from the collection. Returns `true` if the item was found and removed.                                                                                                           |
-| get(key,&nbsp;[keep]), getIn(path,&nbsp;[keep]) | `any`     | Returns value at `key`, or `undefined` if not found. By default unwraps scalar values from their surrounding node; to disable set `keep` to `true` (collections are always returned intact).     |
-| has(key), hasIn(path)                           | `boolean` | Checks if the collection includes a value with the key `key`.                                                                                                                                    |
-| set(key, value), setIn(path, value)             | `any`     | Sets a value in this collection. For `!!set`, `value` needs to be a boolean to add/remove the item from the set. When overwriting a `Scalar` value with a scalar, the original node is retained. |
+| Method          | Returns   | Description                                                                                                                                                                                      |
+| --------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| add(value)      | `void`    | Adds a value to the collection. For `!!map` and `!!omap` the value must be a Pair instance, which must not have a key that already exists in the map.                                            |
+| delete(key)     | `boolean` | Removes a value from the collection. Returns `true` if the item was found and removed.                                                                                                           |
+| get(key)        | `Node`    | Returns value at `key`, or `undefined` if not found.                                                                                                                                             |
+| has(key)        | `boolean` | Checks if the collection includes a value with the key `key`.                                                                                                                                    |
+| set(key, value) | `any`     | Sets a value in this collection. For `!!set`, `value` needs to be a boolean to add/remove the item from the set. When overwriting a `Scalar` value with a scalar, the original node is retained. |
 
 <!-- prettier-ignore -->
 ```js
 const doc = new YAML.Document({ a: 1, b: [2, 3] }) // { a: 1, b: [ 2, 3 ] }
-doc.add({ key: 'c', value: 4 }) // { a: 1, b: [ 2, 3 ], c: 4 }
-doc.addIn(['b'], 5)             // { a: 1, b: [ 2, 3, 5 ], c: 4 }
+doc.add(doc.createPair('c', 4)) // { a: 1, b: [ 2, 3 ], c: 4 }
+doc.get('b').add(5)             // { a: 1, b: [ 2, 3, 5 ], c: 4 }
 doc.set('c', 42)                // { a: 1, b: [ 2, 3, 5 ], c: 42 }
-doc.setIn(['c', 'x']) // Error: Expected YAML collection at c. Remaining path: x
+doc.get('c').set('x') // TypeError: doc.get(...).set is not a function
 doc.delete('c')                 // { a: 1, b: [ 2, 3, 5 ] }
-doc.deleteIn(['b', 1])          // { a: 1, b: [ 2, 5 ] }
+doc.get('b').delete(1)          // { a: 1, b: [ 2, 5 ] }
 
-doc.get('a') // 1
-doc.get('a', true) // Scalar { value: 1 }
-doc.getIn(['b', 1]) // 5
+doc.get('a') // Scalar { value: 1 }
+doc.get('b').get(1) // Scalar { value: 5 }
 doc.has(doc.createNode('a')) // true
 doc.has('c') // false
-doc.hasIn(['b', '0']) // true
+doc.get('b').has(0) // true
 ```
 
 For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. `42` will match `Scalar { value: 42 }`).
-Keys for `!!seq` should be positive integers, or their string representations.
-`add()` and `set()` do not automatically call `doc.createNode()` to wrap the value.
-
-Each of the methods also has a variant that requires an iterable as the first parameter, and allows fetching or modifying deeper collections.
-If any intermediate node in `path` is a scalar rather than a collection, an error will be thrown.
-If any of the intermediate collections is not found:
-
-- `getIn` and `hasIn` will return `undefined` or `false` (respectively)
-- `addIn` and `setIn` will create missing collections; non-negative integer keys will create sequences, all other keys create maps
-- `deleteIn` will throw an error
-
-Note that for `addIn` the path argument points to the collection rather than the item; for maps its `value` should be a `Pair` or an object with `{ key, value }` fields.
+Keys for `!!seq` should be non-negative integers, or their string representations.
+`add()` and `set()` will internally call `doc.createNode()` to wrap the value.
 
 ## Alias Nodes
 
@@ -266,12 +250,12 @@ const doc = YAML.parseDocument(`
   - 1: a number
 `)
 
-const obs = doc.getIn([2, 'including'], true)
+const obs = doc.get(2).get('including')
 obs.type = 'QUOTE_DOUBLE'
 
 YAML.visit(doc, {
   Pair(_, pair) {
-    if (pair.key && pair.key.value === '3') return YAML.visit.REMOVE
+    if (pair.key?.value === '3') return YAML.visit.REMOVE
   },
   Scalar(key, node) {
     if (
@@ -292,7 +276,7 @@ String(doc)
 ```
 
 In general, it's safe to modify nodes manually, e.g. splicing the `items` array of a `YAMLMap` or setting its `flow` value to `true`.
-For operations on nodes at a known location in the tree, it's probably easiest to use `doc.getIn(path, true)` to access them.
+For operations on nodes at a known location in the tree, it's probably easiest to use `doc.get(...)` to access them.
 For more complex or general operations, a visitor API is provided:
 
 #### `YAML.visit(node, visitor): void`

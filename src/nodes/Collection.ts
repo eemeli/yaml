@@ -1,4 +1,3 @@
-import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { Token } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { Node, Range } from './Node.ts'
@@ -7,25 +6,6 @@ import type { Scalar } from './Scalar.ts'
 
 export type Primitive = boolean | number | bigint | string | null
 export type NodeOf<T> = T extends Primitive ? Scalar<T> : T
-
-export function collectionFromPath(
-  schema: Schema,
-  path: unknown[],
-  value: unknown
-): Node {
-  let v = value
-  for (let i = path.length - 1; i >= 0; --i) {
-    const k = path[i]
-    if (typeof k === 'number' && Number.isInteger(k) && k >= 0) {
-      const a: unknown[] = []
-      a[k] = v
-      v = a
-    } else {
-      v = new Map<unknown, unknown>([[k, v]])
-    }
-  }
-  return new NodeCreator(schema, { aliasDuplicateObjects: false }).create(v)
-}
 
 export abstract class Collection {
   schema: Schema | undefined
@@ -111,79 +91,4 @@ export abstract class Collection {
    * Sets a value in this collection.
    */
   abstract set(key: unknown, value: unknown): void
-
-  /**
-   * Adds a value to the collection.
-   *
-   * For `!!map` and `!!omap` the value must be a Pair instance.
-   */
-  addIn(path: unknown[], value: unknown): void {
-    if (!path.length) this.add(value)
-    else {
-      const [key, ...rest] = path
-      const node = this.get(key)
-      if (node instanceof Collection) node.addIn(rest, value)
-      else if (node === undefined && this.schema)
-        this.set(key, collectionFromPath(this.schema, rest, value))
-      else
-        throw new Error(
-          `Expected YAML collection at ${key}. Remaining path: ${rest}`
-        )
-    }
-  }
-
-  /**
-   * Removes a value from the collection.
-   *
-   * @returns `true` if the item was found and removed.
-   */
-  deleteIn(path: unknown[]): boolean {
-    const [key, ...rest] = path
-    if (rest.length === 0) return this.delete(key)
-    const node = this.get(key)
-    if (node instanceof Collection) return node.deleteIn(rest)
-    else
-      throw new Error(
-        `Expected YAML collection at ${key}. Remaining path: ${rest}`
-      )
-  }
-
-  /**
-   * Returns item at `key`, or `undefined` if not found.
-   */
-  getIn(path: unknown[]): Node | Pair | undefined {
-    const [key, ...rest] = path
-    const node = this.get(key)
-    if (rest.length === 0) return node
-    else return node instanceof Collection ? node.getIn(rest) : undefined
-  }
-
-  /**
-   * Checks if the collection includes a value with the key `key`.
-   */
-  hasIn(path: unknown[]): boolean {
-    const [key, ...rest] = path
-    if (rest.length === 0) return this.has(key)
-    const node = this.get(key)
-    return node instanceof Collection ? node.hasIn(rest) : false
-  }
-
-  /**
-   * Sets a value in this collection.
-   */
-  setIn(path: unknown[], value: unknown): void {
-    const [key, ...rest] = path
-    if (rest.length === 0) {
-      this.set(key, value)
-    } else {
-      const node = this.get(key)
-      if (node instanceof Collection) node.setIn(rest, value)
-      else if (node === undefined && this.schema)
-        this.set(key, collectionFromPath(this.schema, rest, value))
-      else
-        throw new Error(
-          `Expected YAML collection at ${key}. Remaining path: ${rest}`
-        )
-    }
-  }
 }
