@@ -1,5 +1,4 @@
 import { Collection } from '../nodes/Collection.ts'
-import { NodeBase } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
@@ -14,29 +13,23 @@ export function stringifyPair(
   onChompKeep?: () => void
 ): string {
   const {
-    doc,
     indent,
     indentStep,
     noValues,
     options: { commentString, indentSeq, simpleKeys }
   } = ctx
-  let keyComment = (key instanceof NodeBase && key.comment) || null
   if (simpleKeys) {
-    if (keyComment) {
+    if (key.comment) {
       throw new Error('With simple keys, key nodes cannot have comments')
     }
-    if (
-      key instanceof Collection ||
-      (!(key instanceof NodeBase) && typeof key === 'object')
-    ) {
+    if (key instanceof Collection) {
       const msg = 'With simple keys, collection cannot be used as a key value'
       throw new Error(msg)
     }
   }
   let explicitKey =
     !simpleKeys &&
-    (!key ||
-      !(key instanceof Scalar) ||
+    (!(key instanceof Scalar) ||
       key.type === Scalar.BLOCK_FOLDED ||
       key.type === Scalar.BLOCK_LITERAL)
 
@@ -46,6 +39,7 @@ export function stringifyPair(
     indent: indent + indentStep,
     noValues: false
   }
+  let keyComment = key.comment
   let keyCommentDone = false
   let chompKeep = false
   let str = stringify(
@@ -94,7 +88,7 @@ export function stringifyPair(
   }
 
   let vsb, vcb, valueComment
-  if (value instanceof NodeBase) {
+  if (value) {
     vsb = !!value.spaceBefore
     vcb = value.commentBefore
     valueComment = value.comment
@@ -102,7 +96,6 @@ export function stringifyPair(
     vsb = false
     vcb = null
     valueComment = null
-    if (value && typeof value === 'object') value = doc.createNode(value)
   }
   ctx.implicitKey = false
   if (!explicitKey && !keyComment && value instanceof Scalar)

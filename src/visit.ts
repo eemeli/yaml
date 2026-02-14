@@ -1,6 +1,7 @@
 import { Document, type DocValue } from './doc/Document.ts'
 import { Alias } from './nodes/Alias.ts'
-import { NodeBase, type Node } from './nodes/Node.ts'
+import { isNode } from './nodes/identity.ts'
+import type { Node } from './nodes/Node.ts'
 import { Pair } from './nodes/Pair.ts'
 import { Scalar } from './nodes/Scalar.ts'
 import { YAMLMap } from './nodes/YAMLMap.ts'
@@ -17,7 +18,7 @@ export type visitorFn<T> = (
 ) => void | symbol | number | Node | Pair
 
 export type visitor =
-  | visitorFn<unknown>
+  | visitorFn<Node | Pair | null>
   | {
       Alias?: visitorFn<Alias>
       Collection?: visitorFn<YAMLMap | YAMLSeq>
@@ -42,7 +43,7 @@ export type asyncVisitorFn<T> = (
   | Promise<void | symbol | number | Node | Pair>
 
 export type asyncVisitor =
-  | asyncVisitorFn<unknown>
+  | asyncVisitorFn<Node | Pair | null>
   | {
       Alias?: asyncVisitorFn<Alias>
       Collection?: asyncVisitorFn<YAMLMap | YAMLSeq>
@@ -109,13 +110,13 @@ visit.REMOVE = REMOVE
 
 function visit_(
   key: number | 'key' | 'value' | null,
-  node: unknown,
+  node: Node | Pair | null,
   visitor: visitor,
   path: readonly (Document | Node | Pair)[]
 ): number | symbol | void {
   const ctrl = callVisitor(key, node, visitor, path)
 
-  if (ctrl instanceof NodeBase || ctrl instanceof Pair) {
+  if (isNode(ctrl) || ctrl instanceof Pair) {
     replaceNode(key, path, ctrl)
     return visit_(key, ctrl, visitor, path)
   }
@@ -208,13 +209,13 @@ visitAsync.REMOVE = REMOVE
 
 async function visitAsync_(
   key: number | 'key' | 'value' | null,
-  node: unknown,
+  node: Node | Pair | null,
   visitor: asyncVisitor,
   path: readonly (Document | Node | Pair)[]
 ): Promise<number | symbol | void> {
   const ctrl = await callVisitor(key, node, visitor, path)
 
-  if (ctrl instanceof NodeBase || ctrl instanceof Pair) {
+  if (isNode(ctrl) || ctrl instanceof Pair) {
     replaceNode(key, path, ctrl)
     return visitAsync_(key, ctrl, visitor, path)
   }
@@ -275,19 +276,19 @@ function initVisitor<V extends visitor | asyncVisitor>(visitor: V) {
 
 function callVisitor(
   key: number | 'key' | 'value' | null,
-  node: unknown,
+  node: Node | Pair | null,
   visitor: visitor,
   path: readonly (Document | Node | Pair)[]
 ): ReturnType<visitorFn<unknown>>
 function callVisitor(
   key: number | 'key' | 'value' | null,
-  node: unknown,
+  node: Node | Pair | null,
   visitor: asyncVisitor,
   path: readonly (Document | Node | Pair)[]
 ): ReturnType<asyncVisitorFn<unknown>>
 function callVisitor(
   key: number | 'key' | 'value' | null,
-  node: unknown,
+  node: Node | Pair | null,
   visitor: visitor | asyncVisitor,
   path: readonly (Document | Node | Pair)[]
 ): ReturnType<visitorFn<unknown>> | ReturnType<asyncVisitorFn<unknown>> {
@@ -309,7 +310,7 @@ function replaceNode(
   if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
     parent.items[key as number] = node
   } else if (parent instanceof Pair) {
-    if (node instanceof NodeBase) {
+    if (isNode(node)) {
       if (key === 'key') parent.key = node
       else parent.value = node
     } else {

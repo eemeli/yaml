@@ -85,8 +85,6 @@ describe('arrays', () => {
       const res = '- 3\n- - four\n  - 5\n'
       const doc = new Document(array)
       expect(String(doc)).toBe(res)
-      doc.value = array as any
-      expect(String(doc)).toBe(res)
       doc.value = doc.createNode(array)
       expect(String(doc)).toBe(res)
     })
@@ -180,8 +178,6 @@ z:
   v: 6\n`
       const doc = new Document(object)
       expect(String(doc)).toBe(res)
-      doc.value = object as any
-      expect(String(doc)).toBe(res)
       doc.value = doc.createNode(object)
       expect(String(doc)).toBe(res)
     })
@@ -214,8 +210,6 @@ describe('Set', () => {
     test('set doc value', () => {
       const res = '- 3\n- - four\n  - 5\n'
       const doc = new Document(set)
-      expect(String(doc)).toBe(res)
-      doc.value = set as any
       expect(String(doc)).toBe(res)
       doc.value = doc.createNode(set)
       expect(String(doc)).toBe(res)
@@ -292,8 +286,6 @@ y:
   v: 6
 : z\n`
       const doc = new Document(map)
-      expect(String(doc)).toBe(res)
-      doc.value = map as any
       expect(String(doc)).toBe(res)
       doc.value = doc.createNode(map)
       expect(String(doc)).toBe(res)

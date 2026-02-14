@@ -2,7 +2,7 @@ import { anchorIsValid } from '../doc/anchors.ts'
 import type { Document } from '../doc/Document.ts'
 import { Alias } from '../nodes/Alias.ts'
 import { Collection } from '../nodes/Collection.ts'
-import { NodeBase, type Node } from '../nodes/Node.ts'
+import type { Node } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { ToStringOptions } from '../options.ts'
@@ -131,31 +131,26 @@ function stringifyProps(
 }
 
 export function stringify(
-  item: unknown,
+  node: Node | Pair | null,
   ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
 ): string {
-  if (item instanceof Pair) return item.toString(ctx, onComment, onChompKeep)
-  if (item instanceof Alias) {
-    if (ctx.doc.directives) return item.toString(ctx)
-
-    if (ctx.resolvedAliases?.has(item)) {
-      throw new TypeError(
-        `Cannot stringify circular structure without alias nodes`
-      )
-    } else {
-      if (ctx.resolvedAliases) ctx.resolvedAliases.add(item)
-      else ctx.resolvedAliases = new Set([item])
-      item = item.resolve(ctx.doc)
+  if (node instanceof Pair) return node.toString(ctx, onComment, onChompKeep)
+  if (node instanceof Alias) {
+    if (ctx.doc.directives) return node.toString(ctx)
+    if (ctx.resolvedAliases?.has(node)) {
+      const msg = 'Cannot stringify circular structure without alias nodes'
+      throw new TypeError(msg)
     }
+
+    if (ctx.resolvedAliases) ctx.resolvedAliases.add(node)
+    else ctx.resolvedAliases = new Set([node])
+    node = node.resolve(ctx.doc) ?? null
   }
 
   let tagObj: ScalarTag | CollectionTag | undefined = undefined
-  const node =
-    item instanceof NodeBase
-      ? (item as Node)
-      : ctx.doc.createNode(item, { onTagObj: o => (tagObj = o) })
+  node ??= ctx.doc.createNode(null, { onTagObj: o => (tagObj = o) })
   tagObj ??= getTagObject(ctx.doc.schema.tags, node)
 
   const props = stringifyProps(node, tagObj, ctx)

@@ -1,7 +1,8 @@
 import type { Document } from './doc/Document.ts'
 import { Alias } from './nodes/Alias.ts'
 import { Collection } from './nodes/Collection.ts'
-import { type Node, NodeBase } from './nodes/Node.ts'
+import { isNode } from './nodes/identity.ts'
+import type { Node } from './nodes/Node.ts'
 import { Pair } from './nodes/Pair.ts'
 import { Scalar } from './nodes/Scalar.ts'
 import { YAMLMap } from './nodes/YAMLMap.ts'
@@ -68,13 +69,13 @@ function addEvents(
   events: string[],
   doc: Document,
   errPos: number,
-  node: NodeBase | Pair | null
+  node: Node | Pair | null
 ) {
   if (!node) {
     events.push('=VAL :')
     return
   }
-  if (errPos !== -1 && node instanceof NodeBase && node.range![0] >= errPos)
+  if (errPos !== -1 && isNode(node) && node.range![0] >= errPos)
     throw new Error()
   let props = ''
   let anchor =
@@ -88,7 +89,7 @@ function addEvents(
     }
     props = ` &${anchor}`
   }
-  if (node instanceof NodeBase && node.tag) props += ` <${node.tag}>`
+  if (isNode(node) && node.tag) props += ` <${node.tag}>`
 
   if (node instanceof YAMLMap) {
     const ev = node.flow ? '+MAP {}' : '+MAP'

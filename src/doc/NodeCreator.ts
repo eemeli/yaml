@@ -1,6 +1,7 @@
 import { Alias } from '../nodes/Alias.ts'
 import { Collection } from '../nodes/Collection.ts'
-import { type Node, NodeBase } from '../nodes/Node.ts'
+import { isNode } from '../nodes/identity.ts'
+import { type Node } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
@@ -60,7 +61,7 @@ export class NodeCreator {
 
   create(value: unknown, tagName?: string): Node {
     if (value instanceof Document) value = value.value
-    if (value instanceof NodeBase) return value as Node
+    if (isNode(value)) return value
     if (value instanceof Pair) {
       const map = (this.schema.map.nodeClass! as typeof YAMLMap).from(
         this,
@@ -143,10 +144,10 @@ export class NodeCreator {
     return node
   }
 
-  createPair(key: unknown, value: unknown): Pair<NodeBase, NodeBase | null> {
+  createPair(key: unknown, value: unknown): Pair<Node, Node | null> {
     const k = this.create(key)
     const v = value == null ? null : this.create(value)
-    return new Pair<NodeBase, NodeBase | null>(k, v)
+    return new Pair<Node, Node | null>(k, v)
   }
 
   /**

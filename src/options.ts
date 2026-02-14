@@ -1,7 +1,7 @@
 import type { Reviver } from './doc/applyReviver.ts'
 import type { Directives } from './doc/directives.ts'
 import type { LogLevelId } from './log.ts'
-import type { NodeBase } from './nodes/Node.ts'
+import type { Node } from './nodes/Node.ts'
 import type { Pair } from './nodes/Pair.ts'
 import type { Scalar } from './nodes/Scalar.ts'
 import type { LineCounter } from './parse/line-counter.ts'
@@ -67,7 +67,7 @@ export type ParseOptions = {
    *
    * Default: `true`
    */
-  uniqueKeys?: boolean | ((a: NodeBase, b: NodeBase) => boolean)
+  uniqueKeys?: boolean | ((a: Node, b: Node) => boolean)
 }
 
 export type DocumentOptions = {

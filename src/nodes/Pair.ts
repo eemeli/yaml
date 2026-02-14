@@ -5,12 +5,12 @@ import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyPair } from '../stringify/stringifyPair.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
 import type { NodeOf, Primitive } from './Collection.ts'
-import type { NodeBase } from './Node.ts'
+import type { Node } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
 
 export class Pair<
-  K extends Primitive | NodeBase = Primitive | NodeBase,
-  V extends Primitive | NodeBase = Primitive | NodeBase
+  K extends Primitive | Node = Primitive | Node,
+  V extends Primitive | Node = Primitive | Node
 > {
   key: NodeOf<K>
   value: NodeOf<V> | null

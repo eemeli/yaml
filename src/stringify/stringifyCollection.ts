@@ -1,5 +1,4 @@
 import type { Collection } from '../nodes/Collection.ts'
-import { NodeBase } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import type { StringifyContext } from './stringify.ts'
 import { stringify } from './stringify.ts'
@@ -45,16 +44,13 @@ function stringifyBlockCollection(
   for (let i = 0; i < items.length; ++i) {
     const item = items[i]
     let comment: string | null = null
-    if (item instanceof NodeBase) {
+    if (item instanceof Pair) {
+      if (!chompKeep && item.key.spaceBefore) lines.push('')
+      addCommentBefore(ctx, lines, item.key.commentBefore, chompKeep)
+    } else if (item) {
       if (!chompKeep && item.spaceBefore) lines.push('')
       addCommentBefore(ctx, lines, item.commentBefore, chompKeep)
       if (item.comment) comment = item.comment
-    } else if (item instanceof Pair) {
-      const ik = item.key instanceof NodeBase ? item.key : null
-      if (ik) {
-        if (!chompKeep && ik.spaceBefore) lines.push('')
-        addCommentBefore(ctx, lines, ik.commentBefore, chompKeep)
-      }
     }
 
     chompKeep = false
@@ -112,25 +108,23 @@ function stringifyFlowCollection(
   for (let i = 0; i < items.length; ++i) {
     const item = items[i]
     let comment: string | null = null
-    if (item instanceof NodeBase) {
-      if (item.spaceBefore) lines.push('')
-      addCommentBefore(ctx, lines, item.commentBefore, false)
-      if (item.comment) comment = item.comment
-    } else if (item instanceof Pair) {
-      const ik = item.key instanceof NodeBase ? item.key : null
-      if (ik) {
-        if (ik.spaceBefore) lines.push('')
-        addCommentBefore(ctx, lines, ik.commentBefore, false)
-        if (ik.comment) reqNewline = true
-      }
+    if (item instanceof Pair) {
+      const ik = item.key
+      if (ik.spaceBefore) lines.push('')
+      addCommentBefore(ctx, lines, ik.commentBefore, false)
+      if (ik.comment) reqNewline = true
 
-      const iv = item.value instanceof NodeBase ? item.value : null
+      const iv = item.value
       if (iv) {
         if (iv.comment) comment = iv.comment
         if (iv.commentBefore) reqNewline = true
-      } else if (item.value == null && ik?.comment) {
+      } else if (ik?.comment) {
         comment = ik.comment
       }
+    } else if (item) {
+      if (item.spaceBefore) lines.push('')
+      addCommentBefore(ctx, lines, item.commentBefore, false)
+      if (item.comment) comment = item.comment
     }
 
     if (comment) reqNewline = true

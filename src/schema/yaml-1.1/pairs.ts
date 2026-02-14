@@ -1,5 +1,5 @@
 import type { NodeCreator } from '../../doc/NodeCreator.ts'
-import type { NodeBase } from '../../nodes/Node.ts'
+import type { Node } from '../../nodes/Node.ts'
 import { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
@@ -30,7 +30,7 @@ export function resolvePairs(
         }
         seq.items[i] = pair
       } else {
-        seq.items[i] = new Pair<NodeBase, null>(item, null)
+        seq.items[i] = new Pair<Node, null>(item, null)
       }
     }
   } else onError('Expected a sequence for this tag')

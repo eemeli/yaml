@@ -1,11 +1,11 @@
 import type { Document, DocValue } from '../doc/Document.ts'
 import type { Token } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
-import type { StringifyContext } from '../stringify/stringify.ts'
+import type { StringifyContext } from '../util.ts'
 import type { Alias } from './Alias.ts'
 import type { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
-import type { MapLike, YAMLMap } from './YAMLMap.ts'
+import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
 
 export type Node = Alias | Scalar | YAMLSeq | YAMLMap
@@ -29,12 +29,12 @@ export type NodeType<T> = T extends
 
 export type Range = [start: number, valueEnd: number, nodeEnd: number]
 
-export abstract class NodeBase {
+export interface NodeBase {
   /** A comment on or immediately after this */
-  declare comment?: string | null
+  comment?: string | null
 
   /** A comment before this */
-  declare commentBefore?: string | null
+  commentBefore?: string | null
 
   /**
    * The `[start, value-end, node-end]` character offsets for the part of the
@@ -42,44 +42,26 @@ export abstract class NodeBase {
    * and `node-end` positions are themselves not included in their respective
    * ranges.
    */
-  declare range?: Range | null
+  range?: Range | null
 
   /** A blank line before this node and its commentBefore */
-  declare spaceBefore?: boolean
+  spaceBefore?: boolean
 
   /** The CST token that was composed into this node.  */
-  declare srcToken?: Token
+  srcToken?: Token
 
   /** A fully qualified tag, if required */
-  declare tag?: string
+  tag?: string
 
-  /**
-   * Customize the way that a key-value pair is resolved.
-   * Used for YAML 1.1 !!merge << handling.
-   */
-  declare addToJSMap?: (
-    doc: Document<DocValue, boolean>,
-    ctx: ToJSContext | undefined,
-    map: MapLike,
-    value: unknown
-  ) => void
+  /** Create a copy of this node.  */
+  clone(_schema?: Schema): this
 
   /** A plain JavaScript representation of this node. */
-  abstract toJS(doc: Document<DocValue, boolean>, opt?: ToJSContext): any
+  toJS(doc: Document<DocValue, boolean>, opt?: ToJSContext): any
 
-  abstract toString(
+  toString(
     ctx?: StringifyContext,
     onComment?: () => void,
     onChompKeep?: () => void
   ): string
-
-  /** Create a copy of this node.  */
-  clone(_schema?: Schema): NodeBase {
-    const copy: NodeBase = Object.create(
-      Object.getPrototypeOf(this),
-      Object.getOwnPropertyDescriptors(this)
-    )
-    if (this.range) copy.range = this.range.slice() as NodeBase['range']
-    return copy
-  }
 }

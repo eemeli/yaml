@@ -5,7 +5,8 @@ import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
 import { Collection, type NodeOf, type Primitive } from './Collection.ts'
-import { NodeBase } from './Node.ts'
+import { isNode } from './identity.ts'
+import type { Node, NodeBase } from './Node.ts'
 import type { Pair } from './Pair.ts'
 import { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
@@ -14,8 +15,11 @@ const isScalarValue = (value: unknown): boolean =>
   !value || (typeof value !== 'function' && typeof value !== 'object')
 
 export class YAMLSeq<
-  T extends Primitive | NodeBase | Pair = Primitive | NodeBase | Pair
-> extends Collection {
+  T extends Primitive | Node | Pair = Primitive | Node | Pair
+>
+  extends Collection
+  implements NodeBase
+{
   static get tagName(): 'tag:yaml.org,2002:seq' {
     return 'tag:yaml.org,2002:seq'
   }
@@ -27,7 +31,7 @@ export class YAMLSeq<
     value: T,
     options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
   ): void {
-    if (value instanceof NodeBase) this.items.push(value as NodeOf<T>)
+    if (isNode(value)) this.items.push(value as NodeOf<T>)
     else if (!this.schema) throw new Error('Schema is required')
     else {
       const nc = new NodeCreator(this.schema, {
@@ -94,7 +98,7 @@ export class YAMLSeq<
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
     const prev = this.items[idx]
     if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
-    else if (value instanceof NodeBase) this.items[idx] = value as NodeOf<T>
+    else if (isNode(value)) this.items[idx] = value as NodeOf<T>
     else if (!this.schema) throw new Error('Schema is required')
     else {
       const nc = new NodeCreator(this.schema, {

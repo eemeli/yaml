@@ -2,7 +2,6 @@ import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
 import { Collection, type Primitive } from '../nodes/Collection.ts'
 import type { Node, NodeType, Range } from '../nodes/Node.ts'
-import type { NodeBase } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import { ToJSContext } from '../nodes/toJS.ts'
@@ -226,13 +225,13 @@ export class Document<
     value: V,
     options: CreateNodeOptions = {}
   ): Pair<
-    K extends Primitive | NodeBase ? K : NodeBase,
-    V extends Primitive | NodeBase ? V : NodeBase
+    K extends Primitive | Node ? K : Node,
+    V extends Primitive | Node ? V : Node
   > {
     const nc = new NodeCreator(this, options)
     const pair = nc.createPair(key, value) as Pair<
-      K extends Primitive | NodeBase ? K : NodeBase,
-      V extends Primitive | NodeBase ? V : NodeBase
+      K extends Primitive | Node ? K : Node,
+      V extends Primitive | Node ? V : Node
     >
     nc.setAnchors()
     return pair
@@ -261,7 +260,7 @@ export class Document<
   /**
    * Returns item at `key`, or `undefined` if not found.
    */
-  get(key: any): Strict extends true ? NodeBase | Pair | undefined : any {
+  get(key: any): Strict extends true ? Node | Pair | undefined : any {
     return this.value instanceof Collection ? this.value.get(key) : undefined
   }
 
@@ -270,7 +269,7 @@ export class Document<
    */
   getIn(
     path: unknown[]
-  ): Strict extends true ? NodeBase | Pair | null | undefined : any {
+  ): Strict extends true ? Node | Pair | null | undefined : any {
     if (!path.length) return this.value
     return this.value instanceof Collection ? this.value.getIn(path) : undefined
   }

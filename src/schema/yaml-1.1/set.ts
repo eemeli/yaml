@@ -1,7 +1,8 @@
 import type { Document, DocValue } from '../../doc/Document.ts'
 import { NodeCreator } from '../../doc/NodeCreator.ts'
 import type { NodeOf, Primitive } from '../../nodes/Collection.ts'
-import { NodeBase } from '../../nodes/Node.ts'
+import { isNode } from '../../nodes/identity.ts'
+import type { Node } from '../../nodes/Node.ts'
 import { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
@@ -12,7 +13,7 @@ import type { StringifyContext } from '../../stringify/stringify.ts'
 import type { CollectionTag } from '../types.ts'
 
 export class YAMLSet<
-  T extends Primitive | NodeBase = Primitive | NodeBase
+  T extends Primitive | Node = Primitive | Node
 > extends YAMLMap<T, T> {
   static tag = 'tag:yaml.org,2002:set'
 
@@ -64,8 +65,8 @@ export class YAMLSet<
     if (prev && !value) {
       this.items.splice(this.items.indexOf(prev), 1)
     } else if (!prev && value) {
-      let node: NodeBase
-      if (key instanceof NodeBase) {
+      let node: Node
+      if (isNode(key)) {
         node = key
       } else if (!this.schema) {
         throw new Error('Schema is required')
@@ -100,7 +101,7 @@ export class YAMLSet<
       for (let value of iterable as Iterable<unknown>) {
         if (typeof nc.replacer === 'function')
           value = nc.replacer.call(iterable, value, value)
-        set.items.push(nc.createPair(value, null) as Pair<NodeBase, null>)
+        set.items.push(nc.createPair(value, null) as Pair<Node, null>)
       }
     return set
   }

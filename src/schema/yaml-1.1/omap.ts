@@ -1,6 +1,6 @@
 import type { Document, DocValue } from '../../doc/Document.ts'
 import type { Primitive } from '../../nodes/Collection.ts'
-import type { NodeBase } from '../../nodes/Node.ts'
+import type { Node } from '../../nodes/Node.ts'
 import type { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
@@ -12,8 +12,8 @@ import type { CollectionTag } from '../types.ts'
 import { createPairs, resolvePairs } from './pairs.ts'
 
 export class YAMLOMap<
-  K extends Primitive | NodeBase = Primitive | NodeBase,
-  V extends Primitive | NodeBase = Primitive | NodeBase
+  K extends Primitive | Node = Primitive | Node,
+  V extends Primitive | Node = Primitive | Node
 > extends YAMLSeq<Pair<K, V>> {
   static tag = 'tag:yaml.org,2002:omap'
 

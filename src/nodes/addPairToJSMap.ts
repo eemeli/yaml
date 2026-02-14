@@ -2,7 +2,7 @@ import type { Document, DocValue } from '../doc/Document.ts'
 import { warn } from '../log.ts'
 import { addMergeToJSMap, isMergeKey } from '../schema/yaml-1.1/merge.ts'
 import { createStringifyContext } from '../stringify/stringify.ts'
-import type { NodeBase } from './Node.ts'
+import type { Node } from './Node.ts'
 import type { Pair } from './Pair.ts'
 import type { ToJSContext } from './toJS.ts'
 import type { MapLike } from './YAMLMap.ts'
@@ -13,7 +13,7 @@ export function addPairToJSMap(
   map: MapLike,
   { key, value }: Pair
 ): MapLike {
-  if (key.addToJSMap) key.addToJSMap(doc, ctx, map, value)
+  if ('addToJSMap' in key) key.addToJSMap?.(doc, ctx, map, value)
   // TODO: Should drop this special case for bare << handling
   else if (isMergeKey(doc, key)) addMergeToJSMap(doc, ctx, map, value)
   else {
@@ -41,7 +41,7 @@ export function addPairToJSMap(
 function stringifyKey(
   doc: Document<DocValue, boolean>,
   ctx: ToJSContext,
-  key: NodeBase,
+  key: Node,
   jsKey: unknown
 ) {
   if (jsKey === null) return ''

@@ -980,8 +980,7 @@ describe('custom tags', () => {
       doc.value.items[3].comment = 'cc'
       const s = new Scalar(6)
       s.tag = '!g'
-      // @ts-expect-error TS should complain here
-      doc.value.items.splice(1, 1, s, '7')
+      doc.value.items.splice(1, 1, s, new Scalar('7'))
       expect(String(doc)).toBe(source`
         %TAG !e! tag:example.com,2000:test/
         %TAG !f! tag:example.com,2000:other/
