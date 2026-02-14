@@ -3,28 +3,56 @@ import type { Document, DocValue } from '../doc/Document.ts'
 import type { FlowScalar } from '../parse/cst.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { visit } from '../visit.ts'
-import type { Node } from './Node.ts'
-import { NodeBase } from './Node.ts'
+import type { Node, NodeBase, Range } from './Node.ts'
 import { Pair } from './Pair.ts'
 import type { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
 
-export class Alias extends NodeBase {
+export class Alias implements NodeBase {
   source: string
 
   declare anchor?: never
+
+  /** A comment on or immediately after this node. */
+  declare comment?: string | null
+
+  /** A comment before this node. */
+  declare commentBefore?: string | null
+
+  /**
+   * The `[start, value-end, node-end]` character offsets for
+   * the part of the source parsed into this node (undefined if not parsed).
+   * The `value-end` and `node-end` positions are themselves not included in their respective ranges.
+   */
+  declare range?: Range | null
+
+  /** A blank line before this node and its commentBefore */
+  declare spaceBefore?: boolean
+
+  /** The CST token that was composed into this node.  */
   declare srcToken?: FlowScalar & { type: 'alias' }
 
+  declare tag?: never
+
   constructor(source: string) {
-    super()
     this.source = source
     Object.defineProperty(this, 'tag', {
       set() {
         throw new Error('Alias nodes cannot have tags')
       }
     })
+  }
+
+  /** Create a copy of this node.  */
+  clone(): this {
+    const copy: this = Object.create(
+      Object.getPrototypeOf(this),
+      Object.getOwnPropertyDescriptors(this)
+    )
+    if (this.range) copy.range = [...this.range]
+    return copy
   }
 
   /**
@@ -114,25 +142,24 @@ export class Alias extends NodeBase {
 
 function getAliasCount(
   doc: Document,
-  node: unknown,
+  node: Node | Pair | null,
   anchors: ToJSContext['anchors']
 ): number {
   if (node instanceof Alias) {
     const source = node.resolve(doc)
     const anchor = anchors && source && anchors.get(source)
     return anchor ? anchor.count * anchor.aliasCount : 0
-  } else if (node instanceof NodeBase && 'items' in node) {
-    const coll = node as YAMLMap | YAMLSeq
-    let count = 0
-    for (const item of coll.items) {
-      const c = getAliasCount(doc, item, anchors)
-      if (c > count) count = c
-    }
-    return count
   } else if (node instanceof Pair) {
     const kc = getAliasCount(doc, node.key, anchors)
     const vc = getAliasCount(doc, node.value, anchors)
     return Math.max(kc, vc)
+  } else if (node && 'items' in node) {
+    let count = 0
+    for (const item of node.items) {
+      const c = getAliasCount(doc, item, anchors)
+      if (c > count) count = c
+    }
+    return count
   }
   return 1
 }

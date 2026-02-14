@@ -6,7 +6,8 @@ import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
 import { Collection, type NodeOf, type Primitive } from './Collection.ts'
-import { NodeBase } from './Node.ts'
+import { isNode } from './identity.ts'
+import type { Node, NodeBase } from './Node.ts'
 import { Pair } from './Pair.ts'
 import { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
@@ -17,8 +18,8 @@ export type MapLike =
   | Record<string | number | symbol, any>
 
 export function findPair<
-  K extends Primitive | NodeBase = Primitive | NodeBase,
-  V extends Primitive | NodeBase = Primitive | NodeBase
+  K extends Primitive | Node = Primitive | Node,
+  V extends Primitive | Node = Primitive | Node
 >(items: Iterable<Pair<K, V>>, key: unknown): Pair<K, V> | undefined {
   const k = key instanceof Scalar ? key.value : key
   for (const it of items) {
@@ -29,9 +30,12 @@ export function findPair<
 }
 
 export class YAMLMap<
-  K extends Primitive | NodeBase = Primitive | NodeBase,
-  V extends Primitive | NodeBase = Primitive | NodeBase
-> extends Collection {
+  K extends Primitive | Node = Primitive | Node,
+  V extends Primitive | Node = Primitive | Node
+>
+  extends Collection
+  implements NodeBase
+{
   static get tagName(): 'tag:yaml.org,2002:map' {
     return 'tag:yaml.org,2002:map'
   }
@@ -109,10 +113,7 @@ export class YAMLMap<
     options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
   ): void {
     let pair: Pair
-    if (
-      key instanceof NodeBase &&
-      (value instanceof NodeBase || value === null)
-    ) {
+    if (isNode(key) && (value === null || isNode(value))) {
       pair = new Pair(key, value)
     } else if (!this.schema) {
       throw new Error('Schema is required')

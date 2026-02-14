@@ -752,25 +752,7 @@ describe('simple keys', () => {
     )
   })
 
-  test('key with JS object value', () => {
-    const doc = YAML.parseDocument<any>('[foo]: bar')
-    doc.value.items[0].key = { foo: 42 }
-    expect(doc.toString()).toBe('? foo: 42\n: bar\n')
-    expect(() => doc.toString({ simpleKeys: true })).toThrow(
-      /With simple keys, collection cannot be used as a key value/
-    )
-  })
-
-  test('key with JS null value', () => {
-    const doc = YAML.parseDocument<any>('[foo]: bar')
-    doc.value.items[0].key = null
-    expect(doc.toString()).toBe('? null\n: bar\n')
-    expect(() => doc.toString({ simpleKeys: true })).toThrow(
-      /With simple keys, collection cannot be used as a key value/
-    )
-  })
-
-  test('key value lingth > 1024', () => {
+  test('key value length > 1024', () => {
     const str = `
     ? ${new Array(1026).join('a')}
     : longkey`

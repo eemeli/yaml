@@ -1,4 +1,5 @@
-import { NodeBase, type Node } from '../nodes/Node.ts'
+import { isNode } from '../nodes/identity.ts'
+import type { Node } from '../nodes/Node.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
@@ -135,7 +136,7 @@ export function composeCollection(
       ctx.options
     ) ?? coll
 
-  const node = res instanceof NodeBase ? (res as Node) : new Scalar(res)
+  const node = isNode(res) ? res : new Scalar(res)
   node.range = coll.range
   node.tag = tagName
   if (tag?.format) (node as Scalar).format = tag.format

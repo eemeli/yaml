@@ -9,7 +9,7 @@ It is valid to have an anchor associated with a node even if it has no aliases.
 ## Scalar Values
 
 ```js
-class NodeBase {
+interface NodeBase {
   comment?: string        // a comment on or immediately after this
   commentBefore?: string  // a comment before this
   range?: [number, number, number]
@@ -19,16 +19,16 @@ class NodeBase {
       // included in their respective ranges.
   spaceBefore?: boolean
       // a blank line before this node and its commentBefore
-  tag?: string       // a fully qualified tag, if required
-  clone(): NodeBase  // a copy of this node
-  toJS(doc, context?): any // a plain JS representation of this node
+  tag?: string    // a fully qualified tag, if required
+  clone(): this   // a copy of this node
+  toJS(doc): any  // a plain JS representation of this node
 }
 ```
 
 For scalar values, the `tag` will not be set unless it was explicitly defined in the source document; this also applies for unsupported tags that have been resolved using a fallback tag (string, `YAMLMap`, or `YAMLSeq`).
 
 ```js
-class Scalar<T = unknown> extends NodeBase {
+class Scalar<T = unknown> implements NodeBase {
   anchor?: string  // an anchor associated with this node
   format?: 'BIN' | 'HEX' | 'OCT' | 'TIME' | undefined
       // By default (undefined), numbers use decimal notation.
@@ -54,12 +54,12 @@ class Pair {
   value: Node | null
 }
 
-class Collection extends NodeBase {
+class Collection implements NodeBase {
   anchor?: string  // an anchor associated with this node
   flow?: boolean   // use flow style when stringifying this
   schema?: Schema
   addIn(path: unknown[], value: unknown): void
-  clone(schema?: Schema): NodeBase  // a deep copy of this collection
+  clone(schema?: Schema): this  // a deep copy of this collection
   deleteIn(path: unknown[]): boolean
   getIn(path: unknown[], keepScalar?: boolean): unknown
   hasIn(path: unknown[]): boolean
@@ -140,7 +140,7 @@ Note that for `addIn` the path argument points to the collection rather than the
 
 <!-- prettier-ignore -->
 ```js
-class Alias extends NodeBase {
+class Alias implements NodeBase {
   source: string
   resolve(doc: Document): Scalar | YAMLMap | YAMLSeq | undefined
 }
