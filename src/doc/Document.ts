@@ -5,8 +5,7 @@ import type { Node, NodeType, Range } from '../nodes/Node.ts'
 import type { NodeBase } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
-import type { ToJSContext } from '../nodes/toJS.ts'
-import { toJS } from '../nodes/toJS.ts'
+import { ToJSContext } from '../nodes/toJS.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
 import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type {
@@ -359,26 +358,10 @@ export class Document<
   }
 
   /** A plain JavaScript representation of the document `value`. */
-  toJS(opt?: ToJSOptions & { [ignored: string]: unknown }): any
-
-  // json & jsonArg are only used from toJSON()
-  toJS({
-    json,
-    jsonArg,
-    mapAsMap,
-    maxAliasCount,
-    onAnchor,
-    reviver
-  }: ToJSOptions & { json?: boolean; jsonArg?: string | null } = {}): any {
-    const ctx: ToJSContext = {
-      anchors: new Map(),
-      doc: this,
-      keep: !json,
-      mapAsMap: mapAsMap === true,
-      mapKeyWarned: false,
-      maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100
-    }
-    const res = toJS(this.value, jsonArg ?? '', ctx)
+  toJS(opt: ToJSOptions = {}): any {
+    const { onAnchor, reviver } = opt
+    const ctx = new ToJSContext(opt)
+    const res = this.value.toJS(this, ctx)
     if (typeof onAnchor === 'function')
       for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
     return typeof reviver === 'function'
@@ -386,14 +369,9 @@ export class Document<
       : res
   }
 
-  /**
-   * A JSON representation of the document `value`.
-   *
-   * @param jsonArg Used by `JSON.stringify` to indicate the array index or
-   *   property name.
-   */
-  toJSON(jsonArg?: string | null, onAnchor?: ToJSOptions['onAnchor']): any {
-    return this.toJS({ json: true, jsonArg, mapAsMap: false, onAnchor })
+  /** A JSON representation of the document `value`.  */
+  toJSON(): any {
+    return this.toJS({ mapAsMap: false })
   }
 
   /** A YAML representation of the document. */

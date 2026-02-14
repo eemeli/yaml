@@ -1,9 +1,9 @@
+import type { Document, DocValue } from '../../doc/Document.ts'
 import type { Primitive } from '../../nodes/Collection.ts'
 import type { NodeBase } from '../../nodes/Node.ts'
-import { Pair } from '../../nodes/Pair.ts'
+import type { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
-import { toJS } from '../../nodes/toJS.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
 import type { NodeCreator } from '../../util.ts'
@@ -29,21 +29,18 @@ export class YAMLOMap<
   set: typeof YAMLMap.prototype.set = YAMLMap.prototype.set.bind(this)
 
   /**
-   * If `ctx` is given, the return type is actually `Map<unknown, unknown>`,
+   * If `ctx` is given, the return type is always `Map<unknown, unknown>`,
    * but TypeScript won't allow widening the signature of a child method.
    */
-  toJSON(_?: unknown, ctx?: ToJSContext): unknown[] {
-    if (!ctx) return super.toJSON(_)
+  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): unknown[] {
+    if (!ctx) return super.toJS(doc)
     const map = new Map()
-    if (ctx?.onCreate) ctx.onCreate(map)
+    if (this.anchor) {
+      ctx.anchors.set(this, { aliasCount: 0, count: 1, res: map })
+    }
     for (const pair of this.items) {
-      let key, value
-      if (pair instanceof Pair) {
-        key = toJS(pair.key, '', ctx)
-        value = toJS(pair.value, key, ctx)
-      } else {
-        key = toJS(pair, '', ctx)
-      }
+      const key = pair.key.toJS(doc, ctx)
+      const value = pair.value ? pair.value.toJS(doc, ctx) : pair.value
       if (map.has(key))
         throw new Error('Ordered maps must not include duplicate keys')
       map.set(key, value)

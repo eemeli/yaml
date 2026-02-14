@@ -1,13 +1,10 @@
-import { applyReviver } from '../doc/applyReviver.ts'
-import type { Document } from '../doc/Document.ts'
-import type { ToJSOptions } from '../options.ts'
+import type { Document, DocValue } from '../doc/Document.ts'
 import type { Token } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import type { Alias } from './Alias.ts'
 import type { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
-import { toJS } from './toJS.ts'
 import type { MapLike, YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
 
@@ -61,13 +58,14 @@ export abstract class NodeBase {
    * Used for YAML 1.1 !!merge << handling.
    */
   declare addToJSMap?: (
+    doc: Document<DocValue, boolean>,
     ctx: ToJSContext | undefined,
     map: MapLike,
     value: unknown
   ) => void
 
-  /** A plain JS representation of this node */
-  abstract toJSON(): any
+  /** A plain JavaScript representation of this node. */
+  abstract toJS(doc: Document<DocValue, boolean>, opt?: ToJSContext): any
 
   abstract toString(
     ctx?: StringifyContext,
@@ -83,27 +81,5 @@ export abstract class NodeBase {
     )
     if (this.range) copy.range = this.range.slice() as NodeBase['range']
     return copy
-  }
-
-  /** A plain JavaScript representation of this node. */
-  toJS(
-    doc: Document,
-    { mapAsMap, maxAliasCount, onAnchor, reviver }: ToJSOptions = {}
-  ): any {
-    if (!doc?.schema) throw new TypeError('A document argument is required')
-    const ctx: ToJSContext = {
-      anchors: new Map(),
-      doc,
-      keep: true,
-      mapAsMap: mapAsMap === true,
-      mapKeyWarned: false,
-      maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100
-    }
-    const res = toJS(this, '', ctx)
-    if (typeof onAnchor === 'function')
-      for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
-    return typeof reviver === 'function'
-      ? applyReviver(reviver, { '': res }, '', res)
-      : res
   }
 }

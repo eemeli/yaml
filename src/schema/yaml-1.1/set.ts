@@ -1,3 +1,4 @@
+import type { Document, DocValue } from '../../doc/Document.ts'
 import { NodeCreator } from '../../doc/NodeCreator.ts'
 import type { NodeOf, Primitive } from '../../nodes/Collection.ts'
 import { NodeBase } from '../../nodes/Node.ts'
@@ -80,8 +81,8 @@ export class YAMLSet<
     }
   }
 
-  toJSON(_?: unknown, ctx?: ToJSContext): any {
-    return super.toJSON(_, ctx, Set)
+  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any {
+    return super.toJS(doc, ctx, Set)
   }
 
   toString(

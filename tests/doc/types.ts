@@ -37,22 +37,26 @@ describe('tags', () => {
     test('flow map', () => {
       const doc = parseDocument('{ foo }')
       expect(doc.value.tag).toBeUndefined()
-      expect(doc.value.toJSON()).toMatchObject({ foo: null })
+      expect(doc.toJS()).toMatchObject({ foo: null })
+      expect(doc.toJSON()).toMatchObject({ foo: null })
     })
     test('flow seq', () => {
       const doc = parseDocument('[ foo ]')
       expect(doc.value.tag).toBeUndefined()
-      expect(doc.value.toJSON()).toMatchObject(['foo'])
+      expect(doc.toJS()).toMatchObject(['foo'])
+      expect(doc.toJSON()).toMatchObject(['foo'])
     })
     test('block map', () => {
       const doc = parseDocument('foo:\n')
       expect(doc.value.tag).toBeUndefined()
-      expect(doc.value.toJSON()).toMatchObject({ foo: null })
+      expect(doc.toJS()).toMatchObject({ foo: null })
+      expect(doc.toJSON()).toMatchObject({ foo: null })
     })
     test('block seq', () => {
       const doc = parseDocument('- foo')
       expect(doc.value.tag).toBeUndefined()
-      expect(doc.value.toJSON()).toMatchObject(['foo'])
+      expect(doc.toJS()).toMatchObject(['foo'])
+      expect(doc.toJSON()).toMatchObject(['foo'])
     })
   })
 
@@ -70,22 +74,22 @@ describe('tags', () => {
     test('flow map', () => {
       const doc = parseDocument('!!map { foo }')
       expect(doc.value.tag).toBe('tag:yaml.org,2002:map')
-      expect(doc.value.toJSON()).toMatchObject({ foo: null })
+      expect(doc.toJS()).toMatchObject({ foo: null })
     })
     test('flow seq', () => {
       const doc = parseDocument('!!seq [ foo ]')
       expect(doc.value.tag).toBe('tag:yaml.org,2002:seq')
-      expect(doc.value.toJSON()).toMatchObject(['foo'])
+      expect(doc.toJS()).toMatchObject(['foo'])
     })
     test('block map', () => {
       const doc = parseDocument('!!map\nfoo:\n')
       expect(doc.value.tag).toBe('tag:yaml.org,2002:map')
-      expect(doc.value.toJSON()).toMatchObject({ foo: null })
+      expect(doc.toJS()).toMatchObject({ foo: null })
     })
     test('block seq', () => {
       const doc = parseDocument('!!seq\n- foo')
       expect(doc.value.tag).toBe('tag:yaml.org,2002:seq')
-      expect(doc.value.toJSON()).toMatchObject(['foo'])
+      expect(doc.toJS()).toMatchObject(['foo'])
     })
   })
 
@@ -220,6 +224,17 @@ describe('number types', () => {
       expect(doc.value.items[3]).not.toHaveProperty('format')
       expect(doc.value.items[6]).not.toHaveProperty('format')
       expect(doc.value.items[6]).not.toHaveProperty('minFractionDigits')
+      expect(doc.toJS()).toEqual([10n, 83n, 0n, 123456n, 310, 0.5123, 4.02])
+      expect(doc.value.toJS(doc)).toEqual([
+        10n,
+        83n,
+        0n,
+        123456n,
+        310,
+        0.5123,
+        4.02
+      ])
+      expect(doc.get(0).toJS()).toBe(10n)
     })
 
     test('Version 1.2', () => {
@@ -698,13 +713,13 @@ date (00:00:00Z): 2002-12-14`
       doc.value.items.forEach(item => {
         expect(item.value!.value).toBeInstanceOf(Date)
       })
-      expect(doc.toJSON()).toMatchObject({
-        canonical: '2001-12-15T02:59:43.100Z',
-        'valid iso8601': '2001-12-15T02:59:43.100Z',
-        'no secs': '2001-12-15T02:59:00.000Z',
-        'space separated': '2001-12-15T02:59:43.100Z',
-        'no time zone (Z)': '2001-12-15T02:59:43.100Z',
-        'date (00:00:00Z)': '2002-12-14T00:00:00.000Z'
+      expect(doc.toJS()).toMatchObject({
+        canonical: new Date('2001-12-15T02:59:43.100Z'),
+        'valid iso8601': new Date('2001-12-15T02:59:43.100Z'),
+        'no secs': new Date('2001-12-15T02:59:00.000Z'),
+        'space separated': new Date('2001-12-15T02:59:43.100Z'),
+        'no time zone (Z)': new Date('2001-12-15T02:59:43.100Z'),
+        'date (00:00:00Z)': new Date('2002-12-14T00:00:00.000Z')
       })
       expect(String(doc)).toBe(`%YAML 1.1
 ---
@@ -1034,9 +1049,9 @@ describe('custom tags', () => {
 
   class YAMLNullObject extends YAMLMap {
     tag: string = '!nullobject'
-    toJSON(_?: unknown, ctx?: any): any {
-      const obj = super.toJSON<Record<any, any>>(
-        _,
+    toJS(doc: any, ctx?: any): any {
+      const obj = super.toJS<Record<any, any>>(
+        doc,
         { ...ctx, mapAsMap: false },
         Object
       )

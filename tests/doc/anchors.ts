@@ -181,7 +181,7 @@ describe('__proto__ as anchor name', () => {
     )
     const alias = doc.createAlias(doc.value.items[0], '__proto__')
     doc.value.items.push(alias)
-    expect(doc.toJSON()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
+    expect(doc.toJS()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
     expect(String(doc)).toMatch(
       '[ &__proto__ { a: A }, { b: B }, *__proto__ ]\n'
     )

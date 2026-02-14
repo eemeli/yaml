@@ -1,3 +1,4 @@
+import type { Document, DocValue } from '../doc/Document.ts'
 import type { CollectionItem } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
@@ -28,9 +29,12 @@ export class Pair<
     return new Pair(key, value)
   }
 
-  toJSON(_?: unknown, ctx?: ToJSContext): ReturnType<typeof addPairToJSMap> {
-    const pair = ctx?.mapAsMap ? new Map() : {}
-    return addPairToJSMap(ctx, pair, this)
+  toJS(
+    doc: Document<DocValue, boolean>,
+    ctx: ToJSContext
+  ): ReturnType<typeof addPairToJSMap> {
+    const pair = ctx.mapAsMap ? new Map() : {}
+    return addPairToJSMap(doc, ctx, pair, this)
   }
 
   toString(

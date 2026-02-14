@@ -49,7 +49,7 @@ describe('Map', () => {
     expect(map.get('a')).toMatchObject({ value: 1 })
     const subMap = map.get('b')
     expect(subMap).toBeInstanceOf(YAMLMap)
-    expect(subMap!.toJSON()).toMatchObject({
+    expect(subMap!.toJS(doc)).toMatchObject({
       c: 3,
       d: 4
     })
@@ -60,7 +60,7 @@ describe('Map', () => {
     expect(map.get(doc.createNode('a'))).toMatchObject({ value: 1 })
     const subMap = map.get(doc.createNode('b'))
     expect(subMap).toBeInstanceOf(YAMLMap)
-    expect(subMap!.toJSON()).toMatchObject({ c: 3, d: 4 })
+    expect(subMap!.toJS(doc)).toMatchObject({ c: 3, d: 4 })
     expect(map.get(doc.createNode('c'))).toBeUndefined()
   })
 
@@ -140,7 +140,7 @@ describe('Seq', () => {
     expect(seq.get(0)).toMatchObject({ value: 1 })
     const subSeq = seq.get(1)
     expect(subSeq).toBeInstanceOf(YAMLSeq)
-    expect(subSeq!.toJSON()).toMatchObject([2, 3])
+    expect(subSeq!.toJS(doc)).toMatchObject([2, 3])
     expect(seq.get(2)).toBeUndefined()
   })
 
@@ -269,7 +269,7 @@ describe('OMap', () => {
     expect(omap.get('a')).toMatchObject({ value: 1 })
     const subMap = omap.get('b')
     expect(subMap).toBeInstanceOf(YAMLMap)
-    expect(subMap.toJSON()).toMatchObject({ c: 3, d: 4 })
+    expect(subMap.toJS(doc)).toMatchObject({ c: 3, d: 4 })
     expect(omap.get('c')).toBeUndefined()
   })
 

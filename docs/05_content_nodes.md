@@ -21,8 +21,7 @@ class NodeBase {
       // a blank line before this node and its commentBefore
   tag?: string       // a fully qualified tag, if required
   clone(): NodeBase  // a copy of this node
-  toJS(doc, options?): any // a plain JS representation of this node
-  toJSON(): any      // a plain JSON representation of this node
+  toJS(doc, context?): any // a plain JS representation of this node
 }
 ```
 

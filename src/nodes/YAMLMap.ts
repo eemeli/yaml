@@ -1,14 +1,15 @@
+import type { Document, DocValue } from '../doc/Document.ts'
+import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { CreateNodeOptions } from '../options.ts'
 import type { BlockMap, FlowCollection } from '../parse/cst.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
-import { NodeCreator } from '../doc/NodeCreator.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
 import { Collection, type NodeOf, type Primitive } from './Collection.ts'
 import { NodeBase } from './Node.ts'
 import { Pair } from './Pair.ts'
-import type { ToJSContext } from './toJS.ts'
 import { Scalar } from './Scalar.ts'
+import { ToJSContext } from './toJS.ts'
 
 export type MapLike =
   | Map<any, any>
@@ -127,24 +128,26 @@ export class YAMLMap<
   }
 
   /**
-   * @param ctx - Conversion context, originally set in Document#toJS()
-   * @param {Class} Type - If set, forces the returned collection type
+   * A plain JavaScript representation of this node.
+   *
+   * @param Type - If set, forces the returned collection type
    * @returns Instance of Type, Map, or Object
    */
-  toJSON<T extends MapLike = Map<any, any>>(
-    _: unknown,
+  toJS<T extends MapLike = Map<any, any>>(
+    doc: Document<DocValue, boolean>,
     ctx: ToJSContext | undefined,
     Type: { new (): T }
   ): T
-  toJSON(_?: unknown, ctx?: ToJSContext): any
-  toJSON<T extends MapLike>(
-    _?: unknown,
+  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any
+  toJS<T extends MapLike>(
+    doc: Document<DocValue, boolean>,
     ctx?: ToJSContext,
     Type?: { new (): T }
   ) {
+    ctx ??= new ToJSContext()
     const map = Type ? new Type() : ctx?.mapAsMap ? new Map() : {}
-    if (ctx?.onCreate) ctx.onCreate(map)
-    for (const item of this.items) addPairToJSMap(ctx, map, item)
+    if (this.anchor) ctx.setAnchor(this, map)
+    for (const item of this.items) addPairToJSMap(doc, ctx, map, item)
     return map
   }
 
