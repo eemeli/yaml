@@ -47,13 +47,6 @@ export class YAMLOMap<
     }
     return map as unknown as unknown[]
   }
-
-  static from(nc: NodeCreator, iterable: unknown): YAMLOMap {
-    const pairs = createPairs(nc, iterable)
-    const omap = new this(nc.schema)
-    omap.items = pairs.items
-    return omap
-  }
 }
 
 export const omap: CollectionTag = {
@@ -62,6 +55,13 @@ export const omap: CollectionTag = {
   nodeClass: YAMLOMap,
   default: false,
   tag: 'tag:yaml.org,2002:omap',
+
+  createNode(nc: NodeCreator, iterable: unknown): YAMLOMap {
+    const pairs = createPairs(nc, iterable)
+    const omap = new YAMLOMap(nc.schema)
+    omap.items = pairs.items
+    return omap
+  },
 
   resolve(seq, onError) {
     const pairs = resolvePairs(seq, onError)

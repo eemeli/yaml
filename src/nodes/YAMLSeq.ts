@@ -57,6 +57,25 @@ export class YAMLSeq<
   /** A fully qualified tag, if required */
   declare tag?: string
 
+  /**
+   * A generic collection factory method that can be extended
+   * to other node classes that inherit from YAMLSeq
+   */
+  static create(nc: NodeCreator, obj: unknown): YAMLSeq {
+    const seq = new this(nc.schema)
+    if (obj && Symbol.iterator in Object(obj)) {
+      let i = 0
+      for (let it of obj as Iterable<unknown>) {
+        if (typeof nc.replacer === 'function') {
+          const key = obj instanceof Set ? it : String(i++)
+          it = nc.replacer.call(obj, key, it)
+        }
+        seq.items.push(nc.create(it))
+      }
+    }
+    return seq
+  }
+
   constructor(schema?: Schema) {
     Object.defineProperty(this, 'schema', {
       value: schema,
@@ -187,20 +206,5 @@ export class YAMLSeq<
       onChompKeep,
       onComment
     })
-  }
-
-  static from(nc: NodeCreator, obj: unknown): YAMLSeq {
-    const seq = new this(nc.schema)
-    if (obj && Symbol.iterator in Object(obj)) {
-      let i = 0
-      for (let it of obj as Iterable<unknown>) {
-        if (typeof nc.replacer === 'function') {
-          const key = obj instanceof Set ? it : String(i++)
-          it = nc.replacer.call(obj, key, it)
-        }
-        seq.items.push(nc.create(it))
-      }
-    }
-    return seq
   }
 }

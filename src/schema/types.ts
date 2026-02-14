@@ -91,16 +91,14 @@ export interface CollectionTag extends TagBase {
   /** The source collection type supported by this tag. */
   collection: 'map' | 'seq'
 
+  createNode: (nc: NodeCreator, value: unknown) => Node
+
   /**
    * The `Node` child class that implements this tag.
    * If set, used to select this tag when stringifying.
-   *
-   * If the class provides a static `from` method, then that
-   * will be used if the tag object doesn't have a `createNode` method.
    */
   nodeClass?: {
     new (schema?: Schema): Node
-    from?: (nc: NodeCreator, obj: unknown) => Node
   }
 
   /**

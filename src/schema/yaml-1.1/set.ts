@@ -94,17 +94,6 @@ export class YAMLSet<
     if (!ctx) return JSON.stringify(this)
     return super.toString({ ...ctx, noValues: true }, onComment, onChompKeep)
   }
-
-  static from(nc: NodeCreator, iterable: unknown): YAMLSet {
-    const set = new this(nc.schema)
-    if (iterable && Symbol.iterator in Object(iterable))
-      for (let value of iterable as Iterable<unknown>) {
-        if (typeof nc.replacer === 'function')
-          value = nc.replacer.call(iterable, value, value)
-        set.items.push(nc.createPair(value, null) as Pair<Node, null>)
-      }
-    return set
-  }
 }
 
 const hasAllNullValues = (map: YAMLMap): boolean =>
@@ -124,6 +113,18 @@ export const set: CollectionTag = {
   nodeClass: YAMLSet,
   default: false,
   tag: 'tag:yaml.org,2002:set',
+
+  createNode(nc: NodeCreator, iterable: unknown): YAMLSet {
+    const set = new YAMLSet(nc.schema)
+    if (iterable && Symbol.iterator in Object(iterable))
+      for (let value of iterable as Iterable<unknown>) {
+        if (typeof nc.replacer === 'function')
+          value = nc.replacer.call(iterable, value, value)
+        set.items.push(nc.createPair(value, null) as Pair<Node, null>)
+      }
+    return set
+  },
+
   resolve(map, onError) {
     if (!(map instanceof YAMLMap)) {
       onError('Expected a mapping for this tag')

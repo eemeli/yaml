@@ -1060,6 +1060,9 @@ describe('custom tags', () => {
   const nullObject: CollectionTag = {
     tag: '!nullobject',
     collection: 'map',
+    createNode(nc, value) {
+      return YAMLNullObject.create(nc, value)
+    },
     identify: (value: any) =>
       !!value && typeof value === 'object' && !Object.getPrototypeOf(value),
     nodeClass: YAMLNullObject

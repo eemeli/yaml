@@ -3,7 +3,6 @@ import { isCollection, isNode } from '../nodes/identity.ts'
 import { type Node } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
-import type { YAMLMap } from '../nodes/YAMLMap.ts'
 import type { CreateNodeOptions } from '../options.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { CollectionTag, ScalarTag } from '../schema/types.ts'
@@ -62,10 +61,7 @@ export class NodeCreator {
     if (value instanceof Document) value = value.value
     if (isNode(value)) return value
     if (value instanceof Pair) {
-      const map = (this.schema.map.nodeClass! as typeof YAMLMap).from(
-        this,
-        null
-      )
+      const map = this.schema.map.createNode(this, null)
       map.items.push(value)
       return map
     }
@@ -131,10 +127,7 @@ export class NodeCreator {
       this.#onTagObj = undefined
     }
 
-    const node =
-      tagObj?.createNode?.(this, value) ??
-      tagObj?.nodeClass?.from?.(this, value) ??
-      new Scalar(value)
+    const node = tagObj?.createNode?.(this, value) ?? new Scalar(value)
     if (tagName) node.tag = tagName
     else if (!tagObj.default) node.tag = tagObj.tag
 

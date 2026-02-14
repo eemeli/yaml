@@ -74,10 +74,10 @@ export class YAMLMap<
   }
 
   /**
-   * A generic collection parsing method that can be extended
+   * A generic collection factory method that can be extended
    * to other node classes that inherit from YAMLMap
    */
-  static from(nc: NodeCreator, obj: unknown): YAMLMap<any, any> {
+  static create(nc: NodeCreator, obj: unknown): YAMLMap<any, any> {
     const { replacer } = nc
     const map = new this(nc.schema)
     const add = (key: unknown, value: unknown) => {
