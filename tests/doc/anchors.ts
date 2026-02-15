@@ -212,7 +212,7 @@ describe('merge <<', () => {
   x: 1
   label: center/big`
 
-  test.only('YAML.parse with merge:true', () => {
+  test('YAML.parse with merge:true', () => {
     const res = parse(src, { merge: true })
     expect(res).toHaveLength(8)
     for (let i = 4; i < res.length; ++i) {
@@ -334,7 +334,7 @@ describe('merge <<', () => {
         merge: true
       })
       const alias = doc.createAlias(doc.get(0).get('a'))
-      doc.get(1).add(doc.createPair('<<', alias))
+      doc.get(1).push(doc.createPair('<<', alias))
       expect(String(doc)).toBe('[ { a: &a1 A }, { b: B, <<: *a1 } ]\n')
       expect(() => doc.toJS()).toThrow(
         'Merge sources must be maps or map aliases'

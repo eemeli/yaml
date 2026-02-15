@@ -27,10 +27,11 @@ describe('Map', () => {
     ])
   })
 
-  test('add', () => {
-    map.add(doc.createPair('c', 'x'))
+  test('push', () => {
+    map.push(doc.createPair('c', 'x'))
     expect(map.get('c')).toMatchObject({ value: 'x' })
-    map.add(doc.createPair('c', 'y'))
+    expect(() => map.push(doc.createPair('c', 'y'))).toThrow()
+    map.set('c', 'y')
     expect(map.get('c')).toMatchObject({ value: 'y' })
     expect(map).toHaveLength(3)
   })
@@ -116,10 +117,10 @@ describe('Seq', () => {
     expect(seq).toMatchObject([{ value: 1 }, [{ value: 2 }, { value: 3 }]])
   })
 
-  test('add', () => {
-    seq.add(9)
-    expect(seq.get(2)).toMatchObject({ value: 9 })
-    seq.add(1)
+  test('push', () => {
+    seq.push(9)
+    expect(seq[2]).toMatchObject({ value: 9 })
+    seq.push(1)
     expect(seq).toHaveLength(4)
   })
 
@@ -140,7 +141,6 @@ describe('Seq', () => {
   })
 
   test('get with non-integer', () => {
-    expect(() => seq.get(-1)).toThrow(RangeError)
     expect(() => seq.get(0.5)).toThrow(TypeError)
     expect(() => seq.get('0' as any)).toThrow(TypeError)
     expect(() => seq.get(doc.createNode(0) as any)).toThrow(TypeError)
@@ -164,7 +164,7 @@ describe('Seq', () => {
   test('set with integer', () => {
     seq.set(0, 2)
     expect(seq.get(0)).toMatchObject({ value: 2 })
-    seq.set(1, 5)
+    seq.set(-1, 5)
     expect(seq.get(1)).toMatchObject({ value: 5 })
     seq.set(2, 6)
     expect(seq.get(2)).toMatchObject({ value: 6 })
@@ -172,7 +172,6 @@ describe('Seq', () => {
   })
 
   test('set with non-integer', () => {
-    expect(() => seq.set(-1, 2)).toThrow(RangeError)
     expect(() => seq.set(0.5, 2)).toThrow(TypeError)
     expect(() => seq.set(doc.createNode(0) as any, 2)).toThrow(TypeError)
   })
@@ -192,13 +191,13 @@ describe('Set', () => {
     ])
   })
 
-  test('add', () => {
-    set.add('x')
+  test('push', () => {
+    set.push('x')
     expect(set.get('x')).toMatchObject({ value: 'x' })
-    set.add('x')
+    set.push('x')
     const y0 = new Scalar('y')
-    set.add(new Pair(y0))
-    set.add(new Pair(new Scalar('y')))
+    set.push(new Pair(y0))
+    set.push(new Pair(new Scalar('y')))
     expect(set.get('y')).toBe(y0)
     expect(set).toHaveLength(5)
   })
@@ -243,10 +242,11 @@ describe('OMap', () => {
     ])
   })
 
-  test('add', () => {
-    omap.add(doc.createPair('c', 'x'))
+  test('push', () => {
+    omap.push(doc.createPair('c', 'x'))
     expect(omap.get('c')).toMatchObject({ value: 'x' })
-    omap.add(doc.createPair('c', 'y'))
+    expect(() => omap.push(doc.createPair('c', 'y'))).toThrow()
+    omap.set('c', 'y')
     expect(omap).toHaveLength(3)
   })
 
@@ -299,12 +299,6 @@ describe('Document', () => {
     ])
   })
 
-  test('add', () => {
-    doc.add(doc.createPair('c', 'x'))
-    expect(doc.get('c')).toMatchObject({ value: 'x' })
-    expect(doc.value).toHaveLength(3)
-  })
-
   test('delete', () => {
     expect(doc.delete('a')).toBe(true)
     expect(doc.delete('a')).toBe(false)
@@ -317,27 +311,26 @@ describe('Document', () => {
     expect(() => doc.set('a', 1)).toThrow(/document value/)
   })
 
-  test('get', () => {
+  test('get with map value', () => {
+    const doc = new Document({ a: 1, b: [2, 3] })
     expect(doc.get('a')).toMatchObject({ value: 1 })
     expect(doc.get('c')).toBeUndefined()
   })
 
-  test('get on scalar value', () => {
+  test('get with seq value', () => {
+    const doc = new Document([2, 3])
+    expect(doc.get(0)).toMatchObject({ value: 2 })
+    expect(() => doc.get(-1)).toThrow()
+    expect(() => doc.get('a')).toThrow()
+  })
+
+  test('get with scalar value', () => {
     const doc = new Document('s')
     expect(doc.get('a')).toBeUndefined()
   })
 
-  test('has', () => {
-    expect(doc.has('a')).toBe(true)
-    expect(doc.has('c')).toBe(false)
-  })
-
-  test('has on scalar value', () => {
-    const doc = new Document('s')
-    expect(doc.has('a')).toBe(false)
-  })
-
-  test('set', () => {
+  test('set with map value', () => {
+    const doc = new Document({ a: 1, b: [2, 3] })
     doc.set('a', 2)
     expect(doc.get('a')).toMatchObject({ value: 2 })
     doc.set('c', 6)
@@ -345,7 +338,17 @@ describe('Document', () => {
     expect(doc.value).toHaveLength(3)
   })
 
-  test('set on scalar value', () => {
+  test('set with seq value', () => {
+    const doc = new Document([2, 3])
+    doc.set(0, 4)
+    expect(doc.get(0)).toMatchObject({ value: 4 })
+    doc.set(3, 6)
+    expect(doc.get(3)).toMatchObject({ value: 6 })
+    expect(() => doc.set('a', 1)).toThrow(TypeError)
+    expect(doc.value).toHaveLength(4)
+  })
+
+  test('set with scalar value', () => {
     const doc = new Document('s')
     expect(() => doc.set('a', 1)).toThrow(/document value/)
   })

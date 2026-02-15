@@ -122,30 +122,43 @@ export class YAMLMap<
     return copyCollection(this, schema)
   }
 
-  /**
-   * Adds a key-value pair to the map.
-   *
-   * Using a key that is already in the collection overwrites the previous value.
-   */
-  add(pair: Pair<K, V>): void {
-    if (!(pair instanceof Pair)) throw new TypeError('Expected a Pair')
-
-    const prev = findPair(this, pair.key)
-    const sortEntries = this.schema?.sortMapEntries
-    if (prev) {
-      // For scalars, keep the old node & its comments and anchors
-      if (prev.value instanceof Scalar && pair.value instanceof Scalar)
-        prev.value.value = pair.value.value
-      else prev.value = pair.value
-    } else if (sortEntries) {
-      const i = this.findIndex(item => sortEntries(pair, item) < 0)
-      if (i === -1) this.push(pair)
-      else this.splice(i, 0, pair)
-    } else {
-      this.push(pair)
-    }
+  /** @private */
+  _push(pair: Pair<K, V>): void {
+    super.push(pair)
   }
 
+  /**
+   * Adds new key-value pairs to the mapping, and returns its new length.
+   *
+   * Added pairs must not have the same keys as ones previously set in the map.
+   */
+  push(...pairs: Pair<K, V>[]): number {
+    for (const pair of pairs) {
+      if (!(pair instanceof Pair)) {
+        const msg = `Expected a Pair, but found ${(pair as any).constructor?.name ?? pair}`
+        throw new TypeError(msg)
+      }
+      if (findPair(this, pair.key)) {
+        const msg = `Maps must not include duplicate keys: ${String(pair.key)}`
+        throw new Error(msg)
+      }
+
+      if (this.schema?.sortMapEntries) {
+        const sortEntries = this.schema.sortMapEntries
+        const i = this.findIndex(item => sortEntries(pair, item) < 0)
+        if (i === -1) super.push(pair)
+        else this.splice(i, 0, pair)
+      } else {
+        super.push(pair)
+      }
+    }
+    return this.length
+  }
+
+  /**
+   * Removes a value from the mapping.
+   * @returns `true` if the item was found and removed.
+   */
   delete(key: unknown): boolean {
     const it = findPair(this, key)
     if (!it) return false
@@ -153,11 +166,13 @@ export class YAMLMap<
     return del.length > 0
   }
 
+  /** Returns item at `key`, or `undefined` if not found.  */
   get(key: unknown): NodeOf<V> | undefined {
     const it = findPair(this, key)
     return it?.value ?? undefined
   }
 
+  /** Checks if the mapping includes a value with the key `key`.  */
   has(key: unknown): boolean {
     return !!findPair(this, key)
   }
@@ -170,9 +185,8 @@ export class YAMLMap<
     let pair: Pair
     if (isNode(key) && (value === null || isNode(value))) {
       pair = new Pair(key, value)
-    } else if (!this.schema) {
-      throw new Error('Schema is required')
     } else {
+      if (!this.schema) throw new Error('Schema is required')
       const nc = new NodeCreator(this.schema, {
         ...options,
         aliasDuplicateObjects: false
@@ -180,7 +194,22 @@ export class YAMLMap<
       pair = nc.createPair(key, value)
       nc.setAnchors()
     }
-    this.add(pair as Pair<K, V>)
+
+    const prev = findPair(this, pair.key)
+    if (prev) {
+      const pv = pair.value as NodeOf<V>
+      // For scalars, keep the old node & its comments and anchors
+      if (prev.value instanceof Scalar && pv instanceof Scalar) {
+        Object.assign(prev.value, pv)
+      } else prev.value = pv
+    } else if (this.schema?.sortMapEntries) {
+      const sortEntries = this.schema.sortMapEntries
+      const i = this.findIndex(item => sortEntries(pair, item) < 0)
+      if (i === -1) super.push(pair as Pair<K, V>)
+      else this.splice(i, 0, pair as Pair<K, V>)
+    } else {
+      super.push(pair as Pair<K, V>)
+    }
   }
 
   /**

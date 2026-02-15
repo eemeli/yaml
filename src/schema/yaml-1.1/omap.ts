@@ -22,10 +22,10 @@ export class YAMLOMap<
     this.tag = YAMLOMap.tag
   }
 
-  add: typeof YAMLMap.prototype.add = YAMLMap.prototype.add.bind(this)
   delete: typeof YAMLMap.prototype.delete = YAMLMap.prototype.delete.bind(this)
   get: typeof YAMLMap.prototype.get = YAMLMap.prototype.get.bind(this)
   has: typeof YAMLMap.prototype.has = YAMLMap.prototype.has.bind(this)
+  push: typeof YAMLMap.prototype.push = YAMLMap.prototype.push.bind(this)
   set: typeof YAMLMap.prototype.set = YAMLMap.prototype.set.bind(this)
 
   /**

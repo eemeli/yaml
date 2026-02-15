@@ -116,7 +116,7 @@ export function resolveBlockMap(
       offset = valueNode.range![2]
       const pair = new Pair(keyNode, valueNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
-      map.push(pair)
+      map._push(pair)
     } else {
       // key with no value
       if (implicitKey)
@@ -131,7 +131,7 @@ export function resolveBlockMap(
       }
       const pair = new Pair(keyNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
-      map.push(pair)
+      map._push(pair)
     }
   }
 

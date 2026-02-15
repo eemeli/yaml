@@ -151,11 +151,6 @@ export class Document<
     return copy
   }
 
-  /** Adds a value to the document. */
-  add(value: any): void {
-    assertCollection(this.value).add(value)
-  }
-
   /**
    * Create a new `Alias` node, ensuring that the target `node` has the required anchor.
    *
@@ -238,14 +233,13 @@ export class Document<
    * @returns `true` if the item was found and removed.
    */
   delete(key: any): boolean {
-    return assertCollection(this.value).delete(key)
+    return isCollection(this.value) ? this.value.delete(key) : false
   }
 
   /**
    * Returns item at `key`, or `undefined` if not found.
    */
-  get(key?: any): Strict extends true ? Node | Pair | undefined : any {
-    if (key === undefined) return this.value
+  get(key: any): Strict extends true ? Node | Pair | undefined : any {
     return isCollection(this.value) ? this.value.get(key) : undefined
   }
 
@@ -261,7 +255,8 @@ export class Document<
    * boolean to add/remove the item from the set.
    */
   set(key: any, value: any): void {
-    assertCollection(this.value).set(key, value)
+    if (isCollection(this.value)) this.value.set(key, value)
+    else throw new Error('Expected a YAML collection as document value')
   }
 
   /**
@@ -341,9 +336,4 @@ export class Document<
     }
     return stringifyDocument(this, options)
   }
-}
-
-function assertCollection(value: unknown) {
-  if (isCollection(value)) return value
-  throw new Error('Expected a YAML collection as document value')
 }

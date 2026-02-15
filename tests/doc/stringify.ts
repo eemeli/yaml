@@ -329,12 +329,11 @@ z:
     )
   })
 
-  test('Map with non-Pair item', () => {
+  test('pushing non-Pair item', () => {
     const doc = new YAML.Document<YAML.YAMLMap, false>({ x: 3, y: 4 })
     expect(String(doc)).toBe('x: 3\ny: 4\n')
     // @ts-expect-error This should fail.
-    doc.value.push('TEST')
-    expect(() => String(doc)).toThrow(/^Map items must all be pairs.*TEST/)
+    expect(() => doc.value.push('TEST')).toThrow(TypeError)
   })
 
   test('Keep block scalar types for keys', () => {
@@ -797,9 +796,9 @@ describe('sortMapEntries', () => {
       a.key < b.key ? 1 : a.key > b.key ? -1 : 0
     expect(YAML.stringify(obj, { sortMapEntries })).toBe('c: 3\nb: 2\na: 1\n')
   })
-  test('doc.add', () => {
-    const doc = new YAML.Document(obj, { sortMapEntries: true })
-    doc.add(doc.createPair('bb', 4))
+  test('map.push', () => {
+    const doc = new YAML.Document<YAML.YAMLMap>(obj, { sortMapEntries: true })
+    doc.value.push(doc.createPair('bb', 4))
     expect(String(doc)).toBe('a: 1\nb: 2\nbb: 4\nc: 3\n')
   })
   test('doc.set', () => {

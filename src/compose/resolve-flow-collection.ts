@@ -109,7 +109,7 @@ export function resolveFlowCollection(
       const valueNode = value
         ? composeNode(ctx, value, props, onError)
         : composeEmptyNode(ctx, props.end, sep, null, props, onError)
-      ;(coll as YAMLSeq).push(valueNode)
+      ;(coll as YAMLSeq)._push(valueNode)
       offset = valueNode.range![2]
       if (isBlock(value)) onError(valueNode.range!, 'BLOCK_IN_FLOW', blockMsg)
     } else {
@@ -193,14 +193,14 @@ export function resolveFlowCollection(
         const map = coll as YAMLMap
         if (mapIncludes(ctx, map, keyNode))
           onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
-        map.push(pair)
+        map._push(pair)
       } else {
         const map = new YAMLMap(ctx.schema)
         map.flow = true
-        map.push(pair)
+        map._push(pair)
         const endRange = (valueNode ?? keyNode).range!
         map.range = [keyNode.range![0], endRange[1], endRange[2]]
-        ;(coll as YAMLSeq).push(map)
+        ;(coll as YAMLSeq)._push(map)
       }
       offset = valueNode ? valueNode.range![2] : valueProps.end
     }

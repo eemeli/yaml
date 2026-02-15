@@ -907,7 +907,7 @@ date (00:00:00Z): 2002-12-14\n`)
       const src = '- { a: A, b: B }\n- { b: X }\n'
       const doc = parseDocument(src, { version: '1.1' })
       const alias = doc.createAlias(doc.get(0), 'a')
-      doc.get(1).add(doc.createPair('<<', alias))
+      doc.get(1).push(doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
@@ -919,7 +919,7 @@ date (00:00:00Z): 2002-12-14\n`)
       const src = '- { a: A, b: B }\n- { b: X }\n'
       const doc = parseDocument(src, { version: '1.1' })
       const alias = doc.createAlias(doc.get(0), 'a')
-      doc.get(1).add(doc.createPair('<<', alias))
+      doc.get(1).push(doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },

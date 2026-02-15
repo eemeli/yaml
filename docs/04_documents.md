@@ -117,15 +117,14 @@ which is expected to always contain a `YAMLMap`, `YAMLSeq`, or `Scalar` value.
 ```js
 const doc = parseDocument('a: 1\nb: [2, 3]\n')
 doc.get('a') // 1
-doc.get() // YAMLMap { items: [Pair, Pair], ... }
 doc.get('b').has(0) // true
-doc.get('b').add(4) // -> doc.get('b').items.length === 3
+doc.get('b').push(4) // -> doc.get('b').items.length === 3
 doc.get('b').delete(1) // true
 doc.get('b').get(1) // 4
 ```
 
 In addition to the above, the document object also provides the same **accessor methods** as [collections](#collections), based on the top-level collection:
-`add`, `delete`, `get`, `has`, and `set`.
+`delete`, `get`, `has`, and `set`.
 
 #### `Document#toJS()`, `Document#toJSON()` and `Document#toString()`
 

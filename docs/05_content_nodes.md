@@ -61,21 +61,19 @@ interface CollectionBase extends NodeBase {
   clone(schema?: Schema): this  // a deep copy of this collection
 }
 
-class YAMLMap<K = unknown, V = unknown> implements CollectionBase {
-  items: Pair<K, V>[]
-  add(pair: Pair<K, V> | { key: K; value: V }, overwrite?: boolean): void
+class YAMLMap<K = unknown, V = unknown> extends Array<Pair<K, V>> implements CollectionBase {
   delete(key: K): boolean
   get(key: K, keepScalar?: boolean): unknown
   has(key: K): boolean
+  push(...pairs: Pair<K, V>[]): number
   set(key: K, value: V): void
 }
 
-class YAMLSeq<T = unknown> implements CollectionBase {
-  items: T[]
-  add(value: T): void
+class YAMLSeq<T = unknown> extends Array<NodeOf<T>> implements CollectionBase {
   delete(key: number | Scalar<number>): boolean
   get(key: number | Scalar<number>, keepScalar?: boolean): unknown
   has(key: number | Scalar<number>): boolean
+  push(...items: Array<T | NodeOf<T>>): number
   set(key: number | Scalar<number>, value: T): void
 }
 ```
@@ -93,21 +91,21 @@ All of the collections provide the following accessor methods:
 
 | Method          | Returns   | Description                                                                                                                                                                                      |
 | --------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| add(value)      | `void`    | Adds a value to the collection. For `!!map` and `!!omap` the value must be a Pair instance, which must not have a key that already exists in the map.                                            |
 | delete(key)     | `boolean` | Removes a value from the collection. Returns `true` if the item was found and removed.                                                                                                           |
 | get(key)        | `Node`    | Returns value at `key`, or `undefined` if not found.                                                                                                                                             |
 | has(key)        | `boolean` | Checks if the collection includes a value with the key `key`.                                                                                                                                    |
+| push(...values) | `number`  | Adds values to the collection. For `!!map` and `!!omap` the value must be a Pair instance, which must not have a key that already exists in the map.                                             |
 | set(key, value) | `any`     | Sets a value in this collection. For `!!set`, `value` needs to be a boolean to add/remove the item from the set. When overwriting a `Scalar` value with a scalar, the original node is retained. |
 
 <!-- prettier-ignore -->
 ```js
 const doc = new YAML.Document({ a: 1, b: [2, 3] }) // { a: 1, b: [ 2, 3 ] }
-doc.add(doc.createPair('c', 4)) // { a: 1, b: [ 2, 3 ], c: 4 }
-doc.get('b').add(5)             // { a: 1, b: [ 2, 3, 5 ], c: 4 }
-doc.set('c', 42)                // { a: 1, b: [ 2, 3, 5 ], c: 42 }
-doc.get('c').set('x') // TypeError: doc.get(...).set is not a function
-doc.delete('c')                 // { a: 1, b: [ 2, 3, 5 ] }
-doc.get('b').delete(1)          // { a: 1, b: [ 2, 5 ] }
+doc.set('c', 4)         // { a: 1, b: [ 2, 3 ], c: 4 }
+doc.get('b').push(5)    // { a: 1, b: [ 2, 3, 5 ], c: 4 }
+doc.set('c', 42)        // { a: 1, b: [ 2, 3, 5 ], c: 42 }
+doc.get('c').set('x')   // TypeError: doc.get(...).set is not a function
+doc.delete('c')         // { a: 1, b: [ 2, 3, 5 ] }
+doc.get('b').delete(1)  // { a: 1, b: [ 2, 5 ] }
 
 doc.get('a') // Scalar { value: 1 }
 doc.get('b').get(1) // Scalar { value: 5 }
@@ -118,7 +116,7 @@ doc.get('b').has(0) // true
 
 For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. `42` will match `Scalar { value: 42 }`).
 Keys for `!!seq` should be non-negative integers, or their string representations.
-`add()` and `set()` will internally call `doc.createNode()` to wrap the value.
+`set()` will internally call `doc.createNode()` to wrap the value.
 
 ## Alias Nodes
 
@@ -165,8 +163,8 @@ const map = doc.createNode({ balloons: 99 })
 //        key: Scalar { value: 'balloons' },
 //        value: Scalar { value: 99 } } ] }
 
-doc.add(map)
-doc.get(0, true).comment = ' A commented item'
+doc.value.push(map)
+doc.get(0).comment = ' A commented item'
 String(doc)
 // - some # A commented item
 // - values
@@ -197,8 +195,8 @@ To that end, you'll need to assign its return value to the `value` of a document
 <h4 style="clear:both"><code>doc.createAlias(node, name?): Alias</code></h4>
 
 ```js
-const alias = doc.createAlias(doc.get(1, true), 'foo')
-doc.add(alias)
+const alias = doc.createAlias(doc.get(1), 'foo')
+doc.value.push(alias)
 String(doc)
 // - some # A commented item
 // - &foo values
@@ -223,7 +221,7 @@ const doc = new Document([
   42,
   { including: 'objects', 3: 'a string' }
 ])
-doc.add(doc.createPair(1, 'a number'))
+doc.value.push(doc.createPair(1, 'a number'))
 
 doc.toString()
 // - some values

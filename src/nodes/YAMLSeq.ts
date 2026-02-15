@@ -5,10 +5,15 @@ import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
-import { copyCollection, type CollectionBase, type NodeOf, type Primitive } from './Collection.ts'
+import {
+  copyCollection,
+  type CollectionBase,
+  type NodeOf,
+  type Primitive
+} from './Collection.ts'
 import { isNode } from './identity.ts'
 import type { Node, Range } from './Node.ts'
-import type { Pair } from './Pair.ts'
+import { Pair } from './Pair.ts'
 import { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
 
@@ -96,20 +101,29 @@ export class YAMLSeq<
     return copyCollection(this, schema)
   }
 
-  add(
-    value: T,
-    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
-  ): void {
-    if (isNode(value)) this.push(value as NodeOf<T>)
-    else if (!this.schema) throw new Error('Schema is required')
-    else {
-      const nc = new NodeCreator(this.schema, {
-        ...options,
-        aliasDuplicateObjects: false
-      })
-      this.push(nc.create(value) as NodeOf<T>)
-      nc.setAnchors()
+  /** @private */
+  _push(item: NodeOf<T>): void {
+    super.push(item)
+  }
+
+  /**
+   * Appends new elements to the sequence, and returns its new length.
+   *
+   * Non-node values are converted to Node values.
+   */
+  push(...items: Array<T | NodeOf<T>>): number {
+    let nc: NodeCreator | undefined
+    for (const value of items) {
+      if (isNode(value) || value instanceof Pair) {
+        super.push(value as NodeOf<T>)
+      } else {
+        if (!this.schema) throw new Error('Schema is required')
+        nc ??= new NodeCreator(this.schema, { aliasDuplicateObjects: false })
+        super.push(nc.create(value) as NodeOf<T>)
+        nc.setAnchors()
+      }
     }
+    return this.length
   }
 
   /**
@@ -155,7 +169,7 @@ export class YAMLSeq<
    * Sets a value in this collection. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    *
-   * Throws if `idx` is not a non-negative integer.
+   * Throws if `idx` is not an integer.
    */
   set(
     idx: number,
@@ -164,28 +178,39 @@ export class YAMLSeq<
   ): void {
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
-    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    const prev = this[idx]
+    const prev = this.at(idx)
     if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
-    else if (isNode(value)) this[idx] = value as NodeOf<T>
-    else if (!this.schema) throw new Error('Schema is required')
     else {
-      const nc = new NodeCreator(this.schema, {
-        ...options,
-        aliasDuplicateObjects: false
-      })
-      this[idx] = nc.create(value) as NodeOf<T>
-      nc.setAnchors()
+      let nv
+      if (isNode(value)) nv = value as NodeOf<T>
+      else {
+        if (!this.schema) throw new Error('Schema is required')
+        const nc = new NodeCreator(this.schema, {
+          ...options,
+          aliasDuplicateObjects: false
+        })
+        nv = nc.create(value) as NodeOf<T>
+        nc.setAnchors()
+      }
+      if (idx < 0) {
+        if (idx < -this.length) throw new RangeError(`Invalid index ${idx}`)
+        idx += this.length
+      }
+      this[idx] = nv
     }
   }
 
   /** A plain JavaScript representation of this node. */
   toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any[] {
     ctx ??= new ToJSContext()
-    const res: unknown[] = []
-    if (this.anchor) ctx.setAnchor(this, res)
-    for (const item of this) res.push(item.toJS(doc, ctx))
-    return res
+    if (this.anchor) {
+      const res: unknown[] = []
+      if (this.anchor) ctx.setAnchor(this, res)
+      for (const item of this) res.push(item.toJS(doc, ctx))
+      return res
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return Array.from(this, item => item.toJS(doc, ctx))
   }
 
   toString(

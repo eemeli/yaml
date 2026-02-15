@@ -30,9 +30,6 @@ export interface CollectionBase extends NodeBase {
    */
   clone(schema?: Schema): this
 
-  /** Adds a value to the collection. */
-  add(value: unknown): void
-
   /**
    * Removes a value from the collection.
    * @returns `true` if the item was found and removed.

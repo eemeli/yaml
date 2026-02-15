@@ -25,22 +25,22 @@ export class YAMLSet<
   /**
    * Add a value to the set.
    *
-   * If `value` is a Pair, its `.value` must be null and `options` is ignored.
+   * If a value of `items` is a Pair, its `.value` must be null.
    *
    * If the set already includes a matching value, no value is added.
    */
-  add(
-    value: unknown,
-    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
-  ): void {
-    if (!(value instanceof Pair)) {
-      this.set(value, true, options)
-    } else if (value.value !== null) {
-      throw new TypeError('set pair values must be null')
-    } else {
-      const prev = findPair(this, value.key)
-      if (!prev) this.push(value as Pair<T, T>)
+  push(...items: unknown[]): number {
+    for (const value of items) {
+      if (value instanceof Pair) {
+        if (value.value !== null)
+          throw new TypeError('set pair values must be null')
+        const prev = findPair(this, value.key)
+        if (!prev) super.push(value as Pair<T, T>)
+      } else {
+        this.set(value, true)
+      }
     }
+    return this.length
   }
 
   /**
@@ -66,11 +66,9 @@ export class YAMLSet<
       this.splice(this.indexOf(prev), 1)
     } else if (!prev && value) {
       let node: Node
-      if (isNode(key)) {
-        node = key
-      } else if (!this.schema) {
-        throw new Error('Schema is required')
-      } else {
+      if (isNode(key)) node = key
+      else {
+        if (!this.schema) throw new Error('Schema is required')
         const nc = new NodeCreator(this.schema, {
           ...options,
           aliasDuplicateObjects: false
