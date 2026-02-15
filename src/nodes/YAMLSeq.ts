@@ -127,45 +127,6 @@ export class YAMLSeq<
   }
 
   /**
-   * Removes a value from the collection.
-   *
-   * Throws if `idx` is not a non-negative integer.
-   *
-   * @returns `true` if the item was found and removed.
-   */
-  delete(idx: number): boolean {
-    if (!Number.isInteger(idx))
-      throw new TypeError(`Expected an integer, not ${idx}.`)
-    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    const del = this.splice(idx, 1)
-    return del.length > 0
-  }
-
-  /**
-   * Returns item at `key`, or `undefined` if not found.
-   *
-   * Throws if `idx` is not a non-negative integer.
-   */
-  get(idx: number): NodeOf<T> | undefined {
-    if (!Number.isInteger(idx))
-      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
-    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    return this[idx]
-  }
-
-  /**
-   * Checks if the collection includes a value with the key `key`.
-   *
-   * Throws if `idx` is not a non-negative integer.
-   */
-  has(idx: number): boolean {
-    if (!Number.isInteger(idx))
-      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
-    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    return idx < this.length
-  }
-
-  /**
    * Sets a value in this collection. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    *

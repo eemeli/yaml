@@ -6,8 +6,8 @@ import type { Node, NodeType, Range } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
 import { ToJSContext } from '../nodes/toJS.ts'
-import type { YAMLMap } from '../nodes/YAMLMap.ts'
-import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
+import { YAMLMap } from '../nodes/YAMLMap.ts'
+import { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type {
   CreateNodeOptions,
   DocumentOptions,
@@ -229,25 +229,15 @@ export class Document<
   }
 
   /**
-   * Removes a value from the document.
-   * @returns `true` if the item was found and removed.
-   */
-  delete(key: any): boolean {
-    return isCollection(this.value) ? this.value.delete(key) : false
-  }
-
-  /**
    * Returns item at `key`, or `undefined` if not found.
    */
   get(key: any): Strict extends true ? Node | Pair | undefined : any {
-    return isCollection(this.value) ? this.value.get(key) : undefined
-  }
-
-  /**
-   * Checks if the document includes a value with the key `key`.
-   */
-  has(key: any): boolean {
-    return isCollection(this.value) ? this.value.has(key) : false
+    if (this.value instanceof YAMLMap) return this.value.get(key)
+    if (this.value instanceof YAMLSeq) {
+      if (Number.isInteger(key)) return this.value.at(key)
+      throw new TypeError(`Expected an integer, not ${JSON.stringify(key)}.`)
+    }
+    return undefined
   }
 
   /**

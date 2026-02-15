@@ -124,50 +124,21 @@ describe('Seq', () => {
     expect(seq).toHaveLength(4)
   })
 
-  test('delete', () => {
-    expect(seq.delete(0)).toBe(true)
-    expect(seq.delete(2)).toBe(false)
-    expect(() => seq.delete('a' as any)).toThrow(TypeError)
-    expect(seq.get(0)).toMatchObject([{ value: 2 }, { value: 3 }])
-    expect(seq).toHaveLength(1)
-  })
-
-  test('get with integer', () => {
-    expect(seq.get(0)).toMatchObject({ value: 1 })
-    const subSeq = seq.get(1)
+  test('at() with integer', () => {
+    expect(seq.at(0)).toMatchObject({ value: 1 })
+    const subSeq = seq.at(1)
     expect(subSeq).toBeInstanceOf(YAMLSeq)
     expect(subSeq!.toJS(doc)).toMatchObject([2, 3])
-    expect(seq.get(2)).toBeUndefined()
-  })
-
-  test('get with non-integer', () => {
-    expect(() => seq.get(0.5)).toThrow(TypeError)
-    expect(() => seq.get('0' as any)).toThrow(TypeError)
-    expect(() => seq.get(doc.createNode(0) as any)).toThrow(TypeError)
-  })
-
-  test('has with integer', () => {
-    expect(seq.has(0)).toBe(true)
-    expect(seq.has(1)).toBe(true)
-    expect(seq.has(2)).toBe(false)
-  })
-
-  test('has with non-integer', () => {
-    expect(() => seq.has(-1)).toThrow(RangeError)
-    expect(() => seq.has(0.5)).toThrow(TypeError)
-    expect(() => seq.has('0' as any)).toThrow(TypeError)
-    // @ts-expect-error TS complains, as it should.
-    expect(() => seq.has()).toThrow(TypeError)
-    expect(() => seq.has(doc.createNode(0) as any)).toThrow(TypeError)
+    expect(seq.at(2)).toBeUndefined()
   })
 
   test('set with integer', () => {
     seq.set(0, 2)
-    expect(seq.get(0)).toMatchObject({ value: 2 })
+    expect(seq.at(0)).toMatchObject({ value: 2 })
     seq.set(-1, 5)
-    expect(seq.get(1)).toMatchObject({ value: 5 })
+    expect(seq.at(1)).toMatchObject({ value: 5 })
     seq.set(2, 6)
-    expect(seq.get(2)).toMatchObject({ value: 6 })
+    expect(seq.at(2)).toMatchObject({ value: 6 })
     expect(seq).toHaveLength(3)
   })
 
@@ -287,30 +258,6 @@ describe('OMap', () => {
 })
 
 describe('Document', () => {
-  let doc: Document<YAMLMap<string, Scalar<number> | YAMLSeq<Scalar<number>>>>
-  beforeEach(() => {
-    doc = new Document({ a: 1, b: [2, 3] })
-    expect(doc.value).toMatchObject([
-      { key: { value: 'a' }, value: { value: 1 } },
-      {
-        key: { value: 'b' },
-        value: [{ value: 2 }, { value: 3 }]
-      }
-    ])
-  })
-
-  test('delete', () => {
-    expect(doc.delete('a')).toBe(true)
-    expect(doc.delete('a')).toBe(false)
-    expect(doc.get('a')).toBeUndefined()
-    expect(doc.value).toHaveLength(1)
-  })
-
-  test('delete on scalar value', () => {
-    const doc = new Document('s')
-    expect(() => doc.set('a', 1)).toThrow(/document value/)
-  })
-
   test('get with map value', () => {
     const doc = new Document({ a: 1, b: [2, 3] })
     expect(doc.get('a')).toMatchObject({ value: 1 })
@@ -320,7 +267,7 @@ describe('Document', () => {
   test('get with seq value', () => {
     const doc = new Document([2, 3])
     expect(doc.get(0)).toMatchObject({ value: 2 })
-    expect(() => doc.get(-1)).toThrow()
+    expect(doc.get(-1)).toMatchObject({ value: 3 })
     expect(() => doc.get('a')).toThrow()
   })
 
