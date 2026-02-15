@@ -138,7 +138,7 @@ export function stringifyPair(
     const vs0 = valueStr[0]
     const nl0 = valueStr.indexOf('\n')
     const hasNewline = nl0 !== -1
-    const flow = ctx.inFlow ?? value.flow ?? value.items.length === 0
+    const flow = ctx.inFlow ?? value.flow ?? value.length === 0
     if (hasNewline || !flow) {
       let hasPropsLine = false
       if (hasNewline && (vs0 === '&' || vs0 === '!')) {

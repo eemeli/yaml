@@ -42,6 +42,7 @@ export default defineConfig({
       instances
     },
     globals: true,
+    setupFiles: ['tests/_setup.ts'],
     include: ['tests/**/*.{js,ts}'],
     exclude: [
       'tests/_*',

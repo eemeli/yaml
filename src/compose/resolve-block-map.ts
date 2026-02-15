@@ -76,7 +76,7 @@ export function resolveBlockMap(
     if (ctx.schema.compat) flowIndentCheck(bm.indent, key, onError)
     ctx.atKey = false
 
-    if (mapIncludes(ctx, map.items, keyNode))
+    if (mapIncludes(ctx, map, keyNode))
       onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
 
     // value properties
@@ -116,7 +116,7 @@ export function resolveBlockMap(
       offset = valueNode.range![2]
       const pair = new Pair(keyNode, valueNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
-      map.items.push(pair)
+      map.push(pair)
     } else {
       // key with no value
       if (implicitKey)
@@ -131,7 +131,7 @@ export function resolveBlockMap(
       }
       const pair = new Pair(keyNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
-      map.items.push(pair)
+      map.push(pair)
     }
   }
 

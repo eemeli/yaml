@@ -48,3 +48,19 @@ export interface CollectionBase extends NodeBase {
   /** Sets a value in this collection.  */
   set(key: unknown, value: unknown): void
 }
+
+export function copyCollection<T extends Collection>(
+  orig: T,
+  schema: Schema | undefined
+): T {
+  const copy = (orig.constructor as typeof YAMLMap).from(orig, it =>
+    it.clone(schema)
+  ) as typeof orig
+  if (orig.range) copy.range = [...orig.range]
+  const propDesc = Object.getOwnPropertyDescriptors(orig)
+  for (const [name, prop] of Object.entries(propDesc)) {
+    if (!(name in copy)) Object.defineProperty(copy, name, prop)
+  }
+  if (schema) copy.schema = schema
+  return copy
+}

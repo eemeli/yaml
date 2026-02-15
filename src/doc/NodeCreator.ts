@@ -62,7 +62,7 @@ export class NodeCreator {
     if (isNode(value)) return value
     if (value instanceof Pair) {
       const map = this.schema.map.createNode(this, null)
-      map.items.push(value)
+      map.push(value)
       return map
     }
     if (

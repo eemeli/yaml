@@ -15,6 +15,10 @@ export class Pair<
   key: NodeOf<K>
   value: NodeOf<V> | null
 
+  declare comment?: never
+  declare commentBefore?: never
+  declare spaceBefore?: never
+
   /** The CST token that was composed into this pair.  */
   declare srcToken?: CollectionItem
 

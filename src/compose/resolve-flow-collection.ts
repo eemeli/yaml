@@ -23,8 +23,9 @@ export function resolveFlowCollection(
 ): YAMLMap | YAMLSeq {
   const isMap = fc.start.source === '{'
   const fcName = isMap ? 'flow map' : 'flow sequence'
-  const NodeClass = tag?.nodeClass ?? (isMap ? YAMLMap : YAMLSeq)
-  const coll = new NodeClass(ctx.schema) as YAMLMap | YAMLSeq
+  let coll
+  if (tag?.nodeClass) coll = new tag.nodeClass(ctx.schema) as YAMLMap | YAMLSeq
+  else coll = isMap ? new YAMLMap(ctx.schema) : new YAMLSeq(ctx.schema)
   coll.flow = true
   const atRoot = ctx.atRoot
   if (atRoot) ctx.atRoot = false
@@ -93,7 +94,7 @@ export function resolveFlowCollection(
           }
         }
         if (prevItemComment) {
-          let prev = coll.items[coll.items.length - 1]
+          let prev = coll[coll.length - 1]
           if (prev instanceof Pair) prev = prev.value ?? prev.key
           if (prev.comment) prev.comment += '\n' + prevItemComment
           else prev.comment = prevItemComment
@@ -108,7 +109,7 @@ export function resolveFlowCollection(
       const valueNode = value
         ? composeNode(ctx, value, props, onError)
         : composeEmptyNode(ctx, props.end, sep, null, props, onError)
-      ;(coll as YAMLSeq).items.push(valueNode)
+      ;(coll as YAMLSeq).push(valueNode)
       offset = valueNode.range![2]
       if (isBlock(value)) onError(valueNode.range!, 'BLOCK_IN_FLOW', blockMsg)
     } else {
@@ -190,16 +191,16 @@ export function resolveFlowCollection(
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
       if (isMap) {
         const map = coll as YAMLMap
-        if (mapIncludes(ctx, map.items, keyNode))
+        if (mapIncludes(ctx, map, keyNode))
           onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
-        map.items.push(pair)
+        map.push(pair)
       } else {
         const map = new YAMLMap(ctx.schema)
         map.flow = true
-        map.items.push(pair)
+        map.push(pair)
         const endRange = (valueNode ?? keyNode).range!
         map.range = [keyNode.range![0], endRange[1], endRange[2]]
-        ;(coll as YAMLSeq).items.push(map)
+        ;(coll as YAMLSeq).push(map)
       }
       offset = valueNode ? valueNode.range![2] : valueProps.end
     }

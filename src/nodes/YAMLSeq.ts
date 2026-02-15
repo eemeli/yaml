@@ -5,7 +5,7 @@ import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
-import type { CollectionBase, NodeOf, Primitive } from './Collection.ts'
+import { copyCollection, type CollectionBase, type NodeOf, type Primitive } from './Collection.ts'
 import { isNode } from './identity.ts'
 import type { Node, Range } from './Node.ts'
 import type { Pair } from './Pair.ts'
@@ -17,12 +17,13 @@ const isScalarValue = (value: unknown): boolean =>
 
 export class YAMLSeq<
   T extends Primitive | Node | Pair = Primitive | Node | Pair
-> implements CollectionBase {
+>
+  extends Array<NodeOf<T>>
+  implements CollectionBase
+{
   static get tagName(): 'tag:yaml.org,2002:seq' {
     return 'tag:yaml.org,2002:seq'
   }
-
-  items: NodeOf<T>[] = []
 
   schema: Schema | undefined
 
@@ -70,13 +71,14 @@ export class YAMLSeq<
           const key = obj instanceof Set ? it : String(i++)
           it = nc.replacer.call(obj, key, it)
         }
-        seq.items.push(nc.create(it))
+        seq.push(nc.create(it))
       }
     }
     return seq
   }
 
-  constructor(schema?: Schema) {
+  constructor(schema?: Schema, elements: Array<NodeOf<T>> = []) {
+    super(...elements)
     Object.defineProperty(this, 'schema', {
       value: schema,
       configurable: true,
@@ -91,28 +93,21 @@ export class YAMLSeq<
    * @param schema - If defined, overwrites the original's schema
    */
   clone(schema?: Schema): this {
-    const copy: this = Object.create(
-      Object.getPrototypeOf(this),
-      Object.getOwnPropertyDescriptors(this)
-    )
-    if (schema) copy.schema = schema
-    copy.items = copy.items.map(it => it.clone(schema) as NodeOf<T>)
-    if (this.range) copy.range = [...this.range]
-    return copy
+    return copyCollection(this, schema)
   }
 
   add(
     value: T,
     options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
   ): void {
-    if (isNode(value)) this.items.push(value as NodeOf<T>)
+    if (isNode(value)) this.push(value as NodeOf<T>)
     else if (!this.schema) throw new Error('Schema is required')
     else {
       const nc = new NodeCreator(this.schema, {
         ...options,
         aliasDuplicateObjects: false
       })
-      this.items.push(nc.create(value) as NodeOf<T>)
+      this.push(nc.create(value) as NodeOf<T>)
       nc.setAnchors()
     }
   }
@@ -128,7 +123,7 @@ export class YAMLSeq<
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${idx}.`)
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    const del = this.items.splice(idx, 1)
+    const del = this.splice(idx, 1)
     return del.length > 0
   }
 
@@ -141,7 +136,7 @@ export class YAMLSeq<
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    return this.items[idx]
+    return this[idx]
   }
 
   /**
@@ -153,7 +148,7 @@ export class YAMLSeq<
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    return idx < this.items.length
+    return idx < this.length
   }
 
   /**
@@ -170,16 +165,16 @@ export class YAMLSeq<
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    const prev = this.items[idx]
+    const prev = this[idx]
     if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
-    else if (isNode(value)) this.items[idx] = value as NodeOf<T>
+    else if (isNode(value)) this[idx] = value as NodeOf<T>
     else if (!this.schema) throw new Error('Schema is required')
     else {
       const nc = new NodeCreator(this.schema, {
         ...options,
         aliasDuplicateObjects: false
       })
-      this.items[idx] = nc.create(value) as NodeOf<T>
+      this[idx] = nc.create(value) as NodeOf<T>
       nc.setAnchors()
     }
   }
@@ -189,7 +184,7 @@ export class YAMLSeq<
     ctx ??= new ToJSContext()
     const res: unknown[] = []
     if (this.anchor) ctx.setAnchor(this, res)
-    for (const item of this.items) res.push(item.toJS(doc, ctx))
+    for (const item of this) res.push(item.toJS(doc, ctx))
     return res
   }
 

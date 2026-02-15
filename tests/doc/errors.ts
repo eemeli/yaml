@@ -66,12 +66,10 @@ describe('block collections', () => {
     expect(doc.errors[0].message).toMatch(
       'All mapping items must start at the same column'
     )
-    expect(doc.value).toMatchObject({
-      items: [
-        { key: { value: 'foo' }, value: { value: '1' } },
-        { key: { value: 'bar' }, value: { value: 2 } }
-      ]
-    })
+    expect(doc.value).toMatchObject([
+      { key: { value: 'foo' }, value: { value: '1' } },
+      { key: { value: 'bar' }, value: { value: 2 } }
+    ])
   })
 
   test('sequence with bad indentation', () => {
@@ -81,9 +79,7 @@ describe('block collections', () => {
     expect(doc.errors[0].message).toMatch(
       'All sequence items must start at the same column'
     )
-    expect(doc.value).toMatchObject({
-      items: [{ value: 'foo' }, { items: [{ value: 'bar' }] }]
-    })
+    expect(doc.value).toMatchObject([{ value: 'foo' }, [{ value: 'bar' }]])
   })
 
   test('seq item in mapping', () => {
@@ -94,12 +90,10 @@ describe('block collections', () => {
       { code: 'UNEXPECTED_TOKEN' },
       { code: 'MISSING_CHAR' }
     ])
-    expect(doc.value).toMatchObject({
-      items: [
-        { key: { value: 'foo' }, value: { value: '1' } },
-        { key: { value: null }, value: null }
-      ]
-    })
+    expect(doc.value).toMatchObject([
+      { key: { value: 'foo' }, value: { value: '1' } },
+      { key: { value: null }, value: null }
+    ])
   })
 
   test('doubled value indicator', () => {

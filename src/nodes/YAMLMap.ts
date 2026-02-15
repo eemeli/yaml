@@ -6,7 +6,12 @@ import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
-import type { CollectionBase, NodeOf, Primitive } from './Collection.ts'
+import {
+  copyCollection,
+  type CollectionBase,
+  type NodeOf,
+  type Primitive
+} from './Collection.ts'
 import { isNode } from './identity.ts'
 import type { Node, Range } from './Node.ts'
 import { Pair } from './Pair.ts'
@@ -33,9 +38,10 @@ export function findPair<
 export class YAMLMap<
   K extends Primitive | Node = Primitive | Node,
   V extends Primitive | Node = Primitive | Node
-> implements CollectionBase {
-  items: Pair<K, V>[] = []
-
+>
+  extends Array<Pair<K, V>>
+  implements CollectionBase
+{
   schema: Schema | undefined
 
   /** An optional anchor on this collection. Used by alias nodes. */
@@ -84,7 +90,7 @@ export class YAMLMap<
       if (typeof replacer === 'function') value = replacer.call(obj, key, value)
       else if (Array.isArray(replacer) && !replacer.includes(key)) return
       if (value !== undefined || nc.keepUndefined)
-        map.items.push(nc.createPair(key, value))
+        map.push(nc.createPair(key, value))
     }
     if (obj instanceof Map) {
       for (const [key, value] of obj) add(key, value)
@@ -92,12 +98,13 @@ export class YAMLMap<
       for (const key of Object.keys(obj)) add(key, (obj as any)[key])
     }
     if (typeof nc.schema.sortMapEntries === 'function') {
-      map.items.sort(nc.schema.sortMapEntries)
+      map.sort(nc.schema.sortMapEntries)
     }
     return map
   }
 
-  constructor(schema?: Schema) {
+  constructor(schema?: Schema, elements: Array<Pair<K, V>> = []) {
+    super(...elements)
     Object.defineProperty(this, 'schema', {
       value: schema,
       configurable: true,
@@ -112,14 +119,7 @@ export class YAMLMap<
    * @param schema - If defined, overwrites the original's schema
    */
   clone(schema?: Schema): this {
-    const copy: this = Object.create(
-      Object.getPrototypeOf(this),
-      Object.getOwnPropertyDescriptors(this)
-    )
-    if (schema) copy.schema = schema
-    copy.items = copy.items.map(it => it.clone(schema))
-    if (this.range) copy.range = [...this.range]
-    return copy
+    return copyCollection(this, schema)
   }
 
   /**
@@ -130,7 +130,7 @@ export class YAMLMap<
   add(pair: Pair<K, V>): void {
     if (!(pair instanceof Pair)) throw new TypeError('Expected a Pair')
 
-    const prev = findPair(this.items, pair.key)
+    const prev = findPair(this, pair.key)
     const sortEntries = this.schema?.sortMapEntries
     if (prev) {
       // For scalars, keep the old node & its comments and anchors
@@ -138,28 +138,28 @@ export class YAMLMap<
         prev.value.value = pair.value.value
       else prev.value = pair.value
     } else if (sortEntries) {
-      const i = this.items.findIndex(item => sortEntries(pair, item) < 0)
-      if (i === -1) this.items.push(pair)
-      else this.items.splice(i, 0, pair)
+      const i = this.findIndex(item => sortEntries(pair, item) < 0)
+      if (i === -1) this.push(pair)
+      else this.splice(i, 0, pair)
     } else {
-      this.items.push(pair)
+      this.push(pair)
     }
   }
 
   delete(key: unknown): boolean {
-    const it = findPair(this.items, key)
+    const it = findPair(this, key)
     if (!it) return false
-    const del = this.items.splice(this.items.indexOf(it), 1)
+    const del = this.splice(this.indexOf(it), 1)
     return del.length > 0
   }
 
   get(key: unknown): NodeOf<V> | undefined {
-    const it = findPair(this.items, key)
+    const it = findPair(this, key)
     return it?.value ?? undefined
   }
 
   has(key: unknown): boolean {
-    return !!findPair(this.items, key)
+    return !!findPair(this, key)
   }
 
   set(
@@ -203,7 +203,7 @@ export class YAMLMap<
     ctx ??= new ToJSContext()
     const map = Type ? new Type() : ctx?.mapAsMap ? new Map() : {}
     if (this.anchor) ctx.setAnchor(this, map)
-    for (const item of this.items) addPairToJSMap(doc, ctx, map, item)
+    for (const item of this) addPairToJSMap(doc, ctx, map, item)
     return map
   }
 
@@ -213,7 +213,7 @@ export class YAMLMap<
     onChompKeep?: () => void
   ): string {
     if (!ctx) return JSON.stringify(this)
-    for (const item of this.items) {
+    for (const item of this) {
       if (!(item instanceof Pair))
         throw new Error(
           `Map items must all be pairs; found ${JSON.stringify(item)} instead`

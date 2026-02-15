@@ -50,7 +50,7 @@ export function resolveBlockSeq(
       : composeEmptyNode(ctx, props.end, start, null, props, onError)
     if (ctx.schema.compat) flowIndentCheck(bs.indent, value, onError)
     offset = node.range![2]
-    seq.items.push(node)
+    seq.push(node)
   }
   seq.range = [bs.offset, offset, commentEnd ?? offset]
   return seq

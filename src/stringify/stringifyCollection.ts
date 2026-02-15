@@ -23,7 +23,7 @@ export function stringifyCollection(
 }
 
 function stringifyBlockCollection(
-  { comment, items }: Readonly<Collection>,
+  coll: Readonly<Collection>,
   ctx: StringifyContext,
   {
     blockItemPrefix,
@@ -41,8 +41,8 @@ function stringifyBlockCollection(
 
   let chompKeep = false // flag for the preceding node's status
   const lines: string[] = []
-  for (let i = 0; i < items.length; ++i) {
-    const item = items[i]
+  for (let i = 0; i < coll.length; ++i) {
+    const item = coll[i]
     let comment: string | null = null
     if (item instanceof Pair) {
       if (!chompKeep && item.key.spaceBefore) lines.push('')
@@ -76,8 +76,8 @@ function stringifyBlockCollection(
     }
   }
 
-  if (comment) {
-    str += '\n' + indentComment(commentString(comment), indent)
+  if (coll.comment) {
+    str += '\n' + indentComment(commentString(coll.comment), indent)
     if (onComment) onComment()
   } else if (chompKeep && onChompKeep) onChompKeep()
 
@@ -85,7 +85,7 @@ function stringifyBlockCollection(
 }
 
 function stringifyFlowCollection(
-  { items }: Readonly<Collection>,
+  coll: Readonly<Collection>,
   ctx: StringifyContext,
   { flowChars, itemIndent }: StringifyCollectionOptions
 ) {
@@ -105,8 +105,8 @@ function stringifyFlowCollection(
   let reqNewline = false
   let linesAtValue = 0
   const lines: string[] = []
-  for (let i = 0; i < items.length; ++i) {
-    const item = items[i]
+  for (let i = 0; i < coll.length; ++i) {
+    const item = coll[i]
     let comment: string | null = null
     if (item instanceof Pair) {
       const ik = item.key
@@ -129,7 +129,7 @@ function stringifyFlowCollection(
 
     if (comment) reqNewline = true
     let str = stringify(item, itemCtx, () => (comment = null))
-    if (i < items.length - 1) str += ','
+    if (i < coll.length - 1) str += ','
     if (comment) str += lineComment(str, itemIndent, commentString(comment))
     if (!reqNewline && (lines.length > linesAtValue || str.includes('\n')))
       reqNewline = true

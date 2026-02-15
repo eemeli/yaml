@@ -124,12 +124,12 @@ function visit_(
   if (typeof ctrl !== 'symbol') {
     if (node instanceof YAMLMap || node instanceof YAMLSeq) {
       path = [...path, node]
-      for (let i = 0; i < node.items.length; ++i) {
-        const ci = visit_(i, node.items[i], visitor, path)
+      for (let i = 0; i < node.length; ++i) {
+        const ci = visit_(i, node[i], visitor, path)
         if (typeof ci === 'number') i = ci - 1
         else if (ci === BREAK) return BREAK
         else if (ci === REMOVE) {
-          node.items.splice(i, 1)
+          node.splice(i, 1)
           i -= 1
         }
       }
@@ -218,12 +218,12 @@ async function visitAsync_(
   if (typeof ctrl !== 'symbol') {
     if (node instanceof YAMLMap || node instanceof YAMLSeq) {
       path = [...path, node]
-      for (let i = 0; i < node.items.length; ++i) {
-        const ci = await visitAsync_(i, node.items[i], visitor, path)
+      for (let i = 0; i < node.length; ++i) {
+        const ci = await visitAsync_(i, node[i], visitor, path)
         if (typeof ci === 'number') i = ci - 1
         else if (ci === BREAK) return BREAK
         else if (ci === REMOVE) {
-          node.items.splice(i, 1)
+          node.splice(i, 1)
           i -= 1
         }
       }
@@ -303,7 +303,7 @@ function replaceNode(
 ): number | symbol | void {
   const parent = path[path.length - 1]
   if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
-    parent.items[key as number] = node
+    parent[key as number] = node
   } else if (parent instanceof Pair) {
     if (isNode(node)) {
       if (key === 'key') parent.key = node

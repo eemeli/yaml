@@ -38,8 +38,8 @@ export class YAMLSet<
     } else if (value.value !== null) {
       throw new TypeError('set pair values must be null')
     } else {
-      const prev = findPair(this.items, value.key)
-      if (!prev) this.items.push(value as Pair<T, T>)
+      const prev = findPair(this, value.key)
+      if (!prev) this.push(value as Pair<T, T>)
     }
   }
 
@@ -47,7 +47,7 @@ export class YAMLSet<
    * Returns the value matching `key`.
    */
   get(key: unknown): NodeOf<T> | undefined {
-    const pair = findPair(this.items, key)
+    const pair = findPair(this, key)
     return pair?.key
   }
 
@@ -61,9 +61,9 @@ export class YAMLSet<
   ): void {
     if (typeof value !== 'boolean')
       throw new Error(`Expected a boolean value, not ${typeof value}`)
-    const prev = findPair(this.items, key)
+    const prev = findPair(this, key)
     if (prev && !value) {
-      this.items.splice(this.items.indexOf(prev), 1)
+      this.splice(this.indexOf(prev), 1)
     } else if (!prev && value) {
       let node: Node
       if (isNode(key)) {
@@ -78,7 +78,7 @@ export class YAMLSet<
         node = nc.create(key)
         nc.setAnchors()
       }
-      this.items.push(new Pair(node as NodeOf<T>))
+      this.push(new Pair(node as NodeOf<T>))
     }
   }
 
@@ -97,7 +97,7 @@ export class YAMLSet<
 }
 
 const hasAllNullValues = (map: YAMLMap): boolean =>
-  map.items.every(
+  map.every(
     ({ value }) =>
       value == null ||
       (value instanceof Scalar &&
@@ -120,7 +120,7 @@ export const set: CollectionTag = {
       for (let value of iterable as Iterable<unknown>) {
         if (typeof nc.replacer === 'function')
           value = nc.replacer.call(iterable, value, value)
-        set.items.push(nc.createPair(value, null) as Pair<Node, null>)
+        set.push(nc.createPair(value, null) as Pair<Node, null>)
       }
     return set
   },
@@ -134,7 +134,7 @@ export const set: CollectionTag = {
       return map
     } else {
       const set = Object.assign(new YAMLSet(), map)
-      for (const pair of map.items) pair.value &&= null
+      for (const pair of map) pair.value &&= null
       return set
     }
   }

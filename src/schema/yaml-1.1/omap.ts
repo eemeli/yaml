@@ -17,8 +17,8 @@ export class YAMLOMap<
 > extends YAMLSeq<Pair<K, V>> {
   static tag = 'tag:yaml.org,2002:omap'
 
-  constructor(schema?: Schema) {
-    super(schema)
+  constructor(schema?: Schema, elements?: Array<Pair<K, V>>) {
+    super(schema, elements)
     this.tag = YAMLOMap.tag
   }
 
@@ -38,7 +38,7 @@ export class YAMLOMap<
     if (this.anchor) {
       ctx.anchors.set(this, { aliasCount: 0, count: 1, res: map })
     }
-    for (const pair of this.items) {
+    for (const pair of this) {
       const key = pair.key.toJS(doc, ctx)
       const value = pair.value ? pair.value.toJS(doc, ctx) : pair.value
       if (map.has(key))
@@ -58,15 +58,13 @@ export const omap: CollectionTag = {
 
   createNode(nc: NodeCreator, iterable: unknown): YAMLOMap {
     const pairs = createPairs(nc, iterable)
-    const omap = new YAMLOMap(nc.schema)
-    omap.items = pairs.items
-    return omap
+    return new YAMLOMap(nc.schema, pairs)
   },
 
   resolve(seq, onError) {
     const pairs = resolvePairs(seq, onError)
     const seenKeys: unknown[] = []
-    for (const { key } of pairs.items) {
+    for (const { key } of pairs) {
       if (key instanceof Scalar) {
         if (seenKeys.includes(key.value)) {
           onError(`Ordered maps must not include duplicate keys: ${key.value}`)

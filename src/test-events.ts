@@ -90,7 +90,7 @@ function addEvents(
   if (node instanceof YAMLMap) {
     const ev = node.flow ? '+MAP {}' : '+MAP'
     events.push(`${ev}${props}`)
-    node.items.forEach(({ key, value }) => {
+    node.forEach(({ key, value }) => {
       addEvents(events, doc, errPos, key)
       addEvents(events, doc, errPos, value)
     })
@@ -98,7 +98,7 @@ function addEvents(
   } else if (node instanceof YAMLSeq) {
     const ev = node.flow ? '+SEQ []' : '+SEQ'
     events.push(`${ev}${props}`)
-    node.items.forEach(item => {
+    node.forEach(item => {
       addEvents(events, doc, errPos, item)
     })
     events.push('-SEQ')
