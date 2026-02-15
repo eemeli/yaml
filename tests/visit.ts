@@ -1,13 +1,18 @@
 import {
   Document,
+  Pair,
   parseDocument,
   visit,
   visitAsync,
+  YAMLMap,
   YAMLSeq,
   type Scalar
 } from 'yaml'
 
-const coll = { items: {} }
+const DOC = expect.any(Document)
+const MAP = expect.any(YAMLMap)
+const PAIR = expect.any(Pair)
+const SEQ = expect.any(YAMLSeq)
 
 for (const [visit_, title] of [
   [visit, 'visit()'],
@@ -19,12 +24,12 @@ for (const [visit_, title] of [
       const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
-        [null, coll, [{}]],
-        [0, { key: {}, value: {} }, [{}, {}]],
-        ['key', { type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
-        ['value', { type: 'PLAIN', value: 1 }, [{}, {}, {}]],
-        [1, { key: {}, value: {} }, [{}, {}]],
-        ['key', { type: 'PLAIN', value: 'two' }, [{}, {}, {}]]
+        [null, MAP, [DOC]],
+        [0, { key: {}, value: {} }, [DOC, MAP]],
+        ['key', { type: 'PLAIN', value: 'one' }, [DOC, MAP, PAIR]],
+        ['value', { type: 'PLAIN', value: 1 }, [DOC, MAP, PAIR]],
+        [1, { key: {}, value: {} }, [DOC, MAP]],
+        ['key', { type: 'PLAIN', value: 'two' }, [DOC, MAP, PAIR]]
       ])
     })
 
@@ -33,9 +38,9 @@ for (const [visit_, title] of [
       const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
-        [null, coll, [{ value: {} }]],
-        [0, { type: 'PLAIN', value: 1 }, [{ value: {} }, coll]],
-        [1, { type: 'PLAIN', value: 'two' }, [{ value: {} }, coll]]
+        [null, SEQ, [DOC]],
+        [0, { type: 'PLAIN', value: 1 }, [DOC, SEQ]],
+        [1, { type: 'PLAIN', value: 'two' }, [DOC, SEQ]]
       ])
     })
 
@@ -44,9 +49,9 @@ for (const [visit_, title] of [
       const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
-        [null, coll, [{}]],
-        [0, { type: 'PLAIN', value: 1, anchor: 'a' }, [{}, {}]],
-        [1, { source: 'a' }, [{}, {}]]
+        [null, SEQ, [DOC]],
+        [0, { type: 'PLAIN', value: 1, anchor: 'a' }, [DOC, SEQ]],
+        [1, { source: 'a' }, [DOC, SEQ]]
       ])
     })
 
@@ -55,12 +60,12 @@ for (const [visit_, title] of [
       const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
-        [null, coll, [{}]],
-        [0, { key: {}, value: {} }, [{}, {}]],
-        ['key', { type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
-        ['value', coll, [{}, {}, {}]],
-        [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [{}, {}, {}, {}]],
-        [1, { type: 'QUOTE_SINGLE', value: 'two' }, [{}, {}, {}, {}]]
+        [null, MAP, [DOC]],
+        [0, { key: {}, value: {} }, [DOC, MAP]],
+        ['key', { type: 'PLAIN', value: 'foo' }, [DOC, MAP, PAIR]],
+        ['value', SEQ, [DOC, MAP, PAIR]],
+        [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [DOC, MAP, PAIR, SEQ]],
+        [1, { type: 'QUOTE_SINGLE', value: 'two' }, [DOC, MAP, PAIR, SEQ]]
       ])
     })
 
@@ -69,9 +74,9 @@ for (const [visit_, title] of [
       const fn = vi.fn()
       await visit_(doc.get('foo') as Scalar, fn)
       expect(fn.mock.calls).toMatchObject([
-        [null, coll, []],
-        [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [coll]],
-        [1, { type: 'QUOTE_SINGLE', value: 'two' }, [coll]]
+        [null, SEQ, []],
+        [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [SEQ]],
+        [1, { type: 'QUOTE_SINGLE', value: 'two' }, [SEQ]]
       ])
     })
 
@@ -80,9 +85,9 @@ for (const [visit_, title] of [
       const fn = vi.fn()
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Alias: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
-        [null, { items: [{}, {}] }, [{}]],
-        [0, { value: 1 }, [{}, {}]],
-        [1, { value: 'two' }, [{}, {}]]
+        [null, SEQ, [DOC]],
+        [0, { value: 1 }, [DOC, SEQ]],
+        [1, { value: 'two' }, [DOC, SEQ]]
       ])
       expect(String(doc)).toBe('- 1\n- two\n')
     })
@@ -92,9 +97,9 @@ for (const [visit_, title] of [
       const Scalar = vi.fn()
       await visit_(doc, { Scalar })
       expect(Scalar.mock.calls).toMatchObject([
-        ['key', { type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
-        [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [{}, {}, {}, {}]],
-        [1, { type: 'QUOTE_SINGLE', value: 'two' }, [{}, {}, {}, {}]]
+        ['key', { type: 'PLAIN', value: 'foo' }, [DOC, MAP, PAIR]],
+        [0, { type: 'QUOTE_DOUBLE', value: 'one' }, [DOC, MAP, PAIR, SEQ]],
+        [1, { type: 'QUOTE_SINGLE', value: 'two' }, [DOC, MAP, PAIR, SEQ]]
       ])
     })
 
@@ -103,13 +108,13 @@ for (const [visit_, title] of [
       const fn = vi.fn()
       await visit_(doc, fn)
       expect(fn.mock.calls).toMatchObject([
-        [null, coll, [{}]],
-        [0, { key: {}, value: {} }, [{}, {}]],
-        ['key', { type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
-        ['value', { type: 'PLAIN', value: 1 }, [{}, {}, {}]],
-        [1, { key: {}, value: {} }, [{}, {}]],
-        ['key', { type: 'PLAIN', value: 'two' }, [{}, {}, {}]],
-        ['value', null, [{}, {}, {}]]
+        [null, MAP, [DOC]],
+        [0, { key: {}, value: {} }, [DOC, MAP]],
+        ['key', { type: 'PLAIN', value: 'one' }, [DOC, MAP, PAIR]],
+        ['value', { type: 'PLAIN', value: 1 }, [DOC, MAP, PAIR]],
+        [1, { key: {}, value: {} }, [DOC, MAP]],
+        ['key', { type: 'PLAIN', value: 'two' }, [DOC, MAP, PAIR]],
+        ['value', null, [DOC, MAP, PAIR]]
       ])
     })
 
@@ -144,9 +149,9 @@ for (const [visit_, title] of [
         Scalar
       })
       expect(Scalar.mock.calls).toMatchObject([
-        [0, { type: 'PLAIN', value: 'one' }, [{}, {}]],
-        [1, { type: 'PLAIN', value: 'two' }, [{}, {}]],
-        [2, { value: 'three' }, [{}, {}]]
+        [0, { type: 'PLAIN', value: 'one' }, [DOC, SEQ]],
+        [1, { type: 'PLAIN', value: 'two' }, [DOC, SEQ]],
+        [2, { value: 'three' }, [DOC, SEQ]]
       ])
       expect(String(doc)).toBe('- one\n- two\n- three\n')
     })
@@ -158,13 +163,13 @@ for (const [visit_, title] of [
       )
       await visit_(doc, { Map: fn, Pair: fn, Seq: fn, Scalar: fn })
       expect(fn.mock.calls).toMatchObject([
-        [null, coll, [{}]],
-        [0, { key: {}, value: {} }, [{}, {}]],
-        ['key', { type: 'PLAIN', value: 'foo' }, [{}, {}, {}]],
-        ['value', coll, [{}, {}, {}]],
-        [1, { key: {}, value: {} }, [{}, {}]],
-        ['key', { type: 'PLAIN', value: 'bar' }, [{}, {}, {}]],
-        ['value', { type: 'PLAIN', value: null }, [{}, {}, {}]]
+        [null, MAP, [DOC]],
+        [0, { key: {}, value: {} }, [DOC, MAP]],
+        ['key', { type: 'PLAIN', value: 'foo' }, [DOC, MAP, PAIR]],
+        ['value', SEQ, [DOC, MAP, PAIR]],
+        [1, { key: {}, value: {} }, [DOC, MAP]],
+        ['key', { type: 'PLAIN', value: 'bar' }, [DOC, MAP, PAIR]],
+        ['value', { type: 'PLAIN', value: null }, [DOC, MAP, PAIR]]
       ])
     })
 
@@ -175,8 +180,8 @@ for (const [visit_, title] of [
       )
       await visit_(doc, { Scalar })
       expect(Scalar.mock.calls).toMatchObject([
-        [0, { type: 'PLAIN', value: 'one' }, [{}, {}]],
-        [1, { type: 'PLAIN', value: 'two' }, [{}, {}]]
+        [0, { type: 'PLAIN', value: 'one' }, [DOC, SEQ]],
+        [1, { type: 'PLAIN', value: 'two' }, [DOC, SEQ]]
       ])
     })
 
@@ -187,10 +192,10 @@ for (const [visit_, title] of [
       )
       await visit_(doc, { Scalar })
       expect(Scalar.mock.calls).toMatchObject([
-        [0, { type: 'PLAIN', value: 'one' }, [{}, {}]],
-        [1, { type: 'PLAIN', value: 'two' }, [{}, {}]],
-        [1, { value: 42 }, [{}, {}]],
-        [2, { type: 'PLAIN', value: 'three' }, [{}, {}]]
+        [0, { type: 'PLAIN', value: 'one' }, [DOC, SEQ]],
+        [1, { type: 'PLAIN', value: 'two' }, [DOC, SEQ]],
+        [1, { value: 42 }, [DOC, SEQ]],
+        [2, { type: 'PLAIN', value: 'three' }, [DOC, SEQ]]
       ])
       expect(String(doc)).toBe('- one\n- 42\n- three\n')
     })
@@ -200,8 +205,8 @@ for (const [visit_, title] of [
       const Scalar = vi.fn(key => (key === 0 ? 2 : undefined))
       await visit_(doc, { Scalar })
       expect(Scalar.mock.calls).toMatchObject([
-        [0, { type: 'PLAIN', value: 'one' }, [{}, {}]],
-        [2, { type: 'PLAIN', value: 'three' }, [{}, {}]]
+        [0, { type: 'PLAIN', value: 'one' }, [DOC, SEQ]],
+        [2, { type: 'PLAIN', value: 'three' }, [DOC, SEQ]]
       ])
     })
 
@@ -212,9 +217,9 @@ for (const [visit_, title] of [
       )
       await visit_(doc, { Scalar })
       expect(Scalar.mock.calls).toMatchObject([
-        [0, { type: 'PLAIN', value: 'one' }, [{}, {}]],
-        [1, { type: 'PLAIN', value: 'two' }, [{}, {}]],
-        [1, { type: 'PLAIN', value: 'three' }, [{}, {}]]
+        [0, { type: 'PLAIN', value: 'one' }, [DOC, SEQ]],
+        [1, { type: 'PLAIN', value: 'two' }, [DOC, SEQ]],
+        [1, { type: 'PLAIN', value: 'three' }, [DOC, SEQ]]
       ])
       expect(String(doc)).toBe('- one\n- three\n')
     })
@@ -226,10 +231,10 @@ for (const [visit_, title] of [
       )
       await visit_(doc, { Scalar })
       expect(Scalar.mock.calls).toMatchObject([
-        ['key', { type: 'PLAIN', value: 'one' }, [{}, {}, {}]],
-        ['value', { type: 'PLAIN', value: 1 }, [{}, {}, {}]],
-        ['key', { type: 'PLAIN', value: 'two' }, [{}, {}, {}]],
-        ['value', { type: 'PLAIN', value: 2 }, [{}, {}, {}]]
+        ['key', { type: 'PLAIN', value: 'one' }, [DOC, MAP, PAIR]],
+        ['value', { type: 'PLAIN', value: 1 }, [DOC, MAP, PAIR]],
+        ['key', { type: 'PLAIN', value: 'two' }, [DOC, MAP, PAIR]],
+        ['value', { type: 'PLAIN', value: 2 }, [DOC, MAP, PAIR]]
       ])
       expect(String(doc)).toBe('one: 1\ntwo: null\n')
     })

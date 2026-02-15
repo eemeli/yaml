@@ -122,7 +122,7 @@ function visit_(
 
   if (typeof ctrl !== 'symbol') {
     if (node instanceof YAMLMap || node instanceof YAMLSeq) {
-      path = Object.freeze(path.concat(node))
+      path = Object.freeze([...path, node])
       for (let i = 0; i < node.items.length; ++i) {
         const ci = visit_(i, node.items[i], visitor, path)
         if (typeof ci === 'number') i = ci - 1
@@ -133,7 +133,7 @@ function visit_(
         }
       }
     } else if (node instanceof Pair) {
-      path = Object.freeze(path.concat(node))
+      path = Object.freeze([...path, node])
       const ck = visit_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
       else if (ck === REMOVE) node.key = new Scalar(null)
@@ -221,7 +221,7 @@ async function visitAsync_(
 
   if (typeof ctrl !== 'symbol') {
     if (node instanceof YAMLMap || node instanceof YAMLSeq) {
-      path = Object.freeze(path.concat(node))
+      path = Object.freeze([...path, node])
       for (let i = 0; i < node.items.length; ++i) {
         const ci = await visitAsync_(i, node.items[i], visitor, path)
         if (typeof ci === 'number') i = ci - 1
@@ -232,7 +232,7 @@ async function visitAsync_(
         }
       }
     } else if (node instanceof Pair) {
-      path = Object.freeze(path.concat(node))
+      path = Object.freeze([...path, node])
       const ck = await visitAsync_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
       else if (ck === REMOVE) node.key = new Scalar(null)
