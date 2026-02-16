@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v6
       - uses: browserstack/github-actions/setup-env@master
         with:
-          username:  ${{ secrets.BROWSERSTACK_USERNAME }}
+          username: ${{ secrets.BROWSERSTACK_USERNAME }}
           access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           project-name: yaml
       - uses: browserstack/github-actions/setup-local@master
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/setup-node@v6
       - uses: browserstack/github-actions/setup-env@master
         with:
-          username:  ${{ secrets.BROWSERSTACK_USERNAME }}
+          username: ${{ secrets.BROWSERSTACK_USERNAME }}
           access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           project-name: yaml
       - uses: browserstack/github-actions/setup-local@master
@@ -59,6 +59,10 @@ jobs:
       - run: npx vitest run --config=.github/vitest.browserstack.config.js
         env:
           BROWSERS: firefox:94
+        # BrowserStack is really flaky with this, so most errors here are:
+        #   Error: Failed to connect to the browser session "..." [firefox:94] within the timeout.
+        continue-on-error: true
+        timeout-minutes: 10
 
       - uses: browserstack/github-actions/setup-local@master
         if: always()
