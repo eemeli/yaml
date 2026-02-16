@@ -153,9 +153,9 @@ function getAliasCount(
     const kc = getAliasCount(doc, ctx, node.key, anchors)
     const vc = getAliasCount(doc, ctx, node.value, anchors)
     return Math.max(kc, vc)
-  } else if (node && 'items' in node) {
+  } else if (Array.isArray(node)) {
     let count = 0
-    for (const item of node.items) {
+    for (const item of node) {
       const c = getAliasCount(doc, ctx, item, anchors)
       if (c > count) count = c
     }

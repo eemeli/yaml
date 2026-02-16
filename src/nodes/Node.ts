@@ -53,8 +53,12 @@ export interface NodeBase {
   /** A fully qualified tag, if required */
   tag?: string
 
-  /** Create a copy of this node.  */
-  clone(_schema?: Schema): this
+  /**
+   * Create a copy of this node.
+   *
+   * @param schema - If defined, overwrites the original's schema for cloned collections.
+   */
+  clone(schema?: Schema): this
 
   /** A plain JavaScript representation of this node. */
   toJS(doc: Document<DocValue, boolean>, opt?: ToJSContext): any

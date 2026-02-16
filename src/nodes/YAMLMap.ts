@@ -2,12 +2,18 @@ import type { Document, DocValue } from '../doc/Document.ts'
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { CreateNodeOptions } from '../options.ts'
 import type { BlockMap, FlowCollection } from '../parse/cst.ts'
+import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
-import { Collection, type NodeOf, type Primitive } from './Collection.ts'
+import {
+  copyCollection,
+  type CollectionBase,
+  type NodeOf,
+  type Primitive
+} from './Collection.ts'
 import { isNode } from './identity.ts'
-import type { Node, NodeBase } from './Node.ts'
+import type { Node, Range } from './Node.ts'
 import { Pair } from './Pair.ts'
 import { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
@@ -33,28 +39,58 @@ export class YAMLMap<
   K extends Primitive | Node = Primitive | Node,
   V extends Primitive | Node = Primitive | Node
 >
-  extends Collection
-  implements NodeBase
+  extends Array<Pair<K, V>>
+  implements CollectionBase
 {
+  schema: Schema | undefined
+
+  /** An optional anchor on this collection. Used by alias nodes. */
+  declare anchor?: string
+
+  /**
+   * If true, stringify this and all child nodes using flow rather than
+   * block styles.
+   */
+  declare flow?: boolean
+
+  /** A comment on or immediately after this collection. */
+  declare comment?: string | null
+
+  /** A comment before this collection. */
+  declare commentBefore?: string | null
+
+  /**
+   * The `[start, value-end, node-end]` character offsets for
+   * the part of the source parsed into this collection (undefined if not parsed).
+   * The `value-end` and `node-end` positions are themselves not included in their respective ranges.
+   */
+  declare range?: Range | null
+
+  /** A blank line before this collection and its commentBefore */
+  declare spaceBefore?: boolean
+
+  /** The CST token that was composed into this collection.  */
+  declare srcToken?: BlockMap | FlowCollection
+
+  /** A fully qualified tag, if required */
+  declare tag?: string
+
   static get tagName(): 'tag:yaml.org,2002:map' {
     return 'tag:yaml.org,2002:map'
   }
 
-  items: Pair<K, V>[] = []
-  declare srcToken?: BlockMap | FlowCollection
-
   /**
-   * A generic collection parsing method that can be extended
+   * A generic collection factory method that can be extended
    * to other node classes that inherit from YAMLMap
    */
-  static from(nc: NodeCreator, obj: unknown): YAMLMap<any, any> {
+  static create(nc: NodeCreator, obj: unknown): YAMLMap<any, any> {
     const { replacer } = nc
     const map = new this(nc.schema)
     const add = (key: unknown, value: unknown) => {
       if (typeof replacer === 'function') value = replacer.call(obj, key, value)
       else if (Array.isArray(replacer) && !replacer.includes(key)) return
       if (value !== undefined || nc.keepUndefined)
-        map.items.push(nc.createPair(key, value))
+        map.push(nc.createPair(key, value))
     }
     if (obj instanceof Map) {
       for (const [key, value] of obj) add(key, value)
@@ -62,49 +98,83 @@ export class YAMLMap<
       for (const key of Object.keys(obj)) add(key, (obj as any)[key])
     }
     if (typeof nc.schema.sortMapEntries === 'function') {
-      map.items.sort(nc.schema.sortMapEntries)
+      map.sort(nc.schema.sortMapEntries)
     }
     return map
   }
 
-  /**
-   * Adds a key-value pair to the map.
-   *
-   * Using a key that is already in the collection overwrites the previous value.
-   */
-  add(pair: Pair<K, V>): void {
-    if (!(pair instanceof Pair)) throw new TypeError('Expected a Pair')
-
-    const prev = findPair(this.items, pair.key)
-    const sortEntries = this.schema?.sortMapEntries
-    if (prev) {
-      // For scalars, keep the old node & its comments and anchors
-      if (prev.value instanceof Scalar && pair.value instanceof Scalar)
-        prev.value.value = pair.value.value
-      else prev.value = pair.value
-    } else if (sortEntries) {
-      const i = this.items.findIndex(item => sortEntries(pair, item) < 0)
-      if (i === -1) this.items.push(pair)
-      else this.items.splice(i, 0, pair)
-    } else {
-      this.items.push(pair)
-    }
+  constructor(schema?: Schema, elements: Array<Pair<K, V>> = []) {
+    super(...elements)
+    Object.defineProperty(this, 'schema', {
+      value: schema,
+      configurable: true,
+      enumerable: false,
+      writable: true
+    })
   }
 
+  /**
+   * Create a copy of this collection.
+   *
+   * @param schema - If defined, overwrites the original's schema
+   */
+  clone(schema?: Schema): this {
+    return copyCollection(this, schema)
+  }
+
+  /** @private */
+  _push(pair: Pair<K, V>): void {
+    super.push(pair)
+  }
+
+  /**
+   * Adds new key-value pairs to the mapping, and returns its new length.
+   *
+   * Added pairs must not have the same keys as ones previously set in the map.
+   */
+  push(...pairs: Pair<K, V>[]): number {
+    for (const pair of pairs) {
+      if (!(pair instanceof Pair)) {
+        const msg = `Expected a Pair, but found ${(pair as any).constructor?.name ?? pair}`
+        throw new TypeError(msg)
+      }
+      if (findPair(this, pair.key)) {
+        const msg = `Maps must not include duplicate keys: ${String(pair.key)}`
+        throw new Error(msg)
+      }
+
+      if (this.schema?.sortMapEntries) {
+        const sortEntries = this.schema.sortMapEntries
+        const i = this.findIndex(item => sortEntries(pair, item) < 0)
+        if (i === -1) super.push(pair)
+        else this.splice(i, 0, pair)
+      } else {
+        super.push(pair)
+      }
+    }
+    return this.length
+  }
+
+  /**
+   * Removes a value from the mapping.
+   * @returns `true` if the item was found and removed.
+   */
   delete(key: unknown): boolean {
-    const it = findPair(this.items, key)
+    const it = findPair(this, key)
     if (!it) return false
-    const del = this.items.splice(this.items.indexOf(it), 1)
+    const del = this.splice(this.indexOf(it), 1)
     return del.length > 0
   }
 
+  /** Returns item at `key`, or `undefined` if not found.  */
   get(key: unknown): NodeOf<V> | undefined {
-    const it = findPair(this.items, key)
+    const it = findPair(this, key)
     return it?.value ?? undefined
   }
 
+  /** Checks if the mapping includes a value with the key `key`.  */
   has(key: unknown): boolean {
-    return !!findPair(this.items, key)
+    return !!findPair(this, key)
   }
 
   set(
@@ -115,9 +185,8 @@ export class YAMLMap<
     let pair: Pair
     if (isNode(key) && (value === null || isNode(value))) {
       pair = new Pair(key, value)
-    } else if (!this.schema) {
-      throw new Error('Schema is required')
     } else {
+      if (!this.schema) throw new Error('Schema is required')
       const nc = new NodeCreator(this.schema, {
         ...options,
         aliasDuplicateObjects: false
@@ -125,7 +194,22 @@ export class YAMLMap<
       pair = nc.createPair(key, value)
       nc.setAnchors()
     }
-    this.add(pair as Pair<K, V>)
+
+    const prev = findPair(this, pair.key)
+    if (prev) {
+      const pv = pair.value as NodeOf<V>
+      // For scalars, keep the old node & its comments and anchors
+      if (prev.value instanceof Scalar && pv instanceof Scalar) {
+        Object.assign(prev.value, pv)
+      } else prev.value = pv
+    } else if (this.schema?.sortMapEntries) {
+      const sortEntries = this.schema.sortMapEntries
+      const i = this.findIndex(item => sortEntries(pair, item) < 0)
+      if (i === -1) super.push(pair as Pair<K, V>)
+      else this.splice(i, 0, pair as Pair<K, V>)
+    } else {
+      super.push(pair as Pair<K, V>)
+    }
   }
 
   /**
@@ -148,7 +232,7 @@ export class YAMLMap<
     ctx ??= new ToJSContext()
     const map = Type ? new Type() : ctx?.mapAsMap ? new Map() : {}
     if (this.anchor) ctx.setAnchor(this, map)
-    for (const item of this.items) addPairToJSMap(doc, ctx, map, item)
+    for (const item of this) addPairToJSMap(doc, ctx, map, item)
     return map
   }
 
@@ -158,7 +242,7 @@ export class YAMLMap<
     onChompKeep?: () => void
   ): string {
     if (!ctx) return JSON.stringify(this)
-    for (const item of this.items) {
+    for (const item of this) {
       if (!(item instanceof Pair))
         throw new Error(
           `Map items must all be pairs; found ${JSON.stringify(item)} instead`

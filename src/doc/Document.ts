@@ -1,9 +1,10 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
-import { Collection, type Primitive } from '../nodes/Collection.ts'
+import type { Primitive } from '../nodes/Collection.ts'
+import { isCollection } from '../nodes/identity.ts'
 import type { Node, NodeType, Range } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
-import { Scalar } from '../nodes/Scalar.ts'
+import type { Scalar } from '../nodes/Scalar.ts'
 import { ToJSContext } from '../nodes/toJS.ts'
 import type { YAMLMap } from '../nodes/YAMLMap.ts'
 import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
@@ -150,16 +151,6 @@ export class Document<
     return copy
   }
 
-  /** Adds a value to the document. */
-  add(value: any): void {
-    assertCollection(this.value).add(value)
-  }
-
-  /** Adds a value to the document. */
-  addIn(path: unknown[], value: unknown): void {
-    assertCollection(this.value).addIn(path, value)
-  }
-
   /**
    * Create a new `Alias` node, ensuring that the target `node` has the required anchor.
    *
@@ -242,51 +233,21 @@ export class Document<
    * @returns `true` if the item was found and removed.
    */
   delete(key: any): boolean {
-    return assertCollection(this.value).delete(key)
-  }
-
-  /**
-   * Removes a value from the document.
-   * @returns `true` if the item was found and removed.
-   */
-  deleteIn(path: unknown[]): boolean {
-    if (!path.length) {
-      this.value = new Scalar(null) as Value
-      return true
-    }
-    return assertCollection(this.value).deleteIn(path)
+    return isCollection(this.value) ? this.value.delete(key) : false
   }
 
   /**
    * Returns item at `key`, or `undefined` if not found.
    */
   get(key: any): Strict extends true ? Node | Pair | undefined : any {
-    return this.value instanceof Collection ? this.value.get(key) : undefined
-  }
-
-  /**
-   * Returns item at `path`, or `undefined` if not found.
-   */
-  getIn(
-    path: unknown[]
-  ): Strict extends true ? Node | Pair | null | undefined : any {
-    if (!path.length) return this.value
-    return this.value instanceof Collection ? this.value.getIn(path) : undefined
+    return isCollection(this.value) ? this.value.get(key) : undefined
   }
 
   /**
    * Checks if the document includes a value with the key `key`.
    */
   has(key: any): boolean {
-    return this.value instanceof Collection ? this.value.has(key) : false
-  }
-
-  /**
-   * Checks if the document includes a value at `path`.
-   */
-  hasIn(path: unknown[]): boolean {
-    if (!path.length) return true
-    return this.value instanceof Collection ? this.value.hasIn(path) : false
+    return isCollection(this.value) ? this.value.has(key) : false
   }
 
   /**
@@ -294,19 +255,8 @@ export class Document<
    * boolean to add/remove the item from the set.
    */
   set(key: any, value: any): void {
-    assertCollection(this.value).set(key, value)
-  }
-
-  /**
-   * Sets a value in this document. For `!!set`, `value` needs to be a
-   * boolean to add/remove the item from the set.
-   */
-  setIn(path: unknown[], value: unknown): void {
-    if (!path.length) {
-      this.value = value as Value
-    } else {
-      assertCollection(this.value).setIn(path, value)
-    }
+    if (isCollection(this.value)) this.value.set(key, value)
+    else throw new Error('Expected a YAML collection as document value')
   }
 
   /**
@@ -386,9 +336,4 @@ export class Document<
     }
     return stringifyDocument(this, options)
   }
-}
-
-function assertCollection(value: unknown) {
-  if (value instanceof Collection) return value as YAMLMap | YAMLSeq
-  throw new Error('Expected a YAML collection as document value')
 }

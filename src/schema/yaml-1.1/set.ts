@@ -25,29 +25,29 @@ export class YAMLSet<
   /**
    * Add a value to the set.
    *
-   * If `value` is a Pair, its `.value` must be null and `options` is ignored.
+   * If a value of `items` is a Pair, its `.value` must be null.
    *
    * If the set already includes a matching value, no value is added.
    */
-  add(
-    value: unknown,
-    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
-  ): void {
-    if (!(value instanceof Pair)) {
-      this.set(value, true, options)
-    } else if (value.value !== null) {
-      throw new TypeError('set pair values must be null')
-    } else {
-      const prev = findPair(this.items, value.key)
-      if (!prev) this.items.push(value as Pair<T, T>)
+  push(...items: unknown[]): number {
+    for (const value of items) {
+      if (value instanceof Pair) {
+        if (value.value !== null)
+          throw new TypeError('set pair values must be null')
+        const prev = findPair(this, value.key)
+        if (!prev) super.push(value as Pair<T, T>)
+      } else {
+        this.set(value, true)
+      }
     }
+    return this.length
   }
 
   /**
    * Returns the value matching `key`.
    */
   get(key: unknown): NodeOf<T> | undefined {
-    const pair = findPair(this.items, key)
+    const pair = findPair(this, key)
     return pair?.key
   }
 
@@ -61,16 +61,14 @@ export class YAMLSet<
   ): void {
     if (typeof value !== 'boolean')
       throw new Error(`Expected a boolean value, not ${typeof value}`)
-    const prev = findPair(this.items, key)
+    const prev = findPair(this, key)
     if (prev && !value) {
-      this.items.splice(this.items.indexOf(prev), 1)
+      this.splice(this.indexOf(prev), 1)
     } else if (!prev && value) {
       let node: Node
-      if (isNode(key)) {
-        node = key
-      } else if (!this.schema) {
-        throw new Error('Schema is required')
-      } else {
+      if (isNode(key)) node = key
+      else {
+        if (!this.schema) throw new Error('Schema is required')
         const nc = new NodeCreator(this.schema, {
           ...options,
           aliasDuplicateObjects: false
@@ -78,7 +76,7 @@ export class YAMLSet<
         node = nc.create(key)
         nc.setAnchors()
       }
-      this.items.push(new Pair(node as NodeOf<T>))
+      this.push(new Pair(node as NodeOf<T>))
     }
   }
 
@@ -94,21 +92,10 @@ export class YAMLSet<
     if (!ctx) return JSON.stringify(this)
     return super.toString({ ...ctx, noValues: true }, onComment, onChompKeep)
   }
-
-  static from(nc: NodeCreator, iterable: unknown): YAMLSet {
-    const set = new this(nc.schema)
-    if (iterable && Symbol.iterator in Object(iterable))
-      for (let value of iterable as Iterable<unknown>) {
-        if (typeof nc.replacer === 'function')
-          value = nc.replacer.call(iterable, value, value)
-        set.items.push(nc.createPair(value, null) as Pair<Node, null>)
-      }
-    return set
-  }
 }
 
 const hasAllNullValues = (map: YAMLMap): boolean =>
-  map.items.every(
+  map.every(
     ({ value }) =>
       value == null ||
       (value instanceof Scalar &&
@@ -124,6 +111,18 @@ export const set: CollectionTag = {
   nodeClass: YAMLSet,
   default: false,
   tag: 'tag:yaml.org,2002:set',
+
+  createNode(nc: NodeCreator, iterable: unknown): YAMLSet {
+    const set = new YAMLSet(nc.schema)
+    if (iterable && Symbol.iterator in Object(iterable))
+      for (let value of iterable as Iterable<unknown>) {
+        if (typeof nc.replacer === 'function')
+          value = nc.replacer.call(iterable, value, value)
+        set.push(nc.createPair(value, null) as Pair<Node, null>)
+      }
+    return set
+  },
+
   resolve(map, onError) {
     if (!(map instanceof YAMLMap)) {
       onError('Expected a mapping for this tag')
@@ -133,7 +132,7 @@ export const set: CollectionTag = {
       return map
     } else {
       const set = Object.assign(new YAMLSet(), map)
-      for (const pair of map.items) pair.value &&= null
+      for (const pair of map) pair.value &&= null
       return set
     }
   }

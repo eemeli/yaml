@@ -19,11 +19,11 @@ export class Schema {
 
   // These are used by createNode() and composeScalar()
   /** @internal */
-  declare readonly map: CollectionTag
+  declare readonly map: typeof map
   /** @internal */
-  declare readonly scalar: ScalarTag
+  declare readonly scalar: typeof string
   /** @internal */
-  declare readonly seq: CollectionTag
+  declare readonly seq: typeof seq
 
   constructor({
     compat,

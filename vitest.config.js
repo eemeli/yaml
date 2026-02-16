@@ -36,6 +36,7 @@ export default defineConfig({
   test: {
     alias,
     globals: true,
+    setupFiles: ['tests/_setup.ts'],
     include: ['tests/**/*.{js,ts}'],
     exclude: ['tests/_*', 'tests/artifacts/', 'tests/json-test-suite/']
   }

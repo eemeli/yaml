@@ -147,7 +147,7 @@ describe('number types', () => {
         intAsBigInt: false,
         version: '1.1'
       })
-      expect(doc.value.items).toMatchObject([
+      expect(doc.value).toMatchObject([
         { value: 10, format: 'BIN' },
         { value: 83, format: 'OCT' },
         { value: -0, format: 'OCT' },
@@ -159,10 +159,10 @@ describe('number types', () => {
         { value: 0.42 },
         { value: 0.4 }
       ])
-      expect(doc.value.items[3]).not.toHaveProperty('format')
-      expect(doc.value.items[6]).not.toHaveProperty('format')
-      expect(doc.value.items[6]).not.toHaveProperty('minFractionDigits')
-      expect(doc.value.items[7]).not.toHaveProperty('format')
+      expect(doc.value[3]).not.toHaveProperty('format')
+      expect(doc.value[6]).not.toHaveProperty('format')
+      expect(doc.value[6]).not.toHaveProperty('minFractionDigits')
+      expect(doc.value[7]).not.toHaveProperty('format')
     })
 
     test('Version 1.2', () => {
@@ -180,7 +180,7 @@ describe('number types', () => {
         intAsBigInt: false,
         version: '1.2'
       })
-      expect(doc.value.items).toMatchObject([
+      expect(doc.value).toMatchObject([
         { value: 83, format: 'OCT' },
         { value: 0, format: 'OCT' },
         { value: 123456 },
@@ -191,10 +191,10 @@ describe('number types', () => {
         { value: 0.42 },
         { value: 0.4 }
       ])
-      expect(doc.value.items[2]).not.toHaveProperty('format')
-      expect(doc.value.items[5]).not.toHaveProperty('format')
-      expect(doc.value.items[5]).not.toHaveProperty('minFractionDigits')
-      expect(doc.value.items[6]).not.toHaveProperty('format')
+      expect(doc.value[2]).not.toHaveProperty('format')
+      expect(doc.value[5]).not.toHaveProperty('format')
+      expect(doc.value[5]).not.toHaveProperty('minFractionDigits')
+      expect(doc.value[6]).not.toHaveProperty('format')
     })
   })
 
@@ -212,7 +212,7 @@ describe('number types', () => {
         intAsBigInt: true,
         version: '1.1'
       })
-      expect(doc.value.items).toMatchObject([
+      expect(doc.value).toMatchObject([
         { value: 10n, format: 'BIN' },
         { value: 83n, format: 'OCT' },
         { value: 0n, format: 'OCT' },
@@ -221,9 +221,9 @@ describe('number types', () => {
         { value: 0.5123, format: 'EXP' },
         { value: 4.02 }
       ])
-      expect(doc.value.items[3]).not.toHaveProperty('format')
-      expect(doc.value.items[6]).not.toHaveProperty('format')
-      expect(doc.value.items[6]).not.toHaveProperty('minFractionDigits')
+      expect(doc.value[3]).not.toHaveProperty('format')
+      expect(doc.value[6]).not.toHaveProperty('format')
+      expect(doc.value[6]).not.toHaveProperty('minFractionDigits')
       expect(doc.toJS()).toEqual([10n, 83n, 0n, 123456n, 310, 0.5123, 4.02])
       expect(doc.value.toJS(doc)).toEqual([
         10n,
@@ -249,7 +249,7 @@ describe('number types', () => {
         intAsBigInt: true,
         version: '1.2'
       })
-      expect(doc.value.items).toMatchObject([
+      expect(doc.value).toMatchObject([
         { value: 83n, format: 'OCT' },
         { value: 0n, format: 'OCT' },
         { value: 123456n },
@@ -257,9 +257,9 @@ describe('number types', () => {
         { value: 0.5123, format: 'EXP' },
         { value: 4.02 }
       ])
-      expect(doc.value.items[2]).not.toHaveProperty('format')
-      expect(doc.value.items[5]).not.toHaveProperty('format')
-      expect(doc.value.items[5]).not.toHaveProperty('minFractionDigits')
+      expect(doc.value[2]).not.toHaveProperty('format')
+      expect(doc.value[5]).not.toHaveProperty('format')
+      expect(doc.value[5]).not.toHaveProperty('minFractionDigits')
     })
   })
 })
@@ -344,7 +344,7 @@ describe('json schema', () => {
     })
     expect(doc.errors).toHaveLength(2)
     doc.errors = []
-    doc.value.items[1].value!.tag = 'tag:yaml.org,2002:float'
+    doc.value[1].value!.tag = 'tag:yaml.org,2002:float'
     expect(String(doc)).toBe(
       '"canonical": 685230.15\n"fixed": !!float 685230.15\n"negative infinity": "-.inf"\n"not a number": ".NaN"\n'
     )
@@ -486,7 +486,7 @@ one: 1
         '{ 3: 4 }': 'many'
       })
       expect(doc.errors).toHaveLength(0)
-      doc.value.items[2].key = doc.createNode({ 3: 4 })
+      doc.value[2].key = doc.createNode({ 3: 4 })
       expect(doc.toJS()).toMatchObject({
         one: 1,
         2: 'two',
@@ -508,7 +508,7 @@ one: 1
         ])
       )
       expect(doc.errors).toHaveLength(0)
-      doc.value.items[2].key = doc.createNode({ 5: 6 })
+      doc.value[2].key = doc.createNode({ 5: 6 })
       expect(doc.toJS({ mapAsMap: true })).toMatchObject(
         new Map<unknown, unknown>([
           ['one', 1],
@@ -538,8 +538,8 @@ description:
     const doc = parseDocument<YAMLMap<Scalar, Scalar<Uint8Array>>>(src, {
       schema: 'yaml-1.1'
     })
-    const canonical = doc.value.items[0].value!.value
-    const generic = doc.value.items[1].value!.value
+    const canonical = doc.value[0].value!.value
+    const generic = doc.value[1].value!.value
     expect(canonical).toBeInstanceOf(Uint8Array)
     expect(generic).toBeInstanceOf(Uint8Array)
     expect(canonical).toHaveLength(185)
@@ -710,7 +710,7 @@ no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
       const doc = parseDocument<YAMLMap<Scalar, Scalar>>(src)
-      doc.value.items.forEach(item => {
+      doc.value.forEach(item => {
         expect(item.value!.value).toBeInstanceOf(Date)
       })
       expect(doc.toJS()).toMatchObject({
@@ -748,7 +748,7 @@ date (00:00:00Z): 2002-12-14\n`)
       test(name, () => {
         const doc = parseDocument<YAMLSeq>(src, { version: '1.1' })
         expect(doc.value).toBeInstanceOf(YAMLSeq)
-        expect(doc.value.items).toMatchObject([
+        expect(doc.value).toMatchObject([
           { key: { value: 'a' }, value: { value: 1 } },
           { key: { value: 'b' }, value: { value: 2 } },
           { key: { value: 'a' }, value: { value: 3 } }
@@ -907,7 +907,7 @@ date (00:00:00Z): 2002-12-14\n`)
       const src = '- { a: A, b: B }\n- { b: X }\n'
       const doc = parseDocument(src, { version: '1.1' })
       const alias = doc.createAlias(doc.get(0), 'a')
-      doc.addIn([1], doc.createPair('<<', alias))
+      doc.get(1).push(doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
@@ -919,7 +919,7 @@ date (00:00:00Z): 2002-12-14\n`)
       const src = '- { a: A, b: B }\n- { b: X }\n'
       const doc = parseDocument(src, { version: '1.1' })
       const alias = doc.createAlias(doc.get(0), 'a')
-      doc.addIn([1], doc.createPair('<<', alias))
+      doc.get(1).push(doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
@@ -945,12 +945,11 @@ describe('custom tags', () => {
       const doc = parseDocument<YAMLSeq<Scalar>>(src)
       expect(doc.value).toBeInstanceOf(YAMLSeq)
       expect(doc.value.tag).toBe('tag:example.com,2000:test/x')
-      const { items } = doc.value
-      expect(items).toHaveLength(4)
-      items.forEach(item => expect(typeof item.value).toBe('string'))
-      expect(items[0].tag).toBe('!y')
-      expect(items[1].tag).toBe('tag:example.com,2000:test/z')
-      expect(items[2].tag).toBe('tag:example.com,2000:other/w')
+      expect(doc.value).toHaveLength(4)
+      doc.value.forEach(item => expect(typeof item.value).toBe('string'))
+      expect(doc.value[0].tag).toBe('!y')
+      expect(doc.value[1].tag).toBe('tag:example.com,2000:test/z')
+      expect(doc.value[2].tag).toBe('tag:example.com,2000:other/w')
     })
 
     test('stringify', () => {
@@ -977,10 +976,10 @@ describe('custom tags', () => {
       })
 
       doc.value.commentBefore = 'c'
-      doc.value.items[3].comment = 'cc'
+      doc.value[3].comment = 'cc'
       const s = new Scalar(6)
       s.tag = '!g'
-      doc.value.items.splice(1, 1, s, new Scalar('7'))
+      doc.value.splice(1, 1, s, new Scalar('7'))
       expect(String(doc)).toBe(source`
         %TAG !e! tag:example.com,2000:test/
         %TAG !f! tag:example.com,2000:other/
@@ -1060,6 +1059,9 @@ describe('custom tags', () => {
   const nullObject: CollectionTag = {
     tag: '!nullobject',
     collection: 'map',
+    createNode(nc, value) {
+      return YAMLNullObject.create(nc, value)
+    },
     identify: (value: any) =>
       !!value && typeof value === 'object' && !Object.getPrototypeOf(value),
     nodeClass: YAMLNullObject

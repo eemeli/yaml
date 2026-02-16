@@ -150,8 +150,7 @@ blah blah\n`)
           YAML.YAMLMap<YAML.Scalar, YAML.Scalar>,
           false
         >({ foo }, { version })
-        for (const node of doc.value.items)
-          node.value!.type = Scalar.QUOTE_DOUBLE
+        for (const node of doc.value) node.value!.type = Scalar.QUOTE_DOUBLE
         expect(
           doc
             .toString(opt)
@@ -165,7 +164,7 @@ blah blah\n`)
         const doc = new YAML.Document<YAML.YAMLSeq<YAML.Scalar>, false>([foo], {
           version
         })
-        for (const node of doc.value.items) node.type = Scalar.QUOTE_DOUBLE
+        for (const node of doc.value) node.type = Scalar.QUOTE_DOUBLE
         expect(
           doc
             .toString(opt)
@@ -180,8 +179,8 @@ blah blah\n`)
           YAML.YAMLMap<YAML.Scalar, YAML.YAMLSeq<YAML.Scalar>>,
           false
         >({ foo: [foo] }, { version })
-        const seq = doc.value.items[0].value!
-        for (const node of seq.items) node.type = Scalar.QUOTE_DOUBLE
+        const seq = doc.value[0].value!
+        for (const node of seq) node.type = Scalar.QUOTE_DOUBLE
         expect(
           doc
             .toString(opt)
@@ -330,12 +329,11 @@ z:
     )
   })
 
-  test('Map with non-Pair item', () => {
+  test('pushing non-Pair item', () => {
     const doc = new YAML.Document<YAML.YAMLMap, false>({ x: 3, y: 4 })
     expect(String(doc)).toBe('x: 3\ny: 4\n')
     // @ts-expect-error This should fail.
-    doc.value.items.push('TEST')
-    expect(() => String(doc)).toThrow(/^Map items must all be pairs.*TEST/)
+    expect(() => doc.value.push('TEST')).toThrow(TypeError)
   })
 
   test('Keep block scalar types for keys', () => {
@@ -368,7 +366,7 @@ z:
     test('Block map, with key.comment', () => {
       const doc = getDoc()
       doc.set('a', new Scalar(null))
-      doc.value.items[0].key.comment = 'c'
+      doc.value[0].key.comment = 'c'
       expect(doc.toString({ nullStr: '' })).toBe('a: #c\nb:\n')
     })
 
@@ -388,7 +386,7 @@ z:
     test('Flow map, with key.comment', () => {
       const doc = getDoc()
       doc.value.flow = true
-      doc.value.items[0].key.comment = 'c'
+      doc.value[0].key.comment = 'c'
       expect(doc.toString({ nullStr: '' })).toBe('{\n  a:, #c\n  b:\n}\n')
     })
 
@@ -730,14 +728,14 @@ describe('simple keys', () => {
 
   test('key with block scalar value', () => {
     const doc = YAML.parseDocument<any>('foo: bar')
-    doc.value.items[0].key.type = 'BLOCK_LITERAL'
+    doc.value[0].key.type = 'BLOCK_LITERAL'
     expect(doc.toString()).toBe('? |-\n  foo\n: bar\n')
     expect(doc.toString({ simpleKeys: true })).toBe('"foo": bar\n')
   })
 
   test('key with comment', () => {
     const doc = YAML.parseDocument<any>('foo: bar')
-    doc.value.items[0].key.comment = 'FOO'
+    doc.value[0].key.comment = 'FOO'
     expect(doc.toString()).toBe('foo: #FOO\n  bar\n')
     expect(() => doc.toString({ simpleKeys: true })).toThrow(
       /With simple keys, key nodes cannot have comments/
@@ -798,9 +796,9 @@ describe('sortMapEntries', () => {
       a.key < b.key ? 1 : a.key > b.key ? -1 : 0
     expect(YAML.stringify(obj, { sortMapEntries })).toBe('c: 3\nb: 2\na: 1\n')
   })
-  test('doc.add', () => {
-    const doc = new YAML.Document(obj, { sortMapEntries: true })
-    doc.add(doc.createPair('bb', 4))
+  test('map.push', () => {
+    const doc = new YAML.Document<YAML.YAMLMap>(obj, { sortMapEntries: true })
+    doc.value.push(doc.createPair('bb', 4))
     expect(String(doc)).toBe('a: 1\nb: 2\nbb: 4\nc: 3\n')
   })
   test('doc.set', () => {
@@ -1042,7 +1040,7 @@ describe('Scalar options', () => {
         defaultKeyType: Scalar.QUOTE_SINGLE
       } as const
       const doc = new YAML.Document<YAML.YAMLMap, false>({ foo: null })
-      const key = doc.value.items[0].key as Scalar
+      const key = doc.value[0].key as Scalar
       key.type = Scalar.BLOCK_LITERAL
       expect(doc.toString(opt)).toBe('? "foo"\n')
     })
@@ -1428,8 +1426,7 @@ describe('YAML.stringify on ast Document', () => {
 
 describe('flow collection padding', () => {
   const doc = new YAML.Document()
-  doc.value = new YAML.YAMLSeq()
-  doc.value.items = [new Scalar(1), new Scalar(2)]
+  doc.value = new YAML.YAMLSeq(undefined, [new Scalar(1), new Scalar(2)])
   doc.value.flow = true
 
   test('default', () => {

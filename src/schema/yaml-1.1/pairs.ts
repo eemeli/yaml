@@ -11,13 +11,13 @@ export function resolvePairs(
   onError: (message: string) => void
 ): YAMLSeq<Pair> {
   if (seq instanceof YAMLSeq) {
-    for (let i = 0; i < seq.items.length; ++i) {
-      const item = seq.items[i]
+    for (let i = 0; i < seq.length; ++i) {
+      const item = seq[i]
       if (item instanceof Pair) continue
       else if (item instanceof YAMLMap) {
-        if (item.items.length > 1)
+        if (item.length > 1)
           onError('Each pair must have its own sequence indicator')
-        const pair = item.items[0] || new Pair(new Scalar(null))
+        const pair = item[0] || new Pair(new Scalar(null))
         if (item.commentBefore)
           pair.key.commentBefore = pair.key.commentBefore
             ? `${item.commentBefore}\n${pair.key.commentBefore}`
@@ -28,9 +28,9 @@ export function resolvePairs(
             ? `${item.comment}\n${cn.comment}`
             : item.comment
         }
-        seq.items[i] = pair
+        seq[i] = pair
       } else {
-        seq.items[i] = new Pair<Node, null>(item, null)
+        seq[i] = new Pair<Node, null>(item, null)
       }
     }
   } else onError('Expected a sequence for this tag')
@@ -64,7 +64,7 @@ export function createPairs(nc: NodeCreator, iterable: unknown): YAMLSeq<Pair> {
       } else {
         key = it
       }
-      pairs.items.push(nc.createPair(key, value))
+      pairs.push(nc.createPair(key, value))
     }
   return pairs
 }

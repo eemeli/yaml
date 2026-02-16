@@ -436,7 +436,7 @@ application specific tag: !something |
       warnings: [['Unresolved tag: !something']],
       special(src) {
         const doc = YAML.parseDocument<any>(src, { schema: 'yaml-1.1' })
-        const data = doc.value.items[1].value.value
+        const data = doc.value[1].value.value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)
       }
@@ -1718,11 +1718,9 @@ mapping: !!map
       special(src) {
         const doc = YAML.parseDocument<YAML.YAMLSeq<any>, false>(src)
         expect(doc.value.tag).toBeUndefined()
-        expect(doc.value.items[0].value.tag).toBe('tag:yaml.org,2002:seq')
-        expect(doc.value.items[0].value.items[1].tag).toBe(
-          'tag:yaml.org,2002:seq'
-        )
-        expect(doc.value.items[1].value.tag).toBe('tag:yaml.org,2002:map')
+        expect(doc.value[0].value.tag).toBe('tag:yaml.org,2002:seq')
+        expect(doc.value[0].value[1].tag).toBe('tag:yaml.org,2002:seq')
+        expect(doc.value[1].value.tag).toBe('tag:yaml.org,2002:map')
       }
     }
   },

@@ -2,12 +2,18 @@ import type { Document, DocValue } from '../doc/Document.ts'
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { CreateNodeOptions } from '../options.ts'
 import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
+import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyCollection } from '../stringify/stringifyCollection.ts'
-import { Collection, type NodeOf, type Primitive } from './Collection.ts'
+import {
+  copyCollection,
+  type CollectionBase,
+  type NodeOf,
+  type Primitive
+} from './Collection.ts'
 import { isNode } from './identity.ts'
-import type { Node, NodeBase } from './Node.ts'
-import type { Pair } from './Pair.ts'
+import type { Node, Range } from './Node.ts'
+import { Pair } from './Pair.ts'
 import { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
 
@@ -17,30 +23,107 @@ const isScalarValue = (value: unknown): boolean =>
 export class YAMLSeq<
   T extends Primitive | Node | Pair = Primitive | Node | Pair
 >
-  extends Collection
-  implements NodeBase
+  extends Array<NodeOf<T>>
+  implements CollectionBase
 {
   static get tagName(): 'tag:yaml.org,2002:seq' {
     return 'tag:yaml.org,2002:seq'
   }
 
-  items: NodeOf<T>[] = []
+  schema: Schema | undefined
+
+  /** An optional anchor on this collection. Used by alias nodes. */
+  declare anchor?: string
+
+  /**
+   * If true, stringify this and all child nodes using flow rather than
+   * block styles.
+   */
+  declare flow?: boolean
+
+  /** A comment on or immediately after this collection. */
+  declare comment?: string | null
+
+  /** A comment before this collection. */
+  declare commentBefore?: string | null
+
+  /**
+   * The `[start, value-end, node-end]` character offsets for
+   * the part of the source parsed into this collection (undefined if not parsed).
+   * The `value-end` and `node-end` positions are themselves not included in their respective ranges.
+   */
+  declare range?: Range | null
+
+  /** A blank line before this collection and its commentBefore */
+  declare spaceBefore?: boolean
+
+  /** The CST token that was composed into this collection.  */
   declare srcToken?: BlockSequence | FlowCollection
 
-  add(
-    value: T,
-    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
-  ): void {
-    if (isNode(value)) this.items.push(value as NodeOf<T>)
-    else if (!this.schema) throw new Error('Schema is required')
-    else {
-      const nc = new NodeCreator(this.schema, {
-        ...options,
-        aliasDuplicateObjects: false
-      })
-      this.items.push(nc.create(value) as NodeOf<T>)
-      nc.setAnchors()
+  /** A fully qualified tag, if required */
+  declare tag?: string
+
+  /**
+   * A generic collection factory method that can be extended
+   * to other node classes that inherit from YAMLSeq
+   */
+  static create(nc: NodeCreator, obj: unknown): YAMLSeq {
+    const seq = new this(nc.schema)
+    if (obj && Symbol.iterator in Object(obj)) {
+      let i = 0
+      for (let it of obj as Iterable<unknown>) {
+        if (typeof nc.replacer === 'function') {
+          const key = obj instanceof Set ? it : String(i++)
+          it = nc.replacer.call(obj, key, it)
+        }
+        seq.push(nc.create(it))
+      }
     }
+    return seq
+  }
+
+  constructor(schema?: Schema, elements: Array<NodeOf<T>> = []) {
+    super(...elements)
+    Object.defineProperty(this, 'schema', {
+      value: schema,
+      configurable: true,
+      enumerable: false,
+      writable: true
+    })
+  }
+
+  /**
+   * Create a copy of this collection.
+   *
+   * @param schema - If defined, overwrites the original's schema
+   */
+  clone(schema?: Schema): this {
+    return copyCollection(this, schema)
+  }
+
+  /** @private */
+  _push(item: NodeOf<T>): void {
+    super.push(item)
+  }
+
+  /**
+   * Appends new elements to the sequence, and returns its new length.
+   *
+   * Non-node values are converted to Node values.
+   */
+  push(...items: Array<T | NodeOf<T>>): number {
+    let nc: NodeCreator | undefined
+    for (const value of items) {
+      if (isNode(value) || value instanceof Pair) {
+        super.push(value as NodeOf<T>)
+      } else {
+        if (!this.schema) throw new Error('Schema is required')
+        nc ??= new NodeCreator(this.schema, { aliasDuplicateObjects: false })
+        super.push(nc.create(value) as NodeOf<T>)
+        nc.setAnchors()
+      }
+    }
+    return this.length
   }
 
   /**
@@ -54,7 +137,7 @@ export class YAMLSeq<
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${idx}.`)
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    const del = this.items.splice(idx, 1)
+    const del = this.splice(idx, 1)
     return del.length > 0
   }
 
@@ -67,7 +150,7 @@ export class YAMLSeq<
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    return this.items[idx]
+    return this[idx]
   }
 
   /**
@@ -79,14 +162,14 @@ export class YAMLSeq<
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
     if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    return idx < this.items.length
+    return idx < this.length
   }
 
   /**
    * Sets a value in this collection. For `!!set`, `value` needs to be a
    * boolean to add/remove the item from the set.
    *
-   * Throws if `idx` is not a non-negative integer.
+   * Throws if `idx` is not an integer.
    */
   set(
     idx: number,
@@ -95,28 +178,39 @@ export class YAMLSeq<
   ): void {
     if (!Number.isInteger(idx))
       throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
-    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    const prev = this.items[idx]
+    const prev = this.at(idx)
     if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
-    else if (isNode(value)) this.items[idx] = value as NodeOf<T>
-    else if (!this.schema) throw new Error('Schema is required')
     else {
-      const nc = new NodeCreator(this.schema, {
-        ...options,
-        aliasDuplicateObjects: false
-      })
-      this.items[idx] = nc.create(value) as NodeOf<T>
-      nc.setAnchors()
+      let nv
+      if (isNode(value)) nv = value as NodeOf<T>
+      else {
+        if (!this.schema) throw new Error('Schema is required')
+        const nc = new NodeCreator(this.schema, {
+          ...options,
+          aliasDuplicateObjects: false
+        })
+        nv = nc.create(value) as NodeOf<T>
+        nc.setAnchors()
+      }
+      if (idx < 0) {
+        if (idx < -this.length) throw new RangeError(`Invalid index ${idx}`)
+        idx += this.length
+      }
+      this[idx] = nv
     }
   }
 
   /** A plain JavaScript representation of this node. */
   toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any[] {
     ctx ??= new ToJSContext()
-    const res: unknown[] = []
-    if (this.anchor) ctx.setAnchor(this, res)
-    for (const item of this.items) res.push(item.toJS(doc, ctx))
-    return res
+    if (this.anchor) {
+      const res: unknown[] = []
+      if (this.anchor) ctx.setAnchor(this, res)
+      for (const item of this) res.push(item.toJS(doc, ctx))
+      return res
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return Array.from(this, item => item.toJS(doc, ctx))
   }
 
   toString(
@@ -132,20 +226,5 @@ export class YAMLSeq<
       onChompKeep,
       onComment
     })
-  }
-
-  static from(nc: NodeCreator, obj: unknown): YAMLSeq {
-    const seq = new this(nc.schema)
-    if (obj && Symbol.iterator in Object(obj)) {
-      let i = 0
-      for (let it of obj as Iterable<unknown>) {
-        if (typeof nc.replacer === 'function') {
-          const key = obj instanceof Set ? it : String(i++)
-          it = nc.replacer.call(obj, key, it)
-        }
-        seq.items.push(nc.create(it))
-      }
-    }
-    return seq
   }
 }
