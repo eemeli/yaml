@@ -98,7 +98,7 @@ export function getTags(
   const schemaTags = schemas.get(schemaName)
   if (schemaTags && !customTags) {
     return addMergeTag && !schemaTags.includes(merge)
-      ? schemaTags.concat(merge)
+      ? [...schemaTags, merge]
       : schemaTags.slice()
   }
 
@@ -121,7 +121,7 @@ export function getTags(
   } else if (typeof customTags === 'function') {
     tags = customTags(tags.slice())
   }
-  if (addMergeTag) tags = tags.concat(merge)
+  if (addMergeTag) tags = [...tags, merge]
 
   return tags.reduce<(CollectionTag | ScalarTag)[]>((tags, tag) => {
     const tagObj = typeof tag === 'string' ? tagsByName[tag] : tag

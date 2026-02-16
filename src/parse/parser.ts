@@ -641,7 +641,7 @@ export class Parser {
               })
             } else if (start.length > 0) {
               // Not actually at next item
-              it.sep = it.sep.concat(start, this.sourceToken)
+              it.sep = [...it.sep, ...start, this.sourceToken]
             } else {
               it.sep.push(this.sourceToken)
             }

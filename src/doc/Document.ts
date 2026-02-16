@@ -205,7 +205,7 @@ export class Document<
       const keyToStr = (v: unknown) =>
         typeof v === 'number' || v instanceof String || v instanceof Number
       const asStr = replacer.filter(keyToStr).map(String)
-      if (asStr.length > 0) replacer = replacer.concat(asStr)
+      if (asStr.length > 0) replacer = [...replacer, ...asStr]
       nc = new NodeCreator(this, options, replacer)
     } else {
       options ??= replacer ?? undefined
