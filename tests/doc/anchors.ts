@@ -117,6 +117,7 @@ describe('errors', () => {
     const node = doc.value.items[0]
     const alias = doc.createAlias(node, 'AA')
     expect(() => {
+      // @ts-expect-error This is intentionally wrong.
       alias.tag = 'tag:yaml.org,2002:alias'
     }).toThrow('Alias nodes cannot have tags')
   })

@@ -1,6 +1,7 @@
 import { NodeCreator } from '../doc/NodeCreator.ts'
+import type { Token } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
-import { type Node, NodeBase } from './Node.ts'
+import type { Node, Range } from './Node.ts'
 import type { Pair } from './Pair.ts'
 import type { Scalar } from './Scalar.ts'
 
@@ -26,12 +27,12 @@ export function collectionFromPath(
   return new NodeCreator(schema, { aliasDuplicateObjects: false }).create(v)
 }
 
-export abstract class Collection extends NodeBase {
+export abstract class Collection {
   schema: Schema | undefined
 
-  declare items: (NodeBase | Pair)[]
+  declare items: (Node | Pair)[]
 
-  /** An optional anchor on this node. Used by alias nodes. */
+  /** An optional anchor on this collection. Used by alias nodes. */
   declare anchor?: string
 
   /**
@@ -40,8 +41,29 @@ export abstract class Collection extends NodeBase {
    */
   declare flow?: boolean
 
+  /** A comment on or immediately after this collection. */
+  declare comment?: string | null
+
+  /** A comment before this collection. */
+  declare commentBefore?: string | null
+
+  /**
+   * The `[start, value-end, node-end]` character offsets for
+   * the part of the source parsed into this collection (undefined if not parsed).
+   * The `value-end` and `node-end` positions are themselves not included in their respective ranges.
+   */
+  declare range?: Range | null
+
+  /** A blank line before this collection and its commentBefore */
+  declare spaceBefore?: boolean
+
+  /** The CST token that was composed into this collection.  */
+  declare srcToken?: Token
+
+  /** A fully qualified tag, if required */
+  declare tag?: string
+
   constructor(schema?: Schema) {
-    super()
     Object.defineProperty(this, 'schema', {
       value: schema,
       configurable: true,
@@ -55,14 +77,14 @@ export abstract class Collection extends NodeBase {
    *
    * @param schema - If defined, overwrites the original's schema
    */
-  clone(schema?: Schema): Collection {
-    const copy: Collection = Object.create(
+  clone(schema?: Schema): this {
+    const copy: this = Object.create(
       Object.getPrototypeOf(this),
       Object.getOwnPropertyDescriptors(this)
     )
     if (schema) copy.schema = schema
     copy.items = copy.items.map(it => it.clone(schema))
-    if (this.range) copy.range = this.range.slice() as NodeBase['range']
+    if (this.range) copy.range = [...this.range]
     return copy
   }
 
@@ -78,7 +100,7 @@ export abstract class Collection extends NodeBase {
   /**
    * Returns item at `key`, or `undefined` if not found.
    */
-  abstract get(key: unknown): NodeBase | Pair | undefined
+  abstract get(key: unknown): Node | Pair | undefined
 
   /**
    * Checks if the collection includes a value with the key `key`.
@@ -129,7 +151,7 @@ export abstract class Collection extends NodeBase {
   /**
    * Returns item at `key`, or `undefined` if not found.
    */
-  getIn(path: unknown[]): NodeBase | Pair | undefined {
+  getIn(path: unknown[]): Node | Pair | undefined {
     const [key, ...rest] = path
     const node = this.get(key)
     if (rest.length === 0) return node
