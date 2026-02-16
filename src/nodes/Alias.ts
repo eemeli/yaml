@@ -110,8 +110,7 @@ export class Alias implements NodeBase {
     }
     if (maxAliasCount >= 0) {
       data.count += 1
-      if (data.aliasCount === 0)
-        data.aliasCount = getAliasCount(doc, source, anchors)
+      data.aliasCount ||= getAliasCount(doc, ctx, source, anchors)
       if (data.count * data.aliasCount > maxAliasCount) {
         const msg =
           'Excessive alias count indicates a resource exhaustion attack'
@@ -142,21 +141,22 @@ export class Alias implements NodeBase {
 
 function getAliasCount(
   doc: Document,
+  ctx: ToJSContext,
   node: Node | Pair | null,
   anchors: ToJSContext['anchors']
 ): number {
   if (node instanceof Alias) {
-    const source = node.resolve(doc)
+    const source = node.resolve(doc, ctx)
     const anchor = anchors && source && anchors.get(source)
     return anchor ? anchor.count * anchor.aliasCount : 0
   } else if (node instanceof Pair) {
-    const kc = getAliasCount(doc, node.key, anchors)
-    const vc = getAliasCount(doc, node.value, anchors)
+    const kc = getAliasCount(doc, ctx, node.key, anchors)
+    const vc = getAliasCount(doc, ctx, node.value, anchors)
     return Math.max(kc, vc)
   } else if (node && 'items' in node) {
     let count = 0
     for (const item of node.items) {
-      const c = getAliasCount(doc, item, anchors)
+      const c = getAliasCount(doc, ctx, item, anchors)
       if (c > count) count = c
     }
     return count

@@ -49,7 +49,7 @@ export function addMergeToJSMap(
   map: MapLike,
   value: unknown
 ): void {
-  value = ctx && value instanceof Alias ? value.resolve(doc) : value
+  value = ctx && value instanceof Alias ? value.resolve(doc, ctx) : value
   if (value instanceof YAMLSeq)
     for (const it of value.items) mergeValue(doc, ctx, map, it)
   else if (Array.isArray(value))
@@ -63,7 +63,7 @@ function mergeValue(
   map: MapLike,
   value: unknown
 ) {
-  const source = value instanceof Alias ? value.resolve(doc) : value
+  const source = value instanceof Alias ? value.resolve(doc, ctx) : value
   const srcMap = (source as YAMLMap).toJS(doc, ctx, Map<any, any>)
   if (!(srcMap instanceof Map))
     throw new Error('Merge sources must be maps or map aliases')
