@@ -99,9 +99,9 @@ export const visit: {
 } = function visit(node, visitor) {
   const visitor_ = initVisitor(visitor)
   if (node instanceof Document) {
-    const cd = visit_(null, node.value, visitor_, Object.freeze([node]))
+    const cd = visit_(null, node.value, visitor_, [node])
     if (cd === REMOVE) node.value = new Scalar(null)
-  } else visit_(null, node, visitor_, Object.freeze([]))
+  } else visit_(null, node, visitor_, [])
 }
 
 visit.BREAK = BREAK
@@ -123,7 +123,7 @@ function visit_(
 
   if (typeof ctrl !== 'symbol') {
     if (node instanceof YAMLMap || node instanceof YAMLSeq) {
-      path = Object.freeze([...path, node])
+      path = [...path, node]
       for (let i = 0; i < node.items.length; ++i) {
         const ci = visit_(i, node.items[i], visitor, path)
         if (typeof ci === 'number') i = ci - 1
@@ -134,7 +134,7 @@ function visit_(
         }
       }
     } else if (node instanceof Pair) {
-      path = Object.freeze([...path, node])
+      path = [...path, node]
       const ck = visit_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
       else if (ck === REMOVE) node.key = new Scalar(null)
@@ -193,14 +193,9 @@ export const visitAsync: {
 } = async function visitAsync(node, visitor) {
   const visitor_ = initVisitor(visitor)
   if (node instanceof Document) {
-    const cd = await visitAsync_(
-      null,
-      node.value,
-      visitor_,
-      Object.freeze([node])
-    )
+    const cd = await visitAsync_(null, node.value, visitor_, [node])
     if (cd === REMOVE) node.value = new Scalar(null)
-  } else await visitAsync_(null, node, visitor_, Object.freeze([]))
+  } else await visitAsync_(null, node, visitor_, [])
 }
 
 visitAsync.BREAK = BREAK
@@ -222,7 +217,7 @@ async function visitAsync_(
 
   if (typeof ctrl !== 'symbol') {
     if (node instanceof YAMLMap || node instanceof YAMLSeq) {
-      path = Object.freeze([...path, node])
+      path = [...path, node]
       for (let i = 0; i < node.items.length; ++i) {
         const ci = await visitAsync_(i, node.items[i], visitor, path)
         if (typeof ci === 'number') i = ci - 1
@@ -233,7 +228,7 @@ async function visitAsync_(
         }
       }
     } else if (node instanceof Pair) {
-      path = Object.freeze([...path, node])
+      path = [...path, node]
       const ck = await visitAsync_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
       else if (ck === REMOVE) node.key = new Scalar(null)

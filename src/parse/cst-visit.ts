@@ -75,7 +75,7 @@ export const visit: {
 } = function visit(cst, visitor) {
   if ('type' in cst && cst.type === 'document')
     cst = { start: cst.start, value: cst.value }
-  _visit(Object.freeze([]), cst, visitor)
+  _visit([], cst, visitor)
 }
 
 visit.BREAK = BREAK
@@ -118,11 +118,7 @@ function _visit(
     const token = item[field]
     if (token && 'items' in token) {
       for (let i = 0; i < token.items.length; ++i) {
-        const ci = _visit(
-          Object.freeze(path.concat([[field, i]])),
-          token.items[i],
-          visitor
-        )
+        const ci = _visit([...path, [field, i]], token.items[i], visitor)
         if (typeof ci === 'number') i = ci - 1
         else if (ci === BREAK) return BREAK
         else if (ci === REMOVE) {
