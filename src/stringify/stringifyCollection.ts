@@ -134,7 +134,18 @@ function stringifyFlowCollection(
 
     if (comment) reqNewline = true
     let str = stringify(item, itemCtx, () => (comment = null))
-    if (i < items.length - 1) str += ','
+    if (i < items.length - 1) {
+      str += ','
+    } else if (ctx.options.trailingComma) {
+      // 'look forwards' to see if entries will be connected with newlines
+      const willReqNewline = reqNewline
+        || lines.reduce((sum, line) => sum + line.length + 2, 2) + (str.length + 2) + (comment ? lineComment(str, itemIndent, commentString(comment)).length : 0) > ctx.options.lineWidth
+        || lines.length > linesAtValue
+        || str.includes('\n')
+      if (willReqNewline) {
+        str += ','
+      }
+    }
     if (comment) str += lineComment(str, itemIndent, commentString(comment))
     if (!reqNewline && (lines.length > linesAtValue || str.includes('\n')))
       reqNewline = true

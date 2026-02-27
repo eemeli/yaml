@@ -387,4 +387,11 @@ export type ToStringOptions = {
    * Default: `'true'`
    */
   verifyAliasOrder?: boolean
+
+  /**
+   * Add a trailing comma after the last entry in a flow map or flow sequence that's split across multiple lines.
+   *
+   * Default: `'false'`
+   */
+  trailingComma?: boolean
 }

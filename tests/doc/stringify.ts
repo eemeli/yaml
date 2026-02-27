@@ -543,6 +543,167 @@ z:
       expect(String(doc)).toBe(src)
     })
   })
+
+  describe('trailing comma (maps)', () => {
+    test('single line due to under 80 characters', () => {
+      const doc = new YAML.Document<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>, false>({
+        a: 'aaaaaaaaa',
+        b: 'bbbbbbbbb',
+        c: 'ccccccccc',
+      })
+      doc.contents.flow = true
+      expect(doc.toString({ trailingComma: true })).toBe('{ a: aaaaaaaaa, b: bbbbbbbbb, c: ccccccccc }\n')
+    })
+    test('single line due to exactly 80 characters', () => {
+      const doc = YAML.parseDocument(source`
+{
+  a: aaaaaaa,
+  b: bbbbbbb,
+  c: ccccccc,
+  d: ddddddd,
+  e: eeeeeee,
+  f: ffffffff
+}
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('{ a: aaaaaaa, b: bbbbbbb, c: ccccccc, d: ddddddd, e: eeeeeee, f: ffffffff }\n')
+    })
+    test('multi line due to exactly 81 characters', () => {
+      const doc = YAML.parseDocument(source`
+{
+  a: aaaaaaa,
+  b: bbbbbbb,
+  c: ccccccc,
+  d: ddddddd,
+  e: eeeeeee,
+  f: fffffffff
+}
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('{\n  a: aaaaaaa,\n  b: bbbbbbb,\n  c: ccccccc,\n  d: ddddddd,\n  e: eeeeeee,\n  f: fffffffff,\n}\n')
+    })
+    test('multiline due to existing comment', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: aaaaaaaaa, # my cool comment
+          b: bbbbbbbbb
+        }
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('{\n  a: aaaaaaaaa, # my cool comment\n  b: bbbbbbbbb,\n}\n')
+    })
+    test('multiline due to preserving a newline', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: aaaaaaaaa,
+
+          b: bbbbbbbbb
+        }
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('{\n  a: aaaaaaaaa,\n\n  b: bbbbbbbbb,\n}\n')
+    })
+    test('multiline due to entry includes a newline', () => {
+      const doc = YAML.parseDocument(source`
+{
+  a: {
+    a: a # a
+  },
+  b: bbb
+}
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('{\n  a:\n    {\n      a: a, # a\n    },\n  b: bbb,\n}\n')
+    })
+    test('multiline due to over 80 characters', () => {
+      const doc = new YAML.Document<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>, false>({
+        a: 'aaaaaaaaa',
+        b: 'bbbbbbbbb',
+        c: 'ccccccccc',
+        d: 'ddddddddd',
+        e: 'eeeeeeeee',
+        f: 'fffffffff'
+      })
+      doc.contents.flow = true
+      expect(doc.toString({ trailingComma: true })).toBe('{\n  a: aaaaaaaaa,\n  b: bbbbbbbbb,\n  c: ccccccccc,\n  d: ddddddddd,\n  e: eeeeeeeee,\n  f: fffffffff,\n}\n')
+    })
+  })
+
+  describe('trailing comma (arrays)', () => {
+    test('single line due to under 80 characters', () => {
+      const doc = new YAML.Document<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>, false>([
+        'aaaaaaaaa',
+        'bbbbbbbbb',
+        'ccccccccc',
+      ])
+      doc.contents.flow = true
+      expect(doc.toString({ trailingComma: true })).toBe('[ aaaaaaaaa, bbbbbbbbb, ccccccccc ]\n')
+    })
+    test('single line due to exactly 80 characters', () => {
+      const doc = YAML.parseDocument(source`
+[
+  aaaaaaaaaa,
+  bbbbbbbbbb,
+  cccccccccc,
+  dddddddddd,
+  eeeeeeeeee,
+  fffffffffff
+]
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('[ aaaaaaaaaa, bbbbbbbbbb, cccccccccc, dddddddddd, eeeeeeeeee, fffffffffff ]\n')
+    })
+    test('multi line due to exactly 81 characters', () => {
+      const doc = YAML.parseDocument(source`
+[
+  aaaaaaaaaa,
+  bbbbbbbbbb,
+  cccccccccc,
+  dddddddddd,
+  eeeeeeeeee,
+  ffffffffffff
+]
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('[\n  aaaaaaaaaa,\n  bbbbbbbbbb,\n  cccccccccc,\n  dddddddddd,\n  eeeeeeeeee,\n  ffffffffffff,\n]\n')
+    })
+    test('multiline due to existing comment', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          aaaaaaaaa, # my cool comment
+          bbbbbbbbb
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('[\n  aaaaaaaaa, # my cool comment\n  bbbbbbbbb,\n]\n')
+    })
+    test('multiline due to preserving a newline', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          aaaaaaaaa,
+
+          bbbbbbbbb
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('[\n  aaaaaaaaa,\n\n  bbbbbbbbb,\n]\n')
+    })
+    test('multiline due to entry includes a newline', () => {
+      const doc = YAML.parseDocument(source`
+[
+  {
+    a: a # a
+  },
+  bbb
+]
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe('[\n  {\n      a: a, # a\n    },\n  bbb,\n]\n')
+    })
+    test('multiline due to over 80 characters', () => {
+      const doc = new YAML.Document<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>, false>([
+        'aaaaaaaaa',
+        'bbbbbbbbb',
+        'ccccccccc',
+        'ddddddddd',
+        'eeeeeeeee',
+        'fffffffff',
+        'ggggggggg'
+      ])
+      doc.contents.flow = true
+      expect(doc.toString({ trailingComma: true })).toBe('[\n  aaaaaaaaa,\n  bbbbbbbbb,\n  ccccccccc,\n  ddddddddd,\n  eeeeeeeee,\n  fffffffff,\n  ggggggggg,\n]\n')
+    })
+  })
 })
 
 test('Quoting colons (#43)', () => {
