@@ -553,7 +553,7 @@ z:
           c: ccc
         }
         `)
-      expect(doc.toString({ trailingComma: true })).toBe('{ a: aaa, b: bbb, c: ccc }\n')
+      expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe('{ a: aaa, b: bbb, c: ccc }\n')
     })
     test('no trailing comma is added when the flow map is exactly the word wrap length', () => {
       const doc = YAML.parseDocument(source`
@@ -576,6 +576,16 @@ z:
         }
         `)
       expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe('{\n  a: aaa,\n  b: bbb,\n  c: ccc,\n  d: ddddddd,\n}\n')
+    })
+    test('no trailing comma is added when the word wrap length is 0', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: aaa,
+          b: bbb,
+          c: ccc
+        }
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 0 })).toBe('{ a: aaa, b: bbb, c: ccc }\n')
     })
     test('a trailing comma is added when a comment is present in the flow map', () => {
       const doc = YAML.parseDocument(source`
@@ -619,7 +629,7 @@ z:
           ccc
         ]
         `)
-      expect(doc.toString({ trailingComma: true })).toBe('[ aaa, bbb, ccc ]\n')
+      expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe('[ aaa, bbb, ccc ]\n')
     })
     test('no trailing comma is added when the flow array is exactly the word wrap length', () => {
       const doc = YAML.parseDocument(source`
@@ -642,6 +652,16 @@ z:
         ]
         `)
       expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe('[\n  aaaaaa,\n  bbbbbb,\n  cccccc,\n  dddddddddd,\n]\n')
+    })
+    test('no trailing comma is added when the word wrap length is 0', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          aaa,
+          bbb,
+          ccc
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 0 })).toBe('{ a: aaa, b: bbb, c: ccc }\n')
     })
     test('a trailing comma is added when a comment is present in the flow array', () => {
       const doc = YAML.parseDocument(source`
