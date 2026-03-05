@@ -661,7 +661,7 @@ z:
           ccc
         ]
         `)
-      expect(doc.toString({ trailingComma: true, lineWidth: 0 })).toBe('{ a: aaa, b: bbb, c: ccc }\n')
+      expect(doc.toString({ trailingComma: true, lineWidth: 0 })).toBe('[ aaa, bbb, ccc ]\n')
     })
     test('a trailing comma is added when a comment is present in the flow array', () => {
       const doc = YAML.parseDocument(source`
