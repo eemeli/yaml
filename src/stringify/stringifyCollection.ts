@@ -108,7 +108,6 @@ function stringifyFlowCollection(
   let reqNewline = false
   let linesAtValue = 0
   const lines: string[] = []
-  let precomputedLineLength = -1
   for (let i = 0; i < items.length; ++i) {
     const item = items[i]
     let comment: string | null = null
@@ -137,40 +136,19 @@ function stringifyFlowCollection(
     let str = stringify(item, itemCtx, () => (comment = null))
     if (i < items.length - 1) {
       str += ','
-      if (comment) str += lineComment(str, itemIndent, commentString(comment))
-      if (!reqNewline && (lines.length > linesAtValue || str.includes('\n')))
-        reqNewline = true
-      lines.push(str)
-      linesAtValue = lines.length
-    } else {
-      let renderedComment = ''
-      if (comment) {
-        renderedComment = lineComment(str, itemIndent, commentString(comment))
+    } else if (ctx.options.trailingComma) {
+      if (ctx.options.lineWidth > 0) {
+        reqNewline ||= lines.reduce((sum, line) => sum + line.length + 2, 2) + (str.length + 2) > ctx.options.lineWidth
       }
-
-      if (ctx.options.trailingComma) {
-        // only should happen when lines are connected with newlines;
-        // figure out if that'll happen
-        let newlineDueToLength = false
-        if (ctx.options.lineWidth > 0) {
-          precomputedLineLength = lines.reduce((sum, line) => sum + line.length + 2, 2) + (str.length + 2) + renderedComment.length
-          newlineDueToLength = precomputedLineLength > ctx.options.lineWidth
-        }
-
-        const willReqNewline = reqNewline
-          || newlineDueToLength
-          || lines.length > linesAtValue
-          || str.includes('\n')
-        if (willReqNewline) {
-          str += ','
-        }
+      reqNewline ||= lines.length > linesAtValue || str.includes('\n')
+      if (reqNewline) {
+        str += ','
       }
-      str += renderedComment
-      if (!reqNewline && (lines.length > linesAtValue || str.includes('\n')))
-        reqNewline = true
-      lines.push(str)
-      linesAtValue = lines.length
     }
+    if (comment) str += lineComment(str, itemIndent, commentString(comment))
+    reqNewline ||= lines.length > linesAtValue || str.includes('\n')
+    lines.push(str)
+    linesAtValue = lines.length
   }
 
   const { start, end } = flowChars
@@ -178,7 +156,7 @@ function stringifyFlowCollection(
     return start + end
   } else {
     if (!reqNewline) {
-      const len = precomputedLineLength >= 0 ? precomputedLineLength : lines.reduce((sum, line) => sum + line.length + 2, 2)
+      const len = lines.reduce((sum, line) => sum + line.length + 2, 2)
       reqNewline = ctx.options.lineWidth > 0 && len > ctx.options.lineWidth
     }
     if (reqNewline) {
