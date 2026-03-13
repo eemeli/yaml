@@ -57,7 +57,7 @@ export function createStringifyContext(
       singleQuote: null,
       trailingComma: false,
       trueStr: 'true',
-      verifyAliasOrder: true,
+      verifyAliasOrder: true
     },
     doc.schema.toStringOptions,
     options

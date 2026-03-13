@@ -139,7 +139,10 @@ function stringifyFlowCollection(
       str += ','
     } else if (ctx.options.trailingComma) {
       if (ctx.options.lineWidth > 0) {
-        reqNewline ||= lines.reduce((sum, line) => sum + line.length + 2, 2) + (str.length + 2) > ctx.options.lineWidth
+        reqNewline ||=
+          lines.reduce((sum, line) => sum + line.length + 2, 2) +
+            (str.length + 2) >
+          ctx.options.lineWidth
       }
       if (reqNewline) {
         str += ','
