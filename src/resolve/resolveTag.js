@@ -1,7 +1,12 @@
 import { Collection } from '../ast/Collection.js'
 import { Scalar } from '../ast/Scalar.js'
 import { Type, defaultTags } from '../constants.js'
-import { YAMLReferenceError, YAMLWarning } from '../errors.js'
+import {
+  YAMLError,
+  YAMLReferenceError,
+  YAMLSemanticError,
+  YAMLWarning
+} from '../errors.js'
 import { resolveScalar } from './resolveScalar.js'
 import { resolveString } from './resolveString.js'
 
@@ -46,9 +51,13 @@ export function resolveTag(doc, node, tagName) {
       return res
     }
   } catch (error) {
-    /* istanbul ignore if */
-    if (!error.source) error.source = node
-    doc.errors.push(error)
+    if (error instanceof YAMLError) {
+      if (!error.source) error.source = node
+      doc.errors.push(error)
+    } else {
+      const msg = error instanceof Error ? error.message : String(error)
+      doc.errors.push(new YAMLSemanticError(node, msg))
+    }
     return null
   }
 

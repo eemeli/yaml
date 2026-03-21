@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import YAML from '../../index.js'
+import { YAMLError } from '../../util.js'
 
 describe('tags', () => {
   describe('implicit tags', () => {
@@ -614,6 +615,15 @@ describe('Excessive entity expansion attacks', () => {
       })
     }
   })
+})
+
+test('Excessive recursion', () => {
+  const depth = 5000
+  const src = '['.repeat(depth) + '1' + ']'.repeat(depth)
+  const doc = YAML.parseDocument(src)
+  for (const error of doc.errors) {
+    expect(error).toBeInstanceOf(YAMLError)
+  }
 })
 
 test('Anchor for empty node (6KGN)', () => {

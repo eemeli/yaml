@@ -196,13 +196,20 @@ export class ParseContext {
         parent: context.parent.type
       }
     const node = createNewNode(type, props)
-    let offset = node.parse(context, valueStart)
+    let offset = start
+    try {
+      offset = node.parse(context, valueStart)
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error)
+      if (!node.error) node.error = new YAMLSyntaxError(node, msg)
+    }
     node.range = new Range(start, offset)
     /* istanbul ignore if */
     if (offset <= start) {
       // This should never happen, but if it does, let's make sure to at least
       // step one character forward to avoid a busy loop.
-      node.error = new Error(`Node#parse consumed no characters`)
+      if (!node.error)
+        node.error = new Error(`Node#parse consumed no characters`)
       node.error.parseEnd = offset
       node.error.source = node
       node.range.end = start + 1
