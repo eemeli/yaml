@@ -1,5 +1,9 @@
 let moduleNameMapper
-const testPathIgnorePatterns = ['tests/common', 'cst/common']
+const testPathIgnorePatterns = [
+  'cst/common',
+  'tests/common',
+  'tests/json-test-suite'
+]
 
 // The npm script name is significant.
 switch (process.env.npm_lifecycle_event) {
