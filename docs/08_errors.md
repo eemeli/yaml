@@ -43,6 +43,7 @@ To identify errors for special handling, you should primarily use `code` to diff
 | `MULTIPLE_DOCS`          | A YAML stream may include multiple documents. If yours does, you'll need to use `parseAllDocuments()` to work with it.                                                       |
 | `MULTIPLE_TAGS`          | A node is only allowed to have one tag.                                                                                                                                      |
 | `NON_STRING_KEY`         | With the `stringKeys` option, all mapping keys must be strings                                                                                                               |
+| `RESOURCE_EXHAUSTION`    | The input document has excessive nesting, leading to a stack overflow during parsing.                                                                                        |
 | `TAB_AS_INDENT`          | Only spaces are allowed as indentation.                                                                                                                                      |
 | `TAG_RESOLVE_FAILED`     | Something went wrong when resolving a node's tag with the current schema.                                                                                                    |
 | `UNEXPECTED_TOKEN`       | A token was encountered in a place where it wasn't expected.                                                                                                                 |
