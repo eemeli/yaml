@@ -16,4 +16,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Sync version to jsr.jsonc
+        run: |
+          node -e "
+            const fs = require('fs');
+            const pkgVersion = require('./package.json').version;
+            let text = fs.readFileSync('jsr.jsonc', 'utf8');
+
+            text = text.replace(
+              /(\"version\"\s*:\s*\")([^\"]+)(\")/,
+              \`$1\${pkgVersion}$3\`
+            );
+
+            fs.writeFileSync('jsr.jsonc', text);
+          "
       - run: npx jsr publish
