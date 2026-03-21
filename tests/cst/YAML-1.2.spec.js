@@ -527,8 +527,9 @@ rbi:
       ]
     },
 
-    'Example 2.15. Folded newlines are preserved for "more indented" and blank lines': {
-      src: `>
+    'Example 2.15. Folded newlines are preserved for "more indented" and blank lines':
+      {
+        src: `>
  Sammy Sosa completed another
  fine season with great stats.
 
@@ -536,19 +537,19 @@ rbi:
    0.288 Batting Average
 
  What a year!`,
-      tgt: [
-        {
-          contents: [
-            `Sammy Sosa completed another fine season with great stats.
+        tgt: [
+          {
+            contents: [
+              `Sammy Sosa completed another fine season with great stats.
 
   63 Home Runs
   0.288 Batting Average
 
 What a year!\n`
-          ]
-        }
-      ]
-    },
+            ]
+          }
+        ]
+      },
 
     'Example 2.16. Indentation determines scope': {
       src: `name: Mark McGwire
@@ -1109,8 +1110,7 @@ comments:
                 'comments',
                 {
                   type: Type.MAP_VALUE,
-                  node:
-                    'Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.'
+                  node: 'Late afternoon is best. Backup contact is Nancy Billsmer @ 338-4338.'
                 }
               ]
             }

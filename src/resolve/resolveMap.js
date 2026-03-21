@@ -150,7 +150,8 @@ function resolveBlockMapItems(doc, cst) {
             if (typeof item.range.origStart === 'number') {
               const origPos = item.range.origStart + 1
               valueNode.range.origStart = valueNode.range.origEnd = origPos
-              valueNode.valueRange.origStart = valueNode.valueRange.origEnd = origPos
+              valueNode.valueRange.origStart = valueNode.valueRange.origEnd =
+                origPos
             }
           }
           const pair = new Pair(key, resolveNode(doc, valueNode))
