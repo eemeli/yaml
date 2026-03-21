@@ -34,3 +34,4 @@ jobs:
         uses: actions/setup-node@v4
       - run: npm ci
       - run: npm run lint
+      - run: npx prettier --check .
