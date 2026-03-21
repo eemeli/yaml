@@ -61,8 +61,14 @@ export function composeNode(
     case 'block-map':
     case 'block-seq':
     case 'flow-collection':
-      node = composeCollection(CN, ctx, token, props, onError)
-      if (anchor) node.anchor = anchor.source.substring(1)
+      try {
+        node = composeCollection(CN, ctx, token, props, onError)
+        if (anchor) node.anchor = anchor.source.substring(1)
+      } catch (error) {
+        // Almost certainly here due to a stack overflow
+        const message = error instanceof Error ? error.message : String(error)
+        onError(token, 'RESOURCE_EXHAUSTION', message)
+      }
       break
     default: {
       const message =
@@ -70,17 +76,10 @@ export function composeNode(
           ? token.message
           : `Unsupported token (type: ${token.type})`
       onError(token, 'UNEXPECTED_TOKEN', message)
-      node = composeEmptyNode(
-        ctx,
-        token.offset,
-        undefined,
-        null,
-        props,
-        onError
-      )
       isSrcToken = false
     }
   }
+  node ??= composeEmptyNode(ctx, token.offset, undefined, null, props, onError)
   if (anchor && node.anchor === '')
     onError(anchor, 'BAD_ALIAS', 'Anchor cannot be an empty string')
   if (
