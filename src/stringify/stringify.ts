@@ -49,6 +49,7 @@ export function createStringifyContext(
       nullStr: 'null',
       simpleKeys: false,
       singleQuote: null,
+      trailingComma: false,
       trueStr: 'true',
       verifyAliasOrder: true
     },

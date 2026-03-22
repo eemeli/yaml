@@ -4,7 +4,6 @@ permissions: {}
 
 on:
   pull_request:
-    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
@@ -35,3 +34,4 @@ jobs:
         uses: actions/setup-node@v4
       - run: npm ci
       - run: npm run lint
+      - run: npx prettier --check .

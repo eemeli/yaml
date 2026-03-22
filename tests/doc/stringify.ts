@@ -544,6 +544,186 @@ z:
       expect(String(doc)).toBe(src)
     })
   })
+
+  describe('trailing comma (maps)', () => {
+    test('no trailing comma is added when the flow map is shorter than the word wrap length', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: aaa,
+          b: bbb,
+          c: ccc
+        }
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe(
+        '{ a: aaa, b: bbb, c: ccc }\n'
+      )
+    })
+    test('no trailing comma is added when the flow map is exactly the word wrap length', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: aaa,
+          b: bbb,
+          c: ccc,
+          d: dddddd
+        }
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe(
+        '{ a: aaa, b: bbb, c: ccc, d: dddddd }\n'
+      )
+    })
+    test('a trailing comma is added when the flow map is exactly one more than the word wrap length', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: aaa,
+          b: bbb,
+          c: ccc,
+          d: ddddddd
+        }
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe(
+        '{\n  a: aaa,\n  b: bbb,\n  c: ccc,\n  d: ddddddd,\n}\n'
+      )
+    })
+    test('no trailing comma is added when the word wrap length is 0', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: aaa,
+          b: bbb,
+          c: ccc
+        }
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 0 })).toBe(
+        '{ a: aaa, b: bbb, c: ccc }\n'
+      )
+    })
+    test('a trailing comma is added when a comment is present in the flow map', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: aaa, # my cool comment
+          b: bbb,
+          c: ccc
+        }
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe(
+        '{\n  a: aaa, # my cool comment\n  b: bbb,\n  c: ccc,\n}\n'
+      )
+    })
+    test('a trailing comma is added when a newline is present in the flow map', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: aaa,
+
+          b: bbb
+        }
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe(
+        '{\n  a: aaa,\n\n  b: bbb,\n}\n'
+      )
+    })
+    test('a trailing comma is added when one of the entries includes a newline', () => {
+      const doc = YAML.parseDocument(source`
+        {
+          a: {
+            a: a # a
+          },
+          b: bbb
+        }
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe(
+        '{\n  a:\n    {\n      a: a, # a\n    },\n  b: bbb,\n}\n'
+      )
+    })
+  })
+
+  describe('trailing comma (arrays)', () => {
+    test('no trailing comma is added when the flow array is shorter than the word wrap length', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          aaa,
+          bbb,
+          ccc
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe(
+        '[ aaa, bbb, ccc ]\n'
+      )
+    })
+    test('no trailing comma is added when the flow array is exactly the word wrap length', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          aaaaaa,
+          bbbbbb,
+          cccccc,
+          ddddddddd
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe(
+        '[ aaaaaa, bbbbbb, cccccc, ddddddddd ]\n'
+      )
+    })
+    test('a trailing comma is added when the flow array is exactly one more than the word wrap length', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          aaaaaa,
+          bbbbbb,
+          cccccc,
+          dddddddddd
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 40 })).toBe(
+        '[\n  aaaaaa,\n  bbbbbb,\n  cccccc,\n  dddddddddd,\n]\n'
+      )
+    })
+    test('no trailing comma is added when the word wrap length is 0', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          aaa,
+          bbb,
+          ccc
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true, lineWidth: 0 })).toBe(
+        '[ aaa, bbb, ccc ]\n'
+      )
+    })
+    test('a trailing comma is added when a comment is present in the flow array', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          aaa, # my cool comment
+          bbb,
+          ccc
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe(
+        '[\n  aaa, # my cool comment\n  bbb,\n  ccc,\n]\n'
+      )
+    })
+    test('a trailing comma is added when a newline is present in the flow array', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          aaa,
+
+          bbb
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe(
+        '[\n  aaa,\n\n  bbb,\n]\n'
+      )
+    })
+    test('a trailing comma is added when one of the entries includes a newline', () => {
+      const doc = YAML.parseDocument(source`
+        [
+          {
+            a: a # a
+          },
+          bbb
+        ]
+        `)
+      expect(doc.toString({ trailingComma: true })).toBe(
+        '[\n  {\n      a: a, # a\n    },\n  bbb,\n]\n'
+      )
+    })
+  })
 })
 
 test('Quoting colons (#43)', () => {

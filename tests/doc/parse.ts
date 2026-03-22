@@ -452,94 +452,105 @@ describe('odd indentations', () => {
   })
 })
 
-describe('Excessive entity expansion attacks', async () => {
-  const src1 = await readArtifact('pr104/case1.yml', 'utf8')
-  const src2 = await readArtifact('pr104/case2.yml', 'utf8')
-  const srcB = await readArtifact('pr104/billion-laughs.yml', 'utf8')
-  const srcQ = await readArtifact('pr104/quadratic.yml', 'utf8')
-
-  describe('Limit count by default', () => {
-    for (const [name, src] of [
-      ['js-yaml case 1', src1],
-      ['js-yaml case 2', src2],
-      ['billion laughs', srcB],
-      ['quadratic expansion', srcQ]
-    ]) {
-      test(name, () => {
-        expect(() => YAML.parse(src, { logLevel: 'error' })).toThrow(
-          /Excessive alias count/
-        )
-      })
+describe('Resource exhaustion attacks', () => {
+  test('Excessive recursion', () => {
+    const depth = 5000
+    const src = '['.repeat(depth) + '1' + ']'.repeat(depth)
+    const doc = YAML.parseDocument(src)
+    for (const error of doc.errors) {
+      expect(error).toMatchObject({ code: 'RESOURCE_EXHAUSTION' })
     }
   })
 
-  describe('Work sensibly even with disabled limits', () => {
-    test('js-yaml case 1', () => {
-      const mockWarn =
-        typeof process !== 'undefined'
-          ? vi.spyOn(process, 'emitWarning').mockImplementation(() => {})
-          : vi.spyOn(console, 'warn').mockImplementation(() => {})
-      const obj = YAML.parse(src1, { maxAliasCount: -1 })
-      expect(obj).toMatchObject({})
-      const key = Object.keys(obj)[0]
-      expect(key.length).toBeGreaterThan(2000)
-      expect(key.length).toBeLessThan(8000)
-      expect(mockWarn).toHaveBeenCalled()
-      mockWarn.mockRestore()
+  describe('Excessive entity expansion attacks', async () => {
+    const src1 = await readArtifact('pr104/case1.yml', 'utf8')
+    const src2 = await readArtifact('pr104/case2.yml', 'utf8')
+    const srcB = await readArtifact('pr104/billion-laughs.yml', 'utf8')
+    const srcQ = await readArtifact('pr104/quadratic.yml', 'utf8')
+
+    describe('Limit count by default', () => {
+      for (const [name, src] of [
+        ['js-yaml case 1', src1],
+        ['js-yaml case 2', src2],
+        ['billion laughs', srcB],
+        ['quadratic expansion', srcQ]
+      ]) {
+        test(name, () => {
+          expect(() => YAML.parse(src, { logLevel: 'error' })).toThrow(
+            /Excessive alias count/
+          )
+        })
+      }
     })
 
-    test('js-yaml case 2', () => {
-      const arr = YAML.parse(src2, { logLevel: 'error', maxAliasCount: -1 })
-      expect(arr).toHaveLength(2)
-      const key = Object.keys(arr[1])[0]
-      expect(key).toBe('*id057')
-    })
-
-    test('billion laughs', () => {
-      const obj = YAML.parse(srcB, { maxAliasCount: -1 })
-      expect(Object.keys(obj)).toHaveLength(9)
-    })
-
-    test('quadratic expansion', () => {
-      const obj = YAML.parse(srcQ, { maxAliasCount: -1 })
-      expect(Object.keys(obj)).toHaveLength(11)
-    })
-  })
-
-  describe('maxAliasCount limits', () => {
-    const rows = [
-      'a: &a [lol, lol, lol, lol, lol, lol, lol, lol, lol]',
-      'b: &b [*a, *a, *a, *a, *a, *a, *a, *a, *a]',
-      'c: &c [*b, *b, *b, *b]',
-      'd: &d [*c, *c]',
-      'e: [*d]'
-    ]
-
-    test(`depth 0: maxAliasCount 1 passes`, () => {
-      expect(() => YAML.parse(rows[0], { maxAliasCount: 1 })).not.toThrow()
-    })
-
-    test(`depth 1: maxAliasCount 1 fails on first alias`, () => {
-      const src = `${rows[0]}\nb: *a`
-      expect(() => YAML.parse(src, { maxAliasCount: 1 })).toThrow()
-    })
-
-    const limits = [10, 50, 150, 300]
-    for (let i = 0; i < 4; ++i) {
-      const src = rows.slice(0, i + 2).join('\n')
-
-      test(`depth ${i + 1}: maxAliasCount ${limits[i] - 1} fails`, () => {
-        expect(() =>
-          YAML.parse(src, { maxAliasCount: limits[i] - 1 })
-        ).toThrow()
+    describe('Work sensibly even with disabled limits', () => {
+      test('js-yaml case 1', () => {
+        const mockWarn =
+          typeof process !== 'undefined'
+            ? vi.spyOn(process, 'emitWarning').mockImplementation(() => {})
+            : vi.spyOn(console, 'warn').mockImplementation(() => {})
+        const obj = YAML.parse(src1, { maxAliasCount: -1 })
+        expect(obj).toMatchObject({})
+        const key = Object.keys(obj)[0]
+        expect(key.length).toBeGreaterThan(2000)
+        expect(key.length).toBeLessThan(8000)
+        expect(mockWarn).toHaveBeenCalled()
+        mockWarn.mockRestore()
       })
 
-      test(`depth ${i + 1}: maxAliasCount ${limits[i]} passes`, () => {
-        expect(() =>
-          YAML.parse(src, { maxAliasCount: limits[i] })
-        ).not.toThrow()
+      test('js-yaml case 2', () => {
+        const arr = YAML.parse(src2, { logLevel: 'error', maxAliasCount: -1 })
+        expect(arr).toHaveLength(2)
+        const key = Object.keys(arr[1])[0]
+        expect(key).toBe('*id057')
       })
-    }
+
+      test('billion laughs', () => {
+        const obj = YAML.parse(srcB, { maxAliasCount: -1 })
+        expect(Object.keys(obj)).toHaveLength(9)
+      })
+
+      test('quadratic expansion', () => {
+        const obj = YAML.parse(srcQ, { maxAliasCount: -1 })
+        expect(Object.keys(obj)).toHaveLength(11)
+      })
+    })
+
+    describe('maxAliasCount limits', () => {
+      const rows = [
+        'a: &a [lol, lol, lol, lol, lol, lol, lol, lol, lol]',
+        'b: &b [*a, *a, *a, *a, *a, *a, *a, *a, *a]',
+        'c: &c [*b, *b, *b, *b]',
+        'd: &d [*c, *c]',
+        'e: [*d]'
+      ]
+
+      test(`depth 0: maxAliasCount 1 passes`, () => {
+        expect(() => YAML.parse(rows[0], { maxAliasCount: 1 })).not.toThrow()
+      })
+
+      test(`depth 1: maxAliasCount 1 fails on first alias`, () => {
+        const src = `${rows[0]}\nb: *a`
+        expect(() => YAML.parse(src, { maxAliasCount: 1 })).toThrow()
+      })
+
+      const limits = [10, 50, 150, 300]
+      for (let i = 0; i < 4; ++i) {
+        const src = rows.slice(0, i + 2).join('\n')
+
+        test(`depth ${i + 1}: maxAliasCount ${limits[i] - 1} fails`, () => {
+          expect(() =>
+            YAML.parse(src, { maxAliasCount: limits[i] - 1 })
+          ).toThrow()
+        })
+
+        test(`depth ${i + 1}: maxAliasCount ${limits[i]} passes`, () => {
+          expect(() =>
+            YAML.parse(src, { maxAliasCount: limits[i] })
+          ).not.toThrow()
+        })
+      }
+    })
   })
 })
 

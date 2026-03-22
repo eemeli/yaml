@@ -372,6 +372,13 @@ export type ToStringOptions = {
   singleQuote?: boolean | null
 
   /**
+   * Add a trailing comma after the last entry in a flow map or flow sequence that's split across multiple lines.
+   *
+   * Default: `'false'`
+   */
+  trailingComma?: boolean
+
+  /**
    * String representation for `true`.
    * With the core schema, use `'true'`, `'True'`, or `'TRUE'`.
    *

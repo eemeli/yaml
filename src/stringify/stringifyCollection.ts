@@ -129,10 +129,21 @@ function stringifyFlowCollection(
 
     if (comment) reqNewline = true
     let str = stringify(item, itemCtx, () => (comment = null))
-    if (i < coll.length - 1) str += ','
+    reqNewline ||= lines.length > linesAtValue || str.includes('\n')
+    if (i < coll.length - 1) {
+      str += ','
+    } else if (ctx.options.trailingComma) {
+      if (ctx.options.lineWidth > 0) {
+        reqNewline ||=
+          lines.reduce((sum, line) => sum + line.length + 2, 2) +
+            (str.length + 2) >
+          ctx.options.lineWidth
+      }
+      if (reqNewline) {
+        str += ','
+      }
+    }
     if (comment) str += lineComment(str, itemIndent, commentString(comment))
-    if (!reqNewline && (lines.length > linesAtValue || str.includes('\n')))
-      reqNewline = true
     lines.push(str)
     linesAtValue = lines.length
   }
