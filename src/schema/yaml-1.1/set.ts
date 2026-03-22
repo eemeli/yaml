@@ -123,17 +123,12 @@ export const set: CollectionTag = {
     return set
   },
 
-  resolve(map, onError) {
-    if (!(map instanceof YAMLMap)) {
-      onError('Expected a mapping for this tag')
-      return map
-    } else if (!hasAllNullValues(map)) {
+  resolve(set, onError) {
+    if (!(set instanceof YAMLSet)) {
+      onError('Expected a set for this tag')
+    } else if (!hasAllNullValues(set)) {
       onError('Set items must all have null values')
-      return map
-    } else {
-      const set = Object.assign(new YAMLSet(), map)
-      for (const pair of map) pair.value &&= null
-      return set
     }
+    return set
   }
 }

@@ -6,7 +6,6 @@ import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
-import type { NodeCreator } from '../../util.ts'
 import type { Schema } from '../Schema.ts'
 import type { CollectionTag } from '../types.ts'
 import { createPairs, resolvePairs } from './pairs.ts'
@@ -56,7 +55,7 @@ export const omap: CollectionTag = {
   default: false,
   tag: 'tag:yaml.org,2002:omap',
 
-  createNode(nc: NodeCreator, iterable: unknown): YAMLOMap {
+  createNode(nc, iterable) {
     const pairs = createPairs(nc, iterable)
     return new YAMLOMap(nc.schema, pairs)
   },

@@ -1,6 +1,6 @@
 import type { NodeCreator } from '../../doc/NodeCreator.ts'
+import type { Collection } from '../../nodes/Collection.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
-import type { YAMLSeq } from '../../nodes/YAMLSeq.ts'
 import type { CollectionTag } from '../types.ts'
 
 export const map: {
@@ -10,7 +10,7 @@ export const map: {
   tag: string
   createNode(nc: NodeCreator, obj: unknown): YAMLMap<any, any>
   resolve(
-    map: YAMLMap | YAMLSeq,
+    map: Collection,
     onError: (message: string) => void
   ): YAMLMap<any, any>
 } = {
@@ -19,11 +19,11 @@ export const map: {
   nodeClass: YAMLMap,
   tag: 'tag:yaml.org,2002:map',
 
-  createNode(nc: NodeCreator, obj: unknown): YAMLMap<any, any> {
+  createNode(nc, obj): YAMLMap<any, any> {
     return YAMLMap.create(nc, obj)
   },
 
-  resolve(map: YAMLMap | YAMLSeq, onError: (message: string) => void) {
+  resolve(map, onError) {
     if (!(map instanceof YAMLMap)) onError('Expected a mapping for this tag')
     return map as YAMLMap<any, any>
   }

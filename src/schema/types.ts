@@ -1,8 +1,7 @@
 import type { NodeCreator } from '../doc/NodeCreator.ts'
+import type { Collection } from '../nodes/Collection.ts'
 import type { Node } from '../nodes/Node.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
-import type { YAMLMap } from '../nodes/YAMLMap.ts'
-import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type { ParseOptions } from '../options.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import type { Schema } from './Schema.ts'
@@ -108,7 +107,7 @@ export interface CollectionTag extends TagBase {
    * Note: this is required if nodeClass is not provided.
    */
   resolve?: (
-    value: YAMLMap | YAMLSeq,
+    value: Collection,
     onError: (message: string) => void,
     options: ParseOptions
   ) => unknown
