@@ -7,8 +7,9 @@ import type { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
+import type { YAMLSet } from './YAMLSet.ts'
 
-export type Node = Alias | Scalar | YAMLSeq | YAMLMap
+export type Node = Alias | Scalar | YAMLSeq | YAMLMap | YAMLSet
 
 /** Utility type mapper */
 export type NodeType<T> = T extends
@@ -23,9 +24,11 @@ export type NodeType<T> = T extends
     ? Scalar<string | Date>
     : T extends Array<any>
       ? YAMLSeq<NodeType<T[number]>>
-      : T extends { [key: string | number]: any }
-        ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
-        : Node
+      : T extends Set<any>
+        ? YAMLSet<NodeType<keyof T>>
+        : T extends { [key: string | number]: any }
+          ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
+          : Node
 
 export type Range = [start: number, valueEnd: number, nodeEnd: number]
 

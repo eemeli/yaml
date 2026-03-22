@@ -6,6 +6,7 @@ import { Pair } from './nodes/Pair.ts'
 import { Scalar } from './nodes/Scalar.ts'
 import { YAMLMap } from './nodes/YAMLMap.ts'
 import { YAMLSeq } from './nodes/YAMLSeq.ts'
+import { YAMLSet } from './nodes/YAMLSet.ts'
 
 const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')
@@ -21,13 +22,13 @@ export type visitor =
   | visitorFn<Node | Pair | null>
   | {
       Alias?: visitorFn<Alias>
-      Collection?: visitorFn<YAMLMap | YAMLSeq>
-      Map?: visitorFn<YAMLMap>
-      Node?: visitorFn<Alias | Scalar | YAMLMap | YAMLSeq>
+      Collection?: visitorFn<YAMLMap | YAMLSeq | YAMLSet>
+      Map?: visitorFn<YAMLMap | YAMLSet>
+      Node?: visitorFn<Alias | Scalar | YAMLMap | YAMLSeq | YAMLSet>
       Pair?: visitorFn<Pair>
       Scalar?: visitorFn<Scalar>
       Seq?: visitorFn<YAMLSeq>
-      Value?: visitorFn<Scalar | YAMLMap | YAMLSeq>
+      Value?: visitorFn<Scalar | YAMLMap | YAMLSeq | YAMLSet>
     }
 
 export type asyncVisitorFn<T> = (
@@ -46,13 +47,13 @@ export type asyncVisitor =
   | asyncVisitorFn<Node | Pair | null>
   | {
       Alias?: asyncVisitorFn<Alias>
-      Collection?: asyncVisitorFn<YAMLMap | YAMLSeq>
-      Map?: asyncVisitorFn<YAMLMap>
-      Node?: asyncVisitorFn<Alias | Scalar | YAMLMap | YAMLSeq>
+      Collection?: asyncVisitorFn<YAMLMap | YAMLSeq | YAMLSet>
+      Map?: asyncVisitorFn<YAMLMap | YAMLSet>
+      Node?: asyncVisitorFn<Alias | Scalar | YAMLMap | YAMLSeq | YAMLSet>
       Pair?: asyncVisitorFn<Pair>
       Scalar?: asyncVisitorFn<Scalar>
       Seq?: asyncVisitorFn<YAMLSeq>
-      Value?: asyncVisitorFn<Scalar | YAMLMap | YAMLSeq>
+      Value?: asyncVisitorFn<Scalar | YAMLMap | YAMLSeq | YAMLSet>
     }
 
 /**
@@ -122,7 +123,11 @@ function visit_(
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
+    if (
+      node instanceof YAMLMap ||
+      node instanceof YAMLSeq ||
+      node instanceof YAMLSet
+    ) {
       path = [...path, node]
       for (let i = 0; i < node.length; ++i) {
         const ci = visit_(i, node[i], visitor, path)
@@ -216,7 +221,11 @@ async function visitAsync_(
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
+    if (
+      node instanceof YAMLMap ||
+      node instanceof YAMLSeq ||
+      node instanceof YAMLSet
+    ) {
       path = [...path, node]
       for (let i = 0; i < node.length; ++i) {
         const ci = await visitAsync_(i, node[i], visitor, path)
@@ -288,7 +297,8 @@ function callVisitor(
   path: readonly (Document | Node | Pair)[]
 ): ReturnType<visitorFn<unknown>> | ReturnType<asyncVisitorFn<unknown>> {
   if (typeof visitor === 'function') return visitor(key, node, path)
-  if (node instanceof YAMLMap) return visitor.Map?.(key, node, path)
+  if (node instanceof YAMLMap || node instanceof YAMLSet)
+    return visitor.Map?.(key, node, path)
   if (node instanceof YAMLSeq) return visitor.Seq?.(key, node, path)
   if (node instanceof Pair) return visitor.Pair?.(key, node, path)
   if (node instanceof Scalar) return visitor.Scalar?.(key, node, path)
@@ -302,7 +312,11 @@ function replaceNode(
   node: Node | Pair
 ): number | symbol | void {
   const parent = path[path.length - 1]
-  if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
+  if (
+    parent instanceof YAMLMap ||
+    parent instanceof YAMLSeq ||
+    parent instanceof YAMLSet
+  ) {
     parent[key as number] = node
   } else if (parent instanceof Pair) {
     if (isNode(node)) {

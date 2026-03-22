@@ -1,101 +1,12 @@
-import type { Document, DocValue } from '../../doc/Document.ts'
-import { NodeCreator } from '../../doc/NodeCreator.ts'
-import type { NodeOf, Primitive } from '../../nodes/Collection.ts'
-import { isNode } from '../../nodes/identity.ts'
+import type { NodeCreator } from '../../doc/NodeCreator.ts'
 import type { Node } from '../../nodes/Node.ts'
-import { Pair } from '../../nodes/Pair.ts'
+import type { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
-import type { ToJSContext } from '../../nodes/toJS.ts'
-import { findPair, YAMLMap } from '../../nodes/YAMLMap.ts'
-import type { CreateNodeOptions } from '../../options.ts'
-import type { Schema } from '../../schema/Schema.ts'
-import type { StringifyContext } from '../../stringify/stringify.ts'
+import { YAMLSet } from '../../nodes/YAMLSet.ts'
 import type { CollectionTag } from '../types.ts'
 
-export class YAMLSet<
-  T extends Primitive | Node = Primitive | Node
-> extends YAMLMap<T, T> {
-  static tag = 'tag:yaml.org,2002:set'
-
-  constructor(schema?: Schema) {
-    super(schema)
-    this.tag = YAMLSet.tag
-  }
-
-  /**
-   * Add a value to the set.
-   *
-   * If a value of `items` is a Pair, its `.value` must be null.
-   *
-   * If the set already includes a matching value, no value is added.
-   */
-  push(...items: unknown[]): number {
-    for (const value of items) {
-      if (value instanceof Pair) {
-        if (value.value !== null)
-          throw new TypeError('set pair values must be null')
-        const prev = findPair(this, value.key)
-        if (!prev) super.push(value as Pair<T, T>)
-      } else {
-        this.set(value, true)
-      }
-    }
-    return this.length
-  }
-
-  /**
-   * Returns the value matching `key`.
-   */
-  get(key: unknown): NodeOf<T> | undefined {
-    const pair = findPair(this, key)
-    return pair?.key
-  }
-
-  /**
-   * `value` needs to be true/false to add/remove the item from the set.
-   */
-  set(
-    key: unknown,
-    value: boolean,
-    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
-  ): void {
-    if (typeof value !== 'boolean')
-      throw new Error(`Expected a boolean value, not ${typeof value}`)
-    const prev = findPair(this, key)
-    if (prev && !value) {
-      this.splice(this.indexOf(prev), 1)
-    } else if (!prev && value) {
-      let node: Node
-      if (isNode(key)) node = key
-      else {
-        if (!this.schema) throw new Error('Schema is required')
-        const nc = new NodeCreator(this.schema, {
-          ...options,
-          aliasDuplicateObjects: false
-        })
-        node = nc.create(key)
-        nc.setAnchors()
-      }
-      this.push(new Pair(node as NodeOf<T>))
-    }
-  }
-
-  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any {
-    return super.toJS(doc, ctx, Set)
-  }
-
-  toString(
-    ctx?: StringifyContext,
-    onComment?: () => void,
-    onChompKeep?: () => void
-  ): string {
-    if (!ctx) return JSON.stringify(this)
-    return super.toString({ ...ctx, noValues: true }, onComment, onChompKeep)
-  }
-}
-
-const hasAllNullValues = (map: YAMLMap): boolean =>
-  map.every(
+const hasAllNullValues = (set: YAMLSet): boolean =>
+  set.every(
     ({ value }) =>
       value == null ||
       (value instanceof Scalar &&

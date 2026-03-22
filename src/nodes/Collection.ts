@@ -3,8 +3,9 @@ import type { NodeBase } from './Node.ts'
 import type { Scalar } from './Scalar.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
+import type { YAMLSet } from './YAMLSet.ts'
 
-export type Collection = YAMLMap | YAMLSeq
+export type Collection = YAMLMap | YAMLSeq | YAMLSet
 
 export type Primitive = boolean | number | bigint | string | null
 

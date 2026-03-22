@@ -6,6 +6,7 @@ import { Pair } from './nodes/Pair.ts'
 import { Scalar } from './nodes/Scalar.ts'
 import { YAMLMap } from './nodes/YAMLMap.ts'
 import { YAMLSeq } from './nodes/YAMLSeq.ts'
+import { YAMLSet } from './nodes/YAMLSet.ts'
 import { parseAllDocuments } from './public-api.ts'
 import { visit } from './visit.ts'
 
@@ -87,7 +88,7 @@ function addEvents(
   }
   if (isNode(node) && node.tag) props += ` <${node.tag}>`
 
-  if (node instanceof YAMLMap) {
+  if (node instanceof YAMLMap || node instanceof YAMLSet) {
     const ev = node.flow ? '+MAP {}' : '+MAP'
     events.push(`${ev}${props}`)
     node.forEach(({ key, value }) => {

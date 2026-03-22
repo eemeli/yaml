@@ -9,6 +9,7 @@ import type { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
+import type { YAMLSet } from './YAMLSet.ts'
 
 export class Alias implements NodeBase {
   source: string
@@ -62,7 +63,7 @@ export class Alias implements NodeBase {
   resolve(
     doc: Document,
     ctx?: ToJSContext
-  ): Scalar | YAMLMap | YAMLSeq | undefined {
+  ): Scalar | YAMLMap | YAMLSeq | YAMLSet | undefined {
     let nodes: Node[]
     if (ctx?.aliasResolveCache) {
       nodes = ctx.aliasResolveCache
@@ -76,7 +77,7 @@ export class Alias implements NodeBase {
       if (ctx) ctx.aliasResolveCache = nodes
     }
 
-    let found: Scalar | YAMLMap | YAMLSeq | undefined = undefined
+    let found: Scalar | YAMLMap | YAMLSeq | YAMLSet | undefined = undefined
     for (const node of nodes) {
       if (node === this) break
       if (node.anchor === this.source) found = node

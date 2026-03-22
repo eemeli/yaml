@@ -8,6 +8,7 @@ import type { Scalar } from '../nodes/Scalar.ts'
 import { ToJSContext } from '../nodes/toJS.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
+import { YAMLSet } from '../nodes/YAMLSet.ts'
 import type {
   CreateNodeOptions,
   DocumentOptions,
@@ -23,7 +24,7 @@ import { applyReviver } from './applyReviver.ts'
 import { Directives } from './directives.ts'
 import { NodeCreator } from './NodeCreator.ts'
 
-export type DocValue = Scalar | YAMLSeq | YAMLMap
+export type DocValue = Scalar | YAMLSeq | YAMLMap | YAMLSet
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)
 
@@ -232,7 +233,9 @@ export class Document<
    * Returns item at `key`, or `undefined` if not found.
    */
   get(key: any): Strict extends true ? Node | Pair | undefined : any {
-    if (this.value instanceof YAMLMap) return this.value.get(key)
+    if (this.value instanceof YAMLMap || this.value instanceof YAMLSet) {
+      return this.value.get(key)
+    }
     if (this.value instanceof YAMLSeq) {
       if (Number.isInteger(key)) return this.value.at(key)
       throw new TypeError(`Expected an integer, not ${JSON.stringify(key)}.`)

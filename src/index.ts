@@ -21,6 +21,7 @@ export { Pair } from './nodes/Pair.ts'
 export { Scalar } from './nodes/Scalar.ts'
 export { YAMLMap } from './nodes/YAMLMap.ts'
 export { YAMLSeq } from './nodes/YAMLSeq.ts'
+export { YAMLSet } from './nodes/YAMLSet.ts'
 
 export type {
   CreateNodeOptions,
@@ -47,7 +48,6 @@ export {
 export type { TagId, Tags } from './schema/tags.ts'
 export type { CollectionTag, ScalarTag } from './schema/types.ts'
 export type { YAMLOMap } from './schema/yaml-1.1/omap.ts'
-export type { YAMLSet } from './schema/yaml-1.1/set.ts'
 
 export type {
   asyncVisitor,

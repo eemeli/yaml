@@ -3,6 +3,7 @@ import type { Node } from '../nodes/Node.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
+import type { YAMLSet } from '../nodes/YAMLSet.ts'
 import type {
   BlockMap,
   BlockSequence,
@@ -31,7 +32,10 @@ function resolveCollection(
         ? resolveBlockSeq(CN, ctx, token, onError, tag)
         : resolveFlowCollection(CN, ctx, token, onError, tag)
 
-  const Coll = coll.constructor as typeof YAMLMap | typeof YAMLSeq
+  const Coll = coll.constructor as
+    | typeof YAMLMap
+    | typeof YAMLSeq
+    | typeof YAMLSet
 
   // If we got a tagName matching the class, or the tag name is '!',
   // then use the tagName from the node class used to create it.
