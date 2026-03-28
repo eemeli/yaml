@@ -88,7 +88,7 @@ function addEvents(
   }
   if (isNode(node) && node.tag) props += ` <${node.tag}>`
 
-  if (node instanceof YAMLMap || node instanceof YAMLSet) {
+  if (node instanceof YAMLMap) {
     const ev = node.flow ? '+MAP {}' : '+MAP'
     events.push(`${ev}${props}`)
     node.forEach(({ key, value }) => {
@@ -103,6 +103,14 @@ function addEvents(
       addEvents(events, doc, errPos, item)
     })
     events.push('-SEQ')
+  } else if (node instanceof YAMLSet) {
+    const ev = node.flow ? '+MAP {}' : '+MAP'
+    events.push(`${ev}${props}`)
+    for (const value of node.values.values()) {
+      addEvents(events, doc, errPos, value)
+      events.push('=VAL :')
+    }
+    events.push('-MAP')
   } else if (node instanceof Pair) {
     events.push(`+MAP${props}`)
     addEvents(events, doc, errPos, node.key)

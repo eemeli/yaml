@@ -104,15 +104,14 @@ export class Composer<
 
   private decorate(doc: Document.Parsed<Value, Strict>, afterDoc: boolean) {
     const { comment, afterEmptyLine } = parsePrelude(this.prelude)
-    //console.log({ dc: doc.comment, prelude, comment })
     if (comment) {
       const dc = doc.value
       if (afterDoc) {
         doc.comment = doc.comment ? `${doc.comment}\n${comment}` : comment
       } else if (afterEmptyLine || doc.directives.docStart) {
         doc.commentBefore = comment
-      } else if (isCollection(dc) && !dc.flow && dc.length > 0) {
-        let it = dc[0]
+      } else if (isCollection(dc) && !dc.flow && dc.size > 0) {
+        let it = Array.isArray(dc) ? dc[0] : dc.values.values().next().value!
         if (it instanceof Pair) it = it.key
         const cb = it.commentBefore
         it.commentBefore = cb ? `${comment}\n${cb}` : comment

@@ -14,11 +14,9 @@ export class YAMLOMap<
   K extends Primitive | Node = Primitive | Node,
   V extends Primitive | Node = Primitive | Node
 > extends YAMLSeq<Pair<K, V>> {
-  static tag = 'tag:yaml.org,2002:omap'
-
   constructor(schema?: Schema, elements?: Array<Pair<K, V>>) {
     super(schema, elements)
-    this.tag = YAMLOMap.tag
+    this.tag = omap.tag
   }
 
   delete: typeof YAMLMap.prototype.delete = YAMLMap.prototype.delete.bind(this)

@@ -21,7 +21,6 @@ export type StringifyContext = {
   inFlow: boolean | null
   inStringifyKey?: boolean
   flowCollectionPadding: string
-  noValues?: boolean
   options: Readonly<
     Required<Omit<ToStringOptions, 'collectionStyle' | 'indent'>>
   >

@@ -92,6 +92,10 @@ export class YAMLSeq<
     })
   }
 
+  get size(): number {
+    return this.length
+  }
+
   /**
    * Create a copy of this collection.
    *

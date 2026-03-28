@@ -1,6 +1,5 @@
 import {
   Document,
-  Pair,
   Scalar,
   YAMLMap,
   type YAMLOMap,
@@ -155,22 +154,24 @@ describe('Set', () => {
     doc = new Document(null, { version: '1.1' })
     set = doc.createNode([1, 2, 3], { tag: '!!set' }) as any
     doc.value = set
-    expect(set).toMatchObject([
-      { key: { value: 1 }, value: null },
-      { key: { value: 2 }, value: null },
-      { key: { value: 3 }, value: null }
-    ])
+    expect(set).toMatchObject({
+      values: new Map([
+        [1, { value: 1 }],
+        [2, { value: 2 }],
+        [3, { value: 3 }]
+      ])
+    })
   })
 
-  test('push', () => {
-    set.push('x')
+  test('add', () => {
+    set.add('x')
     expect(set.get('x')).toMatchObject({ value: 'x' })
-    set.push('x')
+    set.add('x')
     const y0 = new Scalar('y')
-    set.push(new Pair(y0))
-    set.push(new Pair(new Scalar('y')))
+    set.add(y0)
+    set.add(new Scalar('y'))
     expect(set.get('y')).toBe(y0)
-    expect(set).toHaveLength(5)
+    expect(set.size).toBe(5)
   })
 
   test('get', () => {
@@ -179,16 +180,17 @@ describe('Set', () => {
     expect(set.get('1')).toBeUndefined()
   })
 
-  test('set', () => {
-    set.set(1, true)
-    expect(set.get(1)).toMatchObject({ value: 1 })
-    set.set(1, false)
-    expect(set.get(1)).toBeUndefined()
-    set.set(4, false)
-    expect(set.get(4)).toBeUndefined()
-    set.set(4, true)
-    expect(set.get(4)).toMatchObject(new Scalar(4))
-    expect(set).toHaveLength(3)
+  test('has', () => {
+    expect(set.has(0)).toBe(false)
+    expect(set.has(1)).toBe(true)
+    expect(set.has(new Scalar(1))).toBe(true)
+  })
+
+  test('delete', () => {
+    expect(set.delete(0)).toBe(false)
+    expect(set.delete(1)).toBe(true)
+    expect(set.has(1)).toBe(false)
+    expect(set.size).toBe(2)
   })
 })
 

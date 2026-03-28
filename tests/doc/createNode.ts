@@ -213,11 +213,21 @@ describe('Set', () => {
     test('Schema#createNode() - YAML 1.1', () => {
       const doc = new Document(null, { version: '1.1' })
       const s = doc.createNode(set) as any
-      expect(s.constructor.tag).toBe('tag:yaml.org,2002:set')
-      expect(s).toMatchObject([
-        { key: { value: 3 } },
-        { key: [{ key: { value: 'four' } }, { key: { value: 5 } }] }
-      ])
+      expect(s.constructor.tagName).toBe('tag:yaml.org,2002:set')
+      expect(s).toMatchObject({
+        values: new Map<number | symbol, any>([
+          [3, { value: 3 }],
+          [
+            expect.any(Symbol),
+            {
+              values: new Map<string | number, any>([
+                ['four', { value: 'four' }],
+                [5, { value: 5 }]
+              ])
+            }
+          ]
+        ])
+      })
     })
   })
 })

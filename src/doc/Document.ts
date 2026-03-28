@@ -1,7 +1,6 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
 import type { Primitive } from '../nodes/Collection.ts'
-import { isCollection } from '../nodes/identity.ts'
 import type { Node, NodeType, Range } from '../nodes/Node.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
@@ -244,12 +243,14 @@ export class Document<
   }
 
   /**
-   * Sets a value in this document. For `!!set`, `value` needs to be a
-   * boolean to add/remove the item from the set.
+   * Sets a value in this document. For `!!set`, `value` is ignored.
    */
   set(key: any, value: any): void {
-    if (isCollection(this.value)) this.value.set(key, value)
-    else throw new Error('Expected a YAML collection as document value')
+    if (this.value instanceof YAMLSet) {
+      this.value.add(key)
+    } else if (this.value instanceof YAMLMap || this.value instanceof YAMLSeq) {
+      this.value.set(key, value)
+    } else throw new Error('Expected a YAML collection as document value')
   }
 
   /**

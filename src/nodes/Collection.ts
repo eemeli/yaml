@@ -20,11 +20,11 @@ export interface CollectionBase extends NodeBase {
   /** If true, stringify this and all child nodes using flow styles. */
   flow?: boolean
 
-  /** Sets a value in this collection. */
-  set(key: unknown, value: unknown): void
+  /** The number of items in this collection. */
+  readonly size: number
 }
 
-export function copyCollection<T extends Collection>(
+export function copyCollection<T extends YAMLMap | YAMLSeq>(
   orig: T,
   schema: Schema | undefined
 ): T {

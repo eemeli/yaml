@@ -1,5 +1,6 @@
-import type { Collection } from '../nodes/Collection.ts'
 import { Pair } from '../nodes/Pair.ts'
+import type { YAMLMap } from '../nodes/YAMLMap.ts'
+import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type { StringifyContext } from './stringify.ts'
 import { stringify } from './stringify.ts'
 import { indentComment, lineComment } from './stringifyComment.ts'
@@ -13,7 +14,7 @@ interface StringifyCollectionOptions {
 }
 
 export function stringifyCollection(
-  collection: Readonly<Collection>,
+  collection: Readonly<YAMLMap | YAMLSeq>,
   ctx: StringifyContext,
   options: StringifyCollectionOptions
 ): string {
@@ -23,7 +24,7 @@ export function stringifyCollection(
 }
 
 function stringifyBlockCollection(
-  coll: Readonly<Collection>,
+  coll: Readonly<YAMLMap | YAMLSeq>,
   ctx: StringifyContext,
   {
     blockItemPrefix,
@@ -37,7 +38,7 @@ function stringifyBlockCollection(
     indent,
     options: { commentString }
   } = ctx
-  const itemCtx = Object.assign({}, ctx, { indent: itemIndent, type: null })
+  const itemCtx = { ...ctx, indent: itemIndent }
 
   let chompKeep = false // flag for the preceding node's status
   const lines: string[] = []
@@ -85,7 +86,7 @@ function stringifyBlockCollection(
 }
 
 function stringifyFlowCollection(
-  coll: Readonly<Collection>,
+  coll: Readonly<YAMLMap | YAMLSeq>,
   ctx: StringifyContext,
   { flowChars, itemIndent }: StringifyCollectionOptions
 ) {
@@ -96,11 +97,7 @@ function stringifyFlowCollection(
     options: { commentString }
   } = ctx
   itemIndent += indentStep
-  const itemCtx = Object.assign({}, ctx, {
-    indent: itemIndent,
-    inFlow: true,
-    type: null
-  })
+  const itemCtx = { ...ctx, indent: itemIndent, inFlow: true }
 
   let reqNewline = false
   let linesAtValue = 0

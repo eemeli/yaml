@@ -15,7 +15,6 @@ export function stringifyPair(
   const {
     indent,
     indentStep,
-    noValues,
     options: { commentString, indentSeq, simpleKeys }
   } = ctx
   if (simpleKeys) {
@@ -35,9 +34,8 @@ export function stringifyPair(
 
   ctx = {
     ...ctx,
-    implicitKey: !explicitKey && (simpleKeys || !noValues),
-    indent: indent + indentStep,
-    noValues: false
+    implicitKey: !explicitKey,
+    indent: indent + indentStep
   }
   let keyComment = key.comment
   let keyCommentDone = false
@@ -58,17 +56,11 @@ export function stringifyPair(
   }
 
   if (ctx.inFlow) {
-    if (noValues || value == null) {
+    if (value == null) {
       if (keyCommentDone && onComment) onComment()
-      return str === ''
-        ? '?'
-        : explicitKey
-          ? `? ${str}`
-          : noValues
-            ? str
-            : `${str}:`
+      return str === '' ? '?' : explicitKey ? `? ${str}` : `${str}:`
     }
-  } else if ((noValues && !simpleKeys) || (value == null && explicitKey)) {
+  } else if (value == null && explicitKey) {
     str = `? ${str}`
     if (keyComment && !keyCommentDone) {
       str += lineComment(str, ctx.indent, commentString(keyComment))
@@ -138,7 +130,7 @@ export function stringifyPair(
     const vs0 = valueStr[0]
     const nl0 = valueStr.indexOf('\n')
     const hasNewline = nl0 !== -1
-    const flow = ctx.inFlow ?? value.flow ?? value.length === 0
+    const flow = ctx.inFlow ?? value.flow ?? value.size === 0
     if (hasNewline || !flow) {
       let hasPropsLine = false
       if (hasNewline && (vs0 === '&' || vs0 === '!')) {

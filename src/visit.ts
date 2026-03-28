@@ -123,11 +123,7 @@ function visit_(
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (
-      node instanceof YAMLMap ||
-      node instanceof YAMLSeq ||
-      node instanceof YAMLSet
-    ) {
+    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
       path = [...path, node]
       for (let i = 0; i < node.length; ++i) {
         const ci = visit_(i, node[i], visitor, path)
@@ -138,6 +134,17 @@ function visit_(
           i -= 1
         }
       }
+    } else if (node instanceof YAMLSet) {
+      path = [...path, node]
+      const entries = Array.from(node.values)
+      const delKeys = []
+      for (let i = 0; i < entries.length; ++i) {
+        const ci = visit_(i, entries[i][1], visitor, path)
+        if (typeof ci === 'number') i = ci - 1
+        else if (ci === BREAK) return BREAK
+        else if (ci === REMOVE) delKeys.push(entries[i][0])
+      }
+      for (const dk of delKeys) node.values.delete(dk)
     } else if (node instanceof Pair) {
       path = [...path, node]
       const ck = visit_('key', node.key, visitor, path)
@@ -221,11 +228,7 @@ async function visitAsync_(
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (
-      node instanceof YAMLMap ||
-      node instanceof YAMLSeq ||
-      node instanceof YAMLSet
-    ) {
+    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
       path = [...path, node]
       for (let i = 0; i < node.length; ++i) {
         const ci = await visitAsync_(i, node[i], visitor, path)
@@ -236,6 +239,17 @@ async function visitAsync_(
           i -= 1
         }
       }
+    } else if (node instanceof YAMLSet) {
+      path = [...path, node]
+      const entries = Array.from(node.values)
+      const delKeys = []
+      for (let i = 0; i < entries.length; ++i) {
+        const ci = await visitAsync_(i, entries[i][1], visitor, path)
+        if (typeof ci === 'number') i = ci - 1
+        else if (ci === BREAK) return BREAK
+        else if (ci === REMOVE) delKeys.push(entries[i][0])
+      }
+      for (const dk of delKeys) node.values.delete(dk)
     } else if (node instanceof Pair) {
       path = [...path, node]
       const ck = await visitAsync_('key', node.key, visitor, path)
@@ -312,12 +326,12 @@ function replaceNode(
   node: Node | Pair
 ): number | symbol | void {
   const parent = path[path.length - 1]
-  if (
-    parent instanceof YAMLMap ||
-    parent instanceof YAMLSeq ||
-    parent instanceof YAMLSet
-  ) {
+  if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
     parent[key as number] = node
+  } else if (parent instanceof YAMLSet) {
+    const entries = Array.from(parent.values)
+    entries[key as number] = [parent.keyOf(node as Node, true), node as Node]
+    parent.values = new Map(entries)
   } else if (parent instanceof Pair) {
     if (isNode(node)) {
       if (key === 'key') parent.key = node

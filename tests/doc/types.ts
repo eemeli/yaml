@@ -780,7 +780,7 @@ date (00:00:00Z): 2002-12-14\n`)
     ])
       test(name, () => {
         const doc = parseDocument<any>(src, { version: '1.1' })
-        expect(doc.value.constructor.tag).toBe('tag:yaml.org,2002:omap')
+        expect(doc.value.constructor.name).toBe('YAMLOMap')
         expect(doc.toJS()).toBeInstanceOf(Map)
         expect(doc.toJS()).toMatchObject(
           new Map([
@@ -828,7 +828,7 @@ date (00:00:00Z): 2002-12-14\n`)
         ],
         { tag: '!!omap' }
       )
-      expect(doc.value.constructor.tag).toBe('tag:yaml.org,2002:omap')
+      expect(doc.value.constructor.name).toBe('YAMLOMap')
       expect(String(doc)).toBe(`!!omap\n- a: 1\n- b: 2\n- a: 3\n`)
     })
   })
@@ -840,7 +840,7 @@ date (00:00:00Z): 2002-12-14\n`)
     ])
       test(name, () => {
         const doc = parseDocument<any>(src, { version: '1.1' })
-        expect(doc.value.constructor.tag).toBe('tag:yaml.org,2002:set')
+        expect(doc.value.constructor.tagName).toBe('tag:yaml.org,2002:set')
         expect(doc.toJS()).toBeInstanceOf(Set)
         expect(doc.toJS()).toMatchObject(new Set(['a', 'b', 'c']))
         expect(String(doc)).toBe(src)
@@ -855,7 +855,7 @@ date (00:00:00Z): 2002-12-14\n`)
       expect(doc.errors).toMatchObject([
         {
           name: 'YAMLParseError',
-          message: 'Set items must all have null values'
+          message: 'Set items must not have non-empty values'
         }
       ])
     })

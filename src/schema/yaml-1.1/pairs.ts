@@ -1,4 +1,5 @@
 import type { NodeCreator } from '../../doc/NodeCreator.ts'
+import type { Collection } from '../../nodes/Collection.ts'
 import type { Node } from '../../nodes/Node.ts'
 import { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
@@ -7,7 +8,7 @@ import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
 import type { CollectionTag } from '../types.ts'
 
 export function resolvePairs(
-  seq: YAMLSeq | YAMLMap,
+  seq: Collection,
   onError: (message: string) => void
 ): YAMLSeq<Pair> {
   if (seq instanceof YAMLSeq) {

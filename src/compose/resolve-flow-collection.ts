@@ -1,6 +1,8 @@
+import type { Node } from '../nodes/Node.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
+import { YAMLSet } from '../nodes/YAMLSet.ts'
 import type { FlowCollection, Token } from '../parse/cst.ts'
 import type { CollectionTag } from '../schema/types.ts'
 import type { ComposeContext, ComposeNode } from './compose-node.ts'
@@ -20,11 +22,12 @@ export function resolveFlowCollection(
   fc: FlowCollection,
   onError: ComposeErrorHandler,
   tag?: CollectionTag
-): YAMLMap | YAMLSeq {
+): YAMLMap | YAMLSeq | YAMLSet {
   const isMap = fc.start.source === '{'
   const fcName = isMap ? 'flow map' : 'flow sequence'
   let coll
-  if (tag?.nodeClass) coll = new tag.nodeClass(ctx.schema) as YAMLMap | YAMLSeq
+  if (tag?.nodeClass)
+    coll = new tag.nodeClass(ctx.schema) as YAMLMap | YAMLSeq | YAMLSet
   else coll = isMap ? new YAMLMap(ctx.schema) : new YAMLSeq(ctx.schema)
   coll.flow = true
   const atRoot = ctx.atRoot
@@ -94,7 +97,9 @@ export function resolveFlowCollection(
           }
         }
         if (prevItemComment) {
-          let prev = coll[coll.length - 1]
+          let prev!: Node | Pair
+          if (Array.isArray(coll)) prev = coll[coll.length - 1]
+          else for (const prev_ of coll.values.values()) prev = prev_
           if (prev instanceof Pair) prev = prev.value ?? prev.key
           if (prev.comment) prev.comment += '\n' + prevItemComment
           else prev.comment = prevItemComment
@@ -190,10 +195,10 @@ export function resolveFlowCollection(
       const pair = new Pair(keyNode, valueNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
       if (isMap) {
-        const map = coll as YAMLMap
-        if (mapIncludes(ctx, map, keyNode))
+        if (mapIncludes(ctx, coll as YAMLMap | YAMLSet, keyNode))
           onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
-        map._push(pair)
+        if (coll instanceof YAMLSet) coll.add(keyNode)
+        else coll._push(pair)
       } else {
         const map = new YAMLMap(ctx.schema)
         map.flow = true
