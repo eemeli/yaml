@@ -18,6 +18,14 @@ export class Pair<
   /** The CST token that was composed into this pair.  */
   declare srcToken?: CollectionItem
 
+  /**
+   * The number of spaces of indentation between the key and the value.
+   *
+   * If the value is in flow / on the same line as the key,
+   * the indentStep will be 0.
+   */
+  indentStep?: number
+
   constructor(key: NodeOf<K>, value: NodeOf<V> | null = null) {
     this.key = key
     this.value = value

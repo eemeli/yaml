@@ -116,6 +116,12 @@ export function resolveBlockMap(
       offset = valueNode.range![2]
       const pair = new Pair(keyNode, valueNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
+      if (ctx.options.keepIndentStep) {
+        pair.indentStep =
+          valueProps.hasNewline && value && 'indent' in value
+            ? value.indent - bm.indent
+            : 0
+      }
       map.items.push(pair)
     } else {
       // key with no value

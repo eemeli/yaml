@@ -7,17 +7,24 @@ import { stringify } from './stringify.ts'
 import { indentComment, lineComment } from './stringifyComment.ts'
 
 export function stringifyPair(
-  { key, value }: Readonly<Pair>,
+  { key, value, indentStep: pairIndentStep }: Readonly<Pair>,
   ctx: StringifyContext,
   onComment?: () => void,
   onChompKeep?: () => void
 ): string {
-  const {
+  let {
     indent,
     indentStep,
     noValues,
     options: { commentString, indentSeq, simpleKeys }
   } = ctx
+
+  // Use the indentStep that is on the Pair by default,
+  // since that is preserved from the original document.
+  if (pairIndentStep !== undefined) {
+    indentStep = ' '.repeat(pairIndentStep)
+  }
+
   if (simpleKeys) {
     if (key.comment) {
       throw new Error('With simple keys, key nodes cannot have comments')
@@ -153,7 +160,8 @@ export function stringifyPair(
         }
         if (sp0 === -1 || nl0 < sp0) hasPropsLine = true
       }
-      if (!hasPropsLine) ws = `\n${ctx.indent}`
+      if (!hasPropsLine && (indentStep.length > 0 || !value.flow))
+        ws = `\n${ctx.indent}`
     }
   } else if (valueStr === '' || valueStr[0] === '\n') {
     ws = ''
