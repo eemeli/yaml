@@ -1,7 +1,7 @@
-import { Document, type DocValue } from './doc/Document.ts'
+import { Document } from './doc/Document.ts'
 import { Alias } from './nodes/Alias.ts'
-import { isNode } from './nodes/identity.ts'
-import type { Node } from './nodes/Node.ts'
+import { isCollection, isNode } from './nodes/identity.ts'
+import type { Node, Primitive } from './nodes/types.ts'
 import { Pair } from './nodes/Pair.ts'
 import { Scalar } from './nodes/Scalar.ts'
 import { YAMLMap } from './nodes/YAMLMap.ts'
@@ -123,7 +123,7 @@ function visit_(
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
+    if (node instanceof YAMLSeq) {
       path = [...path, node]
       for (let i = 0; i < node.length; ++i) {
         const ci = visit_(i, node[i], visitor, path)
@@ -134,9 +134,11 @@ function visit_(
           i -= 1
         }
       }
-    } else if (node instanceof YAMLSet) {
+    } else if (node instanceof YAMLMap || node instanceof YAMLSet) {
       path = [...path, node]
-      const entries = Array.from(node.values)
+      const entries = Array.from(
+        node.values as Iterable<[symbol | Primitive, Node | Pair]>
+      )
       const delKeys = []
       for (let i = 0; i < entries.length; ++i) {
         const ci = visit_(i, entries[i][1], visitor, path)
@@ -228,7 +230,7 @@ async function visitAsync_(
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
+    if (node instanceof YAMLSeq) {
       path = [...path, node]
       for (let i = 0; i < node.length; ++i) {
         const ci = await visitAsync_(i, node[i], visitor, path)
@@ -239,9 +241,11 @@ async function visitAsync_(
           i -= 1
         }
       }
-    } else if (node instanceof YAMLSet) {
+    } else if (node instanceof YAMLMap || node instanceof YAMLSet) {
       path = [...path, node]
-      const entries = Array.from(node.values)
+      const entries = Array.from(
+        node.values as Iterable<[symbol | Primitive, Node | Pair]>
+      )
       const delKeys = []
       for (let i = 0; i < entries.length; ++i) {
         const ci = await visitAsync_(i, entries[i][1], visitor, path)
@@ -326,12 +330,24 @@ function replaceNode(
   node: Node | Pair
 ): number | symbol | void {
   const parent = path[path.length - 1]
-  if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
+  if (parent instanceof YAMLSeq) {
     parent[key as number] = node
+  } else if (parent instanceof YAMLMap) {
+    if (node instanceof Pair) {
+      const entries = Array.from(parent.values)
+      entries[key as number] = [parent.keyOf(node, true), node]
+      parent.values = new Map(entries)
+    } else {
+      throw new Error('Cannot replace map pair with non-pair value')
+    }
   } else if (parent instanceof YAMLSet) {
-    const entries = Array.from(parent.values)
-    entries[key as number] = [parent.keyOf(node as Node, true), node as Node]
-    parent.values = new Map(entries)
+    if (isNode(node)) {
+      const entries = Array.from(parent.values)
+      entries[key as number] = [parent.keyOf(node, true), node]
+      parent.values = new Map(entries)
+    } else {
+      throw new Error('Cannot replace set value with non-node value')
+    }
   } else if (parent instanceof Pair) {
     if (isNode(node)) {
       if (key === 'key') parent.key = node
@@ -340,7 +356,8 @@ function replaceNode(
       throw new Error(`Cannot replace pair ${key} with non-node value`)
     }
   } else if (parent instanceof Document) {
-    parent.value = node as DocValue
+    if (node instanceof Scalar || isCollection(node)) parent.value = node
+    else throw new Error('Cannot replace Document value with non-node value')
   } else {
     const pt = parent instanceof Alias ? 'alias' : 'scalar'
     throw new Error(`Cannot replace node with ${pt} parent`)

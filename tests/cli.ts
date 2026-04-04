@@ -245,18 +245,26 @@ const skip = Number(major) < 20
       )
     })
     describe('--doc', () => {
-      ok('basic', 'hello: world', ['--doc'], [{ value: [{}] }])
+      ok(
+        'basic',
+        'hello: world',
+        ['--doc'],
+        [{ value: { values: new Map([['hello', {}]]) } }]
+      )
       ok(
         'multiple',
         'hello: world\n---\n42',
         ['--doc'],
-        [{ value: [{}] }, { value: { value: 42 } }]
+        [
+          { value: { values: new Map([['hello', {}]]) } },
+          { value: { value: 42 } }
+        ]
       )
       ok(
         'error',
         'hello: world: 2',
         ['--doc'],
-        [{ value: [{}] }],
+        [{ value: { values: new Map([['hello', {}]]) } }],
         [{ name: 'YAMLParseError' }]
       )
     })

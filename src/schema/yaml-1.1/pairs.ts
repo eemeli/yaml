@@ -1,6 +1,6 @@
 import type { NodeCreator } from '../../doc/NodeCreator.ts'
-import type { Collection } from '../../nodes/Collection.ts'
-import type { Node } from '../../nodes/Node.ts'
+import type { Collection } from '../../nodes/types.ts'
+import type { Node } from '../../nodes/types.ts'
 import { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
@@ -15,10 +15,11 @@ export function resolvePairs(
     for (let i = 0; i < seq.length; ++i) {
       const item = seq[i]
       if (item instanceof Pair) continue
-      else if (item instanceof YAMLMap) {
-        if (item.length > 1)
+      if (item instanceof YAMLMap) {
+        if (item.size > 1)
           onError('Each pair must have its own sequence indicator')
-        const pair = item[0] || new Pair(new Scalar(null))
+        const pair =
+          item.values.values().next().value ?? new Pair(new Scalar(null))
         if (item.commentBefore)
           pair.key.commentBefore = pair.key.commentBefore
             ? `${item.commentBefore}\n${pair.key.commentBefore}`

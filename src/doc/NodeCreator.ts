@@ -1,6 +1,6 @@
 import { Alias } from '../nodes/Alias.ts'
 import { isCollection, isNode } from '../nodes/identity.ts'
-import { type Node } from '../nodes/Node.ts'
+import { type Node } from '../nodes/types.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { CreateNodeOptions } from '../options.ts'
@@ -62,8 +62,7 @@ export class NodeCreator {
     if (isNode(value)) return value
     if (value instanceof Pair) {
       const map = this.schema.map.createNode(this, null)
-      map.push(value)
-      return map
+      return map.set(value)
     }
     if (
       value instanceof String ||

@@ -435,8 +435,8 @@ application specific tag: !something |
       ],
       warnings: [['Unresolved tag: !something']],
       special(src) {
-        const doc = YAML.parseDocument<any>(src, { schema: 'yaml-1.1' })
-        const data = doc.value[1].value.value
+        const doc = YAML.parseDocument<any, false>(src, { schema: 'yaml-1.1' })
+        const data = doc.get('picture').value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)
       }
@@ -1687,7 +1687,8 @@ last line
     },
 
     'Example 8.21. Block Scalar Nodes': {
-      src: `literal: |2
+      src: `\
+literal: |2
   value
 folded:
    !foo
@@ -1703,7 +1704,8 @@ folded:
     },
 
     'Example 8.22. Block Collection Nodes': {
-      src: `sequence: !!seq
+      src: `\
+sequence: !!seq
 - entry
 - !!seq
  - nested
@@ -1716,11 +1718,14 @@ mapping: !!map
         }
       ],
       special(src) {
-        const doc = YAML.parseDocument<YAML.YAMLSeq<any>, false>(src)
+        const doc = YAML.parseDocument<YAML.YAMLMap<any, YAML.YAMLSeq>, false>(
+          src
+        )
         expect(doc.value.tag).toBeUndefined()
-        expect(doc.value[0].value.tag).toBe('tag:yaml.org,2002:seq')
-        expect(doc.value[0].value[1].tag).toBe('tag:yaml.org,2002:seq')
-        expect(doc.value[1].value.tag).toBe('tag:yaml.org,2002:map')
+        const seq = doc.get('sequence')
+        expect(seq.tag).toBe('tag:yaml.org,2002:seq')
+        expect(seq[1].tag).toBe('tag:yaml.org,2002:seq')
+        expect(doc.get('mapping').tag).toBe('tag:yaml.org,2002:map')
       }
     }
   },

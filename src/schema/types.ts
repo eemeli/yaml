@@ -1,6 +1,6 @@
 import type { NodeCreator } from '../doc/NodeCreator.ts'
-import type { Collection } from '../nodes/Collection.ts'
-import type { Node } from '../nodes/Node.ts'
+import type { Collection } from '../nodes/types.ts'
+import type { Node } from '../nodes/types.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
 import type { ParseOptions } from '../options.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
@@ -97,7 +97,7 @@ export interface CollectionTag extends TagBase {
    * If set, used to select this tag when stringifying.
    */
   nodeClass?: {
-    new (schema?: Schema): Node
+    new (schema: Schema): Node
   }
 
   /**

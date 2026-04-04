@@ -4,216 +4,224 @@ import type { CreateNodeOptions } from '../options.ts'
 import type { BlockMap, FlowCollection } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
-import { stringifyCollection } from '../stringify/stringifyCollection.ts'
+import { indentComment, lineComment } from '../stringify/stringifyComment.ts'
+import { stringifyPair } from '../stringify/stringifyPair.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
-import {
-  copyCollection,
-  type CollectionBase,
-  type NodeOf,
-  type Primitive
-} from './Collection.ts'
 import { isNode } from './identity.ts'
-import type { Node, Range } from './Node.ts'
 import { Pair } from './Pair.ts'
 import { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
+import type { CollectionBase, Node, NodeOf, Primitive, Range } from './types.ts'
+import { cloneMapOrSet } from './util-clone-map-or-set.ts'
 
 export type MapLike =
   | Map<any, any>
   | Set<any>
   | Record<string | number | symbol, any>
 
-export function findPair<
-  K extends Primitive | Node = Primitive | Node,
-  V extends Primitive | Node = Primitive | Node
->(items: Iterable<Pair<K, V>>, key: unknown): Pair<K, V> | undefined {
-  const k = key instanceof Scalar ? key.value : key
-  for (const it of items) {
-    if (it.key === key || it.key === k) return it
-    if (it.key instanceof Scalar && it.key.value === k) return it
-  }
-  return undefined
-}
+type Key<K extends Primitive | Node, V extends Primitive | Node> =
+  | K
+  | NodeOf<K>
+  | (K extends Scalar ? K['value'] : never)
+  | Pair<K, V>
 
 export class YAMLMap<
   K extends Primitive | Node = Primitive | Node,
   V extends Primitive | Node = Primitive | Node
->
-  extends Array<Pair<K, V>>
-  implements CollectionBase
-{
-  schema: Schema | undefined
+> implements CollectionBase {
+  static readonly tagName = 'tag:yaml.org,2002:map'
 
-  /** An optional anchor on this collection. Used by alias nodes. */
+  declare schema: Schema
+
+  values: Map<Primitive | symbol, Pair<K, V>> = new Map()
+
+  /** An optional anchor on this map. Used by alias nodes. */
   declare anchor?: string
 
-  /**
-   * If true, stringify this and all child nodes using flow rather than
-   * block styles.
-   */
+  /** If true, stringify this and all child nodes using flow rather than block styles. */
   declare flow?: boolean
 
-  /** A comment on or immediately after this collection. */
+  /** A comment on or immediately after this map. */
   declare comment?: string | null
 
-  /** A comment before this collection. */
+  /** A comment before this map. */
   declare commentBefore?: string | null
 
   /**
    * The `[start, value-end, node-end]` character offsets for
-   * the part of the source parsed into this collection (undefined if not parsed).
+   * the part of the source parsed into this map (undefined if not parsed).
    * The `value-end` and `node-end` positions are themselves not included in their respective ranges.
    */
   declare range?: Range | null
 
-  /** A blank line before this collection and its commentBefore */
+  /** A blank line before this map and its commentBefore */
   declare spaceBefore?: boolean
 
-  /** The CST token that was composed into this collection.  */
+  /** The CST token that was composed into this map.  */
   declare srcToken?: BlockMap | FlowCollection
 
   /** A fully qualified tag, if required */
   declare tag?: string
 
-  static get tagName(): 'tag:yaml.org,2002:map' {
-    return 'tag:yaml.org,2002:map'
-  }
-
   /**
-   * A generic collection factory method that can be extended
-   * to other node classes that inherit from YAMLMap
+   * A generic collection factory method that can be used
+   * by other node classes that inherit from YAMLMap
    */
   static create(nc: NodeCreator, obj: unknown): YAMLMap<any, any> {
     const { replacer } = nc
     const map = new this(nc.schema)
-    const add = (key: unknown, value: unknown) => {
-      if (typeof replacer === 'function') value = replacer.call(obj, key, value)
-      else if (Array.isArray(replacer) && !replacer.includes(key)) return
-      if (value !== undefined || nc.keepUndefined)
-        map.push(nc.createPair(key, value))
-    }
-    if (obj instanceof Map) {
-      for (const [key, value] of obj) add(key, value)
-    } else if (obj && typeof obj === 'object') {
-      for (const key of Object.keys(obj)) add(key, (obj as any)[key])
-    }
-    if (typeof nc.schema.sortMapEntries === 'function') {
-      map.sort(nc.schema.sortMapEntries)
+    if (obj && typeof obj === 'object') {
+      const iter = obj instanceof Map ? obj : Object.entries(obj)
+      for (let [key, value] of iter) {
+        if (replacer) {
+          if (typeof replacer === 'function')
+            value = replacer.call(obj, key, value)
+          else if (Array.isArray(replacer) && !replacer.includes(key)) continue
+        }
+        if (value !== undefined || nc.keepUndefined)
+          map.set(nc.createPair(key, value))
+      }
     }
     return map
   }
 
-  constructor(schema?: Schema, elements: Array<Pair<K, V>> = []) {
-    super(...elements)
+  constructor(schema: Schema, elements?: Array<Pair<K, V>>) {
     Object.defineProperty(this, 'schema', {
       value: schema,
       configurable: true,
       enumerable: false,
       writable: true
     })
+    this.values = new Map(
+      elements?.map(pair => {
+        let key_: Primitive | symbol | undefined = this.schema.mapKey(pair)
+        if (key_ === undefined) key_ = Symbol()
+        return [key_, pair]
+      })
+    )
   }
 
   get size(): number {
-    return this.length
+    return this.values.size
   }
 
   /**
-   * Create a copy of this collection.
+   * Create a copy of this map.
    *
    * @param schema - If defined, overwrites the original's schema
    */
   clone(schema?: Schema): this {
-    return copyCollection(this, schema)
-  }
-
-  /** @private */
-  _push(pair: Pair<K, V>): void {
-    super.push(pair)
+    return cloneMapOrSet(this, schema)
   }
 
   /**
-   * Adds new key-value pairs to the mapping, and returns its new length.
-   *
-   * Added pairs must not have the same keys as ones previously set in the map.
-   */
-  push(...pairs: Pair<K, V>[]): number {
-    for (const pair of pairs) {
-      if (!(pair instanceof Pair)) {
-        const msg = `Expected a Pair, but found ${(pair as any).constructor?.name ?? pair}`
-        throw new TypeError(msg)
-      }
-      if (findPair(this, pair.key)) {
-        const msg = `Maps must not include duplicate keys: ${String(pair.key)}`
-        throw new Error(msg)
-      }
-
-      if (this.schema?.sortMapEntries) {
-        const sortEntries = this.schema.sortMapEntries
-        const i = this.findIndex(item => sortEntries(pair, item) < 0)
-        if (i === -1) super.push(pair)
-        else this.splice(i, 0, pair)
-      } else {
-        super.push(pair)
-      }
-    }
-    return this.length
-  }
-
-  /**
-   * Removes a value from the mapping.
+   * Remove a value from the mapping.
    * @returns `true` if the item was found and removed.
    */
-  delete(key: unknown): boolean {
-    const it = findPair(this, key)
-    if (!it) return false
-    const del = this.splice(this.indexOf(it), 1)
-    return del.length > 0
+  delete(key: Key<K, V>): boolean {
+    const pk = this.schema.mapKey(key)
+    if (pk !== undefined) return this.values.delete(pk)
+    const nk = key instanceof Pair ? key.key : isNode(key) ? key : null
+    if (nk) {
+      for (const [k, p] of this.values)
+        if (p.key === nk) return this.values.delete(k)
+    }
+    return false
   }
 
-  /** Returns item at `key`, or `undefined` if not found.  */
-  get(key: unknown): NodeOf<V> | undefined {
-    const it = findPair(this, key)
-    return it?.value ?? undefined
+  /** Return value at `key`, or `undefined` if not found.  */
+  get(key: Key<K, V>): NodeOf<V> | null | undefined {
+    return this.getPair(key)?.value
   }
 
-  /** Checks if the mapping includes a value with the key `key`.  */
-  has(key: unknown): boolean {
-    return !!findPair(this, key)
+  /** Return pair at `key`, or `undefined` if not found.  */
+  getPair(key: Key<K, V>): Pair<K, V> | undefined {
+    const pk = this.schema.mapKey(key)
+    if (pk !== undefined) return this.values.get(pk)
+    const nk = key instanceof Pair ? key.key : isNode(key) ? key : null
+    if (nk) {
+      for (const p of this.values.values()) if (p.key === nk) return p
+    }
+    return undefined
+  }
+
+  /** Check if the mapping includes a value with the key `key`.  */
+  has(key: Key<K, V>): boolean {
+    const pk = this.schema.mapKey(key)
+    if (pk !== undefined) return this.values.has(pk)
+    const nk = key instanceof Pair ? key.key : isNode(key) ? key : null
+    if (nk) {
+      for (const p of this.values.values()) if (p.key === nk) return true
+    }
+    return false
+  }
+
+  /**
+   * Return the internal Map key matching `key`, or `undefined` if not found.
+   *
+   * @param allowMissing - If `true`, a key is always returned,
+   *                       even if the key is not in the map.
+   */
+  keyOf(key: Key<K, V>, allowMissing: true): Primitive | symbol
+  keyOf(key: Key<K, V>, allowMissing?: boolean): Primitive | symbol | undefined
+  keyOf(key: Key<K, V>, allowMissing = false): Primitive | symbol | undefined {
+    const pk = this.schema.mapKey(key)
+    if (pk !== undefined)
+      return allowMissing || this.values.has(pk) ? pk : undefined
+    const nk = key instanceof Pair ? key.key : isNode(key) ? key : null
+    if (nk) {
+      for (const [k, v] of this.values) if (v.key === nk) return k
+    }
+    return allowMissing ? Symbol() : undefined
+  }
+
+  pairs(): Iterable<Pair<K, V>> {
+    return this.values.values()
   }
 
   set(
-    key: unknown,
-    value: unknown,
+    key: K | NodeOf<K> | (K extends Scalar ? K['value'] : never),
+    value: V | NodeOf<V> | (V extends Scalar ? V['value'] : never) | null,
     options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
-  ): void {
-    let pair: Pair
-    if (isNode(key) && (value === null || isNode(value))) {
-      pair = new Pair(key, value)
+  ): this
+  set(pair: Pair<K, V>): this
+  set(
+    keyOrPair: Key<K, V>,
+    value?: V | NodeOf<V> | (V extends Scalar ? V['value'] : never) | null,
+    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
+  ): this {
+    let pair: Pair<K, V>
+    if (keyOrPair instanceof Pair) {
+      pair = keyOrPair
+    } else if (isNode(keyOrPair) && (value == null || isNode(value))) {
+      pair = new Pair(keyOrPair, value ?? null)
     } else {
-      if (!this.schema) throw new Error('Schema is required')
       const nc = new NodeCreator(this.schema, {
         ...options,
         aliasDuplicateObjects: false
       })
-      pair = nc.createPair(key, value)
+      pair = nc.createPair(keyOrPair, value) as Pair<K, V>
       nc.setAnchors()
     }
 
-    const prev = findPair(this, pair.key)
-    if (prev) {
-      const pv = pair.value as NodeOf<V>
-      // For scalars, keep the old node & its comments and anchors
-      if (prev.value instanceof Scalar && pv instanceof Scalar) {
-        Object.assign(prev.value, pv)
-      } else prev.value = pv
-    } else if (this.schema?.sortMapEntries) {
-      const sortEntries = this.schema.sortMapEntries
-      const i = this.findIndex(item => sortEntries(pair, item) < 0)
-      if (i === -1) super.push(pair as Pair<K, V>)
-      else this.splice(i, 0, pair as Pair<K, V>)
-    } else {
-      super.push(pair as Pair<K, V>)
+    let key_: Primitive | symbol | undefined = this.schema.mapKey(pair)
+    if (key_ === undefined) key_ = Symbol()
+    if (pair.value instanceof Scalar) {
+      const prev = this.values.get(key_)
+      if (prev) {
+        if (!prev.value) {
+          prev.value = pair.value
+          return this
+        }
+        if (prev.value instanceof Scalar) {
+          // For scalars, keep the old node & its comments and anchors
+          Object.assign(prev.value, pair.value)
+          return this
+        }
+      }
     }
+    this.values.set(key_, pair)
+    return this
   }
 
   /**
@@ -236,7 +244,7 @@ export class YAMLMap<
     ctx ??= new ToJSContext()
     const map = Type ? new Type() : ctx?.mapAsMap ? new Map() : {}
     if (this.anchor) ctx.setAnchor(this, map)
-    for (const item of this) addPairToJSMap(doc, ctx, map, item)
+    for (const pair of this.values.values()) addPairToJSMap(doc, ctx, map, pair)
     return map
   }
 
@@ -246,18 +254,136 @@ export class YAMLMap<
     onChompKeep?: () => void
   ): string {
     if (!ctx) return JSON.stringify(this)
-    for (const item of this) {
-      if (!(item instanceof Pair))
-        throw new Error(
-          `Map items must all be pairs; found ${JSON.stringify(item)} instead`
-        )
+    let pairs: Iterable<Pair<K, V>> = this.values.values()
+    if (ctx.sortMapEntries) pairs = Array.from(pairs).sort(ctx.sortMapEntries)
+    return (ctx.inFlow ?? this.flow)
+      ? this.#stringifyFlowMap(ctx, pairs)
+      : this.#stringifyBlockMap(ctx, pairs, onComment, onChompKeep)
+  }
+
+  #stringifyBlockMap(
+    ctx: StringifyContext,
+    pairs: Iterable<Pair<K, V>>,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ) {
+    const {
+      indent,
+      options: { commentString }
+    } = ctx
+
+    let chompKeep = false // flag for the preceding node's status
+    const lines: string[] = []
+    for (const pair of pairs) {
+      let comment: string | null = null
+      if (!chompKeep && pair.key.spaceBefore) lines.push('')
+
+      let cb = pair.key.commentBefore
+      if (cb && chompKeep) cb = cb.replace(/^\n+/, '')
+      if (cb) {
+        const ic = indentComment(commentString(cb), indent).trimStart()
+        lines.push(ic)
+      }
+
+      chompKeep = false
+      let str = stringifyPair(
+        pair,
+        ctx,
+        () => (comment = null),
+        () => (chompKeep = true)
+      )
+      if (comment) str += lineComment(str, indent, commentString(comment))
+      if (chompKeep && comment) chompKeep = false
+      lines.push(str)
     }
-    return stringifyCollection(this, ctx, {
-      blockItemPrefix: '',
-      flowChars: { start: '{', end: '}' },
-      itemIndent: ctx.indent || '',
-      onChompKeep,
-      onComment
-    })
+
+    let str: string
+    if (lines.length === 0) {
+      str = '{}'
+    } else {
+      str = lines[0]
+      for (let i = 1; i < lines.length; ++i) {
+        const line = lines[i]
+        str += line ? `\n${indent}${line}` : '\n'
+      }
+    }
+
+    if (this.comment) {
+      str += '\n' + indentComment(commentString(this.comment), indent)
+      onComment?.()
+    } else if (chompKeep) onChompKeep?.()
+
+    return str
+  }
+
+  #stringifyFlowMap(ctx: StringifyContext, pairs: Iterable<Pair<K, V>>) {
+    const {
+      indent,
+      indentStep,
+      flowCollectionPadding: fcPadding,
+      options: { commentString, lineWidth, trailingComma }
+    } = ctx
+    const itemIndent = indent + indentStep
+    const itemCtx = { ...ctx, indent: itemIndent, inFlow: true }
+
+    let reqNewline = false
+    let linesAtValue = 0
+    const lines: string[] = []
+    let itemsLeft = this.values.size
+    for (const pair of pairs) {
+      itemsLeft -= 1
+
+      let comment: string | null = null
+      const ik = pair.key
+      if (ik.spaceBefore) {
+        lines.push('')
+        reqNewline = true
+      }
+      if (ik.commentBefore) {
+        const ic = indentComment(commentString(ik.commentBefore), indent)
+        lines.push(ic.trimStart()) // Avoid double indent on first line
+        reqNewline = true
+      }
+      if (ik.comment) reqNewline = true
+
+      const iv = pair.value
+      if (iv) {
+        if (iv.comment) comment = iv.comment
+        if (iv.commentBefore) reqNewline = true
+      } else if (ik?.comment) {
+        comment = ik.comment
+      }
+
+      if (comment) reqNewline = true
+      let str = stringifyPair(pair, itemCtx, () => (comment = null))
+      reqNewline ||= lines.length > linesAtValue || str.includes('\n')
+      if (itemsLeft > 0) {
+        str += ','
+      } else if (trailingComma) {
+        if (!reqNewline && lineWidth > 0) {
+          const len =
+            lines.reduce((sum, line) => sum + line.length + 2, 2) +
+            (str.length + 2)
+          reqNewline = len > lineWidth
+        }
+        if (reqNewline) str += ','
+      }
+      if (comment) str += lineComment(str, itemIndent, commentString(comment))
+      lines.push(str)
+      linesAtValue = lines.length
+    }
+
+    if (lines.length === 0) return '{}'
+    if (!reqNewline) {
+      const len = lines.reduce((sum, line) => sum + line.length + 2, 2)
+      reqNewline = ctx.options.lineWidth > 0 && len > ctx.options.lineWidth
+    }
+    if (reqNewline) {
+      let str = '{'
+      for (const line of lines)
+        str += line ? `\n${indentStep}${indent}${line}` : '\n'
+      return `${str}\n${indent}}`
+    }
+    return `{${fcPadding}${lines.join(' ')}${fcPadding}}`
   }
 }

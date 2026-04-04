@@ -1,5 +1,5 @@
 import type { NodeCreator } from '../../doc/NodeCreator.ts'
-import type { Collection } from '../../nodes/Collection.ts'
+import type { Collection } from '../../nodes/types.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
 import type { CollectionTag } from '../types.ts'
 

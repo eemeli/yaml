@@ -16,7 +16,7 @@ export { YAMLError, YAMLParseError, YAMLWarning } from './errors.ts'
 
 export { Alias } from './nodes/Alias.ts'
 export { isCollection, isNode } from './nodes/identity.ts'
-export type { Node, NodeBase, Range } from './nodes/Node.ts'
+export type { Node, NodeBase, Range } from './nodes/types.ts'
 export { Pair } from './nodes/Pair.ts'
 export { Scalar } from './nodes/Scalar.ts'
 export { YAMLMap } from './nodes/YAMLMap.ts'

@@ -1,6 +1,6 @@
 import { Alias } from './Alias.ts'
-import type { Node } from './Node.ts'
 import { Scalar } from './Scalar.ts'
+import type { Node } from './types.ts'
 import { YAMLMap } from './YAMLMap.ts'
 import { YAMLSeq } from './YAMLSeq.ts'
 import { YAMLSet } from './YAMLSet.ts'

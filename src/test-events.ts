@@ -1,7 +1,7 @@
 import type { Document } from './doc/Document.ts'
 import { Alias } from './nodes/Alias.ts'
 import { isNode } from './nodes/identity.ts'
-import type { Node } from './nodes/Node.ts'
+import type { Node } from './nodes/types.ts'
 import { Pair } from './nodes/Pair.ts'
 import { Scalar } from './nodes/Scalar.ts'
 import { YAMLMap } from './nodes/YAMLMap.ts'
@@ -91,10 +91,10 @@ function addEvents(
   if (node instanceof YAMLMap) {
     const ev = node.flow ? '+MAP {}' : '+MAP'
     events.push(`${ev}${props}`)
-    node.forEach(({ key, value }) => {
+    for (const { key, value } of node.values.values()) {
       addEvents(events, doc, errPos, key)
       addEvents(events, doc, errPos, value)
-    })
+    }
     events.push('-MAP')
   } else if (node instanceof YAMLSeq) {
     const ev = node.flow ? '+SEQ []' : '+SEQ'

@@ -95,14 +95,16 @@ describe('objects', () => {
   test('createNode({})', () => {
     const s = new Document().createNode({})
     expect(s).toBeInstanceOf(YAMLMap)
-    expect(s).toHaveLength(0)
+    expect(s.size).toBe(0)
   })
 
   test('createNode({ x: true })', () => {
     const doc = new Document()
     const s = doc.createNode({ x: true })
     expect(s).toBeInstanceOf(YAMLMap)
-    expect(s).toMatchObject([{ key: { value: 'x' }, value: { value: true } }])
+    expect(s).toMatchObject({
+      values: new Map([['x', { key: { value: 'x' }, value: { value: true } }]])
+    })
     doc.value = s
     expect(String(doc)).toBe('x: true\n')
   })
@@ -111,7 +113,10 @@ describe('objects', () => {
     const doc = new Document()
     const s = doc.createNode({ x: true }, { flow: true })
     expect(s).toBeInstanceOf(YAMLMap)
-    expect(s).toMatchObject([{ key: { value: 'x' }, value: { value: true } }])
+    expect(s).toMatchObject({
+      flow: true,
+      values: new Map([['x', { key: { value: 'x' }, value: { value: true } }]])
+    })
     doc.value = s
     expect(String(doc)).toBe('{ x: true }\n')
   })
@@ -119,7 +124,9 @@ describe('objects', () => {
   test('createNode({ x: true, y: undefined })', () => {
     const s = new Document().createNode({ x: true, y: undefined })
     expect(s).toBeInstanceOf(YAMLMap)
-    expect(s).toMatchObject([{ key: { value: 'x' }, value: { value: true } }])
+    expect(s).toMatchObject({
+      values: new Map([['x', { key: { value: 'x' }, value: { value: true } }]])
+    })
   })
 
   test('createNode({ x: true, y: undefined }, { keepUndefined: true })', () => {
@@ -128,17 +135,21 @@ describe('objects', () => {
       { keepUndefined: true }
     )
     expect(s).toBeInstanceOf(YAMLMap)
-    expect(s).toMatchObject([
-      { key: { value: 'x' }, value: { value: true } },
-      { key: { value: 'y' }, value: null }
-    ])
+    expect(s).toMatchObject({
+      values: new Map([
+        ['x', { key: { value: 'x' }, value: { value: true } }],
+        ['y', { key: { value: 'y' }, value: null }]
+      ])
+    })
   })
 
   test('createNode(pair)', () => {
     const pair = new Document().createPair('x', true)
     const s = new Document().createNode(pair)
     expect(s).toBeInstanceOf(YAMLMap)
-    expect(s).toMatchObject([{ key: { value: 'x' }, value: { value: true } }])
+    expect(s).toMatchObject({
+      values: new Map([['x', { key: { value: 'x' }, value: { value: true } }]])
+    })
   })
 
   describe('{ x: 3, y: [4], z: { w: "five", v: 6 } }', () => {
@@ -146,18 +157,25 @@ describe('objects', () => {
     test('createNode(value)', () => {
       const s = new Document().createNode(object)
       expect(s).toBeInstanceOf(YAMLMap)
-      expect(s).toHaveLength(3)
-      expect(s).toMatchObject([
-        { key: { value: 'x' }, value: { value: 3 } },
-        { key: { value: 'y' }, value: [{ value: 4 }] },
-        {
-          key: { value: 'z' },
-          value: [
-            { key: { value: 'w' }, value: { value: 'five' } },
-            { key: { value: 'v' }, value: { value: 6 } }
+      expect(s.size).toBe(3)
+      expect(s).toMatchObject({
+        values: new Map([
+          ['x', { key: { value: 'x' }, value: { value: 3 } }],
+          ['y', { key: { value: 'y' }, value: [{ value: 4 }] }],
+          [
+            'z',
+            {
+              key: { value: 'z' },
+              value: {
+                values: new Map([
+                  ['w', { key: { value: 'w' }, value: { value: 'five' } }],
+                  ['v', { key: { value: 'v' }, value: { value: 6 } }]
+                ])
+              }
+            }
           ]
-        }
-      ])
+        ])
+      })
     })
     test('set doc value', () => {
       const res = `x: 3
@@ -236,12 +254,14 @@ describe('Map', () => {
   test('createNode(new Map)', () => {
     const s = new Document().createNode(new Map())
     expect(s).toBeInstanceOf(YAMLMap)
-    expect(s).toHaveLength(0)
+    expect(s.size).toBe(0)
   })
   test('createNode(new Map([["x", true]]))', () => {
     const s = new Document().createNode(new Map([['x', true]]))
     expect(s).toBeInstanceOf(YAMLMap)
-    expect(s).toMatchObject([{ key: { value: 'x' }, value: { value: true } }])
+    expect(s).toMatchObject({
+      values: new Map([['x', { key: { value: 'x' }, value: { value: true } }]])
+    })
   })
   describe("Map { 'x' => 3, 'y' => Set { 4 }, Map { 'w' => 'five', 'v' => 6 } => 'z' }", () => {
     const map = new Map<unknown, unknown>([
@@ -258,18 +278,25 @@ describe('Map', () => {
     test('createNode(map)', () => {
       const s = new Document().createNode(map)
       expect(s).toBeInstanceOf(YAMLMap)
-      expect(s).toHaveLength(3)
-      expect(s).toMatchObject([
-        { key: { value: 'x' }, value: { value: 3 } },
-        { key: { value: 'y' }, value: [{ value: 4 }] },
-        {
-          key: [
-            { key: { value: 'w' }, value: { value: 'five' } },
-            { key: { value: 'v' }, value: { value: 6 } }
-          ],
-          value: { value: 'z' }
-        }
-      ])
+      expect(s.size).toBe(3)
+      expect(s).toMatchObject({
+        values: new Map([
+          ['x', { key: { value: 'x' }, value: { value: 3 } }],
+          ['y', { key: { value: 'y' }, value: [{ value: 4 }] }],
+          [
+            expect.any(Symbol),
+            {
+              key: {
+                values: new Map([
+                  ['w', { key: { value: 'w' }, value: { value: 'five' } }],
+                  ['v', { key: { value: 'v' }, value: { value: 6 } }]
+                ])
+              },
+              value: { value: 'z' }
+            }
+          ]
+        ])
+      })
     })
     test('set doc value', () => {
       const res = `x: 3
@@ -300,7 +327,11 @@ describe('strictly equal objects', () => {
     const s = new Document().createNode([foo, foo])
     expect(s).toBeInstanceOf(YAMLSeq)
     expect(s).toMatchObject([
-      [{ key: { value: 'foo' }, value: { value: 'FOO' } }],
+      {
+        values: new Map([
+          ['foo', { key: { value: 'foo' }, value: { value: 'FOO' } }]
+        ])
+      },
       { source: 'a1' }
     ])
     expect(s[0].anchor).toBe('a1')
@@ -313,8 +344,16 @@ describe('strictly equal objects', () => {
     })
     expect(s).toBeInstanceOf(YAMLSeq)
     expect(s).toMatchObject([
-      [{ key: { value: 'foo' }, value: { value: 'FOO' } }],
-      [{ key: { value: 'foo' }, value: { value: 'FOO' } }]
+      {
+        values: new Map([
+          ['foo', { key: { value: 'foo' }, value: { value: 'FOO' } }]
+        ])
+      },
+      {
+        values: new Map([
+          ['foo', { key: { value: 'foo' }, value: { value: 'FOO' } }]
+        ])
+      }
     ])
   })
 })
@@ -324,13 +363,12 @@ describe('circular references', () => {
     const map: any = { foo: 'bar' }
     map.map = map
     const doc = new Document(map)
-    expect(doc.value).toMatchObject([
-      { key: { value: 'foo' }, value: { value: 'bar' } },
-      {
-        key: { value: 'map' },
-        value: { source: 'a1' }
-      }
-    ])
+    expect(doc.value).toMatchObject({
+      values: new Map([
+        ['foo', { key: { value: 'foo' }, value: { value: 'bar' } }],
+        ['map', { key: { value: 'map' }, value: { source: 'a1' } }]
+      ])
+    })
     expect(doc.value.anchor).toBe('a1')
     expect(doc.toString()).toBe(source`
       &a1
@@ -386,7 +424,9 @@ describe('circular references', () => {
     const node = doc.createNode(seq) as any
     const source = node[0].get('foo').get('bar').get('baz') as Node
     const alias = node[1].get('fe').get('fi').get('fo').get('baz') as Alias
-    expect(source).toMatchObject([{ key: { value: 'a' }, value: { value: 1 } }])
+    expect(source).toMatchObject({
+      values: new Map([['a', { key: { value: 'a' }, value: { value: 1 } }]])
+    })
     expect(alias.source).toBe(source.anchor)
   })
 })

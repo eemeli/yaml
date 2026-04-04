@@ -1,5 +1,5 @@
 import { isNode } from '../nodes/identity.ts'
-import type { Node } from '../nodes/Node.ts'
+import type { Node } from '../nodes/types.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'

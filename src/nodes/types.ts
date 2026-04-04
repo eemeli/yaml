@@ -9,7 +9,13 @@ import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
 import type { YAMLSet } from './YAMLSet.ts'
 
-export type Node = Alias | Scalar | YAMLSeq | YAMLMap | YAMLSet
+export type Collection = YAMLMap | YAMLSeq | YAMLSet
+
+export type Node = Scalar | Collection | Alias
+
+export type Primitive = boolean | number | bigint | string | null
+
+export type NodeOf<T> = T extends Primitive ? Scalar<T> : T
 
 /** Utility type mapper */
 export type NodeType<T> = T extends
@@ -71,4 +77,17 @@ export interface NodeBase {
     onComment?: () => void,
     onChompKeep?: () => void
   ): string
+}
+
+export interface CollectionBase extends NodeBase {
+  schema?: Schema
+
+  /** An optional anchor on this collection. Used by alias nodes. */
+  anchor?: string
+
+  /** If true, stringify this and all child nodes using flow styles. */
+  flow?: boolean
+
+  /** The number of items in this collection. */
+  readonly size: number
 }

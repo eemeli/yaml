@@ -160,7 +160,7 @@ describe('double-quoted', () => {
         const str = YAML.stringify({ x })
         const doc = YAML.parseDocument<any>(str)
         expect(doc.errors).toHaveLength(0)
-        expect(doc.value[0].value.value).toBe(x)
+        expect(doc.value.get('x').value).toBe(x)
       })
     })
 
@@ -188,7 +188,7 @@ describe('double-quoted', () => {
         const str = YAML.stringify({ key: [[value]] })
         const doc = YAML.parseDocument<any>(str)
         expect(doc.errors).toHaveLength(0)
-        expect(doc.value[0].value[0][0].value).toBe(value)
+        expect(doc.value.get('key')[0][0].value).toBe(value)
       })
     })
 

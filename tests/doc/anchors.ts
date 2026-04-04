@@ -78,11 +78,13 @@ describe('create', () => {
     const doc = new Document()
     const ref: unknown[] = []
     const node = doc.createNode({ src: ref, ref })
-    expect(node).toMatchObject([
-      { key: { value: 'src' }, value: [] },
-      { key: { value: 'ref' }, value: { source: 'a1' } }
-    ])
-    expect(node[0].value?.anchor).toBe('a1')
+    expect(node).toMatchObject({
+      values: new Map([
+        ['src', { key: { value: 'src' }, value: [] }],
+        ['ref', { key: { value: 'ref' }, value: { source: 'a1' } }]
+      ])
+    })
+    expect(node.get('src')!.anchor).toBe('a1')
   })
 
   test('repeated Date in createNode', () => {
@@ -90,10 +92,12 @@ describe('create', () => {
     const date = new Date()
     const value = date.toJSON()
     const node = doc.createNode({ src: date, ref: date })
-    expect(node).toMatchObject([
-      { key: { value: 'src' }, value: { value, anchor: 'a1' } },
-      { key: { value: 'ref' }, value: { source: 'a1' } }
-    ])
+    expect(node).toMatchObject({
+      values: new Map([
+        ['src', { key: { value: 'src' }, value: { value, anchor: 'a1' } }],
+        ['ref', { key: { value: 'ref' }, value: { source: 'a1' } }]
+      ])
+    })
   })
 })
 
@@ -244,7 +248,9 @@ describe('merge <<', () => {
 
   test('YAML.parseDocument', () => {
     const doc = parseDocument<YAMLSeq<YAMLMap>, false>(src, { merge: true })
-    expect(doc.value.slice(5).map(it => it[0].value)).toMatchObject([
+    expect(
+      doc.value.slice(5).map(it => it.values.values().next().value!.value)
+    ).toMatchObject([
       { source: 'CENTER' },
       [{ source: 'CENTER' }, { source: 'BIG' }],
       [{ source: 'BIG' }, { source: 'LEFT' }, { source: 'SMALL' }]
@@ -287,7 +293,7 @@ describe('merge <<', () => {
       )
       const [a, b] = doc.value
       const merge = doc.createPair('<<', doc.createAlias(a))
-      b.push(merge)
+      b.set(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
     })
@@ -299,7 +305,7 @@ describe('merge <<', () => {
       )
       const [a, b] = doc.value
       const merge = doc.createPair('<<', doc.createAlias(a))
-      b.push(merge)
+      b.set(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
     })
@@ -311,7 +317,7 @@ describe('merge <<', () => {
       )
       const [a, b] = doc.value
       const merge = doc.createPair(Symbol('<<'), doc.createAlias(a))
-      b.push(merge)
+      b.set(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
     })
@@ -324,7 +330,7 @@ describe('merge <<', () => {
       const [a, b] = doc.value
       const alias = doc.createAlias(a, 'AA')
       const merge = doc.createPair('<<', alias)
-      b.push(merge)
+      b.set(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &AA { a: A }, { b: B, <<: *AA } ]\n')
     })
@@ -334,7 +340,7 @@ describe('merge <<', () => {
         merge: true
       })
       const alias = doc.createAlias(doc.get(0).get('a'))
-      doc.get(1).push(doc.createPair('<<', alias))
+      doc.get(1).set(doc.createPair('<<', alias))
       expect(String(doc)).toBe('[ { a: &a1 A }, { b: B, <<: *a1 } ]\n')
       expect(() => doc.toJS()).toThrow(
         'Merge sources must be maps or map aliases'

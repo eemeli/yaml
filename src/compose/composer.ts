@@ -3,7 +3,7 @@ import { Document, type DocValue } from '../doc/Document.ts'
 import type { ErrorCode } from '../errors.ts'
 import { YAMLParseError, YAMLWarning } from '../errors.ts'
 import { isCollection } from '../nodes/identity.ts'
-import type { Range } from '../nodes/Node.ts'
+import type { Range } from '../nodes/types.ts'
 import { Pair } from '../nodes/Pair.ts'
 import type {
   DocumentOptions,

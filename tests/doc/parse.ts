@@ -173,15 +173,34 @@ test('long scalar value in flow map (#36)', () => {
 
 describe('flow collection keys', () => {
   test('block map with flow collection key as explicit key', () => {
-    const doc = YAML.parseDocument<any>(`? []: x`)
+    const doc = YAML.parseDocument<YAML.YAMLMap<YAML.YAMLMap, null>>(`? []: x`)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.value).toMatchObject([
-      {
-        key: [{ key: [], value: { value: 'x' } }],
-        value: null
+    expect(doc.value).toMatchObject({
+      values: new Map([
+        [
+          expect.any(Symbol),
+          {
+            key: {
+              values: new Map([
+                [
+                  expect.any(Symbol),
+                  {
+                    key: Object.assign([], { flow: false }),
+                    value: { value: 'x' }
+                  }
+                ]
+              ])
+            },
+            value: null
+          }
+        ]
+      ])
+    })
+    for (const outer of doc.value.pairs()) {
+      for (const inner of outer.key.pairs()) {
+        expect(inner.key).toMatchObject({ flow: true })
       }
-    ])
-    expect(doc.value[0].key[0].key).toMatchObject({ flow: true })
+    }
   })
 
   test('flow collection as first block map key (redhat-developer/vscode-yaml#712)', () => {
@@ -191,15 +210,22 @@ describe('flow collection keys', () => {
         c: d
     `)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.value).toMatchObject([
-      {
-        key: { value: 'a' },
-        value: [
-          { key: [], value: { value: 'b' } },
-          { key: { value: 'c' }, value: { value: 'd' } }
+    expect(doc.value).toMatchObject({
+      values: new Map([
+        [
+          'a',
+          {
+            key: { value: 'a' },
+            value: {
+              values: new Map([
+                [expect.any(Symbol), { key: [], value: { value: 'b' } }],
+                ['c', { key: { value: 'c' }, value: { value: 'd' } }]
+              ])
+            }
+          }
         ]
-      }
-    ])
+      ])
+    })
   })
 
   test('flow collection as second block map key (redhat-developer/vscode-yaml#712)', () => {
@@ -210,28 +236,37 @@ describe('flow collection keys', () => {
         c: d
     `)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.value).toMatchObject([
-      { key: { value: 'x' }, value: { value: 'y' } },
-      {
-        key: { value: 'a' },
-        value: [
-          { key: [], value: { value: 'b' } },
-          { key: { value: 'c' }, value: { value: 'd' } }
+    expect(doc.value).toMatchObject({
+      values: new Map([
+        ['x', { key: { value: 'x' }, value: { value: 'y' } }],
+        [
+          'a',
+          {
+            key: { value: 'a' },
+            value: {
+              values: new Map([
+                [expect.any(Symbol), { key: [], value: { value: 'b' } }],
+                ['c', { key: { value: 'c' }, value: { value: 'd' } }]
+              ])
+            }
+          }
         ]
-      }
-    ])
+      ])
+    })
   })
 
   test('empty scalar as last flow collection value (#550)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:}')
-    expect(doc.value).toMatchObject([
-      { key: { value: 'c' }, value: { value: null } }
-    ])
+    expect(doc.value).toMatchObject({
+      values: new Map([['c', { key: { value: 'c' }, value: { value: null } }]])
+    })
   })
 
   test('plain key with no space before flow collection value (#550)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:[]}')
-    expect(doc.value).toMatchObject([{ key: { value: 'c' }, value: [] }])
+    expect(doc.value).toMatchObject({
+      values: new Map([['c', { key: { value: 'c' }, value: [] }]])
+    })
   })
 })
 
@@ -308,8 +343,10 @@ describe('empty(ish) nodes', () => {
     const src = '{ ? : 123 }'
     const doc = YAML.parseDocument<any>(src)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.value[0].key.value).toBeNull()
-    expect(doc.value[0].value.value).toBe(123)
+    expect(doc.getPair(null)).toMatchObject({
+      key: { value: null },
+      value: { value: 123 }
+    })
   })
 
   describe('comment on empty pair value (#19)', () => {
@@ -344,8 +381,8 @@ describe('empty(ish) nodes', () => {
   })
 
   test('empty node position', () => {
-    const doc = YAML.parseDocument<any>('\r\na: # 123\r\n')
-    const empty = doc.value[0].value
+    const doc = YAML.parseDocument<any, false>('\r\na: # 123\r\n')
+    const empty = doc.get('a')
     expect(empty.range).toEqual([5, 5, 12])
   })
 
@@ -380,7 +417,7 @@ describe('maps with no values', () => {
     const src = `{\na: null,\n? b\n}`
     const doc = YAML.parseDocument<any>(src)
     expect(String(doc)).toBe(`{ a: null, b: }\n`)
-    doc.value[1].key.comment = 'c'
+    doc.getPair('b')!.key.comment = 'c'
     expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n}\n`)
     doc.set('b', 'x')
     expect(String(doc)).toBe(`{\n  a: null,\n  b: #c\n    x\n}\n`)
@@ -399,18 +436,22 @@ describe('maps with no values', () => {
 
   test('implicit scalar key after explicit key with no value', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\nx:\n')
-    expect(doc.value).toMatchObject([
-      { key: [{ value: 1 }], value: null },
-      { key: { value: 'x' }, value: { value: null } }
-    ])
+    expect(doc.value).toMatchObject({
+      values: new Map<any, any>([
+        [expect.any(Symbol), { key: [{ value: 1 }], value: null }],
+        ['x', { key: { value: 'x' }, value: { value: null } }]
+      ])
+    })
   })
 
   test('implicit flow collection key after explicit key with no value', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\n[x]: y\n')
-    expect(doc.value).toMatchObject([
-      { key: [{ value: 1 }], value: null },
-      { key: [{ value: 'x' }], value: { value: 'y' } }
-    ])
+    expect(doc.value).toMatchObject({
+      values: new Map<any, any>([
+        [expect.any(Symbol), { key: [{ value: 1 }], value: null }],
+        [expect.any(Symbol), { key: [{ value: 'x' }], value: { value: 'y' } }]
+      ])
+    })
   })
 })
 
@@ -418,10 +459,12 @@ describe('odd indentations', () => {
   test('Block map with empty explicit key (#551)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('?\n? a')
     expect(doc.errors).toHaveLength(0)
-    expect(doc.value).toMatchObject([
-      { key: { value: null }, value: null },
-      { key: { value: 'a' }, value: null }
-    ])
+    expect(doc.value).toMatchObject({
+      values: new Map([
+        [null, { key: { value: null }, value: null }],
+        ['a', { key: { value: 'a' }, value: null }]
+      ])
+    })
   })
 
   test('Block map with unindented !!null explicit key', () => {
@@ -577,14 +620,14 @@ describe('duplicate keys', () => {
 
   test('disable with option', () => {
     const doc = YAML.parseDocument('foo: 1\nbar: 2\nfoo: 3\n', {
-      uniqueKeys: false
+      mapKey: () => Symbol()
     })
     expect(doc.errors).toMatchObject([])
   })
 
   test('customise with option', () => {
     const doc = YAML.parseDocument('foo: 1\nbar: 2\nfoo: 3\n', {
-      uniqueKeys: () => true
+      mapKey: () => true
     })
     expect(doc.errors).toMatchObject([
       { code: 'DUPLICATE_KEY' },
@@ -690,7 +733,7 @@ describe('keepSourceTokens', () => {
     test(`${type}: default false`, () => {
       const doc = YAML.parseDocument<any>(src)
       expect(doc.value).not.toHaveProperty('srcToken')
-      expect(doc.value[0]).not.toHaveProperty('srcToken')
+      expect(doc.getPair('foo')).not.toHaveProperty('srcToken')
       expect(doc.get('foo')).not.toHaveProperty('srcToken')
     })
 
@@ -699,7 +742,7 @@ describe('keepSourceTokens', () => {
         keepSourceTokens: true
       })
       expect(doc.value.srcToken).toMatchObject({ type })
-      expect(doc.value[0].srcToken).toMatchObject({
+      expect(doc.getPair('foo').srcToken).toMatchObject({
         key: { type: 'scalar' },
         value: { type: 'scalar' }
       })
@@ -921,15 +964,17 @@ describe('stringKeys', () => {
       `,
       { stringKeys: true }
     )
-    expect(doc.value).toMatchObject([
-      { key: { value: 'x' }, value: { value: 'x' } },
-      { key: { value: 'y' }, value: { value: 'y' } },
-      { key: { value: '42' }, value: { value: 42 } },
-      { key: { value: 'true' }, value: { value: true } },
-      { key: { value: 'null' }, value: { value: null } },
-      { key: { value: '~' }, value: { value: null } },
-      { key: { value: '' }, value: { value: null } }
-    ])
+    expect(doc.value).toMatchObject({
+      values: new Map([
+        ['x', { key: { value: 'x' }, value: { value: 'x' } }],
+        ['y', { key: { value: 'y' }, value: { value: 'y' } }],
+        ['42', { key: { value: '42' }, value: { value: 42 } }],
+        ['true', { key: { value: 'true' }, value: { value: true } }],
+        ['null', { key: { value: 'null' }, value: { value: null } }],
+        ['~', { key: { value: '~' }, value: { value: null } }],
+        ['', { key: { value: '' }, value: { value: null } }]
+      ])
+    })
   })
 
   test('explicit non-string tag', () => {

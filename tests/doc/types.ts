@@ -344,7 +344,7 @@ describe('json schema', () => {
     })
     expect(doc.errors).toHaveLength(2)
     doc.errors = []
-    doc.value[1].value!.tag = 'tag:yaml.org,2002:float'
+    doc.get('fixed')!.tag = 'tag:yaml.org,2002:float'
     expect(String(doc)).toBe(
       '"canonical": 685230.15\n"fixed": !!float 685230.15\n"negative infinity": "-.inf"\n"not a number": ".NaN"\n'
     )
@@ -486,7 +486,8 @@ one: 1
         '{ 3: 4 }': 'many'
       })
       expect(doc.errors).toHaveLength(0)
-      doc.value[2].key = doc.createNode({ 3: 4 })
+      const last = Array.from(doc.value.values.values()).at(-1)
+      last!.key = doc.createNode({ 3: 4 })
       expect(doc.toJS()).toMatchObject({
         one: 1,
         2: 'two',
@@ -508,7 +509,8 @@ one: 1
         ])
       )
       expect(doc.errors).toHaveLength(0)
-      doc.value[2].key = doc.createNode({ 5: 6 })
+      const last = Array.from(doc.value.values.values()).at(-1)
+      last!.key = doc.createNode({ 5: 6 })
       expect(doc.toJS({ mapAsMap: true })).toMatchObject(
         new Map<unknown, unknown>([
           ['one', 1],
@@ -538,8 +540,8 @@ description:
     const doc = parseDocument<YAMLMap<Scalar, Scalar<Uint8Array>>>(src, {
       schema: 'yaml-1.1'
     })
-    const canonical = doc.value[0].value!.value
-    const generic = doc.value[1].value!.value
+    const canonical = doc.value.get('canonical')!.value
+    const generic = doc.value.get('generic')!.value
     expect(canonical).toBeInstanceOf(Uint8Array)
     expect(generic).toBeInstanceOf(Uint8Array)
     expect(canonical).toHaveLength(185)
@@ -710,9 +712,9 @@ no time zone (Z): 2001-12-15 2:59:43.10
 date (00:00:00Z): 2002-12-14`
 
       const doc = parseDocument<YAMLMap<Scalar, Scalar>>(src)
-      doc.value.forEach(item => {
-        expect(item.value!.value).toBeInstanceOf(Date)
-      })
+      for (const pair of doc.value.values.values()) {
+        expect(pair.value!.value).toBeInstanceOf(Date)
+      }
       expect(doc.toJS()).toMatchObject({
         canonical: new Date('2001-12-15T02:59:43.100Z'),
         'valid iso8601': new Date('2001-12-15T02:59:43.100Z'),
@@ -829,7 +831,9 @@ date (00:00:00Z): 2002-12-14\n`)
         { tag: '!!omap' }
       )
       expect(doc.value.constructor.name).toBe('YAMLOMap')
-      expect(String(doc)).toBe(`!!omap\n- a: 1\n- b: 2\n- a: 3\n`)
+      expect(() => doc.toString()).toThrow()
+      doc.value[2].key.value = 'c'
+      expect(String(doc)).toBe(`!!omap\n- a: 1\n- b: 2\n- c: 3\n`)
     })
   })
 
@@ -907,7 +911,7 @@ date (00:00:00Z): 2002-12-14\n`)
       const src = '- { a: A, b: B }\n- { b: X }\n'
       const doc = parseDocument(src, { version: '1.1' })
       const alias = doc.createAlias(doc.get(0), 'a')
-      doc.get(1).push(doc.createPair('<<', alias))
+      doc.get(1).set(doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
@@ -919,7 +923,7 @@ date (00:00:00Z): 2002-12-14\n`)
       const src = '- { a: A, b: B }\n- { b: X }\n'
       const doc = parseDocument(src, { version: '1.1' })
       const alias = doc.createAlias(doc.get(0), 'a')
-      doc.get(1).push(doc.createPair('<<', alias))
+      doc.get(1).set(doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },

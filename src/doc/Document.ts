@@ -1,10 +1,9 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
-import type { Primitive } from '../nodes/Collection.ts'
-import type { Node, NodeType, Range } from '../nodes/Node.ts'
-import type { Pair } from '../nodes/Pair.ts'
+import { Pair } from '../nodes/Pair.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
 import { ToJSContext } from '../nodes/toJS.ts'
+import type { Node, NodeType, Primitive, Range } from '../nodes/types.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import { YAMLSet } from '../nodes/YAMLSet.ts'
@@ -116,7 +115,6 @@ export class Document<
         prettyErrors: true,
         strict: true,
         stringKeys: false,
-        uniqueKeys: true,
         version: '1.2'
       },
       options
@@ -231,13 +229,29 @@ export class Document<
   /**
    * Returns item at `key`, or `undefined` if not found.
    */
-  get(key: any): Strict extends true ? Node | Pair | undefined : any {
+  get(key: any): Strict extends true ? Node | Pair | null | undefined : any {
     if (this.value instanceof YAMLMap || this.value instanceof YAMLSet) {
       return this.value.get(key)
     }
     if (this.value instanceof YAMLSeq) {
       if (Number.isInteger(key)) return this.value.at(key)
       throw new TypeError(`Expected an integer, not ${JSON.stringify(key)}.`)
+    }
+    return undefined
+  }
+
+  /**
+   * Returns pair at `key`, or `undefined` if not found.
+   */
+  getPair(key: any): Strict extends true ? Pair | undefined : any {
+    if (this.value instanceof YAMLMap) return this.value.getPair(key)
+    if (this.value instanceof YAMLSeq) {
+      if (!Number.isInteger(key)) {
+        throw new TypeError(`Expected an integer, not ${JSON.stringify(key)}.`)
+      }
+      const pair = this.value.at(key)
+      if (pair instanceof Pair) return pair
+      throw new TypeError(`Value at ${key} is not a Pair`)
     }
     return undefined
   }

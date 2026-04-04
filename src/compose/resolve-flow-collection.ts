@@ -1,4 +1,4 @@
-import type { Node } from '../nodes/Node.ts'
+import type { Node } from '../nodes/types.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
@@ -10,7 +10,6 @@ import type { ComposeErrorHandler } from './composer.ts'
 import { resolveEnd } from './resolve-end.ts'
 import { resolveProps } from './resolve-props.ts'
 import { containsNewline } from './util-contains-newline.ts'
-import { mapIncludes } from './util-map-includes.ts'
 
 const blockMsg = 'Block collections are not allowed within flow collections'
 const isBlock = (token: Token | null | undefined) =>
@@ -195,14 +194,15 @@ export function resolveFlowCollection(
       const pair = new Pair(keyNode, valueNode)
       if (ctx.options.keepSourceTokens) pair.srcToken = collItem
       if (isMap) {
-        if (mapIncludes(ctx, coll as YAMLMap | YAMLSet, keyNode))
+        const map = coll as YAMLMap | YAMLSet
+        if (map.has(keyNode))
           onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
-        if (coll instanceof YAMLSet) coll.add(keyNode)
-        else coll._push(pair)
+        if (map instanceof YAMLSet) map.add(keyNode)
+        else map.set(pair)
       } else {
         const map = new YAMLMap(ctx.schema)
         map.flow = true
-        map._push(pair)
+        map.set(pair)
         const endRange = (valueNode ?? keyNode).range!
         map.range = [keyNode.range![0], endRange[1], endRange[2]]
         ;(coll as YAMLSeq)._push(map)

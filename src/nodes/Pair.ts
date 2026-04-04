@@ -4,9 +4,8 @@ import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { stringifyPair } from '../stringify/stringifyPair.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
-import type { NodeOf, Primitive } from './Collection.ts'
-import type { Node } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
+import type { Node, NodeOf, Primitive } from './types.ts'
 
 export class Pair<
   K extends Primitive | Node = Primitive | Node,

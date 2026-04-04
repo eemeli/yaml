@@ -8,7 +8,6 @@ import type { ComposeErrorHandler } from './composer.ts'
 import { resolveProps } from './resolve-props.ts'
 import { containsNewline } from './util-contains-newline.ts'
 import { flowIndentCheck } from './util-flow-indent-check.ts'
-import { mapIncludes } from './util-map-includes.ts'
 
 const startColMsg = 'All mapping items must start at the same column'
 
@@ -77,7 +76,7 @@ export function resolveBlockMap(
     if (ctx.schema.compat) flowIndentCheck(bm.indent, key, onError)
     ctx.atKey = false
 
-    if (mapIncludes(ctx, map, keyNode))
+    if (map.has(keyNode))
       onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
 
     // value properties
@@ -129,7 +128,7 @@ export function resolveBlockMap(
       } else {
         const pair = new Pair(keyNode, valueNode)
         if (ctx.options.keepSourceTokens) pair.srcToken = collItem
-        map._push(pair)
+        map.set(pair)
       }
     } else {
       // key with no value
@@ -148,7 +147,7 @@ export function resolveBlockMap(
       } else {
         const pair = new Pair(keyNode)
         if (ctx.options.keepSourceTokens) pair.srcToken = collItem
-        map._push(pair)
+        map.set(pair)
       }
     }
   }

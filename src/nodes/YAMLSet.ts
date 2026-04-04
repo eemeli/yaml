@@ -5,31 +5,18 @@ import type { BlockMap, FlowCollection } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
 import { stringify, type StringifyContext } from '../stringify/stringify.ts'
 import { indentComment, lineComment } from '../stringify/stringifyComment.ts'
-import type { CollectionBase, NodeOf, Primitive } from './Collection.ts'
 import { isCollection, isNode } from './identity.ts'
-import type { Node, Range } from './Node.ts'
-import { Scalar } from './Scalar.ts'
+import { Pair } from './Pair.ts'
 import { ToJSContext } from './toJS.ts'
-
-function primitiveKey(value: unknown): Primitive | undefined {
-  const value_ = value instanceof Scalar ? value.value : value
-  switch (typeof value_) {
-    case 'bigint':
-    case 'boolean':
-    case 'number':
-    case 'string':
-      return value_
-    default:
-      return value_ ? undefined : null
-  }
-}
+import type { CollectionBase, Node, NodeOf, Primitive, Range } from './types.ts'
+import { cloneMapOrSet } from './util-clone-map-or-set.ts'
 
 export class YAMLSet<
   T extends Primitive | Node = Primitive | Node
 > implements CollectionBase {
   static readonly tagName = 'tag:yaml.org,2002:set'
 
-  schema: Schema | undefined
+  declare schema: Schema
 
   /** A fully qualified tag */
   tag = 'tag:yaml.org,2002:set'
@@ -61,7 +48,7 @@ export class YAMLSet<
   /** The CST token that was composed into this set.  */
   declare srcToken?: BlockMap | FlowCollection
 
-  constructor(schema?: Schema) {
+  constructor(schema: Schema) {
     Object.defineProperty(this, 'schema', {
       value: schema,
       configurable: true,
@@ -83,7 +70,6 @@ export class YAMLSet<
     let node: Node
     if (isNode(value)) node = value
     else {
-      if (!this.schema) throw new Error('Schema is required')
       const nc = new NodeCreator(this.schema, {
         ...options,
         aliasDuplicateObjects: false
@@ -91,9 +77,9 @@ export class YAMLSet<
       node = nc.create(value)
       nc.setAnchors()
     }
-    let key_: Primitive | symbol | undefined = primitiveKey(node)
-    if (key_ === undefined) key_ = Symbol()
-    this.values.set(key_, node as NodeOf<T>)
+    let key: Primitive | symbol | undefined = this.schema.mapKey(node)
+    if (key === undefined) key = Symbol()
+    this.values.set(key, node as NodeOf<T>)
     return this
   }
 
@@ -103,17 +89,7 @@ export class YAMLSet<
    * @param schema - If defined, overwrites the original's schema
    */
   clone(schema?: Schema): this {
-    schema ??= this.schema
-    const copy = new (this.constructor as typeof YAMLSet)(schema)
-    for (const [key, value] of this.values) {
-      copy.values.set(key, value.clone(schema))
-    }
-    if (this.range) copy.range = [...this.range]
-    const propDesc = Object.getOwnPropertyDescriptors(this)
-    for (const [name, prop] of Object.entries(propDesc)) {
-      if (!(name in copy)) Object.defineProperty(copy, name, prop)
-    }
-    return copy as this
+    return cloneMapOrSet(this, schema)
   }
 
   /**
@@ -121,7 +97,7 @@ export class YAMLSet<
    * @returns `true` if the item was found and removed.
    */
   delete(value: T | NodeOf<T>): boolean {
-    const pk = primitiveKey(value)
+    const pk = this.schema.mapKey(value)
     if (pk !== undefined) return this.values.delete(pk)
     if (isNode(value)) {
       for (const [k, v] of this.values) {
@@ -133,7 +109,7 @@ export class YAMLSet<
 
   /** Return the node matching `value`, if the set includes it.  */
   get(value: T | NodeOf<T>): NodeOf<T> | undefined {
-    const pk = primitiveKey(value)
+    const pk = this.schema.mapKey(value)
     if (pk !== undefined) return this.values.get(pk)
     if (isNode(value)) {
       for (const v of this.values.values()) if (v === value) return v
@@ -143,7 +119,7 @@ export class YAMLSet<
 
   /** Check if the set includes `value`.  */
   has(value: T | NodeOf<T>): boolean {
-    const pk = primitiveKey(value)
+    const pk = this.schema.mapKey(value)
     if (pk !== undefined) return this.values.has(pk)
     if (isNode(value)) {
       for (const v of this.values.values()) if (v === value) return true
@@ -152,7 +128,7 @@ export class YAMLSet<
   }
 
   /**
-   * Return the internal key matching `value`, or `undefined` if not found.
+   * Return the internal Map key matching `value`, or `undefined` if not found.
    *
    * @param allowMissing - If `true`, a key is always returned,
    *                       even if the value is not in the set.
@@ -166,7 +142,7 @@ export class YAMLSet<
     value: T | NodeOf<T>,
     allowMissing = false
   ): Primitive | symbol | undefined {
-    const pk = primitiveKey(value)
+    const pk = this.schema.mapKey(value)
     if (pk !== undefined)
       return allowMissing || this.values.has(pk) ? pk : undefined
     if (isNode(value)) {
@@ -190,15 +166,22 @@ export class YAMLSet<
     onChompKeep?: () => void
   ): string {
     if (!ctx) return JSON.stringify(this)
+    let items: Iterable<NodeOf<T>> = this.values.values()
+    if (ctx.sortMapEntries) {
+      items = Array.from(items, item => new Pair(item))
+        .sort(ctx.sortMapEntries)
+        .map(pair => pair.key)
+    }
     if (ctx.inFlow ?? this.flow) {
-      return this.#stringifyFlowSet(ctx)
+      return this.#stringifyFlowSet(ctx, items)
     } else {
-      return this.#stringifyBlockSet(ctx, onComment, onChompKeep)
+      return this.#stringifyBlockSet(ctx, items, onComment, onChompKeep)
     }
   }
 
   #stringifyBlockSet(
     ctx: StringifyContext,
+    items: Iterable<NodeOf<T>>,
     onComment?: () => void,
     onChompKeep?: () => void
   ) {
@@ -215,7 +198,7 @@ export class YAMLSet<
 
     let chompKeep = false // flag for the preceding node's status
     let res: string | null = null
-    for (const item of this.values.values()) {
+    for (const item of items) {
       if (!chompKeep && item.spaceBefore) {
         if (typeof res === 'string') res += '\n'
         else res = ''
@@ -255,7 +238,7 @@ export class YAMLSet<
     return res ?? '{}'
   }
 
-  #stringifyFlowSet(ctx: StringifyContext) {
+  #stringifyFlowSet(ctx: StringifyContext, items: Iterable<NodeOf<T>>) {
     const {
       indent,
       indentStep,
@@ -272,7 +255,7 @@ export class YAMLSet<
     const lines: string[] = []
     let itemsLeft = this.values.size
     let singleLineWidth = 2 * fcPadding.length // '{}' + ' ' + ' ' - ', '
-    for (const item of this.values.values()) {
+    for (const item of items) {
       itemsLeft -= 1
 
       if (item.spaceBefore) {

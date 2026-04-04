@@ -1,4 +1,4 @@
-import type { Node } from '../nodes/Node.ts'
+import type { Node } from '../nodes/types.ts'
 import { visit } from '../visit.ts'
 import type { Document, DocValue } from './Document.ts'
 
