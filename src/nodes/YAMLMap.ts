@@ -19,7 +19,7 @@ export type MapLike =
   | Set<any>
   | Record<string | number | symbol, any>
 
-type Key<K extends Primitive | Node, V extends Primitive | Node> =
+export type KeyArg<K extends Primitive | Node, V extends Primitive | Node> =
   | K
   | NodeOf<K>
   | (K extends Scalar ? K['value'] : never)
@@ -118,7 +118,7 @@ export class YAMLMap<
    * Remove a value from the mapping.
    * @returns `true` if the item was found and removed.
    */
-  delete(key: Key<K, V>): boolean {
+  delete(key: KeyArg<K, V>): boolean {
     const pk = this.schema.mapKey(key)
     if (pk !== undefined) return this.values.delete(pk)
     const nk = key instanceof Pair ? key.key : isNode(key) ? key : null
@@ -130,12 +130,12 @@ export class YAMLMap<
   }
 
   /** Return value at `key`, or `undefined` if not found.  */
-  get(key: Key<K, V>): NodeOf<V> | null | undefined {
+  get(key: KeyArg<K, V>): NodeOf<V> | null | undefined {
     return this.getPair(key)?.value
   }
 
   /** Return pair at `key`, or `undefined` if not found.  */
-  getPair(key: Key<K, V>): Pair<K, V> | undefined {
+  getPair(key: KeyArg<K, V>): Pair<K, V> | undefined {
     const pk = this.schema.mapKey(key)
     if (pk !== undefined) return this.values.get(pk)
     const nk = key instanceof Pair ? key.key : isNode(key) ? key : null
@@ -146,7 +146,7 @@ export class YAMLMap<
   }
 
   /** Check if the mapping includes a value with the key `key`.  */
-  has(key: Key<K, V>): boolean {
+  has(key: KeyArg<K, V>): boolean {
     const pk = this.schema.mapKey(key)
     if (pk !== undefined) return this.values.has(pk)
     const nk = key instanceof Pair ? key.key : isNode(key) ? key : null
@@ -162,9 +162,15 @@ export class YAMLMap<
    * @param allowMissing - If `true`, a key is always returned,
    *                       even if the key is not in the map.
    */
-  keyOf(key: Key<K, V>, allowMissing: true): Primitive | symbol
-  keyOf(key: Key<K, V>, allowMissing?: boolean): Primitive | symbol | undefined
-  keyOf(key: Key<K, V>, allowMissing = false): Primitive | symbol | undefined {
+  keyOf(key: KeyArg<K, V>, allowMissing: true): Primitive | symbol
+  keyOf(
+    key: KeyArg<K, V>,
+    allowMissing?: boolean
+  ): Primitive | symbol | undefined
+  keyOf(
+    key: KeyArg<K, V>,
+    allowMissing = false
+  ): Primitive | symbol | undefined {
     const pk = this.schema.mapKey(key)
     if (pk !== undefined)
       return allowMissing || this.values.has(pk) ? pk : undefined
@@ -186,7 +192,7 @@ export class YAMLMap<
   ): this
   set(pair: Pair<K, V>): this
   set(
-    keyOrPair: Key<K, V>,
+    keyOrPair: KeyArg<K, V>,
     value?: V | NodeOf<V> | (V extends Scalar ? V['value'] : never) | null,
     options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
   ): this {
@@ -196,12 +202,8 @@ export class YAMLMap<
     } else if (isNode(keyOrPair) && (value == null || isNode(value))) {
       pair = new Pair(keyOrPair, value ?? null)
     } else {
-      const nc = new NodeCreator(this.schema, {
-        ...options,
-        aliasDuplicateObjects: false
-      })
+      const nc = new NodeCreator(this.schema, options)
       pair = nc.createPair(keyOrPair, value) as Pair<K, V>
-      nc.setAnchors()
     }
 
     let key_: Primitive | symbol | undefined = this.schema.mapKey(pair)

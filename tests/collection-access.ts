@@ -119,6 +119,9 @@ describe('Seq', () => {
   beforeEach(() => {
     doc = new Document([1, [2, 3]])
     seq = doc.value as any
+  })
+
+  test('create', () => {
     expect(seq).toMatchObject([{ value: 1 }, [{ value: 2 }, { value: 3 }]])
   })
 
@@ -127,6 +130,14 @@ describe('Seq', () => {
     expect(seq[2]).toMatchObject({ value: 9 })
     seq.push(1)
     expect(seq).toHaveLength(4)
+  })
+
+  test('index access', () => {
+    expect(seq[0]).toMatchObject({ value: 1 })
+    const subSeq = seq[1]
+    expect(subSeq).toBeInstanceOf(YAMLSeq)
+    expect(subSeq.toJS(doc)).toMatchObject([2, 3])
+    expect(seq[2]).toBeUndefined()
   })
 
   test('at() with integer', () => {

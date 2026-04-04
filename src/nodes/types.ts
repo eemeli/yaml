@@ -80,7 +80,7 @@ export interface NodeBase {
 }
 
 export interface CollectionBase extends NodeBase {
-  schema?: Schema
+  schema: Schema
 
   /** An optional anchor on this collection. Used by alias nodes. */
   anchor?: string
@@ -90,4 +90,7 @@ export interface CollectionBase extends NodeBase {
 
   /** The number of items in this collection. */
   readonly size: number
+
+  /** Create a deep copy of this collection */
+  clone(schema?: Schema): this
 }

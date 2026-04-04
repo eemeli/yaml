@@ -67,16 +67,9 @@ export class YAMLSet<
   ): this {
     if (this.has(value)) return this
 
-    let node: Node
-    if (isNode(value)) node = value
-    else {
-      const nc = new NodeCreator(this.schema, {
-        ...options,
-        aliasDuplicateObjects: false
-      })
-      node = nc.create(value)
-      nc.setAnchors()
-    }
+    const node = isNode(value)
+      ? value
+      : new NodeCreator(this.schema, options).create(value)
     let key: Primitive | symbol | undefined = this.schema.mapKey(node)
     if (key === undefined) key = Symbol()
     this.values.set(key, node as NodeOf<T>)

@@ -16,7 +16,6 @@ export class NodeCreator {
   replacer?: Replacer
   schema: Schema
 
-  #aliasDuplicateObjects: boolean
   #anchorPrefix: string
   #aliasObjects: unknown[] = []
   #doc?: Document<DocValue, boolean>
@@ -31,10 +30,7 @@ export class NodeCreator {
     options?: CreateNodeOptions,
     replacer?: Replacer
   )
-  constructor(
-    schema: Schema,
-    options: CreateNodeOptions & { aliasDuplicateObjects: false }
-  )
+  constructor(schema: Schema, options?: CreateNodeOptions)
   constructor(
     docOrSchema: Document<DocValue, boolean> | Schema,
     options: CreateNodeOptions = {},
@@ -46,11 +42,10 @@ export class NodeCreator {
     this.#flow = options.flow ?? false
     this.#onTagObj = options.onTagObj
 
-    this.#aliasDuplicateObjects = options.aliasDuplicateObjects ?? true
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     this.#anchorPrefix = options.anchorPrefix || 'a'
     if (docOrSchema instanceof Document) {
-      this.#doc = docOrSchema
+      if (options.aliasDuplicateObjects ?? true) this.#doc = docOrSchema
       this.schema = docOrSchema.schema
     } else {
       this.schema = docOrSchema
@@ -78,12 +73,12 @@ export class NodeCreator {
     // after first. The `ref` wrapper allows for circular references to resolve.
     let ref: { anchor: string | null; node: Node | null } | undefined =
       undefined
-    if (this.#aliasDuplicateObjects && value && typeof value === 'object') {
+    if (this.#doc && value && typeof value === 'object') {
       ref = this.#sourceObjects.get(value)
       if (ref) {
         if (!ref.anchor) {
           this.#aliasObjects.push(value)
-          this.#prevAnchors ??= anchorNames(this.#doc!)
+          this.#prevAnchors ??= anchorNames(this.#doc)
           ref.anchor = findNewAnchor(this.#anchorPrefix, this.#prevAnchors)
           this.#prevAnchors.add(ref.anchor)
         }

@@ -11,33 +11,27 @@ import { parseAllDocuments, parseDocument } from 'yaml'
 const file = fs.readFileSync('./file.yml', 'utf8')
 const doc = parseDocument(file)
 doc.value
+
+// Eliding the .range, .source, and .type attributes:
+//
 // YAMLMap {
-//   items:
-//    [ Pair {
-//        key: Scalar { value: 'YAML', range: [ 0, 4, 4 ] },
-//        value:
-//         YAMLSeq {
-//           items:
-//            [ Scalar {
-//                value: 'A human-readable data serialization language',
-//                range: [ 10, 54, 55 ] },
-//              Scalar {
-//                value: 'https://en.wikipedia.org/wiki/YAML',
-//                range: [ 59, 93, 94 ] } ],
-//           range: [ 8, 94, 94 ] } },
-//      Pair {
-//        key: Scalar { value: 'yaml', range: [ 94, 98, 98 ] },
-//        value:
-//         YAMLSeq {
-//           items:
-//            [ Scalar {
-//                value: 'A complete JavaScript implementation',
-//                range: [ 104, 140, 141 ] },
-//              Scalar {
-//                value: 'https://www.npmjs.com/package/yaml',
-//                range: [ 145, 180, 180 ] } ],
-//           range: [ 102, 180, 180 ] } } ],
-//   range: [ 0, 180, 180 ] }
+//   values: Map(2) {
+//     'YAML' => Pair {
+//       key: Scalar { value: 'YAML' },
+//       value: YAMLSeq(2) [
+//         Scalar { value: 'A human-readable data serialization language' },
+//         Scalar { value: 'https://en.wikipedia.org/wiki/YAML' }
+//       ]
+//     },
+//     'yaml' => Pair {
+//       key: Scalar { value: 'yaml' },
+//       value: YAMLSeq(2) [
+//         Scalar { value: 'A complete JavaScript implementation' },
+//         Scalar { value: 'https://www.npmjs.com/package/yaml' }
+//       ]
+//     }
+//   }
+// }
 ```
 
 These functions should never throw,
@@ -70,7 +64,8 @@ See [Options](#options) for more information on the second parameter.
 
 Creates a new document.
 The document `value` is initialised with `value`, wrapped recursively in appropriate [content nodes](#content-nodes).
-If defined, a `replacer` may filter or modify the initial document value, following the same algorithm as the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter).
+If defined, a `replacer` may filter or modify the initial document value,
+following the same algorithm as the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter).
 See [Options](#options) for more information on the last argument.
 
 | Member        | Type                               | Description                                                                                                                                                         |
@@ -103,27 +98,31 @@ which is expected to always contain a `YAMLMap`, `YAMLSeq`, or `Scalar` value.
 
 ## Document Methods
 
-| Method                                     | Returns    | Description                                                                                                                               |
-| ------------------------------------------ | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| clone()                                    | `Document` | Create a deep copy of this Document and its value. Custom Node values that inherit from `Object` still refer to their original instances. |
-| createAlias(node: Node, name?: string)     | `Alias`    | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated.                |
-| createNode(value,&nbsp;options?)           | `Node`     | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.                |
-| createPair(key,&nbsp;value,&nbsp;options?) | `Pair`     | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.                      |
-| setSchema(version,&nbsp;options?)          | `void`     | Change the YAML version and schema used by the document. `version` must be either `'1.1'` or `'1.2'`; accepts all Schema options.         |
-| toJS(options?)                             | `any`      | A plain JavaScript representation of the document `value`.                                                                                |
-| toJSON()                                   | `any`      | A JSON representation of the document `value`.                                                                                            |
-| toString(options?)                         | `string`   | A YAML representation of the document.                                                                                                    |
+| Method                                     | Returns       | Description                                                                                                                               |
+| ------------------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| clone()                                    | `Document`    | Create a deep copy of this Document and its value. Custom Node values that inherit from `Object` still refer to their original instances. |
+| createAlias(node: Node, name?: string)     | `Alias`       | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated.                |
+| createNode(value,&nbsp;options?)           | `Node`        | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.                |
+| createPair(key,&nbsp;value,&nbsp;options?) | `Pair`        | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.                      |
+| get(key)                                   | `Node ⎮ Pair` | Returns top-level collection item at `key`, or `undefined` if not found.                                                                  |
+| getPair(key)                               | `Pair`        | Returns top-level collection pair at `key`, or `undefined` if not found.                                                                  |
+| set(key)                                   | `void`        | Sets a value in this document's top-level collection. For `!!set`, `value` is ignored.                                                    |
+| setSchema(version,&nbsp;options?)          | `void`        | Change the YAML version and schema used by the document. `version` must be either `'1.1'` or `'1.2'`; accepts all Schema options.         |
+| toJS(options?)                             | `any`         | A plain JavaScript representation of the document `value`.                                                                                |
+| toJSON()                                   | `any`         | A JSON representation of the document `value`.                                                                                            |
+| toString(options?)                         | `string`      | A YAML representation of the document.                                                                                                    |
 
 ```js
 const doc = parseDocument('a: 1\nb: [2, 3]\n')
-doc.get('a') // 1
-doc.get('b').has(0) // true
-doc.get('b').push(4) // -> doc.get('b').items.length === 3
-doc.get('b').delete(1) // true
-doc.get('b').get(1) // 4
+doc.get('a') // Scalar { value: 1 }
+doc.getPair('a') // Pair { key: Scalar { value: 'a' }, value: Scalar { value: 1 } }
+doc.get('b')[0] // Scalar { value: 2 }
+doc.get('b').push(4) // 3
+doc.get('b').splice(1, 1) // YAMLSeq(1) [ Scalar { value: 3 } ]
+doc.get('b').at(1) // 4
 ```
 
-In addition to the above, the document object also provides the same **accessor methods** as [collections](#collections), based on the top-level collection:
+In addition to the above, the document object also provides the following **accessor methods**:
 `delete`, `get`, `has`, and `set`.
 
 #### `Document#toJS()`, `Document#toJSON()` and `Document#toString()`

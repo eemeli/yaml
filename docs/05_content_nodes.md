@@ -55,68 +55,86 @@ class Pair {
 }
 
 interface CollectionBase extends NodeBase {
-  anchor?: string  // an anchor associated with this node
-  flow?: boolean   // use flow style when stringifying this
-  schema?: Schema
+  anchor?: string               // an anchor associated with this node
   clone(schema?: Schema): this  // a deep copy of this collection
+  flow?: boolean                // use flow style when stringifying this
+  schema: Schema
+  readonly size: number         // the number of items in this collection
 }
 
-class YAMLMap<K = unknown, V = unknown> extends Array<Pair<K, V>> implements CollectionBase {
-  delete(key: K): boolean
-  get(key: K, keepScalar?: boolean): unknown
-  has(key: K): boolean
-  push(...pairs: Pair<K, V>[]): number
-  set(key: K, value: V): void
+class YAMLMap<K = Primitive | Node, V = Primitive | Node> implements CollectionBase {
+  constructor(schema: Schema, elements?: Pair<K, V>[])
+  delete(key: K | NodeOf<K>): boolean
+  get(key: K | NodeOf<K>): NodeOf<V>
+  getPair(key: K | NodeOf<K>): Pair<K, V>
+  has(key: K | NodeOf<K>): boolean
+  set(pair: Pair<K, V>): void
+  set(key: K | NodeOf<K>, value?: V | NodeOf<V> | null): void
+  values: Map<unknown, Pair<K, V>>
 }
 
-class YAMLSeq<T = unknown> extends Array<NodeOf<T>> implements CollectionBase {
-  delete(key: number | Scalar<number>): boolean
-  get(key: number | Scalar<number>, keepScalar?: boolean): unknown
-  has(key: number | Scalar<number>): boolean
-  push(...items: Array<T | NodeOf<T>>): number
-  set(key: number | Scalar<number>, value: T): void
+class YAMLSeq<T = Primitive | Node> extends Array<NodeOf<T>> implements CollectionBase {
+  constructor(schema: Schema, elements?: (T | NodeOf<T>)[])
+  set(idx: number, value: T | NodeOf<T>): void
 }
 ```
 
 Within all YAML documents, two forms of collections are supported: sequential `YAMLSeq` collections and key-value `YAMLMap` collections.
-The JavaScript representations of these collections both have an `items` array, which may (`YAMLSeq`) or must (`YAMLMap`) consist of `Pair` objects that contain a `key` and a `value` of any node type, or `null` for `value`.
-The `items` array of a `YAMLSeq` object may contain any node values.
+
+`YAMLSeq` extends `Array`, overriding its `.fill`, `.push`, `.splice`, and `.unshift` methods to wrap all inserted values as `Node` values.
+Indexed access (as in `seq[2]`) is supported, but setting values with it will not wrap values as expected.
+To set values, a `.set` method is provided.
+
+| YAMLSeq Method  | Returns | Description                                                                                                                                                                                                          |
+| --------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| set(idx, value) | `this`  | Sets a value in this sequence. `idx` must be an integer. With a non-Node `value`, `doc.createNode(value)` will be called internally. When overwriting a `Scalar` value with a scalar, the original node is retained. |
+
+`YAMLMap` represents mapping values using an internal `.values` Map, with `Pair` instances as values.
+For all of the following YAMLMap methods, `key` may be a Pair, a Node,
+or a bare scalar value (i.e. `42` will match `Scalar { value: 42 }`).
+To customize key (and thereby equality) handling, use the `mapKey` [Schema option](#schema-options).
+
+| YAMLMap Method  | Returns   | Description                                                                                                                                                                           |
+| --------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| delete(key)     | `boolean` | Removes a value from the map. Returns `true` if the item was found and removed.                                                                                                       |
+| get(key)        | `Node`    | Returns value at `key`, or `undefined` if not found.                                                                                                                                  |
+| getPair(key)    | `Pair`    | Returns pair at `key`, or `undefined` if not found.                                                                                                                                   |
+| has(key)        | `boolean` | Checks if the map includes a value with the key `key`.                                                                                                                                |
+| set(key, value) | `this`    | Sets a value in this map. With a non-Node `value`, `doc.createNode(value)` will be called internally. When overwriting a `Scalar` value with a scalar, the original node is retained. |
 
 When stringifying collections, by default block notation will be used.
 Flow notation will be selected if `flow` is `true`, the collection is within a surrounding flow collection, or if the collection is in an implicit key.
 
-The `yaml-1.1` schema includes [additional collections](https://yaml.org/type/index.html) that are based on `YAMLMap` and `YAMLSeq`: `OMap` and `Pairs` are sequences of `Pair` objects (`OMap` requires unique keys & corresponds to the JS Map object), and `Set` is a map of keys with null values that corresponds to the JS Set object.
+The `yaml-1.1` schema includes [additional collections](https://yaml.org/type/index.html) that are based on `YAMLMap` and `YAMLSeq`:
+`OMap` and `Pairs` are `YAMLSeq<Pair>` instances (`OMap` requires unique keys & corresponds to the JS Map object), while
+`YAMLSet` is a separately implemented collection with an internal `.values` Map, in JS corresponding to the Set object.
 
-All of the collections provide the following accessor methods:
+For all of the following YAMLSet methods, `value` may be a Node
+or a bare scalar value (i.e. `42` will match `Scalar { value: 42 }`).
+To customize key (and thereby equality) handling, use the `mapKey` [Schema option](#schema-options).
 
-| Method          | Returns   | Description                                                                                                                                                                                      |
-| --------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| delete(key)     | `boolean` | Removes a value from the collection. Returns `true` if the item was found and removed.                                                                                                           |
-| get(key)        | `Node`    | Returns value at `key`, or `undefined` if not found.                                                                                                                                             |
-| has(key)        | `boolean` | Checks if the collection includes a value with the key `key`.                                                                                                                                    |
-| push(...values) | `number`  | Adds values to the collection. For `!!map` and `!!omap` the value must be a Pair instance, which must not have a key that already exists in the map.                                             |
-| set(key, value) | `any`     | Sets a value in this collection. For `!!set`, `value` needs to be a boolean to add/remove the item from the set. When overwriting a `Scalar` value with a scalar, the original node is retained. |
+| YAMLSet Method | Returns   | Description                                                                     |
+| -------------- | --------- | ------------------------------------------------------------------------------- |
+| add(value)     | `any`     | Sets a value in this set.                                                       |
+| delete(value)  | `boolean` | Removes a value from the set. Returns `true` if the item was found and removed. |
+| get(value)     | `Node`    | Returns value matching `value`, or `undefined` if not found.                    |
+| has(value)     | `boolean` | Checks if the set includes `value`.                                             |
 
 <!-- prettier-ignore -->
 ```js
 const doc = new YAML.Document({ a: 1, b: [2, 3] }) // { a: 1, b: [ 2, 3 ] }
-doc.set('c', 4)         // { a: 1, b: [ 2, 3 ], c: 4 }
-doc.get('b').push(5)    // { a: 1, b: [ 2, 3, 5 ], c: 4 }
-doc.set('c', 42)        // { a: 1, b: [ 2, 3, 5 ], c: 42 }
-doc.get('c').set('x')   // TypeError: doc.get(...).set is not a function
-doc.delete('c')         // { a: 1, b: [ 2, 3, 5 ] }
-doc.get('b').delete(1)  // { a: 1, b: [ 2, 5 ] }
+doc.set('c', 4)           // { a: 1, b: [ 2, 3 ], c: 4 }
+doc.get('b').push(5)      // { a: 1, b: [ 2, 3, 5 ], c: 4 }
+doc.set('c', 42)          // { a: 1, b: [ 2, 3, 5 ], c: 42 }
+doc.get('c').set('x')     // TypeError: doc.get(...).set is not a function
+doc.value.delete('c')     // { a: 1, b: [ 2, 3, 5 ] }
+doc.get('b').splice(1, 1) // { a: 1, b: [ 2, 5 ] }
 
 doc.get('a') // Scalar { value: 1 }
-doc.get('b').get(1) // Scalar { value: 5 }
-doc.has(doc.createNode('a')) // true
-doc.has('c') // false
-doc.get('b').has(0) // true
+doc.get(doc.createNode('a')) // Scalar { value: 1 }
+doc.get('b')[1] // Scalar { value: 5 }
+doc.get('c') // undefined
 ```
-
-For all of these methods, the keys may be nodes or their wrapped scalar values (i.e. `42` will match `Scalar { value: 42 }`).
-Keys for `!!seq` should be non-negative integers, or their string representations.
-`set()` will internally call `doc.createNode()` to wrap the value.
 
 ## Alias Nodes
 

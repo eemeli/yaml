@@ -11,15 +11,16 @@ export { Composer } from './compose/composer.ts'
 export { Document, type DocValue } from './doc/Document.ts'
 export { Schema } from './schema/Schema.ts'
 
-export type { ErrorCode } from './errors.ts'
 export { YAMLError, YAMLParseError, YAMLWarning } from './errors.ts'
+export type { ErrorCode } from './errors.ts'
 
 export { Alias } from './nodes/Alias.ts'
 export { isCollection, isNode } from './nodes/identity.ts'
-export type { Node, NodeBase, Range } from './nodes/types.ts'
 export { Pair } from './nodes/Pair.ts'
 export { Scalar } from './nodes/Scalar.ts'
+export type { Node, NodeBase, Range } from './nodes/types.ts'
 export { YAMLMap } from './nodes/YAMLMap.ts'
+export type { KeyArg } from './nodes/YAMLMap.ts'
 export { YAMLSeq } from './nodes/YAMLSeq.ts'
 export { YAMLSet } from './nodes/YAMLSet.ts'
 
@@ -49,10 +50,10 @@ export type { TagId, Tags } from './schema/tags.ts'
 export type { CollectionTag, ScalarTag } from './schema/types.ts'
 export type { YAMLOMap } from './schema/yaml-1.1/omap.ts'
 
+export { visit, visitAsync } from './visit.ts'
 export type {
   asyncVisitor,
   asyncVisitorFn,
   visitor,
   visitorFn
 } from './visit.ts'
-export { visit, visitAsync } from './visit.ts'

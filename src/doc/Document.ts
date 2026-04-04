@@ -257,7 +257,7 @@ export class Document<
   }
 
   /**
-   * Sets a value in this document. For `!!set`, `value` is ignored.
+   * Sets a value in this document's top-level collection. For `!!set`, `value` is ignored.
    */
   set(key: any, value: any): void {
     if (this.value instanceof YAMLSet) {

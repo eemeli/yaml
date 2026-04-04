@@ -77,8 +77,8 @@ export class YAMLSeq<
     return seq
   }
 
-  constructor(schema: Schema, elements: Array<NodeOf<T>> = []) {
-    super(...elements)
+  constructor(schema: Schema, elements: Array<T | NodeOf<T>> = []) {
+    super(...nodeValues(schema, elements))
     Object.defineProperty(this, 'schema', {
       value: schema,
       configurable: true,
@@ -109,6 +109,15 @@ export class YAMLSeq<
     return copy
   }
 
+  /**
+   * Change all elements within a range of indices in this sequence to a static value.
+   *
+   * Non-node values are converted to Node values.
+   */
+  fill(value: T | NodeOf<T>, start?: number, end?: number): this {
+    return super.fill(nodeValue(this.schema, value), start, end)
+  }
+
   /** @private */
   _push(item: NodeOf<T>): void {
     super.push(item)
@@ -119,28 +128,18 @@ export class YAMLSeq<
    *
    * Non-node values are converted to Node values.
    */
-  push(...items: Array<T | NodeOf<T>>): number {
-    let nc: NodeCreator | undefined
-    for (const value of items) {
-      if (isNode(value) || value instanceof Pair) {
-        super.push(value as NodeOf<T>)
-      } else {
-        nc ??= new NodeCreator(this.schema, { aliasDuplicateObjects: false })
-        super.push(nc.create(value) as NodeOf<T>)
-        nc.setAnchors()
-      }
-    }
-    return this.length
+  push(...values: Array<T | NodeOf<T>>): number {
+    return super.push(...nodeValues(this.schema, values))
   }
 
   /**
    * Set a value in this sequence.
    *
-   * Throws if `idx` is not an integer.
+   * Non-node values are converted to Node values.
    */
   set(
     idx: number,
-    value: T,
+    value: T | NodeOf<T>,
     options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
   ): void {
     if (!Number.isInteger(idx))
@@ -148,22 +147,38 @@ export class YAMLSeq<
     const prev = this.at(idx)
     if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
     else {
-      let nv
-      if (isNode(value) || value instanceof Pair) nv = value as NodeOf<T>
-      else {
-        const nc = new NodeCreator(this.schema, {
-          ...options,
-          aliasDuplicateObjects: false
-        })
-        nv = nc.create(value) as NodeOf<T>
-        nc.setAnchors()
-      }
       if (idx < 0) {
         if (idx < -this.length) throw new RangeError(`Invalid index ${idx}`)
         idx += this.length
       }
-      this[idx] = nv
+      this[idx] = nodeValue(this.schema, value, options)
     }
+  }
+
+  /**
+   * Changes the contents of this sequence by removing or replacing existing elements
+   * and/or adding new elements in place.
+   *
+   * Non-node values are converted to Node values.
+   */
+  splice(
+    start: number,
+    deleteCount?: number,
+    ...values: Array<T | NodeOf<T>>
+  ): NodeOf<T>[] {
+    const nv = nodeValues(this.schema, values)
+    return arguments.length < 2
+      ? super.splice(start)
+      : super.splice(start, Number(deleteCount), ...nv)
+  }
+
+  /**
+   * Prepend new elements to this sequence, and return its new length.
+   *
+   * Non-node values are converted to Node values.
+   */
+  unshift(...values: Array<T | NodeOf<T>>): number {
+    return super.unshift(...nodeValues(this.schema, values))
   }
 
   /** A plain JavaScript representation of this node. */
@@ -316,6 +331,24 @@ export class YAMLSeq<
     }
     return `[${fcPadding}${lines.join(' ')}${fcPadding}]`
   }
+}
+function nodeValue<T>(
+  schema: Schema,
+  value: T | NodeOf<T>,
+  options?: CreateNodeOptions
+) {
+  if (isNode(value) || value instanceof Pair) return value as NodeOf<T>
+  const nc = new NodeCreator(schema, options)
+  return nc.create(value) as NodeOf<T>
+}
+
+function nodeValues<T>(schema: Schema, values: Array<T | NodeOf<T>>) {
+  let nc: NodeCreator | undefined
+  return values.map(value => {
+    if (isNode(value) || value instanceof Pair) return value
+    nc ??= new NodeCreator(schema)
+    return nc.create(value)
+  }) as NodeOf<T>[]
 }
 
 function addCommentBefore(
