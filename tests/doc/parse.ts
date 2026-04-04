@@ -175,27 +175,7 @@ describe('flow collection keys', () => {
   test('block map with flow collection key as explicit key', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap<YAML.YAMLMap, null>>(`? []: x`)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.value).toMatchObject({
-      values: new Map([
-        [
-          expect.any(Symbol),
-          {
-            key: {
-              values: new Map([
-                [
-                  expect.any(Symbol),
-                  {
-                    key: Object.assign([], { flow: false }),
-                    value: { value: 'x' }
-                  }
-                ]
-              ])
-            },
-            value: null
-          }
-        ]
-      ])
-    })
+    expect(doc.value).toMatchObject(_map([[_map([[_seq(), 'x']]), null]]))
     for (const outer of doc.value.pairs()) {
       for (const inner of outer.key.pairs()) {
         expect(inner.key).toMatchObject({ flow: true })
@@ -210,22 +190,14 @@ describe('flow collection keys', () => {
         c: d
     `)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.value).toMatchObject({
-      values: new Map([
-        [
-          'a',
-          {
-            key: { value: 'a' },
-            value: {
-              values: new Map([
-                [expect.any(Symbol), { key: [], value: { value: 'b' } }],
-                ['c', { key: { value: 'c' }, value: { value: 'd' } }]
-              ])
-            }
-          }
-        ]
-      ])
-    })
+    expect(doc.value).toMatchObject(
+      _map({
+        a: _map([
+          [_seq(), 'b'],
+          ['c', 'd']
+        ])
+      })
+    )
   })
 
   test('flow collection as second block map key (redhat-developer/vscode-yaml#712)', () => {
@@ -240,7 +212,7 @@ describe('flow collection keys', () => {
       _map({
         x: 'y',
         a: _map([
-          [_seq([]), 'b'],
+          [_seq(), 'b'],
           ['c', 'd']
         ])
       })
@@ -254,7 +226,7 @@ describe('flow collection keys', () => {
 
   test('plain key with no space before flow collection value (#550)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:[]}')
-    expect(doc.value).toMatchObject(_map({ c: _seq([]) }))
+    expect(doc.value).toMatchObject(_map({ c: _seq() }))
   })
 })
 
@@ -424,22 +396,22 @@ describe('maps with no values', () => {
 
   test('implicit scalar key after explicit key with no value', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\nx:\n')
-    expect(doc.value).toMatchObject({
-      values: new Map<any, any>([
-        [expect.any(Symbol), { key: [{ value: 1 }], value: null }],
-        ['x', { key: { value: 'x' }, value: { value: null } }]
+    expect(doc.value).toMatchObject(
+      _map([
+        [_seq(1), null],
+        ['x', { value: null }]
       ])
-    })
+    )
   })
 
   test('implicit flow collection key after explicit key with no value', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\n[x]: y\n')
-    expect(doc.value).toMatchObject({
-      values: new Map<any, any>([
-        [expect.any(Symbol), { key: [{ value: 1 }], value: null }],
-        [expect.any(Symbol), { key: [{ value: 'x' }], value: { value: 'y' } }]
+    expect(doc.value).toMatchObject(
+      _map([
+        [_seq(1), null],
+        [_seq('x'), 'y']
       ])
-    })
+    )
   })
 })
 

@@ -38,8 +38,8 @@ export function _pair(key: any, value: any): { key: any; value: any } {
 }
 
 /** Test shorthand for `expect(YAMLSeq).toMatchObject()` */
-export function _seq(input: any[]): any[] {
-  return input.map(_node)
+export function _seq(...inputs: any[]): any[] {
+  return inputs.map(_node)
 }
 
 /** Test shorthand for `expect(YAMLSet).toMatchObject()` */

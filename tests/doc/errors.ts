@@ -1,5 +1,5 @@
 import * as YAML from 'yaml'
-import { source } from '../_utils.ts'
+import { _map, _seq, source } from '../_utils.ts'
 
 describe('tabs as indentation', () => {
   test('fail on map value indented with tab', () => {
@@ -66,12 +66,7 @@ describe('block collections', () => {
     expect(doc.errors[0].message).toMatch(
       'All mapping items must start at the same column'
     )
-    expect(doc.value).toMatchObject({
-      values: new Map([
-        ['foo', { key: { value: 'foo' }, value: { value: '1' } }],
-        ['bar', { key: { value: 'bar' }, value: { value: 2 } }]
-      ])
-    })
+    expect(doc.value).toMatchObject(_map({ foo: '1', bar: 2 }))
   })
 
   test('sequence with bad indentation', () => {
@@ -81,7 +76,7 @@ describe('block collections', () => {
     expect(doc.errors[0].message).toMatch(
       'All sequence items must start at the same column'
     )
-    expect(doc.value).toMatchObject([{ value: 'foo' }, [{ value: 'bar' }]])
+    expect(doc.value).toMatchObject(_seq('foo', _seq('bar')))
   })
 
   test('seq item in mapping', () => {
@@ -92,12 +87,12 @@ describe('block collections', () => {
       { code: 'UNEXPECTED_TOKEN' },
       { code: 'MISSING_CHAR' }
     ])
-    expect(doc.value).toMatchObject({
-      values: new Map([
-        ['foo', { key: { value: 'foo' }, value: { value: '1' } }],
+    expect(doc.value).toMatchObject(
+      _map([
+        ['foo', '1'],
         [null, { key: { value: null }, value: null }]
       ])
-    })
+    )
   })
 
   test('doubled value indicator', () => {

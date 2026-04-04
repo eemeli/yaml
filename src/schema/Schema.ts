@@ -1,4 +1,3 @@
-import type { Primitive } from '../nodes/types.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { SchemaOptions, ToStringOptions } from '../options.ts'
@@ -11,7 +10,7 @@ import type { CollectionTag, ScalarTag } from './types.ts'
 export class Schema {
   compat: Array<CollectionTag | ScalarTag> | null
   knownTags: Record<string, CollectionTag | ScalarTag>
-  mapKey: (value: unknown) => Primitive | symbol | undefined
+  mapKey: (value: unknown) => unknown
   name: string
   tags: Array<CollectionTag | ScalarTag>
   toStringOptions: Readonly<ToStringOptions> | null
@@ -59,16 +58,8 @@ export class Schema {
   }
 }
 
-function defaultMapKey(value: unknown): Primitive | symbol | undefined {
-  let value_ = value instanceof Pair ? value.key : value
-  if (value_ instanceof Scalar) value_ = value_.value
-  switch (typeof value_) {
-    case 'bigint':
-    case 'boolean':
-    case 'number':
-    case 'string':
-      return value_
-    default:
-      return value_ ? undefined : null
-  }
+function defaultMapKey(value: unknown): unknown {
+  if (value instanceof Pair) value = value.key
+  if (value instanceof Scalar) value = value.value
+  return value ?? null
 }

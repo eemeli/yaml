@@ -1,7 +1,6 @@
 import type { Reviver } from './doc/applyReviver.ts'
 import type { Directives } from './doc/directives.ts'
 import type { LogLevelId } from './log.ts'
-import type { Primitive } from './nodes/types.ts'
 import type { Pair } from './nodes/Pair.ts'
 import type { Scalar } from './nodes/Scalar.ts'
 import type { LineCounter } from './parse/line-counter.ts'
@@ -104,7 +103,7 @@ export type SchemaOptions = {
    * If merge keys are enabled by the schema,
    * multiple `<<` keys are each considered unique.
    */
-  mapKey?: (value: unknown) => Primitive | symbol | undefined
+  mapKey?: (value: unknown) => unknown
 
   /**
    * Enable support for `<<` merge keys.

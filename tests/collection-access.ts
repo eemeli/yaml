@@ -7,6 +7,7 @@ import {
   type YAMLSet,
   parseDocument
 } from 'yaml'
+import { _map, _pair, _seq, _set } from './_utils.ts'
 
 describe('Map', () => {
   let doc: Document
@@ -14,23 +15,10 @@ describe('Map', () => {
   beforeEach(() => {
     doc = new Document({ a: 1, b: { c: 3, d: 4 } })
     map = doc.value as any
-    expect(map).toMatchObject({
-      values: new Map([
-        ['a', { key: { value: 'a' }, value: { value: 1 } }],
-        [
-          'b',
-          {
-            key: { value: 'b' },
-            value: {
-              values: new Map([
-                ['c', { key: { value: 'c' }, value: { value: 3 } }],
-                ['d', { key: { value: 'd' }, value: { value: 4 } }]
-              ])
-            }
-          }
-        ]
-      ])
-    })
+  })
+
+  test('create', () => {
+    expect(map).toMatchObject(_map({ a: 1, b: _map({ c: 3, d: 4 }) }))
   })
 
   test('set', () => {
@@ -45,7 +33,7 @@ describe('Map', () => {
     expect(map.delete('a')).toBe(true)
     expect(map.get('a')).toBeUndefined()
     expect(map.delete('c')).toBe(false)
-    expect(map.get('b')).toMatchObject({ size: 2, values: {} })
+    expect(map.get('b')).toMatchObject({ size: 2 })
     expect(map.size).toBe(1)
   })
 
@@ -106,10 +94,25 @@ describe('Map', () => {
   })
 
   test('set scalar node with anchor', () => {
-    doc = parseDocument('a: &A value\nb: *A\n')
+    const doc = parseDocument('a: &A value\nb: *A\n')
     doc.set('a', 'foo')
     expect(doc.get('a')).toMatchObject({ value: 'foo' })
     expect(String(doc)).toBe('a: &A foo\nb: *A\n')
+  })
+
+  test('object key equality', () => {
+    const a1 = [1]
+    const doc = new Document<YAMLMap>(
+      new Map<any, any>([
+        [1, 2],
+        ['1', '2'],
+        [a1, [2]]
+      ])
+    )
+    expect(doc.get(1)).toMatchObject({ value: 2 })
+    expect(doc.get('1')).toMatchObject({ value: '2' })
+    expect(doc.get([1])).toBeUndefined()
+    expect(doc.get(a1)).toMatchObject([{ value: 2 }])
   })
 })
 
@@ -168,16 +171,12 @@ describe('Set', () => {
   let doc: Document
   let set: YAMLSet<number | string>
   beforeEach(() => {
-    doc = new Document(null, { version: '1.1' })
-    set = doc.createNode([1, 2, 3], { tag: '!!set' }) as any
-    doc.value = set
-    expect(set).toMatchObject({
-      values: new Map([
-        [1, { value: 1 }],
-        [2, { value: 2 }],
-        [3, { value: 3 }]
-      ])
-    })
+    doc = new Document([1, 2, [3]], { tag: '!!set', version: '1.1' })
+    set = doc.value as any
+  })
+
+  test('create', () => {
+    expect(set).toMatchObject(_set([1, 2, [[3], _seq(3)]]))
   })
 
   test('add', () => {
@@ -195,12 +194,15 @@ describe('Set', () => {
     expect(set.get(1)).toMatchObject({ value: 1 })
     expect(set.get(0)).toBeUndefined()
     expect(set.get('1')).toBeUndefined()
+    expect(set.get([3] as any)).toBeUndefined()
   })
 
   test('has', () => {
     expect(set.has(0)).toBe(false)
     expect(set.has(1)).toBe(true)
     expect(set.has(new Scalar(1))).toBe(true)
+    const seq = Array.from(set.values.values()).at(-1)!
+    expect(set.has(seq)).toBe(true)
   })
 
   test('delete', () => {
@@ -224,16 +226,8 @@ describe('OMap', () => {
 
   test('create', () => {
     expect(omap).toMatchObject([
-      { key: { value: 'a' }, value: { value: 1 } },
-      {
-        key: { value: 'b' },
-        value: {
-          values: new Map([
-            ['c', { key: { value: 'c' }, value: { value: 3 } }],
-            ['d', { key: { value: 'd' }, value: { value: 4 } }]
-          ])
-        }
-      }
+      _pair('a', 1),
+      _pair('b', _map({ c: 3, d: 4 }))
     ])
   })
 
@@ -251,10 +245,10 @@ describe('OMap', () => {
     omap.set(1, doc.createPair('b', 5))
     omap.set(3, doc.createPair('d', 6))
     expect(omap).toMatchObject([
-      { value: { value: 2 } },
-      { value: { value: 5 } },
+      _pair('a', 2),
+      _pair('b', 5),
       undefined,
-      { value: { value: 6 } }
+      _pair('d', 6)
     ])
     expect(omap.size).toBe(4)
     expect(String(doc)).toBe(`\

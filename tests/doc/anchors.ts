@@ -1,5 +1,6 @@
 import type { Alias, YAMLMap, YAMLSeq } from 'yaml'
 import { Document, parse, parseDocument } from 'yaml'
+import { _map } from '../_utils.ts'
 
 test('basic', () => {
   const src = `- &a 1\n- *a\n`
@@ -78,12 +79,7 @@ describe('create', () => {
     const doc = new Document()
     const ref: unknown[] = []
     const node = doc.createNode({ src: ref, ref })
-    expect(node).toMatchObject({
-      values: new Map([
-        ['src', { key: { value: 'src' }, value: [] }],
-        ['ref', { key: { value: 'ref' }, value: { source: 'a1' } }]
-      ])
-    })
+    expect(node).toMatchObject(_map({ src: [], ref: { source: 'a1' } }))
     expect(node.get('src')!.anchor).toBe('a1')
   })
 
@@ -92,12 +88,9 @@ describe('create', () => {
     const date = new Date()
     const value = date.toJSON()
     const node = doc.createNode({ src: date, ref: date })
-    expect(node).toMatchObject({
-      values: new Map([
-        ['src', { key: { value: 'src' }, value: { value, anchor: 'a1' } }],
-        ['ref', { key: { value: 'ref' }, value: { source: 'a1' } }]
-      ])
-    })
+    expect(node).toMatchObject(
+      _map({ src: { value, anchor: 'a1' }, ref: { source: 'a1' } })
+    )
   })
 })
 

@@ -21,7 +21,7 @@ export class YAMLSet<
   /** A fully qualified tag */
   tag = 'tag:yaml.org,2002:set'
 
-  values: Map<Primitive | symbol, NodeOf<T>> = new Map()
+  values: Map<unknown, NodeOf<T>> = new Map()
 
   /** An optional anchor on this set. Used by alias nodes. */
   declare anchor?: string
@@ -67,12 +67,11 @@ export class YAMLSet<
   ): this {
     if (this.has(value)) return this
 
+    const mk = this.schema.mapKey(value)
     const node = isNode(value)
       ? value
       : new NodeCreator(this.schema, options).create(value)
-    let key: Primitive | symbol | undefined = this.schema.mapKey(node)
-    if (key === undefined) key = Symbol()
-    this.values.set(key, node as NodeOf<T>)
+    this.values.set(mk, node as NodeOf<T>)
     return this
   }
 
@@ -90,8 +89,8 @@ export class YAMLSet<
    * @returns `true` if the item was found and removed.
    */
   delete(value: T | NodeOf<T>): boolean {
-    const pk = this.schema.mapKey(value)
-    if (pk !== undefined) return this.values.delete(pk)
+    const mk = this.schema.mapKey(value)
+    if (this.values.delete(mk)) return true
     if (isNode(value)) {
       for (const [k, v] of this.values) {
         if (v === value) return this.values.delete(k)
@@ -102,8 +101,9 @@ export class YAMLSet<
 
   /** Return the node matching `value`, if the set includes it.  */
   get(value: T | NodeOf<T>): NodeOf<T> | undefined {
-    const pk = this.schema.mapKey(value)
-    if (pk !== undefined) return this.values.get(pk)
+    const mk = this.schema.mapKey(value)
+    const node = this.values.get(mk)
+    if (node) return node
     if (isNode(value)) {
       for (const v of this.values.values()) if (v === value) return v
     }
@@ -112,8 +112,8 @@ export class YAMLSet<
 
   /** Check if the set includes `value`.  */
   has(value: T | NodeOf<T>): boolean {
-    const pk = this.schema.mapKey(value)
-    if (pk !== undefined) return this.values.has(pk)
+    const mk = this.schema.mapKey(value)
+    if (this.values.has(mk)) return true
     if (isNode(value)) {
       for (const v of this.values.values()) if (v === value) return true
     }
@@ -126,22 +126,13 @@ export class YAMLSet<
    * @param allowMissing - If `true`, a key is always returned,
    *                       even if the value is not in the set.
    */
-  keyOf(value: T | NodeOf<T>, allowMissing: true): Primitive | symbol
-  keyOf(
-    value: T | NodeOf<T>,
-    allowMissing?: boolean
-  ): Primitive | symbol | undefined
-  keyOf(
-    value: T | NodeOf<T>,
-    allowMissing = false
-  ): Primitive | symbol | undefined {
-    const pk = this.schema.mapKey(value)
-    if (pk !== undefined)
-      return allowMissing || this.values.has(pk) ? pk : undefined
+  keyOf(value: T | NodeOf<T>, allowMissing = false): unknown {
+    const mk = this.schema.mapKey(value)
+    if (allowMissing || this.values.has(mk)) return mk
     if (isNode(value)) {
       for (const [k, v] of this.values) if (v === value) return k
     }
-    return allowMissing ? Symbol() : undefined
+    return undefined
   }
 
   /** A plain JavaScript representation of this set. */

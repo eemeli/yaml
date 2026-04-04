@@ -15,7 +15,8 @@ export const set: CollectionTag = {
       for (let value of iterable as Iterable<unknown>) {
         if (typeof nc.replacer === 'function')
           value = nc.replacer.call(iterable, value, value)
-        set.add(nc.create(value))
+        const mk = nc.schema.mapKey(value)
+        set.values.set(mk, nc.create(value))
       }
     return set
   },
