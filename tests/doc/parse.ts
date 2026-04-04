@@ -1,6 +1,6 @@
 import type { Mock } from 'vitest'
 import * as YAML from 'yaml'
-import { source } from '../_utils.ts'
+import { _map, _pair, _seq, source } from '../_utils.ts'
 
 let readArtifact
 if (typeof window === 'undefined') {
@@ -236,37 +236,25 @@ describe('flow collection keys', () => {
         c: d
     `)
     expect(doc.errors).toHaveLength(0)
-    expect(doc.value).toMatchObject({
-      values: new Map([
-        ['x', { key: { value: 'x' }, value: { value: 'y' } }],
-        [
-          'a',
-          {
-            key: { value: 'a' },
-            value: {
-              values: new Map([
-                [expect.any(Symbol), { key: [], value: { value: 'b' } }],
-                ['c', { key: { value: 'c' }, value: { value: 'd' } }]
-              ])
-            }
-          }
-        ]
-      ])
-    })
+    expect(doc.value).toMatchObject(
+      _map({
+        x: 'y',
+        a: _map([
+          [_seq([]), 'b'],
+          ['c', 'd']
+        ])
+      })
+    )
   })
 
   test('empty scalar as last flow collection value (#550)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:}')
-    expect(doc.value).toMatchObject({
-      values: new Map([['c', { key: { value: 'c' }, value: { value: null } }]])
-    })
+    expect(doc.value).toMatchObject(_map({ c: { value: null } }))
   })
 
   test('plain key with no space before flow collection value (#550)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:[]}')
-    expect(doc.value).toMatchObject({
-      values: new Map([['c', { key: { value: 'c' }, value: [] }]])
-    })
+    expect(doc.value).toMatchObject(_map({ c: _seq([]) }))
   })
 })
 
@@ -459,12 +447,12 @@ describe('odd indentations', () => {
   test('Block map with empty explicit key (#551)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('?\n? a')
     expect(doc.errors).toHaveLength(0)
-    expect(doc.value).toMatchObject({
-      values: new Map([
-        [null, { key: { value: null }, value: null }],
-        ['a', { key: { value: 'a' }, value: null }]
+    expect(doc.value).toMatchObject(
+      _map([
+        [null, _pair({ value: null }, null)],
+        ['a', null]
       ])
-    })
+    )
   })
 
   test('Block map with unindented !!null explicit key', () => {
@@ -964,17 +952,17 @@ describe('stringKeys', () => {
       `,
       { stringKeys: true }
     )
-    expect(doc.value).toMatchObject({
-      values: new Map([
-        ['x', { key: { value: 'x' }, value: { value: 'x' } }],
-        ['y', { key: { value: 'y' }, value: { value: 'y' } }],
-        ['42', { key: { value: '42' }, value: { value: 42 } }],
-        ['true', { key: { value: 'true' }, value: { value: true } }],
-        ['null', { key: { value: 'null' }, value: { value: null } }],
-        ['~', { key: { value: '~' }, value: { value: null } }],
-        ['', { key: { value: '' }, value: { value: null } }]
-      ])
-    })
+    expect(doc.value).toMatchObject(
+      _map({
+        x: 'x',
+        y: 'y',
+        '42': 42,
+        true: true,
+        null: { value: null },
+        '~': { value: null },
+        '': { value: null }
+      })
+    )
   })
 
   test('explicit non-string tag', () => {
