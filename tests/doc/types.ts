@@ -515,7 +515,7 @@ one: 1
         new Map<unknown, unknown>([
           ['one', 1],
           [2, 'two'],
-          [new Map([[5, 6]]), 'many']
+          [new Map([['5', 6]]), 'many']
         ])
       )
     })
