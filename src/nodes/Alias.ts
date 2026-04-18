@@ -3,12 +3,13 @@ import type { Document, DocValue } from '../doc/Document.ts'
 import type { FlowScalar } from '../parse/cst.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import { visit } from '../visit.ts'
-import type { Node, NodeBase, Range } from './Node.ts'
 import { Pair } from './Pair.ts'
 import type { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
+import type { Node, NodeBase, Range } from './types.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
+import type { YAMLSet } from './YAMLSet.ts'
 
 export class Alias implements NodeBase {
   source: string
@@ -62,7 +63,7 @@ export class Alias implements NodeBase {
   resolve(
     doc: Document,
     ctx?: ToJSContext
-  ): Scalar | YAMLMap | YAMLSeq | undefined {
+  ): Scalar | YAMLMap | YAMLSeq | YAMLSet | undefined {
     let nodes: Node[]
     if (ctx?.aliasResolveCache) {
       nodes = ctx.aliasResolveCache
@@ -76,7 +77,7 @@ export class Alias implements NodeBase {
       if (ctx) ctx.aliasResolveCache = nodes
     }
 
-    let found: Scalar | YAMLMap | YAMLSeq | undefined = undefined
+    let found: Scalar | YAMLMap | YAMLSeq | YAMLSet | undefined = undefined
     for (const node of nodes) {
       if (node === this) break
       if (node.anchor === this.source) found = node
@@ -153,9 +154,9 @@ function getAliasCount(
     const kc = getAliasCount(doc, ctx, node.key, anchors)
     const vc = getAliasCount(doc, ctx, node.value, anchors)
     return Math.max(kc, vc)
-  } else if (node && 'items' in node) {
+  } else if (Array.isArray(node)) {
     let count = 0
-    for (const item of node.items) {
+    for (const item of node) {
       const c = getAliasCount(doc, ctx, item, anchors)
       if (c > count) count = c
     }

@@ -1,8 +1,7 @@
 import { anchorIsValid } from '../doc/anchors.ts'
 import type { Document } from '../doc/Document.ts'
 import { Alias } from '../nodes/Alias.ts'
-import { Collection } from '../nodes/Collection.ts'
-import type { Node } from '../nodes/Node.ts'
+import type { Node } from '../nodes/types.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { ToStringOptions } from '../options.ts'
@@ -22,12 +21,15 @@ export type StringifyContext = {
   inFlow: boolean | null
   inStringifyKey?: boolean
   flowCollectionPadding: string
-  noValues?: boolean
   options: Readonly<
     Required<Omit<ToStringOptions, 'collectionStyle' | 'indent'>>
   >
   resolvedAliases?: Set<Alias>
+  sortMapEntries: ((a: Pair, b: Pair) => number) | null
 }
+
+const sortMapEntriesByKey = (a: Pair, b: Pair) =>
+  a.key < b.key ? -1 : a.key > b.key ? 1 : 0
 
 export function createStringifyContext(
   doc: Document,
@@ -50,6 +52,7 @@ export function createStringifyContext(
       nullStr: 'null',
       simpleKeys: false,
       singleQuote: null,
+      sortMapEntries: false,
       trailingComma: false,
       trueStr: 'true',
       verifyAliasOrder: true
@@ -70,6 +73,13 @@ export function createStringifyContext(
       inFlow = null
   }
 
+  const sortMapEntries =
+    typeof opt.sortMapEntries === 'function'
+      ? opt.sortMapEntries
+      : opt.sortMapEntries === true
+        ? sortMapEntriesByKey
+        : null
+
   return {
     anchors: new Set(),
     doc,
@@ -77,7 +87,8 @@ export function createStringifyContext(
     indent: '',
     indentStep: typeof opt.indent === 'number' ? ' '.repeat(opt.indent) : '  ',
     inFlow,
-    options: opt
+    options: opt,
+    sortMapEntries
   }
 }
 
@@ -120,8 +131,7 @@ function stringifyProps(
 ) {
   if (!doc.directives) return ''
   const props = []
-  const anchor =
-    (node instanceof Scalar || node instanceof Collection) && node.anchor
+  const anchor = node.anchor
   if (anchor && anchorIsValid(anchor)) {
     anchors.add(anchor)
     props.push(`&${anchor}`)

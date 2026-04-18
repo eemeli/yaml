@@ -1,7 +1,7 @@
 import type { Document, DocValue } from '../doc/Document.ts'
 import type { BlockScalar, FlowScalar } from '../parse/cst.ts'
-import type { NodeBase, Range } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
+import type { NodeBase, Range } from './types.ts'
 import type { MapLike } from './YAMLMap.ts'
 
 export declare namespace Scalar {

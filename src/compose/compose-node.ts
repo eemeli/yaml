@@ -1,6 +1,6 @@
 import type { Directives } from '../doc/directives.ts'
 import { Alias } from '../nodes/Alias.ts'
-import type { Node } from '../nodes/Node.ts'
+import type { Node } from '../nodes/types.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { ParseOptions } from '../options.ts'
 import type { FlowScalar, SourceToken, Token } from '../parse/cst.ts'

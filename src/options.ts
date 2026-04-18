@@ -1,7 +1,6 @@
 import type { Reviver } from './doc/applyReviver.ts'
 import type { Directives } from './doc/directives.ts'
 import type { LogLevelId } from './log.ts'
-import type { Node } from './nodes/Node.ts'
 import type { Pair } from './nodes/Pair.ts'
 import type { Scalar } from './nodes/Scalar.ts'
 import type { LineCounter } from './parse/line-counter.ts'
@@ -54,20 +53,6 @@ export type ParseOptions = {
    * Default: `false`
    */
   stringKeys?: boolean
-
-  /**
-   * YAML requires map keys to be unique. By default, this is checked by
-   * comparing scalar values with `===`; deep equality is not checked for
-   * aliases or collections. If merge keys are enabled by the schema,
-   * multiple `<<` keys are allowed.
-   *
-   * Set `false` to disable, or provide your own comparator function to
-   * customise. The comparator will be passed two node values, and
-   * is expected to return a `boolean` indicating their equality.
-   *
-   * Default: `true`
-   */
-  uniqueKeys?: boolean | ((a: Node, b: Node) => boolean)
 }
 
 export type DocumentOptions = {
@@ -110,6 +95,17 @@ export type SchemaOptions = {
   customTags?: Tags | ((tags: Tags) => Tags) | null
 
   /**
+   * Determine an internal Map key representation for map and set values,
+   * which is used for detecting duplicates and to identify values.
+   *
+   * Key equality is based on the SameValueZero algorithm.
+   *
+   * If merge keys are enabled by the schema,
+   * multiple `<<` keys are each considered unique.
+   */
+  mapKey?: (value: unknown) => unknown
+
+  /**
    * Enable support for `<<` merge keys.
    *
    * Default: `false` for YAML 1.2, `true` for earlier versions
@@ -141,15 +137,6 @@ export type SchemaOptions = {
    * Default: `'core'` for YAML 1.2, `'yaml-1.1'` for earlier versions
    */
   schema?: string | Schema
-
-  /**
-   * When adding to or stringifying a map, sort the entries.
-   * If `true`, sort by comparing key values with `<`.
-   * Does not affect item order when parsing.
-   *
-   * Default: `false`
-   */
-  sortMapEntries?: boolean | ((a: Pair, b: Pair) => number)
 
   /**
    * Override default values for `toString()` options.
@@ -370,6 +357,14 @@ export type ToStringOptions = {
    * Default: `null`
    */
   singleQuote?: boolean | null
+
+  /**
+   * When stringifying a map or a set, sort the entries.
+   * If `true`, sort by comparing key values with `<`.
+   *
+   * Default: `false`
+   */
+  sortMapEntries?: boolean | ((a: Pair, b: Pair) => number)
 
   /**
    * Add a trailing comma after the last entry in a flow map or flow sequence that's split across multiple lines.

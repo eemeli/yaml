@@ -1,4 +1,4 @@
-import { Collection } from '../nodes/Collection.ts'
+import { isCollection } from '../nodes/identity.ts'
 import type { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import { YAMLSeq } from '../nodes/YAMLSeq.ts'
@@ -15,14 +15,13 @@ export function stringifyPair(
   const {
     indent,
     indentStep,
-    noValues,
     options: { commentString, indentSeq, simpleKeys }
   } = ctx
   if (simpleKeys) {
     if (key.comment) {
       throw new Error('With simple keys, key nodes cannot have comments')
     }
-    if (key instanceof Collection) {
+    if (isCollection(key)) {
       const msg = 'With simple keys, collection cannot be used as a key value'
       throw new Error(msg)
     }
@@ -35,9 +34,8 @@ export function stringifyPair(
 
   ctx = {
     ...ctx,
-    implicitKey: !explicitKey && (simpleKeys || !noValues),
-    indent: indent + indentStep,
-    noValues: false
+    implicitKey: !explicitKey,
+    indent: indent + indentStep
   }
   let keyComment = key.comment
   let keyCommentDone = false
@@ -58,17 +56,11 @@ export function stringifyPair(
   }
 
   if (ctx.inFlow) {
-    if (noValues || value == null) {
+    if (value == null) {
       if (keyCommentDone && onComment) onComment()
-      return str === ''
-        ? '?'
-        : explicitKey
-          ? `? ${str}`
-          : noValues
-            ? str
-            : `${str}:`
+      return str === '' ? '?' : explicitKey ? `? ${str}` : `${str}:`
     }
-  } else if ((noValues && !simpleKeys) || (value == null && explicitKey)) {
+  } else if (value == null && explicitKey) {
     str = `? ${str}`
     if (keyComment && !keyCommentDone) {
       str += lineComment(str, ctx.indent, commentString(keyComment))
@@ -134,11 +126,11 @@ export function stringifyPair(
     } else {
       ws += `\n${ctx.indent}`
     }
-  } else if (!explicitKey && value instanceof Collection) {
+  } else if (!explicitKey && isCollection(value)) {
     const vs0 = valueStr[0]
     const nl0 = valueStr.indexOf('\n')
     const hasNewline = nl0 !== -1
-    const flow = ctx.inFlow ?? value.flow ?? value.items.length === 0
+    const flow = ctx.inFlow ?? value.flow ?? value.size === 0
     if (hasNewline || !flow) {
       let hasPropsLine = false
       if (hasNewline && (vs0 === '&' || vs0 === '!')) {

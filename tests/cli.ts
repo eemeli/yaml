@@ -1,5 +1,6 @@
 import { Readable } from 'stream'
 import { cli } from 'yaml/cli'
+import { _map } from './_utils.ts'
 
 const [major] = process.versions.node.split('.')
 const skip = Number(major) < 20
@@ -245,18 +246,23 @@ const skip = Number(major) < 20
       )
     })
     describe('--doc', () => {
-      ok('basic', 'hello: world', ['--doc'], [{ value: { items: [{}] } }])
+      ok(
+        'basic',
+        'hello: world',
+        ['--doc'],
+        [{ value: _map({ hello: 'world' }) }]
+      )
       ok(
         'multiple',
         'hello: world\n---\n42',
         ['--doc'],
-        [{ value: { items: [{}] } }, { value: { value: 42 } }]
+        [{ value: _map({ hello: 'world' }) }, { value: { value: 42 } }]
       )
       ok(
         'error',
         'hello: world: 2',
         ['--doc'],
-        [{ value: { items: [{}] } }],
+        [{ value: _map({ hello: _map({ world: 2 }) }) }],
         [{ name: 'YAMLParseError' }]
       )
     })

@@ -1,5 +1,6 @@
 import type { NodeCreator } from '../../doc/NodeCreator.ts'
-import type { Node } from '../../nodes/Node.ts'
+import type { Collection } from '../../nodes/types.ts'
+import type { Node } from '../../nodes/types.ts'
 import { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import { YAMLMap } from '../../nodes/YAMLMap.ts'
@@ -7,17 +8,18 @@ import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
 import type { CollectionTag } from '../types.ts'
 
 export function resolvePairs(
-  seq: YAMLSeq | YAMLMap,
+  seq: Collection,
   onError: (message: string) => void
 ): YAMLSeq<Pair> {
   if (seq instanceof YAMLSeq) {
-    for (let i = 0; i < seq.items.length; ++i) {
-      const item = seq.items[i]
+    for (let i = 0; i < seq.length; ++i) {
+      const item = seq[i]
       if (item instanceof Pair) continue
-      else if (item instanceof YAMLMap) {
-        if (item.items.length > 1)
+      if (item instanceof YAMLMap) {
+        if (item.size > 1)
           onError('Each pair must have its own sequence indicator')
-        const pair = item.items[0] || new Pair(new Scalar(null))
+        const pair =
+          item.values.values().next().value ?? new Pair(new Scalar(null))
         if (item.commentBefore)
           pair.key.commentBefore = pair.key.commentBefore
             ? `${item.commentBefore}\n${pair.key.commentBefore}`
@@ -28,9 +30,9 @@ export function resolvePairs(
             ? `${item.comment}\n${cn.comment}`
             : item.comment
         }
-        seq.items[i] = pair
+        seq[i] = pair
       } else {
-        seq.items[i] = new Pair<Node, null>(item, null)
+        seq[i] = new Pair<Node, null>(item, null)
       }
     }
   } else onError('Expected a sequence for this tag')
@@ -64,7 +66,7 @@ export function createPairs(nc: NodeCreator, iterable: unknown): YAMLSeq<Pair> {
       } else {
         key = it
       }
-      pairs.items.push(nc.createPair(key, value))
+      pairs.push(nc.createPair(key, value))
     }
   return pairs
 }

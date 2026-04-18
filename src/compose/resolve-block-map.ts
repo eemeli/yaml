@@ -1,5 +1,6 @@
 import { Pair } from '../nodes/Pair.ts'
 import { YAMLMap } from '../nodes/YAMLMap.ts'
+import { YAMLSet } from '../nodes/YAMLSet.ts'
 import type { BlockMap } from '../parse/cst.ts'
 import type { CollectionTag } from '../schema/types.ts'
 import type { ComposeContext, ComposeNode } from './compose-node.ts'
@@ -7,7 +8,6 @@ import type { ComposeErrorHandler } from './composer.ts'
 import { resolveProps } from './resolve-props.ts'
 import { containsNewline } from './util-contains-newline.ts'
 import { flowIndentCheck } from './util-flow-indent-check.ts'
-import { mapIncludes } from './util-map-includes.ts'
 
 const startColMsg = 'All mapping items must start at the same column'
 
@@ -17,9 +17,9 @@ export function resolveBlockMap(
   bm: BlockMap,
   onError: ComposeErrorHandler,
   tag?: CollectionTag
-): YAMLMap {
+): YAMLMap | YAMLSet {
   const NodeClass = tag?.nodeClass ?? YAMLMap
-  const map = new NodeClass(ctx.schema) as YAMLMap
+  const map = new NodeClass(ctx.schema) as YAMLMap | YAMLSet
 
   if (ctx.atRoot) ctx.atRoot = false
   let offset = bm.offset
@@ -76,7 +76,7 @@ export function resolveBlockMap(
     if (ctx.schema.compat) flowIndentCheck(bm.indent, key, onError)
     ctx.atKey = false
 
-    if (mapIncludes(ctx, map.items, keyNode))
+    if (map.has(keyNode))
       onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique')
 
     // value properties
@@ -114,9 +114,22 @@ export function resolveBlockMap(
         : composeEmptyNode(ctx, offset, sep, null, valueProps, onError)
       if (ctx.schema.compat) flowIndentCheck(bm.indent, value, onError)
       offset = valueNode.range![2]
-      const pair = new Pair(keyNode, valueNode)
-      if (ctx.options.keepSourceTokens) pair.srcToken = collItem
-      map.items.push(pair)
+      if (map instanceof YAMLSet) {
+        if (value || valueProps.anchor || valueProps.tag) {
+          const msg = 'Set items must not have non-empty values'
+          onError(valueNode.range!, 'BAD_COLLECTION_TYPE', msg)
+        }
+        if (valueProps.comment) {
+          if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
+          else keyNode.comment = valueProps.comment
+          keyNode.range![2] = valueProps.end
+        }
+        map.add(keyNode)
+      } else {
+        const pair = new Pair(keyNode, valueNode)
+        if (ctx.options.keepSourceTokens) pair.srcToken = collItem
+        map.set(pair)
+      }
     } else {
       // key with no value
       if (implicitKey)
@@ -129,9 +142,13 @@ export function resolveBlockMap(
         if (keyNode.comment) keyNode.comment += '\n' + valueProps.comment
         else keyNode.comment = valueProps.comment
       }
-      const pair = new Pair(keyNode)
-      if (ctx.options.keepSourceTokens) pair.srcToken = collItem
-      map.items.push(pair)
+      if (map instanceof YAMLSet) {
+        map.add(keyNode)
+      } else {
+        const pair = new Pair(keyNode)
+        if (ctx.options.keepSourceTokens) pair.srcToken = collItem
+        map.set(pair)
+      }
     }
   }
 

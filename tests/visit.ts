@@ -144,7 +144,7 @@ for (const [visit_, title] of [
       const Scalar = vi.fn()
       await visit_(doc, {
         Seq(_, seq) {
-          seq.items.push(doc.createNode('three'))
+          seq.push(doc.createNode('three'))
         },
         Scalar
       })

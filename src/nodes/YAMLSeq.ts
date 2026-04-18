@@ -2,14 +2,15 @@ import type { Document, DocValue } from '../doc/Document.ts'
 import { NodeCreator } from '../doc/NodeCreator.ts'
 import type { CreateNodeOptions } from '../options.ts'
 import type { BlockSequence, FlowCollection } from '../parse/cst.ts'
+import type { Schema } from '../schema/Schema.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
-import { stringifyCollection } from '../stringify/stringifyCollection.ts'
-import { Collection, type NodeOf, type Primitive } from './Collection.ts'
+import { stringify } from '../stringify/stringify.ts'
+import { indentComment, lineComment } from '../stringify/stringifyComment.ts'
 import { isNode } from './identity.ts'
-import type { Node, NodeBase } from './Node.ts'
-import type { Pair } from './Pair.ts'
+import { Pair } from './Pair.ts'
 import { Scalar } from './Scalar.ts'
 import { ToJSContext } from './toJS.ts'
+import type { CollectionBase, Node, NodeOf, Primitive, Range } from './types.ts'
 
 const isScalarValue = (value: unknown): boolean =>
   !value || (typeof value !== 'function' && typeof value !== 'object')
@@ -17,124 +18,51 @@ const isScalarValue = (value: unknown): boolean =>
 export class YAMLSeq<
   T extends Primitive | Node | Pair = Primitive | Node | Pair
 >
-  extends Collection
-  implements NodeBase
+  extends Array<NodeOf<T>>
+  implements CollectionBase
 {
   static get tagName(): 'tag:yaml.org,2002:seq' {
     return 'tag:yaml.org,2002:seq'
   }
 
-  items: NodeOf<T>[] = []
+  declare schema: Schema
+
+  /** An optional anchor on this collection. Used by alias nodes. */
+  declare anchor?: string
+
+  /**
+   * If true, stringify this and all child nodes using flow rather than
+   * block styles.
+   */
+  declare flow?: boolean
+
+  /** A comment on or immediately after this collection. */
+  declare comment?: string | null
+
+  /** A comment before this collection. */
+  declare commentBefore?: string | null
+
+  /**
+   * The `[start, value-end, node-end]` character offsets for
+   * the part of the source parsed into this collection (undefined if not parsed).
+   * The `value-end` and `node-end` positions are themselves not included in their respective ranges.
+   */
+  declare range?: Range | null
+
+  /** A blank line before this collection and its commentBefore */
+  declare spaceBefore?: boolean
+
+  /** The CST token that was composed into this collection.  */
   declare srcToken?: BlockSequence | FlowCollection
 
-  add(
-    value: T,
-    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
-  ): void {
-    if (isNode(value)) this.items.push(value as NodeOf<T>)
-    else if (!this.schema) throw new Error('Schema is required')
-    else {
-      const nc = new NodeCreator(this.schema, {
-        ...options,
-        aliasDuplicateObjects: false
-      })
-      this.items.push(nc.create(value) as NodeOf<T>)
-      nc.setAnchors()
-    }
-  }
+  /** A fully qualified tag, if required */
+  declare tag?: string
 
   /**
-   * Removes a value from the collection.
-   *
-   * Throws if `idx` is not a non-negative integer.
-   *
-   * @returns `true` if the item was found and removed.
+   * A generic collection factory method that can be extended
+   * to other node classes that inherit from YAMLSeq
    */
-  delete(idx: number): boolean {
-    if (!Number.isInteger(idx))
-      throw new TypeError(`Expected an integer, not ${idx}.`)
-    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    const del = this.items.splice(idx, 1)
-    return del.length > 0
-  }
-
-  /**
-   * Returns item at `key`, or `undefined` if not found.
-   *
-   * Throws if `idx` is not a non-negative integer.
-   */
-  get(idx: number): NodeOf<T> | undefined {
-    if (!Number.isInteger(idx))
-      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
-    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    return this.items[idx]
-  }
-
-  /**
-   * Checks if the collection includes a value with the key `key`.
-   *
-   * Throws if `idx` is not a non-negative integer.
-   */
-  has(idx: number): boolean {
-    if (!Number.isInteger(idx))
-      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
-    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    return idx < this.items.length
-  }
-
-  /**
-   * Sets a value in this collection. For `!!set`, `value` needs to be a
-   * boolean to add/remove the item from the set.
-   *
-   * Throws if `idx` is not a non-negative integer.
-   */
-  set(
-    idx: number,
-    value: T,
-    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
-  ): void {
-    if (!Number.isInteger(idx))
-      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
-    if (idx < 0) throw new RangeError(`Invalid negative index ${idx}`)
-    const prev = this.items[idx]
-    if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
-    else if (isNode(value)) this.items[idx] = value as NodeOf<T>
-    else if (!this.schema) throw new Error('Schema is required')
-    else {
-      const nc = new NodeCreator(this.schema, {
-        ...options,
-        aliasDuplicateObjects: false
-      })
-      this.items[idx] = nc.create(value) as NodeOf<T>
-      nc.setAnchors()
-    }
-  }
-
-  /** A plain JavaScript representation of this node. */
-  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any[] {
-    ctx ??= new ToJSContext()
-    const res: unknown[] = []
-    if (this.anchor) ctx.setAnchor(this, res)
-    for (const item of this.items) res.push(item.toJS(doc, ctx))
-    return res
-  }
-
-  toString(
-    ctx?: StringifyContext,
-    onComment?: () => void,
-    onChompKeep?: () => void
-  ): string {
-    if (!ctx) return JSON.stringify(this)
-    return stringifyCollection(this, ctx, {
-      blockItemPrefix: '- ',
-      flowChars: { start: '[', end: ']' },
-      itemIndent: (ctx.indent || '') + '  ',
-      onChompKeep,
-      onComment
-    })
-  }
-
-  static from(nc: NodeCreator, obj: unknown): YAMLSeq {
+  static create(nc: NodeCreator, obj: unknown): YAMLSeq {
     const seq = new this(nc.schema)
     if (obj && Symbol.iterator in Object(obj)) {
       let i = 0
@@ -143,9 +71,295 @@ export class YAMLSeq<
           const key = obj instanceof Set ? it : String(i++)
           it = nc.replacer.call(obj, key, it)
         }
-        seq.items.push(nc.create(it))
+        seq.push(nc.create(it))
       }
     }
     return seq
+  }
+
+  constructor(schema: Schema, elements: Array<T | NodeOf<T>> = []) {
+    super(...nodeValues(schema, elements))
+    Object.defineProperty(this, 'schema', {
+      value: schema,
+      configurable: true,
+      enumerable: false,
+      writable: true
+    })
+  }
+
+  get size(): number {
+    return this.length
+  }
+
+  /**
+   * Create a copy of this collection.
+   *
+   * @param schema - If defined, overwrites the original's schema
+   */
+  clone(schema?: Schema): this {
+    const copy = (this.constructor as typeof YAMLSeq).from(this, it =>
+      it.clone(schema)
+    ) as typeof this
+    if (this.range) copy.range = [...this.range]
+    const propDesc = Object.getOwnPropertyDescriptors(this)
+    for (const [name, prop] of Object.entries(propDesc)) {
+      if (!(name in copy)) Object.defineProperty(copy, name, prop)
+    }
+    if (schema) copy.schema = schema
+    return copy
+  }
+
+  /**
+   * Change all elements within a range of indices in this sequence to a static value.
+   *
+   * Non-node values are converted to Node values.
+   */
+  fill(value: T | NodeOf<T>, start?: number, end?: number): this {
+    return super.fill(nodeValue(this.schema, value), start, end)
+  }
+
+  /** @private */
+  _push(item: NodeOf<T>): void {
+    super.push(item)
+  }
+
+  /**
+   * Append new elements to this sequence, and return its new length.
+   *
+   * Non-node values are converted to Node values.
+   */
+  push(...values: Array<T | NodeOf<T>>): number {
+    return super.push(...nodeValues(this.schema, values))
+  }
+
+  /**
+   * Set a value in this sequence.
+   *
+   * Non-node values are converted to Node values.
+   */
+  set(
+    idx: number,
+    value: T | NodeOf<T>,
+    options?: Omit<CreateNodeOptions, 'aliasDuplicateObjects'>
+  ): void {
+    if (!Number.isInteger(idx))
+      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
+    const prev = this.at(idx)
+    if (prev instanceof Scalar && isScalarValue(value)) prev.value = value
+    else {
+      if (idx < 0) {
+        if (idx < -this.length) throw new RangeError(`Invalid index ${idx}`)
+        idx += this.length
+      }
+      this[idx] = nodeValue(this.schema, value, options)
+    }
+  }
+
+  /**
+   * Changes the contents of this sequence by removing or replacing existing elements
+   * and/or adding new elements in place.
+   *
+   * Non-node values are converted to Node values.
+   */
+  splice(
+    start: number,
+    deleteCount?: number,
+    ...values: Array<T | NodeOf<T>>
+  ): NodeOf<T>[] {
+    const nv = nodeValues(this.schema, values)
+    return arguments.length < 2
+      ? super.splice(start)
+      : super.splice(start, Number(deleteCount), ...nv)
+  }
+
+  /**
+   * Prepend new elements to this sequence, and return its new length.
+   *
+   * Non-node values are converted to Node values.
+   */
+  unshift(...values: Array<T | NodeOf<T>>): number {
+    return super.unshift(...nodeValues(this.schema, values))
+  }
+
+  /** A plain JavaScript representation of this node. */
+  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any[] {
+    ctx ??= new ToJSContext()
+    if (this.anchor) {
+      const res: unknown[] = []
+      if (this.anchor) ctx.setAnchor(this, res)
+      for (const item of this) res.push(item.toJS(doc, ctx))
+      return res
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return Array.from(this, item => item.toJS(doc, ctx))
+  }
+
+  toString(
+    ctx?: StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ): string {
+    if (!ctx) return JSON.stringify(this)
+    return (ctx.inFlow ?? this.flow)
+      ? this.#stringifyFlowSeq(ctx)
+      : this.#stringifyBlockSeq(ctx, onComment, onChompKeep)
+  }
+
+  #stringifyBlockSeq(
+    ctx: StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ) {
+    const {
+      indent,
+      options: { commentString }
+    } = ctx
+    const itemIndent = indent + '  '
+    const itemCtx = { ...ctx, indent: itemIndent }
+
+    let chompKeep = false // flag for the preceding node's status
+    const lines: string[] = []
+    for (let i = 0; i < this.length; ++i) {
+      const item = this[i]
+      let comment: string | null = null
+      if (item instanceof Pair) {
+        if (!chompKeep && item.key.spaceBefore) lines.push('')
+        addCommentBefore(ctx, lines, item.key.commentBefore, chompKeep)
+      } else if (item) {
+        if (!chompKeep && item.spaceBefore) lines.push('')
+        addCommentBefore(ctx, lines, item.commentBefore, chompKeep)
+        if (item.comment) comment = item.comment
+      }
+
+      chompKeep = false
+      let str = stringify(
+        item,
+        itemCtx,
+        () => (comment = null),
+        () => (chompKeep = true)
+      )
+      if (comment) str += lineComment(str, itemIndent, commentString(comment))
+      if (chompKeep && comment) chompKeep = false
+      lines.push(`- ${str}`)
+    }
+
+    let str: string
+    if (lines.length === 0) {
+      str = '[]'
+    } else {
+      str = lines[0]
+      for (let i = 1; i < lines.length; ++i) {
+        const line = lines[i]
+        str += line ? `\n${indent}${line}` : '\n'
+      }
+    }
+
+    if (this.comment) {
+      str += '\n' + indentComment(commentString(this.comment), indent)
+      onComment?.()
+    } else if (chompKeep) onChompKeep?.()
+
+    return str
+  }
+
+  #stringifyFlowSeq(ctx: StringifyContext) {
+    const {
+      indent,
+      indentStep,
+      flowCollectionPadding: fcPadding,
+      options: { commentString }
+    } = ctx
+    const itemIndent = indent + '  ' + indentStep
+    const itemCtx = { ...ctx, indent: itemIndent, inFlow: true }
+
+    let reqNewline = false
+    let linesAtValue = 0
+    const lines: string[] = []
+    for (let i = 0; i < this.length; ++i) {
+      const item = this[i]
+      let comment: string | null = null
+      if (item instanceof Pair) {
+        const ik = item.key
+        if (ik.spaceBefore) lines.push('')
+        addCommentBefore(ctx, lines, ik.commentBefore, false)
+        if (ik.comment) reqNewline = true
+
+        const iv = item.value
+        if (iv) {
+          if (iv.comment) comment = iv.comment
+          if (iv.commentBefore) reqNewline = true
+        } else if (ik?.comment) {
+          comment = ik.comment
+        }
+      } else if (item) {
+        if (item.spaceBefore) lines.push('')
+        addCommentBefore(ctx, lines, item.commentBefore, false)
+        if (item.comment) comment = item.comment
+      }
+
+      if (comment) reqNewline = true
+      let str = stringify(item, itemCtx, () => (comment = null))
+      reqNewline ||= lines.length > linesAtValue || str.includes('\n')
+      if (i < this.length - 1) {
+        str += ','
+      } else if (ctx.options.trailingComma) {
+        if (ctx.options.lineWidth > 0) {
+          reqNewline ||=
+            lines.reduce((sum, line) => sum + line.length + 2, 2) +
+              (str.length + 2) >
+            ctx.options.lineWidth
+        }
+        if (reqNewline) {
+          str += ','
+        }
+      }
+      if (comment) str += lineComment(str, itemIndent, commentString(comment))
+      lines.push(str)
+      linesAtValue = lines.length
+    }
+
+    if (lines.length === 0) return '[]'
+    if (!reqNewline) {
+      const len = lines.reduce((sum, line) => sum + line.length + 2, 2)
+      reqNewline = ctx.options.lineWidth > 0 && len > ctx.options.lineWidth
+    }
+    if (reqNewline) {
+      let str = '['
+      for (const line of lines)
+        str += line ? `\n${indentStep}${indent}${line}` : '\n'
+      return `${str}\n${indent}]`
+    }
+    return `[${fcPadding}${lines.join(' ')}${fcPadding}]`
+  }
+}
+function nodeValue<T>(
+  schema: Schema,
+  value: T | NodeOf<T>,
+  options?: CreateNodeOptions
+) {
+  if (isNode(value) || value instanceof Pair) return value as NodeOf<T>
+  const nc = new NodeCreator(schema, options)
+  return nc.create(value) as NodeOf<T>
+}
+
+function nodeValues<T>(schema: Schema, values: Array<T | NodeOf<T>>) {
+  let nc: NodeCreator | undefined
+  return values.map(value => {
+    if (isNode(value) || value instanceof Pair) return value
+    nc ??= new NodeCreator(schema)
+    return nc.create(value)
+  }) as NodeOf<T>[]
+}
+
+function addCommentBefore(
+  { indent, options: { commentString } }: StringifyContext,
+  lines: string[],
+  comment: string | null | undefined,
+  chompKeep: boolean
+) {
+  if (comment && chompKeep) comment = comment.replace(/^\n+/, '')
+  if (comment) {
+    const ic = indentComment(commentString(comment), indent)
+    lines.push(ic.trimStart()) // Avoid double indent on first line
   }
 }
