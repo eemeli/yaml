@@ -56,7 +56,7 @@ for (const [name, version] of [
           [4.215, '4.215\n'],
           [0, '0.00\n'],
           [-0, '-0.00\n'],
-          [1e32, '1e+32\n'],
+          [1e32, '1e+32\n']
         ]) {
           test(`number (${n}) with trailing zeros`, () => {
             const doc = new YAML.Document<YAML.Scalar, false>(n, { version })
