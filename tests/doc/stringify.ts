@@ -47,16 +47,30 @@ for (const [name, version] of [
         expect(YAML.stringify(-0, { version })).toBe('-0\n')
       })
 
-      test('float with trailing zeros', () => {
-        const doc = new YAML.Document<YAML.Scalar, false>(3, { version })
-        doc.value.minFractionDigits = 2
-        expect(String(doc)).toBe('3.00\n')
-      })
-      test('scientific float ignores minFractionDigits', () => {
-        const doc = new YAML.Document<YAML.Scalar, false>(3, { version })
-        doc.value.format = 'EXP'
-        doc.value.minFractionDigits = 2
-        expect(String(doc)).toBe('3e+0\n')
+      describe('minFractionDigits', () => {
+        for (const [n, exp] of [
+          [3, '3.00\n'],
+          [-3, '-3.00\n'],
+          [4.2, '4.20\n'],
+          [4.21, '4.21\n'],
+          [4.215, '4.215\n'],
+          [0, '0.00\n'],
+          [-0, '-0.00\n'],
+          [1e32, '1e+32\n']
+        ]) {
+          test(`number (${n}) with trailing zeros`, () => {
+            const doc = new YAML.Document<YAML.Scalar, false>(n, { version })
+            doc.value.minFractionDigits = 2
+            expect(doc.toString()).toBe(exp)
+          })
+        }
+
+        test('scientific float ignores minFractionDigits', () => {
+          const doc = new YAML.Document<YAML.Scalar, false>(3, { version })
+          doc.value.format = 'EXP'
+          doc.value.minFractionDigits = 2
+          expect(String(doc)).toBe('3e+0\n')
+        })
       })
 
       test('integer with HEX format', () => {

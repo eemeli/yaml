@@ -39,7 +39,11 @@ export class Scalar<T = unknown> implements NodeBase {
    */
   declare format?: string
 
-  /** If `value` is a number, use this value when stringifying this node. */
+  /**
+   * If `value` is a number that is serialized as a decimal string
+   * (i.e. not using exponential notation),
+   * use this value when stringifying this node.
+   */
   declare minFractionDigits?: number
 
   /**
