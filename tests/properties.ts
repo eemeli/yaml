@@ -1,6 +1,23 @@
 import * as fc from 'fast-check'
 import { parse, stringify } from 'yaml'
 
+/** Set pojo prototypes to `null` recursively */
+function nullifyProto(value: unknown): unknown {
+  if (typeof value !== 'object' || value == null) {
+    return value
+  }
+  if (Array.isArray(value)) {
+    return value.map(nullifyProto)
+  }
+  const result: Record<string, unknown> = { __proto__: null }
+  for (const key in value) {
+    if (Object.hasOwn(value, key)) {
+      result[key] = nullifyProto((value as Record<string, unknown>)[key])
+    }
+  }
+  return result
+}
+
 describe('properties', () => {
   test('parse stringified object', () => {
     const key = fc.fullUnicodeString()
@@ -25,7 +42,9 @@ describe('properties', () => {
 
     fc.assert(
       fc.property(yamlArbitrary, optionsArbitrary, (obj, opts) => {
-        expect(parse(stringify(obj, opts), opts)).toStrictEqual(obj)
+        expect(parse(stringify(obj, opts), opts)).toStrictEqual(
+          nullifyProto(obj)
+        )
       })
     )
   })
