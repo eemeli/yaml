@@ -42,6 +42,9 @@ export class Alias extends NodeBase {
     doc: Document,
     ctx?: ToJSContext
   ): Scalar | YAMLMap | YAMLSeq | undefined {
+    if (ctx?.maxAliasCount === 0)
+      throw new ReferenceError('Alias resolution is disabled')
+
     let nodes: Node[]
     if (ctx?.aliasResolveCache) {
       nodes = ctx.aliasResolveCache

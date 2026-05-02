@@ -530,14 +530,18 @@ describe('Resource exhaustion attacks', () => {
         'e: [*d]'
       ]
 
-      test(`depth 0: maxAliasCount 1 passes`, () => {
-        expect(() => YAML.parse(rows[0], { maxAliasCount: 1 })).not.toThrow()
-      })
+      for (const maxAliasCount of [0, 1]) {
+        test(`depth 0: maxAliasCount ${maxAliasCount} passes`, () => {
+          expect(() => YAML.parse(rows[0], { maxAliasCount })).not.toThrow()
+        })
 
-      test(`depth 1: maxAliasCount 1 fails on first alias`, () => {
-        const src = `${rows[0]}\nb: *a`
-        expect(() => YAML.parse(src, { maxAliasCount: 1 })).toThrow()
-      })
+        test(`depth 1: maxAliasCount ${maxAliasCount} fails on first alias`, () => {
+          const src = `${rows[0]}\nb: *a`
+          expect(() => YAML.parse(src, { maxAliasCount })).toThrow(
+            ReferenceError
+          )
+        })
+      }
 
       const limits = [10, 50, 150, 300]
       for (let i = 0; i < 4; ++i) {
@@ -546,7 +550,7 @@ describe('Resource exhaustion attacks', () => {
         test(`depth ${i + 1}: maxAliasCount ${limits[i] - 1} fails`, () => {
           expect(() =>
             YAML.parse(src, { maxAliasCount: limits[i] - 1 })
-          ).toThrow()
+          ).toThrow(ReferenceError)
         })
 
         test(`depth ${i + 1}: maxAliasCount ${limits[i]} passes`, () => {

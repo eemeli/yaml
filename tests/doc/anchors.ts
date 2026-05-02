@@ -3,13 +3,14 @@ import { Document, parse, parseDocument } from 'yaml'
 
 test('basic', () => {
   const src = `- &a 1\n- *a\n`
-  const doc = parseDocument<YAMLSeq>(src)
+  const doc = parseDocument<YAMLSeq, false>(src)
   expect(doc.errors).toHaveLength(0)
   expect(doc.contents?.items).toMatchObject([
     { anchor: 'a', value: 1 },
     { source: 'a' }
   ])
   expect(String(doc)).toBe(src)
+  expect(doc.get(1).resolve(doc)).toBe(doc.get(0, true))
 })
 
 test('re-defined anchor', () => {
@@ -27,7 +28,7 @@ test('re-defined anchor', () => {
 
 test('circular reference', () => {
   const src = '&a [ 1, *a ]\n'
-  const doc = parseDocument(src)
+  const doc = parseDocument<YAMLSeq, false>(src)
   expect(doc.errors).toHaveLength(0)
   expect(doc.warnings).toHaveLength(0)
   expect(doc.contents).toMatchObject({
@@ -37,6 +38,7 @@ test('circular reference', () => {
   const res = doc.toJS()
   expect(res[1]).toBe(res)
   expect(String(doc)).toBe(src)
+  expect(doc.get(1).resolve(doc)).toBe(doc.contents)
 })
 
 describe('anchor on tagged collection', () => {
@@ -145,6 +147,25 @@ describe('errors', () => {
   test('empty anchor at end', () => {
     const doc = parseDocument('- &\n')
     expect(doc.errors).toMatchObject([{ code: 'BAD_ALIAS' }])
+  })
+
+  test('resolution with maxAliasCount:0', () => {
+    const src = `- &a 1\n- *a\n`
+    const doc = parseDocument<YAMLSeq, false>(src)
+    expect(doc.errors).toHaveLength(0)
+    expect(() => doc.get(1).resolve(doc, { maxAliasCount: 0 })).toThrow(
+      ReferenceError
+    )
+  })
+
+  test('circular reference', () => {
+    const src = '&A { <<: *A, B: b }\n'
+    const doc = parseDocument(src, { merge: true })
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.warnings).toHaveLength(0)
+    expect(() => doc.toJS()).toThrow('Maximum call stack size exceeded')
+    expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(ReferenceError)
+    expect(String(doc)).toBe(src)
   })
 })
 
@@ -453,15 +474,6 @@ y:
       expect(() => parse(src, { merge: true })).toThrow(
         'Merge sources must be maps or map aliases'
       )
-    })
-
-    test('circular reference', () => {
-      const src = '&A { <<: *A, B: b }\n'
-      const doc = parseDocument(src, { merge: true })
-      expect(doc.errors).toHaveLength(0)
-      expect(doc.warnings).toHaveLength(0)
-      expect(() => doc.toJS()).toThrow('Maximum call stack size exceeded')
-      expect(String(doc)).toBe(src)
     })
 
     test('missing whitespace', () => {

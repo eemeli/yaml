@@ -43,11 +43,11 @@ export function addMergeToJSMap(
   map: MapLike,
   value: unknown
 ) {
-  value = ctx && isAlias(value) ? value.resolve(ctx.doc) : value
-  if (isSeq(value)) for (const it of value.items) mergeValue(ctx, map, it)
-  else if (Array.isArray(value))
-    for (const it of value) mergeValue(ctx, map, it)
-  else mergeValue(ctx, map, value)
+  const source = resolveAliasValue(ctx, value)
+  if (isSeq(source)) for (const it of source.items) mergeValue(ctx, map, it)
+  else if (Array.isArray(source))
+    for (const it of source) mergeValue(ctx, map, it)
+  else mergeValue(ctx, map, source)
 }
 
 function mergeValue(
@@ -55,7 +55,7 @@ function mergeValue(
   map: MapLike,
   value: unknown
 ) {
-  const source = ctx && isAlias(value) ? value.resolve(ctx.doc) : value
+  const source = resolveAliasValue(ctx, value)
   if (!isMap(source))
     throw new Error('Merge sources must be maps or map aliases')
   const srcMap = source.toJSON(null, ctx, Map)
@@ -74,4 +74,8 @@ function mergeValue(
     }
   }
   return map
+}
+
+function resolveAliasValue(ctx: ToJSContext | undefined, value: unknown) {
+  return ctx && isAlias(value) ? value.resolve(ctx.doc, ctx) : value
 }
