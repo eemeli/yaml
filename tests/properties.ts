@@ -9,7 +9,7 @@ function nullifyProto(value: unknown): unknown {
   if (Array.isArray(value)) {
     return value.map(nullifyProto)
   }
-  const result: Record<string, unknown> = { __proto__: null }
+  const result: Record<string, unknown> = Object.create(null)
   for (const key in value) {
     if (Object.hasOwn(value, key)) {
       result[key] = nullifyProto((value as Record<string, unknown>)[key])

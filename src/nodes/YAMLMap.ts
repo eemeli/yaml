@@ -239,7 +239,7 @@ export class YAMLMap<
       ? new Type()
       : ctx?.mapAsMap
         ? new Map()
-        : { __proto__: null }
+        : Object.create(null)
     if (this.anchor) ctx.setAnchor(this, map)
     for (const pair of this.values.values()) addPairToJSMap(doc, ctx, map, pair)
     return map
