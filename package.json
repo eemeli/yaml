@@ -17,7 +17,7 @@
   ],
   "type": "module",
   "main": "./dist/index.js",
-  "bin": "./bin.js",
+  "bin": "./dist/bin.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

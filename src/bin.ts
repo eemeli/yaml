@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { UserError, cli, help } from './dist/cli.js'
+import { UserError, cli, help } from './cli.ts'
 
-cli(process.stdin, error => {
+await cli(process.stdin, error => {
   if (error instanceof UserError) {
     if (error.code === UserError.ARGS) console.error(`${help}\n`)
     console.error(error.message)
