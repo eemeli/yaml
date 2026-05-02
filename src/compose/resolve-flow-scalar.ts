@@ -164,7 +164,7 @@ function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
         next = source[++i + 1]
         while (next === ' ' || next === '\t') next = source[++i + 1]
       } else if (next === 'x' || next === 'u' || next === 'U') {
-        const length = { x: 2, u: 4, U: 8 }[next]
+        const length = next === 'x' ? 2 : next === 'u' ? 4 : 8
         res += parseCharCode(source, i + 1, length, onError)
         i += length
       } else {
@@ -235,10 +235,11 @@ function parseCharCode(
   const cc = source.substr(offset, length)
   const ok = cc.length === length && /^[0-9a-fA-F]+$/.test(cc)
   const code = ok ? parseInt(cc, 16) : NaN
-  if (isNaN(code)) {
+  try {
+    return String.fromCodePoint(code)
+  } catch {
     const raw = source.substr(offset - 2, length + 2)
     onError(offset - 2, 'BAD_DQ_ESCAPE', `Invalid escape sequence ${raw}`)
     return raw
   }
-  return String.fromCodePoint(code)
 }

@@ -58,6 +58,18 @@ describe('block scalars', () => {
   })
 })
 
+describe('flow scalars', () => {
+  test('invalid hex escapes', () => {
+    const doc = YAML.parseDocument('"\\x0"')
+    expect(doc.errors).toMatchObject([{ code: 'BAD_DQ_ESCAPE' }])
+  })
+
+  test('invalid unicode escapes', () => {
+    const doc = YAML.parseDocument('"\\U00110000"')
+    expect(doc.errors).toMatchObject([{ code: 'BAD_DQ_ESCAPE' }])
+  })
+})
+
 describe('block collections', () => {
   test('mapping with bad indentation', () => {
     const src = 'foo: "1"\n bar: 2\n'
