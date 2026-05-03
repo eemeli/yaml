@@ -36,7 +36,9 @@ export class Pair<
     doc: Document<DocValue, boolean>,
     ctx: ToJSContext
   ): ReturnType<typeof addPairToJSMap> {
-    const pair = ctx.mapAsMap ? new Map() : {}
+    const pair = ctx.mapAsMap
+      ? new Map()
+      : (Object.create(null) as Record<string, unknown>)
     return addPairToJSMap(doc, ctx, pair, this)
   }
 

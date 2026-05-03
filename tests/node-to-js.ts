@@ -17,12 +17,16 @@ describe('scalars', () => {
 describe('collections', () => {
   test('map', () => {
     const doc = parseDocument('key: 42')
-    expect(doc.value.toJS(doc)).toMatchObject({ key: 42 })
+    expect(doc.value.toJS(doc)).toStrictEqual(
+      Object.assign(Object.create(null), { key: 42 })
+    )
   })
 
   test('map in seq', () => {
     const doc = parseDocument<YAMLSeq, false>('- key: 42')
-    expect(doc.get(0).toJS(doc)).toMatchObject({ key: 42 })
+    expect(doc.get(0).toJS(doc)).toStrictEqual(
+      Object.assign(Object.create(null), { key: 42 })
+    )
   })
 })
 
@@ -51,7 +55,11 @@ describe('alias', () => {
       two: &b { key: *a }
       three: *b
     `)
-    expect(doc.get('three').toJS(doc)).toMatchObject({ key: 42 })
+    expect(doc.get('three').toJS(doc)).toStrictEqual(
+      Object.assign(Object.create(null), {
+        key: 42
+      })
+    )
   })
 
   test('missing anchor', () => {
