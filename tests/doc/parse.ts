@@ -475,6 +475,13 @@ describe('Resource exhaustion attacks', () => {
       const doc = YAML.parseDocument(src)
       expect(doc.errors[0].code).toBe('RESOURCE_EXHAUSTION')
     })
+
+    test('excessive empty lines in flow collection', () => {
+      const src = '[[]' + '\n'.repeat(150_000) + ']'
+      const doc = YAML.parseDocument(src)
+      expect(doc.errors).toHaveLength(0)
+      expect(doc.toJS()).toEqual([[]])
+    })
   })
 
   describe('Excessive entity expansion attacks', () => {

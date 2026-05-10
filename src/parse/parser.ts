@@ -85,6 +85,12 @@ function getFirstKeyStartProps(prev: SourceToken[]) {
   return prev.splice(i, prev.length)
 }
 
+function arrayPushArray(target: SourceToken[], source: SourceToken[]) {
+  // May exhaust call stack with large `source` array
+  if (source.length < 1e5) Array.prototype.push.apply(target, source)
+  else for (let i = 0; i < source.length; ++i) target.push(source[i])
+}
+
 function fixFlowSeqItems(fc: FlowCollection) {
   if (fc.start.type === 'flow-seq-start') {
     for (const it of fc.items) {
@@ -97,9 +103,9 @@ function fixFlowSeqItems(fc: FlowCollection) {
         if (it.key) it.value = it.key
         delete it.key
         if (isFlowToken(it.value)) {
-          if (it.value.end) Array.prototype.push.apply(it.value.end, it.sep)
+          if (it.value.end) arrayPushArray(it.value.end, it.sep)
           else it.value.end = it.sep
-        } else Array.prototype.push.apply(it.start, it.sep)
+        } else arrayPushArray(it.start, it.sep)
         delete it.sep
       }
     }
@@ -517,7 +523,7 @@ export class Parser {
             const prev = map.items[map.items.length - 2]
             const end = (prev?.value as { end: SourceToken[] })?.end
             if (Array.isArray(end)) {
-              Array.prototype.push.apply(end, it.start)
+              arrayPushArray(end, it.start)
               end.push(this.sourceToken)
               map.items.pop()
               return
@@ -721,7 +727,7 @@ export class Parser {
             const prev = seq.items[seq.items.length - 2]
             const end = (prev?.value as { end: SourceToken[] })?.end
             if (Array.isArray(end)) {
-              Array.prototype.push.apply(end, it.start)
+              arrayPushArray(end, it.start)
               end.push(this.sourceToken)
               seq.items.pop()
               return
