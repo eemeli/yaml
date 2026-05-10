@@ -454,13 +454,27 @@ describe('odd indentations', () => {
 })
 
 describe('Resource exhaustion attacks', () => {
-  test('Excessive recursion', () => {
-    const depth = 5000
-    const src = '['.repeat(depth) + '1' + ']'.repeat(depth)
-    const doc = YAML.parseDocument(src)
-    for (const error of doc.errors) {
-      expect(error).toMatchObject({ code: 'RESOURCE_EXHAUSTION' })
-    }
+  describe('Excessive recursion', () => {
+    test('Nested flow collections', () => {
+      const depth = 5000
+      const src = '['.repeat(depth) + '1' + ']'.repeat(depth)
+      const doc = YAML.parseDocument(src)
+      for (const error of doc.errors) {
+        expect(error).toMatchObject({ code: 'RESOURCE_EXHAUSTION' })
+      }
+    })
+
+    test('excessive tag indicators', () => {
+      const src = '! '.repeat(5000) + 'a'
+      const doc = YAML.parseDocument(src)
+      expect(doc.errors).toHaveLength(4999)
+    })
+
+    test('excessive block sequence indicators', () => {
+      const src = '- '.repeat(5000) + 'b'
+      const doc = YAML.parseDocument(src)
+      expect(doc.errors[0].code).toBe('RESOURCE_EXHAUSTION')
+    })
   })
 
   describe('Excessive entity expansion attacks', () => {

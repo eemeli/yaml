@@ -36,3 +36,15 @@ test('indented map + ... + unindented flow collection', () => {
   const res = Array.from(new Lexer().lex(src))
   expect(res).toEqual([DOC, ' ', ':', '\n', '...', '\n', DOC, '{', '\n', '}'])
 })
+
+test('excessive tag indicators', () => {
+  const src = '! '.repeat(5000) + 'a'
+  const res = Array.from(new Lexer().lex(src))
+  expect(res).toEqual([DOC, ...'! '.repeat(5000).split(''), SCALAR, 'a'])
+})
+
+test('excessive block sequence indicators', () => {
+  const src = '- '.repeat(5000) + 'b'
+  const res = Array.from(new Lexer().lex(src))
+  expect(res).toEqual([DOC, ...'- '.repeat(5000).split(''), SCALAR, 'b'])
+})
