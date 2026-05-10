@@ -40,8 +40,10 @@ doc.contents
 //   range: [ 0, 180, 180 ] }
 ```
 
-These functions should never throw,
-provided that `str` is a string and the `options` are valid.
+These functions should not throw,
+provided that `str` is a reasonable string and the `options` are valid.
+Specially crafted inputs may still result in errors due to resource exhaustion,
+such as stack overflows.
 Errors and warnings are included in the documents' `errors` and `warnings` arrays.
 In particular, if `errors` is not empty
 it's likely that the document's parsed `contents` are not entirely correct.

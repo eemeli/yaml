@@ -49,7 +49,8 @@ At the end of input, `lex()` should be called a final time with `incomplete: fal
 
 Internally, the lexer operates a state machine that determines how it parses its input.
 Initially, the lexer is always in the `stream` state.
-The lexer constructor and its `lex()` method should never throw an error.
+The lexer constructor and its `lex()` method should never throw an error,
+except due to resource exhaustion.
 
 All tokens are identifiable either by their exact value or their first character.
 In addition to slices of the input stream, a few control characters are additionally used within the output.
