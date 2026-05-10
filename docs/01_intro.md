@@ -23,7 +23,7 @@ This library:
 
 - Supports both YAML 1.1 and YAML 1.2 and all common data schemas,
 - Passes all of the [yaml-test-suite](https://github.com/yaml/yaml-test-suite) tests,
-- Can accept any string as input without throwing, parsing as much YAML out of it as it can, and
+- Can accept nearly any string as input without throwing, parsing as much YAML out of it as it can, and
 - Supports parsing, modifying, and writing YAML comments and blank lines.
 
 The library is released under the ISC open source license, and the code is [available on GitHub](https://github.com/eemeli/yaml/).

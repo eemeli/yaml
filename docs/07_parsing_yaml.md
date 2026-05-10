@@ -40,7 +40,7 @@ console.dir(tokens)
 #### `lex(source: string): string[]`
 
 The lexer splits an input `source` string into lexical YAML tokens, i.e. smaller strings.
-It should never throw an error.
+It should never throw an error, except due to resource exhaustion.
 
 Internally, the lexer operates a state machine that determines how it parses its input.
 Initially, the lexer is always in the `stream` state.

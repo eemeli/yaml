@@ -40,7 +40,9 @@ YAML.parse(file)
 
 The returned value will match the type of the root value of the parsed YAML document, so Maps become objects, Sequences arrays, and scalars result in nulls, booleans, numbers and strings.
 
-`YAML.parse` may throw on error, and it may log warnings using `console.warn`. It only supports input consisting of a single YAML document; for multi-document support you should use [`YAML.parseAllDocuments`](#parsing-documents).
+`YAML.parse` will throw on error, and it may log warnings using `console.warn`.
+It only supports input consisting of a single YAML document;
+for multi-document support you should use [`YAML.parseAllDocuments`](#parsing-documents).
 
 ## YAML.stringify
 
