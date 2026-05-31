@@ -427,6 +427,21 @@ z:
       const doc = YAML.parseDocument(src)
       expect(String(doc)).toBe(src)
     })
+
+    test('spaceBefore: blank line before nested mapping key', () => {
+      const src = 'a:\n  b:\n\nc:'
+      expect(YAML.parseDocument(src).toString()).toBe('a:\n  b:\n\nc:\n')
+    })
+
+    test('spaceBefore: blank line between sequence items', () => {
+      const src = '- a:\n\n- b'
+      expect(YAML.parseDocument(src).toString()).toBe('- a:\n\n- b\n')
+    })
+
+    test('spaceBefore: blank line between top-level keys', () => {
+      const src = 'a:\n\nb:'
+      expect(YAML.parseDocument(src).toString()).toBe('a:\n\nb:\n')
+    })
   })
 
   describe('properties on collections in block mapping', () => {

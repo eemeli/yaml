@@ -123,6 +123,7 @@ export function stringifyPair(
     }
     if (valueStr === '' && !ctx.inFlow) {
       if (ws === '\n' && valueComment) ws = '\n\n'
+      else if (ws === '\n') ws = ''
     } else {
       ws += `\n${ctx.indent}`
     }
