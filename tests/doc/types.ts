@@ -262,6 +262,36 @@ describe('number types', () => {
       expect(doc.value[5]).not.toHaveProperty('minFractionDigits')
     })
   })
+
+  test('out-of-range floats resolve as strings', () => {
+    expect(parse('gitsha: 61e9540')).toEqual({ gitsha: '61e9540' })
+
+    const doc = parseDocument<YAMLSeq>(`
+- 61e9540
+- -61e9540
+- 1e309
+- 1e308`)
+    expect(doc.value).toMatchObject([
+      { value: '61e9540' },
+      { value: '-61e9540' },
+      { value: '1e309' },
+      { value: 1e308, format: 'EXP' }
+    ])
+    expect(doc.toJS()).toEqual(['61e9540', '-61e9540', '1e309', 1e308])
+  })
+
+  test('out-of-range YAML 1.1 floats resolve as strings', () => {
+    const doc = parseDocument<YAMLSeq>(
+      `
+- 6_1e9540
+- 1e308`,
+      { version: '1.1' }
+    )
+    expect(doc.value).toMatchObject([
+      { value: '6_1e9540' },
+      { value: 1e308, format: 'EXP' }
+    ])
+  })
 })
 
 test('Indented sequence with sequence values (#2)', () => {

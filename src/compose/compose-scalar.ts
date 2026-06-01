@@ -1,7 +1,7 @@
 import { Scalar } from '../nodes/Scalar.ts'
 import type { BlockScalar, FlowScalar, SourceToken } from '../parse/cst.ts'
 import type { Schema } from '../schema/Schema.ts'
-import type { ScalarTag } from '../schema/types.ts'
+import type { CollectionTag, ScalarTag } from '../schema/types.ts'
 import type { ComposeContext } from './compose-node.ts'
 import type { ComposeErrorHandler } from './composer.ts'
 import { resolveBlockScalar } from './resolve-block-scalar.ts'
@@ -89,22 +89,28 @@ function findScalarTagByName(
 }
 
 function findScalarTagByTest(
-  { atKey, directives, schema }: ComposeContext,
+  { atKey, directives, options, schema }: ComposeContext,
   value: string,
   token: FlowScalar,
   onError: ComposeErrorHandler
 ) {
-  const tag =
-    (schema.tags.find(
-      tag =>
-        (tag.default === true || (atKey && tag.default === 'key')) &&
-        tag.test?.test(value)
-    ) as ScalarTag) || schema.scalar
+  const test = (tag: CollectionTag | ScalarTag): tag is ScalarTag =>
+    !tag.collection &&
+    (tag.default === true || (atKey && tag.default === 'key')) &&
+    !!tag.test?.test(value) &&
+    resolvesImplicitly(tag, value, options)
+
+  const tag = schema.tags.find(test) ?? schema.scalar
 
   if (schema.compat) {
     const compat =
-      schema.compat.find(tag => tag.default && tag.test?.test(value)) ??
-      schema.scalar
+      schema.compat.find(
+        tag =>
+          !tag.collection &&
+          tag.default &&
+          tag.test?.test(value) &&
+          resolvesImplicitly(tag, value, options)
+      ) ?? schema.scalar
     if (tag.tag !== compat.tag) {
       const ts = directives.tagString(tag.tag)
       const cs = directives.tagString(compat.tag)
@@ -114,4 +120,22 @@ function findScalarTagByTest(
   }
 
   return tag
+}
+
+const nonFiniteFloat = /^(?:[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN)$/
+
+function resolvesImplicitly(
+  tag: ScalarTag,
+  value: string,
+  options: ComposeContext['options']
+) {
+  if (tag.tag !== 'tag:yaml.org,2002:float' || nonFiniteFloat.test(value))
+    return true
+  try {
+    const res = tag.resolve(value, () => {}, options)
+    const num = res instanceof Scalar ? res.value : res
+    return typeof num !== 'number' || Number.isFinite(num)
+  } catch {
+    return true
+  }
 }
