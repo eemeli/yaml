@@ -155,8 +155,12 @@ describe('errors', () => {
     const doc = parseDocument(src, { merge: true })
     expect(doc.errors).toHaveLength(0)
     expect(doc.warnings).toHaveLength(0)
-    expect(() => doc.toJS()).toThrow('Maximum call stack size exceeded')
+    expect(() => doc.toJS()).toThrow(
+      'Excessive alias count indicates a resource exhaustion attack'
+    )
     expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(ReferenceError)
+    expect(() => doc.toJS({ maxAliasCount: 1 })).toThrow(ReferenceError)
+    expect(() => doc.toJS({ maxAliasCount: 2 })).toThrow(ReferenceError)
     expect(String(doc)).toBe(src)
   })
 })

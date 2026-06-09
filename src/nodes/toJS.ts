@@ -17,7 +17,9 @@ export class ToJSContext {
   }
 
   setAnchor(node: Node, res: unknown): void {
-    this.anchors.set(node, { aliasCount: 0, count: 1, res })
+    const anchor = this.anchors.get(node)
+    if (anchor) anchor.res = res
+    else this.anchors.set(node, { aliasCount: 0, count: 1, res })
   }
 }
 

@@ -48,9 +48,10 @@ export function addMergeToJSMap(
   map: MapLike,
   value: unknown
 ): void {
-  value = ctx && value instanceof Alias ? value.resolve(doc, ctx) : value
-  if (Array.isArray(value) && !(value instanceof YAMLMap)) {
-    for (const it of value) mergeValue(doc, ctx, map, it)
+  const source = ctx && value instanceof Alias ? value.resolve(doc, ctx) : value
+  if (Array.isArray(source) && !(source instanceof YAMLMap)) {
+    if (value instanceof Alias) value.toJS(doc, ctx)
+    for (const it of source) mergeValue(doc, ctx, map, it)
   } else {
     mergeValue(doc, ctx, map, value)
   }
@@ -62,6 +63,7 @@ function mergeValue(
   map: MapLike,
   value: unknown
 ) {
+  if (value instanceof Alias) value.toJS(doc, ctx)
   const source = value instanceof Alias ? value.resolve(doc, ctx) : value
   const srcMap = (source as YAMLMap).toJS(doc, ctx, Map<any, any>)
   if (!(srcMap instanceof Map))
