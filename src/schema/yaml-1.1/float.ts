@@ -22,6 +22,9 @@ export const floatExp: ScalarTag = {
   tag: 'tag:yaml.org,2002:float',
   format: 'EXP',
   test: /^[-+]?(?:[0-9][0-9_]*)?(?:\.[0-9_]*)?[eE][-+]?[0-9]+$/,
+  // Only auto-detect as float when the value round-trips: overflow to ±Infinity
+  // must fall through to the string tag (YAML 1.2 spec §2.4).
+  matchDefault: str => isFinite(parseFloat(str.replace(/_/g, ''))),
   resolve: (str: string) => parseFloat(str.replace(/_/g, '')),
   stringify(node) {
     const num = Number(node.value)

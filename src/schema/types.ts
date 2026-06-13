@@ -81,6 +81,15 @@ export interface ScalarTag extends TagBase {
    * you do.
    */
   test?: RegExp
+
+  /**
+   * An optional additional predicate applied **only** during automatic tag
+   * detection (i.e. when no explicit tag is present). When provided, a scalar
+   * is only resolved with this tag if both `test` and `matchDefault` return
+   * `true`. This lets a tag reject values that would not round-trip faithfully
+   * (e.g. exponential floats that overflow to ±Infinity).
+   */
+  matchDefault?: (value: string) => boolean
 }
 
 export interface CollectionTag extends TagBase {

@@ -435,6 +435,18 @@ not a number: .nan
 not a NaN: -.NaN\n`)
   })
 
+  test('exponential float overflow → string (#657)', () => {
+    // Values that would overflow to ±Infinity must not be parsed as floats;
+    // the YAML 1.2 spec requires that scalars only use a tag if they round-trip.
+    expect(parse('value: 61e9540')).toEqual({ value: '61e9540' })
+    expect(parse('value: -61e9540')).toEqual({ value: '-61e9540' })
+    expect(parse('gitsha: 61e9540')).toEqual({ gitsha: '61e9540' })
+    // Normal finite exponential values must still resolve to numbers.
+    expect(parse('value: 6.1e3')).toEqual({ value: 6100 })
+    // Explicit !!float tag overrides the round-trip guard.
+    expect(parse('value: !!float 61e9540')).toEqual({ value: Infinity })
+  })
+
   test('!!int', () => {
     const src = `canonical: 685230
 decimal: +685230
@@ -617,6 +629,13 @@ sexagesimal: 190:20:30.15
 negative infinity: -.inf
 not a number: .nan
 not a NaN: -.NaN\n`)
+  })
+
+  test('exponential float overflow → string, YAML 1.1 (#657)', () => {
+    const opts = { version: '1.1' as const }
+    expect(parse('value: 61e9540', opts)).toEqual({ value: '61e9540' })
+    expect(parse('value: -61e9540', opts)).toEqual({ value: '-61e9540' })
+    expect(parse('value: 6.1e3', opts)).toEqual({ value: 6100 })
   })
 
   test('!!int', () => {

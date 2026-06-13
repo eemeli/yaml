@@ -98,12 +98,18 @@ function findScalarTagByTest(
     (schema.tags.find(
       tag =>
         (tag.default === true || (atKey && tag.default === 'key')) &&
-        tag.test?.test(value)
+        tag.test?.test(value) &&
+        (!tag.matchDefault || tag.matchDefault(value))
     ) as ScalarTag) || schema.scalar
 
   if (schema.compat) {
     const compat =
-      schema.compat.find(tag => tag.default && tag.test?.test(value)) ??
+      schema.compat.find(
+        tag =>
+          tag.default &&
+          tag.test?.test(value) &&
+          (!tag.matchDefault || tag.matchDefault(value))
+      ) ??
       schema.scalar
     if (tag.tag !== compat.tag) {
       const ts = directives.tagString(tag.tag)
