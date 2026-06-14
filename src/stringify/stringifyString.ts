@@ -201,7 +201,10 @@ function blockString(
         : type === Scalar.BLOCK_LITERAL
           ? true
           : !lineLengthOverLimit(value, lineWidth, indent.length)
-  if (!value) return literal ? '|\n' : '>\n'
+  // When a comment will follow (forceBlockIndent) or content would be
+  // document-marker-ambiguous (indent set), add an explicit indent indicator
+  // so the comment line is not reabsorbed as block-scalar content on re-parse.
+  if (!value) return literal ? (indent ? '|1\n' : '|\n') : (indent ? '>1\n' : '>\n')
 
   // determine chomping from whitespace at value end
   let chomp: '' | '-' | '+'

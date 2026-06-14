@@ -1405,6 +1405,16 @@ describe('Document markers in top-level scalars', () => {
     const doc = YAML.parseDocument('|\nfoo\n')
     expect(doc.toString({ directives: true })).toBe('--- |\nfoo\n')
   })
+
+  test('empty block scalar followed by document comment round-trips (#687)', () => {
+    // |5\n#comment: block scalar with explicit indent 5; #comment is a
+    // document-level YAML comment (indent 0 < 5), so the value is "".
+    // toString() must not re-absorb the comment as block-scalar content.
+    const doc = YAML.parseDocument('|5\n#comment')
+    expect(doc.toJSON()).toBe('')
+    const str = doc.toString()
+    expect(YAML.parseDocument(str).toJSON()).toBe('')
+  })
 })
 
 describe('Document markers in top-level map keys (#431)', () => {
