@@ -699,7 +699,9 @@ export class Parser {
                 return
               }
             } else if (atMapIndent) {
-              map.items.push({ start })
+              if (it.sep || it.value || it.explicitKey || start.length > 0) {
+                map.items.push({ start })
+              }
             }
             this.stack.push(bv)
             return
