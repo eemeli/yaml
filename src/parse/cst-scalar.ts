@@ -162,6 +162,25 @@ export function setScalarValue(
   let { afterKey = false, implicitKey = false, inFlow = false, type } = context
   let indent = 'indent' in token ? token.indent : null
   if (afterKey && typeof indent === 'number') indent += 2
+  if (token.type === 'block-scalar') {
+    // `token.indent` is the indentation of the node, not of the block scalar's
+    // content. Stringifying the new value against it drops the content
+    // indentation and produces invalid YAML (#349); recover the content indent
+    // from the header's explicit indentation indicator, or else from the
+    // indentation of the existing block body.
+    const header = token.props[0]
+    if (header?.type === 'block-scalar-header' && header.indent > 0) {
+      indent = token.indent + header.indent
+    } else {
+      for (const line of token.source.split('\n')) {
+        const ci = line.length - line.replace(/^ +/, '').length
+        if (ci < line.length) {
+          indent = ci
+          break
+        }
+      }
+    }
+  }
   if (!type)
     switch (token.type) {
       case 'single-quoted-scalar':

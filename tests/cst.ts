@@ -107,6 +107,23 @@ describe('CST.visit', () => {
     `)
   })
 
+  test('preserve block scalar indentation when replacing its value (#349)', () => {
+    const doc = cstDoc(source`
+      key: |-
+          line one
+          line two
+    `)
+    CST.visit(doc, item => {
+      if (item.value && CST.isScalar(item.value))
+        CST.setScalarValue(item.value, 'new one\nnew two')
+    })
+    expect(CST.stringify(doc)).toBe(source`
+      key: |-
+          new one
+          new two
+    `)
+  })
+
   test('add item', () => {
     const doc = cstDoc(source`
       -  " foo"
