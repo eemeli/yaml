@@ -240,12 +240,18 @@ function blockString(
     0,
     startNlPos < startEnd ? startNlPos + 1 : startEnd
   )
+  const indentSize = indent ? '2' : '1' // root is at -1
+  // At the document root `indent` is empty, but the indentation indicator is
+  // still '1', so body lines must be indented by a single space to match.
+  const bodyIndent = startWithSpace && !indent ? ' ' : indent
+  // The first body line is prefixed with `bodyIndent` in the output, so it must
+  // be accounted for when checking whether that line is "more-indented".
+  const firstLineIndent = bodyIndent !== indent ? bodyIndent : ''
   if (start) {
     value = value.substring(start.length)
-    start = start.replace(/\n+/g, `$&${indent}`)
+    start = start.replace(/\n+/g, `$&${bodyIndent}`)
   }
 
-  const indentSize = indent ? '2' : '1' // root is at -1
   // Leading | or > is added later
   let header = (startWithSpace ? indentSize : '') + chomp
   if (comment) {
@@ -258,7 +264,7 @@ function blockString(
       .replace(/\n+/g, '\n$&')
       .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
       //                ^ more-ind. ^ empty     ^ capture next empty lines only at end of indent
-      .replace(/\n+/g, `$&${indent}`)
+      .replace(/\n+/g, `$&${bodyIndent}`)
     let literalFallback = false
     const foldOptions = getFoldOptions(ctx, true)
     if (blockQuote !== 'folded' && type !== Scalar.BLOCK_FOLDED) {
@@ -267,16 +273,17 @@ function blockString(
       }
     }
     const body = foldFlowLines(
-      `${start}${foldedValue}${end}`,
-      indent,
+      `${firstLineIndent}${start}${foldedValue}${end}`,
+      bodyIndent,
       FOLD_BLOCK,
       foldOptions
     )
-    if (!literalFallback) return `>${header}\n${indent}${body}`
+    if (!literalFallback)
+      return `>${header}\n${firstLineIndent ? '' : bodyIndent}${body}`
   }
 
-  value = value.replace(/\n+/g, `$&${indent}`)
-  return `|${header}\n${indent}${start}${value}${end}`
+  value = value.replace(/\n+/g, `$&${bodyIndent}`)
+  return `|${header}\n${bodyIndent}${start}${value}${end}`
 }
 
 function plainString(

@@ -914,6 +914,23 @@ describe('scalar styles', () => {
   })
 })
 
+describe('block scalar with leading-space first line round-trips (#692)', () => {
+  for (const str of [
+    '  a\n  b',
+    '  indented\nlines',
+    ' a\nb',
+    '   x\n y\nz',
+    '    deep\nshallow',
+    '  a\n  b\n',
+    ' first more-indented line\nnext line\n'
+  ]) {
+    test(JSON.stringify(str), () => {
+      const ys = YAML.stringify(str)
+      expect(YAML.parse(ys)).toBe(str)
+    })
+  }
+})
+
 describe('simple keys', () => {
   test('key with no value', () => {
     const doc = YAML.parseDocument('? ~')
