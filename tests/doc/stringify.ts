@@ -929,6 +929,13 @@ describe('block scalar with leading-space first line round-trips (#692)', () => 
       expect(YAML.parse(ys)).toBe(str)
     })
   }
+
+  test('BLOCK_LITERAL with leading space and document-start indicator', () => {
+    const str = ' ---\nfoo'
+    const ys = YAML.stringify(str, { defaultStringType: 'BLOCK_LITERAL' })
+    expect(ys).toBe('|1-\n  ---\n foo\n')
+    expect(YAML.parse(ys)).toBe(str)
+  })
 })
 
 describe('simple keys', () => {
