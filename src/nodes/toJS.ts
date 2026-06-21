@@ -1,3 +1,4 @@
+import type { Document } from '../doc/Document.ts'
 import type { ToJSOptions } from '../options.ts'
 import type { Node } from './types.ts'
 
@@ -20,6 +21,33 @@ export class ToJSContext {
     const anchor = this.anchors.get(node)
     if (anchor) anchor.res = res
     else this.anchors.set(node, { aliasCount: 0, count: 1, res })
+  }
+
+  resolveAlias(
+    doc: Document,
+    source: Node,
+    getAliasCount: () => number
+  ): unknown {
+    let data = this.anchors.get(source)
+    if (!data) {
+      source.toJS(doc, this)
+      data = this.anchors.get(source)
+    }
+    /* istanbul ignore if */
+    if (data?.res === undefined) {
+      const msg = 'This should not happen: Alias anchor was not resolved?'
+      throw new ReferenceError(msg)
+    }
+    if (this.maxAliasCount >= 0) {
+      data.count += 1
+      data.aliasCount ||= getAliasCount()
+      if (data.count * data.aliasCount > this.maxAliasCount) {
+        const msg =
+          'Excessive alias count indicates a resource exhaustion attack'
+        throw new ReferenceError(msg)
+      }
+    }
+    return data.res
   }
 }
 

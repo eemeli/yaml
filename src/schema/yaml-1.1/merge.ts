@@ -1,8 +1,8 @@
 import type { Document, DocValue } from '../../doc/Document.ts'
-import { Alias } from '../../nodes/Alias.ts'
+import { Alias, getAliasCount } from '../../nodes/Alias.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
-import { type MapLike, YAMLMap } from '../../nodes/YAMLMap.ts'
+import type { MapLike, YAMLMap } from '../../nodes/YAMLMap.ts'
 import type { ScalarTag } from '../types.ts'
 
 // If the value associated with a merge key is a single mapping node, each of
@@ -48,9 +48,8 @@ export function addMergeToJSMap(
   map: MapLike,
   value: unknown
 ): void {
-  const source = ctx && value instanceof Alias ? value.resolve(doc, ctx) : value
-  if (Array.isArray(source) && !(source instanceof YAMLMap)) {
-    if (value instanceof Alias) value.toJS(doc, ctx)
+  const source = getMergeSource(doc, ctx, value)
+  if (Array.isArray(source)) {
     for (const it of source) mergeValue(doc, ctx, map, it)
   } else {
     mergeValue(doc, ctx, map, value)
@@ -63,8 +62,7 @@ function mergeValue(
   map: MapLike,
   value: unknown
 ) {
-  if (value instanceof Alias) value.toJS(doc, ctx)
-  const source = value instanceof Alias ? value.resolve(doc, ctx) : value
+  const source = getMergeSource(doc, ctx, value)
   const srcMap = (source as YAMLMap).toJS(doc, ctx, Map<any, any>)
   if (!(srcMap instanceof Map))
     throw new Error('Merge sources must be maps or map aliases')
@@ -83,4 +81,25 @@ function mergeValue(
     }
   }
   return map
+}
+
+function getMergeSource(
+  doc: Document<DocValue, boolean>,
+  ctx: ToJSContext,
+  value: unknown
+) {
+  if (!(value instanceof Alias)) return value
+
+  const source = value.resolve(doc, ctx)
+  if (!source) {
+    const msg = `Unresolved alias (the anchor must be set before the alias): ${value.source}`
+    throw new ReferenceError(msg)
+  }
+
+  ctx.resolveAlias(
+    doc,
+    source,
+    () => getAliasCount(doc, ctx, source, ctx.anchors)
+  )
+  return source
 }

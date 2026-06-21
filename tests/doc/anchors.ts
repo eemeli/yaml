@@ -353,6 +353,28 @@ describe('merge <<', () => {
       expect(String(doc)).toBe('[ &AA { a: A }, { b: B, <<: *AA } ]\n')
     })
 
+    test('merge pair of an alias to a sequence', () => {
+      const doc = parseDocument<YAMLSeq, false>('[{ a: A }, [], { b: B }]', {
+        merge: true
+      })
+      const a = doc.get(0) as YAMLMap
+      const seq = doc.get(1) as YAMLSeq
+      const b = doc.get(2) as YAMLMap
+      seq.anchor = 'SEQ'
+      seq.push(doc.createAlias(a, 'AA'))
+      b.set(doc.createPair('<<', doc.createAlias(seq)))
+
+      expect(doc.toJS()).toMatchObject([
+        { a: 'A' },
+        [{ a: 'A' }],
+        { a: 'A', b: 'B' }
+      ])
+      expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(ReferenceError)
+      expect(String(doc)).toBe(
+        '[ &AA { a: A }, &SEQ [ *AA ], { b: B, <<: *SEQ } ]\n'
+      )
+    })
+
     test('require map node', () => {
       const doc = parseDocument<YAMLSeq, false>('[{ a: A }, { b: B }]', {
         merge: true
