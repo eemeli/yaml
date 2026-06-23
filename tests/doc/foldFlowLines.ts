@@ -282,6 +282,17 @@ describe('block scalar', () => {
       aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     `)
   })
+
+  test('leading whitespace-only line round-trips', () => {
+    // A line that is only spaces/tabs is read back as an empty line, so a value
+    // whose first content line is whitespace-only must not use a block scalar.
+    for (const str of ['  \n', ' \n', ' \t\n', '  \n\n', '  \nx', '\n  \n']) {
+      const ys = YAML.stringify(str)
+      const doc = YAML.parseDocument(ys)
+      expect(doc.errors).toHaveLength(0)
+      expect(YAML.parse(ys)).toBe(str)
+    }
+  })
 })
 
 describe('end-to-end', () => {

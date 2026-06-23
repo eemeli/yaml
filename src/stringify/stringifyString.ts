@@ -186,7 +186,13 @@ function blockString(
   const { blockQuote, commentString, lineWidth } = ctx.options
   // 1. Block can't end in whitespace unless the last line is non-empty.
   // 2. Strings consisting of only whitespace are best rendered explicitly.
-  if (!blockQuote || /\n[\t ]+$/.test(value)) {
+  // 3. A leading whitespace-only line is read back as an empty line, dropping
+  //    its spaces, so such values can't survive a block scalar round-trip.
+  if (
+    !blockQuote ||
+    /\n[\t ]+$/.test(value) ||
+    /^\n*[\t ]+(\n|$)/.test(value)
+  ) {
     return quotedString(value, ctx)
   }
 
