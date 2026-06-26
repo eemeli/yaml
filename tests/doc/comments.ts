@@ -366,6 +366,31 @@ describe('stringify comments', () => {
         string
       `)
     })
+
+    test('keep newline-separated comments separate at document start (#600)', () => {
+      // A single comment block before the value attaches to the value.
+      const one = YAML.parseDocument('#foo\n\n42')
+      expect(one.commentBefore).toBe('foo')
+      expect((one.value as YAML.Scalar).commentBefore).toBeUndefined()
+
+      // A comment block detached by an empty line belongs to the document,
+      // the value-adjacent block to the value -- not merged into one.
+      const two = YAML.parseDocument('#foo\n\n#bar\n42')
+      expect(two.commentBefore).toBe('foo')
+      expect((two.value as YAML.Scalar).commentBefore).toBe('bar')
+      expect(String(two)).toBe('#foo\n\n#bar\n42\n')
+
+      // Same for a mapping: the detached comment goes to the document, the
+      // adjacent one to the first key (the original #600 report).
+      const map = YAML.parseDocument('#foo\n\n#bar\nversion: v1.7')
+      expect(map.commentBefore).toBe('foo')
+      expect(String(map)).toBe('#foo\n\n#bar\nversion: v1.7\n')
+
+      // Adjacent comments (no empty line) are still kept together.
+      const adj = YAML.parseDocument('#foo\n#bar\n42')
+      expect(adj.commentBefore).toBeNull()
+      expect((adj.value as YAML.Scalar).commentBefore).toBe('foo\nbar')
+    })
   })
 
   describe('seq comments', () => {
@@ -1019,8 +1044,11 @@ map:
         - v2
       `
       const doc = YAML.parseDocument(src)
+      // `c1` is separated from `c2` by an empty line, so it is detached and
+      // assigned to the document rather than merged into the first item (#600).
+      expect(doc.commentBefore).toBe(' c1')
       expect(doc.value).toMatchObject([
-        { commentBefore: ' c1\n\n c2', comment: ' c3' },
+        { commentBefore: ' c2', comment: ' c3' },
         { commentBefore: ' c4', spaceBefore: true }
       ])
       expect(doc.toString()).toBe(source`
