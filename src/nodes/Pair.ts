@@ -34,7 +34,7 @@ export class Pair<
     ctx: ToJSContext
   ): ReturnType<typeof addPairToJSMap> {
     const pair = ctx.mapAsMap ? new Map() : {}
-    return addPairToJSMap(doc, ctx, pair, this)
+    return addPairToJSMap(doc, ctx, pair, this, true)
   }
 
   toString(

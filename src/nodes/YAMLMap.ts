@@ -147,8 +147,10 @@ export class YAMLMap<
   ) {
     ctx ??= new ToJSContext()
     const map = Type ? new Type() : ctx?.mapAsMap ? new Map() : {}
+    const isPlainObject = Type === undefined
     if (this.anchor) ctx.setAnchor(this, map)
-    for (const item of this.items) addPairToJSMap(doc, ctx, map, item)
+    for (const item of this.items)
+      addPairToJSMap(doc, ctx, map, item, isPlainObject)
     return map
   }
 

@@ -11,7 +11,8 @@ export function addPairToJSMap(
   doc: Document<DocValue, boolean>,
   ctx: ToJSContext,
   map: MapLike,
-  { key, value }: Pair
+  { key, value }: Pair,
+  isPlainObject: boolean
 ): MapLike {
   if ('addToJSMap' in key) key.addToJSMap?.(doc, ctx, map, value)
   // TODO: Should drop this special case for bare << handling
@@ -25,7 +26,11 @@ export function addPairToJSMap(
     } else {
       const stringKey = stringifyKey(doc, ctx, key, jsKey)
       const jsValue = value ? value.toJS(doc, ctx) : value
-      if (stringKey in map)
+      if (
+        (!isPlainObject && stringKey in map) ||
+        stringKey === '__proto__' ||
+        stringKey === 'constructor'
+      )
         Object.defineProperty(map, stringKey, {
           value: jsValue,
           writable: true,
