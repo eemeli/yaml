@@ -52,8 +52,7 @@ function stringifyKey(
   if (jsKey === null) return ''
   // eslint-disable-next-line @typescript-eslint/no-base-to-string
   if (typeof jsKey !== 'object') return String(jsKey)
-  const strCtx = createStringifyContext(doc, {})
-  strCtx.anchors = new Set()
+  const strCtx = createStringifyContext(doc, undefined)
   for (const node of ctx.anchors.keys())
     strCtx.anchors.add(node.anchor as 'string')
   strCtx.inFlow = true

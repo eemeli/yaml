@@ -29,34 +29,51 @@ export type StringifyContext = {
   resolvedAliases?: Set<Alias>
 }
 
+const defaultStringifyOptions = {
+  blockQuote: true,
+  commentString: stringifyComment,
+  defaultKeyType: null,
+  defaultStringType: 'PLAIN',
+  directives: null,
+  doubleQuotedAsJSON: false,
+  doubleQuotedMinMultiLineLength: 40,
+  falseStr: 'false',
+  flowCollectionPadding: true,
+  indentSeq: true,
+  lineWidth: 80,
+  minContentWidth: 20,
+  nullStr: 'null',
+  simpleKeys: false,
+  singleQuote: null,
+  trailingComma: false,
+  trueStr: 'true',
+  verifyAliasOrder: true
+} as const
+
+const resolvedCache = new WeakMap<object, StringifyContext['options']>()
+
+function getResolvedOptions(
+  schema: Document['schema']
+): StringifyContext['options'] {
+  const key = schema.toStringOptions ?? defaultStringifyOptions
+  let resolved = resolvedCache.get(key)
+  if (!resolved) {
+    resolved = schema.toStringOptions
+      ? { ...defaultStringifyOptions, ...schema.toStringOptions }
+      : defaultStringifyOptions
+    resolvedCache.set(key, resolved)
+  }
+  return resolved
+}
+
 export function createStringifyContext(
   doc: Document,
-  options: ToStringOptions
+  options: ToStringOptions | undefined
 ): StringifyContext {
-  const opt = Object.assign(
-    {
-      blockQuote: true,
-      commentString: stringifyComment,
-      defaultKeyType: null,
-      defaultStringType: 'PLAIN',
-      directives: null,
-      doubleQuotedAsJSON: false,
-      doubleQuotedMinMultiLineLength: 40,
-      falseStr: 'false',
-      flowCollectionPadding: true,
-      indentSeq: true,
-      lineWidth: 80,
-      minContentWidth: 20,
-      nullStr: 'null',
-      simpleKeys: false,
-      singleQuote: null,
-      trailingComma: false,
-      trueStr: 'true',
-      verifyAliasOrder: true
-    },
-    doc.schema.toStringOptions,
-    options
-  )
+  const resolved = getResolvedOptions(doc.schema)
+  const opt: StringifyContext['options'] & ToStringOptions = options
+    ? { ...resolved, ...options }
+    : resolved
 
   let inFlow: boolean | null
   switch (opt.collectionStyle) {
