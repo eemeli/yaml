@@ -7,6 +7,10 @@ import type { ComposeErrorHandler } from './composer.ts'
 import { resolveBlockScalar } from './resolve-block-scalar.ts'
 import { resolveFlowScalar } from './resolve-flow-scalar.ts'
 
+export function testTag(test: ScalarTag['test'], value: string): boolean {
+  return typeof test === 'function' ? test(value) : (test?.test(value) ?? false)
+}
+
 export function composeScalar(
   ctx: ComposeContext,
   token: FlowScalar | BlockScalar,
@@ -71,7 +75,7 @@ function findScalarTagByName(
       else return tag
     }
   }
-  for (const tag of matchWithTest) if (tag.test?.test(value)) return tag
+  for (const tag of matchWithTest) if (testTag(tag.test, value)) return tag
   const kt = schema.knownTags[tagName]
   if (kt && !kt.collection) {
     // Ensure that the known tag is available for stringifying,
@@ -88,22 +92,36 @@ function findScalarTagByName(
   return schema.scalar
 }
 
+const schemaTagsWithTest = new WeakMap<Schema, ScalarTag[]>()
+
 function findScalarTagByTest(
   { atKey, directives, schema }: ComposeContext,
   value: string,
   token: FlowScalar,
   onError: ComposeErrorHandler
 ) {
-  const tag =
-    (schema.tags.find(
-      tag =>
-        (tag.default === true || (atKey && tag.default === 'key')) &&
-        tag.test?.test(value)
-    ) as ScalarTag) || schema.scalar
+  let schemaTags = schemaTagsWithTest.get(schema)
+  if (!schemaTags) {
+    schemaTags = schema.tags.filter(
+      (t): t is ScalarTag =>
+        t.test !== undefined && (t.default === true || t.default === 'key')
+    )
+    schemaTagsWithTest.set(schema, schemaTags)
+  }
+  let tag = schema.scalar
+  for (const t of schemaTags) {
+    if (
+      (t.default === true || (atKey && t.default === 'key')) &&
+      testTag(t.test, value)
+    ) {
+      tag = t as ScalarTag
+      break
+    }
+  }
 
   if (schema.compat) {
     const compat =
-      schema.compat.find(tag => tag.default && tag.test?.test(value)) ??
+      schema.compat.find(tag => tag.default && testTag(tag.test, value)) ??
       schema.scalar
     if (tag.tag !== compat.tag) {
       const ts = directives.tagString(tag.tag)
