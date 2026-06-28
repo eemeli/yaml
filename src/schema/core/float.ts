@@ -2,11 +2,45 @@ import { Scalar } from '../../nodes/Scalar.ts'
 import { stringifyNumber } from '../../stringify/stringifyNumber.ts'
 import type { ScalarTag } from '../types.ts'
 
+function isFloatNaN(value: string) {
+  switch (value) {
+    case '.nan':
+    case '.NaN':
+    case '.NAN':
+    case '.inf':
+    case '.Inf':
+    case '.INF':
+    case '+.inf':
+    case '+.Inf':
+    case '+.INF':
+    case '-.inf':
+    case '-.Inf':
+    case '-.INF':
+      return true
+    default:
+      return false
+  }
+}
+
+/** First char must be a digit, sign, or dot to match any float pattern */
+function couldBeFloat(value: string) {
+  const c = value.charCodeAt(0)
+  return (
+    (c >= 0x30 && c <= 0x39) || // 0-9
+    c === 0x2b || // +
+    c === 0x2d || // -
+    c === 0x2e // .
+  )
+}
+
+const floatExpRe = /^[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)[eE][-+]?[0-9]+$/
+const floatRe = /^[-+]?(?:\.[0-9]+|[0-9]+\.[0-9]*)$/
+
 export const floatNaN: ScalarTag = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
-  test: /^(?:[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN)$/,
+  test: isFloatNaN,
   resolve: str =>
     str.slice(-3).toLowerCase() === 'nan'
       ? NaN
@@ -21,7 +55,7 @@ export const floatExp: ScalarTag = {
   default: true,
   tag: 'tag:yaml.org,2002:float',
   format: 'EXP',
-  test: /^[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)[eE][-+]?[0-9]+$/,
+  test: (value: string) => couldBeFloat(value) && floatExpRe.test(value),
   resolve: str => parseFloat(str),
   stringify(node) {
     const num = Number(node.value)
@@ -33,7 +67,7 @@ export const float: ScalarTag = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
-  test: /^[-+]?(?:\.[0-9]+|[0-9]+\.[0-9]*)$/,
+  test: (value: string) => couldBeFloat(value) && floatRe.test(value),
   resolve(str) {
     const node = new Scalar(parseFloat(str))
     const dot = str.indexOf('.')

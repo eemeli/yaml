@@ -1,3 +1,4 @@
+import { testTag } from '../compose/compose-scalar.ts'
 import { Scalar } from '../nodes/Scalar.ts'
 import type { CollectionTag, ScalarTag } from '../schema/types.ts'
 import {
@@ -331,7 +332,9 @@ function plainString(
   // and others in v1.1.
   if (actualString) {
     const test = (tag: CollectionTag | ScalarTag) =>
-      tag.default && tag.tag !== 'tag:yaml.org,2002:str' && tag.test?.test(str)
+      tag.default &&
+      tag.tag !== 'tag:yaml.org,2002:str' &&
+      testTag(tag.test, str)
     const { compat, tags } = ctx.doc.schema
     if (tags.some(test) || compat?.some(test)) return quotedString(value, ctx)
   }
