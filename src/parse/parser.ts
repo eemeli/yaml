@@ -13,6 +13,11 @@ import type {
 import { prettyToken, tokenType } from './cst.ts'
 import { lex } from './lexer.ts'
 
+type FilledBlockMapItem = Extract<
+  BlockMap['items'][number],
+  { sep: SourceToken[] }
+>
+
 function includesToken(list: SourceToken[], type: SourceToken['type']) {
   for (let i = 0; i < list.length; ++i) if (list[i].type === type) return true
   return false
@@ -333,8 +338,10 @@ export class Parser {
           } else if (it.sep) {
             it.value = token
           } else {
-            Object.assign(it, { key: token, sep: [] })
-            this.onKeyLine = !it.explicitKey
+            const item = it as unknown as FilledBlockMapItem
+            item.key = token
+            item.sep = []
+            this.onKeyLine = !item.explicitKey
             return
           }
           break
@@ -350,7 +357,10 @@ export class Parser {
           if (!it || it.value)
             top.items.push({ start: [], key: token, sep: [] })
           else if (it.sep) it.value = token
-          else Object.assign(it, { key: token, sep: [] })
+          else {
+            it.key = token
+            it.sep = []
+          }
           return
         }
         /* istanbul ignore next should not happen */
@@ -602,7 +612,9 @@ export class Parser {
           if (it.explicitKey) {
             if (!it.sep) {
               if (includesToken(it.start, 'newline')) {
-                Object.assign(it, { key: null, sep: [this.sourceToken] })
+                const item = it as unknown as FilledBlockMapItem
+                item.key = null
+                item.sep = [this.sourceToken]
               } else {
                 const start = getFirstKeyStartProps(it.start)
                 this.stack.push({
@@ -647,7 +659,9 @@ export class Parser {
             }
           } else {
             if (!it.sep) {
-              Object.assign(it, { key: null, sep: [this.sourceToken] })
+              const item = it as unknown as FilledBlockMapItem
+              item.key = null
+              item.sep = [this.sourceToken]
             } else if (it.value || atNextItem) {
               map.items.push({ start, key: null, sep: [this.sourceToken] })
             } else if (includesToken(it.sep, 'map-value-ind')) {
@@ -675,7 +689,9 @@ export class Parser {
           } else if (it.sep) {
             this.stack.push(fs)
           } else {
-            Object.assign(it, { key: fs, sep: [] })
+            const item = it as unknown as FilledBlockMapItem
+            item.key = fs
+            item.sep = []
             this.onKeyLine = true
           }
           return
@@ -782,7 +798,10 @@ export class Parser {
           if (!it || it.value)
             fc.items.push({ start: [], key: null, sep: [this.sourceToken] })
           else if (it.sep) it.sep.push(this.sourceToken)
-          else Object.assign(it, { key: null, sep: [this.sourceToken] })
+          else {
+            it.key = null
+            it.sep = [this.sourceToken]
+          }
           return
 
         case 'space':
@@ -802,7 +821,10 @@ export class Parser {
           const fs = this.flowScalar(this.type)
           if (!it || it.value) fc.items.push({ start: [], key: fs, sep: [] })
           else if (it.sep) this.stack.push(fs)
-          else Object.assign(it, { key: fs, sep: [] })
+          else {
+            it.key = fs
+            it.sep = []
+          }
           return
         }
 
