@@ -103,9 +103,15 @@ class Lexer {
 
   private continueScalar(offset: number): number {
     if (this.indentNext > 0) {
-      let ch = this.source.charCodeAt(offset)
+      const len = this.source.length
       let indent = 0
-      while (ch === CHAR_SPACE) ch = this.source.charCodeAt(++indent + offset)
+      while (
+        offset + indent < len &&
+        this.source.charCodeAt(offset + indent) === CHAR_SPACE
+      )
+        ++indent
+      const ch =
+        offset + indent < len ? this.source.charCodeAt(offset + indent) : NaN
       if (ch === CHAR_CR) {
         const next = this.source.charCodeAt(indent + offset + 1)
         if (next === CHAR_LF) return offset + indent + 1
@@ -488,16 +494,16 @@ class Lexer {
     while (++i < len) {
       ch = this.source.charCodeAt(i)
       if (ch === CHAR_COLON) {
-        const next = this.source.charCodeAt(i + 1)
+        const next = i + 1 < len ? this.source.charCodeAt(i + 1) : NaN
         if (isEmptyChar(next) || (inFlow && flowIndicatorChars.has(next))) break
         end = i
       } else if (isEmptyChar(ch)) {
-        let next = this.source.charCodeAt(i + 1)
+        let next = i + 1 < len ? this.source.charCodeAt(i + 1) : NaN
         if (ch === CHAR_CR) {
           if (next === CHAR_LF) {
             i += 1
             ch = CHAR_LF
-            next = this.source.charCodeAt(i + 1)
+            next = i + 1 < len ? this.source.charCodeAt(i + 1) : NaN
           } else end = i
         }
         if (next === CHAR_HASH || (inFlow && flowIndicatorChars.has(next)))
@@ -554,9 +560,12 @@ class Lexer {
 
   private spaces(allowTabs: boolean): number {
     let i = this.pos
-    let ch = this.source.charCodeAt(i)
-    while (ch === CHAR_SPACE || (allowTabs && ch === CHAR_TAB))
-      ch = this.source.charCodeAt(++i)
+    const len = this.source.length
+    while (i < len) {
+      const ch = this.source.charCodeAt(i)
+      if (ch !== CHAR_SPACE && !(allowTabs && ch === CHAR_TAB)) break
+      ++i
+    }
     const n = i - this.pos
     if (n > 0) {
       this.tokens.push(this.source.slice(this.pos, i))
