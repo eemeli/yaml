@@ -1,6 +1,6 @@
 import { BOM, DOCUMENT, FLOW_END, SCALAR } from './cst.ts'
 
-function isEmpty(ch: string) {
+function isEmpty(ch: string | undefined) {
   switch (ch) {
     case undefined:
     case ' ':
@@ -96,8 +96,9 @@ class Lexer {
     this.source = source
   }
 
-  private charAt(n: number): string {
-    return this.source[this.pos + n]
+  private charAt(n: number): string | undefined {
+    const i = this.pos + n
+    return i < this.source.length ? this.source[i] : undefined
   }
 
   private continueScalar(offset: number): number {
@@ -203,7 +204,8 @@ class Lexer {
   document(): 'stream' | 'document' | 'flow' {
     this.spaces(true)
     this.indicators()
-    switch (this.charAt(0)) {
+    const ch = this.charAt(0)
+    switch (ch) {
       case '#':
         this.toLineEnd()
       // fallthrough
@@ -227,7 +229,7 @@ class Lexer {
         return 'document'
       case '"':
       case "'":
-        this.quotedScalar()
+        this.quotedScalar(ch)
         return 'document'
       case '|':
       case '>':
@@ -318,7 +320,7 @@ class Lexer {
       case '"':
       case "'":
         this.flowKey = true
-        this.quotedScalar()
+        this.quotedScalar(ch)
         break
       case ':': {
         if (this.flowKey) {
@@ -368,8 +370,7 @@ class Lexer {
     return hasIndicators
   }
 
-  private quotedScalar(): void {
-    const quote = this.charAt(0)
+  private quotedScalar(quote: string): void {
     let end = this.source.indexOf(quote, this.pos + 1)
     if (quote === "'") {
       while (end !== -1 && this.source[end + 1] === "'")
