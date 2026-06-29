@@ -61,7 +61,19 @@ export function lex(source: string): string[] {
   const lexer = new Lexer(source)
   const end = source.length
   let state: 'stream' | 'document' | 'flow' = 'stream'
-  while (lexer.pos < end) state = lexer[state]()
+  while (lexer.pos < end) {
+    switch (state) {
+      case 'stream':
+        state = lexer.stream()
+        break
+      case 'document':
+        state = lexer.document()
+        break
+      case 'flow':
+        state = lexer.flow()
+        break
+    }
+  }
   return lexer.tokens
 }
 
