@@ -1,10 +1,8 @@
 import { Alias } from '../nodes/Alias.ts'
-import { Collection } from '../nodes/Collection.ts'
-import { isNode } from '../nodes/identity.ts'
-import { type Node } from '../nodes/Node.ts'
+import { isCollection, isNode } from '../nodes/identity.ts'
+import { type Node } from '../nodes/types.ts'
 import { Pair } from '../nodes/Pair.ts'
 import { Scalar } from '../nodes/Scalar.ts'
-import type { YAMLMap } from '../nodes/YAMLMap.ts'
 import type { CreateNodeOptions } from '../options.ts'
 import type { Schema } from '../schema/Schema.ts'
 import type { CollectionTag, ScalarTag } from '../schema/types.ts'
@@ -18,7 +16,6 @@ export class NodeCreator {
   replacer?: Replacer
   schema: Schema
 
-  #aliasDuplicateObjects: boolean
   #anchorPrefix: string
   #aliasObjects: unknown[] = []
   #doc?: Document<DocValue, boolean>
@@ -33,10 +30,7 @@ export class NodeCreator {
     options?: CreateNodeOptions,
     replacer?: Replacer
   )
-  constructor(
-    schema: Schema,
-    options: CreateNodeOptions & { aliasDuplicateObjects: false }
-  )
+  constructor(schema: Schema, options?: CreateNodeOptions)
   constructor(
     docOrSchema: Document<DocValue, boolean> | Schema,
     options: CreateNodeOptions = {},
@@ -48,11 +42,10 @@ export class NodeCreator {
     this.#flow = options.flow ?? false
     this.#onTagObj = options.onTagObj
 
-    this.#aliasDuplicateObjects = options.aliasDuplicateObjects ?? true
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     this.#anchorPrefix = options.anchorPrefix || 'a'
     if (docOrSchema instanceof Document) {
-      this.#doc = docOrSchema
+      if (options.aliasDuplicateObjects ?? true) this.#doc = docOrSchema
       this.schema = docOrSchema.schema
     } else {
       this.schema = docOrSchema
@@ -63,12 +56,8 @@ export class NodeCreator {
     if (value instanceof Document) value = value.value
     if (isNode(value)) return value
     if (value instanceof Pair) {
-      const map = (this.schema.map.nodeClass! as typeof YAMLMap).from(
-        this,
-        null
-      )
-      map.items.push(value)
-      return map
+      const map = this.schema.map.createNode(this, null)
+      return map.set(value)
     }
     if (
       value instanceof String ||
@@ -84,12 +73,12 @@ export class NodeCreator {
     // after first. The `ref` wrapper allows for circular references to resolve.
     let ref: { anchor: string | null; node: Node | null } | undefined =
       undefined
-    if (this.#aliasDuplicateObjects && value && typeof value === 'object') {
+    if (this.#doc && value && typeof value === 'object') {
       ref = this.#sourceObjects.get(value)
       if (ref) {
         if (!ref.anchor) {
           this.#aliasObjects.push(value)
-          this.#prevAnchors ??= anchorNames(this.#doc!)
+          this.#prevAnchors ??= anchorNames(this.#doc)
           ref.anchor = findNewAnchor(this.#anchorPrefix, this.#prevAnchors)
           this.#prevAnchors.add(ref.anchor)
         }
@@ -132,15 +121,12 @@ export class NodeCreator {
       this.#onTagObj = undefined
     }
 
-    const node =
-      tagObj?.createNode?.(this, value) ??
-      tagObj?.nodeClass?.from?.(this, value) ??
-      new Scalar(value)
+    const node = tagObj?.createNode?.(this, value) ?? new Scalar(value)
     if (tagName) node.tag = tagName
     else if (!tagObj.default) node.tag = tagObj.tag
 
     if (ref) ref.node = node
-    if (this.#flow && node instanceof Collection) node.flow = true
+    if (this.#flow && isCollection(node)) node.flow = true
     return node
   }
 
@@ -161,7 +147,7 @@ export class NodeCreator {
       if (
         typeof ref === 'object' &&
         ref.anchor &&
-        (ref.node instanceof Scalar || ref.node instanceof Collection)
+        (ref.node instanceof Scalar || isCollection(ref.node))
       ) {
         ref.node.anchor = ref.anchor
       } else {

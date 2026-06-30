@@ -2,8 +2,8 @@ import { Directives } from '../doc/directives.ts'
 import { Document, type DocValue } from '../doc/Document.ts'
 import type { ErrorCode } from '../errors.ts'
 import { YAMLParseError, YAMLWarning } from '../errors.ts'
-import { Collection } from '../nodes/Collection.ts'
-import type { Range } from '../nodes/Node.ts'
+import { isCollection } from '../nodes/identity.ts'
+import type { Range } from '../nodes/types.ts'
 import { Pair } from '../nodes/Pair.ts'
 import type {
   DocumentOptions,
@@ -104,15 +104,14 @@ export class Composer<
 
   private decorate(doc: Document.Parsed<Value, Strict>, afterDoc: boolean) {
     const { comment, afterEmptyLine } = parsePrelude(this.prelude)
-    //console.log({ dc: doc.comment, prelude, comment })
     if (comment) {
       const dc = doc.value
       if (afterDoc) {
         doc.comment = doc.comment ? `${doc.comment}\n${comment}` : comment
       } else if (afterEmptyLine || doc.directives.docStart) {
         doc.commentBefore = comment
-      } else if (dc instanceof Collection && !dc.flow && dc.items.length > 0) {
-        let it = dc.items[0]
+      } else if (isCollection(dc) && !dc.flow && dc.size > 0) {
+        let it = Array.isArray(dc) ? dc[0] : dc.values.values().next().value!
         if (it instanceof Pair) it = it.key
         const cb = it.commentBefore
         it.commentBefore = cb ? `${comment}\n${cb}` : comment

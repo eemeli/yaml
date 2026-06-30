@@ -2,9 +2,9 @@ import type { Document, DocValue } from '../doc/Document.ts'
 import { warn } from '../log.ts'
 import { addMergeToJSMap, isMergeKey } from '../schema/yaml-1.1/merge.ts'
 import { createStringifyContext } from '../stringify/stringify.ts'
-import type { Node } from './Node.ts'
 import type { Pair } from './Pair.ts'
 import type { ToJSContext } from './toJS.ts'
+import type { Node } from './types.ts'
 import type { MapLike } from './YAMLMap.ts'
 
 export function addPairToJSMap(

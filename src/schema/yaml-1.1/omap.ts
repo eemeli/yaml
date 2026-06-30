@@ -1,12 +1,10 @@
 import type { Document, DocValue } from '../../doc/Document.ts'
-import type { Primitive } from '../../nodes/Collection.ts'
-import type { Node } from '../../nodes/Node.ts'
-import type { Pair } from '../../nodes/Pair.ts'
+import { Pair } from '../../nodes/Pair.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
-import { YAMLMap } from '../../nodes/YAMLMap.ts'
+import type { Node, Primitive } from '../../nodes/types.ts'
 import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
-import type { NodeCreator } from '../../util.ts'
+import type { StringifyContext } from '../../util.ts'
 import type { Schema } from '../Schema.ts'
 import type { CollectionTag } from '../types.ts'
 import { createPairs, resolvePairs } from './pairs.ts'
@@ -15,44 +13,70 @@ export class YAMLOMap<
   K extends Primitive | Node = Primitive | Node,
   V extends Primitive | Node = Primitive | Node
 > extends YAMLSeq<Pair<K, V>> {
-  static tag = 'tag:yaml.org,2002:omap'
-
-  constructor(schema?: Schema) {
-    super(schema)
-    this.tag = YAMLOMap.tag
+  constructor(schema: Schema, elements?: Array<Pair<K, V>>) {
+    super(schema, elements)
+    this.tag = omap.tag
   }
 
-  add: typeof YAMLMap.prototype.add = YAMLMap.prototype.add.bind(this)
-  delete: typeof YAMLMap.prototype.delete = YAMLMap.prototype.delete.bind(this)
-  get: typeof YAMLMap.prototype.get = YAMLMap.prototype.get.bind(this)
-  has: typeof YAMLMap.prototype.has = YAMLMap.prototype.has.bind(this)
-  set: typeof YAMLMap.prototype.set = YAMLMap.prototype.set.bind(this)
+  /**
+   * Append new pairs to the omap, and return its new length.
+   */
+  push(...pairs: Pair<K, V>[]): number {
+    for (const pair of pairs) {
+      if (pair instanceof Pair) super.push(pair)
+      else throw new Error('Omap only supports Pair values')
+    }
+    return this.length
+  }
 
   /**
-   * If `ctx` is given, the return type is always `Map<unknown, unknown>`,
+   * Set a pair in this omap.
+   *
+   * Throws if `idx` is not an integer.
+   */
+  set(idx: number, pair: Pair<K, V>): void {
+    if (!Number.isInteger(idx))
+      throw new TypeError(`Expected an integer, not ${JSON.stringify(idx)}.`)
+    if (idx < 0) {
+      if (idx < -this.length) throw new RangeError(`Invalid index ${idx}`)
+      idx += this.length
+    }
+    this[idx] = pair
+  }
+
+  /**
+   * The returned value actually has type `Map<unknown, unknown>`,
    * but TypeScript won't allow widening the signature of a child method.
    */
-  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): unknown[] {
-    if (!ctx) return super.toJS(doc)
+  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): never[] {
+    if (!ctx) return super.toJS(doc) as never[]
     const map = new Map()
     if (this.anchor) {
       ctx.anchors.set(this, { aliasCount: 0, count: 1, res: map })
     }
-    for (const pair of this.items) {
+    for (const pair of this) {
       const key = pair.key.toJS(doc, ctx)
-      const value = pair.value ? pair.value.toJS(doc, ctx) : pair.value
+      const value = pair.value ? pair.value.toJS(doc, ctx) : null
       if (map.has(key))
         throw new Error('Ordered maps must not include duplicate keys')
       map.set(key, value)
     }
-    return map as unknown as unknown[]
+    return map as unknown as never[]
   }
 
-  static from(nc: NodeCreator, iterable: unknown): YAMLOMap {
-    const pairs = createPairs(nc, iterable)
-    const omap = new this(nc.schema)
-    omap.items = pairs.items
-    return omap
+  toString(
+    ctx?: StringifyContext,
+    onComment?: () => void,
+    onChompKeep?: () => void
+  ): string {
+    const keys = new Set()
+    for (const pair of this) {
+      const key = this.schema.mapKey(pair)
+      if (keys.has(key))
+        throw new Error('Ordered maps must not include duplicate keys')
+      keys.add(key)
+    }
+    return super.toString(ctx, onComment, onChompKeep)
   }
 }
 
@@ -63,10 +87,15 @@ export const omap: CollectionTag = {
   default: false,
   tag: 'tag:yaml.org,2002:omap',
 
+  createNode(nc, iterable) {
+    const pairs = createPairs(nc, iterable)
+    return new YAMLOMap(nc.schema, pairs)
+  },
+
   resolve(seq, onError) {
     const pairs = resolvePairs(seq, onError)
     const seenKeys: unknown[] = []
-    for (const { key } of pairs.items) {
+    for (const { key } of pairs) {
       if (key instanceof Scalar) {
         if (seenKeys.includes(key.value)) {
           onError(`Ordered maps must not include duplicate keys: ${key.value}`)
@@ -75,6 +104,6 @@ export const omap: CollectionTag = {
         }
       }
     }
-    return Object.assign(new YAMLOMap(), pairs)
+    return Object.assign(new YAMLOMap(seq.schema), pairs)
   }
 }

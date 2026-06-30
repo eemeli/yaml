@@ -1,11 +1,12 @@
-import { Document, type DocValue } from './doc/Document.ts'
+import { Document } from './doc/Document.ts'
 import { Alias } from './nodes/Alias.ts'
-import { isNode } from './nodes/identity.ts'
-import type { Node } from './nodes/Node.ts'
+import { isCollection, isNode } from './nodes/identity.ts'
+import type { Node, Primitive } from './nodes/types.ts'
 import { Pair } from './nodes/Pair.ts'
 import { Scalar } from './nodes/Scalar.ts'
 import { YAMLMap } from './nodes/YAMLMap.ts'
 import { YAMLSeq } from './nodes/YAMLSeq.ts'
+import { YAMLSet } from './nodes/YAMLSet.ts'
 
 const BREAK = Symbol('break visit')
 const SKIP = Symbol('skip children')
@@ -21,13 +22,13 @@ export type visitor =
   | visitorFn<Node | Pair | null>
   | {
       Alias?: visitorFn<Alias>
-      Collection?: visitorFn<YAMLMap | YAMLSeq>
-      Map?: visitorFn<YAMLMap>
-      Node?: visitorFn<Alias | Scalar | YAMLMap | YAMLSeq>
+      Collection?: visitorFn<YAMLMap | YAMLSeq | YAMLSet>
+      Map?: visitorFn<YAMLMap | YAMLSet>
+      Node?: visitorFn<Alias | Scalar | YAMLMap | YAMLSeq | YAMLSet>
       Pair?: visitorFn<Pair>
       Scalar?: visitorFn<Scalar>
       Seq?: visitorFn<YAMLSeq>
-      Value?: visitorFn<Scalar | YAMLMap | YAMLSeq>
+      Value?: visitorFn<Scalar | YAMLMap | YAMLSeq | YAMLSet>
     }
 
 export type asyncVisitorFn<T> = (
@@ -46,13 +47,13 @@ export type asyncVisitor =
   | asyncVisitorFn<Node | Pair | null>
   | {
       Alias?: asyncVisitorFn<Alias>
-      Collection?: asyncVisitorFn<YAMLMap | YAMLSeq>
-      Map?: asyncVisitorFn<YAMLMap>
-      Node?: asyncVisitorFn<Alias | Scalar | YAMLMap | YAMLSeq>
+      Collection?: asyncVisitorFn<YAMLMap | YAMLSeq | YAMLSet>
+      Map?: asyncVisitorFn<YAMLMap | YAMLSet>
+      Node?: asyncVisitorFn<Alias | Scalar | YAMLMap | YAMLSeq | YAMLSet>
       Pair?: asyncVisitorFn<Pair>
       Scalar?: asyncVisitorFn<Scalar>
       Seq?: asyncVisitorFn<YAMLSeq>
-      Value?: asyncVisitorFn<Scalar | YAMLMap | YAMLSeq>
+      Value?: asyncVisitorFn<Scalar | YAMLMap | YAMLSeq | YAMLSet>
     }
 
 /**
@@ -122,17 +123,30 @@ function visit_(
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
+    if (node instanceof YAMLSeq) {
       path = [...path, node]
-      for (let i = 0; i < node.items.length; ++i) {
-        const ci = visit_(i, node.items[i], visitor, path)
+      for (let i = 0; i < node.length; ++i) {
+        const ci = visit_(i, node[i], visitor, path)
         if (typeof ci === 'number') i = ci - 1
         else if (ci === BREAK) return BREAK
         else if (ci === REMOVE) {
-          node.items.splice(i, 1)
+          node.splice(i, 1)
           i -= 1
         }
       }
+    } else if (node instanceof YAMLMap || node instanceof YAMLSet) {
+      path = [...path, node]
+      const entries = Array.from(
+        node.values as Iterable<[symbol | Primitive, Node | Pair]>
+      )
+      const delKeys = []
+      for (let i = 0; i < entries.length; ++i) {
+        const ci = visit_(i, entries[i][1], visitor, path)
+        if (typeof ci === 'number') i = ci - 1
+        else if (ci === BREAK) return BREAK
+        else if (ci === REMOVE) delKeys.push(entries[i][0])
+      }
+      for (const dk of delKeys) node.values.delete(dk)
     } else if (node instanceof Pair) {
       path = [...path, node]
       const ck = visit_('key', node.key, visitor, path)
@@ -216,17 +230,30 @@ async function visitAsync_(
   }
 
   if (typeof ctrl !== 'symbol') {
-    if (node instanceof YAMLMap || node instanceof YAMLSeq) {
+    if (node instanceof YAMLSeq) {
       path = [...path, node]
-      for (let i = 0; i < node.items.length; ++i) {
-        const ci = await visitAsync_(i, node.items[i], visitor, path)
+      for (let i = 0; i < node.length; ++i) {
+        const ci = await visitAsync_(i, node[i], visitor, path)
         if (typeof ci === 'number') i = ci - 1
         else if (ci === BREAK) return BREAK
         else if (ci === REMOVE) {
-          node.items.splice(i, 1)
+          node.splice(i, 1)
           i -= 1
         }
       }
+    } else if (node instanceof YAMLMap || node instanceof YAMLSet) {
+      path = [...path, node]
+      const entries = Array.from(
+        node.values as Iterable<[symbol | Primitive, Node | Pair]>
+      )
+      const delKeys = []
+      for (let i = 0; i < entries.length; ++i) {
+        const ci = await visitAsync_(i, entries[i][1], visitor, path)
+        if (typeof ci === 'number') i = ci - 1
+        else if (ci === BREAK) return BREAK
+        else if (ci === REMOVE) delKeys.push(entries[i][0])
+      }
+      for (const dk of delKeys) node.values.delete(dk)
     } else if (node instanceof Pair) {
       path = [...path, node]
       const ck = await visitAsync_('key', node.key, visitor, path)
@@ -288,7 +315,8 @@ function callVisitor(
   path: readonly (Document | Node | Pair)[]
 ): ReturnType<visitorFn<unknown>> | ReturnType<asyncVisitorFn<unknown>> {
   if (typeof visitor === 'function') return visitor(key, node, path)
-  if (node instanceof YAMLMap) return visitor.Map?.(key, node, path)
+  if (node instanceof YAMLMap || node instanceof YAMLSet)
+    return visitor.Map?.(key, node, path)
   if (node instanceof YAMLSeq) return visitor.Seq?.(key, node, path)
   if (node instanceof Pair) return visitor.Pair?.(key, node, path)
   if (node instanceof Scalar) return visitor.Scalar?.(key, node, path)
@@ -302,8 +330,24 @@ function replaceNode(
   node: Node | Pair
 ): number | symbol | void {
   const parent = path[path.length - 1]
-  if (parent instanceof YAMLMap || parent instanceof YAMLSeq) {
-    parent.items[key as number] = node
+  if (parent instanceof YAMLSeq) {
+    parent[key as number] = node
+  } else if (parent instanceof YAMLMap) {
+    if (node instanceof Pair) {
+      const entries = Array.from(parent.values)
+      entries[key as number] = [parent.keyOf(node, true), node]
+      parent.values = new Map(entries)
+    } else {
+      throw new Error('Cannot replace map pair with non-pair value')
+    }
+  } else if (parent instanceof YAMLSet) {
+    if (isNode(node)) {
+      const entries = Array.from(parent.values)
+      entries[key as number] = [parent.keyOf(node, true), node]
+      parent.values = new Map(entries)
+    } else {
+      throw new Error('Cannot replace set value with non-node value')
+    }
   } else if (parent instanceof Pair) {
     if (isNode(node)) {
       if (key === 'key') parent.key = node
@@ -312,7 +356,8 @@ function replaceNode(
       throw new Error(`Cannot replace pair ${key} with non-node value`)
     }
   } else if (parent instanceof Document) {
-    parent.value = node as DocValue
+    if (node instanceof Scalar || isCollection(node)) parent.value = node
+    else throw new Error('Cannot replace Document value with non-node value')
   } else {
     const pt = parent instanceof Alias ? 'alias' : 'scalar'
     throw new Error(`Cannot replace node with ${pt} parent`)

@@ -26,7 +26,7 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - run: npm install --no-save @vitest/browser-playwright@4
+      - run: npm install --no-save @vitest/browser-playwright@4.1.4
       - run: npx vitest run --config=.github/vitest.browserstack.config.js
         env:
           BROWSERS: chrome:93 chrome:latest firefox:latest
@@ -55,7 +55,7 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - run: npm install --no-save @vitest/browser-playwright@4
+      - run: npm install --no-save @vitest/browser-playwright@4.1.4
       - run: npx vitest run --config=.github/vitest.browserstack.config.js
         env:
           BROWSERS: firefox:94

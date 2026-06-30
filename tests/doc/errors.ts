@@ -1,5 +1,5 @@
 import * as YAML from 'yaml'
-import { source } from '../_utils.ts'
+import { _map, _seq, source } from '../_utils.ts'
 
 describe('tabs as indentation', () => {
   test('fail on map value indented with tab', () => {
@@ -58,6 +58,18 @@ describe('block scalars', () => {
   })
 })
 
+describe('flow scalars', () => {
+  test('invalid hex escapes', () => {
+    const doc = YAML.parseDocument('"\\x0"')
+    expect(doc.errors).toMatchObject([{ code: 'BAD_DQ_ESCAPE' }])
+  })
+
+  test('invalid unicode escapes', () => {
+    const doc = YAML.parseDocument('"\\U00110000"')
+    expect(doc.errors).toMatchObject([{ code: 'BAD_DQ_ESCAPE' }])
+  })
+})
+
 describe('block collections', () => {
   test('mapping with bad indentation', () => {
     const src = 'foo: "1"\n bar: 2\n'
@@ -66,12 +78,7 @@ describe('block collections', () => {
     expect(doc.errors[0].message).toMatch(
       'All mapping items must start at the same column'
     )
-    expect(doc.value).toMatchObject({
-      items: [
-        { key: { value: 'foo' }, value: { value: '1' } },
-        { key: { value: 'bar' }, value: { value: 2 } }
-      ]
-    })
+    expect(doc.value).toMatchObject(_map({ foo: '1', bar: 2 }))
   })
 
   test('sequence with bad indentation', () => {
@@ -81,9 +88,7 @@ describe('block collections', () => {
     expect(doc.errors[0].message).toMatch(
       'All sequence items must start at the same column'
     )
-    expect(doc.value).toMatchObject({
-      items: [{ value: 'foo' }, { items: [{ value: 'bar' }] }]
-    })
+    expect(doc.value).toMatchObject(_seq('foo', _seq('bar')))
   })
 
   test('seq item in mapping', () => {
@@ -94,12 +99,12 @@ describe('block collections', () => {
       { code: 'UNEXPECTED_TOKEN' },
       { code: 'MISSING_CHAR' }
     ])
-    expect(doc.value).toMatchObject({
-      items: [
-        { key: { value: 'foo' }, value: { value: '1' } },
-        { key: { value: null }, value: null }
-      ]
-    })
+    expect(doc.value).toMatchObject(
+      _map([
+        ['foo', '1'],
+        [null, { key: { value: null }, value: null }]
+      ])
+    )
   })
 
   test('doubled value indicator', () => {

@@ -1,12 +1,12 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
-import { Collection, type Primitive } from '../nodes/Collection.ts'
-import type { Node, NodeType, Range } from '../nodes/Node.ts'
-import type { Pair } from '../nodes/Pair.ts'
-import { Scalar } from '../nodes/Scalar.ts'
+import { Pair } from '../nodes/Pair.ts'
+import type { Scalar } from '../nodes/Scalar.ts'
 import { ToJSContext } from '../nodes/toJS.ts'
-import type { YAMLMap } from '../nodes/YAMLMap.ts'
-import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
+import type { Node, NodeType, Primitive, Range } from '../nodes/types.ts'
+import { YAMLMap } from '../nodes/YAMLMap.ts'
+import { YAMLSeq } from '../nodes/YAMLSeq.ts'
+import { YAMLSet } from '../nodes/YAMLSet.ts'
 import type {
   CreateNodeOptions,
   DocumentOptions,
@@ -22,7 +22,7 @@ import { applyReviver } from './applyReviver.ts'
 import { Directives } from './directives.ts'
 import { NodeCreator } from './NodeCreator.ts'
 
-export type DocValue = Scalar | YAMLSeq | YAMLMap
+export type DocValue = Scalar | YAMLSeq | YAMLMap | YAMLSet
 
 export type Replacer = any[] | ((key: any, value: any) => unknown)
 
@@ -115,7 +115,6 @@ export class Document<
         prettyErrors: true,
         strict: true,
         stringKeys: false,
-        uniqueKeys: true,
         version: '1.2'
       },
       options
@@ -148,16 +147,6 @@ export class Document<
     copy.value = this.value.clone(copy.schema) as Value
     if (this.range) copy.range = this.range.slice() as Document['range']
     return copy
-  }
-
-  /** Adds a value to the document. */
-  add(value: any): void {
-    assertCollection(this.value).add(value)
-  }
-
-  /** Adds a value to the document. */
-  addIn(path: unknown[], value: unknown): void {
-    assertCollection(this.value).addIn(path, value)
   }
 
   /**
@@ -238,75 +227,44 @@ export class Document<
   }
 
   /**
-   * Removes a value from the document.
-   * @returns `true` if the item was found and removed.
-   */
-  delete(key: any): boolean {
-    return assertCollection(this.value).delete(key)
-  }
-
-  /**
-   * Removes a value from the document.
-   * @returns `true` if the item was found and removed.
-   */
-  deleteIn(path: unknown[]): boolean {
-    if (!path.length) {
-      this.value = new Scalar(null) as Value
-      return true
-    }
-    return assertCollection(this.value).deleteIn(path)
-  }
-
-  /**
    * Returns item at `key`, or `undefined` if not found.
    */
-  get(key: any): Strict extends true ? Node | Pair | undefined : any {
-    return this.value instanceof Collection ? this.value.get(key) : undefined
+  get(key: any): Strict extends true ? Node | Pair | null | undefined : any {
+    if (this.value instanceof YAMLMap || this.value instanceof YAMLSet) {
+      return this.value.get(key)
+    }
+    if (this.value instanceof YAMLSeq) {
+      if (Number.isInteger(key)) return this.value.at(key)
+      throw new TypeError(`Expected an integer, not ${JSON.stringify(key)}.`)
+    }
+    return undefined
   }
 
   /**
-   * Returns item at `path`, or `undefined` if not found.
+   * Returns pair at `key`, or `undefined` if not found.
    */
-  getIn(
-    path: unknown[]
-  ): Strict extends true ? Node | Pair | null | undefined : any {
-    if (!path.length) return this.value
-    return this.value instanceof Collection ? this.value.getIn(path) : undefined
+  getPair(key: any): Strict extends true ? Pair | undefined : any {
+    if (this.value instanceof YAMLMap) return this.value.getPair(key)
+    if (this.value instanceof YAMLSeq) {
+      if (!Number.isInteger(key)) {
+        throw new TypeError(`Expected an integer, not ${JSON.stringify(key)}.`)
+      }
+      const pair = this.value.at(key)
+      if (pair instanceof Pair) return pair
+      throw new TypeError(`Value at ${key} is not a Pair`)
+    }
+    return undefined
   }
 
   /**
-   * Checks if the document includes a value with the key `key`.
-   */
-  has(key: any): boolean {
-    return this.value instanceof Collection ? this.value.has(key) : false
-  }
-
-  /**
-   * Checks if the document includes a value at `path`.
-   */
-  hasIn(path: unknown[]): boolean {
-    if (!path.length) return true
-    return this.value instanceof Collection ? this.value.hasIn(path) : false
-  }
-
-  /**
-   * Sets a value in this document. For `!!set`, `value` needs to be a
-   * boolean to add/remove the item from the set.
+   * Sets a value in this document's top-level collection. For `!!set`, `value` is ignored.
    */
   set(key: any, value: any): void {
-    assertCollection(this.value).set(key, value)
-  }
-
-  /**
-   * Sets a value in this document. For `!!set`, `value` needs to be a
-   * boolean to add/remove the item from the set.
-   */
-  setIn(path: unknown[], value: unknown): void {
-    if (!path.length) {
-      this.value = value as Value
-    } else {
-      assertCollection(this.value).setIn(path, value)
-    }
+    if (this.value instanceof YAMLSet) {
+      this.value.add(key)
+    } else if (this.value instanceof YAMLMap || this.value instanceof YAMLSeq) {
+      this.value.set(key, value)
+    } else throw new Error('Expected a YAML collection as document value')
   }
 
   /**
@@ -386,9 +344,4 @@ export class Document<
     }
     return stringifyDocument(this, options)
   }
-}
-
-function assertCollection(value: unknown) {
-  if (value instanceof Collection) return value as YAMLMap | YAMLSeq
-  throw new Error('Expected a YAML collection as document value')
 }

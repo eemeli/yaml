@@ -110,6 +110,9 @@ const nullObject = {
   tag: '!nullobject',
   collection: 'map',
   nodeClass: YAMLNullObject,
+  createNode(nc, obj) {
+    return YAMLNullObject.create(nc, obj)
+  },
   identify: v => !!(typeof v === 'object' && v && !Object.getPrototypeOf(v))
 }
 
@@ -147,18 +150,17 @@ class YAMLError extends YAMLMap {
     })
     return Object.assign(er, rest)
   }
-
-  static from(schema, obj, ctx) {
-    const { name, message, stack } = obj
-    // ensure these props remain, even if not enumerable
-    return super.from(schema, { ...obj, name, message, stack }, ctx)
-  }
 }
 
 const error = {
   tag: '!error',
   collection: 'map',
   nodeClass: YAMLError,
+  createNode(nc, obj) {
+    const { name, message, stack } = obj
+    // ensure these props remain, even if not enumerable
+    return YAMLNullObject.create(nc, { ...obj, name, message, stack })
+  },
   identify: v => !!(typeof v === 'object' && v && v instanceof Error)
 }
 
@@ -240,7 +242,7 @@ import {
 
 To define your own tag, you'll need to define an object comprising of some of the following fields. Those in bold are required:
 
-- `createNode(schema, value, ctx): Node` is an optional factory function, used e.g. by collections when wrapping JS objects as AST nodes.
+- `createNode(nodeCreator, value): Node` is a factory function, required by collection tags for wrapping JS objects as AST nodes.
 - `format: string` If a tag has multiple forms that should be parsed and/or stringified differently, use `format` to identify them. Used by `!!int` and `!!float`.
 - **`identify(value): boolean`** is used by `doc.createNode()` to detect your data type, e.g. using `typeof` or `instanceof`. Required.
 - `nodeClass: Node` is the `Node` child class that implements this tag. Required for collections and tags that have overlapping JS representations.

@@ -25,15 +25,11 @@ const instances = env.BROWSERS.split(' ').map(name => {
 
 export default defineConfig({
   test: {
-    alias: [
-      {
-        find: /^yaml/,
-        customResolver(path) {
-          const name = path.split('/')[1] ?? 'index'
-          return resolve(import.meta.dirname, '..', 'dist', `${name}.js`)
-        }
-      }
-    ],
+    alias: {
+      'yaml/cli': resolve(import.meta.dirname, '..', 'dist', 'cli.js'),
+      'yaml/util': resolve(import.meta.dirname, '..', 'dist', 'util.js'),
+      yaml: resolve(import.meta.dirname, '..', 'dist', 'index.js')
+    },
     api: { host: '0.0.0.0' },
     browser: {
       enabled: true,
@@ -42,6 +38,7 @@ export default defineConfig({
       instances
     },
     globals: true,
+    setupFiles: ['tests/_setup.ts'],
     include: ['tests/**/*.{js,ts}'],
     exclude: [
       'tests/_*',

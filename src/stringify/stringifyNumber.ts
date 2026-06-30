@@ -14,7 +14,8 @@ export function stringifyNumber({
     !format &&
     minFractionDigits &&
     (!tag || tag === 'tag:yaml.org,2002:float') &&
-    /^\d/.test(n)
+    /^-?\d/.test(n) &&
+    !n.includes('e')
   ) {
     let i = n.indexOf('.')
     if (i < 0) {

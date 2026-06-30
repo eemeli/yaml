@@ -1,8 +1,7 @@
 import type { NodeCreator } from '../doc/NodeCreator.ts'
-import type { Node } from '../nodes/Node.ts'
+import type { Collection } from '../nodes/types.ts'
+import type { Node } from '../nodes/types.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
-import type { YAMLMap } from '../nodes/YAMLMap.ts'
-import type { YAMLSeq } from '../nodes/YAMLSeq.ts'
 import type { ParseOptions } from '../options.ts'
 import type { StringifyContext } from '../stringify/stringify.ts'
 import type { Schema } from './Schema.ts'
@@ -91,16 +90,14 @@ export interface CollectionTag extends TagBase {
   /** The source collection type supported by this tag. */
   collection: 'map' | 'seq'
 
+  createNode: (nc: NodeCreator, value: unknown) => Node
+
   /**
    * The `Node` child class that implements this tag.
    * If set, used to select this tag when stringifying.
-   *
-   * If the class provides a static `from` method, then that
-   * will be used if the tag object doesn't have a `createNode` method.
    */
   nodeClass?: {
-    new (schema?: Schema): Node
-    from?: (nc: NodeCreator, obj: unknown) => Node
+    new (schema: Schema): Node
   }
 
   /**
@@ -110,7 +107,7 @@ export interface CollectionTag extends TagBase {
    * Note: this is required if nodeClass is not provided.
    */
   resolve?: (
-    value: YAMLMap | YAMLSeq,
+    value: Collection,
     onError: (message: string) => void,
     options: ParseOptions
   ) => unknown

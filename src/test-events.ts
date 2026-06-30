@@ -1,12 +1,12 @@
 import type { Document } from './doc/Document.ts'
 import { Alias } from './nodes/Alias.ts'
-import { Collection } from './nodes/Collection.ts'
 import { isNode } from './nodes/identity.ts'
-import type { Node } from './nodes/Node.ts'
+import type { Node } from './nodes/types.ts'
 import { Pair } from './nodes/Pair.ts'
 import { Scalar } from './nodes/Scalar.ts'
 import { YAMLMap } from './nodes/YAMLMap.ts'
 import { YAMLSeq } from './nodes/YAMLSeq.ts'
+import { YAMLSet } from './nodes/YAMLSet.ts'
 import { parseAllDocuments } from './public-api.ts'
 import { visit } from './visit.ts'
 
@@ -78,10 +78,7 @@ function addEvents(
   if (errPos !== -1 && isNode(node) && node.range![0] >= errPos)
     throw new Error()
   let props = ''
-  let anchor =
-    node instanceof Scalar || node instanceof Collection
-      ? node.anchor
-      : undefined
+  let anchor = isNode(node) ? node.anchor : undefined
   if (anchor) {
     if (/\d$/.test(anchor)) {
       const alt = anchor.replace(/\d$/, '')
@@ -94,18 +91,26 @@ function addEvents(
   if (node instanceof YAMLMap) {
     const ev = node.flow ? '+MAP {}' : '+MAP'
     events.push(`${ev}${props}`)
-    node.items.forEach(({ key, value }) => {
+    for (const { key, value } of node.values.values()) {
       addEvents(events, doc, errPos, key)
       addEvents(events, doc, errPos, value)
-    })
+    }
     events.push('-MAP')
   } else if (node instanceof YAMLSeq) {
     const ev = node.flow ? '+SEQ []' : '+SEQ'
     events.push(`${ev}${props}`)
-    node.items.forEach(item => {
+    node.forEach(item => {
       addEvents(events, doc, errPos, item)
     })
     events.push('-SEQ')
+  } else if (node instanceof YAMLSet) {
+    const ev = node.flow ? '+MAP {}' : '+MAP'
+    events.push(`${ev}${props}`)
+    for (const value of node.values.values()) {
+      addEvents(events, doc, errPos, value)
+      events.push('=VAL :')
+    }
+    events.push('-MAP')
   } else if (node instanceof Pair) {
     events.push(`+MAP${props}`)
     addEvents(events, doc, errPos, node.key)

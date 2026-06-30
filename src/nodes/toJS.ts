@@ -1,5 +1,5 @@
 import type { ToJSOptions } from '../options.ts'
-import type { Node } from './Node.ts'
+import type { Node } from './types.ts'
 
 /** A context used in `node.toJS()` implementations */
 export class ToJSContext {

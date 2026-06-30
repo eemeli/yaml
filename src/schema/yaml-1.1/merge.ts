@@ -2,8 +2,7 @@ import type { Document, DocValue } from '../../doc/Document.ts'
 import { Alias } from '../../nodes/Alias.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
-import type { MapLike, YAMLMap } from '../../nodes/YAMLMap.ts'
-import { YAMLSeq } from '../../nodes/YAMLSeq.ts'
+import { type MapLike, YAMLMap } from '../../nodes/YAMLMap.ts'
 import type { ScalarTag } from '../types.ts'
 
 // If the value associated with a merge key is a single mapping node, each of
@@ -50,11 +49,11 @@ export function addMergeToJSMap(
   value: unknown
 ): void {
   value = ctx && value instanceof Alias ? value.resolve(doc, ctx) : value
-  if (value instanceof YAMLSeq)
-    for (const it of value.items) mergeValue(doc, ctx, map, it)
-  else if (Array.isArray(value))
+  if (Array.isArray(value) && !(value instanceof YAMLMap)) {
     for (const it of value) mergeValue(doc, ctx, map, it)
-  else mergeValue(doc, ctx, map, value)
+  } else {
+    mergeValue(doc, ctx, map, value)
+  }
 }
 
 function mergeValue(

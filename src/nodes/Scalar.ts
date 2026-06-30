@@ -1,7 +1,7 @@
 import type { Document, DocValue } from '../doc/Document.ts'
 import type { BlockScalar, FlowScalar } from '../parse/cst.ts'
-import type { NodeBase, Range } from './Node.ts'
 import type { ToJSContext } from './toJS.ts'
+import type { NodeBase, Range } from './types.ts'
 import type { MapLike } from './YAMLMap.ts'
 
 export declare namespace Scalar {
@@ -39,7 +39,11 @@ export class Scalar<T = unknown> implements NodeBase {
    */
   declare format?: string
 
-  /** If `value` is a number, use this value when stringifying this node. */
+  /**
+   * If `value` is a number that is serialized as a decimal string
+   * (i.e. not using exponential notation),
+   * use this value when stringifying this node.
+   */
   declare minFractionDigits?: number
 
   /**

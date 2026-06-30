@@ -17,12 +17,10 @@ describe('%TAG', () => {
       '!': '!foo:',
       '!bar!': '!bar:'
     })
-    expect(doc.value).toMatchObject({
-      items: [
-        { value: 'v1', tag: '!foo:bar' },
-        { value: 'v2', tag: '!bar:foo' }
-      ]
-    })
+    expect(doc.value).toMatchObject([
+      { value: 'v1', tag: '!foo:bar' },
+      { value: 'v2', tag: '!bar:foo' }
+    ])
   })
 
   test('parse global tags', () => {
@@ -39,12 +37,10 @@ describe('%TAG', () => {
       '!': 'foo:',
       '!bar!': 'bar:bar#bar?'
     })
-    expect(doc.value).toMatchObject({
-      items: [
-        { value: 'v1', tag: 'foo:bar' },
-        { value: 'v2', tag: 'bar:bar#bar?foo' }
-      ]
-    })
+    expect(doc.value).toMatchObject([
+      { value: 'v1', tag: 'foo:bar' },
+      { value: 'v2', tag: 'bar:bar#bar?foo' }
+    ])
   })
 
   test('create & stringify', () => {

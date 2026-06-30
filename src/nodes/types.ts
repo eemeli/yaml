@@ -7,8 +7,15 @@ import type { Scalar } from './Scalar.ts'
 import type { ToJSContext } from './toJS.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSeq } from './YAMLSeq.ts'
+import type { YAMLSet } from './YAMLSet.ts'
 
-export type Node = Alias | Scalar | YAMLSeq | YAMLMap
+export type Collection = YAMLMap | YAMLSeq | YAMLSet
+
+export type Node = Scalar | Collection | Alias
+
+export type Primitive = boolean | number | bigint | string | null
+
+export type NodeOf<T> = T extends Primitive ? Scalar<T> : T
 
 /** Utility type mapper */
 export type NodeType<T> = T extends
@@ -23,9 +30,11 @@ export type NodeType<T> = T extends
     ? Scalar<string | Date>
     : T extends Array<any>
       ? YAMLSeq<NodeType<T[number]>>
-      : T extends { [key: string | number]: any }
-        ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
-        : Node
+      : T extends Set<any>
+        ? YAMLSet<NodeType<keyof T>>
+        : T extends { [key: string | number]: any }
+          ? YAMLMap<NodeType<keyof T>, NodeType<T[keyof T]>>
+          : Node
 
 export type Range = [start: number, valueEnd: number, nodeEnd: number]
 
@@ -53,8 +62,12 @@ export interface NodeBase {
   /** A fully qualified tag, if required */
   tag?: string
 
-  /** Create a copy of this node.  */
-  clone(_schema?: Schema): this
+  /**
+   * Create a copy of this node.
+   *
+   * @param schema - If defined, overwrites the original's schema for cloned collections.
+   */
+  clone(schema?: Schema): this
 
   /** A plain JavaScript representation of this node. */
   toJS(doc: Document<DocValue, boolean>, opt?: ToJSContext): any
@@ -64,4 +77,20 @@ export interface NodeBase {
     onComment?: () => void,
     onChompKeep?: () => void
   ): string
+}
+
+export interface CollectionBase extends NodeBase {
+  schema: Schema
+
+  /** An optional anchor on this collection. Used by alias nodes. */
+  anchor?: string
+
+  /** If true, stringify this and all child nodes using flow styles. */
+  flow?: boolean
+
+  /** The number of items in this collection. */
+  readonly size: number
+
+  /** Create a deep copy of this collection */
+  clone(schema?: Schema): this
 }
