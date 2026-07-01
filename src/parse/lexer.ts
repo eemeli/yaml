@@ -20,7 +20,7 @@ const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.has(ch)
 const blockScalarHeader = /([|>][^\s#]*)([ \t]*)((?:.|\r(?!\n))*)$/my
 const blockStart = /([-?:])(?=[ \n\r\t]|$)([ \t]*)/y
 const directiveLine = /(%.*?)(?:([ \t]+)(#.*)?)?$/my
-const docMarker = /[-.]{3}(?=[ \n\r\t]|$)(?:([ \t]+)(#.*)?)?/y
+const docMarker = /(?:-{3}|\.{3})(?=[ \n\r\t]|$)(?:([ \t]+)(#.*)?)?/y
 const emptyLineOrComment = /([ \t]*)(#.*)?$/my
 const indicator =
   //  |anchor       |explicit tag |implicit tag                                 |block start           |block start in flow   |spaces

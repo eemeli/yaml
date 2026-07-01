@@ -76,3 +76,11 @@ test('trailing comments on ...', () => {
     '\n'
   ])
 })
+
+test('mixed - and . are plain scalars, not document markers', () => {
+  // Only the exact sequences '---' and '...' are document markers;
+  // any other 3-char combination of '-' and '.' is a plain scalar.
+  for (const src of ['-.-', '--.', '.--', '-..', '..-', '.-.']) {
+    expect(lex(src)).toEqual([DOC, SCALAR, src])
+  }
+})
