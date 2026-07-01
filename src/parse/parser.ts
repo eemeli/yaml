@@ -698,7 +698,14 @@ export class Parser {
                 })
                 return
               }
-            } else if (atMapIndent) {
+            } else if (
+              atMapIndent &&
+              (it.sep || it.explicitKey || start.length > 0)
+            ) {
+              // Only open a new item when the current one already has content;
+              // otherwise reuse a preceding empty item that holds just a blank
+              // line or comment, rather than orphaning it before this key. An
+              // empty item is only valid at the very end of a block map.
               map.items.push({ start })
             }
             this.stack.push(bv)
