@@ -14,7 +14,7 @@ import {
   YAMLMap,
   YAMLSeq
 } from 'yaml'
-import { seqTag, stringifyString, stringTag } from 'yaml/util'
+import { seqTag, stringifyNumber, stringifyString, stringTag } from 'yaml/util'
 import { source } from '../_utils.ts'
 
 const parseDocument = <T extends DocValue = DocValue>(
@@ -260,6 +260,36 @@ describe('number types', () => {
       expect(doc.value[2]).not.toHaveProperty('format')
       expect(doc.value[5]).not.toHaveProperty('format')
       expect(doc.value[5]).not.toHaveProperty('minFractionDigits')
+    })
+  })
+
+  describe('overflowing values keep their source (#660)', () => {
+    test('float overflowing to Infinity round-trips via its source', () => {
+      expect(String(parseDocument('gitsha: 61e9540'))).toBe('gitsha: 61e9540\n')
+    })
+
+    test('negative overflow keeps its source', () => {
+      expect(String(parseDocument('n: -61e9540'))).toBe('n: -61e9540\n')
+    })
+
+    test('literal .inf / .nan are still emitted as such', () => {
+      expect(String(parseDocument('n: .inf'))).toBe('n: .inf\n')
+      expect(String(parseDocument('n: -.inf'))).toBe('n: -.inf\n')
+      expect(String(parseDocument('n: .nan'))).toBe('n: .nan\n')
+    })
+
+    test('a programmatic Infinity with no source is emitted as .inf', () => {
+      const doc = parseDocument('n: 1')
+      doc.set('n', Infinity)
+      expect(String(doc)).toBe('n: .inf\n')
+    })
+
+    test('the source is used only while it still resolves to the value', () => {
+      const node = new Scalar(Infinity)
+      node.source = '61e9540' // overflows to Infinity → matches, so it is used
+      expect(stringifyNumber(node)).toBe('61e9540')
+      node.source = '5' // stale after a value edit: resolves to 5, not Infinity
+      expect(stringifyNumber(node)).toBe('.inf')
     })
   })
 })
