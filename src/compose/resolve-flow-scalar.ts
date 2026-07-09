@@ -112,8 +112,8 @@ function foldLines(source: string) {
 
   // This finds the index in the first line of the last non-space/non-tab char
   let end = newLineIndex
-  if (source.charCodeAt(end - 1) === CHAR_CR) end--
   let cc = source.charCodeAt(end - 1)
+  if (cc === CHAR_CR) cc = source.charCodeAt(--end - 1)
   while (end > 0 && (cc === CHAR_SPACE || cc === CHAR_TAB))
     cc = source.charCodeAt(--end - 1)
   let res = source.slice(0, end)
@@ -130,8 +130,8 @@ function foldLines(source: string) {
     while (start < newLineIndex && (cc === CHAR_SPACE || cc === CHAR_TAB))
       cc = source.charCodeAt(++start)
     end = newLineIndex
-    if (source.charCodeAt(end - 1) === CHAR_CR) end--
     cc = source.charCodeAt(end - 1)
+    if (cc === CHAR_CR) cc = source.charCodeAt(--end - 1)
     while (end > start && (cc === CHAR_SPACE || cc === CHAR_TAB))
       cc = source.charCodeAt(--end - 1)
 
