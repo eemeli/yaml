@@ -104,16 +104,12 @@ function findScalarTagByTest(
     )
     schemaTagsWithTest.set(schema, schemaTags)
   }
-  let tag = schema.scalar
-  for (const t of schemaTags) {
-    if (
-      (t.default === true || (atKey && t.default === 'key')) &&
-      t.test?.(value)
-    ) {
-      tag = t
-      break
-    }
-  }
+  const tag =
+    schemaTags.find(
+      t =>
+        (t.default === true || (atKey && t.default === 'key')) &&
+        t.test?.(value)
+    ) ?? schema.scalar
 
   if (schema.compat) {
     const compat =
