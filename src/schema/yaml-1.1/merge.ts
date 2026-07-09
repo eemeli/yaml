@@ -46,13 +46,14 @@ export function addMergeToJSMap(
   doc: Document<DocValue, boolean>,
   ctx: ToJSContext,
   map: MapLike,
-  value: unknown
+  value: unknown,
+  isPlainObject: boolean
 ): void {
   value = ctx && value instanceof Alias ? value.resolve(doc, ctx) : value
   if (Array.isArray(value) && !(value instanceof YAMLMap)) {
-    for (const it of value) mergeValue(doc, ctx, map, it)
+    for (const it of value) mergeValue(doc, ctx, map, it, isPlainObject)
   } else {
-    mergeValue(doc, ctx, map, value)
+    mergeValue(doc, ctx, map, value, isPlainObject)
   }
 }
 
@@ -60,7 +61,8 @@ function mergeValue(
   doc: Document<DocValue, boolean>,
   ctx: ToJSContext,
   map: MapLike,
-  value: unknown
+  value: unknown,
+  isPlainObject: boolean
 ) {
   const source = value instanceof Alias ? value.resolve(doc, ctx) : value
   const srcMap = (source as YAMLMap).toJS(doc, ctx, Map<any, any>)
@@ -72,12 +74,16 @@ function mergeValue(
     } else if (map instanceof Set) {
       map.add(key)
     } else if (!Object.prototype.hasOwnProperty.call(map, key)) {
-      Object.defineProperty(map, key, {
-        value,
-        writable: true,
-        enumerable: true,
-        configurable: true
-      })
+      if (!isPlainObject || key === '__proto__' || key === 'constructor') {
+        Object.defineProperty(map, key, {
+          value,
+          writable: true,
+          enumerable: true,
+          configurable: true
+        })
+      } else {
+        map[key] = value
+      }
     }
   }
   return map

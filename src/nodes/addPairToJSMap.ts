@@ -14,9 +14,10 @@ export function addPairToJSMap(
   { key, value }: Pair,
   isPlainObject: boolean
 ): MapLike {
-  if ('addToJSMap' in key) key.addToJSMap?.(doc, ctx, map, value)
+  if ('addToJSMap' in key) key.addToJSMap?.(doc, ctx, map, value, isPlainObject)
   // TODO: Should drop this special case for bare << handling
-  else if (isMergeKey(doc, key)) addMergeToJSMap(doc, ctx, map, value)
+  else if (isMergeKey(doc, key))
+    addMergeToJSMap(doc, ctx, map, value, isPlainObject)
   else {
     const jsKey = key.toJS(doc, ctx)
     if (map instanceof Map) {
