@@ -284,12 +284,24 @@ describe('number types', () => {
       expect(String(doc)).toBe('n: .inf\n')
     })
 
+    test('editing the value of a node parsed from a non-finite source is reflected', () => {
+      const doc = parseDocument('n: 61e9540') // value Infinity, source '61e9540'
+      const node = doc.get('n', true) as Scalar
+      node.value = -Infinity // stale source no longer resolves to the value
+      expect(String(doc)).toBe('n: -.inf\n')
+    })
+
     test('the source is used only while it still resolves to the value', () => {
       const node = new Scalar(Infinity)
       node.source = '61e9540' // overflows to Infinity → matches, so it is used
       expect(stringifyNumber(node)).toBe('61e9540')
       node.source = '5' // stale after a value edit: resolves to 5, not Infinity
       expect(stringifyNumber(node)).toBe('.inf')
+    })
+
+    test('a YAML 1.1 float with underscores that overflows keeps its source', () => {
+      const doc = parseDocument('n: 6_1e9540', { version: '1.1' })
+      expect(String(doc)).toBe('n: 6_1e9540\n')
     })
   })
 })

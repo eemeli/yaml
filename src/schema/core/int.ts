@@ -35,7 +35,7 @@ export const int: ScalarTag = {
   tag: 'tag:yaml.org,2002:int',
   test: /^[-+]?[0-9]+$/,
   resolve: (str, _onError, opt) => intResolve(str, 0, 10, opt),
-  stringify: stringifyNumber
+  stringify: node => stringifyNumber(node)
 }
 
 export const intHex: ScalarTag = {
