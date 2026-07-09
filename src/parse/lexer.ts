@@ -581,7 +581,8 @@ class Lexer {
     }
     const n = i - this.pos
     if (n > 0) {
-      this.tokens.push(this.source.slice(this.pos, i))
+      const s = this.source.substr(this.pos, n)
+      this.tokens.push(s)
       this.pos = i
     }
     return n
