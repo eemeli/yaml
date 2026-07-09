@@ -22,7 +22,7 @@ const jsonScalars: ScalarTag[] = [
     createNode: () => new Scalar(null),
     default: true,
     tag: 'tag:yaml.org,2002:null',
-    test: str => /^null$/.test(str),
+    test: str => str === 'null',
     resolve: () => null,
     stringify: stringifyJSON
   },
@@ -30,7 +30,7 @@ const jsonScalars: ScalarTag[] = [
     identify: value => typeof value === 'boolean',
     default: true,
     tag: 'tag:yaml.org,2002:bool',
-    test: str => /^true$|^false$/.test(str),
+    test: str => str === 'true' || str === 'false',
     resolve: str => str === 'true',
     stringify: stringifyJSON
   },
@@ -58,7 +58,7 @@ const jsonScalars: ScalarTag[] = [
 const jsonError: ScalarTag = {
   default: true,
   tag: '',
-  test: str => /^/.test(str),
+  test: () => true,
   resolve(str, onError) {
     onError(`Unresolved plain scalar ${JSON.stringify(str)}`)
     return str
