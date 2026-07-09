@@ -7,10 +7,6 @@ import type { ComposeErrorHandler } from './composer.ts'
 import { resolveBlockScalar } from './resolve-block-scalar.ts'
 import { resolveFlowScalar } from './resolve-flow-scalar.ts'
 
-export function testTag(test: ScalarTag['test'], value: string): boolean {
-  return typeof test === 'function' ? test(value) : (test?.test(value) ?? false)
-}
-
 export function composeScalar(
   ctx: ComposeContext,
   token: FlowScalar | BlockScalar,
@@ -75,7 +71,7 @@ function findScalarTagByName(
       else return tag
     }
   }
-  for (const tag of matchWithTest) if (testTag(tag.test, value)) return tag
+  for (const tag of matchWithTest) if (tag.test?.(value)) return tag
   const kt = schema.knownTags[tagName]
   if (kt && !kt.collection) {
     // Ensure that the known tag is available for stringifying,
@@ -112,7 +108,7 @@ function findScalarTagByTest(
   for (const t of schemaTags) {
     if (
       (t.default === true || (atKey && t.default === 'key')) &&
-      testTag(t.test, value)
+      t.test?.(value)
     ) {
       tag = t
       break
@@ -121,7 +117,7 @@ function findScalarTagByTest(
 
   if (schema.compat) {
     const compat =
-      schema.compat.find(tag => tag.default && testTag(tag.test, value)) ??
+      schema.compat.find(tag => tag.default && tag.test?.(value)) ??
       schema.scalar
     if (tag.tag !== compat.tag) {
       const ts = directives.tagString(tag.tag)

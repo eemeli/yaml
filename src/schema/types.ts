@@ -80,7 +80,7 @@ export interface ScalarTag extends TagBase {
    * For most cases, it's unlikely that you'll actually want to use these,
    * even if you first think you do.
    */
-  test?: RegExp | ((value: string) => boolean)
+  test?: (value: string) => boolean
 }
 
 export interface CollectionTag extends TagBase {

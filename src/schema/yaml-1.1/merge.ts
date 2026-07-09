@@ -17,14 +17,13 @@ const MERGE_KEY = '<<'
 
 export const merge: ScalarTag & {
   identify(value: unknown): boolean
-  test: RegExp
 } = {
   identify: value =>
     value === MERGE_KEY ||
     (typeof value === 'symbol' && value.description === MERGE_KEY),
   default: 'key',
   tag: 'tag:yaml.org,2002:merge',
-  test: /^<<$/,
+  test: str => /^<<$/.test(str),
   resolve: () =>
     Object.assign(new Scalar(Symbol(MERGE_KEY)), {
       addToJSMap: addMergeToJSMap

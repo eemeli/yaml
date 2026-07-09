@@ -58,7 +58,7 @@ export const intTime: ScalarTag = {
   default: true,
   tag: 'tag:yaml.org,2002:int',
   format: 'TIME',
-  test: /^[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+$/,
+  test: str => /^[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+$/.test(str),
   resolve: (str, _onError, { intAsBigInt }) =>
     parseSexagesimal(str, intAsBigInt),
   stringify: stringifySexagesimal
@@ -69,12 +69,20 @@ export const floatTime: ScalarTag = {
   default: true,
   tag: 'tag:yaml.org,2002:float',
   format: 'TIME',
-  test: /^[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*$/,
+  test: str => /^[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*$/.test(str),
   resolve: str => parseSexagesimal(str, false),
   stringify: stringifySexagesimal
 }
 
-export const timestamp: ScalarTag & { test: RegExp } = {
+const timestampRe = RegExp(
+  '^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})' + // YYYY-Mm-Dd
+    '(?:' + // time is optional
+    '(?:t|T|[ \\t]+)' + // t | T | whitespace
+    '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2}(\\.[0-9]+)?)' + // Hh:Mm:Ss(.ss)?
+    '(?:[ \\t]*(Z|[-+][012]?[0-9](?::[0-9]{2})?))?' + // Z | +5 | -03:30
+    ')?$'
+)
+export const timestamp: ScalarTag = {
   identify: value => value instanceof Date,
   default: true,
   tag: 'tag:yaml.org,2002:timestamp',
@@ -82,17 +90,10 @@ export const timestamp: ScalarTag & { test: RegExp } = {
   // If the time zone is omitted, the timestamp is assumed to be specified in UTC. The time part
   // may be omitted altogether, resulting in a date format. In such a case, the time part is
   // assumed to be 00:00:00Z (start of day, UTC).
-  test: RegExp(
-    '^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})' + // YYYY-Mm-Dd
-      '(?:' + // time is optional
-      '(?:t|T|[ \\t]+)' + // t | T | whitespace
-      '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2}(\\.[0-9]+)?)' + // Hh:Mm:Ss(.ss)?
-      '(?:[ \\t]*(Z|[-+][012]?[0-9](?::[0-9]{2})?))?' + // Z | +5 | -03:30
-      ')?$'
-  ),
+  test: str => timestampRe.test(str),
 
   resolve(str) {
-    const match = str.match(timestamp.test)
+    const match = str.match(timestampRe)
     if (!match)
       throw new Error('!!timestamp expects a date, starting with yyyy-mm-dd')
     const [, year, month, day, hour, minute, second] = match.map(Number)

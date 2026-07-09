@@ -37,13 +37,13 @@ const tagsByName: {
   intOct: ScalarTag
   intTime: ScalarTag
   map: CollectionTag
-  merge: ScalarTag & { identify(value: unknown): boolean; test: RegExp }
+  merge: ScalarTag & { identify(value: unknown): boolean }
   null: ScalarTag & { test: (value: string) => boolean }
   omap: CollectionTag
   pairs: CollectionTag
   seq: CollectionTag
   set: CollectionTag
-  timestamp: ScalarTag & { test: RegExp }
+  timestamp: ScalarTag
 } = {
   binary,
   bool: boolTag,
@@ -73,14 +73,11 @@ export const coreKnownTags: {
   'tag:yaml.org,2002:binary': ScalarTag
   'tag:yaml.org,2002:merge': ScalarTag & {
     identify(value: unknown): boolean
-    test: RegExp
   }
   'tag:yaml.org,2002:omap': CollectionTag
   'tag:yaml.org,2002:pairs': CollectionTag
   'tag:yaml.org,2002:set': CollectionTag
-  'tag:yaml.org,2002:timestamp': ScalarTag & {
-    test: RegExp
-  }
+  'tag:yaml.org,2002:timestamp': ScalarTag
 } = {
   'tag:yaml.org,2002:binary': binary,
   'tag:yaml.org,2002:merge': merge,
