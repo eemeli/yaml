@@ -388,7 +388,7 @@ class Lexer {
     return hasIndicators
   }
 
-  private quotedScalar(quote: string): void {
+  private quotedScalar(quote: '"' | "'"): void {
     let end = this.source.indexOf(quote, this.pos + 1)
     if (quote === "'") {
       while (end !== -1 && this.source[end + 1] === "'")
