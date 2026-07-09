@@ -1,13 +1,8 @@
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ScalarTag } from '../types.ts'
 
-const isBool = (value: string) =>
-  value === 'true' ||
-  value === 'True' ||
-  value === 'TRUE' ||
-  value === 'false' ||
-  value === 'False' ||
-  value === 'FALSE'
+const boolValues = new Set(['true', 'True', 'TRUE', 'false', 'False', 'FALSE'])
+const isBool = (value: string) => boolValues.has(value)
 
 export const boolTag: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => typeof value === 'boolean',

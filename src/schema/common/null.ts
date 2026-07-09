@@ -1,12 +1,8 @@
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ScalarTag } from '../types.ts'
 
-const isNull = (value: string) =>
-  value === '' ||
-  value === '~' ||
-  value === 'null' ||
-  value === 'Null' ||
-  value === 'NULL'
+const nullValues = new Set(['', '~', 'null', 'Null', 'NULL'])
+const isNull = (value: string) => nullValues.has(value)
 
 export const nullTag: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => value == null,
