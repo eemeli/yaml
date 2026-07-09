@@ -286,7 +286,7 @@ describe('number types', () => {
 
     test('editing the value of a node parsed from a non-finite source is reflected', () => {
       const doc = parseDocument('n: 61e9540') // value Infinity, source '61e9540'
-      const node = doc.get('n', true) as Scalar
+      const node = doc.get('n') as Scalar
       node.value = -Infinity // stale source no longer resolves to the value
       expect(String(doc)).toBe('n: -.inf\n')
     })
