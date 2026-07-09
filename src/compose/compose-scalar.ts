@@ -114,7 +114,7 @@ function findScalarTagByTest(
       (t.default === true || (atKey && t.default === 'key')) &&
       testTag(t.test, value)
     ) {
-      tag = t as ScalarTag
+      tag = t
       break
     }
   }
