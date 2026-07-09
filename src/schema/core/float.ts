@@ -2,24 +2,22 @@ import { Scalar } from '../../nodes/Scalar.ts'
 import { stringifyNumber } from '../../stringify/stringifyNumber.ts'
 import type { ScalarTag } from '../types.ts'
 
+const floatNaNValues = new Set([
+  '.nan',
+  '.NaN',
+  '.NAN',
+  '.inf',
+  '.Inf',
+  '.INF',
+  '+.inf',
+  '+.Inf',
+  '+.INF',
+  '-.inf',
+  '-.Inf',
+  '-.INF'
+])
 function isFloatNaN(value: string) {
-  switch (value) {
-    case '.nan':
-    case '.NaN':
-    case '.NAN':
-    case '.inf':
-    case '.Inf':
-    case '.INF':
-    case '+.inf':
-    case '+.Inf':
-    case '+.INF':
-    case '-.inf':
-    case '-.Inf':
-    case '-.INF':
-      return true
-    default:
-      return false
-  }
+  return floatNaNValues.has(value)
 }
 
 /** First char must be a digit, sign, or dot to match any float pattern */
