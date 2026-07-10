@@ -4,6 +4,7 @@ import { Scalar } from '../nodes/Scalar.ts'
 import type { FlowScalar } from '../parse/cst.ts'
 import type { ComposeErrorHandler } from './composer.ts'
 import { resolveEnd } from './resolve-end.ts'
+import { checkPrintableChars } from './util-check-printable.ts'
 
 type FlowScalarErrorHandler = (
   offset: number,
@@ -26,6 +27,7 @@ export function resolveFlowScalar(
   let value: string
   const _onError: FlowScalarErrorHandler = (rel, code, msg) =>
     onError(offset + rel, code, msg)
+  checkPrintableChars(source, offset, onError)
   switch (type) {
     case 'scalar':
       _type = Scalar.PLAIN

@@ -70,6 +70,47 @@ describe('flow scalars', () => {
   })
 })
 
+describe('non-printable characters (#703)', () => {
+  test('control character in plain scalar', () => {
+    const doc = YAML.parseDocument('a\x07b')
+    expect(doc.errors).toMatchObject([{ code: 'CONTROL_CHAR' }])
+  })
+
+  test('control character in single-quoted scalar', () => {
+    const doc = YAML.parseDocument("'a\x07b'")
+    expect(doc.errors).toMatchObject([{ code: 'CONTROL_CHAR' }])
+  })
+
+  test('literal control character in double-quoted scalar', () => {
+    const doc = YAML.parseDocument('"a\x07b"')
+    expect(doc.errors).toMatchObject([{ code: 'CONTROL_CHAR' }])
+  })
+
+  test('control character in block scalar', () => {
+    const doc = YAML.parseDocument('|\n a\x07b\n')
+    expect(doc.errors).toMatchObject([{ code: 'CONTROL_CHAR' }])
+  })
+
+  test('multiple control characters are each reported', () => {
+    const doc = YAML.parseDocument('a\x01b\x1fc')
+    expect(doc.errors).toMatchObject([
+      { code: 'CONTROL_CHAR' },
+      { code: 'CONTROL_CHAR' }
+    ])
+  })
+
+  test('escaped control characters in double-quoted scalar are allowed', () => {
+    const doc = YAML.parseDocument('"a\\tb\\x07c"')
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.toJS()).toBe('a\tb\x07c')
+  })
+
+  test('tab and NEL are allowed', () => {
+    const doc = YAML.parseDocument('"a\tb\x85c"')
+    expect(doc.errors).toHaveLength(0)
+  })
+})
+
 describe('block collections', () => {
   test('mapping with bad indentation', () => {
     const src = 'foo: "1"\n bar: 2\n'
