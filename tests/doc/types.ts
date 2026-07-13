@@ -278,7 +278,7 @@ describe('number types', () => {
       expect(String(parseDocument('n: .nan'))).toBe('n: .nan\n')
     })
 
-    test('a programmatic Infinity with no source is emitted as .inf', () => {
+    test('a programmatic Infinity with finite source is emitted as .inf', () => {
       const doc = parseDocument('n: 1')
       doc.set('n', Infinity)
       expect(String(doc)).toBe('n: .inf\n')
@@ -293,9 +293,9 @@ describe('number types', () => {
 
     test('the source is used only while it still resolves to the value', () => {
       const node = new Scalar(Infinity)
-      node.source = '61e9540' // overflows to Infinity → matches, so it is used
+      node.source = '61e9540'
       expect(stringifyNumber(node)).toBe('61e9540')
-      node.source = '5' // stale after a value edit: resolves to 5, not Infinity
+      node.source = '5'
       expect(stringifyNumber(node)).toBe('.inf')
     })
 
