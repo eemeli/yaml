@@ -43,10 +43,21 @@ function parsePrelude(prelude: string[]) {
   let comment = ''
   let atComment = false
   let afterEmptyLine = false
+  let commentBefore = ''
   for (let i = 0; i < prelude.length; ++i) {
     const source = prelude[i]
     switch (source[0]) {
       case '#':
+        // A comment group separated from the next one by an empty line is
+        // detached from it. Keep such groups separate so that leading detached
+        // comments are assigned to the document and only the value-adjacent
+        // group to the value node, rather than merging them together (#600).
+        if (afterEmptyLine && comment !== '') {
+          commentBefore = commentBefore
+            ? `${commentBefore}\n\n${comment}`
+            : comment
+          comment = ''
+        }
         comment +=
           (comment === '' ? '' : afterEmptyLine ? '\n\n' : '\n') +
           (source.substring(1) || ' ')
@@ -63,7 +74,7 @@ function parsePrelude(prelude: string[]) {
         atComment = false
     }
   }
-  return { comment, afterEmptyLine }
+  return { comment, afterEmptyLine, commentBefore }
 }
 
 /**
@@ -103,21 +114,44 @@ export class Composer<
   }
 
   private decorate(doc: Document.Parsed<Value, Strict>, afterDoc: boolean) {
-    const { comment, afterEmptyLine } = parsePrelude(this.prelude)
-    if (comment) {
+    const { comment, afterEmptyLine, commentBefore } = parsePrelude(
+      this.prelude
+    )
+    if (comment || commentBefore) {
       const dc = doc.value
       if (afterDoc) {
-        doc.comment = doc.comment ? `${doc.comment}\n${comment}` : comment
-      } else if (afterEmptyLine || doc.directives.docStart) {
-        doc.commentBefore = comment
-      } else if (isCollection(dc) && !dc.flow && dc.size > 0) {
-        let it = Array.isArray(dc) ? dc[0] : dc.values.values().next().value!
-        if (it instanceof Pair) it = it.key
-        const cb = it.commentBefore
-        it.commentBefore = cb ? `${comment}\n${cb}` : comment
+        const trailing = commentBefore
+          ? comment
+            ? `${commentBefore}\n\n${comment}`
+            : commentBefore
+          : comment
+        doc.comment = doc.comment ? `${doc.comment}\n${trailing}` : trailing
       } else {
-        const cb = dc.commentBefore
-        dc.commentBefore = cb ? `${comment}\n${cb}` : comment
+        // Detached leading comment groups belong to the document, not the
+        // value node (#600).
+        if (commentBefore) {
+          doc.commentBefore = doc.commentBefore
+            ? `${commentBefore}\n${doc.commentBefore}`
+            : commentBefore
+        }
+        // The value-adjacent comment group, if any.
+        if (comment) {
+          if (afterEmptyLine || doc.directives.docStart) {
+            doc.commentBefore = doc.commentBefore
+              ? `${doc.commentBefore}\n\n${comment}`
+              : comment
+          } else if (isCollection(dc) && !dc.flow && dc.size > 0) {
+            let it = Array.isArray(dc)
+              ? dc[0]
+              : dc.values.values().next().value!
+            if (it instanceof Pair) it = it.key
+            const cb = it.commentBefore
+            it.commentBefore = cb ? `${comment}\n${cb}` : comment
+          } else {
+            const cb = dc.commentBefore
+            dc.commentBefore = cb ? `${comment}\n${cb}` : comment
+          }
+        }
       }
     }
 
@@ -146,7 +180,14 @@ export class Composer<
     warnings: YAMLWarning[]
   } {
     return {
-      comment: parsePrelude(this.prelude).comment,
+      comment: (() => {
+        const { comment, commentBefore } = parsePrelude(this.prelude)
+        return commentBefore
+          ? comment
+            ? `${commentBefore}\n\n${comment}`
+            : commentBefore
+          : comment
+      })(),
       directives: this.directives,
       errors: this.errors,
       warnings: this.warnings
