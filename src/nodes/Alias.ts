@@ -93,7 +93,7 @@ export class Alias implements NodeBase {
   toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any {
     if (!doc?.schema) throw new TypeError('A document argument is required')
     ctx ??= new ToJSContext()
-    const { anchors, maxAliasCount } = ctx
+    const { anchors } = ctx
 
     const source = this.resolve(doc, ctx)
     if (!source) {
@@ -101,28 +101,11 @@ export class Alias implements NodeBase {
       throw new ReferenceError(msg)
     }
 
-    let data = anchors.get(source)
-    if (!data) {
-      // Resolve anchors for Node.prototype.toJS()
-      source.toJS(doc, ctx)
-      data = anchors.get(source)
-    }
-    /* istanbul ignore if */
-    if (data?.res === undefined) {
-      const msg = 'This should not happen: Alias anchor was not resolved?'
-      throw new ReferenceError(msg)
-    }
-    if (maxAliasCount >= 0) {
-      data.count += 1
-      data.aliasCount ||= getAliasCount(doc, ctx, source, anchors)
-      if (data.count * data.aliasCount > maxAliasCount) {
-        const msg =
-          'Excessive alias count indicates a resource exhaustion attack'
-        throw new ReferenceError(msg)
-      }
-    }
-
-    return data.res
+    return ctx.resolveAlias(
+      doc,
+      source,
+      () => getAliasCount(doc, ctx, source, anchors)
+    )
   }
 
   toString(
@@ -143,7 +126,7 @@ export class Alias implements NodeBase {
   }
 }
 
-function getAliasCount(
+export function getAliasCount(
   doc: Document,
   ctx: ToJSContext,
   node: Node | Pair | null,

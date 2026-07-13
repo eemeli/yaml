@@ -155,8 +155,12 @@ describe('errors', () => {
     const doc = parseDocument(src, { merge: true })
     expect(doc.errors).toHaveLength(0)
     expect(doc.warnings).toHaveLength(0)
-    expect(() => doc.toJS()).toThrow('Maximum call stack size exceeded')
+    expect(() => doc.toJS()).toThrow(
+      'Excessive alias count indicates a resource exhaustion attack'
+    )
     expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(ReferenceError)
+    expect(() => doc.toJS({ maxAliasCount: 1 })).toThrow(ReferenceError)
+    expect(() => doc.toJS({ maxAliasCount: 2 })).toThrow(ReferenceError)
     expect(String(doc)).toBe(src)
   })
 })
@@ -347,6 +351,28 @@ describe('merge <<', () => {
       b.set(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &AA { a: A }, { b: B, <<: *AA } ]\n')
+    })
+
+    test('merge pair of an alias to a sequence', () => {
+      const doc = parseDocument<YAMLSeq, false>('[{ a: A }, [], { b: B }]', {
+        merge: true
+      })
+      const a = doc.get(0) as YAMLMap
+      const seq = doc.get(1) as YAMLSeq
+      const b = doc.get(2) as YAMLMap
+      seq.anchor = 'SEQ'
+      seq.push(doc.createAlias(a, 'AA'))
+      b.set(doc.createPair('<<', doc.createAlias(seq)))
+
+      expect(doc.toJS()).toMatchObject([
+        { a: 'A' },
+        [{ a: 'A' }],
+        { a: 'A', b: 'B' }
+      ])
+      expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(ReferenceError)
+      expect(String(doc)).toBe(
+        '[ &AA { a: A }, &SEQ [ *AA ], { b: B, <<: *SEQ } ]\n'
+      )
     })
 
     test('require map node', () => {
