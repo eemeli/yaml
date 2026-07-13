@@ -13,7 +13,7 @@ export const floatNaN: ScalarTag = {
       : str[0] === '-'
         ? Number.NEGATIVE_INFINITY
         : Number.POSITIVE_INFINITY,
-  stringify: stringifyNumber
+  stringify: node => stringifyNumber(node, '1.1')
 }
 
 export const floatExp: ScalarTag = {
@@ -25,7 +25,7 @@ export const floatExp: ScalarTag = {
   resolve: (str: string) => parseFloat(str.replace(/_/g, '')),
   stringify(node) {
     const num = Number(node.value)
-    return isFinite(num) ? num.toExponential() : stringifyNumber(node)
+    return isFinite(num) ? num.toExponential() : stringifyNumber(node, '1.1')
   }
 }
 
@@ -43,5 +43,5 @@ export const float: ScalarTag = {
     }
     return node
   },
-  stringify: stringifyNumber
+  stringify: node => stringifyNumber(node, '1.1')
 }

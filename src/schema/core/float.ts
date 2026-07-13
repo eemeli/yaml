@@ -13,7 +13,7 @@ export const floatNaN: ScalarTag = {
       : str[0] === '-'
         ? Number.NEGATIVE_INFINITY
         : Number.POSITIVE_INFINITY,
-  stringify: stringifyNumber
+  stringify: node => stringifyNumber(node)
 }
 
 export const floatExp: ScalarTag = {
@@ -41,5 +41,5 @@ export const float: ScalarTag = {
       node.minFractionDigits = str.length - dot - 1
     return node
   },
-  stringify: stringifyNumber
+  stringify: node => stringifyNumber(node)
 }

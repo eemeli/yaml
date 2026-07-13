@@ -72,7 +72,7 @@ export const int: ScalarTag = {
   test: /^[-+]?[0-9][0-9_]*$/,
   resolve: (str: string, _onError: unknown, opt: ParseOptions) =>
     intResolve(str, 0, 10, opt),
-  stringify: stringifyNumber
+  stringify: node => stringifyNumber(node, '1.1')
 }
 
 export const intHex: ScalarTag = {
