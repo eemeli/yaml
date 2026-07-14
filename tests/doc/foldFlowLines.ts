@@ -321,7 +321,8 @@ describe('end-to-end', () => {
   test('More-indented first line (#55)', () => {
     const str = ' first more-indented line\nnext line\n'
     const ys = YAML.stringify(str, foldOptions)
-    expect(ys).toBe('>1\n first more-indented line\nnext line\n')
+    expect(ys).toBe('>1\n  first more-indented line\n next line\n')
+    expect(YAML.parse(ys)).toBe(str)
   })
 
   test('plain string', () => {

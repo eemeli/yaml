@@ -190,7 +190,7 @@ function blockString(
     return quotedString(value, ctx)
   }
 
-  const indent =
+  let indent =
     ctx.indent ||
     (ctx.forceBlockIndent || containsDocumentMarker(value) ? '  ' : '')
   const literal =
@@ -240,12 +240,22 @@ function blockString(
     0,
     startNlPos < startEnd ? startNlPos + 1 : startEnd
   )
+  const indentSize = indent ? '2' : '1' // root is at -1
+  // At the document root `indent` is empty, but the indentation indicator is
+  // still '1', so body lines must be indented by a single space to match.
+  // The first body line is prefixed with this indent in the output, so when we
+  // have to introduce it here it must also be accounted for when checking
+  // whether that line is "more-indented".
+  let firstLineIndent = ''
+  if (startWithSpace && !indent) {
+    indent = ' '
+    firstLineIndent = indent
+  }
   if (start) {
     value = value.substring(start.length)
     start = start.replace(/\n+/g, `$&${indent}`)
   }
 
-  const indentSize = indent ? '2' : '1' // root is at -1
   // Leading | or > is added later
   let header = (startWithSpace ? indentSize : '') + chomp
   if (comment) {
@@ -267,14 +277,19 @@ function blockString(
       }
     }
     const body = foldFlowLines(
-      `${start}${foldedValue}${end}`,
+      `${firstLineIndent}${start}${foldedValue}${end}`,
       indent,
       FOLD_BLOCK,
       foldOptions
     )
-    if (!literalFallback) return `>${header}\n${indent}${body}`
+    if (!literalFallback)
+      return `>${header}\n${firstLineIndent ? '' : indent}${body}`
   }
 
+  // For literal scalars the body is emitted verbatim, with every line — the
+  // first one included — prefixed by `indent`. When a leading space promoted
+  // `indent` to ' ' above, that single space is therefore already applied to
+  // the first line, so no separate `firstLineIndent` accounting is needed here.
   value = value.replace(/\n+/g, `$&${indent}`)
   return `|${header}\n${indent}${start}${value}${end}`
 }
