@@ -79,6 +79,17 @@ describe('parse comments', () => {
       expect(doc.value.value).toBe('value')
       expect(doc.value.range).toMatchObject([4, 18, 18])
     })
+
+    test('empty block scalar followed by comment (#687)', () => {
+      const doc = YAML.parseDocument<YAML.Scalar, false>('|5\n#comment')
+      expect(doc.value.value).toBe('')
+      expect(doc.comment).toBe('comment')
+      // Round-trip must keep the comment a comment; without an explicit indent
+      // indicator on the empty block scalar it gets parsed back as its content.
+      const rt = YAML.parseDocument<YAML.Scalar, false>(doc.toString())
+      expect(rt.value.value).toBe('')
+      expect(rt.comment).toBe('comment')
+    })
   })
 
   describe('seq entry comments', () => {
