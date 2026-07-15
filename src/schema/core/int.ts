@@ -54,7 +54,7 @@ function isHexInt(value: string) {
   return true
 }
 
-export const intOct: ScalarTag = {
+export const intOct: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => intIdentify(value) && value >= 0,
   default: true,
   tag: 'tag:yaml.org,2002:int',
@@ -64,7 +64,7 @@ export const intOct: ScalarTag = {
   stringify: node => intStringify(node, 8, '0o')
 }
 
-export const int: ScalarTag = {
+export const int: ScalarTag & { test: (value: string) => boolean } = {
   identify: intIdentify,
   default: true,
   tag: 'tag:yaml.org,2002:int',
@@ -73,7 +73,7 @@ export const int: ScalarTag = {
   stringify: stringifyNumber
 }
 
-export const intHex: ScalarTag = {
+export const intHex: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => intIdentify(value) && value >= 0,
   default: true,
   tag: 'tag:yaml.org,2002:int',

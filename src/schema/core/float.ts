@@ -31,7 +31,7 @@ function couldBeFloat(value: string) {
 const floatExpRe = /^[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)[eE][-+]?[0-9]+$/
 const floatRe = /^[-+]?(?:\.[0-9]+|[0-9]+\.[0-9]*)$/
 
-export const floatNaN: ScalarTag = {
+export const floatNaN: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
@@ -45,7 +45,7 @@ export const floatNaN: ScalarTag = {
   stringify: stringifyNumber
 }
 
-export const floatExp: ScalarTag = {
+export const floatExp: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
@@ -58,7 +58,7 @@ export const floatExp: ScalarTag = {
   }
 }
 
-export const float: ScalarTag = {
+export const float: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',

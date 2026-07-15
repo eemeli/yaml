@@ -17,6 +17,7 @@ const MERGE_KEY = '<<'
 
 export const merge: ScalarTag & {
   identify(value: unknown): boolean
+  test: (value: string) => boolean
 } = {
   identify: value =>
     value === MERGE_KEY ||

@@ -53,7 +53,7 @@ function stringifySexagesimal(node: Scalar) {
   )
 }
 
-export const intTime: ScalarTag = {
+export const intTime: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => typeof value === 'bigint' || Number.isInteger(value),
   default: true,
   tag: 'tag:yaml.org,2002:int',
@@ -64,7 +64,7 @@ export const intTime: ScalarTag = {
   stringify: stringifySexagesimal
 }
 
-export const floatTime: ScalarTag = {
+export const floatTime: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
@@ -82,7 +82,7 @@ const timestampRe = RegExp(
     '(?:[ \\t]*(Z|[-+][012]?[0-9](?::[0-9]{2})?))?' + // Z | +5 | -03:30
     ')?$'
 )
-export const timestamp: ScalarTag = {
+export const timestamp: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => value instanceof Date,
   default: true,
   tag: 'tag:yaml.org,2002:timestamp',
