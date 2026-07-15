@@ -2,13 +2,12 @@ import { Scalar } from '../../nodes/Scalar.ts'
 import type { ScalarTag } from '../types.ts'
 
 const boolValues = new Set(['true', 'True', 'TRUE', 'false', 'False', 'FALSE'])
-const isBool = (value: string) => boolValues.has(value)
 
 export const boolTag: ScalarTag & { test: (value: string) => boolean } = {
   identify: value => typeof value === 'boolean',
   default: true,
   tag: 'tag:yaml.org,2002:bool',
-  test: isBool,
+  test: (value: string) => boolValues.has(value),
   resolve: str => new Scalar(str[0] === 't' || str[0] === 'T'),
   stringify({ source, value }, ctx) {
     if (source && boolTag.test(source)) {

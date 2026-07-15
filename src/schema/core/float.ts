@@ -16,9 +16,6 @@ const floatNaNValues = new Set([
   '-.Inf',
   '-.INF'
 ])
-function isFloatNaN(value: string) {
-  return floatNaNValues.has(value)
-}
 
 /** First char must be a digit, sign, or dot to match any float pattern */
 function couldBeFloat(value: string) {
@@ -38,7 +35,7 @@ export const floatNaN: ScalarTag = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
-  test: isFloatNaN,
+  test: (value: string) => floatNaNValues.has(value),
   resolve: str =>
     str.slice(-3).toLowerCase() === 'nan'
       ? NaN

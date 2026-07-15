@@ -27,7 +27,7 @@ const schemas = new Map<string, Array<CollectionTag | ScalarTag>>([
 
 const tagsByName: {
   binary: ScalarTag
-  bool: ScalarTag & { test: (value: string) => boolean }
+  bool: ScalarTag
   float: ScalarTag
   floatExp: ScalarTag
   floatNaN: ScalarTag
@@ -38,7 +38,7 @@ const tagsByName: {
   intTime: ScalarTag
   map: CollectionTag
   merge: ScalarTag & { identify(value: unknown): boolean }
-  null: ScalarTag & { test: (value: string) => boolean }
+  null: ScalarTag
   omap: CollectionTag
   pairs: CollectionTag
   seq: CollectionTag
