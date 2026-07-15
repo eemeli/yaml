@@ -11,11 +11,13 @@ export function addPairToJSMap(
   doc: Document<DocValue, boolean>,
   ctx: ToJSContext,
   map: MapLike,
-  { key, value }: Pair
+  { key, value }: Pair,
+  isPlainObject: boolean
 ): MapLike {
-  if ('addToJSMap' in key) key.addToJSMap?.(doc, ctx, map, value)
+  if ('addToJSMap' in key) key.addToJSMap?.(doc, ctx, map, value, isPlainObject)
   // TODO: Should drop this special case for bare << handling
-  else if (isMergeKey(doc, key)) addMergeToJSMap(doc, ctx, map, value)
+  else if (isMergeKey(doc, key))
+    addMergeToJSMap(doc, ctx, map, value, isPlainObject)
   else {
     const jsKey = key.toJS(doc, ctx)
     if (map instanceof Map) {
@@ -25,7 +27,11 @@ export function addPairToJSMap(
     } else {
       const stringKey = stringifyKey(doc, ctx, key, jsKey)
       const jsValue = value ? value.toJS(doc, ctx) : value
-      if (stringKey in map)
+      if (
+        (!isPlainObject && stringKey in map) ||
+        stringKey === '__proto__' ||
+        stringKey === 'constructor'
+      )
         Object.defineProperty(map, stringKey, {
           value: jsValue,
           writable: true,
@@ -47,8 +53,7 @@ function stringifyKey(
   if (jsKey === null) return ''
   // eslint-disable-next-line @typescript-eslint/no-base-to-string
   if (typeof jsKey !== 'object') return String(jsKey)
-  const strCtx = createStringifyContext(doc, {})
-  strCtx.anchors = new Set()
+  const strCtx = createStringifyContext(doc, undefined)
   for (const node of ctx.anchors.keys())
     strCtx.anchors.add(node.anchor as 'string')
   strCtx.inFlow = true

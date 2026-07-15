@@ -102,44 +102,56 @@ function singleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
   return foldLines(source.slice(1, -1)).replace(/''/g, "'")
 }
 
-function foldLines(source: string) {
-  /**
-   * The negative lookbehind here and in the `re` RegExp is to
-   * prevent causing a polynomial search time in certain cases.
-   *
-   * The try-catch is for Safari, which doesn't support this yet:
-   * https://caniuse.com/js-regexp-lookbehind
-   */
-  let first: RegExp, line: RegExp
-  try {
-    first = new RegExp('(.*?)(?<![ \t])[ \t]*\r?\n', 'sy')
-    line = new RegExp('[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?\r?\n', 'sy')
-  } catch {
-    first = /(.*?)[ \t]*\r?\n/sy
-    line = /[ \t]*(.*?)[ \t]*\r?\n/sy
-  }
-  let match = first.exec(source)
-  if (!match) return source
+const CHAR_CR = 0x0d
+const CHAR_SPACE = 0x20
+const CHAR_TAB = 0x09
 
-  let res = match[1]
+function foldLines(source: string) {
+  let newLineIndex = source.indexOf('\n')
+  if (newLineIndex === -1) return source
+
+  // This finds the index in the first line of the last non-space/non-tab char
+  let end = newLineIndex
+  let cc = source.charCodeAt(end - 1)
+  if (cc === CHAR_CR) cc = source.charCodeAt(--end - 1)
+  while (end > 0 && (cc === CHAR_SPACE || cc === CHAR_TAB))
+    cc = source.charCodeAt(--end - 1)
+  let res = source.slice(0, end)
+
   let sep = ' '
-  let pos = first.lastIndex
-  line.lastIndex = pos
-  while ((match = line.exec(source))) {
-    if (match[1] === '') {
+  let pos = newLineIndex + 1
+
+  // now we go through each line, find the first non-space/tab char.
+  // then find the last non-space/tab char.
+  // the slice between those is added to the result with a separator
+  while ((newLineIndex = source.indexOf('\n', pos)) !== -1) {
+    let start = pos
+    cc = source.charCodeAt(start)
+    while (start < newLineIndex && (cc === CHAR_SPACE || cc === CHAR_TAB))
+      cc = source.charCodeAt(++start)
+    end = newLineIndex
+    cc = source.charCodeAt(end - 1)
+    if (cc === CHAR_CR) cc = source.charCodeAt(--end - 1)
+    while (end > start && (cc === CHAR_SPACE || cc === CHAR_TAB))
+      cc = source.charCodeAt(--end - 1)
+
+    if (start === end) {
       if (sep === '\n') res += sep
       else sep = '\n'
     } else {
-      res += sep + match[1]
+      res += sep + source.slice(start, end)
       sep = ' '
     }
-    pos = line.lastIndex
+    pos = newLineIndex + 1
   }
 
-  const last = /[ \t]*(.*)/sy
-  last.lastIndex = pos
-  match = last.exec(source)
-  return res + sep + (match?.[1] ?? '')
+  // finally we find the first non-space/tab char in the last line and
+  // add the rest to the result
+  let start = pos
+  cc = source.charCodeAt(start)
+  while (start < source.length && (cc === CHAR_SPACE || cc === CHAR_TAB))
+    cc = source.charCodeAt(++start)
+  return res + sep + source.slice(start)
 }
 
 function doubleQuotedValue(source: string, onError: FlowScalarErrorHandler) {

@@ -235,9 +235,19 @@ export class YAMLMap<
     Type?: { new (): T }
   ) {
     ctx ??= new ToJSContext()
-    const map = Type ? new Type() : ctx?.mapAsMap ? new Map() : {}
+    let map: MapLike
+    let isPlainObject = false
+    if (Type) {
+      map = new Type()
+    } else if (ctx.mapAsMap) {
+      map = new Map()
+    } else {
+      map = {}
+      isPlainObject = true
+    }
     if (this.anchor) ctx.setAnchor(this, map)
-    for (const pair of this.values.values()) addPairToJSMap(doc, ctx, map, pair)
+    for (const pair of this.values.values())
+      addPairToJSMap(doc, ctx, map, pair, isPlainObject)
     return map
   }
 

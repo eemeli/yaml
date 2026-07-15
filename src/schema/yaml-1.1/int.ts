@@ -48,7 +48,7 @@ export const intBin: ScalarTag = {
   default: true,
   tag: 'tag:yaml.org,2002:int',
   format: 'BIN',
-  test: /^[-+]?0b[0-1_]+$/,
+  test: str => /^[-+]?0b[0-1_]+$/.test(str),
   resolve: (str: string, _onError: unknown, opt: ParseOptions) =>
     intResolve(str, 2, 2, opt),
   stringify: node => intStringify(node, 2, '0b')
@@ -59,7 +59,7 @@ export const intOct: ScalarTag = {
   default: true,
   tag: 'tag:yaml.org,2002:int',
   format: 'OCT',
-  test: /^[-+]?0[0-7_]+$/,
+  test: str => /^[-+]?0[0-7_]+$/.test(str),
   resolve: (str: string, _onError: unknown, opt: ParseOptions) =>
     intResolve(str, 1, 8, opt),
   stringify: node => intStringify(node, 8, '0')
@@ -69,7 +69,7 @@ export const int: ScalarTag = {
   identify: intIdentify,
   default: true,
   tag: 'tag:yaml.org,2002:int',
-  test: /^[-+]?[0-9][0-9_]*$/,
+  test: str => /^[-+]?[0-9][0-9_]*$/.test(str),
   resolve: (str: string, _onError: unknown, opt: ParseOptions) =>
     intResolve(str, 0, 10, opt),
   stringify: node => stringifyNumber(node, '1.1')
@@ -80,7 +80,7 @@ export const intHex: ScalarTag = {
   default: true,
   tag: 'tag:yaml.org,2002:int',
   format: 'HEX',
-  test: /^[-+]?0x[0-9a-fA-F_]+$/,
+  test: str => /^[-+]?0x[0-9a-fA-F_]+$/.test(str),
   resolve: (str: string, _onError: unknown, opt: ParseOptions) =>
     intResolve(str, 2, 16, opt),
   stringify: node => intStringify(node, 16, '0x')

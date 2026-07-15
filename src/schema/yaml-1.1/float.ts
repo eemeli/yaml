@@ -6,7 +6,7 @@ export const floatNaN: ScalarTag = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
-  test: /^(?:[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN)$/,
+  test: str => /^(?:[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN)$/.test(str),
   resolve: (str: string) =>
     str.slice(-3).toLowerCase() === 'nan'
       ? NaN
@@ -21,7 +21,8 @@ export const floatExp: ScalarTag = {
   default: true,
   tag: 'tag:yaml.org,2002:float',
   format: 'EXP',
-  test: /^[-+]?(?:[0-9][0-9_]*)?(?:\.[0-9_]*)?[eE][-+]?[0-9]+$/,
+  test: str =>
+    /^[-+]?(?:[0-9][0-9_]*)?(?:\.[0-9_]*)?[eE][-+]?[0-9]+$/.test(str),
   resolve: (str: string) => parseFloat(str.replace(/_/g, '')),
   stringify(node) {
     const num = Number(node.value)
@@ -33,7 +34,7 @@ export const float: ScalarTag = {
   identify: value => typeof value === 'number',
   default: true,
   tag: 'tag:yaml.org,2002:float',
-  test: /^[-+]?(?:[0-9][0-9_]*)?\.[0-9_]*$/,
+  test: str => /^[-+]?(?:[0-9][0-9_]*)?\.[0-9_]*$/.test(str),
   resolve(str: string) {
     const node = new Scalar(parseFloat(str.replace(/_/g, '')))
     const dot = str.indexOf('.')
