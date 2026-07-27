@@ -49,7 +49,11 @@ const jsonScalars: ScalarTag[] = [
     default: true,
     tag: 'tag:yaml.org,2002:float',
     test: /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][-+]?[0-9]+)?$/,
-    resolve: str => parseFloat(str),
+    resolve(str) {
+      const num = parseFloat(str)
+      if (!Number.isFinite(num)) return str
+      return num
+    },
     stringify: stringifyJSON
   }
 ]

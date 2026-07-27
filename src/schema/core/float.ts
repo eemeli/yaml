@@ -22,7 +22,11 @@ export const floatExp: ScalarTag = {
   tag: 'tag:yaml.org,2002:float',
   format: 'EXP',
   test: /^[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)[eE][-+]?[0-9]+$/,
-  resolve: str => parseFloat(str),
+  resolve(str) {
+    const num = parseFloat(str)
+    if (!Number.isFinite(num)) return str
+    return num
+  },
   stringify(node) {
     const num = Number(node.value)
     return isFinite(num) ? num.toExponential() : stringifyNumber(node)
@@ -35,7 +39,9 @@ export const float: ScalarTag = {
   tag: 'tag:yaml.org,2002:float',
   test: /^[-+]?(?:\.[0-9]+|[0-9]+\.[0-9]*)$/,
   resolve(str) {
-    const node = new Scalar(parseFloat(str))
+    const num = parseFloat(str)
+    if (!Number.isFinite(num)) return str
+    const node = new Scalar(num)
     const dot = str.indexOf('.')
     if (dot !== -1 && str[str.length - 1] === '0')
       node.minFractionDigits = str.length - dot - 1

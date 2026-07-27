@@ -264,12 +264,16 @@ describe('number types', () => {
   })
 
   describe('overflowing values keep their source (#660)', () => {
-    test('float overflowing to Infinity round-trips via its source', () => {
-      expect(String(parseDocument('gitsha: 61e9540'))).toBe('gitsha: 61e9540\n')
+    test('float overflowing to Infinity is parsed as a string', () => {
+      const doc = parseDocument('gitsha: 61e9540')
+      expect(doc.toJS({}).gitsha).toBe('61e9540')
+      expect(String(doc)).toBe('gitsha: "61e9540"\n')
     })
 
-    test('negative overflow keeps its source', () => {
-      expect(String(parseDocument('n: -61e9540'))).toBe('n: -61e9540\n')
+    test('negative overflow is parsed as a string', () => {
+      const doc = parseDocument('n: -61e9540')
+      expect(doc.toJS({}).n).toBe('-61e9540')
+      expect(String(doc)).toBe('n: "-61e9540"\n')
     })
 
     test('literal .inf / .nan are still emitted as such', () => {
@@ -299,9 +303,9 @@ describe('number types', () => {
       expect(stringifyNumber(node)).toBe('.inf')
     })
 
-    test('a YAML 1.1 float with underscores that overflows keeps its source', () => {
+    test('a YAML 1.1 float with underscores that overflows is parsed as a string', () => {
       const doc = parseDocument('n: 6_1e9540', { version: '1.1' })
-      expect(String(doc)).toBe('n: 6_1e9540\n')
+      expect(String(doc)).toBe('n: "6_1e9540"\n')
     })
   })
 })
