@@ -76,11 +76,11 @@ export interface ScalarTag extends TagBase {
 
   /**
    * Together with `default` allows for values to be stringified without an
-   * explicit tag and detected using a regular expression. For most cases, it's
-   * unlikely that you'll actually want to use these, even if you first think
-   * you do.
+   * explicit tag and detected using a regular expression or a test function.
+   * For most cases, it's unlikely that you'll actually want to use these,
+   * even if you first think you do.
    */
-  test?: RegExp
+  test?: (value: string) => boolean
 }
 
 export interface CollectionTag extends TagBase {
