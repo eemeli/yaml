@@ -48,7 +48,8 @@ export function resolveProps(
   let comma: SourceToken | null = null
   let found: SourceToken | null = null
   let start: number | null = null
-  for (const token of tokens) {
+  let token: SourceToken | undefined
+  for (token of tokens) {
     if (reqSpace) {
       if (
         token.type !== 'space' &&
@@ -171,8 +172,7 @@ export function resolveProps(
         hasSpace = false
     }
   }
-  const last = tokens[tokens.length - 1]
-  const end = last ? last.offset + last.source.length : offset
+  const end = token ? token.offset + token.source.length : offset
   if (
     reqSpace &&
     next &&

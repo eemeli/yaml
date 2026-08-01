@@ -25,25 +25,27 @@ const schemas = new Map<string, Array<CollectionTag | ScalarTag>>([
   ['yaml-1.1', yaml11]
 ])
 
+type WithScalarTagTest = { test: (value: string) => boolean }
+
 const tagsByName: {
   binary: ScalarTag
-  bool: ScalarTag & { test: RegExp }
-  float: ScalarTag
-  floatExp: ScalarTag
-  floatNaN: ScalarTag
-  floatTime: ScalarTag
-  int: ScalarTag
-  intHex: ScalarTag
-  intOct: ScalarTag
-  intTime: ScalarTag
+  bool: ScalarTag & WithScalarTagTest
+  float: ScalarTag & WithScalarTagTest
+  floatExp: ScalarTag & WithScalarTagTest
+  floatNaN: ScalarTag & WithScalarTagTest
+  floatTime: ScalarTag & WithScalarTagTest
+  int: ScalarTag & WithScalarTagTest
+  intHex: ScalarTag & WithScalarTagTest
+  intOct: ScalarTag & WithScalarTagTest
+  intTime: ScalarTag & WithScalarTagTest
   map: CollectionTag
-  merge: ScalarTag & { identify(value: unknown): boolean; test: RegExp }
-  null: ScalarTag & { test: RegExp }
+  merge: ScalarTag & { identify(value: unknown): boolean } & WithScalarTagTest
+  null: ScalarTag & WithScalarTagTest
   omap: CollectionTag
   pairs: CollectionTag
   seq: CollectionTag
   set: CollectionTag
-  timestamp: ScalarTag & { test: RegExp }
+  timestamp: ScalarTag & WithScalarTagTest
 } = {
   binary,
   bool: boolTag,
@@ -73,14 +75,11 @@ export const coreKnownTags: {
   'tag:yaml.org,2002:binary': ScalarTag
   'tag:yaml.org,2002:merge': ScalarTag & {
     identify(value: unknown): boolean
-    test: RegExp
-  }
+  } & WithScalarTagTest
   'tag:yaml.org,2002:omap': CollectionTag
   'tag:yaml.org,2002:pairs': CollectionTag
   'tag:yaml.org,2002:set': CollectionTag
-  'tag:yaml.org,2002:timestamp': ScalarTag & {
-    test: RegExp
-  }
+  'tag:yaml.org,2002:timestamp': ScalarTag & WithScalarTagTest
 } = {
   'tag:yaml.org,2002:binary': binary,
   'tag:yaml.org,2002:merge': merge,

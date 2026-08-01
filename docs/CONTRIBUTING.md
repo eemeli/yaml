@@ -62,5 +62,18 @@ Note that the CI environment runs tests in both Node.js and browsers, so using n
 If you're intending to contribute to the upstream repo, please make sure that your code style matches the Prettier and ESLint rules.
 The easiest way to do that is to configure your editor to do that for you, but `lint` and `prettier` npm scripts are also provided.
 
-If you use an LLM when writing pull requests, this must be explicitly declared in the pull request.
-If there is indication of undeclared LLM assistance, the pull request will be declined.
+Do not rebase or squash a PR while it's being reviewed.
+Instead, add new commits or (if necessary to resolve conflicts)
+merge from the `main` branch to your feature branch.
+
+## Use of LLMs and Similar Tools
+
+Prose contributions and comments must be your own writing,
+not the product of large language models (LLMs) or other tools.
+This includes code comments added in PRs, as well as all issue and PR contents.
+
+If you would like to use an LLM to contribute code to `yaml`,
+please request and discuss this in an appropriate issue first.
+LLM use must be clearly indicated and pre-approved.
+If there is indication of undeclared LLM assistance,
+the issue or pull request will be declined.

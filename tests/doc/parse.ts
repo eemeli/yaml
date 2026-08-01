@@ -219,6 +219,39 @@ describe('flow collection keys', () => {
     )
   })
 
+  test('flow collection key after a blank line (#646)', () => {
+    const doc = YAML.parseDocument('1: 2\n\n[3]: 4')
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.value).toMatchObject(
+      _map([
+        [1, 2],
+        [_seq(3), 4]
+      ])
+    )
+  })
+
+  test('flow collection key after a comment line (#646)', () => {
+    const doc = YAML.parseDocument('1: 2\n# c\n[3]: 4')
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.value).toMatchObject(
+      _map([
+        [1, 2],
+        [_seq(3), 4]
+      ])
+    )
+  })
+
+  test('flow collection key after an empty explicit key (#646)', () => {
+    const doc = YAML.parseDocument('?\n[3]: 4')
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.value).toMatchObject(
+      _map([
+        [null, { key: { value: null }, value: null }],
+        [_seq(3), 4]
+      ])
+    )
+  })
+
   test('empty scalar as last flow collection value (#550)', () => {
     const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:}')
     expect(doc.value).toMatchObject(_map({ c: { value: null } }))
