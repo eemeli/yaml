@@ -29,7 +29,9 @@
 
 <p>The returned value will match the type of the root value of the parsed YAML document, so Maps become objects, Sequences arrays, and scalars result in nulls, booleans, numbers and strings.</p>
 
-<p><code>YAML.parse</code> may throw on error, and it may log warnings using <code>console.warn</code>. It only supports input consisting of a single YAML document; for multi-document support you should use <a href="#parsing-documents"><code>YAML.parseAllDocuments</code></a>.</p>
+<p><code>YAML.parse</code> will throw on error, and it may log warnings using <code>console.warn</code>.
+It only supports input consisting of a single YAML document;
+for multi-document support you should use <a href="#parsing-documents"><code>YAML.parseAllDocuments</code></a>.</p>
 <h2 id='yaml-stringify'>YAML.stringify</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="mf">3.14159</span><span class="p">)</span>
 <span class="c1">// '3.14159\n'</span>
 

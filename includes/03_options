@@ -383,6 +383,12 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <td>Use &#39;single quote&#39; rather than &quot;double quote&quot; where applicable. Set to <code>false</code> to disable single quotes completely.</td>
 </tr>
 <tr>
+<td>trailingComma</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Add a trailing comma after the last entry in a flow collection that&#39;s split across multiple lines.</td>
+</tr>
+<tr>
 <td>trueStr</td>
 <td><code>string</code></td>
 <td><code>&#39;true&#39;</code></td>

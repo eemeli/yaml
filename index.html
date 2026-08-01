@@ -471,7 +471,7 @@ This library:</p>
 <ul>
 <li>Supports both YAML 1.1 and YAML 1.2 and all common data schemas,</li>
 <li>Passes all of the <a href="https://github.com/yaml/yaml-test-suite">yaml-test-suite</a> tests,</li>
-<li>Can accept any string as input without throwing, parsing as much YAML out of it as it can, and</li>
+<li>Can accept nearly any string as input without throwing, parsing as much YAML out of it as it can, and</li>
 <li>Supports parsing, modifying, and writing YAML comments and blank lines.</li>
 </ul>
 
@@ -586,7 +586,9 @@ The first has the simplest API and &quot;just works&quot;, the second gets you a
 
 <p>The returned value will match the type of the root value of the parsed YAML document, so Maps become objects, Sequences arrays, and scalars result in nulls, booleans, numbers and strings.</p>
 
-<p><code>YAML.parse</code> may throw on error, and it may log warnings using <code>console.warn</code>. It only supports input consisting of a single YAML document; for multi-document support you should use <a href="#parsing-documents"><code>YAML.parseAllDocuments</code></a>.</p>
+<p><code>YAML.parse</code> will throw on error, and it may log warnings using <code>console.warn</code>.
+It only supports input consisting of a single YAML document;
+for multi-document support you should use <a href="#parsing-documents"><code>YAML.parseAllDocuments</code></a>.</p>
 <h2 id='yaml-stringify'>YAML.stringify</h2><div class="highlight"><pre class="highlight javascript"><code><span class="nx">YAML</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="mf">3.14159</span><span class="p">)</span>
 <span class="c1">// '3.14159\n'</span>
 
@@ -996,6 +998,12 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <td>Use &#39;single quote&#39; rather than &quot;double quote&quot; where applicable. Set to <code>false</code> to disable single quotes completely.</td>
 </tr>
 <tr>
+<td>trailingComma</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Add a trailing comma after the last entry in a flow collection that&#39;s split across multiple lines.</td>
+</tr>
+<tr>
 <td>trueStr</td>
 <td><code>string</code></td>
 <td><code>&#39;true&#39;</code></td>
@@ -1038,8 +1046,10 @@ Multiple merge keys may be used on the same map, with earlier values taking prec
 <span class="c1">//           range: [ 102, 180, 180 ] } } ],</span>
 <span class="c1">//   range: [ 0, 180, 180 ] }</span>
 </code></pre></div>
-<p>These functions should never throw,
-provided that <code>str</code> is a string and the <code>options</code> are valid.
+<p>These functions should not throw,
+provided that <code>str</code> is a reasonable string and the <code>options</code> are valid.
+Specially crafted inputs may still result in errors due to resource exhaustion,
+such as stack overflows.
 Errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays.
 In particular, if <code>errors</code> is not empty
 it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
@@ -1987,7 +1997,8 @@ At the end of input, <code>lex()</code> should be called a final time with <code
 
 <p>Internally, the lexer operates a state machine that determines how it parses its input.
 Initially, the lexer is always in the <code>stream</code> state.
-The lexer constructor and its <code>lex()</code> method should never throw an error.</p>
+The lexer constructor and its <code>lex()</code> method should never throw an error,
+except due to resource exhaustion.</p>
 
 <p>All tokens are identifiable either by their exact value or their first character.
 In addition to slices of the input stream, a few control characters are additionally used within the output.</p>
@@ -2669,6 +2680,10 @@ In particular, <code>TypeError</code> may occur when parsing invalid input using
 <tr>
 <td><code>NON_STRING_KEY</code></td>
 <td>With the <code>stringKeys</code> option, all mapping keys must be strings</td>
+</tr>
+<tr>
+<td><code>RESOURCE_EXHAUSTION</code></td>
+<td>The input document has excessive nesting, leading to a stack overflow during parsing.</td>
 </tr>
 <tr>
 <td><code>TAB_AS_INDENT</code></td>

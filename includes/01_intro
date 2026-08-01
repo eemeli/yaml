@@ -21,7 +21,7 @@ This library:</p>
 <ul>
 <li>Supports both YAML 1.1 and YAML 1.2 and all common data schemas,</li>
 <li>Passes all of the <a href="https://github.com/yaml/yaml-test-suite">yaml-test-suite</a> tests,</li>
-<li>Can accept any string as input without throwing, parsing as much YAML out of it as it can, and</li>
+<li>Can accept nearly any string as input without throwing, parsing as much YAML out of it as it can, and</li>
 <li>Supports parsing, modifying, and writing YAML comments and blank lines.</li>
 </ul>
 

@@ -130,6 +130,10 @@ In particular, <code>TypeError</code> may occur when parsing invalid input using
 <td>With the <code>stringKeys</code> option, all mapping keys must be strings</td>
 </tr>
 <tr>
+<td><code>RESOURCE_EXHAUSTION</code></td>
+<td>The input document has excessive nesting, leading to a stack overflow during parsing.</td>
+</tr>
+<tr>
 <td><code>TAB_AS_INDENT</code></td>
 <td>Only spaces are allowed as indentation.</td>
 </tr>

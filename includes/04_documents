@@ -34,8 +34,10 @@
 <span class="c1">//           range: [ 102, 180, 180 ] } } ],</span>
 <span class="c1">//   range: [ 0, 180, 180 ] }</span>
 </code></pre></div>
-<p>These functions should never throw,
-provided that <code>str</code> is a string and the <code>options</code> are valid.
+<p>These functions should not throw,
+provided that <code>str</code> is a reasonable string and the <code>options</code> are valid.
+Specially crafted inputs may still result in errors due to resource exhaustion,
+such as stack overflows.
 Errors and warnings are included in the documents&#39; <code>errors</code> and <code>warnings</code> arrays.
 In particular, if <code>errors</code> is not empty
 it&#39;s likely that the document&#39;s parsed <code>contents</code> are not entirely correct.</p>
