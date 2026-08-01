@@ -101,10 +101,8 @@ export class Alias implements NodeBase {
       throw new ReferenceError(msg)
     }
 
-    return ctx.resolveAlias(
-      doc,
-      source,
-      () => getAliasCount(doc, ctx, source, anchors)
+    return ctx.resolveAlias(doc, source, () =>
+      getAliasCount(doc, ctx, source, anchors)
     )
   }
 

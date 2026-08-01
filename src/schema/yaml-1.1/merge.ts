@@ -102,10 +102,8 @@ function getMergeSource(
     throw new ReferenceError(msg)
   }
 
-  ctx.resolveAlias(
-    doc,
-    source,
-    () => getAliasCount(doc, ctx, source, ctx.anchors)
+  ctx.resolveAlias(doc, source, () =>
+    getAliasCount(doc, ctx, source, ctx.anchors)
   )
   return source
 }
