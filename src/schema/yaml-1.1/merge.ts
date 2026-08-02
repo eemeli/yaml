@@ -1,5 +1,5 @@
 import type { Document, DocValue } from '../../doc/Document.ts'
-import { Alias, getAliasCount } from '../../nodes/Alias.ts'
+import { Alias } from '../../nodes/Alias.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
 import type { MapLike, YAMLMap } from '../../nodes/YAMLMap.ts'
@@ -102,8 +102,6 @@ function getMergeSource(
     throw new ReferenceError(msg)
   }
 
-  ctx.resolveAlias(doc, source, () =>
-    getAliasCount(doc, ctx, source, ctx.anchors)
-  )
+  ctx.resolveAlias(doc, source)
   return source
 }

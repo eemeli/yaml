@@ -1,5 +1,7 @@
 import type { Document } from '../doc/Document.ts'
 import type { ToJSOptions } from '../options.ts'
+import { Alias } from './Alias.ts'
+import { Pair } from './Pair.ts'
 import type { Node } from './types.ts'
 
 /** A context used in `node.toJS()` implementations */
@@ -23,11 +25,7 @@ export class ToJSContext {
     else this.anchors.set(node, { aliasCount: 0, count: 1, res })
   }
 
-  resolveAlias(
-    doc: Document,
-    source: Node,
-    getAliasCount: () => number
-  ): unknown {
+  resolveAlias(doc: Document, source: Node): unknown {
     let data = this.anchors.get(source)
     if (!data) {
       source.toJS(doc, this)
@@ -40,7 +38,7 @@ export class ToJSContext {
     }
     if (this.maxAliasCount >= 0) {
       data.count += 1
-      data.aliasCount ||= getAliasCount()
+      data.aliasCount ||= this.getAliasCount(doc, source)
       if (data.count * data.aliasCount > this.maxAliasCount) {
         const msg =
           'Excessive alias count indicates a resource exhaustion attack'
@@ -48,6 +46,26 @@ export class ToJSContext {
       }
     }
     return data.res
+  }
+
+  private getAliasCount(doc: Document, node: Node | Pair | null): number {
+    if (node instanceof Alias) {
+      const source = node.resolve(doc, this)
+      const anchor = source && this.anchors.get(source)
+      return anchor ? anchor.count * anchor.aliasCount : 0
+    } else if (node instanceof Pair) {
+      const kc = this.getAliasCount(doc, node.key)
+      const vc = this.getAliasCount(doc, node.value)
+      return Math.max(kc, vc)
+    } else if (Array.isArray(node)) {
+      let count = 0
+      for (const item of node) {
+        const c = this.getAliasCount(doc, item)
+        if (c > count) count = c
+      }
+      return count
+    }
+    return 1
   }
 }
 
