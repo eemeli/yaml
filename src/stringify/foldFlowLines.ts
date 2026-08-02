@@ -68,6 +68,14 @@ export function foldFlowLines(
   let escStart = -1
   let escEnd = -1
   if (mode === FOLD_BLOCK) {
+    if (text[0] === ' ' || text[0] === '\t') {
+      // Unlike the following ones, the first line does not include the block
+      // indent, which the caller adds. Any white space here is therefore
+      // content of a more-indented line, which must not be folded.
+      const nl = text.indexOf('\n')
+      if (nl === -1) return text
+      i = nl
+    }
     i = consumeMoreIndentedLines(text, i, indent.length)
     if (i !== -1) end = i + endStep
   }

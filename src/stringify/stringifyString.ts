@@ -190,9 +190,14 @@ function blockString(
     return quotedString(value, ctx)
   }
 
+  // Content starting with a space requires an explicit indentation indicator,
+  // which is only unambiguous if the block itself is indented as well.
+  const startsWithSpace = /^[\n ]*[ ]/.test(value)
   const indent =
     ctx.indent ||
-    (ctx.forceBlockIndent || containsDocumentMarker(value) ? '  ' : '')
+    (ctx.forceBlockIndent || startsWithSpace || containsDocumentMarker(value)
+      ? '  '
+      : '')
   const literal =
     blockQuote === 'literal'
       ? true
@@ -227,14 +232,12 @@ function blockString(
   }
 
   // determine indent indicator from whitespace at value start
-  let startWithSpace = false
   let startEnd: number
   let startNlPos = -1
   for (startEnd = 0; startEnd < value.length; ++startEnd) {
     const ch = value[startEnd]
-    if (ch === ' ') startWithSpace = true
-    else if (ch === '\n') startNlPos = startEnd
-    else break
+    if (ch === '\n') startNlPos = startEnd
+    else if (ch !== ' ') break
   }
   let start = value.substring(
     0,
@@ -245,9 +248,8 @@ function blockString(
     start = start.replace(/\n+/g, `$&${indent}`)
   }
 
-  const indentSize = indent ? '2' : '1' // root is at -1
   // Leading | or > is added later
-  let header = (startWithSpace ? indentSize : '') + chomp
+  let header = (startsWithSpace ? '2' : '') + chomp
   if (comment) {
     header += ' ' + commentString(comment.replace(/ ?[\r\n]+/g, ' '))
     if (onComment) onComment()
