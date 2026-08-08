@@ -350,6 +350,7 @@ describe('merge <<', () => {
       const merge = doc.createPair('<<', alias)
       b.set(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
+      expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(ReferenceError)
       expect(String(doc)).toBe('[ &AA { a: A }, { b: B, <<: *AA } ]\n')
     })
 

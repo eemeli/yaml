@@ -38,7 +38,7 @@ export class ToJSContext {
     }
     if (this.maxAliasCount >= 0) {
       data.count += 1
-      data.aliasCount ||= this.getAliasCount(doc, source)
+      data.aliasCount ||= this.#getAliasCount(doc, source)
       if (data.count * data.aliasCount > this.maxAliasCount) {
         const msg =
           'Excessive alias count indicates a resource exhaustion attack'
@@ -48,19 +48,19 @@ export class ToJSContext {
     return data.res
   }
 
-  private getAliasCount(doc: Document, node: Node | Pair | null): number {
+  #getAliasCount(doc: Document, node: Node | Pair | null): number {
     if (node instanceof Alias) {
       const source = node.resolve(doc, this)
       const anchor = source && this.anchors.get(source)
       return anchor ? anchor.count * anchor.aliasCount : 0
     } else if (node instanceof Pair) {
-      const kc = this.getAliasCount(doc, node.key)
-      const vc = this.getAliasCount(doc, node.value)
+      const kc = this.#getAliasCount(doc, node.key)
+      const vc = this.#getAliasCount(doc, node.value)
       return Math.max(kc, vc)
     } else if (Array.isArray(node)) {
       let count = 0
       for (const item of node) {
-        const c = this.getAliasCount(doc, item)
+        const c = this.#getAliasCount(doc, item)
         if (c > count) count = c
       }
       return count
