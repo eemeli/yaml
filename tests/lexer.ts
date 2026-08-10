@@ -76,3 +76,31 @@ test('trailing comments on ...', () => {
     '\n'
   ])
 })
+
+// \r, U+2028 and U+2029 end a line for a /m regexp but not for YAML. Getting
+// these wrong makes lex() loop rather than fail, so on a regression these time
+// out instead of reporting an assertion error.
+test('lone CR at stream start', () => {
+  const src = '\rZ\n'
+  expect(lex(src)).toEqual([DOC, SCALAR, '\rZ', '\n'])
+})
+
+test('Unicode line separators at stream start', () => {
+  expect(lex('\u2028Z\n')).toEqual([DOC, SCALAR, '\u2028Z', '\n'])
+  expect(lex('\u2029Z\n')).toEqual([DOC, SCALAR, '\u2029Z', '\n'])
+})
+
+test('CRLF at stream start', () => {
+  const src = '  \r\nA\n'
+  expect(lex(src)).toEqual(['  ', '\r\n', DOC, SCALAR, 'A', '\n'])
+})
+
+test('comment containing a Unicode line separator', () => {
+  const src = '# c\u2028Z\n'
+  expect(lex(src)).toEqual(['# c\u2028Z', '\n'])
+})
+
+test('comment containing a lone CR', () => {
+  expect(lex('# c\rZ\n')).toEqual(['# c\rZ', '\n'])
+  expect(lex('#a\r')).toEqual(['#a\r'])
+})

@@ -37,7 +37,10 @@ const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.has(ch)
 const blockScalarHeader = /([|>][^\s#]*)([ \t]*)((?:.|\r(?!\n))*)$/my
 const directiveLine = /(%.*?)(?:([ \t]+)(#.*)?)?$/my
 const docMarker = /[-.]{3}(?=[ \n\r\t]|$)(?:([ \t]+)(#.*)?)?/y
-const emptyLineOrComment = /([ \t]*)(#.*)?$/my
+// Anchored on the line breaks that newline() consumes; a /m `$` would also
+// match before \r, U+2028 and U+2029, matching empty without advancing. When it
+// does not match, lineStart() takes over, so the lexer still moves forward.
+const emptyLineOrComment = /([ \t]*)(#[^\n]*?)?(?=\r?\n|$)/y
 const indicator =
   //  |anchor       |explicit tag |implicit tag                                 |block start           |block start in flow   |spaces
   /(?:(&[^\s,[\]{}]*|!<[^\s>]*>?|!(?:[0-9a-z-#;/?:@&=+$_.!~*'()]|%[0-9a-f]{2})*)|([-?:])(?=[ \n\r\t]|$)|([-?:])(?=[,[\]{}]|$))([ \t]*)/iy
