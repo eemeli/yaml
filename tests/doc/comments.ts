@@ -304,6 +304,18 @@ describe('parse comments', () => {
 
 describe('stringify comments', () => {
   describe('single-line comments', () => {
+    test('comment after empty block scalar keeps its indentation indicator', () => {
+      const src = '|5\n#comment\n'
+      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      expect(doc.toJS()).toBe('')
+      expect(doc.comment).toBe('comment')
+      const res = String(doc)
+      expect(res).toBe('|2\n\n\n#comment\n')
+      const reparsed = YAML.parseDocument<YAML.Scalar, false>(res)
+      expect(reparsed.toJS()).toBe('')
+      expect(reparsed.comment).toBe('comment')
+    })
+
     test('plain', () => {
       const src = 'string'
       const doc = YAML.parseDocument<YAML.Scalar, false>(src)

@@ -201,7 +201,12 @@ function blockString(
         : type === Scalar.BLOCK_LITERAL
           ? true
           : !lineLengthOverLimit(value, lineWidth, indent.length)
-  if (!value) return literal ? '|\n' : '>\n'
+  if (!value) {
+    // An explicit indentation indicator is required to keep a following
+    // comment from being parsed as part of the block scalar.
+    const ind = ctx.forceBlockIndent ? '2' : ''
+    return literal ? `|${ind}\n` : `>${ind}\n`
+  }
 
   // determine chomping from whitespace at value end
   let chomp: '' | '-' | '+'
