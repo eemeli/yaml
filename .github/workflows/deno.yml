@@ -40,4 +40,4 @@ jobs:
             fs.writeFileSync("jsr.jsonc", text);
           '
       - run: deno --allow-env src/public-api.ts
-      - run: deno publish --no-check --dry-run
+      - run: deno publish --no-check --dry-run --allow-dirty

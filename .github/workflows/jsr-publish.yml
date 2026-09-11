@@ -30,4 +30,4 @@ jobs:
 
             fs.writeFileSync("jsr.jsonc", text);
           '
-      - run: npx jsr publish
+      - run: npx jsr publish --allow-dirty
