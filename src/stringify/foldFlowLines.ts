@@ -71,7 +71,7 @@ export function foldFlowLines(
     i = consumeMoreIndentedLines(text, i, indent.length)
     if (i !== -1) end = i + endStep
   }
-  for (let ch; (ch = text[(i += 1)]); ) {
+  for (let ch; (ch = text[(i += 1)]);) {
     if (mode === FOLD_QUOTED && ch === '\\') {
       escStart = i
       switch (text[i + 1]) {

@@ -15,15 +15,10 @@ import type { CollectionBase, Node, NodeOf, Primitive, Range } from './types.ts'
 import { cloneMapOrSet } from './util-clone-map-or-set.ts'
 
 export type MapLike =
-  | Map<any, any>
-  | Set<any>
-  | Record<string | number | symbol, any>
+  Map<any, any> | Set<any> | Record<string | number | symbol, any>
 
 export type KeyArg<K extends Primitive | Node, V extends Primitive | Node> =
-  | K
-  | NodeOf<K>
-  | (K extends Scalar ? K['value'] : never)
-  | Pair<K, V>
+  K | NodeOf<K> | (K extends Scalar ? K['value'] : never) | Pair<K, V>
 
 export class YAMLMap<
   K extends Primitive | Node = Primitive | Node,

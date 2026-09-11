@@ -2,20 +2,10 @@
 // https://json-schema.org/draft/2020-12/json-schema-validation.html
 
 type JsonSchema =
-  | boolean
-  | ArraySchema
-  | ObjectSchema
-  | NumberSchema
-  | StringSchema
+  boolean | ArraySchema | ObjectSchema | NumberSchema | StringSchema
 
 type JsonType =
-  | 'array'
-  | 'object'
-  | 'string'
-  | 'number'
-  | 'integer'
-  | 'boolean'
-  | 'null'
+  'array' | 'object' | 'string' | 'number' | 'integer' | 'boolean' | 'null'
 
 interface CommonSchema {
   type?: JsonType | JsonType[]

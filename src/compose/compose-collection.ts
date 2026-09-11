@@ -33,9 +33,7 @@ function resolveCollection(
         : resolveFlowCollection(CN, ctx, token, onError, tag)
 
   const Coll = coll.constructor as
-    | typeof YAMLMap
-    | typeof YAMLSeq
-    | typeof YAMLSet
+    typeof YAMLMap | typeof YAMLSeq | typeof YAMLSet
 
   // If we got a tagName matching the class, or the tag name is '!',
   // then use the tagName from the node class used to create it.

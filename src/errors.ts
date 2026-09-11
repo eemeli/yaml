@@ -65,8 +65,7 @@ export const prettifyError =
   (error: YAMLError): void => {
     if (error.pos[0] === -1) return
     error.linePos = error.pos.map(pos => lc.linePos(pos)) as
-      | [LinePos]
-      | [LinePos, LinePos]
+      [LinePos] | [LinePos, LinePos]
     const { line, col } = error.linePos[0]
     error.message += ` at line ${line}, column ${col}`
 

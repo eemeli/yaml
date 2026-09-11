@@ -140,9 +140,7 @@ export type Token =
   | FlowCollection
 
 export type TokenType =
-  | SourceToken['type']
-  | DocumentEnd['type']
-  | FlowScalar['type']
+  SourceToken['type'] | DocumentEnd['type'] | FlowScalar['type']
 
 /** The byte order mark */
 export const BOM = '\u{FEFF}'

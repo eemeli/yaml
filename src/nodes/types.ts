@@ -19,12 +19,7 @@ export type NodeOf<T> = T extends Primitive ? Scalar<T> : T
 
 /** Utility type mapper */
 export type NodeType<T> = T extends
-  | string
-  | number
-  | bigint
-  | boolean
-  | null
-  | undefined
+  string | number | bigint | boolean | null | undefined
   ? Scalar<T>
   : T extends Date
     ? Scalar<string | Date>

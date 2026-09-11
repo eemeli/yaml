@@ -129,8 +129,7 @@ export function parse(
 export function parse(
   src: string,
   reviver?:
-    | Reviver
-    | (ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions),
+    Reviver | (ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions),
   options?: ParseOptions & DocumentOptions & SchemaOptions & ToJSOptions
 ): any {
   let _reviver: Reviver | undefined = undefined

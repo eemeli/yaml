@@ -15,10 +15,7 @@ import { composeDoc } from './compose-doc.ts'
 import { resolveEnd } from './resolve-end.ts'
 
 type ErrorSource =
-  | number
-  | [number, number]
-  | Range
-  | { offset: number; source?: string }
+  number | [number, number] | Range | { offset: number; source?: string }
 
 export type ComposeErrorHandler = (
   source: ErrorSource,
