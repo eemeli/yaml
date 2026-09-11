@@ -35,7 +35,7 @@ const invalidAnchorChars = new Set(' ,[]{}\n\r\t')
 const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.has(ch)
 
 const blockScalarHeader = /([|>][^\s#]*)([ \t]*)((?:.|\r(?!\n))*)$/my
-const directiveLine = /(%.*?)(?:([ \t]+)(#.*)?)?$/my
+const directiveLine = /(%(?:[^ \t\n\r]|[ \t](?![\n\r#]))*)([ \t]*)(#.*)?$/my
 const docMarker = /[-.]{3}(?=[ \n\r\t]|$)(?:([ \t]+)(#.*)?)?/y
 const emptyLineOrComment = /([ \t]*)(#.*)?$/my
 const indicator =
