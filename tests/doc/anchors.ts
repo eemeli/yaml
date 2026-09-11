@@ -163,7 +163,7 @@ describe('errors', () => {
     const doc = parseDocument(src, { merge: true })
     expect(doc.errors).toHaveLength(0)
     expect(doc.warnings).toHaveLength(0)
-    expect(() => doc.toJS()).toThrow('Maximum call stack size exceeded')
+    expect(() => doc.toJS()).toThrow(ReferenceError)
     expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(ReferenceError)
     expect(String(doc)).toBe(src)
   })
@@ -341,6 +341,7 @@ describe('merge <<', () => {
       const merge = doc.createPair(Symbol('<<'), doc.createAlias(a))
       b.items.push(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
+      expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(ReferenceError)
       expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
     })
 
