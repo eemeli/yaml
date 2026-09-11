@@ -25,6 +25,7 @@ export const map: {
 
   resolve(map, onError) {
     if (!(map instanceof YAMLMap)) onError('Expected a mapping for this tag')
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     return map as YAMLMap<any, any>
   }
 } satisfies CollectionTag

@@ -81,7 +81,7 @@ export const binary: ScalarTag = {
     }
 
     return stringifyString(
-      { comment, type, value: str } as Scalar,
+      { comment, type, value: str },
       ctx,
       onComment,
       onChompKeep

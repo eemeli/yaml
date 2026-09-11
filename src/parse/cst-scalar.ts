@@ -99,15 +99,12 @@ export function createScalarToken(
     offset = -1,
     type = 'PLAIN'
   } = context
-  const source = stringifyString(
-    { type, value } as Scalar,
-    {
-      implicitKey,
-      indent: indent > 0 ? ' '.repeat(indent) : '',
-      inFlow,
-      options: { blockQuote: true, lineWidth: -1 }
-    } as StringifyContext
-  )
+  const source = stringifyString({ type, value }, {
+    implicitKey,
+    indent: indent > 0 ? ' '.repeat(indent) : '',
+    inFlow,
+    options: { blockQuote: true, lineWidth: -1 }
+  } as StringifyContext)
   const end = context.end ?? [
     { type: 'newline', offset: -1, indent, source: '\n' }
   ]
@@ -180,15 +177,12 @@ export function setScalarValue(
       default:
         type = 'PLAIN'
     }
-  const source = stringifyString(
-    { type, value } as Scalar,
-    {
-      implicitKey: implicitKey || indent === null,
-      indent: indent !== null && indent > 0 ? ' '.repeat(indent) : '',
-      inFlow,
-      options: { blockQuote: true, lineWidth: -1 }
-    } as StringifyContext
-  )
+  const source = stringifyString({ type, value }, {
+    implicitKey: implicitKey || indent === null,
+    indent: indent !== null && indent > 0 ? ' '.repeat(indent) : '',
+    inFlow,
+    options: { blockQuote: true, lineWidth: -1 }
+  } as StringifyContext)
   switch (source[0]) {
     case '|':
     case '>':

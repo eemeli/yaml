@@ -115,7 +115,7 @@ function getTagObject(tags: Array<ScalarTag | CollectionTag>, item: Node) {
       return match.find(t => t.format === (item as Scalar).format) ?? match[0]
   }
 
-  let tagObj: ScalarTag | CollectionTag | undefined = undefined
+  let tagObj: ScalarTag | CollectionTag | undefined
   let obj: unknown
   if (item instanceof Scalar) {
     obj = item.value

@@ -4,7 +4,7 @@ import { Scalar } from '../nodes/Scalar.ts'
 
 export function primitiveKey(value: unknown): Primitive | undefined {
   let value_ = value instanceof Pair ? value.key : value
-  value_ = value instanceof Scalar ? value.value : value
+  value_ = value_ instanceof Scalar ? value_.value : value
   switch (typeof value_) {
     case 'bigint':
     case 'boolean':

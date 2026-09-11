@@ -32,7 +32,6 @@ export function stringifyDocument(
   }
 
   let chompKeep = false
-  let contentComment = null
   if (doc.value.spaceBefore && hasDirectives) lines.push('')
   if (doc.value.commentBefore) {
     const cs = commentString(doc.value.commentBefore)
@@ -40,7 +39,7 @@ export function stringifyDocument(
   }
   // top-level block scalars need to be indented if followed by a comment
   ctx.forceBlockIndent = !!doc.comment
-  contentComment = doc.value.comment
+  let contentComment = doc.value.comment
   const onChompKeep = contentComment ? undefined : () => (chompKeep = true)
   let body = stringify(
     doc.value,

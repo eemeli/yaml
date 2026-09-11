@@ -93,18 +93,20 @@ export class Document<
   )
   constructor(
     value?: unknown,
-    replacer?:
+    replacerOrOptions?:
       | Replacer
       | (DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions)
       | null,
     options?: DocumentOptions & SchemaOptions & ParseOptions & CreateNodeOptions
   ) {
-    let _replacer: Replacer | null = null
-    if (typeof replacer === 'function' || Array.isArray(replacer)) {
-      _replacer = replacer
-    } else if (options === undefined && replacer) {
-      options = replacer
-      replacer = undefined
+    let replacer: Replacer | null = null
+    if (
+      typeof replacerOrOptions === 'function' ||
+      Array.isArray(replacerOrOptions)
+    ) {
+      replacer = replacerOrOptions
+    } else if (options === undefined && replacerOrOptions) {
+      options = replacerOrOptions
     }
 
     const opt = Object.assign(
@@ -127,7 +129,7 @@ export class Document<
     } else this.directives = new Directives({ version })
     this.setSchema(version, options)
 
-    this.value = this.createNode(value, _replacer, options) as Value
+    this.value = this.createNode(value, replacer, options) as Value
   }
 
   /**
