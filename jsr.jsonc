@@ -1,6 +1,6 @@
 {
   "name": "@eemeli/yaml",
-  "version": "3.0.0-1",
+  "version": "Set in .github/workflows/jsr-publish.yml",
   "license": "ISC",
   "exports": {
     ".": "./src/index.ts",
