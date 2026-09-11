@@ -107,11 +107,27 @@ function unfoldLines(source: string) {
   let match = line.exec(source)
   if (!match) return source
 
-  let res = match[1].replace(/[ \t]+$/, '')
+  /**
+   * The negative lookbehinds in these RegExps are to
+   * prevent causing a polynomial search time in certain cases.
+   *
+   * The try-catch is for Safari < 16.4 and other old browsers:
+   * https://caniuse.com/js-regexp-lookbehind
+   */
+  let trimEnd: RegExp, trimBoth: RegExp
+  try {
+    trimEnd = new RegExp('(?<![ \t])[ \t]+$')
+    trimBoth = new RegExp('^[ \t]+|(?<![ \t])[ \t]+$', 'g')
+  } catch {
+    trimEnd = /[ \t]+$/
+    trimBoth = /^[ \t]+|[ \t]+$/g
+  }
+
+  let res = match[1].replace(trimEnd, '')
   let sep = ' '
   let pos = line.lastIndex
   while ((match = line.exec(source))) {
-    const lm = match[1].replace(/^[ \t]+|[ \t]+$/g, '')
+    const lm = match[1].replace(trimBoth, '')
     if (lm === '') {
       if (sep === '\n') res += sep
       else sep = '\n'
