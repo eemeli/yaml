@@ -93,44 +93,30 @@ function plainValue(source: string, onError: FlowScalarErrorHandler) {
   }
   if (badChar)
     onError(0, 'BAD_SCALAR_START', `Plain value cannot start with ${badChar}`)
-  return foldLines(source)
+  return unfoldLines(source)
 }
 
 function singleQuotedValue(source: string, onError: FlowScalarErrorHandler) {
   if (source[source.length - 1] !== "'" || source.length === 1)
     onError(source.length, 'MISSING_CHAR', "Missing closing 'quote")
-  return foldLines(source.slice(1, -1)).replace(/''/g, "'")
+  return unfoldLines(source.slice(1, -1)).replace(/''/g, "'")
 }
 
-function foldLines(source: string) {
-  /**
-   * The negative lookbehind here and in the `re` RegExp is to
-   * prevent causing a polynomial search time in certain cases.
-   *
-   * The try-catch is for Safari, which doesn't support this yet:
-   * https://caniuse.com/js-regexp-lookbehind
-   */
-  let first: RegExp, line: RegExp
-  try {
-    first = new RegExp('(.*?)(?<![ \t])[ \t]*\r?\n', 'sy')
-    line = new RegExp('[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?\r?\n', 'sy')
-  } catch {
-    first = /(.*?)[ \t]*\r?\n/sy
-    line = /[ \t]*(.*?)[ \t]*\r?\n/sy
-  }
-  let match = first.exec(source)
+function unfoldLines(source: string) {
+  const line = /(.*?)\r?\n/sy
+  let match = line.exec(source)
   if (!match) return source
 
-  let res = match[1]
+  let res = match[1].replace(/[ \t]+$/, '')
   let sep = ' '
-  let pos = first.lastIndex
-  line.lastIndex = pos
+  let pos = line.lastIndex
   while ((match = line.exec(source))) {
-    if (match[1] === '') {
+    const lm = match[1].replace(/^[ \t]+|[ \t]+$/g, '')
+    if (lm === '') {
       if (sep === '\n') res += sep
       else sep = '\n'
     } else {
-      res += sep + match[1]
+      res += sep + lm
       sep = ' '
     }
     pos = line.lastIndex
