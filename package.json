@@ -38,7 +38,7 @@
     "test": "vitest run",
     "test:all": "npm test && npm run test:types && npm run test:dist && npm run test:dist:types",
     "test:dist": "npm run build && vitest run",
-    "test:dist:types": "tsc --allowJs --moduleResolution node --noEmit --target es5 dist/cli.js dist/index.js dist/test-events.js dist/util.js",
+    "test:dist:types": "tsc --ignoreConfig --allowJs --moduleResolution bundler --noEmit --target es2015 dist/cli.js dist/index.js dist/test-events.js dist/util.js",
     "test:types": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
     "docs:install": "cd docs-slate && bundle install",
     "predocs:deploy": "node docs/prepare-docs.js",
@@ -63,7 +63,7 @@
     "prettier": "^3.0.2",
     "rolldown": "^1.0.0-beta.54",
     "rolldown-plugin-dts": "^0.22.1",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.4.0",
     "vitest": "^4.0.15"
   },

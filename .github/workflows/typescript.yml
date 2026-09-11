@@ -23,4 +23,6 @@ jobs:
       - run: npm run test:dist:types
 
       - run: npm install --no-save @types/node@20.19.0 typescript@5.9.2
-      - run: npm run test:dist:types
+      - run: >
+          npx tsc --allowJs --moduleResolution node --noEmit --target es5
+          dist/cli.js dist/index.js dist/test-events.js dist/util.js

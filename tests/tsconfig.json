@@ -1,11 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "..",
     "paths": {
-      "yaml": ["src/index.ts"],
-      "yaml/cli": ["src/cli.ts"],
-      "yaml/util": ["src/util.ts"]
+      "yaml": ["../src/index.ts"],
+      "yaml/cli": ["../src/cli.ts"],
+      "yaml/util": ["../src/util.ts"]
     },
     "rootDir": "..",
     "types": ["vitest/globals", "node"]
