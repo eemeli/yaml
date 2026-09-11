@@ -2,17 +2,6 @@ import { Scalar } from '../../nodes/Scalar.ts'
 import { stringifyString } from '../../stringify/stringifyString.ts'
 import type { ScalarTag } from '../types.ts'
 
-declare global {
-  interface Uint8Array {
-    /** https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64 */
-    toBase64(options?: unknown): string
-  }
-  interface Uint8ArrayConstructor {
-    /** https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64 */
-    fromBase64(string: string, options?: unknown): Uint8Array
-  }
-}
-
 export const binary: ScalarTag = {
   identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array
   default: false,
