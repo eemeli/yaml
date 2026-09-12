@@ -59,8 +59,16 @@ First of all, make sure that all the tests pass, and that you've added test case
 Our set of test suites is rather extensive, and is a significant help in making sure no regressions are introduced.
 Note that the CI environment runs tests in both Node.js and browsers, so using new language features may require polyfilling.
 
-If you're intending to contribute to the upstream repo, please make sure that your code style matches the Prettier and ESLint rules.
-The easiest way to do that is to configure your editor to do that for you, but `lint` and `prettier` npm scripts are also provided.
+Please make sure that your code style matches the Prettier and ESLint rules.
+The easiest way to do that is to configure your editor to do that for you,
+but `lint` and `prettier` npm scripts are also provided.
+
+If your change adds any code comments,
+please make sure that they are really necessary,
+and documenting something not obvious from the code itself.
+
+If you are not a maintainer, your PRs MUST use the PR template,
+and they MUST reference a pre-existing issue.
 
 Do not rebase or squash a PR while it's being reviewed.
 Instead, add new commits or (if necessary to resolve conflicts)
@@ -74,6 +82,6 @@ This includes code comments added in PRs, as well as all issue and PR contents.
 
 If you would like to use an LLM to contribute code to `yaml`,
 please request and discuss this in an appropriate issue first.
-LLM use must be clearly indicated and pre-approved.
+LLM use MUST be clearly indicated and pre-approved.
 If there is indication of undeclared LLM assistance,
 the issue or pull request will be declined.
