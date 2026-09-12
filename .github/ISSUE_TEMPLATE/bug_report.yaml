@@ -1,0 +1,56 @@
+name: Bug report
+description: Report an issue to help us improve the library
+labels: bug
+
+body:
+  - type: checkboxes
+    attributes:
+      label: Checklist
+      description: Please ensure you have completed each of the following.
+      options:
+        - label: I have read the [Contributing Guidelines](https://github.com/eemeli/yaml/blob/main/docs/CONTRIBUTING.md).
+          required: true
+        - label: I affirm that I am submitting my own writing, and not the output of an LLM or similar tool.
+          required: true
+
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behaviour.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected behaviour
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: '`yaml` library version'
+      description: e.g. 2.9.1 or 3.0.0-2
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Environment
+      description: e.g. Node.js 26.0.0 or Firefox 155
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.
+    validations:
+      required: false
