@@ -24,7 +24,7 @@ describe('doc.clone()', () => {
     expect(node).toBeInstanceOf(Scalar)
     expect(node).toMatchObject({ value: 42 })
 
-    const alias = copy.createAlias(node as Scalar, 'foo')
+    const alias = copy.createAlias(node, 'foo')
     expect(alias).toBeInstanceOf(Alias)
     expect(alias).toMatchObject({ source: 'foo' })
   })
@@ -38,7 +38,7 @@ describe('doc.clone()', () => {
   })
 
   test('has separate directives from original', () => {
-    const doc = parseDocument<YAMLMap, false>('foo: bar')
+    const doc = parseDocument<YAMLMap>('foo: bar')
     const copy = doc.clone()
     copy.directives.yaml.explicit = true
     expect(copy.toString()).toBe(source`

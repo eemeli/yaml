@@ -303,7 +303,7 @@ describe('end-to-end', () => {
 
       Unfolded paragraph.
     `
-    const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+    const doc = YAML.parseDocument<YAML.Scalar>(src)
     expect(doc.value.value).toBe(source`
       Text on a line that should get folded with a line width of 20 characters.
 
@@ -331,7 +331,7 @@ describe('end-to-end', () => {
         fold twice
       - plain with comment # that won't get folded
     `
-    const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(src)
+    const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>>(src)
     expect(doc.value[0].value).toBe(
       'plain value with enough length to fold twice'
     )

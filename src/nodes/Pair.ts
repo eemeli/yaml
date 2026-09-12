@@ -33,7 +33,7 @@ export class Pair<
   }
 
   toJS(
-    doc: Document<DocValue, boolean>,
+    doc: Document<DocValue>,
     ctx: ToJSContext
   ): ReturnType<typeof addPairToJSMap> {
     const pair = ctx.mapAsMap ? new Map() : {}

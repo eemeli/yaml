@@ -312,7 +312,7 @@ describe('circular references', () => {
     const baz: any = {}
     const map = { foo: { bar: { baz } } }
     baz.map = map
-    const doc = new Document<any, false>(map)
+    const doc = new Document<any>(map)
     expect(doc.get('foo').get('bar').get('baz').get('map')).toMatchObject({
       source: 'a1'
     })

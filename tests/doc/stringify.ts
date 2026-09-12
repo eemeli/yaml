@@ -59,14 +59,14 @@ for (const [name, version] of [
           [1e32, '1e+32\n']
         ]) {
           test(`number (${n}) with trailing zeros`, () => {
-            const doc = new YAML.Document<YAML.Scalar, false>(n, { version })
+            const doc = new YAML.Document<YAML.Scalar>(n, { version })
             doc.value.minFractionDigits = 2
             expect(doc.toString()).toBe(exp)
           })
         }
 
         test('scientific float ignores minFractionDigits', () => {
-          const doc = new YAML.Document<YAML.Scalar, false>(3, { version })
+          const doc = new YAML.Document<YAML.Scalar>(3, { version })
           doc.value.format = 'EXP'
           doc.value.minFractionDigits = 2
           expect(String(doc)).toBe('3e+0\n')
@@ -74,17 +74,17 @@ for (const [name, version] of [
       })
 
       test('integer with HEX format', () => {
-        const doc = new YAML.Document<YAML.Scalar, false>(42, { version })
+        const doc = new YAML.Document<YAML.Scalar>(42, { version })
         doc.value.format = 'HEX'
         expect(String(doc)).toBe('0x2a\n')
       })
       test('float with HEX format', () => {
-        const doc = new YAML.Document<YAML.Scalar, false>(4.2, { version })
+        const doc = new YAML.Document<YAML.Scalar>(4.2, { version })
         doc.value.format = 'HEX'
         expect(String(doc)).toBe('4.2\n')
       })
       test('negative integer with HEX format', () => {
-        const doc = new YAML.Document<YAML.Scalar, false>(-42, { version })
+        const doc = new YAML.Document<YAML.Scalar>(-42, { version })
         doc.value.format = 'HEX'
         const exp = version === '1.2' ? '-42\n' : '-0x2a\n'
         expect(String(doc)).toBe(exp)
@@ -97,14 +97,14 @@ for (const [name, version] of [
         expect(YAML.stringify(Object(BigInt('-42')), { version })).toBe('-42\n')
       })
       test('BigInt with HEX format', () => {
-        const doc = new YAML.Document<YAML.Scalar, false>(BigInt('42'), {
+        const doc = new YAML.Document<YAML.Scalar>(BigInt('42'), {
           version
         })
         doc.value.format = 'HEX'
         expect(String(doc)).toBe('0x2a\n')
       })
       test('BigInt with OCT format', () => {
-        const doc = new YAML.Document<YAML.Scalar, false>(BigInt('42'), {
+        const doc = new YAML.Document<YAML.Scalar>(BigInt('42'), {
           version
         })
         doc.value.format = 'OCT'
@@ -112,7 +112,7 @@ for (const [name, version] of [
         expect(String(doc)).toBe(exp)
       })
       test('negative BigInt with OCT format', () => {
-        const doc = new YAML.Document<YAML.Scalar, false>(BigInt('-42'), {
+        const doc = new YAML.Document<YAML.Scalar>(BigInt('-42'), {
           version
         })
         doc.value.format = 'OCT'
@@ -160,10 +160,10 @@ blah blah\n`)
 
       test('long line in map', () => {
         const foo = 'fuzz'.repeat(16)
-        const doc = new YAML.Document<
-          YAML.YAMLMap<YAML.Scalar, YAML.Scalar>,
-          false
-        >({ foo }, { version })
+        const doc = new YAML.Document<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>>(
+          { foo },
+          { version }
+        )
         for (const pair of doc.value.values.values())
           pair.value!.type = Scalar.QUOTE_DOUBLE
         expect(
@@ -176,7 +176,7 @@ blah blah\n`)
 
       test('long line in sequence', () => {
         const foo = 'fuzz'.repeat(16)
-        const doc = new YAML.Document<YAML.YAMLSeq<YAML.Scalar>, false>([foo], {
+        const doc = new YAML.Document<YAML.YAMLSeq<YAML.Scalar>>([foo], {
           version
         })
         for (const node of doc.value) node.type = Scalar.QUOTE_DOUBLE
@@ -191,8 +191,7 @@ blah blah\n`)
       test('long line in sequence in map', () => {
         const foo = 'fuzz'.repeat(16)
         const doc = new YAML.Document<
-          YAML.YAMLMap<YAML.Scalar, YAML.YAMLSeq<YAML.Scalar>>,
-          false
+          YAML.YAMLMap<YAML.Scalar, YAML.YAMLSeq<YAML.Scalar>>
         >({ foo: [foo] }, { version })
         const seq = doc.value.get('foo')!
         for (const node of seq) node.type = Scalar.QUOTE_DOUBLE
@@ -345,7 +344,7 @@ z:
   })
 
   test('pushing non-Pair item', () => {
-    const doc = new YAML.Document<YAML.YAMLMap, false>({ x: 3, y: 4 })
+    const doc = new YAML.Document<YAML.YAMLMap>({ x: 3, y: 4 })
     expect(String(doc)).toBe('x: 3\ny: 4\n')
     // @ts-expect-error This should fail.
     expect(() => doc.value.push('TEST')).toThrow(TypeError)
@@ -369,7 +368,7 @@ z:
 
   describe('No extra whitespace for empty values', () => {
     const getDoc = () =>
-      new YAML.Document<YAML.YAMLMap, false>({
+      new YAML.Document<YAML.YAMLMap>({
         a: null,
         b: null
       })
@@ -388,7 +387,7 @@ z:
     test('Block map, with value.commentBefore', () => {
       const doc = getDoc()
       doc.set('a', new Scalar(null))
-      doc.get('a').commentBefore = 'c'
+      doc.get('a')!.commentBefore = 'c'
       expect(doc.toString({ nullStr: '' })).toBe('a:\n  #c\nb:\n')
     })
 
@@ -409,7 +408,7 @@ z:
       const doc = getDoc()
       doc.value.flow = true
       doc.set('a', new Scalar(null))
-      doc.get('a').commentBefore = 'c'
+      doc.get('a')!.commentBefore = 'c'
       expect(doc.toString({ nullStr: '' })).toBe(
         '{\n  a:\n    #c\n    ,\n  b:\n}\n'
       )
@@ -513,8 +512,8 @@ z:
       expect(String(doc)).toBe(src)
     })
     test('explicit tag on empty mapping', () => {
-      const doc = new YAML.Document<YAML.DocValue, false>({ key: {} })
-      doc.get('key').tag = '!tag'
+      const doc = new YAML.Document<YAML.YAMLMap>({ key: {} })
+      doc.get('key')!.tag = '!tag'
       expect(String(doc)).toBe(source`
         key: !tag {}
       `)
@@ -1139,53 +1138,61 @@ describe('lineWidth', () => {
 
 describe('collectionStyle', () => {
   test('collectionStyle: undefined', () => {
-    const doc = new YAML.Document<YAML.YAMLMap, false>({ foo: ['bar'] })
+    const doc = new YAML.Document<YAML.YAMLMap<string, YAML.YAMLSeq>>({
+      foo: ['bar']
+    })
     expect(doc.toString()).toBe('foo:\n  - bar\n')
 
     doc.value.flow = false
-    doc.get('foo').flow = true
+    doc.get('foo')!.flow = true
     expect(doc.toString()).toBe('foo: [ bar ]\n')
 
     doc.value.flow = true
-    doc.get('foo').flow = false
+    doc.get('foo')!.flow = false
     expect(doc.toString()).toBe('{ foo: [ bar ] }\n')
   })
 
   test("collectionStyle: 'any'", () => {
-    const doc = new YAML.Document<YAML.YAMLMap, false>({ foo: ['bar'] })
+    const doc = new YAML.Document<YAML.YAMLMap<string, YAML.YAMLSeq>>({
+      foo: ['bar']
+    })
     expect(doc.toString({ collectionStyle: 'any' })).toBe('foo:\n  - bar\n')
 
     doc.value.flow = false
-    doc.get('foo').flow = true
+    doc.get('foo')!.flow = true
     expect(doc.toString({ collectionStyle: 'any' })).toBe('foo: [ bar ]\n')
 
     doc.value.flow = true
-    doc.get('foo').flow = false
+    doc.get('foo')!.flow = false
     expect(doc.toString({ collectionStyle: 'any' })).toBe('{ foo: [ bar ] }\n')
   })
 
   test("collectionStyle: 'block'", () => {
-    const doc = new YAML.Document<YAML.YAMLMap, false>({ foo: ['bar'] })
+    const doc = new YAML.Document<YAML.YAMLMap<string, YAML.YAMLSeq>>({
+      foo: ['bar']
+    })
     expect(doc.toString({ collectionStyle: 'block' })).toBe('foo:\n  - bar\n')
 
     doc.value.flow = false
-    doc.get('foo').flow = true
+    doc.get('foo')!.flow = true
     expect(doc.toString({ collectionStyle: 'block' })).toBe('foo:\n  - bar\n')
 
     doc.value.flow = true
-    doc.get('foo').flow = false
+    doc.get('foo')!.flow = false
     expect(doc.toString({ collectionStyle: 'block' })).toBe('foo:\n  - bar\n')
   })
 
   test("collectionStyle: 'flow'", () => {
-    const doc = new YAML.Document<YAML.YAMLMap, false>({ foo: ['bar'] })
+    const doc = new YAML.Document<YAML.YAMLMap<string, YAML.YAMLSeq>>({
+      foo: ['bar']
+    })
     expect(doc.toString({ collectionStyle: 'flow' })).toBe('{ foo: [ bar ] }\n')
 
-    doc.get('foo').flow = true
+    doc.get('foo')!.flow = true
     expect(doc.toString({ collectionStyle: 'flow' })).toBe('{ foo: [ bar ] }\n')
 
     doc.value.flow = true
-    doc.get('foo').flow = false
+    doc.get('foo')!.flow = false
     expect(doc.toString({ collectionStyle: 'flow' })).toBe('{ foo: [ bar ] }\n')
   })
 })
@@ -1238,7 +1245,7 @@ describe('Scalar options', () => {
         defaultStringType: Scalar.QUOTE_DOUBLE,
         defaultKeyType: Scalar.QUOTE_SINGLE
       } as const
-      const doc = new YAML.Document<YAML.YAMLMap, false>({ foo: null })
+      const doc = new YAML.Document<YAML.YAMLMap>({ foo: null })
       const key = doc.getPair('foo')!.key as Scalar
       key.type = Scalar.BLOCK_LITERAL
       expect(doc.toString(opt)).toBe('? "foo"\n')
@@ -1380,7 +1387,7 @@ describe('Document markers in top-level scalars', () => {
   })
 
   test("'foo\\n...'", () => {
-    const doc = new YAML.Document<YAML.Scalar, false>('foo\n...')
+    const doc = new YAML.Document<YAML.Scalar>('foo\n...')
     doc.value.type = Scalar.QUOTE_SINGLE
     const str = String(doc)
     expect(str).toBe("'foo\n\n  ...'\n")
@@ -1388,7 +1395,7 @@ describe('Document markers in top-level scalars', () => {
   })
 
   test('"foo\\n..."', () => {
-    const doc = new YAML.Document<YAML.Scalar, false>('foo\n...')
+    const doc = new YAML.Document<YAML.Scalar>('foo\n...')
     doc.value.type = Scalar.QUOTE_DOUBLE
     const str = doc.toString({ doubleQuotedMinMultiLineLength: 0 })
     expect(str).toBe('"foo\n\n  ..."\n')

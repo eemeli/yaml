@@ -48,7 +48,7 @@ export class YAMLOMap<
    * The returned value actually has type `Map<unknown, unknown>`,
    * but TypeScript won't allow widening the signature of a child method.
    */
-  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): never[] {
+  toJS(doc: Document<DocValue>, ctx?: ToJSContext): never[] {
     if (!ctx) return super.toJS(doc) as never[]
     const map = new Map()
     if (this.anchor) {

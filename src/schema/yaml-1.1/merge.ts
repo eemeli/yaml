@@ -32,10 +32,7 @@ export const merge: ScalarTag & {
   stringify: () => MERGE_KEY
 }
 
-export const isMergeKey = (
-  doc: Document<DocValue, boolean>,
-  key: unknown
-): boolean =>
+export const isMergeKey = (doc: Document<DocValue>, key: unknown): boolean =>
   (merge.identify(key) ||
     (key instanceof Scalar &&
       (!key.type || key.type === Scalar.PLAIN) &&
@@ -43,7 +40,7 @@ export const isMergeKey = (
   Boolean(doc.schema.tags.some(tag => tag.tag === merge.tag && tag.default))
 
 export function addMergeToJSMap(
-  doc: Document<DocValue, boolean>,
+  doc: Document<DocValue>,
   ctx: ToJSContext,
   map: MapLike,
   value: unknown,
@@ -58,7 +55,7 @@ export function addMergeToJSMap(
 }
 
 function mergeValue(
-  doc: Document<DocValue, boolean>,
+  doc: Document<DocValue>,
   ctx: ToJSContext,
   map: MapLike,
   value: unknown,
@@ -90,7 +87,7 @@ function mergeValue(
 }
 
 function getMergeSource(
-  doc: Document<DocValue, boolean>,
+  doc: Document<DocValue>,
   ctx: ToJSContext,
   value: unknown
 ) {

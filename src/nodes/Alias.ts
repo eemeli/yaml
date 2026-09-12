@@ -89,7 +89,7 @@ export class Alias implements NodeBase {
   }
 
   /** A plain JavaScript representation of the resolved value of this alias. */
-  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any {
+  toJS(doc: Document<DocValue>, ctx?: ToJSContext): any {
     if (!doc?.schema) throw new TypeError('A document argument is required')
     ctx ??= new ToJSContext()
 

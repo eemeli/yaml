@@ -17,7 +17,7 @@ describe('parse comments', () => {
         #comment
         string
       `
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       expect(doc.value.commentBefore).toBe('comment\ncomment')
       expect(String(doc)).toBe(src)
     })
@@ -30,7 +30,7 @@ describe('parse comments', () => {
         #comment
         string
       `
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       expect(doc.value.commentBefore).toBe('comment\n \ncomment')
       expect(String(doc)).toBe(source`
         ---
@@ -52,7 +52,7 @@ describe('parse comments', () => {
   describe('top-level scalar comments', () => {
     test('plain', () => {
       const src = '#c0\nvalue #c1\n#c2'
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       expect(doc.value.commentBefore).toBe('c0')
       expect(doc.value.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
@@ -62,7 +62,7 @@ describe('parse comments', () => {
 
     test('"quoted"', () => {
       const src = '#c0\n"value" #c1\n#c2'
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       expect(doc.value.commentBefore).toBe('c0')
       expect(doc.value.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
@@ -72,7 +72,7 @@ describe('parse comments', () => {
 
     test('block', () => {
       const src = '#c0\n>- #c1\n value\n#c2\n'
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       expect(doc.value.commentBefore).toBe('c0')
       expect(doc.value.comment).toBe('c1')
       expect(doc.comment).toBe('c2')
@@ -251,7 +251,7 @@ describe('parse comments', () => {
 
   describe('flow collection comments', () => {
     test('line comment after , in seq', () => {
-      const doc = YAML.parseDocument<YAML.YAMLSeq, false>(source`
+      const doc = YAML.parseDocument<YAML.YAMLSeq>(source`
         [ a, #c0
           b #c1
         ]`)
@@ -262,7 +262,7 @@ describe('parse comments', () => {
     })
 
     test('line comment after , in map', () => {
-      const doc = YAML.parseDocument<YAML.YAMLMap, false>(source`
+      const doc = YAML.parseDocument<YAML.YAMLMap>(source`
         { a, #c0
           b: c, #c1
           d #c2
@@ -277,7 +277,7 @@ describe('parse comments', () => {
     })
 
     test('multi-line comments', () => {
-      const doc = YAML.parseDocument<YAML.YAMLMap, false>('{ a,\n#c0\n#c1\nb }')
+      const doc = YAML.parseDocument<YAML.YAMLMap>('{ a,\n#c0\n#c1\nb }')
       expect(doc.value).toMatchObject(
         _map({
           a: { key: { value: 'a' }, value: {} },
@@ -306,21 +306,21 @@ describe('stringify comments', () => {
   describe('single-line comments', () => {
     test('plain', () => {
       const src = 'string'
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       doc.value.comment = 'comment'
       expect(String(doc)).toBe('string #comment\n')
     })
 
     test('"quoted"', () => {
       const src = '"string\\u0000"'
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       doc.value.comment = 'comment'
       expect(String(doc)).toBe('"string\\0" #comment\n')
     })
 
     test('block', () => {
       const src = '>\nstring\n'
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       doc.value.comment = 'comment'
       expect(String(doc)).toBe('> #comment\nstring\n')
     })
@@ -329,21 +329,21 @@ describe('stringify comments', () => {
   describe('multi-line comments', () => {
     test('plain', () => {
       const src = 'string'
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       doc.value.comment = 'comment\nlines'
       expect(String(doc)).toBe('string\n#comment\n#lines\n')
     })
 
     test('"quoted"', () => {
       const src = '"string\\u0000"'
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       doc.value.comment = 'comment\nlines'
       expect(String(doc)).toBe('"string\\0"\n#comment\n#lines\n')
     })
 
     test('block', () => {
       const src = '>\nstring\n'
-      const doc = YAML.parseDocument<YAML.Scalar, false>(src)
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
       doc.value.comment = 'comment\nlines'
       expect(String(doc)).toBe('> #comment lines\nstring\n')
     })
@@ -371,7 +371,7 @@ describe('stringify comments', () => {
   describe('seq comments', () => {
     test('plain', () => {
       const src = '- value 1\n- value 2\n'
-      const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(src)
+      const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>>(src)
       doc.value.commentBefore = 'c0'
       doc.value[0].commentBefore = 'c1'
       doc.value[1].commentBefore = 'c2'
@@ -388,7 +388,7 @@ describe('stringify comments', () => {
 
     test('multiline', () => {
       const src = '- value 1\n- value 2\n'
-      const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(src)
+      const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>>(src)
       doc.value[0].commentBefore = 'c0\nc1'
       doc.value[1].commentBefore = ' \nc2\n\nc3'
       doc.value.comment = 'c4\nc5'
@@ -408,10 +408,10 @@ describe('stringify comments', () => {
 
     test('seq-in-map', () => {
       const src = 'map:\n  - value 1\n  - value 2\n'
-      const doc = YAML.parseDocument<
-        YAML.YAMLMap<YAML.Scalar, YAML.YAMLSeq<YAML.Scalar>>,
-        false
-      >(src)
+      const doc =
+        YAML.parseDocument<
+          YAML.YAMLMap<YAML.Scalar, YAML.YAMLSeq<YAML.Scalar>>
+        >(src)
       const { key, value: seq } = doc.value.getPair('map')!
       key.commentBefore = 'c0'
       key.comment = 'c1'
@@ -432,9 +432,7 @@ describe('stringify comments', () => {
     })
 
     test('custom stringifier', () => {
-      const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(
-        '- a\n- b\n'
-      )
+      const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>>('- a\n- b\n')
       doc.value.commentBefore = 'c0'
       doc.value[0].commentBefore = 'c1'
       doc.value[1].commentBefore = 'c2\nc3'
@@ -453,10 +451,8 @@ describe('stringify comments', () => {
   describe('map entry comments', () => {
     test('plain', () => {
       const src = 'key1: value 1\nkey2: value 2\n'
-      const doc = YAML.parseDocument<
-        YAML.YAMLMap<YAML.Scalar, YAML.Scalar>,
-        false
-      >(src)
+      const doc =
+        YAML.parseDocument<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>>(src)
       const p1 = doc.getPair('key1')!
       p1.key.commentBefore = 'c0'
       const p2 = doc.getPair('key2')!
@@ -477,10 +473,8 @@ describe('stringify comments', () => {
 
     test('multiline', () => {
       const src = 'key1: value 1\nkey2: value 2\n'
-      const doc = YAML.parseDocument<
-        YAML.YAMLMap<YAML.Scalar, YAML.Scalar>,
-        false
-      >(src)
+      const doc =
+        YAML.parseDocument<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>>(src)
       const p1 = doc.getPair('key1')!
       p1.key.commentBefore = 'c0\nc1'
       const p2 = doc.getPair('key2')!
@@ -665,7 +659,7 @@ describe('blank lines', () => {
   })
 
   test('before first node in document with directives', () => {
-    const doc = YAML.parseDocument<YAML.Scalar, false>('str\n')
+    const doc = YAML.parseDocument<YAML.Scalar>('str\n')
     doc.value.spaceBefore = true
     expect(doc.toString({ directives: true })).toBe('---\n\nstr\n')
   })
@@ -1037,9 +1031,7 @@ map:
 
   describe('newlines as comments', () => {
     test('seq', () => {
-      const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>, false>(
-        '- v1\n- v2\n'
-      )
+      const doc = YAML.parseDocument<YAML.YAMLSeq<YAML.Scalar>>('- v1\n- v2\n')
       const [v1, v2] = doc.value
       v1.commentBefore = '\n'
       v1.comment = '\n'
@@ -1056,10 +1048,10 @@ map:
     })
 
     test('map', () => {
-      const doc = YAML.parseDocument<
-        YAML.YAMLMap<YAML.Scalar, YAML.Scalar>,
-        false
-      >('k1: v1\nk2: v2')
+      const doc =
+        YAML.parseDocument<YAML.YAMLMap<YAML.Scalar, YAML.Scalar>>(
+          'k1: v1\nk2: v2'
+        )
       const p1 = doc.getPair('k1')!
       p1.key.commentBefore = '\n'
       p1.value!.commentBefore = '\n'

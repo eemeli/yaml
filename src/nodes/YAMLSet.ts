@@ -136,7 +136,7 @@ export class YAMLSet<
   }
 
   /** A plain JavaScript representation of this set. */
-  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): Set<any> {
+  toJS(doc: Document<DocValue>, ctx?: ToJSContext): Set<any> {
     ctx ??= new ToJSContext()
     const set = new Set()
     if (this.anchor) ctx.setAnchor(this, set)
