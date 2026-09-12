@@ -1407,6 +1407,38 @@ describe('Document markers in top-level scalars', () => {
   })
 })
 
+describe('Block scalars with leading spaces (#692)', () => {
+  for (const [value, exp] of [
+    ['  a\n  b', '|2-\n    a\n    b\n'],
+    ['  indented\nlines', '|2-\n    indented\n  lines\n'],
+    [' a\nb', '|2-\n   a\n  b\n'],
+    ['   x\n y\nz', '|2-\n     x\n   y\n  z\n'],
+    ['    deep\nshallow', '|2-\n      deep\n  shallow\n'],
+    ['\n  a', '|2-\n  \n    a\n'],
+    ['  \nabc', '|2-\n    \n  abc\n'],
+    [' a\n', '|2\n   a\n'],
+    ['  a\n\n', '|2+\n    a\n\n']
+  ]) {
+    test(JSON.stringify(value), () => {
+      const str = YAML.stringify(value)
+      expect(str).toBe(exp)
+      expect(YAML.parse(str)).toBe(value)
+    })
+  }
+
+  test('as a map value', () => {
+    const str = YAML.stringify({ key: '  a\n  b' })
+    expect(str).toBe('key: |2-\n    a\n    b\n')
+    expect(YAML.parse(str)).toEqual({ key: '  a\n  b' })
+  })
+
+  test('as a seq item', () => {
+    const str = YAML.stringify(['  a\n  b'])
+    expect(str).toBe('- |2-\n    a\n    b\n')
+    expect(YAML.parse(str)).toEqual(['  a\n  b'])
+  })
+})
+
 describe('Document markers in top-level map keys (#431)', () => {
   test('---', () => {
     const str = YAML.stringify({ '--- x': 42 })
