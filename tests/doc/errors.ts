@@ -70,6 +70,84 @@ describe('flow scalars', () => {
   })
 })
 
+describe('non-printable characters (#703)', () => {
+  test('in plain scalar', () => {
+    const doc = YAML.parseDocument('a\x01b')
+    expect(doc.errors).toMatchObject([
+      { code: 'NON_PRINTABLE_CHAR', pos: [1, 2] }
+    ])
+    // The error is recoverable; the value still resolves.
+    expect(doc.toJS()).toBe('a\x01b')
+  })
+
+  test('in flow collection', () => {
+    const doc = YAML.parseDocument('[ a\x01b ]')
+    expect(doc.errors).toMatchObject([{ code: 'NON_PRINTABLE_CHAR' }])
+  })
+
+  test('in double-quoted scalar', () => {
+    const doc = YAML.parseDocument('"a\x02b"')
+    expect(doc.errors).toMatchObject([
+      { code: 'NON_PRINTABLE_CHAR', pos: [2, 3] }
+    ])
+  })
+
+  test('in single-quoted scalar', () => {
+    const doc = YAML.parseDocument("'a\x03b'")
+    expect(doc.errors).toMatchObject([
+      { code: 'NON_PRINTABLE_CHAR', pos: [2, 3] }
+    ])
+  })
+
+  test('in literal block scalar', () => {
+    const doc = YAML.parseDocument('|\n  a\x04b\n')
+    expect(doc.errors).toMatchObject([
+      { code: 'NON_PRINTABLE_CHAR', pos: [5, 6] }
+    ])
+  })
+
+  test('in folded block scalar', () => {
+    const doc = YAML.parseDocument('>\n  a\x05b\n')
+    expect(doc.errors).toMatchObject([
+      { code: 'NON_PRINTABLE_CHAR', pos: [5, 6] }
+    ])
+  })
+
+  test('DEL, C1 controls and lone surrogates are allowed (JSON compatibility)', () => {
+    const doc = YAML.parseDocument('a\x7fb')
+    expect(doc.errors).toHaveLength(0)
+    const doc2 = YAML.parseDocument('a\x80b')
+    expect(doc2.errors).toHaveLength(0)
+    const doc3 = YAML.parseDocument('"a\ud800b"')
+    expect(doc3.errors).toHaveLength(0)
+  })
+
+  test('multiple characters are each reported', () => {
+    const doc = YAML.parseDocument('"a\x00\x00b"')
+    expect(doc.errors).toMatchObject([
+      { code: 'NON_PRINTABLE_CHAR', pos: [2, 3] },
+      { code: 'NON_PRINTABLE_CHAR', pos: [3, 4] }
+    ])
+  })
+
+  test('escaped control character in double-quoted scalar', () => {
+    const doc = YAML.parseDocument('"a\\x01b"')
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.toJS()).toBe('a\x01b')
+  })
+
+  test('printable tab, NEL, BOM and astral characters', () => {
+    const src = 'a\tb\u{85}c\u{FEFF}d\u{1F600}e'
+    const doc = YAML.parseDocument(src)
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.toJS()).toBe(src)
+  })
+
+  test('parse() throws for non-printable characters', () => {
+    expect(() => YAML.parse('a\x01b')).toThrow(YAML.YAMLParseError)
+  })
+})
+
 describe('block collections', () => {
   test('mapping with bad indentation', () => {
     const src = 'foo: "1"\n bar: 2\n'

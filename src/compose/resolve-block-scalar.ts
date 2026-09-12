@@ -3,6 +3,7 @@ import { Scalar } from '../nodes/Scalar.ts'
 import type { BlockScalar } from '../parse/cst.ts'
 import type { ComposeContext } from './compose-node.ts'
 import type { ComposeErrorHandler } from './composer.ts'
+import { checkNonPrintable } from './util-non-printable.ts'
 
 export function resolveBlockScalar(
   ctx: ComposeContext,
@@ -20,6 +21,10 @@ export function resolveBlockScalar(
     return { value: '', type: null, comment: '', range: [start, start, start] }
   const type = header.mode === '>' ? Scalar.BLOCK_FOLDED : Scalar.BLOCK_LITERAL
   const lines = scalar.source ? splitLines(scalar.source) : []
+
+  checkNonPrintable(scalar.source, (rel, code, msg) =>
+    onError(start + header.length + rel, code, msg)
+  )
 
   // determine the end of content & start of chomping
   let chompStart = lines.length
