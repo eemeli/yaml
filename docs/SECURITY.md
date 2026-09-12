@@ -1,7 +1,8 @@
 # Security Policy
 
 Security updates will be provided for the most recent minor v1 and v2 releases of `yaml`.
-Security updates for prerelease versions are not provided.
+Security updates for prerelease versions are not provided,
+and all issues relating to prerelease versions only should be filed as normal issues.
 
 No updates are provided for earlier releases.
 After a 3.0.0 release is published, no updates will be provided for v1 releases.
@@ -10,7 +11,10 @@ To report a suspected security vulnerability,
 please do so on GitHub via this form:
 https://github.com/eemeli/yaml/security/advisories/new
 
-You may expect a response within one week.
+For human-authored security reports,
+you may expect a response within two weeks.
+For excessively verbose LLM-authored security reports,
+you may expect a response within two months.
 
 For extended support, a stronger guarantee, or a faster response time,
 please reach out to the maintainer to discuss a support agreement.
