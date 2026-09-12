@@ -63,7 +63,7 @@ export class NodeCreator {
       value instanceof String ||
       value instanceof Number ||
       value instanceof Boolean ||
-      (typeof BigInt !== 'undefined' && value instanceof BigInt) // not supported everywhere
+      value instanceof BigInt
     ) {
       // https://tc39.es/ecma262/#sec-serializejsonproperty
       value = value.valueOf()
@@ -104,7 +104,7 @@ export class NodeCreator {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         value = (value as any).toJSON()
       }
-      if (!value || typeof value !== 'object') {
+      if (!value || typeof value !== 'object' || JSON.isRawJSON?.(value)) {
         const node = new Scalar(value)
         if (ref) ref.node = node
         return node

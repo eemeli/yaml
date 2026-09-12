@@ -6,6 +6,8 @@
  * @module YAML
  */
 
+/// <reference types="./rawjson.d.ts" />
+
 export { Composer } from './compose/composer.ts'
 
 export { Document, type DocValue } from './doc/Document.ts'
