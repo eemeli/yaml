@@ -95,7 +95,8 @@ import {
 - [`new YAMLSeq()`](#collections)
 - [`doc.createAlias(node, name?): Alias`](#creating-nodes)
 - [`doc.createNode(value, options?): Node`](#creating-nodes)
-- [`doc.createPair(key, value): Pair`](#creating-nodes)
+- [`doc.createPair(key, value, options?): Pair`](#creating-nodes)
+- [`doc.createMergePair(value, options?): Pair`](#creating-nodes)
 - [`visit(node, visitor)`](#finding-and-modifying-nodes)
 - [`visitAsync(node, visitor)`](#finding-and-modifying-nodes)
 

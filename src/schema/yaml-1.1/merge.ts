@@ -17,29 +17,19 @@ const MERGE_KEY = '<<'
 
 export const merge: ScalarTag & {
   identify(value: unknown): boolean
+  resolve(): Scalar<symbol>
   test: (value: string) => boolean
 } = {
   identify: value =>
-    value === MERGE_KEY ||
-    (typeof value === 'symbol' && value.description === MERGE_KEY),
+    typeof value === 'symbol' && value.description === MERGE_KEY,
   default: 'key',
   tag: 'tag:yaml.org,2002:merge',
   test: str => str === MERGE_KEY,
-  resolve: () =>
-    Object.assign(new Scalar(Symbol(MERGE_KEY)), {
-      addToJSMap: addMergeToJSMap
-    }),
+  resolve: () => Object.assign(new Scalar(Symbol(MERGE_KEY)), { addToJSMap }),
   stringify: () => MERGE_KEY
 }
 
-export const isMergeKey = (doc: Document<DocValue>, key: unknown): boolean =>
-  (merge.identify(key) ||
-    (key instanceof Scalar &&
-      (!key.type || key.type === Scalar.PLAIN) &&
-      merge.identify(key.value))) &&
-  Boolean(doc.schema.tags.some(tag => tag.tag === merge.tag && tag.default))
-
-export function addMergeToJSMap(
+function addToJSMap(
   doc: Document<DocValue>,
   ctx: ToJSContext,
   map: MapLike,

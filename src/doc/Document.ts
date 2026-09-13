@@ -1,5 +1,6 @@
 import type { YAMLError, YAMLWarning } from '../errors.ts'
 import { Alias } from '../nodes/Alias.ts'
+import { isNode } from '../nodes/identity.ts'
 import { Pair } from '../nodes/Pair.ts'
 import type { Scalar } from '../nodes/Scalar.ts'
 import { ToJSContext } from '../nodes/toJS.ts'
@@ -16,6 +17,7 @@ import type {
   ToStringOptions
 } from '../options.ts'
 import { Schema } from '../schema/Schema.ts'
+import { merge } from '../schema/yaml-1.1/merge.ts'
 import { stringifyDocument } from '../stringify/stringifyDocument.ts'
 import { anchorNames, findNewAnchor } from './anchors.ts'
 import { applyReviver } from './applyReviver.ts'
@@ -218,6 +220,31 @@ export class Document<Value extends DocValue = DocValue> {
     >
     nc.setAnchors()
     return pair
+  }
+
+  /**
+   * Create a YAML 1.1 `<<` merge pair with the provided value.
+   *
+   * Throws if the current schema does not support merge keys,
+   * or if the value has an invalid shape.
+   */
+  createMergePair(
+    value: unknown,
+    options?: CreateNodeOptions
+  ): Pair<Scalar<symbol>, Alias | YAMLMap | YAMLSeq<Alias | YAMLMap>> {
+    if (!this.schema.tags.includes(merge))
+      throw new Error('Merge tags are not supported in this Document')
+    const v =
+      !options && isNode(value) ? value : this.createNode(value, options)
+    if (
+      v instanceof Alias ||
+      v instanceof YAMLMap ||
+      (v instanceof YAMLSeq &&
+        v.every(a => a instanceof Alias || a instanceof YAMLMap))
+    )
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return new Pair<any, any>(merge.resolve(), v)
+    throw new Error('Invalid merge pair value')
   }
 
   /**

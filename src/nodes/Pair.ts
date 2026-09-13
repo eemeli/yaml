@@ -6,6 +6,7 @@ import { stringifyPair } from '../stringify/stringifyPair.ts'
 import { addPairToJSMap } from './addPairToJSMap.ts'
 import type { ToJSContext } from './toJS.ts'
 import type { Node, NodeOf, Primitive } from './types.ts'
+import type { MapLike } from './YAMLMap.ts'
 
 export class Pair<
   K extends Primitive | Node = Primitive | Node,
@@ -32,12 +33,10 @@ export class Pair<
     return new Pair(key, value)
   }
 
-  toJS(
-    doc: Document<DocValue>,
-    ctx: ToJSContext
-  ): ReturnType<typeof addPairToJSMap> {
+  toJS(doc: Document<DocValue>, ctx: ToJSContext): MapLike {
     const pair = ctx.mapAsMap ? new Map() : {}
-    return addPairToJSMap(doc, ctx, pair, this, true)
+    addPairToJSMap(doc, ctx, pair, this, true)
+    return pair
   }
 
   toString(

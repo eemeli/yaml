@@ -926,10 +926,15 @@ date (00:00:00Z): 2002-12-14\n`)
     })
   })
 
-  describe('!!merge', () => {
+  describe.for([
+    { merge: true },
+    { merge: true, resolveKnownTags: false },
+    { schema: 'yaml-1.1' as const },
+    { version: '1.1' as const }
+  ])('!!merge with %o', options => {
     test('alias', () => {
       const src = '- &a { a: A, b: B }\n- { <<: *a, b: X }\n'
-      const doc = parseDocument(src, { version: '1.1' })
+      const doc = parseDocument(src, options)
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
         { a: 'A', b: 'X' }
@@ -940,7 +945,7 @@ date (00:00:00Z): 2002-12-14\n`)
     test('alias sequence', () => {
       const src =
         '- &a { a: A, b: B, c: C }\n- &b { a: X }\n- { <<: [ *b, *a ], b: X }\n'
-      const doc = parseDocument(src, { version: '1.1' })
+      const doc = parseDocument(src, options)
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
         { a: 'X' },
@@ -951,9 +956,9 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('explicit creation', () => {
       const src = '- { a: A, b: B }\n- { b: X }\n'
-      const doc = parseDocument<YAMLSeq<YAMLMap>>(src, { version: '1.1' })
+      const doc = parseDocument<YAMLSeq<YAMLMap>>(src, options)
       const alias = doc.createAlias(doc.get(0)!, 'a')
-      doc.get(1)!.set(doc.createPair('<<', alias))
+      doc.get(1)!.set(doc.createMergePair(alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
@@ -961,16 +966,30 @@ date (00:00:00Z): 2002-12-14\n`)
       ])
     })
 
-    test('creation by duck typing', () => {
+    test('Creation by duck typing results in quoted "<<" key', () => {
       const src = '- { a: A, b: B }\n- { b: X }\n'
-      const doc = parseDocument<YAMLSeq<YAMLMap>>(src, { version: '1.1' })
+      const doc = parseDocument<YAMLSeq<YAMLMap>>(src, options)
       const alias = doc.createAlias(doc.get(0)!, 'a')
       doc.get(1)!.set(doc.createPair('<<', alias))
-      expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
+      expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, "<<": *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
-        { a: 'A', b: 'X' }
+        { b: 'X', '<<': { a: 'A' } }
       ])
+    })
+
+    test('Using an explicit !!str tag on << makes it not a merge key', () => {
+      const src = '!!str <<: { x: 1 }'
+      const doc = parseDocument<YAMLSeq<YAMLMap>>(src, options)
+      expect(doc.toJS()).toMatchObject({ '<<': { x: 1 } })
+      expect(doc.toString()).toBe('!!str "<<": { x: 1 }\n')
+    })
+
+    test('An explicit !!merge tag is retained', () => {
+      const src = '!!merge <<: { x: 1 }'
+      const doc = parseDocument<YAMLSeq<YAMLMap>>(src, options)
+      expect(doc.toJS()).toMatchObject({ x: 1 })
+      expect(doc.toString()).toBe('!!merge <<: { x: 1 }\n')
     })
   })
 })
