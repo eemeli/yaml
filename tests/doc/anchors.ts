@@ -4,11 +4,11 @@ import { _map } from '../_utils.ts'
 
 test('basic', () => {
   const src = `- &a 1\n- *a\n`
-  const doc = parseDocument<YAMLSeq, false>(src)
+  const doc = parseDocument<YAMLSeq<Alias>>(src)
   expect(doc.errors).toHaveLength(0)
   expect(doc.value).toMatchObject([{ anchor: 'a', value: 1 }, { source: 'a' }])
   expect(String(doc)).toBe(src)
-  expect(doc.get(1).resolve(doc)).toBe(doc.get(0))
+  expect(doc.get(1)!.resolve(doc)).toBe(doc.get(0))
 })
 
 test('re-defined anchor', () => {
@@ -26,7 +26,7 @@ test('re-defined anchor', () => {
 
 test('circular reference', () => {
   const src = '&a [ 1, *a ]\n'
-  const doc = parseDocument<YAMLSeq, false>(src)
+  const doc = parseDocument<YAMLSeq<Alias>>(src)
   expect(doc.errors).toHaveLength(0)
   expect(doc.warnings).toHaveLength(0)
   expect(doc.value).toMatchObject([{ value: 1 }, { source: 'a' }])
@@ -34,7 +34,7 @@ test('circular reference', () => {
   const res = doc.toJS()
   expect(res[1]).toBe(res)
   expect(String(doc)).toBe(src)
-  expect(doc.get(1).resolve(doc)).toBe(doc.value)
+  expect(doc.get(1)!.resolve(doc)).toBe(doc.value)
 })
 
 describe('anchor on tagged collection', () => {
@@ -58,16 +58,16 @@ describe('anchor on tagged collection', () => {
 
 describe('create', () => {
   test('node.anchor', () => {
-    const doc = parseDocument<YAMLSeq, false>('[{ a: A }, { b: B }]')
-    doc.get(0).anchor = 'AA'
-    doc.get(0).get('a').anchor = 'a'
-    doc.get(0).get('a').anchor = ''
-    doc.get(1).get('b').anchor = 'BB'
+    const doc = parseDocument<YAMLSeq<YAMLMap>>('[{ a: A }, { b: B }]')
+    doc.get(0)!.anchor = 'AA'
+    doc.get(0)!.get('a')!.anchor = 'a'
+    doc.get(0)!.get('a')!.anchor = ''
+    doc.get(1)!.get('b')!.anchor = 'BB'
     expect(String(doc)).toBe('[ &AA { a: A }, { b: &BB B } ]\n')
   })
 
   test('doc.createAlias', () => {
-    const doc = parseDocument<YAMLSeq, false>('[{ a: A }, { b: B }]')
+    const doc = parseDocument<YAMLSeq<any>>('[{ a: A }, { b: B }]')
     const alias = doc.createAlias(doc.get(0), 'AA')
     doc.value.push(alias)
     expect(doc.toJS()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
@@ -98,15 +98,15 @@ describe('create', () => {
 
 describe('errors', () => {
   test('invalid anchor characters', () => {
-    const doc = parseDocument<YAMLSeq, false>('[{ a: A }, { b: B }]')
-    doc.get(0).anchor = 'A A'
+    const doc = parseDocument<YAMLSeq<YAMLMap>>('[{ a: A }, { b: B }]')
+    doc.get(0)!.anchor = 'A A'
     expect(() => String(doc)).toThrow(
       'Anchor must not contain whitespace or control characters: "A A"'
     )
   })
 
   test('set tag on alias', () => {
-    const doc = parseDocument<YAMLSeq<YAMLMap>, false>('[{ a: A }, { b: B }]')
+    const doc = parseDocument<YAMLSeq<YAMLMap>>('[{ a: A }, { b: B }]')
     const node = doc.value[0]
     const alias = doc.createAlias(node, 'AA')
     expect(() => {
@@ -116,9 +116,7 @@ describe('errors', () => {
   })
 
   test('alias before anchor', () => {
-    const doc = parseDocument<YAMLSeq<YAMLMap | Alias>, false>(
-      '[{ a: A }, { b: B }]'
-    )
+    const doc = parseDocument<YAMLSeq<any>>('[{ a: A }, { b: B }]')
     const alias = doc.createAlias(doc.get(0), 'AA')
     doc.value.unshift(alias)
     expect(() => String(doc)).toThrow(
@@ -143,7 +141,7 @@ describe('errors', () => {
 
   test('resolution with maxAliasCount:0', () => {
     const src = `- &a 1\n- *a\n`
-    const doc = parseDocument<YAMLSeq, false>(src)
+    const doc = parseDocument<YAMLSeq<any>>(src)
     expect(doc.errors).toHaveLength(0)
     expect(() => doc.get(1).resolve(doc, { maxAliasCount: 0 })).toThrow(
       ReferenceError
@@ -193,9 +191,7 @@ describe('__proto__ as anchor name', () => {
   })
 
   test('create/stringify', () => {
-    const doc = parseDocument<YAMLSeq<YAMLMap | Alias>, false>(
-      '[{ a: A }, { b: B }]'
-    )
+    const doc = parseDocument<YAMLSeq<any>>('[{ a: A }, { b: B }]')
     const alias = doc.createAlias(doc.value[0], '__proto__')
     doc.value.push(alias)
     expect(doc.toJS()).toMatchObject([{ a: 'A' }, { b: 'B' }, { a: 'A' }])
@@ -265,7 +261,7 @@ describe('merge <<', () => {
   })
 
   test('YAML.parseDocument', () => {
-    const doc = parseDocument<YAMLSeq<YAMLMap>, false>(src, { merge: true })
+    const doc = parseDocument<YAMLSeq<YAMLMap>>(src, { merge: true })
     expect(
       doc.value.slice(5).map(it => it.values.values().next().value!.value)
     ).toMatchObject([
@@ -305,10 +301,9 @@ describe('merge <<', () => {
 
   describe('create', () => {
     test('simple case', () => {
-      const doc = parseDocument<YAMLSeq<YAMLMap>, false>(
-        '[{ a: A }, { b: B }]',
-        { merge: true }
-      )
+      const doc = parseDocument<YAMLSeq<YAMLMap>>('[{ a: A }, { b: B }]', {
+        merge: true
+      })
       const [a, b] = doc.value
       const merge = doc.createPair('<<', doc.createAlias(a))
       b.set(merge)
@@ -317,10 +312,9 @@ describe('merge <<', () => {
     })
 
     test('using customTags:["merge"]', () => {
-      const doc = parseDocument<YAMLSeq<YAMLMap>, false>(
-        '[{ a: A }, { b: B }]',
-        { customTags: ['merge'] }
-      )
+      const doc = parseDocument<YAMLSeq<YAMLMap>>('[{ a: A }, { b: B }]', {
+        customTags: ['merge']
+      })
       const [a, b] = doc.value
       const merge = doc.createPair('<<', doc.createAlias(a))
       b.set(merge)
@@ -329,10 +323,9 @@ describe('merge <<', () => {
     })
 
     test('symbol value', () => {
-      const doc = parseDocument<YAMLSeq<YAMLMap>, false>(
-        '[{ a: A }, { b: B }]',
-        { merge: true }
-      )
+      const doc = parseDocument<YAMLSeq<YAMLMap>>('[{ a: A }, { b: B }]', {
+        merge: true
+      })
       const [a, b] = doc.value
       const merge = doc.createPair(Symbol('<<'), doc.createAlias(a))
       b.set(merge)
@@ -341,10 +334,9 @@ describe('merge <<', () => {
     })
 
     test('merge pair of an alias', () => {
-      const doc = parseDocument<YAMLSeq<YAMLMap>, false>(
-        '[{ a: A }, { b: B }]',
-        { merge: true }
-      )
+      const doc = parseDocument<YAMLSeq<YAMLMap>>('[{ a: A }, { b: B }]', {
+        merge: true
+      })
       const [a, b] = doc.value
       const alias = doc.createAlias(a, 'AA')
       const merge = doc.createPair('<<', alias)
@@ -355,7 +347,7 @@ describe('merge <<', () => {
     })
 
     test('merge pair of an alias to a sequence', () => {
-      const doc = parseDocument<YAMLSeq, false>('[{ a: A }, [], { b: B }]', {
+      const doc = parseDocument<YAMLSeq>('[{ a: A }, [], { b: B }]', {
         merge: true
       })
       const a = doc.get(0) as YAMLMap
@@ -377,11 +369,14 @@ describe('merge <<', () => {
     })
 
     test('require map node', () => {
-      const doc = parseDocument<YAMLSeq, false>('[{ a: A }, { b: B }]', {
-        merge: true
-      })
-      const alias = doc.createAlias(doc.get(0).get('a'))
-      doc.get(1).set(doc.createPair('<<', alias))
+      const doc = parseDocument<YAMLSeq<YAMLMap<string, any>>>(
+        '[{ a: A }, { b: B }]',
+        {
+          merge: true
+        }
+      )
+      const alias = doc.createAlias(doc.get(0)!.get('a'))
+      doc.get(1)!.set(doc.createPair('<<', alias))
       expect(String(doc)).toBe('[ { a: &a1 A }, { b: B, <<: *a1 } ]\n')
       expect(() => doc.toJS()).toThrow(
         'Merge sources must be maps or map aliases'

@@ -73,7 +73,7 @@ export class Scalar<T = unknown> implements NodeBase {
    * Used for YAML 1.1 !!merge << handling.
    */
   declare addToJSMap?: (
-    doc: Document<DocValue, boolean>,
+    doc: Document<DocValue>,
     ctx: ToJSContext | undefined,
     map: MapLike,
     value: unknown,

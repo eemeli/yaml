@@ -18,7 +18,7 @@ export class NodeCreator {
 
   #anchorPrefix: string
   #aliasObjects: unknown[] = []
-  #doc?: Document<DocValue, boolean>
+  #doc?: Document<DocValue>
   #flow: boolean
   #onTagObj?: (tagObj: ScalarTag | CollectionTag) => void
   #prevAnchors: Set<string> | null = null
@@ -26,13 +26,13 @@ export class NodeCreator {
     new Map()
 
   constructor(
-    doc: Document<DocValue, boolean>,
+    doc: Document<DocValue>,
     options?: CreateNodeOptions,
     replacer?: Replacer
   )
   constructor(schema: Schema, options?: CreateNodeOptions)
   constructor(
-    docOrSchema: Document<DocValue, boolean> | Schema,
+    docOrSchema: Document<DocValue> | Schema,
     options: CreateNodeOptions = {},
     replacer?: Replacer
   ) {

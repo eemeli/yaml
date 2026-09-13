@@ -36,13 +36,10 @@ function parseOptions(options: ParseOptions) {
  *   EmptyStream and contain additional stream information. In
  *   TypeScript, you should use `'empty' in docs` as a type guard for it.
  */
-export function parseAllDocuments<
-  Value extends DocValue = DocValue,
-  Strict extends boolean = true
->(
+export function parseAllDocuments<Value extends DocValue = DocValue>(
   source: string,
   options: ParseOptions & DocumentOptions & SchemaOptions = {}
-): Document.Parsed<Value, Strict>[] | EmptyStream {
+): Document.Parsed<Value>[] | EmptyStream {
   const { lineCounter, prettyErrors } = parseOptions(options)
   const parser = new Parser(lineCounter?.addNewLine)
   const composer = new Composer(options)
@@ -54,7 +51,7 @@ export function parseAllDocuments<
       doc.warnings.forEach(prettifyError(source, lineCounter))
     }
 
-  type DocType = Document.Parsed<Value, Strict>
+  type DocType = Document.Parsed<Value>
   if (docs.length > 0) return docs as DocType[]
   return Object.assign<
     DocType[],
@@ -64,18 +61,15 @@ export function parseAllDocuments<
 }
 
 /** Parse an input string into a single YAML.Document */
-export function parseDocument<
-  Value extends DocValue = DocValue,
-  Strict extends boolean = true
->(
+export function parseDocument<Value extends DocValue = DocValue>(
   source: string,
   options: ParseOptions & DocumentOptions & SchemaOptions = {}
-): Document.Parsed<Value, Strict> {
+): Document.Parsed<Value> {
   const { lineCounter, prettyErrors } = parseOptions(options)
   const parser = new Parser(lineCounter?.addNewLine)
   const composer = new Composer(options)
 
-  type DocType = Document.Parsed<Value, Strict>
+  type DocType = Document.Parsed<Value>
   // `doc` is always set by compose.end(true) at the very latest
   let doc: DocType = null as any
   for (const _doc of composer.compose(

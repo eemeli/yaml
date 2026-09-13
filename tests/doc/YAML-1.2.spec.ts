@@ -435,7 +435,7 @@ application specific tag: !something |
       ],
       warnings: [['Unresolved tag: !something']],
       special(src) {
-        const doc = YAML.parseDocument<any, false>(src, { schema: 'yaml-1.1' })
+        const doc = YAML.parseDocument<any>(src, { schema: 'yaml-1.1' })
         const data = doc.get('picture').value
         expect(data).toBeInstanceOf(Uint8Array)
         expect(data.byteLength).toBe(65)
@@ -1718,9 +1718,7 @@ mapping: !!map
         }
       ],
       special(src) {
-        const doc = YAML.parseDocument<YAML.YAMLMap<any, YAML.YAMLSeq>, false>(
-          src
-        )
+        const doc = YAML.parseDocument<YAML.YAMLMap<string, any>>(src)
         expect(doc.value.tag).toBeUndefined()
         const seq = doc.get('sequence')
         expect(seq.tag).toBe('tag:yaml.org,2002:seq')

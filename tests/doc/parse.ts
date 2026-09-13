@@ -253,12 +253,12 @@ describe('flow collection keys', () => {
   })
 
   test('empty scalar as last flow collection value (#550)', () => {
-    const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:}')
+    const doc = YAML.parseDocument<YAML.YAMLMap>('{c:}')
     expect(doc.value).toMatchObject(_map({ c: { value: null } }))
   })
 
   test('plain key with no space before flow collection value (#550)', () => {
-    const doc = YAML.parseDocument<YAML.YAMLMap, false>('{c:[]}')
+    const doc = YAML.parseDocument<YAML.YAMLMap>('{c:[]}')
     expect(doc.value).toMatchObject(_map({ c: _seq() }))
   })
 })
@@ -374,7 +374,7 @@ describe('empty(ish) nodes', () => {
   })
 
   test('empty node position', () => {
-    const doc = YAML.parseDocument<any, false>('\r\na: # 123\r\n')
+    const doc = YAML.parseDocument<any>('\r\na: # 123\r\n')
     const empty = doc.get('a')
     expect(empty.range).toEqual([5, 5, 12])
   })
@@ -422,13 +422,13 @@ describe('maps with no values', () => {
   })
 
   test('pair in flow seq has correct range (#573)', () => {
-    const doc = YAML.parseDocument<any, false>('[a:]')
+    const doc = YAML.parseDocument<any>('[a:]')
     expect(doc.range).toEqual([0, 4, 4])
     expect(doc.get(0).range).toEqual([1, 3, 3])
   })
 
   test('implicit scalar key after explicit key with no value', () => {
-    const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\nx:\n')
+    const doc = YAML.parseDocument<YAML.YAMLMap>('? - 1\nx:\n')
     expect(doc.value).toMatchObject(
       _map([
         [_seq(1), null],
@@ -438,7 +438,7 @@ describe('maps with no values', () => {
   })
 
   test('implicit flow collection key after explicit key with no value', () => {
-    const doc = YAML.parseDocument<YAML.YAMLMap, false>('? - 1\n[x]: y\n')
+    const doc = YAML.parseDocument<YAML.YAMLMap>('? - 1\n[x]: y\n')
     expect(doc.value).toMatchObject(
       _map([
         [_seq(1), null],
@@ -450,7 +450,7 @@ describe('maps with no values', () => {
 
 describe('odd indentations', () => {
   test('Block map with empty explicit key (#551)', () => {
-    const doc = YAML.parseDocument<YAML.YAMLMap, false>('?\n? a')
+    const doc = YAML.parseDocument<YAML.YAMLMap>('?\n? a')
     expect(doc.errors).toHaveLength(0)
     expect(doc.value).toMatchObject(
       _map([
@@ -461,28 +461,28 @@ describe('odd indentations', () => {
   })
 
   test('Block map with unindented !!null explicit key', () => {
-    const doc = YAML.parseDocument<YAML.YAMLMap, false>('?\n!!null')
+    const doc = YAML.parseDocument<YAML.YAMLMap>('?\n!!null')
     expect(doc.errors).not.toHaveLength(0)
   })
 
   test('unindented block scalar header in mapping value (#553)', () => {
-    const doc = YAML.parseDocument<YAML.YAMLMap, false>('a:\n|\n x')
+    const doc = YAML.parseDocument<YAML.YAMLMap>('a:\n|\n x')
     expect(doc.errors).not.toHaveLength(0)
   })
 
   test('unindented flow collection in mapping value', () => {
-    const doc = YAML.parseDocument<YAML.YAMLMap, false>('a:\n{x}')
+    const doc = YAML.parseDocument<YAML.YAMLMap>('a:\n{x}')
     expect(doc.errors).not.toHaveLength(0)
   })
 
   test('comment after top-level block scalar with indentation indicator (#547)', () => {
-    const doc = YAML.parseDocument<YAML.Scalar, false>('|1\n x\n#c')
+    const doc = YAML.parseDocument<YAML.Scalar>('|1\n x\n#c')
     expect(doc.errors).toHaveLength(0)
     expect(doc.value).toMatchObject({ value: 'x\n' })
   })
 
   test('tab after indent spaces for flow-in-block (#604)', () => {
-    const doc = YAML.parseDocument<YAML.YAMLMap, false>('foo:\n \tbar')
+    const doc = YAML.parseDocument<YAML.YAMLMap>('foo:\n \tbar')
     expect(doc.errors).toHaveLength(0)
     expect(doc.toJS()).toMatchObject({ foo: 'bar' })
   })
@@ -735,7 +735,7 @@ describe('keepSourceTokens', () => {
     })
 
     test(`${type}: included when set`, () => {
-      const doc = YAML.parseDocument<any, false>(src, {
+      const doc = YAML.parseDocument<any>(src, {
         keepSourceTokens: true
       })
       expect(doc.value.srcToken).toMatchObject({ type })
@@ -750,7 +750,7 @@ describe('keepSourceTokens', () => {
   test('allow for CST modifications (#903)', () => {
     const src = 'foo:\n  [ 42 ]'
     const tokens = Array.from(new YAML.Parser().parse(src))
-    const docs = new YAML.Composer<any, false>({
+    const docs = new YAML.Composer<any>({
       keepSourceTokens: true
     }).compose(tokens)
     const doc = Array.from(docs)[0]

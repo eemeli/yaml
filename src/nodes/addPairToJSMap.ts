@@ -8,7 +8,7 @@ import type { Node } from './types.ts'
 import type { MapLike } from './YAMLMap.ts'
 
 export function addPairToJSMap(
-  doc: Document<DocValue, boolean>,
+  doc: Document<DocValue>,
   ctx: ToJSContext,
   map: MapLike,
   { key, value }: Pair,
@@ -45,7 +45,7 @@ export function addPairToJSMap(
 }
 
 function stringifyKey(
-  doc: Document<DocValue, boolean>,
+  doc: Document<DocValue>,
   ctx: ToJSContext,
   key: Node,
   jsKey: unknown

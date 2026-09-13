@@ -15,17 +15,14 @@ import type { ComposeErrorHandler } from './composer.ts'
 import { resolveEnd } from './resolve-end.ts'
 import { resolveProps } from './resolve-props.ts'
 
-export function composeDoc<
-  Value extends DocValue = DocValue,
-  Strict extends boolean = true
->(
+export function composeDoc<Value extends DocValue = DocValue>(
   options: ParseOptions & DocumentOptions & SchemaOptions,
   directives: Directives,
   { offset, start, value, end }: CST.Document,
   onError: ComposeErrorHandler
-): Document.Parsed<Value, Strict> {
+): Document.Parsed<Value> {
   const opts = Object.assign({ _directives: directives }, options)
-  const doc = new Document(undefined, opts) as Document.Parsed<Value, Strict>
+  const doc = new Document(undefined, opts) as Document.Parsed<Value>
   const ctx: ComposeContext = {
     atKey: false,
     atRoot: true,

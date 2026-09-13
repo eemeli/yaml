@@ -74,13 +74,10 @@ function parsePrelude(prelude: string[]) {
  * const docs = new Composer().compose(tokens)
  * ```
  */
-export class Composer<
-  Value extends DocValue = DocValue,
-  Strict extends boolean = true
-> {
+export class Composer<Value extends DocValue = DocValue> {
   private directives: Directives
-  private doc: Document.Parsed<Value, Strict> | null = null
-  private docs: Document.Parsed<Value, Strict>[] = []
+  private doc: Document.Parsed<Value> | null = null
+  private docs: Document.Parsed<Value>[] = []
   private options: ParseOptions & DocumentOptions & SchemaOptions
   private atDirectives = false
   private prelude: string[] = []
@@ -99,7 +96,7 @@ export class Composer<
     else this.errors.push(new YAMLParseError(pos, code, message))
   }
 
-  private decorate(doc: Document.Parsed<Value, Strict>, afterDoc: boolean) {
+  private decorate(doc: Document.Parsed<Value>, afterDoc: boolean) {
     const { comment, afterEmptyLine } = parsePrelude(this.prelude)
     if (comment) {
       const dc = doc.value
@@ -160,7 +157,7 @@ export class Composer<
     tokens: Iterable<Token>,
     forceDoc = false,
     endOffset = -1
-  ): Document.Parsed<Value, Strict>[] {
+  ): Document.Parsed<Value>[] {
     this.docs = []
     for (const token of tokens) this.next(token)
     return this.end(forceDoc, endOffset)
@@ -180,7 +177,7 @@ export class Composer<
         this.atDirectives = true
         break
       case 'document': {
-        const doc = composeDoc<Value, Strict>(
+        const doc = composeDoc<Value>(
           this.options,
           this.directives,
           token,
@@ -258,17 +255,14 @@ export class Composer<
    * @param forceDoc - If the stream contains no document, still emit a final document including any comments and directives that would be applied to a subsequent document.
    * @param endOffset - Should be set if `forceDoc` is also set, to set the document range end and to indicate errors correctly.
    */
-  end(forceDoc = false, endOffset = -1): Document.Parsed<Value, Strict>[] {
+  end(forceDoc = false, endOffset = -1): Document.Parsed<Value>[] {
     if (this.doc) {
       this.decorate(this.doc, true)
       this.docs.push(this.doc)
       this.doc = null
     } else if (forceDoc) {
       const opts = Object.assign({ _directives: this.directives }, this.options)
-      const doc = new Document(undefined, opts) as Document.Parsed<
-        Value,
-        Strict
-      >
+      const doc = new Document(undefined, opts) as Document.Parsed<Value>
       if (this.atDirectives)
         this.onError(
           endOffset,

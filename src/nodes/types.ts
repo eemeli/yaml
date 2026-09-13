@@ -65,7 +65,7 @@ export interface NodeBase {
   clone(schema?: Schema): this
 
   /** A plain JavaScript representation of this node. */
-  toJS(doc: Document<DocValue, boolean>, opt?: ToJSContext): any
+  toJS(doc: Document<DocValue>, opt?: ToJSContext): any
 
   toString(
     ctx?: StringifyContext,

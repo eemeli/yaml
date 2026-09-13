@@ -20,7 +20,7 @@ import { source } from '../_utils.ts'
 const parseDocument = <T extends DocValue = DocValue>(
   source: string,
   options?: ParseOptions & DocumentOptions & SchemaOptions
-) => origParseDocument<T, false>(source, options)
+) => origParseDocument<T>(source, options)
 
 describe('tags', () => {
   describe('implicit tags', () => {
@@ -208,7 +208,7 @@ describe('number types', () => {
 - 3.1e+2
 - 5.1_2_3E-1
 - 4.02`
-      const doc = parseDocument<YAMLSeq>(src, {
+      const doc = parseDocument<YAMLSeq<number>>(src, {
         intAsBigInt: true,
         version: '1.1'
       })
@@ -234,7 +234,7 @@ describe('number types', () => {
         0.5123,
         4.02
       ])
-      expect(doc.get(0).toJS()).toBe(10n)
+      expect(doc.get(0)!.toJS()).toBe(10n)
     })
 
     test('Version 1.2', () => {
@@ -951,9 +951,9 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('explicit creation', () => {
       const src = '- { a: A, b: B }\n- { b: X }\n'
-      const doc = parseDocument(src, { version: '1.1' })
-      const alias = doc.createAlias(doc.get(0), 'a')
-      doc.get(1).set(doc.createPair('<<', alias))
+      const doc = parseDocument<YAMLSeq<YAMLMap>>(src, { version: '1.1' })
+      const alias = doc.createAlias(doc.get(0)!, 'a')
+      doc.get(1)!.set(doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },
@@ -963,9 +963,9 @@ date (00:00:00Z): 2002-12-14\n`)
 
     test('creation by duck typing', () => {
       const src = '- { a: A, b: B }\n- { b: X }\n'
-      const doc = parseDocument(src, { version: '1.1' })
-      const alias = doc.createAlias(doc.get(0), 'a')
-      doc.get(1).set(doc.createPair('<<', alias))
+      const doc = parseDocument<YAMLSeq<YAMLMap>>(src, { version: '1.1' })
+      const alias = doc.createAlias(doc.get(0)!, 'a')
+      doc.get(1)!.set(doc.createPair('<<', alias))
       expect(doc.toString()).toBe('- &a { a: A, b: B }\n- { b: X, <<: *a }\n')
       expect(doc.toJS()).toMatchObject([
         { a: 'A', b: 'B' },

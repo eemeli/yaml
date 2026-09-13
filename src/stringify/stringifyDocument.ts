@@ -8,7 +8,7 @@ import {
 import { indentComment, lineComment } from './stringifyComment.ts'
 
 export function stringifyDocument(
-  doc: Readonly<Document<DocValue, boolean>>,
+  doc: Document<DocValue>,
   options: ToStringOptions
 ): string {
   const lines: string[] = []

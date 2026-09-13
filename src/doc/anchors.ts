@@ -16,9 +16,7 @@ export function anchorIsValid(anchor: string): true {
   return true
 }
 
-export function anchorNames(
-  root: Document<DocValue, boolean> | Node
-): Set<string> {
+export function anchorNames(root: Document<DocValue> | Node): Set<string> {
   const anchors = new Set<string>()
   visit(root, {
     Value(_key, node) {

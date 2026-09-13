@@ -182,7 +182,7 @@ export class YAMLSeq<
   }
 
   /** A plain JavaScript representation of this node. */
-  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any[] {
+  toJS(doc: Document<DocValue>, ctx?: ToJSContext): any[] {
     ctx ??= new ToJSContext()
     if (this.anchor) {
       const res: unknown[] = []

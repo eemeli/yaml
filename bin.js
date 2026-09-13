@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+/* global console, process */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable no-restricted-imports */
+
 import { UserError, cli, help } from './dist/cli.js'
 
 cli(process.stdin, error => {

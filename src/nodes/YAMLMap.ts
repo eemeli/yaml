@@ -219,13 +219,13 @@ export class YAMLMap<
    * @returns Instance of Type, Map, or Object
    */
   toJS<T extends MapLike = Map<any, any>>(
-    doc: Document<DocValue, boolean>,
+    doc: Document<DocValue>,
     ctx: ToJSContext | undefined,
     Type: { new (): T }
   ): T
-  toJS(doc: Document<DocValue, boolean>, ctx?: ToJSContext): any
+  toJS(doc: Document<DocValue>, ctx?: ToJSContext): any
   toJS<T extends MapLike>(
-    doc: Document<DocValue, boolean>,
+    doc: Document<DocValue>,
     ctx?: ToJSContext,
     Type?: { new (): T }
   ) {

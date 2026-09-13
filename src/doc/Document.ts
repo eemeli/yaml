@@ -29,19 +29,14 @@ export type Replacer = any[] | ((key: any, value: any) => unknown)
 export declare namespace Document {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   /** @ts-ignore The typing of directives fails in TS <= 4.2 */
-  interface Parsed<
-    Value extends DocValue = DocValue,
-    Strict extends boolean = true
-  > extends Document<Value, Strict> {
+  interface Parsed<Value extends DocValue = DocValue> extends Document<Value> {
+    clone(): Parsed<Value>
     directives: Directives
     range: Range
   }
 }
 
-export class Document<
-  Value extends DocValue = DocValue,
-  Strict extends boolean = true
-> {
+export class Document<Value extends DocValue = DocValue> {
   /** A comment before this Document */
   commentBefore: string | null = null
 
@@ -51,7 +46,7 @@ export class Document<
   /** The document value. */
   value: Value
 
-  directives: Strict extends true ? Directives | undefined : Directives
+  directives?: Directives
 
   /** Errors encountered during parsing. */
   errors: YAMLError[] = []
@@ -137,8 +132,8 @@ export class Document<
    *
    * Custom Node values that inherit from `Object` still refer to their original instances.
    */
-  clone(): Document<Value, Strict> {
-    const copy: Document<Value, Strict> = Object.create(Document.prototype)
+  clone(): Document<Value> {
+    const copy: Document<Value> = Object.create(Document.prototype)
     copy.commentBefore = this.commentBefore
     copy.comment = this.comment
     copy.errors = this.errors.slice()
@@ -160,10 +155,7 @@ export class Document<
    * `name` will be used as a prefix for a new unique anchor.
    * If `name` is undefined, the generated anchor will use 'a' as a prefix.
    */
-  createAlias(
-    node: Strict extends true ? DocValue : Node,
-    name?: string
-  ): Alias {
+  createAlias(node: DocValue, name?: string): Alias {
     if (!node.anchor) {
       const prev = anchorNames(this)
       node.anchor =
@@ -231,35 +223,58 @@ export class Document<
   /**
    * Returns item at `key`, or `undefined` if not found.
    */
-  get(key: any): Strict extends true ? Node | Pair | null | undefined : any {
+  get(
+    key: any
+  ): Value extends YAMLSeq
+    ? ReturnType<Value['at']>
+    : Value extends YAMLMap
+      ? ReturnType<Value['get']>
+      : Value extends YAMLSet
+        ? ReturnType<Value['get']>
+        : Node | Pair | null | undefined {
     if (this.value instanceof YAMLMap || this.value instanceof YAMLSet) {
+      // @ts-expect-error TS type narrowing is wrong here.
       return this.value.get(key)
     }
     if (this.value instanceof YAMLSeq) {
+      // @ts-expect-error TS type narrowing is wrong here.
       if (Number.isInteger(key)) return this.value.at(key)
       throw new TypeError(`Expected an integer, not ${JSON.stringify(key)}.`)
     }
+    // @ts-expect-error TS type narrowing is wrong here.
     return undefined
   }
 
   /**
    * Returns pair at `key`, or `undefined` if not found.
    */
-  getPair(key: any): Strict extends true ? Pair | undefined : any {
+  getPair(
+    key: any
+  ): Value extends YAMLMap
+    ? ReturnType<Value['getPair']>
+    : Value extends YAMLSeq
+      ? Value[number] extends Pair
+        ? ReturnType<Value['at']>
+        : Pair | undefined
+      : Pair | undefined {
+    // @ts-expect-error TS type narrowing is wrong here.
     if (this.value instanceof YAMLMap) return this.value.getPair(key)
     if (this.value instanceof YAMLSeq) {
       if (!Number.isInteger(key)) {
         throw new TypeError(`Expected an integer, not ${JSON.stringify(key)}.`)
       }
       const pair = this.value.at(key)
+      // @ts-expect-error TS type narrowing is wrong here.
       if (pair instanceof Pair) return pair
       throw new TypeError(`Value at ${key} is not a Pair`)
     }
+    // @ts-expect-error TS type narrowing is wrong here.
     return undefined
   }
 
   /**
-   * Sets a value in this document's top-level collection. For `!!set`, `value` is ignored.
+   * Sets a value in this document's top-level collection.
+   * For `!!set`, `value` is ignored.
    */
   set(key: any, value: any): void {
     if (this.value instanceof YAMLSet) {
