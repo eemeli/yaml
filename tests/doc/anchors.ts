@@ -304,11 +304,10 @@ describe('merge <<', () => {
       const doc = parseDocument<YAMLSeq<YAMLMap>>('[{ a: A }, { b: B }]', {
         merge: true
       })
-      const [a, b] = doc.value
-      const merge = doc.createPair('<<', doc.createAlias(a))
-      b.set(merge)
-      expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
-      expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
+      const merge = doc.createMergePair({ c: 'C' })
+      doc.value[1].set(merge)
+      expect(doc.toJS()).toMatchObject([{ a: 'A' }, { b: 'B', c: 'C' }])
+      expect(String(doc)).toBe('[ { a: A }, { b: B, <<: { c: C } } ]\n')
     })
 
     test('using customTags:["merge"]', () => {
@@ -316,18 +315,7 @@ describe('merge <<', () => {
         customTags: ['merge']
       })
       const [a, b] = doc.value
-      const merge = doc.createPair('<<', doc.createAlias(a))
-      b.set(merge)
-      expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
-      expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
-    })
-
-    test('symbol value', () => {
-      const doc = parseDocument<YAMLSeq<YAMLMap>>('[{ a: A }, { b: B }]', {
-        merge: true
-      })
-      const [a, b] = doc.value
-      const merge = doc.createPair(Symbol('<<'), doc.createAlias(a))
+      const merge = doc.createMergePair(doc.createAlias(a))
       b.set(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(String(doc)).toBe('[ &a1 { a: A }, { b: B, <<: *a1 } ]\n')
@@ -339,7 +327,7 @@ describe('merge <<', () => {
       })
       const [a, b] = doc.value
       const alias = doc.createAlias(a, 'AA')
-      const merge = doc.createPair('<<', alias)
+      const merge = doc.createMergePair(alias)
       b.set(merge)
       expect(doc.toJS()).toMatchObject([{ a: 'A' }, { a: 'A', b: 'B' }])
       expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(ReferenceError)
@@ -355,7 +343,7 @@ describe('merge <<', () => {
       const b = doc.get(2) as YAMLMap
       seq.anchor = 'SEQ'
       seq.push(doc.createAlias(a, 'AA'))
-      b.set(doc.createPair('<<', doc.createAlias(seq)))
+      b.set(doc.createMergePair(doc.createAlias(seq)))
 
       expect(doc.toJS()).toMatchObject([
         { a: 'A' },
@@ -369,14 +357,14 @@ describe('merge <<', () => {
     })
 
     test('require map node', () => {
-      const doc = parseDocument<YAMLSeq<YAMLMap<string, any>>>(
+      const doc = parseDocument<YAMLSeq<YAMLMap<any, any>>>(
         '[{ a: A }, { b: B }]',
         {
           merge: true
         }
       )
       const alias = doc.createAlias(doc.get(0)!.get('a'))
-      doc.get(1)!.set(doc.createPair('<<', alias))
+      doc.get(1)!.set(doc.createMergePair(alias))
       expect(String(doc)).toBe('[ { a: &a1 A }, { b: B, <<: *a1 } ]\n')
       expect(() => doc.toJS()).toThrow(
         'Merge sources must be maps or map aliases'
