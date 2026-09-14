@@ -17,7 +17,7 @@ import type {
   ToStringOptions
 } from '../options.ts'
 import { Schema } from '../schema/Schema.ts'
-import { merge } from '../schema/yaml-1.1/merge.ts'
+import { MergeKey } from '../schema/yaml-1.1/merge.ts'
 import { stringifyDocument } from '../stringify/stringifyDocument.ts'
 import { anchorNames, findNewAnchor } from './anchors.ts'
 import { applyReviver } from './applyReviver.ts'
@@ -231,8 +231,8 @@ export class Document<Value extends DocValue = DocValue> {
   createMergePair(
     value: unknown,
     options?: CreateNodeOptions
-  ): Pair<Scalar<symbol>, Alias | YAMLMap | YAMLSeq<Alias | YAMLMap>> {
-    if (!this.schema.tags.includes(merge))
+  ): Pair<MergeKey, Alias | YAMLMap | YAMLSeq<Alias | YAMLMap>> {
+    if (this.schema.tags.every(tag => tag.tag !== 'tag:yaml.org,2002:merge'))
       throw new Error('Merge tags are not supported in this Document')
     const v =
       !options && isNode(value) ? value : this.createNode(value, options)
@@ -243,7 +243,7 @@ export class Document<Value extends DocValue = DocValue> {
         v.every(a => a instanceof Alias || a instanceof YAMLMap))
     )
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return new Pair<any, any>(merge.resolve(), v)
+      return new Pair<any, any>(new MergeKey(), v)
     throw new Error('Invalid merge pair value')
   }
 

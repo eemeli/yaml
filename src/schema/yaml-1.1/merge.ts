@@ -17,7 +17,7 @@ const MERGE_KEY = '<<'
 
 export const merge: ScalarTag & {
   identify(value: unknown): boolean
-  resolve(): Scalar<symbol>
+  resolve(): MergeKey
   test: (value: string) => boolean
 } = {
   identify: value =>
@@ -25,8 +25,21 @@ export const merge: ScalarTag & {
   default: 'key',
   tag: 'tag:yaml.org,2002:merge',
   test: str => str === MERGE_KEY,
-  resolve: () => Object.assign(new Scalar(Symbol(MERGE_KEY)), { addToJSMap }),
+  resolve: () => new MergeKey(),
   stringify: () => MERGE_KEY
+}
+
+/**
+ * A YAML 1.1 `!!merge` key
+ *
+ * Using a unique symbol as the value allows for
+ * multiple instances in a map.
+ */
+export class MergeKey extends Scalar<symbol> {
+  constructor() {
+    super(Symbol(MERGE_KEY))
+    this.addToJSMap = addToJSMap
+  }
 }
 
 function addToJSMap(

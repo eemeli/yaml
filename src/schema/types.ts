@@ -93,7 +93,7 @@ export interface CollectionTag extends TagBase {
   createNode: (nc: NodeCreator, value: unknown) => Node
 
   /**
-   * The `Node` child class that implements this tag.
+   * The class that implements this tag.
    * If set, used to select this tag when stringifying.
    */
   nodeClass?: {
