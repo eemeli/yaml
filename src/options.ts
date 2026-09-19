@@ -1,4 +1,3 @@
-import type { Reviver } from './doc/applyReviver.ts'
 import type { Directives } from './doc/directives.ts'
 import type { LogLevelId } from './log.ts'
 import type { Pair } from './nodes/Pair.ts'
@@ -203,11 +202,21 @@ export type ToJSOptions = {
   onAnchor?: (value: unknown, count: number) => void
 
   /**
-   * Optional function that may filter or modify the output JS value
+   * Optional function that may filter or modify the output JS value,
+   * based on the one available in `JSON.parse`:
    *
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#using_the_reviver_parameter
+   *
+   * Includes extensions beyond the `JSON.parse` equivalent
+   * for handling Map and Set objects,
+   * and so the `key` argument is not always a string.
    */
-  reviver?: Reviver
+  reviver?: (
+    this: any,
+    key: unknown,
+    value: unknown,
+    context: { source?: string }
+  ) => unknown
 }
 
 export type ToStringOptions = {

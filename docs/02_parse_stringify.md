@@ -36,9 +36,17 @@ YAML.parse(file)
 
 #### `YAML.parse(str, reviver?, options = {}): any`
 
-`str` should be a string with YAML formatting. If defined, the `reviver` function follows the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter). See [Options](#options) for more information on the last argument, an optional configuration object.
+`str` should be a string with YAML formatting.
+If defined, the `reviver` function follows the [JSON implementation][JSON reviver],
+including support for the callback's `context` argument.
+See [Options](#options) for more information on the last argument,
+an optional configuration object.
 
-The returned value will match the type of the root value of the parsed YAML document, so Maps become objects, Sequences arrays, and scalars result in nulls, booleans, numbers and strings.
+[JSON reviver]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter
+
+The returned value will match the type of the root value of the parsed YAML document,
+so maps become objects, sequences arrays,
+and untagged scalars result in nulls, booleans, numbers and strings.
 
 `YAML.parse` will throw on error, and it may log warnings using `console.warn`.
 It only supports input consisting of a single YAML document;

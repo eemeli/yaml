@@ -762,19 +762,19 @@ describe('keepSourceTokens', () => {
 })
 
 describe('reviver', () => {
-  test('MDN exemple', () => {
+  test('MDN example', () => {
     const reviver = vi.fn((_key, value) => value)
     const src = '{"1": 1, "2": 2, "3": {"4": 4, "5": {"6": 6}}}'
     const obj = JSON.parse(src)
     YAML.parse(src, reviver)
     expect(reviver.mock.calls).toMatchObject([
-      ['1', 1],
-      ['2', 2],
-      ['4', 4],
-      ['6', 6],
-      ['5', { 6: 6 }],
-      ['3', obj[3]],
-      ['', obj]
+      ['1', 1, { source: '1' }],
+      ['2', 2, { source: '2' }],
+      ['4', 4, { source: '4' }],
+      ['6', 6, { source: '6' }],
+      ['5', { 6: 6 }, {}],
+      ['3', obj[3], {}],
+      ['', obj, {}]
     ])
     expect(reviver.mock.instances).toMatchObject([
       obj,
@@ -838,11 +838,11 @@ describe('reviver', () => {
     expect(seq).toBeInstanceOf(Array)
     expect(seq).toMatchObject([undefined, 4, 6, 10])
     expect(reviver.mock.calls).toMatchObject([
-      ['0', 2],
-      ['1', 4],
-      ['2', 6],
-      ['3', 8],
-      ['', {}]
+      ['0', 2, { source: '2' }],
+      ['1', 4, { source: '4' }],
+      ['2', 6, { source: '6' }],
+      ['3', 8, { source: '8' }],
+      ['', {}, {}]
     ])
     expect(these).toMatchObject([
       [2, 4, 6, 8],
@@ -866,11 +866,11 @@ describe('reviver', () => {
     expect(set).toBeInstanceOf(Set)
     expect(Array.from(set)).toMatchObject([4, 6, 10])
     expect(reviver.mock.calls).toMatchObject([
-      [2, 2],
-      [4, 4],
-      [6, 6],
-      [8, 8],
-      ['', {}]
+      [2, 2, { source: '2' }],
+      [4, 4, { source: '4' }],
+      [6, 6, { source: '6' }],
+      [8, 8, { source: '8' }],
+      ['', {}, {}]
     ])
     expect(these).toMatchObject([
       [2, 4, 6, 8],
@@ -898,11 +898,11 @@ describe('reviver', () => {
       [8, 10]
     ])
     expect(reviver.mock.calls).toMatchObject([
-      [2, 3],
-      [4, 5],
-      [6, 7],
-      [8, 9],
-      ['', map]
+      [2, 3, { source: '3' }],
+      [4, 5, { source: '5' }],
+      [6, 7, { source: '7' }],
+      [8, 9, { source: '9' }],
+      ['', map, {}]
     ])
     expect(these).toMatchObject([
       [
@@ -931,6 +931,44 @@ describe('reviver', () => {
         [6, 7],
         [8, 10]
       ]
+    ])
+  })
+
+  test('!!merge simple', () => {
+    const reviver = vi.fn((_key, value) => value)
+    const src = '- &a { a: A, b: B }\n- { <<: *a, b: X }\n'
+    YAML.parse(src, { merge: true, reviver })
+    expect(reviver.mock.calls).toMatchObject([
+      ['a', 'A', { source: 'A' }],
+      ['b', 'B', { source: 'B' }],
+      ['0', { a: 'A', b: 'B' }, {}],
+      ['a', 'A', { source: 'A' }],
+      ['b', 'X', { source: 'X' }],
+      ['1', { a: 'A', b: 'X' }, {}],
+      [
+        '',
+        [
+          { a: 'A', b: 'B' },
+          { a: 'A', b: 'X' }
+        ],
+        {}
+      ]
+    ])
+  })
+
+  test('!!merge recursion', () => {
+    const reviver = vi.fn((_key, value) => value)
+    const src = '- &a { a: *a, b: B }\n- { <<: *a, b: X }\n'
+    const res = YAML.parse(src, { merge: true, reviver })
+    const aRef = res[0]
+    expect(reviver.mock.calls).toMatchObject([
+      ['b', 'B', { source: 'B' }],
+      ['0', { a: aRef, b: 'B' }, {}],
+      ['b', 'B', { source: 'B' }],
+      ['a', { a: aRef, b: 'B' }, {}],
+      ['b', 'X', { source: 'X' }],
+      ['1', { a: { a: aRef, b: 'B' }, b: 'X' }, {}],
+      ['', res, {}]
     ])
   })
 })
