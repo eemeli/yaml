@@ -113,6 +113,7 @@ export function stringifyPair(
   }
 
   let valueCommentDone = false
+  let valueStrConsumed = false
   const valueStr = stringify(
     value,
     ctx,
@@ -126,8 +127,19 @@ export function stringifyPair(
       const cs = commentString(vcb)
       ws += `\n${indentComment(cs, ctx.indent)}`
     }
-    if (valueStr === '' && !ctx.inFlow) {
+    // A custom-tag stringify that returns '' still yields a non-empty valueStr
+    // like "!tag " (props + empty body). Treat that like an empty value so the
+    // tag stays on the key's line; spaceBefore then becomes a blank line after
+    // the pair (same as empty plain scalars), not blank lines before the tag.
+    // Fixes https://github.com/eemeli/yaml/issues/717
+    const onlyTag = /^!\S+\s*$/.test(valueStr)
+    if ((valueStr === '' || onlyTag) && !ctx.inFlow) {
       if (ws === '\n' && valueComment) ws = '\n\n'
+      if (onlyTag) {
+        str += ' ' + valueStr.trimEnd()
+        if (vsb) chompKeep = true
+        valueStrConsumed = true
+      }
     } else {
       ws += `\n${ctx.indent}`
     }
@@ -155,7 +167,8 @@ export function stringifyPair(
   } else if (valueStr === '' || valueStr[0] === '\n') {
     ws = ''
   }
-  str += ws + valueStr
+  if (!valueStrConsumed) str += ws + valueStr
+  else if (vsb && !(keyComment || vcb)) str += ws
 
   if (ctx.inFlow) {
     if (valueCommentDone && onComment) onComment()

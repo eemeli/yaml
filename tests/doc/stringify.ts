@@ -1646,3 +1646,32 @@ describe('flow collection padding', () => {
     expect(doc.toString({ flowCollectionPadding: false })).toBe('[1, 2]\n')
   })
 })
+
+describe('empty tagged scalar with following blank line (#717)', () => {
+  const emptyTag = {
+    tag: '!empty',
+    resolve: () => ({ kind: 'empty' }),
+    identify: (value: unknown) =>
+      !!value &&
+      typeof value === 'object' &&
+      (value as { kind?: string }).kind === 'empty',
+    stringify: () => ''
+  }
+
+  test('keeps tag on the same line and preserves blank line before next seq item', () => {
+    const src = `- type: InstantAction
+  event: !empty
+
+- type: other
+`
+    const doc = YAML.parseDocument(src, { customTags: [emptyTag] })
+    const event = doc.getIn([0, 'event'], true) as Scalar
+    expect(event.tag).toBe('!empty')
+    expect(event.spaceBefore).toBe(true)
+
+    const out = String(doc)
+    expect(out).toContain('event: !empty\n')
+    expect(out).not.toMatch(/event:\n\n\s*!empty/)
+    expect(out).toMatch(/!empty\n\n- type: other/)
+  })
+})
