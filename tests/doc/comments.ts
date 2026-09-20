@@ -366,6 +366,20 @@ describe('stringify comments', () => {
         string
       `)
     })
+
+    test('empty root block scalar keeps indent indicator (#687)', () => {
+      for (const style of ['|', '>'] as const) {
+        const doc = YAML.parseDocument(`${style}5\n#comment`)
+        expect(doc.toJSON()).toBe('')
+        expect(doc.comment).toBe('comment')
+        const out = String(doc)
+        expect(out.startsWith(`${style}2\n`)).toBe(true)
+        expect(out).toContain('#comment')
+        const rt = YAML.parseDocument(out)
+        expect(rt.toJSON()).toBe('')
+        expect(rt.comment).toBe('comment')
+      }
+    })
   })
 
   describe('seq comments', () => {
