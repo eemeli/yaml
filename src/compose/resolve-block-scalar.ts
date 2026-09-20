@@ -3,6 +3,7 @@ import { Scalar } from '../nodes/Scalar.ts'
 import type { BlockScalar } from '../parse/cst.ts'
 import type { ComposeContext } from './compose-node.ts'
 import type { ComposeErrorHandler } from './composer.ts'
+import { checkPrintable } from './util-non-printable.ts'
 
 export function resolveBlockScalar(
   ctx: ComposeContext,
@@ -18,6 +19,7 @@ export function resolveBlockScalar(
   const header = parseBlockScalarHeader(scalar, ctx.options.strict, onError)
   if (!header)
     return { value: '', type: null, comment: '', range: [start, start, start] }
+  if (scalar.source) checkPrintable(scalar.source, start + header.length, onError)
   const type = header.mode === '>' ? Scalar.BLOCK_FOLDED : Scalar.BLOCK_LITERAL
   const lines = scalar.source ? splitLines(scalar.source) : []
 

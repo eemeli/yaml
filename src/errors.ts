@@ -24,6 +24,7 @@ export type ErrorCode =
   | 'TAG_RESOLVE_FAILED'
   | 'UNEXPECTED_TOKEN'
   | 'BAD_COLLECTION_TYPE'
+  | 'NON_PRINTABLE'
 
 export type LinePos = { line: number; col: number }
 
