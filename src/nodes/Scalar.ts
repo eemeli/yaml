@@ -74,7 +74,7 @@ export class Scalar<T = unknown> implements NodeBase {
    */
   declare addToJSMap?: (
     doc: Document<DocValue>,
-    ctx: ToJSContext | undefined,
+    ctx: ToJSContext,
     map: MapLike,
     value: unknown,
     isPlainObject: boolean

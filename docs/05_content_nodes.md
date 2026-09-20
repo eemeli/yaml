@@ -253,7 +253,15 @@ To construct a `YAMLSeq` or `YAMLMap`, use `new Document()` or `doc.createNode()
 
 Once created, normal array operations may be used to modify the `items` array.
 New `Pair` objects may created either by importing the class from `yaml` and using its `new Pair(key, value)` constructor, or by using the `doc.createPair(key, value, options?)` method.
-The latter will recursively wrap the `key` and `value` as nodes, and accepts the same options as `doc.createNode()`
+The latter will recursively wrap the `key` and `value` as nodes, and accepts the same options as `doc.createNode()`.
+
+#### `doc.createMergePair(value, options?): Pair`
+
+To create YAML 1.1 `<<` merge keys, use `doc.createMergePair(value, options?)` on a Document that supports them,
+such as one created with `{ merge: true }` or `{ schema: 'yaml-1.1' }` as options,
+or parsed from a YAML 1.1 document source.
+
+Keys that are otherwise created with the string value `<<` will be quoted to disambiguate them from merge keys.
 
 ## Finding and Modifying Nodes
 

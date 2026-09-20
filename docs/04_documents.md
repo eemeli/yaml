@@ -106,6 +106,7 @@ which is expected to always contain a `YAMLMap`, `YAMLSeq`, or `Scalar` value.
 | createAlias(node: Node, name?: string)     | `Alias`       | Create a new `Alias` node, adding the required anchor for `node`. If `name` is empty, a new anchor name will be generated.                |
 | createNode(value,&nbsp;options?)           | `Node`        | Recursively wrap any input with appropriate `Node` containers. See [Creating Nodes](#creating-nodes) for more information.                |
 | createPair(key,&nbsp;value,&nbsp;options?) | `Pair`        | Recursively wrap `key` and `value` into a `Pair` object. See [Creating Nodes](#creating-nodes) for more information.                      |
+| createMergePair(value,&nbsp;options?)      | `Pair`        | Create a YAML 1.1 `<<` merge `Pair` object. See [Creating Nodes](#creating-nodes) for more information.                                   |
 | get(key)                                   | `Node ⎮ Pair` | Returns top-level collection item at `key`, or `undefined` if not found.                                                                  |
 | getPair(key)                               | `Pair`        | Returns top-level collection pair at `key`, or `undefined` if not found.                                                                  |
 | set(key)                                   | `void`        | Sets a value in this document's top-level collection. For `!!set`, `value` is ignored.                                                    |
