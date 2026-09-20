@@ -2,7 +2,7 @@ import type { Document, DocValue } from '../../doc/Document.ts'
 import { Alias } from '../../nodes/Alias.ts'
 import { Scalar } from '../../nodes/Scalar.ts'
 import type { ToJSContext } from '../../nodes/toJS.ts'
-import type { MapLike, YAMLMap } from '../../nodes/YAMLMap.ts'
+import { type MapLike, YAMLMap } from '../../nodes/YAMLMap.ts'
 import type { ScalarTag } from '../types.ts'
 
 // If the value associated with a merge key is a single mapping node, each of
@@ -51,9 +51,12 @@ function addToJSMap(
 ): void {
   const source = getMergeSource(doc, ctx, value)
   if (Array.isArray(source)) {
-    for (const it of source) mergeValue(doc, ctx, map, it, isPlainObject)
+    for (const v of source) {
+      const s = getMergeSource(doc, ctx, v)
+      mergeValue(doc, ctx, map, s, isPlainObject)
+    }
   } else {
-    mergeValue(doc, ctx, map, value, isPlainObject)
+    mergeValue(doc, ctx, map, source, isPlainObject)
   }
 }
 
@@ -61,14 +64,14 @@ function mergeValue(
   doc: Document<DocValue>,
   ctx: ToJSContext,
   map: MapLike,
-  value: unknown,
+  source: unknown,
   isPlainObject: boolean
 ) {
-  const source = getMergeSource(doc, ctx, value)
-  const srcMap = (source as YAMLMap).toJS(doc, ctx, Map<any, any>)
-  if (!(srcMap instanceof Map))
+  if (!(source instanceof YAMLMap))
     throw new Error('Merge sources must be maps or map aliases')
-  for (const [key, value] of srcMap) {
+  const srcMap = source.toJS(doc, ctx)
+  const srcIter = srcMap instanceof Map ? srcMap : Object.entries(srcMap)
+  for (const [key, value] of srcIter) {
     if (map instanceof Map) {
       if (!map.has(key)) map.set(key, value)
     } else if (map instanceof Set) {

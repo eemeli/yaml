@@ -456,6 +456,16 @@ y:
     expect(() => parse(src, { merge: true })).not.toThrow()
   })
 
+  test('merge with circular reference', () => {
+    const src = '- &a { a: *a, b: B }\n- { <<: *a, b: X }\n'
+    const res = parse(src, { merge: true })
+    expect(res[1].a instanceof Map).toBe(false)
+    expect(res).toEqual([
+      { a: res[0], b: 'B' },
+      { a: res[0], b: 'X' }
+    ])
+  })
+
   describe('parse errors', () => {
     test('non-alias merge value', () => {
       const src = '{ <<: A, B: b }'
