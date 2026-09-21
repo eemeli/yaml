@@ -10,11 +10,10 @@ export function addPairToJSMap(
   doc: Document<DocValue>,
   ctx: ToJSContext,
   map: MapLike,
-  { key, value }: Pair,
-  isPlainObject: boolean
+  { key, value }: Pair
 ): void {
   if ('addToJSMap' in key && typeof key.addToJSMap === 'function') {
-    key.addToJSMap(doc, ctx, map, value, isPlainObject)
+    key.addToJSMap(doc, ctx, map, value)
   } else {
     const jsKey = key.toJS(doc, ctx)
     if (map instanceof Map) {
@@ -25,7 +24,7 @@ export function addPairToJSMap(
       const stringKey = stringifyKey(doc, ctx, key, jsKey)
       const jsValue = value ? value.toJS(doc, ctx) : value
       if (
-        (!isPlainObject && stringKey in map) ||
+        (map.constructor !== Object && stringKey in map) ||
         stringKey === '__proto__' ||
         stringKey === 'constructor'
       )

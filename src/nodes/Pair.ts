@@ -35,7 +35,7 @@ export class Pair<
 
   toJS(doc: Document<DocValue>, ctx: ToJSContext): MapLike {
     const pair = ctx.mapAsMap ? new Map() : {}
-    addPairToJSMap(doc, ctx, pair, this, true)
+    addPairToJSMap(doc, ctx, pair, this)
     return pair
   }
 

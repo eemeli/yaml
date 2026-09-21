@@ -76,8 +76,7 @@ export class Scalar<T = unknown> implements NodeBase {
     doc: Document<DocValue>,
     ctx: ToJSContext,
     map: MapLike,
-    value: unknown,
-    isPlainObject: boolean
+    value: unknown
   ) => void
 
   constructor(value: T) {
