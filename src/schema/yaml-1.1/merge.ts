@@ -46,17 +46,16 @@ function addToJSMap(
   doc: Document<DocValue>,
   ctx: ToJSContext,
   map: MapLike,
-  value: unknown,
-  isPlainObject: boolean
+  value: unknown
 ): void {
   const source = getMergeSource(doc, ctx, value)
   if (Array.isArray(source)) {
     for (const v of source) {
       const s = getMergeSource(doc, ctx, v)
-      mergeValue(doc, ctx, map, s, isPlainObject)
+      mergeValue(doc, ctx, map, s)
     }
   } else {
-    mergeValue(doc, ctx, map, source, isPlainObject)
+    mergeValue(doc, ctx, map, source)
   }
 }
 
@@ -64,8 +63,7 @@ function mergeValue(
   doc: Document<DocValue>,
   ctx: ToJSContext,
   map: MapLike,
-  source: unknown,
-  isPlainObject: boolean
+  source: unknown
 ) {
   if (!(source instanceof YAMLMap))
     throw new Error('Merge sources must be maps or map aliases')
@@ -77,7 +75,11 @@ function mergeValue(
     } else if (map instanceof Set) {
       map.add(key)
     } else if (!Object.prototype.hasOwnProperty.call(map, key)) {
-      if (!isPlainObject || key === '__proto__' || key === 'constructor') {
+      if (
+        map.constructor !== Object ||
+        key === '__proto__' ||
+        key === 'constructor'
+      ) {
         Object.defineProperty(map, key, {
           value,
           writable: true,

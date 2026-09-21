@@ -212,37 +212,15 @@ export class YAMLMap<
     return this
   }
 
-  /**
-   * A plain JavaScript representation of this node.
-   *
-   * @param Type - If set, forces the returned collection type
-   * @returns Instance of Type, Map, or Object
-   */
-  toJS<T extends MapLike = Map<any, any>>(
+  /** A plain JavaScript representation of this node. */
+  toJS(
     doc: Document<DocValue>,
-    ctx: ToJSContext | undefined,
-    Type: { new (): T }
-  ): T
-  toJS(doc: Document<DocValue>, ctx?: ToJSContext): any
-  toJS<T extends MapLike>(
-    doc: Document<DocValue>,
-    ctx?: ToJSContext,
-    Type?: { new (): T }
-  ) {
+    ctx?: ToJSContext
+  ): Map<any, any> | Record<any, any> {
     ctx ??= new ToJSContext()
-    let map: MapLike
-    let isPlainObject = false
-    if (Type) {
-      map = new Type()
-    } else if (ctx.mapAsMap) {
-      map = new Map()
-    } else {
-      map = {}
-      isPlainObject = true
-    }
+    const map = ctx.mapAsMap ? new Map() : {}
     if (this.anchor) ctx.setAnchor(this, map)
-    for (const pair of this.values.values())
-      addPairToJSMap(doc, ctx, map, pair, isPlainObject)
+    for (const pair of this.values.values()) addPairToJSMap(doc, ctx, map, pair)
     return map
   }
 
