@@ -78,5 +78,6 @@ export function stringifyDocument(
       lines.push(indentComment(commentString(dc), ''))
     }
   }
-  return lines.join('\n') + '\n'
+  const str = lines.join('\n') + '\n'
+  return ctx.options.newline === '\r\n' ? str.replace(/\r?\n/g, '\r\n') : str
 }
