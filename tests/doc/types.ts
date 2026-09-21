@@ -1113,11 +1113,9 @@ describe('custom tags', () => {
   class YAMLNullObject extends YAMLMap {
     tag: string = '!nullobject'
     toJS(doc: any, ctx?: any): any {
-      const obj = super.toJS<Record<any, any>>(
-        doc,
-        { ...ctx, mapAsMap: false },
-        Object
-      )
+      ctx = Object.create(ctx)
+      ctx.mapAsMap = false
+      const obj = super.toJS(doc, ctx)
       return Object.assign(Object.create(null), obj)
     }
   }
