@@ -121,13 +121,14 @@ These options influence how the document is transformed into "native" JavaScript
 
 Used by: `parse()`, `doc.toJS()` and `node.toJS()`
 
-| Name          | Type                                  | Default | Description                                                                                                                                         |
-| ------------- | ------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| freeze        | `boolean`                             | `false` | Freeze deeply on the Array and Object values representing the YAML sequences and mappings. Incompatible with a `reviver`.                           |
-| mapAsMap      | `boolean`                             | `false` | Use Map rather than Object to represent mappings.                                                                                                   |
-| maxAliasCount | `number`                              | `100`   | Prevent [exponential entity expansion attacks] by limiting data aliasing; set to `-1` to disable checks; `0` disallows all alias nodes.             |
-| onAnchor      | `(value: any, count: number) => void` |         | Optional callback for each aliased anchor in the document.                                                                                          |
-| reviver       | `(key: any, value: any) => any`       |         | Optionally apply a [reviver function] to the output, following the JSON specification but with appropriate extensions for handling `Map` and `Set`. |
+| Name                | Type                                  | Default  | Description                                                                                                                                         |
+| ------------------- | ------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| freeze              | `boolean`                             | `false`  | Freeze deeply on the Array and Object values representing the YAML sequences and mappings. Incompatible with a `reviver`.                           |
+| mapAsMap            | `boolean`                             | `false`  | Use Map rather than Object to represent mappings. Incompatible with `preferNullPrototype`.                                                          |
+| maxAliasCount       | `number`                              | `100`    | Prevent [exponential entity expansion attacks] by limiting data aliasing; set to `-1` to disable checks; `0` disallows all alias nodes.             |
+| onAnchor            | `(value: any, count: number) => void` |          | Optional callback for each aliased anchor in the document.                                                                                          |
+| preferNullPrototype | `boolean`                             | `freeze` | Use a null prototype for Object values representing YAML mappings. Incompatible with `mapAsMap`.                                                    |
+| reviver             | `(key: any, value: any) => any`       |          | Optionally apply a [reviver function] to the output, following the JSON specification but with appropriate extensions for handling `Map` and `Set`. |
 
 [exponential entity expansion attacks]: https://en.wikipedia.org/wiki/Billion_laughs_attack
 [reviver function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter

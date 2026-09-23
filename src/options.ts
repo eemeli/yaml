@@ -194,6 +194,8 @@ export type ToJSOptions = {
   /**
    * Use Map rather than Object to represent mappings.
    *
+   * Not compatible with `preferNullPrototype: true`.
+   *
    * Default: `false`
    */
   mapAsMap?: boolean
@@ -211,6 +213,15 @@ export type ToJSOptions = {
    * each anchor in the document.
    */
   onAnchor?: (value: unknown, count: number) => void
+
+  /**
+   * Use a null prototype for maps represented by Object values.
+   *
+   * Not compatible with `mapAsMap: true`.
+   *
+   * Default: `freeze ? true : false`
+   */
+  preferNullPrototype?: boolean
 
   /**
    * Optional function that may filter or modify the output JS value,

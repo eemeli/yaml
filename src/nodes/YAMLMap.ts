@@ -217,7 +217,11 @@ export class YAMLMap<
     ctx?: ToJSContext
   ): Map<any, any> | Record<any, any> {
     ctx ??= new ToJSContext()
-    const map = ctx.mapAsMap ? new Map() : {}
+    const map: MapLike = ctx.mapAsMap
+      ? new Map()
+      : ctx.preferNullPrototype
+        ? Object.create(null)
+        : {}
     if (this.anchor) ctx.setAnchor(this, map)
     for (const pair of this.values.values()) addPairToJSMap(doc, ctx, map, pair)
     if (ctx.freeze) Object.freeze(map)
