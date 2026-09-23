@@ -181,7 +181,20 @@ export type CreateNodeOptions = {
 
 export type ToJSOptions = {
   /**
+   * Apply `Object.freeze()` deeply on the Array and Object values
+   * representing the YAML sequences and mappings.
+   *
+   * Not compatible with a `reviver`,
+   * and ineffective for mappings if `mapAsMap: true` is set.
+   *
+   * Default: `false`
+   */
+  freeze?: boolean
+
+  /**
    * Use Map rather than Object to represent mappings.
+   *
+   * Not compatible with `preferNullPrototype: true`.
    *
    * Default: `false`
    */
@@ -202,6 +215,15 @@ export type ToJSOptions = {
   onAnchor?: (value: unknown, count: number) => void
 
   /**
+   * Use a null prototype for maps represented by Object values.
+   *
+   * Not compatible with `mapAsMap: true`.
+   *
+   * Default: `freeze ? true : false`
+   */
+  preferNullPrototype?: boolean
+
+  /**
    * Optional function that may filter or modify the output JS value,
    * based on the one available in `JSON.parse`:
    *
@@ -210,6 +232,8 @@ export type ToJSOptions = {
    * Includes extensions beyond the `JSON.parse` equivalent
    * for handling Map and Set objects,
    * and so the `key` argument is not always a string.
+   *
+   * Not compatible with `freeze: true`.
    */
   reviver?: (
     this: any,

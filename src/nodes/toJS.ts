@@ -11,15 +11,25 @@ export class ToJSContext {
     new Map()
   /** Cached anchor and alias nodes in the order they occur in the document */
   aliasResolveCache?: Node[]
+  freeze: boolean
   mapAsMap: boolean
   mapKeyWarned = false
   maxAliasCount: number
+  preferNullPrototype: boolean
   reviverSources?: WeakMap<any, Map<unknown, string>>
 
   constructor(opt: ToJSOptions = {}) {
-    this.mapAsMap = opt.mapAsMap === true
+    this.freeze = Boolean(opt.freeze)
+    const hasReviver = typeof opt.reviver === 'function'
+    if (this.freeze && hasReviver)
+      throw new Error('Incompatible options: freeze and reviver')
+    this.mapAsMap = Boolean(opt.mapAsMap)
     this.maxAliasCount = opt.maxAliasCount ?? 100
-    if (typeof opt.reviver === 'function') this.reviverSources = new WeakMap()
+    this.preferNullPrototype = Boolean(opt.preferNullPrototype ?? opt.freeze)
+    if (this.mapAsMap && opt.preferNullPrototype) {
+      throw new Error('Incompatible options: mapAsMap and preferNullPrototype')
+    }
+    if (hasReviver) this.reviverSources = new WeakMap()
   }
 
   setAnchor(node: Node, res: unknown): void {
