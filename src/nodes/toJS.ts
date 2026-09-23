@@ -2,6 +2,7 @@ import type { Document } from '../doc/Document.ts'
 import type { ToJSOptions } from '../options.ts'
 import { Alias } from './Alias.ts'
 import { Pair } from './Pair.ts'
+import { Scalar } from './Scalar.ts'
 import type { Node } from './types.ts'
 
 /** A context used in `node.toJS()` implementations */
@@ -13,10 +14,12 @@ export class ToJSContext {
   mapAsMap: boolean
   mapKeyWarned = false
   maxAliasCount: number
+  reviverSources?: WeakMap<any, Map<unknown, string>>
 
-  constructor(opt?: ToJSOptions) {
-    this.mapAsMap = opt?.mapAsMap === true
-    this.maxAliasCount = opt?.maxAliasCount ?? 100
+  constructor(opt: ToJSOptions = {}) {
+    this.mapAsMap = opt.mapAsMap === true
+    this.maxAliasCount = opt.maxAliasCount ?? 100
+    if (typeof opt.reviver === 'function') this.reviverSources = new WeakMap()
   }
 
   setAnchor(node: Node, res: unknown): void {
@@ -66,6 +69,23 @@ export class ToJSContext {
       return count
     }
     return 1
+  }
+
+  /**
+   * Only effective if `source` is a `string` or a `Scalar`,
+   * and a reviver function is being used.
+   */
+  setSource(holder: any, key: unknown, source: unknown): void {
+    if (!this.reviverSources) return
+    if (source instanceof Scalar) source = source.source
+    if (typeof source === 'string') {
+      let map = this.reviverSources.get(holder)
+      if (!map) {
+        map = new Map()
+        this.reviverSources.set(holder, map)
+      }
+      map.set(key, source)
+    }
   }
 }
 

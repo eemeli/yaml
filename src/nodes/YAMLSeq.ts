@@ -190,8 +190,15 @@ export class YAMLSeq<
       for (const item of this) res.push(item.toJS(doc, ctx))
       return res
     }
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return Array.from(this, item => item.toJS(doc, ctx))
+    const res = Array.from(this, item => item.toJS(doc, ctx))
+    if (ctx.reviverSources) {
+      for (let i = 0; i < this.length; ++i)
+        ctx.setSource(res, String(i), this[i])
+    }
+
+    return res
   }
 
   toString(

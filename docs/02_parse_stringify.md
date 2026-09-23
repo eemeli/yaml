@@ -36,9 +36,17 @@ YAML.parse(file)
 
 #### `YAML.parse(str, reviver?, options = {}): any`
 
-`str` should be a string with YAML formatting. If defined, the `reviver` function follows the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter). See [Options](#options) for more information on the last argument, an optional configuration object.
+`str` should be a string with YAML formatting.
+If defined, the `reviver` function follows the [JSON implementation][JSON reviver],
+including support for the callback's `context` argument.
+See [Options](#options) for more information on the last argument,
+an optional configuration object.
 
-The returned value will match the type of the root value of the parsed YAML document, so Maps become objects, Sequences arrays, and scalars result in nulls, booleans, numbers and strings.
+[JSON reviver]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#Using_the_reviver_parameter
+
+The returned value will match the type of the root value of the parsed YAML document,
+so maps become objects, sequences arrays,
+and untagged scalars result in nulls, booleans, numbers and strings.
 
 `YAML.parse` will throw on error, and it may log warnings using `console.warn`.
 It only supports input consisting of a single YAML document;
@@ -69,7 +77,18 @@ YAML.stringify({ number: 3, plain: 'string', block: 'two\nlines\n' })
 
 #### `YAML.stringify(value, replacer?, options = {}): string`
 
-`value` can be of any type. The returned string will always include `\n` as the last character, as is expected of YAML documents. If defined, the `replacer` array or function follows the [JSON implementation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter). See [Options](#options) for more information on the last argument, an optional configuration object. For JSON compatibility, using a number or a string as the `options` value will set the `indent` option accordingly.
+`value` can be of any type.
+The returned string will always include `\n` as the last character,
+as is expected of YAML documents.
+If defined, the `replacer` array or function follows the [JSON implementation][JSON replacer].
+See [Options](#options) for more information on the last argument,
+an optional configuration object.
+For JSON compatibility,
+using a number or a string as the `options` value will set the `indent` option accordingly.
+The serialization of [raw JSON] values is supported.
+
+[JSON replacer]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#The_replacer_parameter
+[raw JSON]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/rawJSON
 
 As strings in particular may be represented in a number of different styles, the simplest option for the value in question will always be chosen, depending mostly on the presence of escaped or control characters and leading & trailing whitespace.
 

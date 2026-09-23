@@ -140,7 +140,11 @@ export class YAMLSet<
     ctx ??= new ToJSContext()
     const set = new Set()
     if (this.anchor) ctx.setAnchor(this, set)
-    for (const item of this.values.values()) set.add(item.toJS(doc, ctx))
+    for (const item of this.values.values()) {
+      const value = item.toJS(doc, ctx)
+      set.add(value)
+      ctx.setSource(set, value, item)
+    }
     return set
   }
 

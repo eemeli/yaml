@@ -70,10 +70,12 @@ function mergeValue(
   const srcMap = source.toJS(doc, ctx)
   const srcIter = srcMap instanceof Map ? srcMap : Object.entries(srcMap)
   for (const [key, value] of srcIter) {
+    const reviverSource = ctx.reviverSources?.get(srcMap)?.get(key)
     if (map instanceof Map) {
-      if (!map.has(key)) map.set(key, value)
-    } else if (map instanceof Set) {
-      map.add(key)
+      if (!map.has(key)) {
+        map.set(key, value)
+        ctx.setSource(map, key, reviverSource)
+      }
     } else if (!Object.prototype.hasOwnProperty.call(map, key)) {
       if (
         map.constructor !== Object ||
@@ -89,6 +91,7 @@ function mergeValue(
       } else {
         map[key] = value
       }
+      ctx.setSource(map, key, reviverSource)
     }
   }
   return map

@@ -360,14 +360,17 @@ export class Document<Value extends DocValue = DocValue> {
 
   /** A plain JavaScript representation of the document `value`. */
   toJS(opt: ToJSOptions = {}): any {
-    const { onAnchor, reviver } = opt
     const ctx = new ToJSContext(opt)
     const res = this.value.toJS(this, ctx)
-    if (typeof onAnchor === 'function')
-      for (const { count, res } of ctx.anchors.values()) onAnchor(res, count)
-    return typeof reviver === 'function'
-      ? applyReviver(reviver, { '': res }, '', res)
-      : res
+    if (typeof opt.onAnchor === 'function') {
+      for (const av of ctx.anchors.values()) opt.onAnchor(av.res, av.count)
+    }
+    if (opt.reviver) {
+      const holder = { '': res }
+      ctx.setSource(holder, '', this.value)
+      return applyReviver(opt.reviver, ctx.reviverSources!, holder, '', res)
+    }
+    return res
   }
 
   /** A JSON representation of the document `value`.  */

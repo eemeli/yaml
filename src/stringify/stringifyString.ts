@@ -347,10 +347,16 @@ export function stringifyString(
   onChompKeep?: () => void
 ): string {
   const { implicitKey, inFlow } = ctx
-  const ss: StringifyScalar =
-    typeof item.value === 'string'
-      ? (item as StringifyScalar)
-      : Object.assign({}, item, { value: String(item.value) })
+
+  let ss: StringifyScalar
+  if (typeof item.value === 'string') {
+    ss = item as StringifyScalar
+  } else {
+    // Raw JSON values are guaranteed to be valid JSON scalars,
+    // and therefore also valid YAML scalars.
+    if (JSON.isRawJSON?.(item.value)) return item.value.rawJSON
+    ss = { ...item, value: String(item.value) }
+  }
 
   let { type } = item
   if (type !== Scalar.QUOTE_DOUBLE) {

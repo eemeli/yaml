@@ -16,13 +16,12 @@ export function addPairToJSMap(
     key.addToJSMap(doc, ctx, map, value)
   } else {
     const jsKey = key.toJS(doc, ctx)
+    const jsValue = value ? value.toJS(doc, ctx) : value
     if (map instanceof Map) {
-      map.set(jsKey, value ? value.toJS(doc, ctx) : value)
-    } else if (map instanceof Set) {
-      map.add(jsKey)
+      map.set(jsKey, jsValue)
+      ctx.setSource(map, jsKey, value)
     } else {
       const stringKey = stringifyKey(doc, ctx, key, jsKey)
-      const jsValue = value ? value.toJS(doc, ctx) : value
       if (
         (map.constructor !== Object && stringKey in map) ||
         stringKey === '__proto__' ||
@@ -35,6 +34,7 @@ export function addPairToJSMap(
           configurable: true
         })
       else map[stringKey] = jsValue
+      ctx.setSource(map, stringKey, value)
     }
   }
 }

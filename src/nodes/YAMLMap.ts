@@ -14,8 +14,7 @@ import { ToJSContext } from './toJS.ts'
 import type { CollectionBase, Node, NodeOf, Primitive, Range } from './types.ts'
 import { cloneMapOrSet } from './util-clone-map-or-set.ts'
 
-export type MapLike =
-  Map<any, any> | Set<any> | Record<string | number | symbol, any>
+export type MapLike = Map<any, any> | Record<string | number | symbol, any>
 
 export type KeyArg<K extends Primitive | Node, V extends Primitive | Node> =
   K | NodeOf<K> | (K extends Scalar ? K['value'] : never) | Pair<K, V>

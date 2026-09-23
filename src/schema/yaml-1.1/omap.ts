@@ -60,6 +60,7 @@ export class YAMLOMap<
       if (map.has(key))
         throw new Error('Ordered maps must not include duplicate keys')
       map.set(key, value)
+      ctx.setSource(map, key, pair.value)
     }
     return map as unknown as never[]
   }
