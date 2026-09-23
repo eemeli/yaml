@@ -123,6 +123,7 @@ Used by: `parse()`, `doc.toJS()` and `node.toJS()`
 
 | Name          | Type                                  | Default | Description                                                                                                                                         |
 | ------------- | ------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| freeze        | `boolean`                             | `false` | Freeze deeply on the Array and Object values representing the YAML sequences and mappings. Incompatible with a `reviver`.                           |
 | mapAsMap      | `boolean`                             | `false` | Use Map rather than Object to represent mappings.                                                                                                   |
 | maxAliasCount | `number`                              | `100`   | Prevent [exponential entity expansion attacks] by limiting data aliasing; set to `-1` to disable checks; `0` disallows all alias nodes.             |
 | onAnchor      | `(value: any, count: number) => void` |         | Optional callback for each aliased anchor in the document.                                                                                          |

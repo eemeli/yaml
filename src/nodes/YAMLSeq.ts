@@ -184,20 +184,14 @@ export class YAMLSeq<
   /** A plain JavaScript representation of this node. */
   toJS(doc: Document<DocValue>, ctx?: ToJSContext): any[] {
     ctx ??= new ToJSContext()
-    if (this.anchor) {
-      const res: unknown[] = []
-      if (this.anchor) ctx.setAnchor(this, res)
-      for (const item of this) res.push(item.toJS(doc, ctx))
-      return res
+    const res: unknown[] = []
+    if (this.anchor) ctx.setAnchor(this, res)
+    for (let i = 0; i < this.length; ++i) {
+      const item = this[i]
+      res.push(item.toJS(doc, ctx))
+      ctx.setSource(res, String(i), item)
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    const res = Array.from(this, item => item.toJS(doc, ctx))
-    if (ctx.reviverSources) {
-      for (let i = 0; i < this.length; ++i)
-        ctx.setSource(res, String(i), this[i])
-    }
-
+    if (ctx.freeze) Object.freeze(res)
     return res
   }
 

@@ -761,6 +761,42 @@ describe('keepSourceTokens', () => {
   })
 })
 
+describe('freeze', () => {
+  test('plain object & array', () => {
+    const src = 'a: 1\nb: 2\nc: [d, e]'
+    const obj = YAML.parse(src, { freeze: true })
+    expect(obj).toEqual({ a: 1, b: 2, c: ['d', 'e'] })
+    expect(Object.isFrozen(obj)).toBe(true)
+    expect(Object.isFrozen(obj.c)).toBe(true)
+  })
+
+  test('mapAsMap & array', () => {
+    const src = 'a: 1\nb: 2\nc: [d, e]'
+    const obj = YAML.parse(src, { freeze: true, mapAsMap: true })
+    expect(obj).toEqual(
+      new Map<string, any>([
+        ['a', 1],
+        ['b', 2],
+        ['c', ['d', 'e']]
+      ])
+    )
+    expect(Object.isFrozen(obj)).toBe(true) // ineffective, alas
+    expect(Object.isFrozen(obj.get('c'))).toBe(true)
+  })
+
+  test('!!merge', () => {
+    const src = '- &a { a: *a, b: B }\n- { <<: *a, b: X }\n'
+    const obj = YAML.parse(src, { freeze: true, merge: true })
+    const aRef = obj[0]
+    expect(obj).toEqual([
+      { a: aRef, b: 'B' },
+      { a: aRef, b: 'X' }
+    ])
+    expect(Object.isFrozen(obj)).toBe(true)
+    expect(Object.isFrozen(aRef)).toBe(true)
+  })
+})
+
 describe('reviver', () => {
   test('MDN example', () => {
     const reviver = vi.fn((_key, value) => value)

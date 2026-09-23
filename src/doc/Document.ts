@@ -360,6 +360,8 @@ export class Document<Value extends DocValue = DocValue> {
 
   /** A plain JavaScript representation of the document `value`. */
   toJS(opt: ToJSOptions = {}): any {
+    if (opt.freeze && opt.reviver)
+      throw new Error('Incompatible options: freeze and reviver')
     const ctx = new ToJSContext(opt)
     const res = this.value.toJS(this, ctx)
     if (typeof opt.onAnchor === 'function') {

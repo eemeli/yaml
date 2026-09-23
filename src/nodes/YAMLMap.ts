@@ -220,6 +220,7 @@ export class YAMLMap<
     const map = ctx.mapAsMap ? new Map() : {}
     if (this.anchor) ctx.setAnchor(this, map)
     for (const pair of this.values.values()) addPairToJSMap(doc, ctx, map, pair)
+    if (ctx.freeze) Object.freeze(map)
     return map
   }
 

@@ -11,13 +11,15 @@ export class ToJSContext {
     new Map()
   /** Cached anchor and alias nodes in the order they occur in the document */
   aliasResolveCache?: Node[]
+  freeze: boolean
   mapAsMap: boolean
   mapKeyWarned = false
   maxAliasCount: number
   reviverSources?: WeakMap<any, Map<unknown, string>>
 
   constructor(opt: ToJSOptions = {}) {
-    this.mapAsMap = opt.mapAsMap === true
+    this.freeze = Boolean(opt.freeze)
+    this.mapAsMap = Boolean(opt.mapAsMap)
     this.maxAliasCount = opt.maxAliasCount ?? 100
     if (typeof opt.reviver === 'function') this.reviverSources = new WeakMap()
   }
