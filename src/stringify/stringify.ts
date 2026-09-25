@@ -41,6 +41,7 @@ const defaultStringifyOptions = {
   indentSeq: true,
   lineWidth: 80,
   minContentWidth: 20,
+  newline: '\n',
   nullStr: 'null',
   simpleKeys: false,
   singleQuote: null,

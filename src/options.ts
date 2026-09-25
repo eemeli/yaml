@@ -344,6 +344,14 @@ export type ToStringOptions = {
   minContentWidth?: number
 
   /**
+   * The line ending sequence used in the output.
+   * Use `'\r\n'` to serialize with Windows-style line endings.
+   *
+   * Default: `'\n'`
+   */
+  newline?: '\n' | '\r\n'
+
+  /**
    * String representation for `null`.
    * With the core schema, use `'null'`, `'Null'`, `'NULL'`, `'~'`, or an empty
    * string `''`.

@@ -1052,6 +1052,50 @@ describe('custom indent', () => {
   })
 })
 
+describe('newline', () => {
+  let obj: unknown
+  beforeEach(() => {
+    const doc = new YAML.Document()
+    const scalar = doc.createNode('line one\nline two')
+    scalar.format = 'L' // block literal style
+    const map = doc.createNode({ foo: 'bar', scalar })
+    map.commentBefore = 'mc'
+    obj = map
+  })
+
+  test("default is '\\n'", () => {
+    expect(YAML.stringify(obj)).toBe(
+      '' + '#mc\nfoo: bar\nscalar: |-\n  line one\n  line two\n'
+    )
+  })
+
+  test("newline: '\\r\\n' is applied to the whole document", () => {
+    expect(YAML.stringify(obj, { newline: '\r\n' })).toBe(
+      '#mc\r\nfoo: bar\r\nscalar: |-\r\n  line one\r\n  line two\r\n'
+    )
+  })
+
+  test("Document#toString({ newline: '\\r\\n' })", () => {
+    const doc = YAML.parseDocument('a: 1\nb:\n  - 2\n')
+    expect(doc.toString({ newline: '\r\n' })).toBe('a: 1\r\nb:\r\n  - 2\r\n')
+  })
+
+  test("stringify() with newline: '\\r\\n' and directives", () => {
+    expect(YAML.stringify(obj, { newline: '\r\n', directives: true })).toBe(
+      '---\r\n#mc\r\nfoo: bar\r\nscalar: |-\r\n  line one\r\n  line two\r\n'
+    )
+  })
+
+  test('toStringDefaults are respected', () => {
+    const doc = new YAML.Document(obj, {
+      toStringDefaults: { newline: '\r\n' }
+    })
+    expect(doc.toString()).toBe(
+      '#mc\r\nfoo: bar\r\nscalar: |-\r\n  line one\r\n  line two\r\n'
+    )
+  })
+})
+
 describe('indentSeq: false', () => {
   let obj: unknown
   beforeEach(() => {
