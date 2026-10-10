@@ -41,6 +41,21 @@ describe('parse comments', () => {
       `)
     })
 
+    test('newline-separated comments at document start (#600)', () => {
+      const src = '#foo\n\n#bar\n42\n'
+      const doc = YAML.parseDocument<YAML.Scalar>(src)
+      expect(doc.commentBefore).toBe('foo')
+      expect(doc.value.commentBefore).toBe('bar')
+      expect(String(doc)).toBe(src)
+    })
+
+    test('newline-separated comments before a map (#600)', () => {
+      const src = '#foo\n\n#bar\n#baz\nkey: value\n'
+      const doc = YAML.parseDocument(src)
+      expect(doc.commentBefore).toBe('foo')
+      expect(String(doc)).toBe(src)
+    })
+
     test('body end comments', () => {
       const src = '\nstring\n#comment\n#comment\n'
       const doc = YAML.parseDocument(src)
@@ -1013,8 +1028,9 @@ map:
         - v2
       `
       const doc = YAML.parseDocument(src)
+      expect(doc.commentBefore).toBe(' c1')
       expect(doc.value).toMatchObject([
-        { commentBefore: ' c1\n\n c2', comment: ' c3' },
+        { commentBefore: ' c2', comment: ' c3' },
         { commentBefore: ' c4', spaceBefore: true }
       ])
       expect(doc.toString()).toBe(source`
