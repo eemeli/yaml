@@ -100,7 +100,8 @@ export function resolveProps(
       case 'newline':
         if (atNewline) {
           if (comment) comment += token.source
-          else if (!found || indicator !== 'seq-item-ind') spaceBefore = true
+          else if ((!found || indicator !== 'seq-item-ind') && !tag && !anchor)
+            spaceBefore = true
         } else commentSep += token.source
         atNewline = true
         hasNewline = true

@@ -192,6 +192,8 @@ export function stringify(
         : node.toString(ctx, onComment, onChompKeep)
   if (!props) return str
   return node instanceof Scalar || str[0] === '{' || str[0] === '['
-    ? `${props} ${str}`
+    ? str !== ''
+      ? `${props} ${str}`
+      : props + '\n'
     : `${props}\n${ctx.indent}${str}`
 }
