@@ -4,6 +4,7 @@ import { Scalar } from '../nodes/Scalar.ts'
 import type { FlowScalar } from '../parse/cst.ts'
 import type { ComposeErrorHandler } from './composer.ts'
 import { resolveEnd } from './resolve-end.ts'
+import { printableCheck } from './util-printable-check.ts'
 
 type FlowScalarErrorHandler = (
   offset: number,
@@ -56,6 +57,7 @@ export function resolveFlowScalar(
         range: [offset, offset + source.length, offset + source.length]
       }
   }
+  printableCheck(source, offset, _type !== Scalar.PLAIN, onError)
 
   const valueEnd = offset + source.length
   const re = resolveEnd(end, valueEnd, strict, onError)

@@ -42,6 +42,7 @@ To identify errors for special handling, you should primarily use `code` to diff
 | `MULTIPLE_ANCHORS`       | A node is only allowed to have one anchor.                                                                                                                                   |
 | `MULTIPLE_DOCS`          | A YAML stream may include multiple documents. If yours does, you'll need to use `parseAllDocuments()` to work with it.                                                       |
 | `MULTIPLE_TAGS`          | A node is only allowed to have one tag.                                                                                                                                      |
+| `NON_PRINTABLE_CHAR`     | Scalars cannot include raw non-printable characters, but for JSON compatibility quoted scalars may include all except C0 control characters. Use double-quoted escapes.      |
 | `NON_STRING_KEY`         | With the `stringKeys` option, all mapping keys must be strings                                                                                                               |
 | `RESOURCE_EXHAUSTION`    | The input document has excessive nesting, leading to a stack overflow during parsing.                                                                                        |
 | `TAB_AS_INDENT`          | Only spaces are allowed as indentation.                                                                                                                                      |

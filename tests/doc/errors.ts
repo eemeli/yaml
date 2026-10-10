@@ -70,6 +70,52 @@ describe('flow scalars', () => {
   })
 })
 
+describe('non-printable characters (#703)', () => {
+  for (const [name, src] of [
+    ['plain', 'a\x01b'],
+    ['single-quoted', "'a\x01b'"],
+    ['double-quoted', '"a\x01b"'],
+    ['block literal', '|\n a\x01b\n'],
+    ['block folded', '>\n a\x01b\n']
+  ])
+    test(name, () => {
+      const doc = YAML.parseDocument(src)
+      const offset = src.indexOf('\x01')
+      expect(doc.errors).toMatchObject([
+        { code: 'NON_PRINTABLE_CHAR', pos: [offset, offset + 1] }
+      ])
+    })
+
+  test('allowed characters', () => {
+    const src = `- a\tb\x85c\u{1F600}\n- "\\x01\x7f\x80\uffff"\n- '\x7f\x80\uffff'\n`
+    const doc = YAML.parseDocument(src)
+    expect(doc.errors).toHaveLength(0)
+    expect(doc.toJS()).toEqual([
+      'a\tb\x85c\u{1F600}',
+      '\x01\x7f\x80\uffff',
+      '\x7f\x80\uffff'
+    ])
+  })
+
+  test('non-C0 characters outside quoted scalars', () => {
+    const doc = YAML.parseDocument('- a\x7f\x80\ud800\uffff\n- |\n  \ufffe\n')
+    expect(doc.errors).toMatchObject(
+      [3, 4, 5, 6, 14].map(offset => ({
+        code: 'NON_PRINTABLE_CHAR',
+        pos: [offset, offset + 1]
+      }))
+    )
+  })
+
+  test('stringify', () => {
+    for (const str of ['\x01', '\x7f', '\ud800', '\ufffe']) {
+      const doc = YAML.parseDocument(YAML.stringify(str))
+      expect(doc.errors).toHaveLength(0)
+      expect(doc.toJS()).toBe(str)
+    }
+  })
+})
+
 describe('block collections', () => {
   test('mapping with bad indentation', () => {
     const src = 'foo: "1"\n bar: 2\n'
