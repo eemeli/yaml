@@ -21,7 +21,7 @@ export const floatExp: ScalarTag = {
   default: true,
   tag: 'tag:yaml.org,2002:float',
   format: 'EXP',
-  test: /^[-+]?(?:[0-9][0-9_]*)?(?:\.[0-9_]*)?[eE][-+]?[0-9]+$/,
+  test: /^[-+]?(?:[0-9][0-9_]*)?\.(?:[0-9_]*)?[eE][-+]?[0-9]+$/,
   resolve: (str: string) => parseFloat(str.replace(/_/g, '')),
   stringify(node) {
     const num = Number(node.value)
