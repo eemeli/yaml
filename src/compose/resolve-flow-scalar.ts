@@ -4,6 +4,10 @@ import { Scalar } from '../nodes/Scalar.ts'
 import type { FlowScalar } from '../parse/cst.ts'
 import type { ComposeErrorHandler } from './composer.ts'
 import { resolveEnd } from './resolve-end.ts'
+import {
+  findNonPrintable,
+  findRawNonPrintable
+} from './util-find-non-printable.ts'
 
 type FlowScalarErrorHandler = (
   offset: number,
@@ -55,6 +59,24 @@ export function resolveFlowScalar(
         comment: '',
         range: [offset, offset + source.length, offset + source.length]
       }
+  }
+
+  // Non-printable characters are not valid in scalar values, but in
+  // double-quoted scalars they may be included via escape sequences,
+  // so for those only the raw source is checked.
+  const badIndex =
+    _type === Scalar.QUOTE_DOUBLE
+      ? findRawNonPrintable(source)
+      : findNonPrintable(value)
+  if (badIndex !== -1) {
+    const str = _type === Scalar.QUOTE_DOUBLE ? source : value
+    const cc = str.codePointAt(badIndex)!
+    const code = `U+${cc.toString(16).toUpperCase().padStart(4, '0')}`
+    _onError(
+      badIndex,
+      'UNEXPECTED_TOKEN',
+      `Scalar value contains a non-printable character: ${code}`
+    )
   }
 
   const valueEnd = offset + source.length

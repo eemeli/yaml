@@ -3,6 +3,7 @@ import { Scalar } from '../nodes/Scalar.ts'
 import type { BlockScalar } from '../parse/cst.ts'
 import type { ComposeContext } from './compose-node.ts'
 import type { ComposeErrorHandler } from './composer.ts'
+import { findNonPrintable } from './util-find-non-printable.ts'
 
 export function resolveBlockScalar(
   ctx: ComposeContext,
@@ -126,6 +127,17 @@ export function resolveBlockScalar(
       break
     default:
       value += '\n'
+  }
+
+  const badIndex = findNonPrintable(value)
+  if (badIndex !== -1) {
+    const cc = value.codePointAt(badIndex)!
+    const code = `U+${cc.toString(16).toUpperCase().padStart(4, '0')}`
+    onError(
+      start + badIndex,
+      'UNEXPECTED_TOKEN',
+      `Scalar value contains a non-printable character: ${code}`
+    )
   }
 
   const end = start + header.length + scalar.source.length

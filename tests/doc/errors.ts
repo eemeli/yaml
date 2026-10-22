@@ -70,6 +70,52 @@ describe('flow scalars', () => {
   })
 })
 
+describe('non-printable characters (#703)', () => {
+  test('error on raw C0 control character in double-quoted scalar', () => {
+    const doc = YAML.parseDocument('key: "a\u0001b"')
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0]).toMatchObject({
+      code: 'UNEXPECTED_TOKEN',
+      message: expect.stringContaining(
+        'Scalar value contains a non-printable character: U+0001'
+      )
+    })
+  })
+
+  test('error on raw C0 control character in plain scalar', () => {
+    const doc = YAML.parseDocument('key: a\u0001b\n')
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0]).toMatchObject({
+      code: 'UNEXPECTED_TOKEN',
+      message: expect.stringContaining(
+        'Scalar value contains a non-printable character: U+0001'
+      )
+    })
+  })
+
+  test('error on C0 control character in block scalar', () => {
+    const doc = YAML.parseDocument('key: |\n a\u0002b\n')
+    expect(doc.errors).toHaveLength(1)
+    expect(doc.errors[0]).toMatchObject({
+      code: 'UNEXPECTED_TOKEN',
+      message: expect.stringContaining(
+        'Scalar value contains a non-printable character: U+0002'
+      )
+    })
+  })
+
+  test('no error on escaped, NEL, tab, newline or astral characters', () => {
+    const doc = YAML.parseDocument('key: "a\\u0001b"')
+    expect(doc.errors).toHaveLength(0)
+    const doc2 = YAML.parseDocument('key: "a\\u0085b"')
+    expect(doc2.errors).toHaveLength(0)
+    const doc3 = YAML.parseDocument('key: |\n a\tb\n c\n')
+    expect(doc3.errors).toHaveLength(0)
+    const doc4 = YAML.parseDocument('key: "\\U0001F600"')
+    expect(doc4.errors).toHaveLength(0)
+  })
+})
+
 describe('block collections', () => {
   test('mapping with bad indentation', () => {
     const src = 'foo: "1"\n bar: 2\n'
