@@ -1615,6 +1615,25 @@ describe('YAML.stringify options as scalar', () => {
       'foo: |-\n   bar\n   fuzz\n'
     )
   })
+  test('block scalar indentation indicator with custom indent (#733)', () => {
+    const value = { k: '  lead\nx\n' }
+    for (const indent of [1, 2, 3, 4]) {
+      const str = YAML.stringify(value, { indent })
+      expect(str).toBe(
+        `k: |${indent}\n${' '.repeat(indent)}  lead\n${' '.repeat(indent)}x\n`
+      )
+      expect(YAML.parse(str)).toEqual(value)
+    }
+
+    const nested = { a: { k: '  lead\nx\n' }, seq: ['  lead\nx\n', { m: '  lead\nx\n' }] }
+    const strNested = YAML.stringify(nested, { indent: 4 })
+    expect(YAML.parse(strNested)).toEqual(nested)
+
+    const folded = { k: '  lead\nx' }
+    const strFolded = YAML.stringify(folded, { indent: 4, blockQuote: 'folded' })
+    expect(strFolded).toBe('k: >4-\n      lead\n    x\n')
+    expect(YAML.parse(strFolded)).toEqual(folded)
+  })
 })
 
 describe('YAML.stringify on ast Document', () => {

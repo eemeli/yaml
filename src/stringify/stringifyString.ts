@@ -245,7 +245,11 @@ function blockString(
     start = start.replace(/\n+/g, `$&${indent}`)
   }
 
-  const indentSize = indent ? '2' : '1' // root is at -1
+  const indentSize = indent
+    ? ctx.implicitKey === false && ctx.indentStep
+      ? String(ctx.indentStep.length)
+      : '2'
+    : '1' // root is at -1
   // Leading | or > is added later
   let header = (startWithSpace ? indentSize : '') + chomp
   if (comment) {

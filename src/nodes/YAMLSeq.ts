@@ -222,7 +222,7 @@ export class YAMLSeq<
       options: { commentString }
     } = ctx
     const itemIndent = indent + '  '
-    const itemCtx = { ...ctx, indent: itemIndent }
+    const itemCtx = { ...ctx, implicitKey: undefined, indent: itemIndent }
 
     let chompKeep = false // flag for the preceding node's status
     const lines: string[] = []
