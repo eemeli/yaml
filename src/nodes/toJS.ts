@@ -9,8 +9,7 @@ import type { Node } from './types.ts'
 export class ToJSContext {
   anchors: Map<Node, { aliasCount: number; count: number; res: unknown }> =
     new Map()
-  /** Cached anchor and alias nodes in the order they occur in the document */
-  aliasResolveCache?: Node[]
+  aliasResolveCache?: Map<Alias | string, Exclude<Node, Alias> | undefined>
   mapAsMap: boolean
   mapKeyWarned = false
   maxAliasCount: number

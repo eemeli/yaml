@@ -66,26 +66,23 @@ export class Alias implements NodeBase {
     if (ctx?.maxAliasCount === 0)
       throw new ReferenceError('Alias resolution is disabled')
 
-    let nodes: Node[]
-    if (ctx?.aliasResolveCache) {
-      nodes = ctx.aliasResolveCache
-    } else {
-      nodes = []
+    let cache = ctx?.aliasResolveCache
+    if (!cache) {
+      cache = new Map()
+      const aliases = cache
       visit(doc, {
         Node: (_key: unknown, node: Node) => {
-          if (node instanceof Alias || node.anchor) nodes.push(node)
+          if (node instanceof Alias) {
+            if (!aliases.has(node)) aliases.set(node, aliases.get(node.source))
+          } else if (node.anchor) {
+            aliases.set(node.anchor, node)
+          }
         }
       })
-      if (ctx) ctx.aliasResolveCache = nodes
+      if (ctx) ctx.aliasResolveCache = cache
     }
 
-    let found: Scalar | YAMLMap | YAMLSeq | YAMLSet | undefined = undefined
-    for (const node of nodes) {
-      if (node === this) break
-      if (node.anchor === this.source) found = node
-    }
-
-    return found
+    return cache.has(this) ? cache.get(this) : cache.get(this.source)
   }
 
   /** A plain JavaScript representation of the resolved value of this alias. */
