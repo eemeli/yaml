@@ -1,5 +1,5 @@
-import type { Alias, YAMLMap, YAMLSeq } from 'yaml'
-import { Document, parse, parseDocument } from 'yaml'
+import type { Scalar, YAMLMap, YAMLSeq } from 'yaml'
+import { Alias, Document, parse, parseDocument } from 'yaml'
 import { _map } from '../_utils.ts'
 
 test('basic', () => {
@@ -22,6 +22,101 @@ test('re-defined anchor', () => {
   ])
   expect(doc.toJS()).toMatchObject([1, 2, 2])
   expect(String(doc)).toBe('- &a 1\n- &a 2\n- *a\n')
+})
+
+describe('alias resolution cache', () => {
+  test('uses the preceding anchor for each alias', () => {
+    const doc = parseDocument('[&a [1], *a, &a [2], *a, &a [3]]')
+    const res = doc.toJS()
+    expect(res).toEqual([[1], [1], [2], [2], [3]])
+    expect(res[1]).toBe(res[0])
+    expect(res[3]).toBe(res[2])
+  })
+
+  test.each(['[*a, &a 1]', '[*missing]', '[&b 1, *b, *a, &a 2]'])(
+    'rejects unresolved aliases in %s',
+    src => {
+      const doc = parseDocument(src)
+      expect(doc.errors).toHaveLength(0)
+      expect(() => doc.toJS()).toThrow('Unresolved alias')
+    }
+  )
+
+  test('a detached alias uses the last matching anchor', () => {
+    const doc = parseDocument<YAMLSeq>('[&a 1, &a { value: 2 }]')
+    const alias = new Alias('a')
+    expect(alias.resolve(doc)).toBe(doc.get(1))
+    expect(alias.toJS(doc)).toEqual({ value: 2 })
+    expect(() => new Alias('missing').toJS(doc)).toThrow('Unresolved alias')
+  })
+
+  test('a detached alias resolves nested aliases in document order', () => {
+    const doc = parseDocument('[&a 1, &b [*a], &a 2]')
+    expect(new Alias('b').toJS(doc)).toEqual([1])
+  })
+
+  test('a repeated alias instance uses its first position', () => {
+    const doc = parseDocument<YAMLSeq>('[&a 1, *a, &a 2]')
+    doc.value.push(doc.get(1)!)
+    expect(doc.toJS()).toEqual([1, 1, 2, 1])
+  })
+
+  test('a repeated unresolved alias stays unresolved', () => {
+    const doc = parseDocument<YAMLSeq>('[*a, &a 1]')
+    const alias = doc.get(0) as Alias
+    doc.value.push(alias)
+    expect(alias.resolve(doc)).toBeUndefined()
+    expect(() => alias.toJS(doc)).toThrow('Unresolved alias')
+  })
+
+  test('fresh calls reflect document edits', () => {
+    const doc = parseDocument<YAMLSeq>('[&a 1, *a, &a 2]')
+    const alias = doc.get(1) as Alias
+    expect(doc.toJS()).toEqual([1, 1, 2])
+    const last = doc.value.pop()!
+    doc.value.unshift(last)
+    expect(doc.toJS()).toEqual([2, 1, 1])
+    expect(alias.resolve(doc)).toBe(doc.get(1))
+    const first = doc.get(1) as Scalar
+    first.anchor = 'b'
+    expect(alias.resolve(doc)).toBe(last)
+    expect(doc.toJS()).toEqual([2, 1, 2])
+    alias.source = 'b'
+    expect(alias.resolve(doc)).toBe(doc.get(1))
+    expect(doc.toJS()).toEqual([2, 1, 1])
+  })
+
+  test('enforces alias limits even after caching', () => {
+    const doc = parseDocument('[&a 1, *a, *a]')
+    expect(() => doc.toJS({ maxAliasCount: 0 })).toThrow(
+      'Alias resolution is disabled'
+    )
+    expect(() => doc.toJS({ maxAliasCount: 2 })).toThrow(
+      'Excessive alias count'
+    )
+    expect(doc.toJS({ maxAliasCount: 3 })).toEqual([1, 1, 1])
+    expect(doc.toJS({ maxAliasCount: -1 })).toEqual([1, 1, 1])
+  })
+
+  test.each([64, 128, 256])(
+    'anchor lookups grow linearly for %i distinct anchors',
+    size => {
+      const doc = new Document<YAMLSeq<Scalar | Alias>>(new Array(size).fill(0))
+      let reads = 0
+      for (let i = 0; i < size; ++i) {
+        const node = doc.value[i] as Scalar
+        Object.defineProperty(node, 'anchor', {
+          get() {
+            reads += 1
+            return `a${i}`
+          }
+        })
+        doc.value.push(new Alias(`a${i}`))
+      }
+      expect(doc.toJS()).toEqual(new Array(2 * size).fill(0))
+      expect(reads).toBeLessThanOrEqual(8 * size)
+    }
+  )
 })
 
 test('circular reference', () => {
