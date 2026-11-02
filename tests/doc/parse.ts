@@ -985,6 +985,19 @@ describe('CRLF line endings', () => {
   })
 })
 
+describe('no infinite loop on lone CR, U+2028 or U+2029', () => {
+  for (const ch of ['\r', '\u2028', '\u2029']) {
+    test(JSON.stringify(ch), () => {
+      expect(YAML.parse(ch)).toBe(ch)
+      expect(YAML.parse(`# comment${ch}a: 1\nb: 2\n`)).toEqual({ b: 2 })
+      expect(YAML.parse(`--- # comment${ch}a: 1\nb: 2\n`)).toEqual({ b: 2 })
+      expect(YAML.parse(`%YAML 1.2 # comment${ch}x\n---\nb: 2\n`)).toEqual({
+        b: 2
+      })
+    })
+  }
+})
+
 describe('stringKeys', () => {
   test('success', () => {
     const doc = YAML.parseDocument<any>(

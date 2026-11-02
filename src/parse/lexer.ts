@@ -34,10 +34,17 @@ const flowIndicatorCharCodes = new Set([44, 91, 93, 123, 125]) // , [ ] { }
 const invalidAnchorChars = new Set(' ,[]{}\n\r\t')
 const isNotAnchorChar = (ch: string) => !ch || invalidAnchorChars.has(ch)
 
-const blockScalarHeader = /([|>][^\s#]*)([ \t]*)((?:.|\r(?!\n))*)$/my
-const directiveLine = /(%(?:[^ \t\n\r]|[ \t](?![\n\r#]))*)([ \t]*)(#.*)?$/my
-const docMarker = /[-.]{3}(?=[ \n\r\t]|$)(?:([ \t]+)(#.*)?)?/y
-const emptyLineOrComment = /([ \t]*)(#.*)?$/my
+// The lexer only treats \n and \r\n as line breaks (see newline() and
+// toLineEnd()). A JS RegExp `.` or multiline `$` would also stop at a lone \r,
+// U+2028 or U+2029, leaving the lexer stuck without consuming any input, so
+// `[^\n\r]|\r(?!\n)` is used for line content and `(?=\r?\n|$)` for line ends.
+const blockScalarHeader =
+  /([|>][^\s#]*)([ \t]*)((?:[^\n\r]|\r(?!\n))*)(?=\r?\n|$)/y
+const directiveLine =
+  /(%(?:[^ \t\n\r]|\r(?!\n)|[ \t](?![\n\r#]))*)([ \t]*)(#(?:[^\n\r]|\r(?!\n))*)?(?=\r?\n|$)/y
+const docMarker =
+  /[-.]{3}(?=[ \n\r\t]|$)(?:([ \t]+)(#(?:[^\n\r]|\r(?!\n))*)?)?/y
+const emptyLineOrComment = /([ \t]*)(#(?:[^\n\r]|\r(?!\n))*)?(?=\r?\n|$)/y
 const indicator =
   //  |anchor       |explicit tag |implicit tag                                 |block start           |block start in flow   |spaces
   /(?:(&[^\s,[\]{}]*|!<[^\s>]*>?|!(?:[0-9a-z-#;/?:@&=+$_.!~*'()]|%[0-9a-f]{2})*)|([-?:])(?=[ \n\r\t]|$)|([-?:])(?=[,[\]{}]|$))([ \t]*)/iy

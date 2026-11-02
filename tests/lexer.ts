@@ -76,3 +76,60 @@ test('trailing comments on ...', () => {
     '\n'
   ])
 })
+
+describe('no infinite loop on lone CR, U+2028 or U+2029', () => {
+  for (const [name, ch] of [
+    ['CR', '\r'],
+    ['LS', '\u2028'],
+    ['PS', '\u2029']
+  ]) {
+    test(`${name} as only character`, () => {
+      expect(lex(ch)).toEqual([DOC, SCALAR, ch])
+    })
+
+    test(`${name} in comment at stream start`, () => {
+      const src = `# a${ch}b\nc`
+      expect(lex(src)).toEqual([`# a${ch}b`, '\n', DOC, SCALAR, 'c'])
+    })
+
+    test(`${name} in comment after directive`, () => {
+      const src = `%YAML 1.2 # a${ch}b\n---\n`
+      expect(lex(src)).toEqual([
+        '%YAML 1.2',
+        ' ',
+        `# a${ch}b`,
+        '\n',
+        DOC,
+        '---',
+        '\n'
+      ])
+    })
+
+    test(`${name} in comment after document marker`, () => {
+      const src = `--- # a${ch}b\nc`
+      expect(lex(src)).toEqual([
+        DOC,
+        '---',
+        ' ',
+        `# a${ch}b`,
+        '\n',
+        SCALAR,
+        'c'
+      ])
+    })
+
+    test(`${name} in comment after document end marker`, () => {
+      const src = `... # a${ch}b\n${ch}`
+      expect(lex(src)).toEqual([
+        DOC,
+        '...',
+        ' ',
+        `# a${ch}b`,
+        '\n',
+        DOC,
+        SCALAR,
+        ch
+      ])
+    })
+  }
+})
