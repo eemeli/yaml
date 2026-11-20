@@ -151,7 +151,7 @@ function visit_(
       path = [...path, node]
       const ck = visit_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
-      else if (ck === REMOVE) node.key = new Scalar(null)
+      else if (ck === REMOVE) replacePairKey(node, new Scalar(null), path)
       const cv = visit_('value', node.value, visitor, path)
       if (cv === BREAK) return BREAK
       else if (cv === REMOVE) node.value = null
@@ -258,7 +258,7 @@ async function visitAsync_(
       path = [...path, node]
       const ck = await visitAsync_('key', node.key, visitor, path)
       if (ck === BREAK) return BREAK
-      else if (ck === REMOVE) node.key = new Scalar(null)
+      else if (ck === REMOVE) replacePairKey(node, new Scalar(null), path)
       const cv = await visitAsync_('value', node.value, visitor, path)
       if (cv === BREAK) return BREAK
       else if (cv === REMOVE) node.value = null
@@ -324,6 +324,17 @@ function callVisitor(
   return undefined
 }
 
+function replacePairKey(
+  pair: Pair,
+  newKey: Node,
+  path: readonly (Document | Node | Pair)[]
+) {
+  const map = path[path.length - 2]
+  const k = map instanceof YAMLMap ? map.keyOf(pair) : undefined
+  pair.key = newKey
+  if (map instanceof YAMLMap && k !== undefined) map._indexNode(newKey, k)
+}
+
 function replaceNode(
   key: number | 'key' | 'value' | null,
   path: readonly (Document | Node | Pair)[],
@@ -335,22 +346,26 @@ function replaceNode(
   } else if (parent instanceof YAMLMap) {
     if (node instanceof Pair) {
       const entries = Array.from(parent.values)
-      entries[key as number] = [parent.keyOf(node, true), node]
+      const k = parent.keyOf(node, true)
+      entries[key as number] = [k, node]
       parent.values = new Map(entries)
+      parent._indexNode(node.key, k)
     } else {
       throw new Error('Cannot replace map pair with non-pair value')
     }
   } else if (parent instanceof YAMLSet) {
     if (isNode(node)) {
       const entries = Array.from(parent.values)
-      entries[key as number] = [parent.keyOf(node, true), node]
+      const k = parent.keyOf(node, true)
+      entries[key as number] = [k, node]
       parent.values = new Map(entries)
+      parent._indexNode(node, k)
     } else {
       throw new Error('Cannot replace set value with non-node value')
     }
   } else if (parent instanceof Pair) {
     if (isNode(node)) {
-      if (key === 'key') parent.key = node
+      if (key === 'key') replacePairKey(parent, node, path)
       else parent.value = node
     } else {
       throw new Error(`Cannot replace pair ${key} with non-node value`)
