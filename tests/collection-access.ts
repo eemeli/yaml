@@ -1,5 +1,6 @@
 import {
   Document,
+  Pair,
   Scalar,
   YAMLMap,
   type YAMLOMap,
@@ -114,6 +115,43 @@ describe('Map', () => {
     expect(doc.get([1])).toBeUndefined()
     expect(doc.get(a1)).toMatchObject([{ value: 2 }])
   })
+
+  test('node key identity lookup after value mutation and non-deterministic mapKey', () => {
+    const d1 = new Document(undefined, { mapKey: () => Symbol() })
+    const m1 = new YAMLMap<string, number>(d1.schema)
+    const k1 = new Scalar('alpha')
+    const p1 = new Pair(k1, new Scalar(1))
+    m1.set(p1)
+
+    expect(m1.has(k1)).toBe(true)
+    expect(m1.getPair(k1)).toBe(p1)
+    expect(m1.has(new Scalar('alpha'))).toBe(false)
+    expect(m1.keyOf(k1)).not.toBeUndefined()
+
+    const cloned = m1.clone()
+    const clonedPair = Array.from(cloned.values.values())[0]!
+    expect(cloned.has(clonedPair.key)).toBe(true)
+    expect(cloned.has(k1)).toBe(false)
+
+    expect(m1.delete(k1)).toBe(true)
+    expect(m1.has(k1)).toBe(false)
+    expect(m1.getPair(k1)).toBeUndefined()
+
+    const m2 = parseDocument('a: 1\nb: 2\n').value as YAMLMap
+    const pairA = m2.getPair('a')!
+    const scalarA = pairA.key as Scalar
+    scalarA.value = 'renamed'
+    expect(m2.has(scalarA)).toBe(true)
+    expect(m2.getPair(scalarA)).toBe(pairA)
+
+    const replacement = new Scalar('a')
+    m2.set(replacement, new Scalar(9))
+    expect(m2.has(scalarA)).toBe(true)
+
+    m2.set(replacement, null)
+    expect(m2.has(scalarA)).toBe(false)
+    expect(m2.getPair(replacement)?.key).toBe(replacement)
+  })
 })
 
 describe('Seq', () => {
@@ -210,6 +248,17 @@ describe('Set', () => {
     expect(set.delete(1)).toBe(true)
     expect(set.has(1)).toBe(false)
     expect(set.size).toBe(2)
+  })
+
+  test('node identity lookup after value mutation', () => {
+    const item = new Scalar<string>('x')
+    set.add(item)
+    item.value = 'mutated'
+    expect(set.has(item)).toBe(true)
+    expect(set.get(item)).toBe(item)
+    expect(set.keyOf(item)).toBe('x')
+    expect(set.delete(item)).toBe(true)
+    expect(set.has(item)).toBe(false)
   })
 })
 
@@ -310,5 +359,15 @@ describe('Document', () => {
   test('set with scalar value', () => {
     const doc = new Document('s')
     expect(() => doc.set('a', 1)).toThrow(/document value/)
+  })
+
+  test('parses large mappings and still detects duplicate keys', () => {
+    const lines = Array.from({ length: 20_000 }, (_, i) => `k${i}: ${i}`)
+    const doc = parseDocument(lines.join('\n') + '\n')
+    expect(doc.errors).toHaveLength(0)
+    expect((doc.value as YAMLMap).size).toBe(20_000)
+
+    const dupDoc = parseDocument(lines.join('\n') + '\nk19999: dup\n')
+    expect(dupDoc.errors).toMatchObject([{ code: 'DUPLICATE_KEY' }])
   })
 })

@@ -1,4 +1,5 @@
 import type { Schema } from '../schema/Schema.ts'
+import { Pair } from './Pair.ts'
 import type { YAMLMap } from './YAMLMap.ts'
 import type { YAMLSet } from './YAMLSet.ts'
 
@@ -9,7 +10,9 @@ export function cloneMapOrSet<T extends YAMLMap | YAMLSet>(
   schema ??= coll.schema
   const copy = new (coll.constructor as typeof YAMLMap)(schema) as T
   for (const [key, value] of coll.values) {
-    copy.values.set(key, value.clone(schema) as any)
+    const cloned = value.clone(schema) as any
+    copy.values.set(key, cloned)
+    copy._indexNode(cloned instanceof Pair ? cloned.key : cloned, key)
   }
   if (coll.range) copy.range = [...coll.range]
   const propDesc = Object.getOwnPropertyDescriptors(coll)

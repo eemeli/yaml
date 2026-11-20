@@ -10,6 +10,13 @@ import { Pair } from './Pair.ts'
 import { ToJSContext } from './toJS.ts'
 import type { CollectionBase, Node, NodeOf, Primitive, Range } from './types.ts'
 import { cloneMapOrSet } from './util-clone-map-or-set.ts'
+import {
+  indexNodeKey,
+  lookupNodeKey,
+  NOT_FOUND
+} from './util-node-key-index.ts'
+
+const getSetNode = <T>(node: T) => node
 
 export class YAMLSet<
   T extends Primitive | Node = Primitive | Node
@@ -22,6 +29,7 @@ export class YAMLSet<
   tag = 'tag:yaml.org,2002:set'
 
   values: Map<unknown, NodeOf<T>> = new Map()
+  #nodeKeys: WeakMap<Node, unknown> = new WeakMap()
 
   /** An optional anchor on this set. Used by alias nodes. */
   declare anchor?: string
@@ -57,6 +65,11 @@ export class YAMLSet<
     })
   }
 
+  /** @internal */
+  _indexNode(node: unknown, mk: unknown): void {
+    indexNodeKey(this.#nodeKeys, node, mk)
+  }
+
   get size(): number {
     return this.values.size
   }
@@ -72,6 +85,7 @@ export class YAMLSet<
       ? value
       : new NodeCreator(this.schema, options).create(value)
     this.values.set(mk, node as NodeOf<T>)
+    indexNodeKey(this.#nodeKeys, node, mk)
     return this
   }
 
@@ -90,11 +104,21 @@ export class YAMLSet<
    */
   delete(value: T | NodeOf<T>): boolean {
     const mk = this.schema.mapKey(value)
+    const prev = this.values.get(mk)
+    if (prev) {
+      if (isNode(prev)) this.#nodeKeys.delete(prev)
+      return this.values.delete(mk)
+    }
     if (this.values.delete(mk)) return true
-    if (isNode(value)) {
-      for (const [k, v] of this.values) {
-        if (v === value) return this.values.delete(k)
-      }
+    const nk = lookupNodeKey(
+      this.values,
+      this.#nodeKeys,
+      isNode(value) ? value : null,
+      getSetNode
+    )
+    if (nk !== NOT_FOUND) {
+      this.#nodeKeys.delete(value as Node)
+      return this.values.delete(nk)
     }
     return false
   }
@@ -104,20 +128,27 @@ export class YAMLSet<
     const mk = this.schema.mapKey(value)
     const node = this.values.get(mk)
     if (node) return node
-    if (isNode(value)) {
-      for (const v of this.values.values()) if (v === value) return v
-    }
-    return undefined
+    const nk = lookupNodeKey(
+      this.values,
+      this.#nodeKeys,
+      isNode(value) ? value : null,
+      getSetNode
+    )
+    return nk === NOT_FOUND ? undefined : this.values.get(nk)
   }
 
   /** Check if the set includes `value`.  */
   has(value: T | NodeOf<T>): boolean {
     const mk = this.schema.mapKey(value)
     if (this.values.has(mk)) return true
-    if (isNode(value)) {
-      for (const v of this.values.values()) if (v === value) return true
-    }
-    return false
+    return (
+      lookupNodeKey(
+        this.values,
+        this.#nodeKeys,
+        isNode(value) ? value : null,
+        getSetNode
+      ) !== NOT_FOUND
+    )
   }
 
   /**
@@ -129,10 +160,13 @@ export class YAMLSet<
   keyOf(value: T | NodeOf<T>, allowMissing = false): unknown {
     const mk = this.schema.mapKey(value)
     if (allowMissing || this.values.has(mk)) return mk
-    if (isNode(value)) {
-      for (const [k, v] of this.values) if (v === value) return k
-    }
-    return undefined
+    const nk = lookupNodeKey(
+      this.values,
+      this.#nodeKeys,
+      isNode(value) ? value : null,
+      getSetNode
+    )
+    return nk === NOT_FOUND ? undefined : nk
   }
 
   /** A plain JavaScript representation of this set. */
