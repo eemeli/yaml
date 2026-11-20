@@ -1293,3 +1293,41 @@ a:
     expect(String(doc)).toBe(src)
   })
 })
+
+describe('empty block scalar with comments (#687)', () => {
+  test('top-level empty block literal followed by comment', () => {
+    const doc = YAML.parseDocument<YAML.Scalar>('|5\n#comment\n')
+    expect(doc.value).toMatchObject({ value: '' })
+    expect(doc.comment).toBe('comment')
+
+    const str = doc.toString()
+    expect(str).toBe('|2\n\n#comment\n')
+
+    const reparsed = YAML.parseDocument<YAML.Scalar>(str)
+    expect(reparsed.value).toMatchObject({ value: '' })
+    expect(reparsed.comment).toBe('comment')
+  })
+
+  test('top-level empty block folded with header and trailing comments', () => {
+    const doc = YAML.parseDocument<YAML.Scalar>('>5 #c1\n#c2\n')
+    expect(doc.value).toMatchObject({ value: '', comment: 'c1' })
+    expect(doc.comment).toBe('c2')
+
+    const str = doc.toString()
+    expect(str).toBe('>2 #c1\n\n#c2\n')
+
+    const reparsed = YAML.parseDocument<YAML.Scalar>(str)
+    expect(reparsed.value).toMatchObject({ value: '', comment: 'c1' })
+    expect(reparsed.comment).toBe('c2')
+  })
+
+  test('map value empty block scalar with header comment', () => {
+    const doc = YAML.parseDocument<YAML.YAMLMap>('a: |5 #c1\n')
+    const str = doc.toString()
+    expect(str).toBe('a: | #c1\n\n')
+
+    const reparsed = YAML.parseDocument<YAML.YAMLMap>(str)
+    expect(reparsed.toJS()).toEqual({ a: '' })
+    expect(reparsed.get('a')).toMatchObject({ comment: 'c1' })
+  })
+})

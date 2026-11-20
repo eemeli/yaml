@@ -201,7 +201,14 @@ function blockString(
         : type === Scalar.BLOCK_LITERAL
           ? true
           : !lineLengthOverLimit(value, lineWidth, indent.length)
-  if (!value) return literal ? '|\n' : '>\n'
+  if (!value) {
+    let header = ctx.forceBlockIndent ? (indent ? '2' : '1') : ''
+    if (comment) {
+      header += ' ' + commentString(comment.replace(/ ?[\r\n]+/g, ' '))
+      if (onComment) onComment()
+    }
+    return `${literal ? '|' : '>'}${header}\n`
+  }
 
   // determine chomping from whitespace at value end
   let chomp: '' | '-' | '+'
