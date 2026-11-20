@@ -73,7 +73,12 @@ export function stringifyDocument(
     let dc = doc.comment
     if (dc && chompKeep) dc = dc.replace(/^\n+/, '')
     if (dc) {
-      if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')
+      const last = lines[lines.length - 1]
+      if (
+        (!chompKeep || contentComment) &&
+        last !== '' &&
+        !last?.endsWith('\n')
+      )
         lines.push('')
       lines.push(indentComment(commentString(dc), ''))
     }
