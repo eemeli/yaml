@@ -661,6 +661,13 @@ not a number: .nan
 not a NaN: -.NaN\n`)
   })
 
+  test('!!float exponent requires a sign in YAML 1.1', () => {
+    expect(parse('3E0', { version: '1.1' })).toBe('3E0')
+    expect(parse('3e+0', { version: '1.1' })).toBe(3)
+    expect(parse('3e-0', { version: '1.1' })).toBe(3)
+    expect(parse('3E0', { version: '1.2' })).toBe(3)
+  })
+
   test('!!int', () => {
     const src = `%YAML 1.1
 ---
