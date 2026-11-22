@@ -609,6 +609,20 @@ generic: !!binary |-
 description: The binary value above is a tiny arrow encoded as a gif image.\n`)
   })
 
+  test('!!binary stringify honours byteOffset and byteLength', () => {
+    const view = new Uint8Array([9, 9, 0, 1, 2, 255]).subarray(2)
+    const src = stringify(view, { version: '1.1' })
+    const value = parse(src, { version: '1.1' })
+    expect(value).toBeInstanceOf(Uint8Array)
+    expect([...value]).toEqual([0, 1, 2, 255])
+
+    const view2 = new Uint8Array(new ArrayBuffer(8), 2, 3)
+    view2.set([5, 6, 7])
+    const src2 = stringify(view2, { version: '1.1' })
+    const value2 = parse(src2, { version: '1.1' })
+    expect([...value2]).toEqual([5, 6, 7])
+  })
+
   test('!!bool', () => {
     const src = `
 canonical: y
