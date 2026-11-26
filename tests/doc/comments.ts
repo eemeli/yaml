@@ -770,6 +770,19 @@ describe('blank lines', () => {
     })
   })
 
+  test('empty block scalar followed by a comment', () => {
+    const src = '|5\n#comment\n'
+    const doc = YAML.parseDocument(src)
+    expect(doc).toMatchObject({ comment: 'comment', value: { value: '' } })
+
+    const res = String(doc)
+    expect(res).toBe('|2\n\n#comment\n')
+    expect(YAML.parseDocument(res)).toMatchObject({
+      comment: 'comment',
+      value: { value: '' }
+    })
+  })
+
   test('before block map values', () => {
     const src = 'a:\n\n  1\nb:\n\n  #c\n  2\n'
     const doc = YAML.parseDocument(src)
